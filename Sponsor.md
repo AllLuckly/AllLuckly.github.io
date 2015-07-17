@@ -12,9 +12,9 @@ path: /images
 </figure>
 
 >
->![(AllLuckly.github.io)](https://github.com/AllLuckly/AllLuckly.github.io/blob/master/images/zjs.jpg?raw=true)<br>
+>![1]({{ page.path }}/zjs.jpg)[](http://allluckly.taobao.com/)<br>
 >[冰之依韩版女装](http://allluckly.taobao.com/)（程序媛福利）
->![1]({{ page.path }}/zjs.jpg)<br>
+>
 >
 >
 
