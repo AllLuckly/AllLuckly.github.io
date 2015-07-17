@@ -1,31 +1,49 @@
 ---
 layout: page
-permalink: /about/
-title: About the Theme
-tags: [Jekyll, theme, modern, minimal, responsive]
+permalink: /about/index.html
+title: ABOUT
+tags: [Bison, 斌少, iOS开发]
 image:
-  feature: abstract-6.jpg
-share: true
+  feature: Hossain-Mohd-Faysal.jpg
 ---
+<figure>
 
-They say three times the charm, so here is another free responsive Jekyll theme for you. I've learned a ton since open sourcing my first two themes [on Github](http://github.com/mmistakes), and wanted to try a few new things this time around. If you've used my previous themes most of this should be familiar territory...
+  <figcaption>静态库般→Me</figcaption>
+</figure>
 
-## What HPSTR brings to the table:
+>iOS软件工程师
+>
+>室内设计爱好者
+>
+>速写爱好者
+>
+>网游爱好者
 
-* Responsive templates for post, page, and post index `_layouts`. Looks great on mobile, tablet, and desktop devices.
-* Gracefully degrads in older browsers. Compatible with Internet Explorer 8+ and all modern browsers.  
-* Modern and minimal design.
-* Sweet animated menu.
-* Background image support.
-* Readable typography to make your words shine.
-* Support for large images to call out your favorite posts.
-* Comments powered by [Disqus](http://disqus.com) if you choose to enable.
-* Simple and clear permalink structure[^1].
-* [Open Graph](https://developers.facebook.com/docs/opengraph/) and [Twitter Cards](https://dev.twitter.com/docs/cards) support for a better social sharing experience.
-* Simple [custom 404 page]({{ site.url }}/404.html) to get you started.
-* Stylesheets for Pygments and Coderay [syntax highlighting]({{ site.url }}/code-highlighting-post/) to make your code examples look snazzy
-* [Grunt](http://gruntjs.com) build script for easy theme development
+我
+喜欢
+做.
 
-<div markdown="0"><a href="{{ site.url }}/theme-setup" class="btn btn-info">Install the Theme</a></div>
 
-[^1]: Example: *domain.com/category-name/post-title*
+*漂亮, 实用, 有意义的东西.*
+
+
+我做我所爱的.
+
+*我爱我所做的.*
+
+
+-----------------------------------------------------
+
+-----------------------------------------------------
+
+> For
+>
+> the makers,
+> 
+> the creators,
+> 
+> the discoverers,
+> 
+> the original thinkers,
+> 
+> ### *This is the space to create.* ###
