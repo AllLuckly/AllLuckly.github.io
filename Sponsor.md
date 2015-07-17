@@ -12,7 +12,7 @@ image:
 </figure>
 
 >
->![(AllLuckly.github.io)](https://github.com/AllLuckly/AllLuckly.github.io/blob/master/z1.jpg?raw=true)<br>
+>![(AllLuckly.github.io)](https://github.com/AllLuckly/AllLuckly.github.io/blob/master/images/zjs.jpg?raw=true)<br>
 >[冰之依韩版女装](http://allluckly.taobao.com/)（程序媛福利）
 >
 >
