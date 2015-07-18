@@ -8,10 +8,14 @@ tags: [Jekyll, HMFAYSAL OMEGA]
 imagefeature: picture-38.jpg
 comments: true
 mathjax: true
+path: /images
 ---
 
 >&quot;iOS开发就像搬运工，当搬到一定境界的时候就可以偷懒了&quot;
 ><small><cite title="Plato">Bison</cite></small>
+
+>![1]({{ page.path }}/zjs.jpg)<br>
+>[冰之依韩版女装](http://allluckly.taobao.com/)（程序媛福利）
 
 最近做的项目需要和安卓的地图同步，安卓没有使用百度地图，而是用的Google Map.<br>
 说实话有点坑，以前没有和安卓端一起做的时候一般用的苹果自带的地图高德的地图或者百度<br>
