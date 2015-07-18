@@ -11,10 +11,12 @@ tags: 【iOS开发之tabview】
 path: /images
 ---
 
-自动计算tabview中label的高度的方法
+
 
 >![1]({{ page.path }}/zjs.jpg)<br>
 >[冰之依韩版女装](http://allluckly.taobao.com/)（程序媛福利）
+
+自动计算tabview中label的高度的方法
 
 {% highlight css %}
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
