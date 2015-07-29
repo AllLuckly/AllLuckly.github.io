@@ -1,10 +1,10 @@
 ---
 layout: post
-title: "iOS开发如何实现长微博的功能"
+title: "iOS开发动画之绕View旋转的View"
 description: "Bison"
 category: 
 headline: Discover the theme elements
-tags: [iOS图片处理]
+tags: [iOS动画]
 imagefeature: picture-35.jpg
 comments: true
 featured: true
