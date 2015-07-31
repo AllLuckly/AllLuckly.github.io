@@ -7,7 +7,7 @@ headline: Discover the theme elements
 tags: [iOS动画]
 imagefeature: picture-35.jpg
 comments: true
-featured: true
+featured: 
 mathjax: true
 path: /images
 ---
