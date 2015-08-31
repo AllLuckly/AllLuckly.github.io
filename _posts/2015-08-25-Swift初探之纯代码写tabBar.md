@@ -7,8 +7,8 @@ headline: Discover the theme elements
 tags: [iOS之Swift初探]
 imagefeature: default_bg7.png
 comments: true
-featured: true
-mathjax: 
+featured: 
+mathjax: true
 path: /images
 ---
 
