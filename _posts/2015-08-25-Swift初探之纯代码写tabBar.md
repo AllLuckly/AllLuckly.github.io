@@ -8,7 +8,7 @@ tags: [iOS之Swift初探]
 imagefeature: default_bg7.png
 comments: true
 featured: true
-mathjax: true
+mathjax: 
 path: /images
 ---
 
