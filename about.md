@@ -21,8 +21,14 @@ image:
 
 -----------------------------------------------------
 
-><figcaption>下面省略10000字吧。。。。</figcaption>
+<figcaption>人生经历此处省略</figcaption>
 
+<figcaption>此处😄省略</figcaption>
 
+<figcaption>此处😄省略</figcaption>
 
-> ### ** ###
+<figcaption>此处😄省略</figcaption>
+
+<figcaption>此处😄省略</figcaption>
+
+<figcaption>此处😄省略</figcaption>
