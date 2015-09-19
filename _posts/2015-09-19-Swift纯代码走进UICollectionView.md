@@ -51,6 +51,7 @@ override func viewDidLoad() {
     colltionView?.dataSource = self;
 
     colltionView?.backgroundColor = UIColor.whiteColor()
+    //设置每一个cell的宽高
     layout.itemSize = CGSizeMake((width-30)/2, 250)
     self.view .addSubview(colltionView!)
     self .getData()
@@ -190,9 +191,12 @@ required init(coder aDecoder: NSCoder) {
 接下来就看我的了<br>
 我们点到我们继承的`UICollectionReusableView`里面去看里面有些什么方法<br>
 功夫不负有心人，😄终于找到了一个可以让我们用的方法<br>
-`override func applyLayoutAttributes(layoutAttributes: UICollectionViewLayoutAttributes!){
+{% highlight css %}
+override func applyLayoutAttributes(layoutAttributes: UICollectionViewLayoutAttributes!){
 
-}`
+}
+{% endhighlight %}
+
 我们可以把要自定义的UI 请求数据什么的都放这方法里面<br>
 也就相当于我们VC里面的`override func viewDidLoad()`这个方法<br>
 教程到结束<br>
@@ -205,7 +209,7 @@ required init(coder aDecoder: NSCoder) {
 
 <br>
  >最终效果图如下<br>
-![(LBPersonalPageDemo)](https://github.com/AllLuckly/LBPersonalPageDemo/blob/master/123.gif?raw=true)<br><br><br>
+![(LBPersonalPageDemo)](https://github.com/AllLuckly/AllLuckly.github.io/blob/master/images/blog/Swift_CollTionView.gif?raw=true)<br><br><br>
 
 
 
