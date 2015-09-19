@@ -202,7 +202,7 @@ override func applyLayoutAttributes(layoutAttributes: UICollectionViewLayoutAttr
 教程到结束<br>
 有任何问题可以留言，定期抽时间回复<br>
 
-版权所有归©Bison本人所有 任何转载请标明出处！
+版权归©Bison所有 任何转载请标明出处！
 
  > [更多经验请点击](http://www.allluckly.cn/)
 
