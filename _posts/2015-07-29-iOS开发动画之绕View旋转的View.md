@@ -25,7 +25,7 @@ path: /images
 
 下面请看代码<br>
 
- > [更多经验请点击](http://allluckly.cf/) 
+ > [更多经验请点击](http://www.allluckly.cn/) 
 
 核心代码
 {% highlight css %}
