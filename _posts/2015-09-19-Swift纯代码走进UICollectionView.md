@@ -7,7 +7,7 @@ headline: Discover the theme elements
 tags: [iOS之Swift初探]
 imagefeature: default_bg.jpg
 comments: true
-featured: true
+featured: 
 mathjax: true
 path: /images
 ---
