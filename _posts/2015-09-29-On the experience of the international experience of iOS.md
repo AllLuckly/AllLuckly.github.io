@@ -70,7 +70,7 @@ iOS多国语言国际化由于我个人也是第一次做，所以遇到了很�
 能怎么办呢？当然是改代码咯。。。。下面是改过的代码<br>
 
 {% highlight css %}
-//判断是否为中文简体
+//判断是否为中文简体，注意这里的containsString：是iOS8的方法，需要判断下哦
 - (BOOL)isSimpleChinese
 {
     NSString *language = [[NSLocale preferredLanguages] firstObject];
