@@ -1,7 +1,6 @@
 ---
 layout: page
-<!--permalink: /about/index.html-->
-permalink: about.allluckly.cn
+permalink: /about/index.html
 title: ABOUT
 tags: [Bison, 斌少, iOS开发]
 image:
