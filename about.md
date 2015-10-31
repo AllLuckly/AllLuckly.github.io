@@ -1,9 +1,8 @@
 ---
 layout: page
-<!--permalink: /about/index.html-->
-permalink: about.allluckly.cn/index.html
+permalink: /about/index.html
 title: ABOUT
-tags: [Bison, 斌少, iOS开发]
+tags: [Bison, 斌少, iOS开发，allluckly.cn,iOS开发技巧，iOS开发博客]
 image:
   feature: Hossain-Mohd-Faysal.jpg
 ---
