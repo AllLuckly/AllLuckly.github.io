@@ -2,9 +2,9 @@
 layout: post
 title: "iOS开发动画之绕View旋转的View"
 description: "Bison"
-category: 
+category: iOS动画
 headline: Discover the theme elements
-tags: [iOS动画]
+tags: [iOS动画，iOS开发技巧，iOS开发，技术博客]
 imagefeature: picture-35.jpg
 comments: true
 featured: 

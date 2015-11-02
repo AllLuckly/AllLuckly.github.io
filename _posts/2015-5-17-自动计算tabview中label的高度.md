@@ -1,13 +1,13 @@
 ---
 layout: post
 published: true
-title: 【iOS开发】自动计算tabview中label的高度
+title: iOS开发自动计算tabview中label的高度
 mathjax: false
 featured: true
 comments: true
 headline: Making blogging easier for masses
-category: 
-tags: 【iOS开发之tabview】
+category: UITabView
+tags: [iOS开发，UITabView，iOS开发技巧，技术博客]
 path: /images
 ---
 

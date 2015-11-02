@@ -2,9 +2,9 @@
 layout: post
 title: "iOS使用Google地图Api创建的地图显示标注及轨迹回放"
 description: "Bison"
-category: 
+category: 地图
 headline: Discover the theme elements
-tags: [Jekyll, HMFAYSAL OMEGA]
+tags: [iOS开发地图, Google地图，iOS开发技巧，技术博客]
 imagefeature: picture-38.jpg
 comments: true
 mathjax: true

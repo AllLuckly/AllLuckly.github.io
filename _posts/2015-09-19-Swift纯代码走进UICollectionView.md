@@ -4,7 +4,7 @@ title: "Swift纯代码走进UICollectionView"
 description: "Bison"
 category: iOS之Swift初探
 headline: Discover the theme elements
-tags: [iOS之Swift初探]
+tags: [Swift，UICollectionView，Swift代码，iOS开发技巧，技术博客]
 imagefeature: default_bg.jpg
 comments: true
 featured: 

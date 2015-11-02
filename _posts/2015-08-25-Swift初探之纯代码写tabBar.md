@@ -2,9 +2,9 @@
 layout: post
 title: "Swift初探之纯代码写tabBar"
 description: "Bison"
-category: 
+category: Swift
 headline: Discover the theme elements
-tags: [iOS之Swift初探]
+tags: [Swift纯代码，swift tabBar，iOS开发技巧，swift自学，技术博客]
 imagefeature: default_bg7.png
 comments: true
 featured: 

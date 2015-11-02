@@ -1,10 +1,10 @@
 ---
 layout: post
-title: 【iOS开发】CocoaPods安装及使用
-description: "Its ON, baby"
+title: iOS开发CocoaPods安装及使用
+description: "Bison"
 headline: ""
-categories: 【iOS开发之第三方框架】
-tags: 【iOS开发之第三方框架】
+categories: CocoaPods
+tags: [CocoaPods，iOS开发，iOS开发技巧，技术博客]
 imagefeature: ""
 imagecredit: 
 imagecreditlink: ""

@@ -4,7 +4,7 @@ title: "iOS开发之多国语言国际化经验浅谈"
 description: "Bison"
 category: iOS之国际化
 headline: Discover the theme elements
-tags: [iOS之国际化]
+tags: [iOS开发国际化，iOS开发本地化，iOS开发技巧，iOS开发，技术博客]
 imagefeature: default_bg.jpg
 comments: true
 featured: 
