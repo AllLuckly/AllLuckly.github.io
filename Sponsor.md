@@ -4,7 +4,7 @@ permalink: /Sponsor/index.html
 title: 赞助商
 tags: [Bison, 斌少, iOS开发]
 image:
-path: /images  
+path:   
 ---
 <figure>
 
