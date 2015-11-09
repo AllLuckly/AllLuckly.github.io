@@ -44,7 +44,7 @@ path: /images/blog/Alamofire
 
 接着我们要把`Alamofire`的静态库加到工程里面来，具体操作如下图
 
-![5]({{ page.path }}/5.jpg)<br>
+![5]({{ page.path }}/5.png)<br>
 
 再然后呢，我们导入`Alamofire`的头文件，运行下，看是否报错，不报错呢，我们导入的文件配置工程就是对的！
 ####PS
