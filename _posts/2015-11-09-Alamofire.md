@@ -7,7 +7,7 @@ headline: Discover the theme elements
 tags: [Swift2.0，Alamofire，iOS开发，iOS开发技巧，技术博客]
 imagefeature: BG.jpg
 comments: true
-featured: true
+featured: 
 mathjax: true
 path: /images/blog/Alamofire
 ---
