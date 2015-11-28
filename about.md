@@ -5,6 +5,8 @@ title: ABOUT
 tags: [Bison, 程序员, iOS开发，allluckly.cn,iOS开发技巧，iOS开发博客]
 image:
   feature: Hossain-Mohd-Faysal.jpg
+
+path: /images
 ---
 <figure>
 
