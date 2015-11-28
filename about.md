@@ -29,4 +29,4 @@ path: /images
 
 >扫码下载该博客`APP`<br>
 <br>
->![1]({{ page.path }}/app.png)
+>![(i)](https://github.com/AllLuckly/AllLuckly.github.io/blob/master/images/app.png?raw=true)
