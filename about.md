@@ -27,5 +27,5 @@ path: /images
 
 <figcaption></figcaption>
 
->扫码下载该博客`APP`
-![1]({{ page.path }}/app.png)
+>扫码下载该博客`APP`<br>
+>![1]({{ page.path }}/app.png)
