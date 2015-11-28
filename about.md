@@ -25,7 +25,7 @@ path: /images
 
 
 
-<figcaption>刘斌，性别：男，姑且不说爱好女了哈。。。😄，思维敏捷，学习能力倍儿棒</figcaption>
+<figcaption></figcaption>
 
-扫码下载该博客`APP`<br>
+>扫码下载该博客`APP`
 ![1]({{ page.path }}/app.png)
