@@ -21,11 +21,9 @@ image:
 
 -----------------------------------------------------
 
->关于我
+
 
 <figcaption>刘斌，性别：男，姑且不说爱好女了哈。。。😄，思维敏捷，学习能力倍儿棒</figcaption>
 
-<figcaption>OC/SWIFT/MAC 开发都没任何问题</figcaption>
-
-<figcaption>最近在找工作，坐标：深圳，有朋友公司需要人的可以拉我过去哦！</figcaption>
-
+扫码下载该博客`APP`<br>
+![1]({{ page.path }}/app.png)
