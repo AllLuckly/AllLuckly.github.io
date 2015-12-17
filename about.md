@@ -27,6 +27,6 @@ path: /images
 
 <figcaption></figcaption>
 
->扫码下载该博客`APP`<br>
-<br>
->![(i)](https://github.com/AllLuckly/AllLuckly.github.io/blob/master/images/app.png?raw=true)
+>[点击--o.0--下载该博客APP](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
+
+
