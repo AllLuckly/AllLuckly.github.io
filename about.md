@@ -26,7 +26,7 @@ path: /images
 
 
 <figcaption></figcaption>
-
+![4]({{ page.path }}/appicon.png)<br>
 >[点击--o.0--下载该博客APP](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
 
 
