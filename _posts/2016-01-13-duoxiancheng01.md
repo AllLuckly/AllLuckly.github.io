@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Bison眼中的iOS开发多线程是这样的（一）"
-description: "Biosn"
+description: "Bison"
 category: 多线程
 headline: Discover the theme elements
 tags: [多线程，NSThread，NSOperationQueue，GCD，技术博客]
