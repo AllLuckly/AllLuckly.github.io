@@ -7,7 +7,7 @@ headline: Discover the theme elements
 tags: [多线程，NSThread，NSOperationQueue，GCD，技术博客]
 imagefeature: BG2.jpg
 comments: true
-featured: 
+featured: true
 mathjax: true
 path: /images
 ---
