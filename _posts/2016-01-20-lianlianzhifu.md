@@ -23,9 +23,7 @@ path: /images
 
 > 2. 添加头文件引用<br>
 
-> 3. 设置link标志<br>
-
-> Target->Build Setting ，Other Linker Flags 设置为 -all_load
+> 3. 设置link标志Target->Build Setting ，Other Linker Flags 设置为 -all_load
 可能添加-all_load以后和其他库冲突，可以尝试使用 -force_load 单独load库, force_load后面跟的是 lib库的完整路径
 -force_load $(SRCROOT)/***/libPaySdkColor.a (****需要按照你的库放置的路径决定)<br>
 
@@ -137,8 +135,6 @@ Demo中的输入项，是用来测试各种支付条件，包括认证支付（�
 解释：签名有特定规则，订单里面的特定参数参与签名。<br>
 应对：ios最新的Demo中提供了payUtil函数，直接调用，就能生成签名正确的订单。然后再次提醒，我们墙裂建议商户在服务器端完成签名操作。<br>
 <br>
-
-
 ### 支付成功之后，不需要做额外的处理，后台那边通过回调地址已提交了，但集成的时候字典里边传的notify_url为服务器的回调地址，此地址为后台人员集成连连支付时给。<br>
 
 ----------------------------------------------------------
