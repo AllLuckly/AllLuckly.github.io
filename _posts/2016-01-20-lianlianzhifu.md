@@ -19,15 +19,15 @@ path: /images
 
 前面简单的集成没有遇到什么坑，在此整理一下官方的集成文档，具体步骤如下<br>
 
-> 1. 导入文件<br>
+>  导入文件<br>
 
-> 2. 添加头文件引用<br>
+>  添加头文件引用<br>
 
-> 3. 设置link标志Target->Build Setting ，Other Linker Flags 设置为 -all_load
+>  设置link标志Target->Build Setting ，Other Linker Flags 设置为 -all_load
 可能添加-all_load以后和其他库冲突，可以尝试使用 -force_load 单独load库, force_load后面跟的是 lib库的完整路径
 -force_load $(SRCROOT)/***/libPaySdkColor.a (****需要按照你的库放置的路径决定)<br>
 
-> 4. 调用sdk显示，注意retain，自动释放以后，调用后会崩溃<br>
+>  调用sdk显示，注意retain，自动释放以后，调用后会崩溃<br>
 
 ```
 self.sdk = [[[LLPaySdk alloc] init] autorealse]; // 创建
@@ -36,7 +36,7 @@ NSDictionary* signedDic = [payUtil signedOrderDic:orderParam andSignKey:md5key_o
 [self.sdk presentPaySdkInViewController:rootVC withTraderInfo:signedDic];
 ```
 
-> 5. 编写结果回调<br>
+>  编写结果回调<br>
 
 ```
 // 订单支付结果返回，主要是异常和成功的不同状态
