@@ -17,9 +17,6 @@ path: /images
 
 <br>
 
-![1]({{ page.path }}/blog/tuogao/tougao07/1.gif)<br>
-
-
 前面简单的集成没有遇到什么坑，在此整理一下官方的集成文档，具体步骤如下<br>
 
 > 1. 导入文件<br>
@@ -47,6 +44,7 @@ NSDictionary* signedDic = [payUtil signedOrderDic:orderParam andSignKey:md5key_o
 // 订单支付结果返回，主要是异常和成功的不同状态
 - (void)paymentEnd:(LLWalletPayResult)resultCode withResultDic:(NSDictionary *)dic
 ```
+<br>
 
 ####SDK可配置部分<br>
 
@@ -60,6 +58,7 @@ iOS SDK可以通过修改资源bundle进行定制， 因为是在bundle里面，
 
 导航栏颜色：替换shoushi3.png文件，以及修改css文件中NavBar字段（后面只表示字段，都是在default.css文件中）中的background-color
 导航栏标题：NavBar字段中的titleIconName; titleText<br>
+<br>
 
 #### 注意有点坑的是这里，这是非第一次付款时弹出框的定制，框子的背景不能改，只能修改下颜色来和app搭配下<br>
 
@@ -79,19 +78,19 @@ iOS SDK可以通过修改资源bundle进行定制， 因为是在bundle里面，
 修改后是这样的：<br>
 
 ![4]({{ page.path }}/blog/lianlianzhifu02.png)<br>
-
-
+<br>
 
 ####参数字段部分<br>
 
 参数说明在demo中有，可以参考。字段名和wap不一致，请参考demo中的参数说明，参数中的user_id 不是商户号，是商户自己体系中的用户编号，前置卡输入时，no_agree是通过API查询得到的绑卡序号
+<br>
 
 ####使用部分<br>
 
 Demo中的输入项，是用来测试各种支付条件，包括认证支付（输入姓名，身份证），前置支付（输入卡号，协议号）。不是必须，请根据自己的支付方式测试。
 支持银行数量，是根据支付类型以及商户来，可以配置，请联系运营。
 支付的验密方式（短信，手势码，支付密码）需要通过我们的服务器人员配置的，请联系相关服务器对接人员。
-
+<br>
 
 ####常见问题<br>
 
@@ -136,9 +135,9 @@ Demo中的输入项，是用来测试各种支付条件，包括认证支付（�
 4、签名验证不对<br>
 解释：签名有特定规则，订单里面的特定参数参与签名。<br>
 应对：ios最新的Demo中提供了payUtil函数，直接调用，就能生成签名正确的订单。然后再次提醒，我们墙裂建议商户在服务器端完成签名操作。<br>
+<br>
 
-
-支付成功之后，不需要做额外的处理，后台那边通过回调地址已提交了，但集成的时候字典里边传的notify_url为服务器的回调地址，此地址为后台人员集成连连支付时给。<br>
+#### 支付成功之后，不需要做额外的处理，后台那边通过回调地址已提交了，但集成的时候字典里边传的notify_url为服务器的回调地址，此地址为后台人员集成连连支付时给。<br>
 
 ----------------------------------------------------------
 
