@@ -142,12 +142,11 @@ Demo中的输入项，是用来测试各种支付条件，包括认证支付（�
 
 > [博主app上线啦，快点此来围观吧](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
 
-> [更多经验请点击](http://allluckly.cn/)<br>
+> 好文推荐：[iOS开发之CollectionViewFlowLayout实现LOL皮肤选择动画](http://allluckly.cn/投稿/tuogao07/)<br>
 
-好文推荐：[Bison眼中的iOS开发多线程是这样的（一）](http://allluckly.cn/多线程/duoxiancheng01/)<br>
+> 原文地址：[http://allluckly.cn](http://allluckly.cn)<br>
 
-
-
+版权归©Bison所有 如需转载请保留原文超链接地址！否则后果自负！
 
 
 
