@@ -46,7 +46,6 @@ NSDictionary* signedDic = [payUtil signedOrderDic:orderParam andSignKey:md5key_o
 ```
 <br>
 
-
 ###SDK可配置部分<br>
 
 iOS SDK可以通过修改资源bundle进行定制， 因为是在bundle里面，请在修改好以后clean proj，这样才会生效。<br>
@@ -60,7 +59,6 @@ iOS SDK可以通过修改资源bundle进行定制， 因为是在bundle里面，
 导航栏颜色：替换shoushi3.png文件，以及修改css文件中NavBar字段（后面只表示字段，都是在default.css文件中）中的background-color
 导航栏标题：NavBar字段中的titleIconName; titleText<br>
 <br>
-
 
 ### 注意有点坑的是这里，这是非第一次付款时弹出框的定制，框子的背景不能改，只能修改下颜色来和app搭配下<br>
 
@@ -82,13 +80,12 @@ iOS SDK可以通过修改资源bundle进行定制， 因为是在bundle里面，
 ![4]({{ page.path }}/blog/lianlianzhifu02.png)<br>
 <br>
 
-
 ###参数字段部分<br>
 
 参数说明在demo中有，可以参考。字段名和wap不一致，请参考demo中的参数说明，参数中的user_id 不是商户号，是商户自己体系中的用户编号，前置卡输入时，no_agree是通过API查询得到的绑卡序号
 <br>
 
-####使用部分<br>
+##使用部分<br>
 
 Demo中的输入项，是用来测试各种支付条件，包括认证支付（输入姓名，身份证），前置支付（输入卡号，协议号）。不是必须，请根据自己的支付方式测试。
 支持银行数量，是根据支付类型以及商户来，可以配置，请联系运营。
@@ -104,7 +101,7 @@ Demo中的输入项，是用来测试各种支付条件，包括认证支付（�
 
 答：sdk没有retain保管。<br>
 
-> 2、sdk中使用了类扩展，请在other link flag中添加 -all_load<br><br>
+> 2、sdk中使用了类扩展，请在other link flag中添加 -all_load<br>
 
 > 3、提示初始化错误<br>
 
