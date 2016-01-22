@@ -7,7 +7,7 @@ headline: Discover the theme elements
 tags: [连连支付，自定义，iOS开发，iOS支付，集成支付]
 imagefeature: BG2.jpg
 comments: true
-featured: true
+featured: 
 mathjax: true
 path: /images
 ---
