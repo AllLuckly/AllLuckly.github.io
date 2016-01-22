@@ -138,6 +138,34 @@ Demo中的输入项，是用来测试各种支付条件，包括认证支付（�
 
 ### 支付成功之后，不需要做额外的处理，后台那边通过回调地址已提交了，但集成的时候字典里边传的notify_url为服务器的回调地址，此地址为后台人员集成连连支付时给。<br>
 
+后面持续遇到到坑有必需申请商户产品配置表如下图：
+
+![3]({{ page.path }}/blog/lianlianzhifu04.jpg)<br>
+
+还有连连通银商户配置表如下图：
+
+![3]({{ page.path }}/blog/lianlianzhifu03.png)<br>
+
+最最坑爹的是“风险控制参数”，需要8个之多，而demo才写了一个，也没说要写其他的，参数如下：<br>
+
+```
+/*
+frms_ware_category  *商品类目(固定2009)
+user_info_mercht_userno 商户用户唯一标识（token）
+user_info_bind_phone 绑定手机号(已有)
+user_info_dt_register 注册时间
+user_info_full_name  用户注册姓名（认证姓名）
+user_info_id_no 用户注册证件号码
+user_info_identify_state 是否实名认证 1是0非
+user_info_identify_type 实名认证方式
+*/
+
+
+```
+
+
+
+
 ----------------------------------------------------------
 
 > [博主app上线啦，快点此来围观吧](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
@@ -147,6 +175,9 @@ Demo中的输入项，是用来测试各种支付条件，包括认证支付（�
 > 原文地址：[http://allluckly.cn](http://allluckly.cn)<br>
 
 版权归©Bison所有 如需转载请保留原文超链接地址！否则后果自负！
+
+
+
 
 
 
