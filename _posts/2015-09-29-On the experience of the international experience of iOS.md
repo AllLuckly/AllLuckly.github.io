@@ -96,6 +96,7 @@ iOS多国语言国际化由于我个人也是第一次做，所以遇到了很�
 
 版权归©Bison所有 任何转载请标明出处！<br>
 
+> [博主app上线了，赶紧点此来围观吧😄](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
 
  > [更多经验请点击](http://www.allluckly.cn/)
 

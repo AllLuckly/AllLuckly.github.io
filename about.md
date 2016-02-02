@@ -21,12 +21,13 @@ path: /images
 >
 >网游爱好者
 
+
+<figcaption>个人作品展</figcaption>
+
 -----------------------------------------------------
 
 
 
-<figcaption></figcaption>
 ![4]({{ page.path }}/appicon.png)<br>
->[点击--o.0--下载该博客APP](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
-
+----------[IT Blog](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)----------<br>
 

@@ -73,7 +73,9 @@ pod "SDWebImage", "~> 2.0"  `
 新增一个值`"${SRCROOT}"`，并且选择`\”Recursive\”`，这样xcode就会在项目目录中递归搜索文件
 自动补齐功能马上就好使了。
 
-你也许会郁闷，为什么会出现.xcworkspace文件呢。这正是你刚刚运行`$ pod install`命令产生的新文件。除了这个文件，你会发现还多了另外一个文件“Podfile.lock”和一个文件夹“Pods”。
+你也许会郁闷，为什么会出现.xcworkspace文件呢。这正是你刚刚运行`$ pod install`命令产生的新文件。除了这个文件，你会发现还多了另外一个文件“Podfile.lock”和一个文件夹“Pods”。<br>
+
+> [博主app上线了，赶紧点此来围观吧😄](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
 
 
 
