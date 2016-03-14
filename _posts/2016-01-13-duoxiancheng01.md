@@ -295,7 +295,7 @@ NSThread* thread;
 {% endhighlight %}
 今天暂时写到这吧....，有点长了😄
 
-> [Bison眼中的iOS开发多线程是这样的（二）](http://allluckly.cn/多线程/duoxiancheng02/)
+> [Bison眼中的iOS开发多线程是这样的（二）](http://allluckly.cn/多线程/duoxiancheng02)
 
 ----------------------------------------------------------
 
@@ -303,7 +303,7 @@ NSThread* thread;
 
 > 原文地址：[http://allluckly.cn](http://allluckly.cn)<br>
 
-好文推荐：[详解持久化Core Data框架的原理以及使用](http://allluckly.cn/持久化/chijiuhua01/)<br>
+好文推荐：[详解持久化Core Data框架的原理以及使用](http://allluckly.cn/持久化/chijiuhua01)<br>
 
 版权归©Bison所有 如需转载请保留原文超链接地址！否则后果自负！
 

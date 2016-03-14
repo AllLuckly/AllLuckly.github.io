@@ -170,7 +170,7 @@ user_info_identify_type 实名认证方式
 
 > [博主app上线啦，快点此来围观吧](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
 
-> 好文推荐：[iOS开发之CollectionViewFlowLayout实现LOL皮肤选择动画](http://allluckly.cn/投稿/tuogao07/)<br>
+> 好文推荐：[iOS开发之CollectionViewFlowLayout实现LOL皮肤选择动画](http://allluckly.cn/投稿/tuogao07)<br>
 
 > 原文地址：[http://allluckly.cn](http://allluckly.cn)<br>
 
