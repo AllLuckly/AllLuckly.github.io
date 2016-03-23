@@ -29,8 +29,8 @@ path: /images
 
 
 
-> 1. [IT Blog](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
+> . [IT Blog](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
 
-> 2. [新华字典](https://itunes.apple.com/cn/app/xin-hua-zi-dian-hai-liang/id1090457290?l=en&mt=8)<br>
+> . [新华字典](https://itunes.apple.com/cn/app/xin-hua-zi-dian-hai-liang/id1090457290?l=en&mt=8)<br>
 
-> 3. [吾爱站长](https://itunes.apple.com/us/app/wu-ai-zhan-zhang-zhan-zhang/id1093020396?mt=8)<br>
+> . [吾爱站长](https://itunes.apple.com/us/app/wu-ai-zhan-zhang-zhan-zhang/id1093020396?mt=8)<br>
