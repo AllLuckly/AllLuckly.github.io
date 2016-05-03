@@ -16,7 +16,7 @@ path: /images
 
 由此自己简单的封装了该功能，下面我们先看看效果图：<br>
 
-![1]({{ page.path }}/blog/1.png)<br>
+![1]({{ page.path }}/blog/LBAppStoreReview/1.png)<br>
 
 弹出试图并没有做什么处理，就是系统的8.0以前用的`UIAlertView`8.0以上用的`UIAlertController`<br>
 
