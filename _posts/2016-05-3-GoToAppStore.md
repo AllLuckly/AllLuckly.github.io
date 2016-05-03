@@ -287,6 +287,8 @@ path: /images
 
 如对你有帮助，请不要吝惜你的star哦！<br>
 
+版权归©Bison所有 如需转载请保留原文超链接地址！否则后果自负！
+
 ----------------------------------------------------------
 
 > [学习iOS开发的app上线啦，点此来围观吧](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
