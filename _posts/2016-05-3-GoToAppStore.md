@@ -7,7 +7,7 @@ headline: Discover the theme elements
 tags: [appstore，评论，aso优化，iOS开发]
 imagefeature: 
 comments: true
-featured: true
+featured: 
 mathjax: true
 path: /images
 ---
