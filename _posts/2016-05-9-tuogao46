@@ -1,0 +1,105 @@
+---
+layout: post
+title: "iOS开发之集成ijkplayer视频直播"
+description: "jianshu_wl"
+category: 投稿
+headline: Discover the theme elements
+tags: [遮罩动画, iOS开发, 碎片动画]
+imagefeature: 
+comments: true
+featured: true
+mathjax: 
+path: /images
+---
+
+编辑：[Bison](http://allluckly.cn)<br>
+投稿：[jianshu_wl](http://www.jianshu.com/p/1f06b27b3ac0)<br>
+
+ijkplayer 是一款做视频直播的框架, 基于ffmpeg, 支持 Android 和 iOS, 网上也有很多集成说明, 但是个人觉得还是不够详细, 在这里详细的讲一下在 iOS 中如何集成ijkplayer, 即便以前从没有接触过, 按着下面做也可以集成成功!
+
+一. 下载ijkplayer
+[ijkplayer下载地址](https://github.com/Bilibili/ijkplayer)
+下载完成后解压, 解压后文件夹内部目录如下图:
+
+
+ijkplayer-master文件夹内容.png
+二. 编译 ijkplayer
+说是编译 ijkplayer, 其实是编译 ffmpeg, 在这里我们已经下载好了ijkplayer, 所以 github 上README.md中的Build iOS那一步中有一些步骤是不需要的.
+下面开始一步一步编译:
+1.打开终端, cd 到jkplayer-master文件夹中, 也就是下载完解压后的文件夹, 如下图:
+
+
+进入到这个文件夹
+2.执行命令行./init-ios.sh, 这一步是去下载 ffmpeg 的, 时间会久一点, 耐心等一下.如下图:
+
+
+3.在第2步中下载完成后, 执行cd ios, 也就是进入到 ios目录中, 如下图:
+
+
+进入ios 文件夹
+4.进入 ios 文件夹后, 在终端依次执行./compile-ffmpeg.sh clean和./compile-ffmpeg.sh all命令, 编译 ffmpeg, 也就是README.md中这两步, 如下图:
+
+
+编译 ffmpeg
+编译时间较久, 耐心等待一下.
+
+三. 打包IJKMediaFramework.framework框架
+集成 ijkplayer 有两种方法:
+一种方法是按照IJKMediaDemo工程中那样, 直接导入工程IJKMediaPlayer.xcodeproj, 在这里不做介绍, 如下图:
+
+
+导入IJKMediaPlayer.xcodeproj
+第二种集成方法是把 ijkplayer 打包成framework导入工程中使用. 下面开始介绍如何打包IJKMediaFramework.framework, 按下面步骤开始一步一步做:
+
+首先打开工程IJKMediaPlayer.xcodeproj, 位置如下图:
+
+
+打开后是这样的, 如下图:
+
+
+要打包的 framework 工程.png
+2.工程打开后设置工程的 scheme, 具体步骤如下图:
+
+
+第一步.png
+
+第二步.png
+3.设置好 scheme 后, 分别选择真机和模拟器进行编译, 编译完成后, 进入 Finder, 如下图:
+
+
+进入 Finder 后, 可以看到有真机和模拟器两个版本的编译结果, 如下图:
+
+
+运行后生成的文件.png
+下面开始合并真机和模拟器版本的 framework, 注意不要合并错了, 合并的是这个文件, 如下图:
+
+
+合并真机和模拟器文件中的这个文件.png
+打开终端, 进行合并, 命令行具体格式为:
+
+lipo -create "真机版本路径" "模拟器版本路径" -output "合并后的文件路径"
+合并后如下图:
+
+
+合并生成后的文件.png
+下面很重要, 需要用合并后的IJKMediaFramework把原来的IJKMediaFramework替换掉, 如下图, 希望你能看懂:
+
+
+用合并生成的文件替换原来的文件.png
+上图中的1、2两步完成后, 绿色框住的那个IJKMediaFramework.framework文件就是我们需要的框架了, 可以复制出来, 稍后我们需要导入工程使用.
+
+四. iOS工程中集成ijkplayer
+新建工程, 导入合并后的IJKMediaFramework.framework以及相关依赖框架以及相关依赖框架,如下图:
+
+
+导入 framework及依赖框架.png
+导入框架后, 在ViewController.m进行测试, 首先导入IJKMediaFramework.h头文件, 编译看有没有错, 如果没有错说明集成成功.
+接着开始在ViewController.m文件中使用IJKMediaFramework框架进行测试使用, 写一个简单的直播视频进行测试, 在这里看一下运行后的结果, 后面会放上 Demo 供下载.
+
+
+香港卫视直播画面
+至此, ijkplayer 集成完毕!
+
+[Demo地址下载地址](https://coding.net/u/wanglei123/p/ijkplayerDemo/git)
+
+
