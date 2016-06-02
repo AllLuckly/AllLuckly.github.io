@@ -1,0 +1,396 @@
+---
+layout: post
+title: "iOS开发之从源代码看OC的消息机制runtime"
+description: "Sindri"
+category: 投稿
+headline: Discover the theme elements
+tags: [runtime, iOS开发, 消息机制]
+imagefeature: 
+comments: true
+featured: true
+mathjax: 
+path: /images
+---
+
+
+前言
+移动端的数据持久化存储方法有很多种:fmdb、coredata、realm(很强大)、archive(归档)等等...
+众所周知，sql系列只能存储基本数据类型，不支持直接存储Object对象类型。realm虽然支持存储Object对象，但是对于已经在使用sql系列的项目来说替换成本还是挺高的。
+所以我觉得当你使用sql类型来存储数据但是又想存储少量的Object对象，或者App仅仅需要少量的数据存储的时候是完全可以使用归档来满足你的需求的。
+所以我封装了WZXArchiver来帮我无脑归、解档。顺便分享我是怎么封装的,如果你有更好的做法或者意见欢迎评论!。
+
+WZXArchiver已实现功能:
+
+基本数据的自动归、解档。
+包含对象的对象的自动归、解档(解档有点不完美)。
+清除所有的归档。(这里不讲)
+正文
+要封装一个自动归档、解档类，首先我们知道归档的基本使用.
+
+归档的基本使用
+创建一个NSObject对象: ManModel，它有两个成员变量NSString类型的name、NSInteger类型的age。
+
+@interface ManModel : NSObject
+
+@property(nonatomic,copy)NSString * name;
+@property(nonatomic,assign)NSInteger age;
+
+@end
+在.m中实现<NSCoding>的协议方法(所有原生的类都是实现了NSCoding协议的，所以你不用在@interface ManModel : NSObject后面加上<NSCoding>)
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {  
+    [aCoder encodeObject:self.name forKey:@"name"];  
+    [aCoder encodeInteger:self.age forKey:@"age"];  
+}  
+
+- (id)initWithCoder:(NSCoder *)aDecoder {  
+    if (self = [super init]) {  
+        self.name = [aDecoder decodeObjectForKey:kNameKey];  
+        self.age = [aDecoder decodeIntegerForKey:kAgeKey];
+    }  
+    return self;  
+}
+然后就可以开始归档了:
+
+//归档
+[NSKeyedArchiver archiveRootObject:你要归档的对象 toFile:@"地址"];
+
+//解档
+[NSKeyedUnarchiver unarchiveObjectWithFile:@"地址"];
+如何封装一个自动归档、解档类
+首先肯定是创建一个NSObject的类别
+为什么用类别又不是创建一个工具类?
+
+因为用类别可以少很多参数。
+可以重写<NSCoding>的协议方法来实现自动归、解档。
+添加方法
+/**
+ *  通过自定的名字归档
+ *
+ *  @param name 名字
+ *
+ *  @return 是否成功
+ */
+- (BOOL)wzx_archiveToName:(NSString *)name;
+
+/**
+ *  通过之前归档的名字解档
+ *
+ *  @param name 名字
+ *
+ *  @return 解档的对象
+ */
++ (id)wzx_unArchiveToName:(NSString *)name;
+这里一定要传入一个算是标识符的字符串，因为我归档的时候要以它为文件名WZX_类名_标识符.archiver,解档的时候再根据这个字符串去解档。
+
+获取对象的成员变量
+要实现自动xxx，基本上是要用到runtime的，这里也不例外。
+不过这里有一点要注意一下:我把获取对象成员变量的方法单独放在一个类别里，提高复用性。
+
+获取对象的成员变量的流程:
+
+创建类别#import "NSObject+WZXProperties.h"
+导入头文件 #import <objc/runtime.h>
+获取成员变量
+
+- (NSArray *)wzx_allProperty {
+NSMutableArray * propertyArr = [NSMutableArray array];
+
+unsigned int outCount;
+
+objc_property_t * properties = class_copyPropertyList([self class], &outCount);
+
+for (int i = 0; i < outCount; i++) {
+    objc_property_t property = properties[i];
+
+    NSString *propertyName = [[NSString alloc] initWithCString:property_getName(property) encoding:NSUTF8StringEncoding] ;
+
+    NSString * propertyType = [[NSString alloc] initWithCString:property_getAttributes(property) encoding:NSUTF8StringEncoding] ;
+
+    [propertyArr addObject:@{
+                               @"name":propertyName,
+                               @"type":[self judgementType:propertyType]
+                               }];
+}
+
+free(properties);
+
+return propertyArr;
+}
+这里可以看到，我返回的是一个字典数组，每个字典包含name(变量名)和type(变量类型)。变量类型肯定是要根据attributes来判断的:
+
+- (NSString *)judgementType:(NSString *)attributes {
+if ([attributes hasPrefix:@"T"]) {
+
+    if ([attributes hasPrefix:@"T@"]) {
+        if ([attributes hasPrefix:@"T@\\\\"NSString\\\\""]) {
+            return @"NSString";
+        } else if([attributes hasPrefix:@"T@\\\\"NSDictionary\\\\""]) {
+            return @"NSDictionary";
+        } else if([attributes hasPrefix:@"T@\\\\"NSArray\\\\""]) {
+            return @"NSArray";
+        } else if([attributes hasPrefix:@"T@\\\\"NSMutableString\\\\""]) {
+            return @"NSMutableString";
+        } else if([attributes hasPrefix:@"T@\\\\"NSMutableDictionary\\\\""]) {
+            return @"NSMutableDictionary";
+        } else if([attributes hasPrefix:@"T@\\\\"NSMutableArray\\\\""]) {
+            return @"NSMutableArray";
+        } else if([attributes hasPrefix:@"T@\\\\"NSData\\\\""]) {
+            return @"NSData";
+        } else if([attributes hasPrefix:@"T@\\\\"NSMutableData\\\\""]) {
+            return @"NSMutableData";
+        } else if([attributes hasPrefix:@"T@\\\\"NSSet\\\\""]) {
+            return @"NSSet";
+        } else if([attributes hasPrefix:@"T@\\\\"NSMutableSet\\\\""]) {
+            return @"NSMutableSet";
+        } else {
+            return [NSString stringWithFormat:@"__Model__:%@",[attributes componentsSeparatedByString:@"\\\\""][1]];
+        }
+
+    }
+
+    if ([attributes hasPrefix:@"Tq"]) {
+        return @"NSInteger";
+    } else if ([attributes hasPrefix:@"TQ"]) {
+        return @"NSUInteger";
+    } else if ([attributes hasPrefix:@"Td"]) {
+        return @"double";
+    } else if ([attributes hasPrefix:@"TB"]) {
+        return @"BOOL";
+    } else if ([attributes hasPrefix:@"Ti"]) {
+        return @"int";
+    } else if ([attributes hasPrefix:@"Tf"]) {
+        return @"float";
+    } else if ([attributes hasPrefix:@"Ts"]) {
+        return @"short";
+    }
+
+    return @"";
+} else {
+
+    //错误的字符串
+    return @"";
+}
+}
+里面有一个__Model__:，用来判断包含的自定义成员变量，传回"__Model__:自定义成员变量的类名"。
+
+自动化归档
+重写encodeWithCoder:方法
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    NSArray * propertyArr = [self wzx_allProperty];
+    for (NSDictionary * propertyDic in propertyArr) {
+        [self encodeWithType:propertyDic[@"type"] Name:propertyDic[@"name"] Coder:aCoder];
+    }
+}
+
+- (void)encodeWithType:(NSString *)type Name:(NSString *)name Coder:(NSCoder *)aCoder {
+    if ([self isObject:type]) {
+
+        [aCoder encodeObject:[self valueForKey:name] forKey:name];
+    } else if([type isEqualToString:@"BOOL"]){
+
+        [aCoder encodeBool:[[self valueForKey:name] boolValue] forKey:name];
+    } else if([type isEqualToString:@"float"]){
+
+        [aCoder encodeFloat:[[self valueForKey:name] floatValue] forKey:name];
+    } else if([type isEqualToString:@"double"]){
+
+        [aCoder encodeFloat:[[self valueForKey:name] doubleValue] forKey:name];
+    } else if([type isEqualToString:@"int"]||
+              [type isEqualToString:@"short"]){
+
+        [aCoder encodeInt:[[self valueForKey:name] intValue] forKey:name];
+    } else if([type isEqualToString:@"NSInteger"]||
+              [type isEqualToString:@"NSUInteger"]){
+
+        [aCoder encodeInteger:[[self valueForKey:name] integerValue] forKey:name];
+    }
+
+    if ([type hasPrefix:@"__Model__:"]) {
+
+        NSString * className = [type componentsSeparatedByString:@"__Model__:"][1];
+        NSString * path = [NSString stringWithFormat:@"%@_%@_%@_%@",NSStringFromClass(self.class),self.WZX_Archiver_Name,className,name];
+
+        [[self valueForKey:name] wzx_archiveToName:path andIsSon:YES];
+    }
+}
+
+- (BOOL)isObject:(NSString *)type {
+    NSArray * objectTypeArr = @[@"NSString",
+                                @"NSMutableString",
+                                @"NSArray",
+                                @"NSMutableArray",
+                                @"NSDictionary",
+                                @"NSMutableDictionary",
+                                @"NSData",
+                                @"NSMutableData",
+                                @"NSSet",
+                                @"NSMutableSet"];
+    return [objectTypeArr containsObject:type];
+}
+这里基本就是判断类型来分别编码，就几个点要说一下:
+
+通过[self valueForKey:xxx]可以取出self的成员变量对应的值。
+通过是否以__Model__ :开头来判断是不是自定义的对象，若是自定义的对象再通过wzx_archiveToName: andIsSon:来将包含的子对象归档，子对象归档的地址是这样的:WZX_对象类名_对象定义的标识符_子对象类名_子对象名.archiver。
+仔细想想，这里对象定义的标识符其实我们是得不到的，因为这是在协议的方法里面，无法直接传递name到这个方法中，所以我们要给这个类别添加一个成员变量。
+给类别添加成员变量
+首先若你希望对象能获取这个成员变量，你可以直接在.h中添加一个成员变量。
+否则你需要在.m中添加:
+
+@interface NSObject ()
+@property(nonatomic, copy)NSString * WZX_Archiver_Name;
+@end
+重写set、get方法,在类别中添加成员变量还是得用到runtime。
+
+static NSString * WZX_Archiver_Name_Key =@"WZX_Archiver_Name_Key";
+- (void)setWZX_Archiver_Name:(NSString *)WZX_Archiver_Name {
+ //self设置一个key为WZX_Archiver_Name_Key的值等于WZX_Archiver_Name
+ //函数最后一个值是属性，这里用copy
+  objc_setAssociatedObject(self, &WZX_Archiver_Name_Key, WZX_Archiver_Name, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+- (NSString *)WZX_Archiver_Name {
+ //返回self以WZX_Archiver_Name_Key为key的值
+  return objc_getAssociatedObject(self, &WZX_Archiver_Name_Key);
+}
+这样我们就成功给类别添加了一个成员变量。
+
+然后我们在wzx_archiveToName:方法时,self.WZX_Archiver_Name = name;
+你就会发现还有一个问题,对象包含的子对象归档时也会走这个方法，这样的话
+self.WZX_Archiver_Name会被更改，从而导致子对象归档的文件名不对。
+所以我们必须要做判断:
+
+- (BOOL)wzx_archiveToName:(NSString *)name {
+    return [self wzx_archiveToName:name andIsSon:NO];
+}
+
+- (BOOL)wzx_archiveToName:(NSString *)name andIsSon:(BOOL)isSon {
+    if (isSon == NO) {
+        //不是对象中的子对象
+        self.WZX_Archiver_Name = name;
+        NSString * path = [[self class] getPath:name];
+        return [NSKeyedArchiver archiveRootObject:self toFile:path];   
+    } else {
+        return [NSKeyedArchiver archiveRootObject:self toFile:[[self class]getSonPath:name]];
+    }
+}
+子类就走wzx_archiveToName:path andIsSon:YES方法。
+
+这样自动化归档部分就完成了。
+
+自动化解档
+重写initWithCoder方法
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-designated-initializers"
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    NSArray * propertyArr = [self wzx_allProperty];
+    for (NSDictionary * propertyDic in propertyArr) {
+        if ([self decodeWithType:propertyDic[@"type"] Name:propertyDic[@"name"] Coder:aDecoder]) {
+            [self setValue:[self decodeWithType:propertyDic[@"type"] Name:propertyDic[@"name"] Coder:aDecoder] forKey:propertyDic[@"name"]];
+        }
+    }
+    return self;
+}
+#pragma clang diagnostic pop
+这里先消除在类别中重写init方法的警告.
+然后因为NSObject是基类不能使用super,所以这里没用self = [super initWithCoder:aDecoder],但是我觉得是没有影响的,NSObject类肯定不会使用XIB或者故事版,所以自然不会使用这个方法,那么就不会有什么影响。
+
+解编码
+- (id)decodeWithType:(NSString *)type Name:(NSString *)name Coder:(NSCoder *)aDecoder {
+    if ([self isObject:type]) {
+
+        return [aDecoder decodeObjectOfClass:NSClassFromString(type) forKey:name];
+    } else if([type isEqualToString:@"int"]||
+              [type isEqualToString:@"short"]){
+
+        return @([aDecoder decodeIntegerForKey:name]);
+    } else if([type isEqualToString:@"BOOL"]){
+
+        return @([aDecoder decodeBoolForKey:name]);
+    } else if([type isEqualToString:@"float"]){
+
+        return @([aDecoder decodeFloatForKey:name]);
+    } else if([type isEqualToString:@"double"]){
+
+        return @([aDecoder decodeDoubleForKey:name]);
+    } else if([type isEqualToString:@"NSInteger"]||
+              [type isEqualToString:@"NSUInteger"]){
+
+        return @([aDecoder decodeIntegerForKey:name]);
+    }
+
+    if ([type hasPrefix:@"__Model__:"]) {
+//        NSString * className = [type componentsSeparatedByString:@"__Model__:"][1];
+//        ;
+//        NSString * docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+//        NSString * path = [docPath stringByAppendingPathComponent:[NSString stringWithFormat:@"WZXArchiver/WZX_%@_%@_%@.archiver",NSStringFromClass(self.class),self.WZX_Archiver_Name,className]];      
+//        [self setValue:[NSClassFromString(className) wzx_unArchiveToName:path isSon:YES]forKey:name];
+    }
+    return nil;
+}
+
+- (BOOL)isObject:(NSString *)type {
+    NSArray * objectTypeArr = @[@"NSString",
+                                @"NSMutableString",
+                                @"NSArray",
+                                @"NSMutableArray",
+                                @"NSDictionary",
+                                @"NSMutableDictionary",
+                                @"NSData",
+                                @"NSMutableData",
+                                @"NSSet",
+                                @"NSMutableSet"];
+    return [objectTypeArr containsObject:type];
+}
+大致和编码一致，根据类型分别编码。
+这里有一点没处理好:这里我将对子对象的解档注释了，因为我在解档的方法中对self. WZX_Archiver_Name赋了值,而在解编码的时候取回来的时候却为nil。所以现在只能通过这个方法来解档:
+
+model.manModel = [ManModel wzx_unArchiveSonEntityToName:WZXArchiver_SonPath(@"Person", @"person1", @"ManModel", @"manModel")];
+如果你有更好的处理方法欢迎评论!
+
+现在自动化解档就可以了。
+
+使用效果:
+#import "WZXArchiver.h"
+
+PersonModel * model = [[PersonModel alloc]init];
+//Object数据类型
+model.str = @"str";
+model.muStr = [NSMutableString stringWithString:@"muStr"];
+model.dic = @{@"key":@"value"};
+model.muDic = [NSMutableDictionary dictionaryWithDictionary:@{
+                                                              @"key":@"muValue"
+                                                            }];
+model.arr = @[@"arr1",@"arr2"];
+model.muArr = [NSMutableArray arrayWithArray:@[@"muarr1",@"muarr2"]];
+model.data = [model.str dataUsingEncoding:NSUTF8StringEncoding];
+model.muData = [NSMutableData dataWithData:model.data];
+model.set = [NSSet setWithObjects:@"1",@"2",@"3",nil];
+model.muSet = [NSMutableSet setWithSet:model.set];
+
+//基本数据类型
+model.w_float = 1.1;
+model.w_doule = 2.2;
+model.w_cgfloat = 3.3;
+model.w_int = 4;
+model.w_integer = 5;
+model.w_uinteger = 6;
+model.w_bool = YES;
+
+//其他对象
+ManModel * manModel = [[ManModel alloc]init];
+manModel.name = @"wzx";
+manModel.age = 23;
+
+model.manModel = manModel;
+
+//归档
+[model wzx_archiveToName:@"person1"];
+
+//解档
+PersonModel * model2 = [PersonModel wzx_unArchiveToName:@"person1"];
+//若你对象中包含另一个对象
+model2.manModel = [ManModel wzx_unArchiveSonEntityToName:WZXArchiver_SonPath(@"PersonModel", @"person1", @"ManModel", @"manModel")];
+PS.
+更多的细节可以看源码
+源码地址
+如果你喜欢这个项目，欢迎点✨.
