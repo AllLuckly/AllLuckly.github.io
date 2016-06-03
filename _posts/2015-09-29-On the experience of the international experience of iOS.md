@@ -15,7 +15,7 @@ path: /images
 >&quot;努力、努力、再努力，今天的付出，乃明天的收获&quot;
 ><small><cite title="Plato">Bison</cite></small>
 
->![1]({{ page.path }}/zjs.jpg)<br>
+>![1]({{ site.url }}/images/zjs.jpg)<br>
 >[冰之依韩版女装](http://allluckly.taobao.com/)（程序媛福利）<br>
 
 

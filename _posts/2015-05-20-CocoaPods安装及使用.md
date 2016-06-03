@@ -17,7 +17,7 @@ path: /images
 
 >&quot;The beginning is the most important part of the work.&quot;
 ><small><cite title="Plato">Plato</cite></small>
->![1]({{ page.path }}/zjs.jpg)<br>
+>![1]({{ site.url }}/images/zjs.jpg)<br>
 >[冰之依韩版女装](http://allluckly.taobao.com/)（程序媛福利）
 1.安装Brew
 

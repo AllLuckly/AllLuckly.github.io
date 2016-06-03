@@ -27,7 +27,7 @@ path: /images/blog/Alamofire
 [传送门](http://allluckly.cn/cocoapods/CocoaPods%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8/)
 首先我们创建一个工程如下图
 
-![1]({{ page.path }}/1.png)<br>
+![1]({{ site.url }}/images/1.png)<br>
 
 然后把下载的`Alamofire`解压文件全部放进创建的项目文件夹中，如下图
 

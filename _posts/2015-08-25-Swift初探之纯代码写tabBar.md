@@ -15,7 +15,7 @@ path: /images
 >&quot;充实自我，提升自我的价值；唯有多学&quot;
 ><small><cite title="Plato">Bison</cite></small>
 
->![1]({{ page.path }}/zjs.jpg)<br>
+>![1]({{ site.url }}/images/zjs.jpg)<br>
 >[冰之依韩版女装](http://allluckly.taobao.com/)（程序媛福利）
 
 最近的项目新版本基本完成了,闲来无事学习学习新出的语言Swift。
