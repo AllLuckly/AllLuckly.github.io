@@ -343,7 +343,7 @@ UI部分由于没有什么需要重用的地方，所以没有再另外抽取出
 
 首先在AppDelegate.m导入头文件#import "LBLaunchImageAdView.h"，然后在didFinishLaunchingWithOptions方法里面初始化一下，最后就是一些点击的回调事件了。到此，讲解完毕，最后丢上效果图和下载地址。<br>
 
-![Untitled.gif](http://upload-images.jianshu.io/upload_images/671504-3d54c003e801a6d2.gif?imageMogr2/auto-orient/strip)<br>
+![1]({{ site.url }}/images/blog/LBLaunchImageAd/1.gif)<br><br>
 
 [下载地址-------戳这里](https://github.com/AllLuckly/LBLaunchImageAd)<br>
 
