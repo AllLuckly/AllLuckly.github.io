@@ -1,10 +1,10 @@
 ---
 layout: post
-title: "iOS开发之AES+Base64数据混合加密与解密"
+title: "分分钟解决iOS开发中App启动广告的功能"
 description: "Bison"
-category: AES
+category: LBLaunchImageAd
 headline: Discover the theme elements
-tags: [AES，Base64，数据混合加密，iOS开发]
+tags: [App启动动画，App启动广告，iOS开发]
 imagefeature: 
 comments: true
 featured: 
@@ -14,9 +14,9 @@ path: /images
 
 
 
-前不久有朋友需要一个启动广告的功能，我说网上有挺多的，他说，看的不是很理想。想让我写一个，于是乎，抽空写了一个，代码通俗易懂，简单的封装了一下，各种事件用block回调的，有俩种样式的广告，一种是全屏广告，另一种是下面露logo的，类似网页新闻的启动广告。依赖`SDWebImage`主要用来下载网络的广告图片，一般项目里面网络图片都用的这个框架，所以在此不做过多的阐述。下面让我们来看看我封装的过程，对于新手来说，可以学习一下这种封装的思想。
+前不久有朋友需要一个启动广告的功能，我说网上有挺多的，他说，看的不是很理想。想让我写一个，于是乎，抽空写了一个，代码通俗易懂，简单的封装了一下，各种事件用block回调的，有俩种样式的广告，一种是全屏广告，另一种是下面露logo的，类似网页新闻的启动广告。依赖`SDWebImage`主要用来下载网络的广告图片，一般项目里面网络图片都用的这个框架，所以在此不做过多的阐述。下面让我们来看看我封装的过程，对于新手来说，可以学习一下这种封装的思想。<br>
 
-## 1.首先建一个继承View的LBLaunchImageAdView
+## 1.首先建一个继承View的LBLaunchImageAdView<br>
 
 #### .h文件 代码如下：<br>
 
@@ -62,7 +62,8 @@ typedef void (^LBClick) (NSInteger tag);
 
 ```
 
-里面主要重写了init方法，init方法方便我们在调用封装的类初始化时传递一些参数，在此，我只传递了三个必要的参数，其他参数都用@property属性来调配，达到自己想要的效果，再有就是一个block的回调函数，主要处理各种事件。下面我们看看.m文件里面实现的部分
+<br>
+里面主要重写了init方法，init方法方便我们在调用封装的类初始化时传递一些参数，在此，我只传递了三个必要的参数，其他参数都用@property属性来调配，达到自己想要的效果，再有就是一个block的回调函数，主要处理各种事件。下面我们看看.m文件里面实现的部分<br>
 
 ```
 //
@@ -296,9 +297,10 @@ typedef void (^LBClick) (NSInteger tag);
 
 ```
 
-UI部分由于没有什么需要重用的地方，所以没有再另外抽取出来方法，全部放在init方法里面，显得有点臃肿。UI部分在此不做过多的阐述，里边主要运用了一个渐变的动画，利用`CABasicAnimation`中的`opacity`,有兴趣的朋友可以看看源码，  再有就是一个图片重构的方法，防止图片变形。
+<br>
+UI部分由于没有什么需要重用的地方，所以没有再另外抽取出来方法，全部放在init方法里面，显得有点臃肿。UI部分在此不做过多的阐述，里边主要运用了一个渐变的动画，利用`CABasicAnimation`中的`opacity`,有兴趣的朋友可以看看源码，  再有就是一个图片重构的方法，防止图片变形。<br>
 
-下面我们说下怎么集成我封装的这个功能吧，挺简单的，首先来看看代码：
+下面我们说下怎么集成我封装的这个功能吧，挺简单的，首先来看看代码：<br>
 
 ```
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -338,11 +340,14 @@ UI部分由于没有什么需要重用的地方，所以没有再另外抽取出
 
 ```
 
-首先在AppDelegate.m导入头文件#import "LBLaunchImageAdView.h"，然后在didFinishLaunchingWithOptions方法里面初始化一下，最后就是一些点击的回调事件了。到此，讲解完毕，最后丢上效果图和下载地址。
 
-![Untitled.gif](http://upload-images.jianshu.io/upload_images/671504-3d54c003e801a6d2.gif?imageMogr2/auto-orient/strip)
+首先在AppDelegate.m导入头文件#import "LBLaunchImageAdView.h"，然后在didFinishLaunchingWithOptions方法里面初始化一下，最后就是一些点击的回调事件了。到此，讲解完毕，最后丢上效果图和下载地址。<br>
 
-[下载地址-------戳这里](https://github.com/AllLuckly/LBLaunchImageAd)
+![Untitled.gif](http://upload-images.jianshu.io/upload_images/671504-3d54c003e801a6d2.gif?imageMogr2/auto-orient/strip)<br>
+
+[下载地址-------戳这里](https://github.com/AllLuckly/LBLaunchImageAd)<br>
+
+版权归©Bison所有 如需转载请保留原文超链接地址！否则后果自负！<br>
 
 ----------------------------------------------------------
 
