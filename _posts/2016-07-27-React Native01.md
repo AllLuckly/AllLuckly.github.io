@@ -7,7 +7,7 @@ headline: Discover the theme elements
 tags: [React Native, iOS开发, 部署环境]
 imagefeature: 
 comments: true
-featured: true
+featured: 
 mathjax: 
 path: /images
 ---
