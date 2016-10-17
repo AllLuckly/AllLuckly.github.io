@@ -26,7 +26,8 @@ path: /images
 
 ### 首先我们先把整个app的架构搭起来
 
-一般市面上的app都已tabbar展示的方式为主，今天我就仿原生的[IT Blog](https://itunes.apple.com/cn/app/it-blog-ios-kai-fa-zhe-wen/id1067787090?mt=8)下面让我们看下[IT blog](https://itunes.apple.com/cn/app/it-blog-ios-kai-fa-zhe-wen/id1067787090?mt=8)长什么样吧！
+一般市面上的app都已tabbar展示的方式为主，今天我就仿原生的[IT Blog](https://itunes.apple.com/cn/app/it-blog-ios-kai-fa-zhe-wen/id1067787090?mt=8)下面让我们看下[IT blog](https://itunes.apple.com/cn/app/it-blog-ios-kai-fa-zhe-wen/id1067787090?mt=8)长什么样吧！<br>
+
 ![1]({{ site.url }}/images/blog/weixinxiaochengxu/20161017/2.jpg)<br>
 
 #### 首先是tabbar
