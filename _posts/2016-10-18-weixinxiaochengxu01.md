@@ -133,7 +133,7 @@ navigator{ overflow: hidden;}
 
 ![1]({{ site.url }}/images/blog/weixinxiaochengxu/20161018/5.gif)<br>
 
-有空的话再写写网络请求方面的，结合这个[demo]()写
+有空的话再写写网络请求方面的，结合这个[demo](https://github.com/AllLuckly/IT-Blog_Wechat)写
 
 本文为[Bison](blog.allluckly.cn)原创，转载请注明出处，否则将追究法律责任
 
