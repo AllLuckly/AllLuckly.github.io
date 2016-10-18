@@ -1,8 +1,8 @@
 ---
 layout: post
 title: "微信小程序开发教程-从零开始（1）"
-description: "Swift"
-category: 投稿
+description: "weChat"
+category: 微信小程序
 headline: Discover the theme elements
 tags: [微信小程序, iOS开发, 应用号]
 imagefeature: 
