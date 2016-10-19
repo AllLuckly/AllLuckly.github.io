@@ -131,7 +131,10 @@ Page({
 ![1]({{ site.url }}/images/blog/weixinxiaochengxu/20161019/2.gif)<br>
 
 不知道什么原因，我这接口返回的图片url在微信小程序中无法显示，为了让效果更加的接近我们的效果图，在本地给我们的数据源加了些网络上的图片，代码如下：
+
+
 ```
+
 data: {
     newList:[{fistImg:"http://img0.imgtn.bdimg.com/it/u=1640246403,1832676351&fm=21&gp=0.jpg"} ,
              {fistImg:"http://a.hiphotos.baidu.com/image/pic/item/c8ea15ce36d3d539be4d77b83f87e950352ab05c.jpg"} , 
