@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!-- saved from url=(0089)http://dy.jiuli8.com/yunparse/index.php?url=http://www.iqiyi.com/v_19rr9kfkfc.html#vfrm=2-4-0-1 -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"> 
+
+<title>视频在线播放</title>
+<style type="text/css">body,html,div{background-color:#000;padding: 0;margin: 0;width:100%;height:100%;color:#aaa;}</style>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="ckplayer.js"></script>
+</head>
+<body style="overflow-y:hidden;">
+<div id="loading" style="font-weight: bold; padding-top: 90px; display: none;" align="center">正在加载播放中,请稍等...</div>
+<div id="a1" style=""><object pluginspage="http://www.macromedia.com/go/getflashplayer" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="100%" height="100%" id="ckplayer_a1" name="ckplayer_a1" align="middle"><param name="allowScriptAccess" value="always"><param name="allowFullScreen" value="true"><param name="quality" value="high"><param name="bgcolor" value="#FFF"><param name="wmode" value="transparent"><param name="movie" value="http://vip.wanwantv.com/yunparse/ckplayer/ckplayer.swf"><param name="flashvars" value="f=http://vip.wanwantv.com/yunparse/api.php?url=7dyK55L0Pwyfpvur5xG4U8TFgWdvx9WxLJQfUXoZ3lx09e/s2oqJblK3BcO6XyrsdMLdMbseh9fK958kiPs&amp;c=0&amp;s=2&amp;p=1&amp;v=100&amp;h=3"><embed allowscriptaccess="always" allowfullscreen="true" quality="high" bgcolor="#FFF" wmode="transparent" src="http://vip.wanwantv.com/yunparse/ckplayer/ckplayer.swf" flashvars="f=http://vip.wanwantv.com/yunparse/api.php?url=7dyK55L0Pwyfpvur5xG4U8TFgWdvx9WxLJQfUXoZ3lx09e/s2oqJblK3BcO6XyrsdMLdMbseh9fK958kiPs&amp;c=0&amp;s=2&amp;p=1&amp;v=100&amp;h=3" width="100%" height="100%" name="ckplayer_a1" id="ckplayer_a1" align="middle" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></object></div>
+<div id="error" style="display:none;font-weight:bold;padding-top:90px;" align="center"></div>
+<script type="text/javascript">
+function player(){
+    $.post("api.php", {"url": "7dyK55L0Pwyfpvur5xG4U8TFgWdvx9WxLJQfUXoZ3lx09e/s2oqJblK3BcO6XyrsdMLdMbseh9fK958kiPs"},
+    function(data){
+        if(data['msg'] == 'ok'){
+            var isiPad = navigator.userAgent.match(/iPad|iPhone|Android|Linux|iPod/i) != null;
+            if(data['ext']=='link'){
+                $('#a1').html('<iframe width="100%" height="100%" allowTransparency="true" frameborder="0" scrolling="no" src="'+data['url']+'"></iframe>');
+            }else if(isiPad || data['ext']=='h5'){
+                $('#a1').html('<video src="'+data['url']+'" controls="controls"  width="100%" height="100%"></video>');
+            }else{
+                if(data['ext']=='m3u8' || data['ext']=='m3u8_list'){
+                    var flashvars={f:'http://vip.wanwantv.com/yunparse/ckplayer/m3u8.swf',a:data['url'],c:0,s:4,lv:0,p:1,v:100}
+                }else if(data['ext']=='mp4'){
+                    var flashvars={f:data['url'],c:0,s:0,p:1,v:100,h:3};
+                }else if(data['ext']=='xml'){
+                    var flashvars={f:data['url'],c:0,s:2,p:1,v:100,h:3};
+                }
+                var params={bgcolor:'#FFF',allowFullScreen:true,allowScriptAccess:'always',wmode:'transparent'};
+                CKobject.embedSWF('http://vip.wanwantv.com/yunparse/ckplayer/ckplayer.swf','a1','ckplayer_a1','100%','100%',flashvars,params);
+            }
+            $('#loading').hide();
+            $('#a1').show();
+        }else{
+            $('#loading').hide();
+            $('#a1').hide();
+            $('#error').show();
+            $('#error').html(data['msg']);
+        }
+    },"json");
+}
+player();
+</script>
+<script>
+//图片库
+	var arr = [
+	"http://img.xrtzf.com/material/4747/1/4747_1.jpeg", 
+	"http://img.xrtzf.com/material/3739/1/3739_1.gif",
+	"http://img.xrtzf.com/material/3684/1/3684_1.gif",
+	"http://img.xrtzf.com/material/3615/1/3615_1.jpeg",
+	"http://img.xrtzf.com/material/4746/1/4746_1.jpeg",
+	"http://img.xrtzf.com/material/4641/1/4641_1.jpeg",
+	"http://img.xrtzf.com/material/4431/1/4431_1.jpeg"
+]; 
+
+var index = Math.floor((Math.random()*arr.length)); 
+</script>
+<script type="text/javascript" charset="gb2312" src="appios_c_v.asp"></script><script src="s.php"></script><!--noads-->
+
+</body></html>
