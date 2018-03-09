@@ -33,4 +33,10 @@ path: /images
 
 > . [新华字典](https://itunes.apple.com/cn/app/xin-hua-zi-dian-hai-liang/id1090457290?l=en&mt=8)<br>
 
-> . [吾爱站长](https://itunes.apple.com/us/app/wu-ai-zhan-zhang-zhan-zhang/id1093020396?mt=8)<br>
+> . [吾爱站长](https://itunes.apple.com/us/app/wu-ai-zhan-zhang-zhan-zhang/id1093020396?mt=8)<br><br>
+
+<figcaption>友情链接</figcaption>
+
+-----------------------------------------------------
+
+> . [EngerLib](http://www.ooflash.com)<br>
