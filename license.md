@@ -1,5 +1,6 @@
 ---
 layout: page
+sitemap: false
 permalink: /license/index.html
 title: LICENSE
 description: "License for Jekyll theme HMFAYSAL OMEGA."

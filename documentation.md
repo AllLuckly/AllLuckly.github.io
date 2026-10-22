@@ -1,5 +1,6 @@
 ---
 layout: page
+sitemap: false
 permalink: /documentation/
 title: Documentation
 description: "Instructions on how to install and customize the HMFAYSAL OMEGA Theme."

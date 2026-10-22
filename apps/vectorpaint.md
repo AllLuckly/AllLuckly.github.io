@@ -6,7 +6,7 @@ description: 了解 VectorPaint 的形状、路径、贝塞尔节点、图层和
 permalink: /apps/vectorpaint/
 ---
 
-VectorPaint 是用于 **iPhone 和 iPad 矢量绘图与 SVG 编辑**的应用。用钢笔、形状、可编辑路径、图层和文字制作 Logo、图标、插画与海报。开发项目目录名为 `draw_illustration`，商店名称是「VectorPaint-矢量绘图与Logo设计」。
+VectorPaint 是用于 **iPhone 和 iPad 矢量绘图与 SVG 编辑**的应用。用钢笔、形状、可编辑路径、图层和文字制作 Logo、图标、插画与海报。商店名称是「VectorPaint-矢量绘图与Logo设计」。
 
 ## 适合的创作场景
 
