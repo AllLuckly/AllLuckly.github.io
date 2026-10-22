@@ -1,0 +1,24 @@
+---
+layout: null
+sitemap: false
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+  {% assign video_works = site.posts | where: 'layout', 'work' %}
+  {% for entry in video_works %}
+    {% unless entry.sitemap == false or entry.noindex or entry.published == false %}
+      {% if entry.video.src and entry.video.poster and entry.video.name and entry.video.description and entry.video.upload_date and entry.video.duration %}
+  <url>
+    <loc>{{ entry.url | replace: '/index.html', '/' | absolute_url | xml_escape }}</loc>
+    <video:video>
+      <video:thumbnail_loc>{{ entry.video.poster | absolute_url | xml_escape }}</video:thumbnail_loc>
+      <video:title>{{ entry.video.name | xml_escape }}</video:title>
+      <video:description>{{ entry.video.description | strip_html | normalize_whitespace | xml_escape }}</video:description>
+      <video:content_loc>{{ entry.video.src | absolute_url | xml_escape }}</video:content_loc>
+      <video:publication_date>{{ entry.video.upload_date | date_to_xmlschema }}</video:publication_date>
+    </video:video>
+  </url>
+      {% endif %}
+    {% endunless %}
+  {% endfor %}
+</urlset>

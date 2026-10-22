@@ -1,5 +1,5 @@
 {%- comment -%}
-Shared metadata for the original blog and the studio/app/guide layouts.
+Shared metadata for the original blog and the studio/app/guide/work layouts.
 Keep product facts in _data/apps.yml and visible page content in agreement.
 {%- endcomment -%}
 {%- assign seo_home = '/' | absolute_url -%}
@@ -17,8 +17,18 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
   {%- assign seo_description = seo_description | append: ' 更多文章，第 ' | append: paginator.page | append: ' 页。' -%}
 {%- endif -%}
 {%- assign seo_article = false -%}
-{%- if page.collection == 'posts' or page.layout == 'post' or page.layout == 'guide' -%}
+{%- if page.collection == 'posts' or page.layout == 'post' or page.layout == 'guide' or page.layout == 'work' -%}
   {%- assign seo_article = true -%}
+{%- endif -%}
+{%- assign seo_video = false -%}
+{%- assign seo_empty_works = false -%}
+{%- if page.url == '/works/' or page.url == '/works/index.html' -%}
+  {%- assign seo_work_posts = site.posts | where: 'layout', 'work' -%}
+  {%- if seo_work_posts.size == 0 -%}{%- assign seo_empty_works = true -%}{%- endif -%}
+{%- endif -%}
+{%- if page.layout == 'work' and page.video.src and page.video.poster and page.video.name and page.video.description and page.video.upload_date and page.video.duration -%}
+  {%- assign seo_video = true -%}
+  {%- assign seo_video_id = seo_canonical | append: '#video' -%}
 {%- endif -%}
 {%- assign seo_image = nil -%}
 {%- if page.image.path -%}
@@ -55,7 +65,7 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
 <title>{{ seo_title | escape }}{% if seo_title != site.title %} · {{ site.title | escape }}{% endif %}</title>
 <meta name="description" content="{{ seo_description | escape }}">
 <link rel="canonical" href="{{ seo_canonical | escape }}">
-{% if page.noindex or page.url == '/404.html' %}<meta name="robots" content="noindex, follow">{% else %}<meta name="robots" content="index, follow, max-image-preview:large">{% endif %}
+{% if page.noindex or seo_empty_works or page.url == '/404.html' %}<meta name="robots" content="noindex, follow">{% else %}<meta name="robots" content="index, follow, max-image-preview:large">{% endif %}
 <meta property="og:locale" content="{{ seo_language | replace: '-', '_' | escape }}">
 <meta property="og:type" content="{% if seo_article %}article{% else %}website{% endif %}">
 <meta property="og:title" content="{{ seo_title | escape }}">
@@ -105,11 +115,31 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
       "inLanguage": {{ seo_language | jsonify }},
       "isPartOf": { "@id": {{ seo_website_id | jsonify }} },
       "publisher": { "@id": {{ seo_person_id | jsonify }} }
-      {% if page.author.name %}, "author": { "@type": "Person", "name": {{ page.author.name | jsonify | replace: '<', '\u003c' }}{% if page.author.url %}, "url": {{ page.author.url | absolute_url | jsonify }}{% endif %} }{% elsif page.author %}, "author": { "@type": "Person", "name": {{ page.author | jsonify | replace: '<', '\u003c' }} }{% endif %}
+      {% if page.author.name %}, "author": { "@type": "Person", "name": {{ page.author.name | jsonify | replace: '<', '\u003c' }}{% if page.author.url %}, "url": {{ page.author.url | absolute_url | jsonify }}{% endif %} }{% elsif page.author %}, "author": { "@type": "Person", "name": {{ page.author | jsonify | replace: '<', '\u003c' }} }{% elsif page.layout == 'work' %}, "author": { "@id": {{ seo_person_id | jsonify }}, "name": {{ seo_owner | jsonify | replace: '<', '\u003c' }} }{% endif %}
       {% if page.date %}, "datePublished": {{ page.date | date_to_xmlschema | jsonify }}{% endif %}
       {% if page.modified or page.date %}, "dateModified": {{ page.modified | default: page.date | date_to_xmlschema | jsonify }}{% endif %}
       {% if seo_image %}, "image": {{ seo_image | jsonify }}{% endif %}
       {% if seo_app %}, "about": { "@id": {{ seo_app_id | jsonify }} }{% endif %}
+      {% if seo_video %}, "video": { "@id": {{ seo_video_id | jsonify }} }{% endif %}
+    }
+    {% endif %}
+    {% if seo_video %},
+    {
+      "@type": "VideoObject",
+      "@id": {{ seo_video_id | jsonify }},
+      "name": {{ page.video.name | jsonify | replace: '<', '\u003c' }},
+      "description": {{ page.video.description | strip_html | normalize_whitespace | jsonify | replace: '<', '\u003c' }},
+      "thumbnailUrl": {{ page.video.poster | absolute_url | jsonify }},
+      "uploadDate": {{ page.video.upload_date | date_to_xmlschema | jsonify }},
+      "duration": {{ page.video.duration | jsonify }},
+      "contentUrl": {{ page.video.src | absolute_url | jsonify }},
+      "encodingFormat": "video/mp4",
+      "inLanguage": {{ seo_language | jsonify }},
+      "mainEntityOfPage": { "@type": "WebPage", "@id": {{ seo_canonical | jsonify }} },
+      "isPartOf": { "@id": {{ seo_canonical | append: '#article' | jsonify }} },
+      "publisher": { "@id": {{ seo_person_id | jsonify }} }
+      {% if seo_app %}, "about": { "@id": {{ seo_app_id | jsonify }} }{% endif %}
+      {% if page.video.captions %}, "caption": { "@type": "MediaObject", "contentUrl": {{ page.video.captions | absolute_url | jsonify }}, "encodingFormat": "text/vtt", "inLanguage": {{ seo_language | jsonify }} }{% endif %}
     }
     {% endif %}
     {% if page.layout == 'app' and seo_app %},
@@ -119,7 +149,6 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
       "url": {{ seo_app_url | jsonify }},
       "name": {{ seo_app.name | jsonify | replace: '<', '\u003c' }},
       "description": {{ seo_app.description | jsonify | replace: '<', '\u003c' }}
-      {% if seo_app.alias %}, "alternateName": {{ seo_app.alias | jsonify | replace: '<', '\u003c' }}{% endif %}
       {% if seo_app.category %}, "applicationCategory": {{ seo_app.category | jsonify | replace: '<', '\u003c' }}{% endif %}
       {% if seo_app.os %}, "operatingSystem": {{ seo_app.os | jsonify | replace: '<', '\u003c' }}{% endif %}
       {% if seo_app.version %}, "softwareVersion": {{ seo_app.version | jsonify | replace: '<', '\u003c' }}{% endif %}
@@ -134,7 +163,13 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
       "itemListElement": [
         { "@type": "ListItem", "position": 1, "name": "首页", "item": {{ seo_home | jsonify }} },
         {% assign seo_breadcrumb_position = 2 %}
-        {% if seo_article and seo_app %}
+        {% if page.layout == 'work' %}
+        { "@type": "ListItem", "position": 2, "name": "作品视频", "item": {{ '/works/' | absolute_url | jsonify }} },
+        {% assign seo_breadcrumb_position = 3 %}
+        {% elsif page.layout == 'guide-series' %}
+        { "@type": "ListItem", "position": 2, "name": "教程", "item": {{ '/guides/' | absolute_url | jsonify }} },
+        {% assign seo_breadcrumb_position = 3 %}
+        {% elsif seo_article and seo_app %}
         { "@type": "ListItem", "position": 2, "name": "教程", "item": {{ '/guides/' | absolute_url | jsonify }} },
         { "@type": "ListItem", "position": 3, "name": {{ seo_app.name | jsonify | replace: '<', '\u003c' }}, "item": {{ seo_app.guide_url | absolute_url | jsonify }} },
         {% assign seo_breadcrumb_position = 4 %}

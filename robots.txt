@@ -9,3 +9,11 @@ User-agent: OAI-SearchBot
 Allow: /
 
 Sitemap: {{ '/sitemap.xml' | absolute_url }}
+{% assign robot_video_works = site.posts | where: 'layout', 'work' %}
+{% assign has_indexable_video = false %}
+{% for entry in robot_video_works %}
+  {% unless entry.sitemap == false or entry.noindex or entry.published == false %}
+    {% if entry.video.src and entry.video.poster and entry.video.name and entry.video.description and entry.video.upload_date and entry.video.duration %}{% assign has_indexable_video = true %}{% endif %}
+  {% endunless %}
+{% endfor %}
+{% if has_indexable_video %}Sitemap: {{ '/video-sitemap.xml' | absolute_url }}{% endif %}

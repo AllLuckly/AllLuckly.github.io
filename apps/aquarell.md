@@ -6,7 +6,7 @@ description: 了解 Aquarell 的自定义笔刷、图层、色板与导出能力
 permalink: /apps/aquarell/
 ---
 
-Aquarell 是一款用于 **iPhone 和 iPad 水彩绘画、插画与手绘创作**的应用。它将笔刷、图层、色板和自定义画布放在一起，适合随手记录灵感，也适合把草图逐步画成完整作品。开发项目目录名为 `pastel`，商店中的产品名称是「Aquarell 水彩绘画与手绘画板」。
+Aquarell 是一款用于 **iPhone 和 iPad 水彩绘画、插画与手绘创作**的应用。它将笔刷、图层、色板和自定义画布放在一起，适合随手记录灵感，也适合把草图逐步画成完整作品。商店中的产品名称是「Aquarell 水彩绘画与手绘画板」。
 
 ## 可以用它做什么
 
@@ -29,10 +29,6 @@ PNG 和 JPEG 适合在博客、社交平台或聊天中分享。需要保留可�
 Aquarell 适合以笔触和像素图层为中心的绘画；如果目标是编辑 SVG 路径或制作可缩放的 Logo，可以查看 [VectorPaint]({{ '/apps/vectorpaint/' | relative_url }})。
 
 ## 常见问题
-
-### Aquarell 和 pastel 是同一个项目吗？
-
-是。`pastel` 是开发项目目录名，面向用户的产品品牌是 Aquarell。查找或下载时使用 Aquarell 与对应 App Store 链接更准确。
 
 ### 可以导出 PSD 吗？
 

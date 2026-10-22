@@ -4,9 +4,14 @@ sitemap: false
 ---
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  {% assign sitemap_works = site.posts | where: 'layout', 'work' %}
   {% for entry in site.pages %}
     {% assign entry_extension = entry.url | split: '.' | last %}
-    {% unless entry.sitemap == false or entry.noindex or entry.published == false or entry.url == '/404.html' or entry.url == '/404/' or entry_extension == 'xml' or entry_extension == 'json' or entry_extension == 'txt' %}
+    {% assign empty_works_index = false %}
+    {% if entry.url == '/works/' or entry.url == '/works/index.html' %}
+      {% if sitemap_works.size == 0 %}{% assign empty_works_index = true %}{% endif %}
+    {% endif %}
+    {% unless entry.sitemap == false or entry.noindex or entry.published == false or empty_works_index or entry.url == '/404' or entry.url == '/404.html' or entry.url == '/404/' or entry_extension == 'xml' or entry_extension == 'json' or entry_extension == 'txt' %}
       {% if entry.layout and entry.title %}
   <url>
     <loc>{{ entry.url | replace: '/index.html', '/' | absolute_url | xml_escape }}</loc>

@@ -1,5 +1,6 @@
 ---
 layout: page
+sitemap: false
 permalink: /theme-setup/
 title: Theme Setup
 description: "Instructions on how to install and customize the modern Jekyll theme HPSTR."

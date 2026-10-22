@@ -1,0 +1,31 @@
+---
+layout: studio
+---
+{% assign app = site.data.apps | where: 'id', page.app_id | first %}
+<div class="wrap work-page">
+  <nav class="breadcrumbs" aria-label="面包屑"><a href="{{ '/' | relative_url }}">首页</a><span>/</span><a href="{{ '/works/' | relative_url }}">作品视频</a><span>/</span><span aria-current="page">{{ page.title }}</span></nav>
+  <header class="article-header work-header">
+    <p class="eyebrow">{{ app.name }} / 创作过程</p>
+    <h1>{{ page.title }}</h1>
+    <p class="article-lede">{{ page.description }}</p>
+    <div class="article-meta"><span>作者 {{ page.author.name | default: page.author | default: site.owner.name }}</span><time datetime="{{ page.date | date_to_xmlschema }}">发布于 {{ page.date | date: '%Y-%m-%d' }}</time>{% if page.modified %}<time datetime="{{ page.modified | date_to_xmlschema }}">更新于 {{ page.modified | date: '%Y-%m-%d' }}</time>{% endif %}</div>
+  </header>
+  {% if page.video.src %}
+  <figure class="work-player">
+    <video id="work-video" controls playsinline preload="metadata" poster="{{ page.video.poster | relative_url | escape }}" aria-label="{{ page.video.name | escape }}" aria-describedby="video-description">
+      <source src="{{ page.video.src | relative_url | escape }}" type="video/mp4">
+      {% if page.video.captions %}<track kind="subtitles" src="{{ page.video.captions | relative_url | escape }}" srclang="zh-CN" label="中文步骤" default>{% endif %}
+      你的浏览器暂时无法播放此视频，请使用下方链接直接打开。
+    </video>
+    <figcaption>
+      <p id="video-description">{{ page.video.description }}</p>
+      {% if page.recording_note %}<p class="recording-note">{{ page.recording_note }}</p>{% endif %}
+      <div class="video-links"><a href="{{ page.video.src | relative_url | escape }}">直接打开视频 ↗</a>{% if page.video.captions %}<a href="{{ page.video.captions | relative_url | escape }}" download>下载中文步骤字幕</a>{% endif %}<a href="#creation-notes">阅读文字过程 ↓</a></div>
+    </figcaption>
+  </figure>
+  {% endif %}
+  <div class="article-layout work-notes" id="creation-notes">
+    <article class="prose"><div data-article-body>{{ content }}</div><a class="text-link" href="{{ '/works/' | relative_url }}">← 查看全部作品视频</a></article>
+    <aside class="article-aside"><div class="aside-box"><img class="aside-icon" src="{{ app.icon | relative_url }}" alt="" width="56" height="56"><h2>{{ app.name }}</h2><p>{{ app.tagline }}</p><a class="button" href="{{ app.store_url }}">在 App Store 查看 ↗</a><a class="aside-guide" href="{{ app.guide_url | relative_url }}">从基础开始，阅读使用教程 →</a><a class="aside-guide" href="{{ app.url | relative_url }}">应用介绍与常见问题 →</a></div></aside>
+  </div>
+</div>

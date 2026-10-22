@@ -5,14 +5,21 @@ layout: studio
 {% assign series = site.posts | where: 'layout', 'guide' | where: 'app_id', page.app_id | sort: 'series_order' %}
 {% assign previous_lesson = nil %}{% assign next_lesson = nil %}
 {% for lesson in series %}{% if lesson.url == page.url %}{% assign previous_index = forloop.index0 | minus: 1 %}{% assign next_index = forloop.index0 | plus: 1 %}{% if previous_index >= 0 %}{% assign previous_lesson = series[previous_index] %}{% endif %}{% assign next_lesson = series[next_index] %}{% endif %}{% endfor %}
-<div class="wrap">
-  <nav class="breadcrumbs" aria-label="面包屑"><a href="{{ '/' | relative_url }}">首页</a><span>/</span><a href="{{ '/guides/' | relative_url }}">教程</a><span>/</span><a href="{{ app.guide_url | relative_url }}">{{ app.name }} 学习路线</a><span>/</span><span aria-current="page">第 {{ page.series_order }} 篇</span></nav>
-  <header class="article-header"><p class="eyebrow">{{ app.category }} / {{ page.topic | default: page.level | default: '使用指南' }}</p><h1>{{ page.title }}</h1><p class="article-lede">{{ page.description }}</p><div class="article-meta"><span>作者 Bison</span><time datetime="{{ page.date | date_to_xmlschema }}">发布于 {{ page.date | date: '%Y-%m-%d' }}</time>{% if page.modified %}<time datetime="{{ page.modified | date_to_xmlschema }}">更新于 {{ page.modified | date: '%Y-%m-%d' }}</time>{% endif %}<span>约 {{ page.reading_time | default: 6 }} 分钟阅读 · 练习时间因人而异</span></div></header>
-  <div class="article-layout">
-    <article class="prose"><details class="mobile-toc" data-toc hidden><summary>本文目录</summary><ol></ol></details><div data-article-body>{{ content }}</div><div class="author-note">由 Bison 撰写 · 界面可能随 App 更新调整，操作时请结合文中的版本说明。</div>
-      <nav class="lesson-navigation" aria-label="继续学习">{% if previous_lesson %}<a href="{{ previous_lesson.url | relative_url }}"><small>← 上一篇</small>{{ previous_lesson.title }}</a>{% endif %}{% if next_lesson %}<a href="{{ next_lesson.url | relative_url }}"><small>下一篇 →</small>{{ next_lesson.title }}</a>{% endif %}</nav>
-      <a class="text-link" href="{{ app.guide_url | relative_url }}">查看 {{ app.name }} 全部 {{ series.size }} 篇教程 →</a>
+<div class="wrap guide-article">
+  <nav class="breadcrumbs" aria-label="面包屑"><a href="{{ '/' | relative_url }}">首页</a><span aria-hidden="true">/</span><a href="{{ '/guides/' | relative_url }}">教程</a><span aria-hidden="true">/</span><a href="{{ app.guide_url | relative_url }}">{{ app.name }}</a><span aria-hidden="true">/</span><span class="breadcrumb-current" aria-current="page" title="{{ page.title | escape }}">{{ page.title }}</span></nav>
+  <div class="guide-reading-layout">
+    <article class="guide-reading-main">
+      <header class="article-header"><p class="article-topic">{{ page.topic | default: page.level | default: '使用指南' }}</p><h1>{{ page.title }}</h1><p class="article-lede">{{ page.description }}</p><div class="article-meta"><span>Bison</span><time datetime="{{ page.modified | default: page.date | date_to_xmlschema }}">{{ page.modified | default: page.date | date: '%Y-%m-%d' }} 更新</time><span>约 {{ page.reading_time | default: 6 }} 分钟</span></div></header>
+      <div class="prose"><details class="mobile-toc" data-toc hidden><summary>本文目录</summary><ol></ol></details><div data-article-body>{{ content }}</div></div>
+      <footer class="guide-reading-footer"><p class="author-note">Bison 撰写。界面有变化时，可以结合文中的版本说明查看。</p>
+        <nav class="lesson-navigation" aria-label="继续学习">{% if previous_lesson %}<a href="{{ previous_lesson.url | relative_url }}"><small>← 上一篇</small><span>{{ previous_lesson.title }}</span></a>{% endif %}{% if next_lesson %}<a class="next-lesson" href="{{ next_lesson.url | relative_url }}"><small>下一篇 →</small><span>{{ next_lesson.title }}</span></a>{% endif %}</nav>
+        <a class="text-link" href="{{ app.guide_url | relative_url }}">返回 {{ app.name }} 学习路线 <span aria-hidden="true">→</span></a>
+      </footer>
     </article>
-    <aside class="article-aside"><div class="aside-box"><img class="aside-icon" src="{{ app.icon | relative_url }}" alt="" width="56" height="56"><h2>{{ app.name }}</h2><p>{{ app.tagline }}</p><p class="small">{{ app.os }} · 资料版本 {{ app.version }}</p><a class="button" href="{{ app.store_url }}">App Store ↗</a><a class="aside-guide" href="{{ app.guide_url | relative_url }}">学习路线 · {{ series.size }} 篇教程 →</a><a class="aside-guide" href="{{ app.url | relative_url }}">应用介绍与常见问题 →</a><nav class="toc" aria-label="本文目录" data-toc hidden><h2>这篇内容</h2><ol></ol></nav></div></aside>
+    <aside class="guide-sidebar" aria-label="教程导航">
+      <a class="guide-context" href="{{ app.guide_url | relative_url }}"><img src="{{ app.icon | relative_url }}" alt="" width="36" height="36"><span><strong>{{ app.name }}</strong><small>学习路线 · 第 {{ page.series_order }} / {{ series.size }} 篇</small></span></a>
+      <nav class="toc" aria-label="本文目录" data-toc hidden><h2>本文目录</h2><ol role="list"></ol></nav>
+      <a class="guide-app-link" href="{{ app.url | relative_url }}">应用介绍与下载 <span aria-hidden="true">↗</span></a>
+    </aside>
   </div>
 </div>
