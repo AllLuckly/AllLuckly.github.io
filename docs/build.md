@@ -32,7 +32,7 @@ bundle exec jekyll serve --host 127.0.0.1 --port 4000
 
 预览地址：<http://127.0.0.1:4000/>。生成文件位于 `_site/`。预览时 URL 与正式域名不同是正常现象；canonical 和结构化数据应继续使用正式域名。
 
-发布前检查首页、三个 App 专题、教程详情、`/page2/`、`/sitemap.xml`、`/robots.txt` 和 `/llms.txt`。分页由 `jekyll-paginate` 生成，主页必须使用 `index.html`，`paginate_path` 保留 `page:num` 以兼容历史文章列表地址。
+发布前检查首页、三个 App 专题、教程详情、`/page2/`、`/sitemap.xml`和 `/robots.txt`。分页由 `jekyll-paginate` 生成，主页必须使用 `index.html`，`paginate_path` 保留 `page:num` 以兼容历史文章列表地址。
 
 ## 常见问题
 
@@ -41,7 +41,7 @@ bundle exec jekyll serve --host 127.0.0.1 --port 4000
 - 更新依赖需先核对 GitHub Pages 的版本表，再调整 Gemfile 并运行 `bundle update`，不要直接删除 lock 文件后部署。
 - 本地构建不等于线上发布成功。推送后仍须检查 GitHub Pages 的部署结果，并确认最终自定义域名的页面、重定向和抓取入口。
 
-构建后可执行 `python3 scripts/validate_site.py`，检查 JSON-LD、sitemap、Atom、应用关系与新增页面的内部链接；执行 `node --check assets/js/studio.js` 检查脚本语法。
+构建后可执行 `python3 scripts/validate_site.py`，检查 JSON-LD、sitemap、Atom、应用关系、教程数量与页面内部链接。脚本使用 PyYAML 读取文章元数据，缺少时可用 `python3 -m pip install PyYAML==6.0.2` 安装。执行 `node --check assets/js/studio.js` 检查脚本语法。
 
 可使用 `python3 scripts/preview.py` 在 `http://127.0.0.1:4173` 预览生产构建。该服务支持 GitHub Pages 的无扩展名旧文章路径，且不会改变 canonical 的生产域名。
 

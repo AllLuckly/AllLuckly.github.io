@@ -1,8 +1,28 @@
 ---
 layout: studio
 title: 应用教程：从绘画、设计到阅读
-description: 按步骤学习 Aquarell 画布与导出、VectorPaint 几何图形制作、漫阅+ 本地漫画导入。
+description: Aquarell、漫阅+ 与 VectorPaint 的中文教程库。按应用与关键词查找画布、笔刷、漫画书库、矢量设计和导出排查教程。
 section: guides
 permalink: /guides/
 ---
-<section class="wrap section page-intro" data-filter-group><p class="eyebrow">THE GUIDES</p><h1>从一个小目标开始。</h1><p>具体的步骤，清楚的边界。<br>找到你需要的教程，一步一步做出来。</p><div class="filters" aria-label="按应用筛选教程" hidden><button type="button" data-filter="all" aria-pressed="true">全部教程</button>{% for app in site.data.apps %}<button type="button" data-filter="{{ app.id }}" aria-pressed="false">{{ app.name }}</button>{% endfor %}</div><p class="filter-status sr-only" role="status" aria-live="polite"></p><div class="guide-grid">{% assign guides = site.posts | where: 'layout', 'guide' %}{% for post in guides %}{% include guide-card.html %}{% endfor %}</div></section>
+{% assign all_guides = site.posts | where: 'layout', 'guide' %}
+<section class="wrap section page-intro" data-filter-group>
+  <p class="eyebrow">THE GUIDES / {{ all_guides.size }} 篇中文教程</p>
+  <h1>从入门，到进阶。</h1>
+  <p>选择一个应用，按顺序练习；也可以直接搜索眼前的问题。<br>每篇教程都有操作步骤、完成检查和常见问题。</p>
+  <div class="learning-paths">
+    {% for app in site.data.apps %}{% assign app_guides = all_guides | where: 'app_id', app.id %}
+    <a class="learning-path theme-{{ app.id }}" href="{{ app.guide_url | relative_url }}"><img src="{{ app.icon | relative_url }}" alt="" width="48" height="48"><div><h2>{{ app.name }}</h2><p>{{ app.category }} · {{ app_guides.size }} 篇教程</p></div><span aria-hidden="true">↗</span></a>
+    {% endfor %}
+  </div>
+  <div class="library-controls" data-library-controls hidden>
+    <label for="guide-search">查找教程<input id="guide-search" type="search" data-guide-search placeholder="试试：透明 PNG、离线、图层…" autocomplete="off"></label>
+    <div class="filters" aria-label="按应用筛选教程"><button type="button" data-filter="all" aria-pressed="true">全部应用</button>{% for app in site.data.apps %}<button type="button" data-filter="{{ app.id }}" aria-pressed="false">{{ app.name }}</button>{% endfor %}</div>
+    <p class="filter-status" role="status" aria-live="polite">共 {{ all_guides.size }} 篇教程</p>
+  </div>
+  <div class="guide-library">
+    {% for app in site.data.apps %}{% assign guides = all_guides | where: 'app_id', app.id | sort: 'series_order' %}
+    <section class="library-section" data-library-section><header class="library-heading"><h2>{{ app.name }} 教程</h2><a href="{{ app.guide_url | relative_url }}">查看学习路线 →</a></header><ol class="lesson-list">{% for post in guides %}{% include lesson-row.html %}{% endfor %}</ol></section>
+    {% endfor %}
+  </div>
+</section>
