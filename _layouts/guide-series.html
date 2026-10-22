@@ -1,0 +1,11 @@
+---
+layout: studio
+---
+{% assign app = site.data.apps | where: 'id', page.app_id | first %}
+{% assign guides = site.posts | where: 'layout', 'guide' | where: 'app_id', page.app_id | sort: 'series_order' %}
+<div class="wrap">
+  <nav class="breadcrumbs" aria-label="面包屑"><a href="{{ '/' | relative_url }}">首页</a><span>/</span><a href="{{ '/guides/' | relative_url }}">教程</a><span>/</span><span aria-current="page">{{ app.name }} 学习路线</span></nav>
+  <header class="series-header theme-{{ app.id }}"><img src="{{ app.icon | relative_url }}" alt="" width="72" height="72"><p class="eyebrow">{{ guides.size }} 篇教程 / {{ app.category }}</p><h1>{{ page.title }}</h1><p>{{ page.description }}</p><a class="button" href="{{ guides.first.url | relative_url }}">从第一篇开始 →</a><a class="text-link" href="{{ app.url | relative_url }}">应用介绍与下载 ↗</a></header>
+  <div class="series-intro prose">{{ content }}</div>
+  <section class="series-lessons" aria-label="{{ app.name }} 教程目录"><div class="library-heading"><h2>完整学习目录</h2><span>{{ guides.size }} 篇 · 可按需跳读</span></div><ol class="lesson-list">{% for post in guides %}{% include lesson-row.html %}{% endfor %}</ol></section>
+</div>

@@ -13,7 +13,7 @@
 
 ## 产品事实的唯一来源
 
-`_data/apps.yml` 为数组；`id` 是文章 `app_id` 的关联键，当前使用 `pastel`、`man_yue`、`draw_illustration`。字段：`id`、`name`、`alias`、`tagline`、`description`、`url`、`store_url`、`icon`、`category`、`os`、`version`。
+`_data/apps.yml` 为数组；`id` 是文章 `app_id` 的关联键，当前使用 `pastel`、`man_yue`、`draw_illustration`。字段：`id`、`name`、`alias`、`tagline`、`description`、`url`、`store_url`、`icon`、`category`、`os`、`version`、`guide_url`。
 
 - 正式产品名、开发者、版本、系统要求和商店链接以已核实来源为准。项目目录名不能直接当作商店名。
 - 产品专题页必须展示结构化数据包含的产品事实；不得在 JSON-LD 偷加正文没有的功能、评分或价格。
@@ -30,6 +30,10 @@ layout: guide
 title: "用具体 App 完成一个明确任务"
 description: "说明适合谁、会完成什么、需要哪些条件。"
 app_id: pastel
+series_order: 21  # 在该 App 的学习路线中连续编号
+topic: 创作练习
+level: 进阶
+reading_time: 8  # 估计阅读分钟数，不含动手练习
 permalink: /guides/descriptive-slug/
 date: 2026-10-22 10:00:00 +0800
 author: Bison
@@ -100,4 +104,12 @@ Bing 建议用清晰标题、表格、FAQ、事实证据和及时更新增强内
 | 产品入口点击 | 哪个页面、哪款 App、点击次数 | 后续配置的站点分析；当前模板不声称已接入分析 |
 | 实际获取 | 商店产品页访问及下载 | 开发者自己的商店分析；需账户数据，不能由外链点击推定 |
 
-先维护每个产品的少量高质量教程与真实作品，再从实际搜索问题补充内容。对比基线与发布后数周的数据，不承诺固定收录天数或推荐名次。
+保持每篇教程有独立任务、具体操作与真实边界，再从实际搜索问题补充内容。对比基线与发布后数周的数据，不承诺固定收录天数或推荐名次。
+
+## 教程库维护
+
+每个 App 的完整目录位于 `/guides/aquarell/`、`/guides/manyue/` 和 `/guides/vectorpaint/`。`series_order` 从 1 连续编号，同一 App 内不重复；目录、上一篇和下一篇都依据该字段排序。新增内容时保持原 URL 稳定，更新必要的相关教程链接。
+
+`/guides/` 的应用筛选与关键词搜索只筛选页面已包含的链接，关闭 JavaScript 仍可阅读全部目录。首页按每个 App 各两篇展示，避免一次集中发布后只出现一种应用。
+
+运行 `python3 scripts/validate_site.py` 会核验三个应用各至少 20 篇、连续编号、独立标题和 URL、正文规模、内部链接与锚点。字数检查只是发布底线，不能替代功能核对和逐篇编辑；证据维护于 `docs/tutorial-evidence-*.md`。不要用同义改写、重复段落或与任务无关的提醒凑数量和篇幅。

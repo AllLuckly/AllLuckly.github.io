@@ -1,45 +1,35 @@
 ---
-layout: note
+layout: about
 permalink: /about/index.html
 title: 你好，我是 Bison。
-description: Bison 的 iOS 开发与创作笔记，分享参与开发的 Aquarell、VectorPaint、漫阅+ 的使用方法。
+description: 我是一名 iOS 开发者，正在做 Aquarell、漫阅+ 和 VectorPaint。这里记录开发过程，也分享这些 App 的使用方法。
 ---
 
-我是一名 iOS 软件工程师，也喜欢速写和室内设计。这个博客记录技术探索，也分享画画、设计与阅读中的小方法。
+<div class="about-intro" markdown="1">
+我是一名 iOS 开发者，也喜欢速写和室内设计。
+
+这个博客以前写 iOS 技术文章比较多。现在除了开发笔记，也会多写一些自己做的 App：怎么用、能拿来做什么，以及遇到问题时怎么处理。
+</div>
 
 ## 我在做的应用
 
-- [Aquarell](/apps/aquarell/)：面向水彩插画、速写与分层绘画。项目标识为 pastel。
-- [VectorPaint](/apps/vectorpaint/)：用路径、形状和文字进行矢量设计。项目标识为 draw_illustration。
-- [漫阅+](/apps/manyue/)：管理和阅读自己的漫画书库。项目标识为 man_yue。
+<div class="about-app-list">
+<section class="about-app">
+<img src="/assets/images/apps/pastel.png" alt="Aquarell 图标" width="64" height="64">
+<div><h3>Aquarell</h3><p>这是一个画画用的 App，支持笔刷、图层和色板。可以画水彩风格的插画，也可以从一片叶子、一只杯子开始练习。我会在这里把画布设置、上色和导出这些步骤写清楚。</p><a href="/apps/aquarell/">看看应用 ↗</a><a href="/guides/aquarell/">阅读绘画教程 →</a></div>
+</section>
+<section class="about-app">
+<img src="/assets/images/apps/man_yue.png" alt="漫阅+ 图标" width="64" height="64">
+<div><h3>漫阅+</h3><p>一个漫画阅读器。把自己的漫画文件导进去，就可以在手机或平板上读；如果书库放在 NAS 或漫画服务器上，也可以连接阅读。教程会从本地导入开始，再讲书架整理、离线阅读和服务器连接。</p><a href="/apps/manyue/">看看应用 ↗</a><a href="/guides/manyue/">阅读使用教程 →</a></div>
+</section>
+<section class="about-app">
+<img src="/assets/images/apps/draw_illustration.png" alt="VectorPaint 图标" width="64" height="64">
+<div><h3>VectorPaint</h3><p>用来画矢量图、做图标和编辑 SVG。和 Aquarell 的笔刷绘画不同，这里主要处理形状、路径和节点。想做一个简单 Logo，或者把图形放大使用，可以从几何图标的教程开始。</p><a href="/apps/vectorpaint/">看看应用 ↗</a><a href="/guides/vectorpaint/">阅读设计教程 →</a></div>
+</section>
+</div>
 
-这些应用的介绍与教程由我以开发参与者的身份整理，不属于第三方独立评测。应用的商店提供者、价格和支持设备请查看各页面链接的 App Store 资料。
+## 留言与交流
 
-## 关于这里的内容
+如果你也在用这些 App，或者对文章有疑问，欢迎到 [GitHub](https://github.com/AllLuckly/AllLuckly.github.io/issues) 留言。
 
-[使用教程](/guides/)围绕一个具体任务展开，标注参考版本、步骤、适用范围和来源。历史技术文章保留原始地址与发表日期，可以从[开发笔记归档](/journal/)查找。
-
-如果你想交流或反馈，可以通过 [GitHub](https://github.com/AllLuckly) 找到我。
-
-## 早期作品与链接
-
-以下保留博客原有的作品记录，当前可用情况请以对应页面为准。
-
-<figcaption>个人作品展</figcaption>
-
------------------------------------------------------
-
-
-
-
-> . [IT Blog](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
-
-> . [新华字典](https://itunes.apple.com/cn/app/xin-hua-zi-dian-hai-liang/id1090457290?l=en&mt=8)<br>
-
-> . [吾爱站长](https://itunes.apple.com/us/app/wu-ai-zhan-zhang-zhan-zhang/id1093020396?mt=8)<br><br>
-
-<figcaption>友情链接</figcaption>
-
------------------------------------------------------
-
-> . [EngerLib](http://www.ooflash.com)<br>
+以前写的 iOS 技术文章都留在[开发笔记](/journal/)里，也欢迎翻翻。
