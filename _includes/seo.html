@@ -14,7 +14,7 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
 {%- assign seo_topic_id = seo_technical.topic | default: page.topic_id -%}
 {%- assign seo_topic = site.data.technical_topics | where: 'id', seo_topic_id | first -%}
 {%- assign seo_collection = false -%}
-{%- if page.layout == 'technical-topic' or page.url == '/journal/' -%}{%- assign seo_collection = true -%}{%- endif -%}
+{%- if page.layout == 'technical-topic' or page.url == '/journal/' or page.layout == 'guide-series' or page.url == '/guides/' or page.url == '/apps/' -%}{%- assign seo_collection = true -%}{%- endif -%}
 {%- assign seo_app = site.data.apps | where: 'id', page.app_id | first -%}
 {%- if page.app_id == nil -%}{%- assign seo_app = nil -%}{%- endif -%}
 {%- assign seo_title = page.seo_title | default: page.title | default: site.title -%}
@@ -135,6 +135,7 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
       {% if seo_modified or page.date %}, "dateModified": {{ seo_modified | default: page.date | date_to_xmlschema | jsonify }}{% endif %}
       {% if seo_image %}, "image": {{ seo_image | jsonify }}{% endif %}
       {% if seo_app %}, "about": { "@id": {{ seo_app_id | jsonify }} }{% endif %}
+      {% if page.layout == 'guide' and page.topic %}, "articleSection": {{ page.topic | jsonify | replace: '<', '\u003c' }}{% endif %}
       {% if seo_video %}, "video": { "@id": {{ seo_video_id | jsonify }} }{% endif %}
     }
     {% endif %}
@@ -147,10 +148,27 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
       "description": {{ seo_description | jsonify | replace: '<', '\u003c' }},
       "inLanguage": {{ seo_language | jsonify }},
       "isPartOf": { "@id": {{ seo_website_id | jsonify }} },
+      {% if seo_app %}"about": { "@id": {{ seo_app_id | jsonify }} },{% endif %}
       "mainEntity": {
         "@type": "ItemList",
         "itemListElement": [
           {% assign seo_item_count = 0 %}
+          {% if page.url == '/apps/' %}
+            {% for entry in site.data.apps %}
+              {% unless forloop.first %},{% endunless %}
+              { "@type": "ListItem", "position": {{ forloop.index }}, "name": {{ entry.name | jsonify }}, "url": {{ entry.url | absolute_url | jsonify }} }
+            {% endfor %}
+          {% elsif page.layout == 'guide-series' or page.url == '/guides/' %}
+            {% for entry_app in site.data.apps %}
+              {% if page.layout != 'guide-series' or entry_app.id == page.app_id %}
+                {% assign seo_lessons = site.posts | where: 'layout', 'guide' | where: 'app_id', entry_app.id | sort: 'series_order' %}
+                {% for entry in seo_lessons %}
+                  {% if seo_item_count > 0 %},{% endif %}{% assign seo_item_count = seo_item_count | plus: 1 %}
+                  { "@type": "ListItem", "position": {{ seo_item_count }}, "name": {{ entry.title | jsonify | replace: '<', '\u003c' }}, "url": {{ entry.url | absolute_url | jsonify }} }
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+          {% else %}
           {% for entry in site.posts %}
             {% assign entry_technical = site.data.technical_articles[entry.path] %}
             {% if entry_technical %}
@@ -161,6 +179,7 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
               {% endif %}
             {% endif %}
           {% endfor %}
+          {% endif %}
         ]
       }
     }
@@ -190,6 +209,7 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
       "@id": {{ seo_app_id | jsonify }},
       "url": {{ seo_app_url | jsonify }},
       "name": {{ seo_app.name | jsonify | replace: '<', '\u003c' }},
+      {% if seo_app.alternate_name %}"alternateName": {{ seo_app.alternate_name | jsonify | replace: '<', '\u003c' }},{% endif %}
       "description": {{ seo_app.description | jsonify | replace: '<', '\u003c' }}
       {% if seo_app.category %}, "applicationCategory": {{ seo_app.category | jsonify | replace: '<', '\u003c' }}{% endif %}
       {% if seo_app.os %}, "operatingSystem": {{ seo_app.os | jsonify | replace: '<', '\u003c' }}{% endif %}

@@ -12,6 +12,8 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1] / '_site'
 SITE_URL = 'https://allluckly.cn/'
+catalog = yaml.safe_load((ROOT.parent / '_data/apps.yml').read_text())
+catalog_by_id = {app['id']: app for app in catalog}
 SITEMAP_NS = {'sm':'http://www.sitemaps.org/schemas/sitemap/0.9','video':'http://www.google.com/schemas/sitemap-video/1.1'}
 class Page(HTMLParser):
     def __init__(self, source):
@@ -75,7 +77,7 @@ for file,page in pages.items():
             if entity['@type']=='SoftwareApplication': apps.append(entity)
             if entity['@type']=='BlogPosting' and 'about' in entity: articles.append(entity)
             if entity['@type']=='VideoObject': videos.append(entity)
-assert len(apps)==3
+assert len(apps)==len(catalog) and len(catalog_by_id)==len(catalog)
 app_ids={app['@id'] for app in apps}
 articles=[article for article in articles if article['about'].get('@id') in app_ids]
 for article in articles:
@@ -110,16 +112,31 @@ guide_urls={urljoin(SITE_URL,g['permalink']) for g in source_guides}
 guide_articles=[article for article in articles if article['url'] in guide_urls]
 assert Counter(article['url'] for article in guide_articles)==Counter(guide_urls), 'published guide URLs differ from source'
 article_counts=Counter(article['about']['@id'] for article in guide_articles)
-assert set(article_counts)==app_ids and min(article_counts.values())>=20, f'expected at least 20 tutorials per app: {article_counts}'
+assert set(article_counts)==app_ids, f'missing app tutorials: {article_counts}'
+for app in catalog:
+    assert article_counts[urljoin(SITE_URL,app['url'])+'#app']>=app['minimum_guides'], f'tutorial target not met: {app["id"]}'
 assert len({g['permalink'] for g in source_guides})==len(source_guides), 'duplicate tutorial URL'
 assert len({g['title'] for g in source_guides})==len(source_guides), 'duplicate tutorial title'
-for app in ['pastel','man_yue','draw_illustration']:
-    orders=sorted(int(g['series_order']) for g in source_guides if g['app_id']==app)
-    assert orders==list(range(1,len(orders)+1)), f'nonsequential learning route: {app}'
-assert Counter(pages[ROOT/'index.html'].filter_items)==Counter({'pastel':2,'man_yue':2,'draw_illustration':2}), 'homepage must introduce all apps'
+for app in catalog:
+    orders=sorted(int(g['series_order']) for g in source_guides if g['app_id']==app['id'])
+    assert orders==list(range(1,len(orders)+1)), f'nonsequential learning route: {app["id"]}'
+    route_source=ROOT.parent / (app['guide_url'].strip('/')+'.html')
+    stages=yaml.safe_load(route_source.read_text().split('---',2)[1])['stages']
+    covered=[i for stage in stages for i in range(stage['start'],stage['end']+1)]
+    assert covered==orders, f'learning stages must cover every lesson exactly once: {app["id"]}'
+assert Counter(pages[ROOT/'index.html'].filter_items)==Counter({app['id']:1 for app in catalog}), 'homepage must introduce all apps'
 assert len(pages[ROOT/'guides/index.html'].filter_items)==len(guide_articles), 'directory must link every tutorial'
-for slug,app in [('aquarell','pastel'),('manyue','man_yue'),('vectorpaint','draw_illustration')]:
-    assert pages[ROOT/f'guides/{slug}/index.html'].filter_items==[app]*sum(g['app_id']==app for g in source_guides)
+for app in catalog:
+    assert pages[target(app['guide_url'])].filter_items==[app['id']]*sum(g['app_id']==app['id'] for g in source_guides)
+collections=[('/apps/', [urljoin(SITE_URL,a['url']) for a in catalog]), ('/guides/', [urljoin(SITE_URL,g['permalink']) for a in catalog for g in sorted(source_guides,key=lambda x:x['series_order']) if g['app_id']==a['id']])]
+collections += [(a['guide_url'],[urljoin(SITE_URL,g['permalink']) for g in sorted(source_guides,key=lambda x:x['series_order']) if g['app_id']==a['id']]) for a in catalog]
+for url,expected in collections:
+    page=pages[target(url)]
+    entity=next(e for graph in page.graphs for e in graph['@graph'] if e['@type']=='CollectionPage')
+    items=entity['mainEntity']['itemListElement']
+    assert [item['url'] for item in items]==expected, f'collection schema order differs: {url}'
+    assert [item['position'] for item in items]==list(range(1,len(items)+1)), url
+    assert set(expected)<={urljoin(SITE_URL,link) for link in page.links}, f'collection links must be visible: {url}'
 work_urls={urljoin(SITE_URL,work['permalink']) for work in source_works}
 assert len(work_urls)==len(source_works), 'duplicate work URL'
 work_articles=[article for article in articles if article['url'] in work_urls]
@@ -199,7 +216,7 @@ for work in source_works:
         if urlparse(absolute).netloc=='allluckly.cn':
             file=target(absolute); assert file and file.stat().st_size>0, f'missing media: {absolute}'
             if asset==video['src']: assert file.stat().st_size<100*1024*1024, f'video exceeds GitHub file limit: {asset}'
-for slug,app in [('aquarell','pastel'),('manyue','man_yue'),('vectorpaint','draw_illustration')]:
-    expected=Counter(work['permalink'] for work in source_works if work['app_id']==app)
-    assert Counter(pages[ROOT/f'apps/{slug}/index.html'].work_items)==expected, f'app work links differ: {app}'
-print(f'PASS: {graph_count} JSON-LD graphs, {len(urls)} sitemap URLs, Atom feed, {len(new)} new/updated pages, {len(guide_articles)} detailed tutorials, 3 complete learning routes and {len(videos)} work videos')
+for app in catalog:
+    expected=Counter(work['permalink'] for work in source_works if work['app_id']==app['id'])
+    assert Counter(pages[target(app['url'])].work_items)==expected, f'app work links differ: {app["id"]}'
+print(f'PASS: {graph_count} JSON-LD graphs, {len(urls)} sitemap URLs, Atom feed, {len(new)} new/updated pages, {len(guide_articles)} detailed tutorials, {len(catalog)} complete learning routes and {len(videos)} work videos')

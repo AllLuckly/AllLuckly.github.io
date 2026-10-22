@@ -4,6 +4,7 @@ app_id: pastel
 title: Aquarell：iPhone 与 iPad 水彩绘画、插画与手绘画板
 description: 了解 Aquarell 的自定义笔刷、图层、色板与导出能力，找到从新建画布到完成第一幅手绘练习的教程。
 permalink: /apps/aquarell/
+modified: 2026-10-23
 ---
 
 Aquarell 是一款用于 **iPhone 和 iPad 水彩绘画、插画与手绘创作**的应用。它将笔刷、图层、色板和自定义画布放在一起，适合随手记录灵感，也适合把草图逐步画成完整作品。商店中的产品名称是「Aquarell 水彩绘画与手绘画板」。
