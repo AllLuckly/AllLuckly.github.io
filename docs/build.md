@@ -1,0 +1,48 @@
+# 本地预览与构建
+
+站点使用 Jekyll 3.10，核心 Markdown、Liquid 和语法高亮依赖与 [GitHub Pages 官方版本表](https://pages.github.com/versions/)保持一致。`Gemfile.lock` 记录实际安装版本，请随 `Gemfile` 一起提交。这里只安装本站需要的依赖，无需安装完整的 `github-pages` 插件集合。
+
+本次本地验证环境：Ruby 4.0.1、Bundler 4.0.3、Jekyll 3.10.0。
+
+## 安装
+
+建议使用 Ruby 3.3 或更新版本，并使用项目锁定的 Bundler。macOS 自带的旧 Ruby 不适合这套依赖。若通过 Homebrew 安装 Ruby，先让当前终端找到它：
+
+```sh
+export PATH="$(brew --prefix ruby)/bin:$PATH"
+ruby --version
+bundle --version
+```
+
+在仓库目录运行：
+
+```sh
+bundle config set --local path vendor/bundle
+bundle install
+```
+
+依赖仅安装到仓库内的 `vendor/bundle`，无需 `sudo`，也不会改动其他项目的 gem。`.bundle`、`vendor/bundle` 和生成的网站均已忽略。
+
+## 检查与预览
+
+```sh
+bundle exec jekyll build --trace
+bundle exec jekyll serve --host 127.0.0.1 --port 4000
+```
+
+预览地址：<http://127.0.0.1:4000/>。生成文件位于 `_site/`。预览时 URL 与正式域名不同是正常现象；canonical 和结构化数据应继续使用正式域名。
+
+发布前检查首页、三个 App 专题、教程详情、`/page2/`、`/sitemap.xml`、`/robots.txt` 和 `/llms.txt`。分页由 `jekyll-paginate` 生成，主页必须使用 `index.html`，`paginate_path` 保留 `page:num` 以兼容历史文章列表地址。
+
+## 常见问题
+
+- 网络环境无法访问 `index.rubygems.org` 时，可尝试 `bundle install --full-index`，直接读取 RubyGems 完整索引。不要关闭 HTTPS 证书校验。
+- Ruby 3.4 / 4 移除了部分默认附带的标准库；Gemfile 已显式声明 `base64`、`bigdecimal`、`csv`、`logger` 和本地预览需要的 `webrick`。
+- 更新依赖需先核对 GitHub Pages 的版本表，再调整 Gemfile 并运行 `bundle update`，不要直接删除 lock 文件后部署。
+- 本地构建不等于线上发布成功。推送后仍须检查 GitHub Pages 的部署结果，并确认最终自定义域名的页面、重定向和抓取入口。
+
+构建后可执行 `python3 scripts/validate_site.py`，检查 JSON-LD、sitemap、Atom、应用关系与新增页面的内部链接；执行 `node --check assets/js/studio.js` 检查脚本语法。
+
+可使用 `python3 scripts/preview.py` 在 `http://127.0.0.1:4173` 预览生产构建。该服务支持 GitHub Pages 的无扩展名旧文章路径，且不会改变 canonical 的生产域名。
+
+此工作副本采用 Git 稀疏检出，省略大量旧图片和历史静态资源；它们仍在 Git 仓库中，没有删除。需要完全离线预览历史文章图片时，先运行 `git sparse-checkout disable` 下载完整资源。新应用图标与新页面所需资源已全部包含。

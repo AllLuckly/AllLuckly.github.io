@@ -1,15 +1,26 @@
 ---
+layout: null
+sitemap: false
 ---
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    {% for link in site.links %}{% if link.external %}{% else %} 
-    <url>
-        <loc>{{ site.url }}{{ link.url }}</loc>
-    </url>{% endif %}{% endfor %}
-    
-    {% for post in site.posts %}
-    <url>
-        <loc>{{ site.url }}{{ post.url }}</loc>
-    </url>
-    {% endfor %}
+  {% for entry in site.pages %}
+    {% assign entry_extension = entry.url | split: '.' | last %}
+    {% unless entry.sitemap == false or entry.noindex or entry.published == false or entry.url == '/404.html' or entry.url == '/404/' or entry_extension == 'xml' or entry_extension == 'json' or entry_extension == 'txt' %}
+      {% if entry.layout and entry.title %}
+  <url>
+    <loc>{{ entry.url | replace: '/index.html', '/' | absolute_url | xml_escape }}</loc>
+    {% if entry.modified or entry.date %}<lastmod>{{ entry.modified | default: entry.date | date_to_xmlschema }}</lastmod>{% endif %}
+  </url>
+      {% endif %}
+    {% endunless %}
+  {% endfor %}
+  {% for entry in site.posts %}
+    {% unless entry.sitemap == false or entry.noindex or entry.published == false %}
+  <url>
+    <loc>{{ entry.url | replace: '/index.html', '/' | absolute_url | xml_escape }}</loc>
+    <lastmod>{{ entry.modified | default: entry.date | date_to_xmlschema }}</lastmod>
+  </url>
+    {% endunless %}
+  {% endfor %}
 </urlset>
