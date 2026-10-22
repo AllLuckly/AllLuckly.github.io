@@ -201,6 +201,13 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
       "publisher": { "@id": {{ seo_person_id | jsonify }} }
       {% if seo_app %}, "about": { "@id": {{ seo_app_id | jsonify }} }{% endif %}
       {% if page.video.captions %}, "caption": { "@type": "MediaObject", "contentUrl": {{ page.video.captions | absolute_url | jsonify }}, "encodingFormat": "text/vtt", "inLanguage": {{ seo_language | jsonify }} }{% endif %}
+      {% if page.video.chapters.size > 0 %}, "hasPart": [
+        {% for chapter in page.video.chapters %}
+          {% assign seo_chapter_url = seo_canonical | append: '?t=' | append: chapter.start | append: '#work-video' %}
+          {% unless forloop.first %},{% endunless %}
+          { "@type": "Clip", "name": {{ chapter.title | jsonify | replace: '<', '\u003c' }}, "startOffset": {{ chapter.start | jsonify }}, "url": {{ seo_chapter_url | jsonify }} }
+        {% endfor %}
+      ]{% endif %}
     }
     {% endif %}
     {% if page.layout == 'app' and seo_app %},

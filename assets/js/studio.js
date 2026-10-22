@@ -109,3 +109,85 @@ if (search) {
     search.querySelector('[data-search-status]').textContent = count ? `找到 ${count} 篇文章` : '没有找到匹配文章，试试其他关键词。';
   });
 }
+
+const workVideo = document.querySelector('#work-video');
+const videoChapters = document.querySelector('[data-video-chapters]');
+if (workVideo && videoChapters) {
+  const links = [...videoChapters.querySelectorAll('[data-video-chapter]')];
+  const status = videoChapters.querySelector('[data-video-chapter-status]');
+  const parseSeconds = value => {
+    if (!/^\d+(?:\.\d+)?$/.test(value)) return null;
+    const seconds = Number(value);
+    return Number.isFinite(seconds) ? seconds : null;
+  };
+  const chapters = links.map(link => ({ link, start: parseSeconds(link.dataset.videoChapter) }));
+  let pendingSeek = null;
+  const showStatus = message => {
+    if (!status) return;
+    status.textContent = message;
+    status.hidden = !message;
+  };
+  const updateChapter = () => {
+    let current = null;
+    chapters.forEach(chapter => {
+      if (chapter.start !== null && chapter.start <= workVideo.currentTime) current = chapter.link;
+    });
+    links.forEach(link => {
+      if (link === current) link.setAttribute('aria-current', 'true');
+      else link.removeAttribute('aria-current');
+    });
+  };
+  const applyPendingSeek = () => {
+    if (pendingSeek === null || workVideo.readyState < 1) return;
+    const duration = workVideo.duration;
+    if (Number.isFinite(duration) && pendingSeek >= duration) {
+      pendingSeek = null;
+      return;
+    }
+    try {
+      workVideo.currentTime = pendingSeek;
+      pendingSeek = null;
+      updateChapter();
+    } catch {
+      showStatus('暂时无法定位章节，请使用播放器进度条。');
+    }
+  };
+  const seekTo = (seconds, play) => {
+    pendingSeek = seconds;
+    showStatus('');
+    applyPendingSeek();
+    workVideo.scrollIntoView({ block: 'center', behavior: 'auto' });
+    // Call play during the click/keyboard event, preserving browser user activation.
+    if (play) {
+      const playback = workVideo.play();
+      if (playback && typeof playback.catch === 'function') {
+        playback.catch(() => showStatus('请点击播放器的播放按钮，继续观看所选章节。'));
+      }
+    }
+  };
+  const seekFromLocation = () => {
+    const match = window.location.hash.match(/^#t=(\d+(?:\.\d+)?)$/);
+    if (!match && window.location.hash && window.location.hash !== '#work-video') return;
+    const value = match ? match[1] : new URLSearchParams(window.location.search).get('t');
+    const seconds = parseSeconds(value);
+    if (seconds !== null) seekTo(seconds, false);
+  };
+  videoChapters.addEventListener('click', event => {
+    const link = event.target.closest('[data-video-chapter]');
+    if (!link || !videoChapters.contains(link) || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const seconds = parseSeconds(link.dataset.videoChapter);
+    if (seconds === null) return;
+    event.preventDefault();
+    const destination = new URL(window.location.href);
+    destination.searchParams.delete('t');
+    destination.hash = link.hash;
+    if (destination.href !== window.location.href) window.history.pushState(null, '', destination.href);
+    seekTo(seconds, true);
+  });
+  workVideo.addEventListener('loadedmetadata', applyPendingSeek);
+  workVideo.addEventListener('timeupdate', updateChapter);
+  window.addEventListener('hashchange', seekFromLocation);
+  window.addEventListener('popstate', seekFromLocation);
+  seekFromLocation();
+  updateChapter();
+}
