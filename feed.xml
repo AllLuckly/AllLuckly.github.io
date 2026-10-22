@@ -14,7 +14,8 @@ sitemap: false
   {% assign feed_updated_epoch = feed_updated | date: '%s' | plus: 0 %}
   {% for post in site.posts %}
     {% unless post.noindex or post.published == false or post.feed == false %}
-      {% assign post_updated = post.modified | default: post.date %}
+      {% assign post_update = site.data.technical_updates[post.path] %}
+      {% assign post_updated = post.modified | default: post_update.updated | default: post.date %}
       {% assign post_updated_epoch = post_updated | date: '%s' | plus: 0 %}
       {% if post_updated_epoch > feed_updated_epoch %}
         {% assign feed_updated = post_updated %}
@@ -34,8 +35,10 @@ sitemap: false
     {% unless post.noindex or post.published == false or post.feed == false %}
       {% if feed_count < 30 %}
         {% assign post_canonical = post.url | replace: '/index.html', '/' | absolute_url %}
+        {% assign post_technical = site.data.technical_articles[post.path] %}
+        {% assign post_update = site.data.technical_updates[post.path] %}
         {% assign feed_content = post.content %}
-        {% assign feed_summary = post.description | default: post.excerpt | strip_html | normalize_whitespace %}
+        {% assign feed_summary = post_technical.summary | default: post.description | default: post.excerpt | strip_html | normalize_whitespace %}
         {% for encoded_control in xml_forbidden_controls %}
           {% assign xml_control = encoded_control | url_decode %}
           {% assign feed_content = feed_content | remove: xml_control %}
@@ -46,9 +49,9 @@ sitemap: false
     <link rel="alternate" type="text/html" href="{{ post_canonical | xml_escape }}" />
     <id>{{ post_canonical | xml_escape }}</id>
     <published>{{ post.date | date_to_xmlschema }}</published>
-    <updated>{{ post.modified | default: post.date | date_to_xmlschema }}</updated>
-    {% if post.author %}<author>
-      <name>{{ post.author.name | default: post.author | xml_escape }}</name>
+    <updated>{{ post.modified | default: post_update.updated | default: post.date | date_to_xmlschema }}</updated>
+    {% if post.author or post_technical.author_name %}<author>
+      <name>{{ post_technical.author_name | default: post.author.name | default: post.author | xml_escape }}</name>
     </author>{% endif %}
     <summary type="text">{{ feed_summary | xml_escape }}</summary>
     <content type="html">{{ feed_content | xml_escape }}</content>

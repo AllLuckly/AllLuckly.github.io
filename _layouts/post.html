@@ -1,109 +1,38 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<!--
-====================================================
-    __  ____  ______________  _______ ___    __ 
-   / / / /  |/  / ____/   \ \/ / ___//   |  / / 
-  / /_/ / /|_/ / /_  / /| |\  /\__ \/ /| | / /  
- / __  / /  / / __/ / ___ |/ /___/ / ___ |/ /___
-/_/ /_/_/  /_/_/   /_/  |_/_//____/_/  |_/_____/
-                                                     
-====================================================
-Owner Name: Hossain Mohammad Faysal
-Profile: https://www.facebook.com/hmfaysal
-Version: 1.1
-Description: Awesome dude, awesome life
-====================================================
--->
-<head>
-{% include head.html %}
-</head>
-<body class="post-template" itemscope itemtype="//schema.org/WebPage">  
-{% include header.html %}
-<div id="main" class="content" role="main" itemprop="mainContentOfPage" itemscope itemtype="//schema.org/Blog">
-    <div class="container">
-        <div class="row">
-            <article class="post col-md-8 col-md-offset-2 hentry" itemprop="blogPost" itemscope itemtype="//schema.org/BlogPosting">
-            {% if site.wpm %}
-            {% assign readtime = page.content | strip_html | number_of_words | append: '.0' | divided_by:site.wpm %}
-            {% else %}
-            {% assign readtime = page.content | strip_html | number_of_words | append: '.0' | divided_by:180 %}
-            {% endif %}
-            {% assign modifiedtime = page.modified | date: "%Y%m%d" %}
-            {% assign posttime = page.date | date: "%Y%m%d" %}
-                    <header class="post-header entry-header">
-                    {% if page.featured %}<div class="cursive">this post is featured</div>{% endif %}
-                        {% if page.link %}
-                        <h1 class="post-title text-center super lighter entry-title" itemprop="headline"><a href="{{ page.link }}" data-toggle="tooltip" title="Go to {{ page.link }}" style="color: #fff; background-color: #45ADA8; border-radius: 4px; padding: 10px">{% if page.type == 'quote' %}<i class="icon-quote-left"></i> {% endif %}{% if page.type == 'status' %}<i class="icon-retweet"></i> {% endif %}{% if page.type == 'video' %}<i class="icon-play-circle"></i> {% endif %}{% if page.type == 'photo' %}<i class="icon-picture"></i> {% endif %}{{ page.title }} <span class="link-arrow">&rarr;</span></a></h1>
-                        {% else %}
-                        <h1 class="post-title text-center super lighter bordered-bottom entry-title" itemprop="headline">{% if page.type == 'quote' %}<i class="icon-quote-left"></i> {% endif %}{% if page.type == 'status' %}<i class="icon-retweet"></i> {% endif %}{% if page.type == 'video' %}<i class="icon-play-circle"></i> {% endif %}{% if page.type == 'photo' %}<i class="icon-picture"></i> {% endif %}{{ page.title }}</h1>
-                        {% endif %}
-                        <div class="cursive" style="color: #000; font-style:italic;">{{ page.description }}</div>
-                        <div class="post-info text-center small">
-                            {% if page.modified %}<span class="entry-date date published">{% else %}<span class="entry-date date published updated">{% endif %}<time datetime="{{ page.date | date_to_xmlschema }}" class="post-time" itemprop="datePublished">{{ page.date | date: "%d %b %Y" }}</time><span>{% if page.modified %}{% if modifiedtime != posttime %} and <code>last modified on <span class="entry-date date updated"><time datetime="{{ page.modified | date: "%Y-%m-%d" }}" itemprop="dateModified">{{ page.modified | date: "%d %b %Y" }}</time></code></span>{% endif %}{% endif %}
-                            in <span class="post-tags">{% for tag in page.categories %}<a href="{{ site.url }}/categories/index.html#{{ page.categories | cgi_encode }}" data-toggle="tooltip" title="Other posts from the {{ tag  }} category" rel="tag">{{ tag }}</a>{% unless forloop.last %}&nbsp;&bull;&nbsp;{% endunless %}{% endfor %}</span>{% if site.readtime %}&nbsp;<span class="post-tags"><i class="icon-time"></i>&nbsp;{% if readtime > 1 and readtime < 1.5 %}1 minute read{% endif %}{% if readtime > 1.5 %}<span class="time">{{ readtime }}</span> minutes read{% endif %}{% if readtime < 1 %}Less than 1 minute read{% endif %}</span>{% endif %}
-                        </div>
-                    </header>
-                    <div class="post-body bordered-bottom" itemprop="description">
-                        {% if page.video %}
-                        {% assign video_embed = page.video | remove:'https://www.youtube.com/watch?v=' %}
-                        <iframe width="940" height="529" src="//www.youtube.com/embed/{{ video_embed }}?theme=light&amp;color=white" frameborder="0" allowfullscreen> </iframe>
-                        {% endif %}
-                        {{ content }}
-                        <br>
-                    {% assign tagsize = page.tags.size %}
-                    {% if tagsize != 0 %}
-                    
-                    <div class="entry-tags text-center">
-                        
-                        
-                        <i class="icon-tags"></i>&nbsp;Tagged with {% for tag in page.tags %}<a href="{{ site.url }}/tags/index.html#{{ tag | cgi_encode }}" data-toggle="tooltip" title="Posts tagged with {{ tag }}" rel="tag">{{ tag }}</a>{% unless forloop.last %}&nbsp;&bull;&nbsp;{% endunless %}{% endfor %}
-                        <div align="center">
-      
-                        </div>
-                    
-                    <!--搜狗广告-->
-                    <div align="center">
-<!--                        <script type="text/javascript">-->
-<!--                            var sogou_ad_id=775435;-->
-<!--                            var sogou_ad_height=250;-->
-<!--                            var sogou_ad_width=300;-->
-<!--                            </script>-->
-<!--                        <script type='text/javascript' src='//images.sohu.com/cs/jsfile/js/c.js'></script>-->
-<!--                         <script type="text/javascript">var jd_union_unid="1000069484",jd_ad_ids="520:6",jd_union_pid="CKWK9ZmqLBDssu/cAxoAII3HkM8EKgA=";var jd_width=250;var jd_height=250;var jd_union_euid="";var p="AhEFXR1aEAMWBWVEH0hfIlgRRgYlXVZaCCsfSlpMWGVEH0hfIm8OS1lKcVRmN2sTZVFuDlRnLRZFCFFZF2sVARADUx1SFAMQN1UaWhQDFQ9QEl4lMk1DCEZrXmwTNwpfBkgyEgNWGVsRBBIEUBlTFjITN2Ur";</script><script type="text/javascript" charset="utf-8" src="//u-x.jd.com/static/js/auto.js"></script>
-                        <script type="text/javascript">var jd_union_pid="1238212371";var jd_union_euid="";</script><script type="text/javascript" src="//ads-union.jd.com/static/js/union.js"></script> -->
-                        
-                    </div>
-                    
-                    <!--搜狗广告-->
-                    
-                    <!--百度主动推送-->
-                    <script>
-                    (function(){
-                     var bp = document.createElement('script');
-                     bp.src = '//push.zhanzhang.baidu.com/push.js';
-                    var s = document.getElementsByTagName("script")[0];
-                    s.parentNode.insertBefore(bp, s);
-                    })();
-                    </script>
-                    <!--百度主动推送-->
-                    
-                    {% endif %}
-                    </div>
-        </div>
-                    <footer class="post-footer entry-meta">
-                        {% if site.share %}{% include share.html %}{% endif %}
-                        {% include signoff.html %} 
-                        {% if site.disqus_shortname and page.comments == true %}<div id="disqus_thread"></div><!-- /#disqus_thread -->{% endif %}
-                    </footer>
-   
-                            
-            </article>
-    </div>
+---
+layout: studio
+technical: true
+section: journal
+---
+{% assign technical_article = site.data.technical_articles[page.path] %}
+{% assign technical_update = site.data.technical_updates[page.path] %}
+{% assign topic_id = technical_article.topic | default: 'web-notes' %}
+{% assign technical_topic = site.data.technical_topics | where: 'id', topic_id | first %}
+<div class="wrap technical-article">
+  <nav class="breadcrumbs" aria-label="面包屑"><a href="{{ '/' | relative_url }}">首页</a><span aria-hidden="true">/</span><a href="{{ '/journal/' | relative_url }}">开发笔记</a><span aria-hidden="true">/</span><a href="{{ technical_topic.url | relative_url }}">{{ technical_topic.name | escape }}</a><span aria-hidden="true">/</span><span class="breadcrumb-current" aria-current="page" title="{{ page.title | escape }}">{{ page.title | escape }}</span></nav>
+  <div class="technical-reading-layout">
+    <article class="technical-reading-main">
+      <header class="technical-article-header">
+        <p class="technical-kicker"><a href="{{ technical_topic.url | relative_url }}">{{ technical_topic.name | escape }}</a><span>历史技术记录</span></p>
+        <h1>{{ page.title | escape }}</h1>
+        {% if technical_article.summary %}<p class="technical-lede">{{ technical_article.summary | escape }}</p>{% endif %}
+        <div class="technical-meta"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%Y-%m-%d' }} · 本站发布</time>{% if technical_article.author_name %}<span>{% if technical_article.provenance == 'original' %}作者{% else %}原文署名{% endif %}：{% if technical_article.author_url %}<a href="{{ technical_article.author_url | escape }}" rel="author">{{ technical_article.author_name | escape }}</a>{% else %}{{ technical_article.author_name | escape }}{% endif %}</span>{% endif %}</div>
+        {% if technical_article.credit or technical_article.source_url %}<div class="technical-credit">{% if technical_article.credit %}<p>{{ technical_article.credit | escape }}</p>{% endif %}{% if technical_article.source_url %}<a href="{{ technical_article.source_url | escape }}">原文所列来源 <span aria-hidden="true">↗</span></a>{% endif %}</div>{% endif %}
+      </header>
+      <aside class="technical-history" aria-label="历史版本说明"><p><strong>阅读前</strong> 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。{% if technical_article.version_note %}{{ technical_article.version_note | escape }}{% else %}涉及的 API、依赖和工具版本请结合发表日期阅读。{% endif %}</p>{% if technical_update %}<div class="technical-reading-update">{% if technical_update.note %}<p>{{ technical_update.note | escape }}</p>{% endif %}{% if technical_update.references.size > 0 %}<ul aria-label="补充参考资料">{% for reference in technical_update.references %}<li><a href="{{ reference.url | escape }}">{{ reference.title | escape }} <span aria-hidden="true">↗</span></a></li>{% endfor %}</ul>{% endif %}{% if technical_update.updated %}<p class="technical-update-date">阅读说明补充于 <time datetime="{{ technical_update.updated | date: '%Y-%m-%d' }}">{{ technical_update.updated | date: '%Y-%m-%d' }}</time></p>{% endif %}</div>{% endif %}</aside>
+      <details class="technical-mobile-toc" data-toc hidden><summary>本文目录</summary><ol></ol></details>
+      <div class="prose technical-prose">
+        <div data-article-body>{{ content | replace: '<h1', '<h2' | replace: '</h1>', '</h2>' }}</div>
+      </div>
+      <footer class="technical-article-footer">
+        {% if technical_article.keywords.size > 0 %}<ul class="technical-keywords" aria-label="本文关键词">{% for keyword in technical_article.keywords %}<li>{{ keyword | escape }}</li>{% endfor %}</ul>{% endif %}
+        <a class="text-link" href="{{ technical_topic.url | relative_url }}">继续阅读「{{ technical_topic.name | escape }}」 <span aria-hidden="true">→</span></a>
+      </footer>
+    </article>
+    <aside class="technical-sidebar" aria-label="文章导航">
+      <a class="technical-context" href="{{ technical_topic.url | relative_url }}"><small>所属主题</small><strong>{{ technical_topic.name | escape }}</strong><span>{{ technical_topic.description | escape }}</span></a>
+      <nav class="toc technical-toc" aria-label="本文目录" data-toc hidden><h2>本文目录</h2><ol role="list"></ol></nav>
+      <section class="technical-related" aria-labelledby="technical-related-title"><h2 id="technical-related-title">同主题阅读</h2><ul>{% assign related_count = 0 %}{% for related_post in site.posts %}{% assign related_data = site.data.technical_articles[related_post.path] %}{% if related_post.layout == 'post' and related_data.topic == topic_id and related_post.url != page.url %}{% if related_count < 4 %}<li><a href="{{ related_post.url | relative_url }}">{{ related_post.title | escape }}</a><time datetime="{{ related_post.date | date_to_xmlschema }}">{{ related_post.date | date: '%Y-%m-%d' }}</time></li>{% assign related_count = related_count | plus: 1 %}{% endif %}{% endif %}{% endfor %}</ul></section>
+      <nav class="technical-topic-links" aria-label="浏览其他技术主题"><h2>主题索引</h2><ul>{% for topic in site.data.technical_topics %}<li><a href="{{ topic.url | relative_url }}"{% if topic.id == topic_id %} aria-current="true"{% endif %}>{{ topic.name | escape }}</a></li>{% endfor %}</ul><a class="technical-back-link" href="{{ '/journal/' | relative_url }}">全部开发笔记 <span aria-hidden="true">→</span></a></nav>
+    </aside>
+  </div>
 </div>
-{% include footer.html %}
-
-    
-{% include scripts.html %} 
-</body>
-</html>

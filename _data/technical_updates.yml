@@ -1,0 +1,58 @@
+_posts/2015-05-20-CocoaPods安装及使用.md:
+  updated: '2026-10-23'
+  note: '原文记录了 2015 年的安装过程，包括当时使用的 Ruby 镜像、Podfile 与 Xcode 设置。现在重新搭建环境，请从 CocoaPods 官方安装指南开始，不要照搬旧镜像地址。本文保留用于理解 Podfile、Pods、Podfile.lock 与 workspace 的关系；旧步骤没有在当前工具链重新执行。'
+  references:
+    - title: CocoaPods 官方安装指南
+      url: https://guides.cocoapods.org/using/getting-started.html
+_posts/2015-06-10-iOS开发打包静态库.a文件.md:
+  updated: '2026-10-23'
+  note: '原文使用 2015 年的 Xcode 界面，分别生成真机和模拟器静态库，再用 lipo 合并。今天交付跨平台二进制时，可对照 Apple 的 XCFramework 文档，分别准备平台及模拟器变体；不要把旧文中的合并命令直接当作当前交付方案。这里没有重新编译旧工程。'
+  references:
+    - title: Apple：创建多平台 XCFramework
+      url: https://developer.apple.com/documentation/xcode/creating-a-multi-platform-binary-framework-bundle
+_posts/2015-07-17-webView的使用与总结.md:
+  updated: '2026-10-23'
+  note: 'UIWebView 已被 Apple 标记为弃用，当前项目应先阅读 WKWebView 的迁移说明。本文保留的是 UIWebView 的加载、代理回调和同步 JavaScript 调用方式；迁移时需要重新核对代理接口与异步调用，不能只替换类名。旧示例未在当前 iOS 重新验证。'
+  references:
+    - title: Apple：从 UIWebView 迁移
+      url: https://developer.apple.com/documentation/webkit/replacing-uiwebview-in-your-app
+_posts/2015-11-09-Alamofire.md:
+  updated: '2026-10-23'
+  note: '这篇使用 Swift 2.0 时代的 Alamofire 接口，适合回看请求、参数和响应处理的组织方式。为新项目接入库时，请核对官方仓库中对应版本的系统、Swift 和安装要求，使用该版本的示例；本文中的旧语法没有重新迁移或编译。'
+  references:
+    - title: Alamofire 官方仓库与使用文档
+      url: https://github.com/Alamofire/Alamofire
+_posts/2016-02-29-duoxiancheng03.md:
+  updated: '2026-10-23'
+  note: '阅读勘误：原文「同步提交任务」一段把函数名写成了 dispatch_async，正确名称是 dispatch_sync；它等待任务完成后返回，可能在当前线程执行。dispatch_once 不接收队列参数，也不负责切换到主线程；同一个静态或全局 token 在进程生命周期内只执行一次，并发调用会等待首次执行完成。另外，dispatch_apply 示例注释中的「异步」不准确，它会等全部迭代完成后再返回。原始代码保留供对照，未重新运行。'
+  references:
+    - title: Apple：同步提交任务
+      url: https://developer.apple.com/documentation/dispatch/dispatchqueue/sync%28execute%3A%29-3segw?language=objc
+    - title: Apple：dispatch_once
+      url: https://developer.apple.com/documentation/dispatch/dispatch_once-c.func
+    - title: Apple：Dispatch Queues 与 dispatch_apply
+      url: https://developer.apple.com/library/archive/documentation/General/Conceptual/ConcurrencyProgrammingGuide/OperationQueues/OperationQueues.html
+_posts/2017-07-11-ffmpeg1.md:
+  updated: '2026-10-23'
+  note: '这是 2017 年通过第三方脚本构建 FFmpeg-iOS 的过程，终端输出对应当时的 macOS 工具链。脚本、汇编工具和目标架构都需要按实际环境重新核对；原文的宽泛权限设置也不应作为默认安装步骤。这里只补充阅读入口，未在当前 Xcode 重跑构建。'
+  references:
+    - title: FFmpeg：Darwin 平台构建说明
+      url: https://ffmpeg.org/platform.html
+_posts/2017-07-11-ffmpeg2.md:
+  updated: '2026-10-23'
+  note: '本文的 av_register_all、avcodec_decode_video2 等调用属于原文使用的旧接口。阅读时可以先理清解封装、找到视频流、解码和释放资源的顺序；在当前 FFmpeg 中实现解码，应对照 send/receive API，分别处理送入数据与循环取帧。旧工程未重新编译。'
+  references:
+    - title: FFmpeg：send/receive 编解码 API
+      url: https://ffmpeg.org/doxygen/trunk/group__lavc__encdec.html
+_posts/2017-07-12-ffmpeg3.md:
+  updated: '2026-10-23'
+  note: '这份封装记录来自 2017 年，阅读重点是编码数据、输出上下文与推流流程如何衔接。当前项目需要按所用 FFmpeg 版本核对封装接口、流参数、时间基及错误处理，参考官方 muxing 文档；本文没有验证今天的推流服务或重新运行原工程。'
+  references:
+    - title: FFmpeg：Muxing 与输出数据流
+      url: https://ffmpeg.org/doxygen/trunk/group__lavf__encoding.html
+_posts/2017-07-20-ffmpeg4.md:
+  updated: '2026-10-23'
+  note: '原文并列展示 FFmpeg 的设备输入和 iOS AVCaptureSession 采集代码。重做实验时，应分别核对设备选择、输入格式和应用权限，不能把桌面设备编号直接套到手机上。官方设备文档可用于核对 avfoundation 选项；本文示例未在当前设备重新验证。'
+  references:
+    - title: FFmpeg：avfoundation 输入设备
+      url: https://ffmpeg.org/ffmpeg-devices.html#avfoundation

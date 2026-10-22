@@ -15,8 +15,6 @@ path: /images
 >&quot;身体是革命的本钱，多锻炼才是王道&quot;
 ><small><cite title="Plato">Bison</cite></small>
 
->![1]({{ site.url }}/images/zjs.jpg)<br>
->[冰之依韩版女装](http://allluckly.taobao.com/)（程序媛福利）
 
 最近项目中出现了个动画，找了很多相关资料<br>
 发现并没有适合的，于是自定义了一个<br>
@@ -25,7 +23,6 @@ path: /images
 
 下面请看代码<br>
 
- > [更多经验请点击](http://www.allluckly.cn/) 
 
 核心代码
 {% highlight css %}
@@ -38,7 +35,5 @@ _timer = [NSTimer scheduledTimerWithTimeInterval:_time target:self selector:@sel
 
 > [点击下载Demo](https://github.com/AllLuckly/RadiusOperation) <br>
 
-> [博主app上线了，赶紧点此来围观吧😄](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
 
 ![(RadiusOperation)](https://github.com/AllLuckly/RadiusOperation/blob/master/123.gif?raw=true)
-

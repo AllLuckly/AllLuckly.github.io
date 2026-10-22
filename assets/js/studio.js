@@ -50,7 +50,10 @@ document.querySelectorAll('[data-filter-group]').forEach(group => {
   updateResults();
   window.addEventListener('pageshow', updateResults);
 });
-const articleHeadings = [...document.querySelectorAll('[data-article-body] h2')];
+let articleHeadings = [...document.querySelectorAll('[data-article-body] h2')];
+if (!articleHeadings.length && document.querySelector('.technical-article')) {
+  articleHeadings = [...document.querySelectorAll('[data-article-body] h3')];
+}
 const articleTocs = [...document.querySelectorAll('[data-toc]')];
 articleTocs.forEach(toc => {
   const list = toc.querySelector('ol');

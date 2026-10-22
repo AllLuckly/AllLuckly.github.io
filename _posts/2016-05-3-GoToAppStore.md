@@ -291,11 +291,6 @@ path: /images
 
 ----------------------------------------------------------
 
-> [学习iOS开发的app上线啦，点此来围观吧](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
-
-> [更多经验请点击](http://allluckly.cn)<br>
-
-好文推荐：[iOS开发之超链接富文本](http://allluckly.cn/投稿/tuogao42)<br>
 
 
-
+好文推荐：[iOS开发之超链接富文本](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao42)<br>

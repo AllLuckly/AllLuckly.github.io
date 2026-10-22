@@ -15,8 +15,6 @@ path: /images
 >&quot;努力、努力、再努力，今天的付出，乃明天的收获&quot;
 ><small><cite title="Plato">Bison</cite></small>
 
->![1]({{ site.url }}/images/zjs.jpg)<br>
->[冰之依韩版女装](http://allluckly.taobao.com/)（程序媛福利）<br>
 
 
 <br>
@@ -89,14 +87,9 @@ iOS多国语言国际化由于我个人也是第一次做，所以遇到了很�
 这样做的好处就是我们替换图片的时候只要判断下后缀是否是`en`<br>
 就可以判断当前语言所需的图片下面我截个图给大家瞧瞧<br>
 
-![屏幕快照 2015-09-29 上午9.40.17.png](http://upload-images.jianshu.io/upload_images/671504-cc907a133a676790.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)<br>
+<span class="technical-missing-image">历史配图暂不可用，<a href="http://upload-images.jianshu.io/upload_images/671504-cc907a133a676790.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">保留原图地址</a>供查阅。</span><br>
 记得叫美工改好名字哦，我们用起来的时候就会方便快捷！<br>
 
 暂时就发现这么多，大家有什么需要补充的也可以邮箱给我。<br>
 
 版权归©Bison所有 任何转载请标明出处！<br>
-
-> [博主app上线了，赶紧点此来围观吧😄](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
-
- > [更多经验请点击](http://www.allluckly.cn/)
-

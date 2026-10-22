@@ -351,8 +351,6 @@ UI部分由于没有什么需要重用的地方，所以没有再另外抽取出
 
 ----------------------------------------------------------
 
-> [学习iOS开发的app上线啦，点此来围观吧](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
 
-> [更多经验请点击](http://allluckly.cn)<br>
 
-好文推荐：[自动归、解档的类](http://allluckly.cn/投稿/tuogao48)<br>
+好文推荐：[自动归、解档的类](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao48)<br>

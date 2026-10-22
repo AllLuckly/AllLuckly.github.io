@@ -18,7 +18,7 @@ path: /images
 ## 前言
 
 微信小程序暂时处于内测期间，公司大的版本刚好上线了，闲来无事，看看微信小程序的文档，顺便学习学习，在此希望和大家一起共勉，发现自己越来越懒惰了，越活越没上进心了，有点危险，给自己敲下警钟吧。废话不多说，开始记录下这些天学习到的一些知识，希望对正在阅读的你有所帮助！
-本文为iOS开发者[Bison](blog.allluckly.cn)自学微信小程序所写，所以很多东西都和iOS进行了一下对比。
+本文为iOS开发者[Bison](https://allluckly.cn/)自学微信小程序所写，所以很多东西都和iOS进行了一下对比。
 
 ## 开搞
 
@@ -166,13 +166,10 @@ com + s 再 编译一下可以看到如下的效果
 
 到此微信小程序的列表功能已经做完了，当然我们看到的布局都是很乱的，下一篇我们将优化UI让他和我们的效果图一样。
 
-本文为[Bison](blog.allluckly.cn)原创，转载请注明出处，否则将追究法律责任
+本文为[Bison](https://allluckly.cn/)原创，转载请注明出处，否则将追究法律责任
 
 ----------------------------------------------------------
 
-> [学习iOS开发的app上线啦，点此来围观吧](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
 
-> [更多经验请点击](https://allluckly.cn)<br>
 
 好文推荐：[分分钟解决iOS开发中App启动动画广告的功能](https://allluckly.cn/lblaunchimagead/LBLaunchImageAd)<br>
-

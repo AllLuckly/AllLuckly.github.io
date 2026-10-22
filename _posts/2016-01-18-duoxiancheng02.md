@@ -15,7 +15,7 @@ path: /images
 
 >&quot;多线程很容易突然出现“错误情况”，这是由于系统的线程调度具有一定的随机性造成的。不过，即使程序偶然出现问题，那也是由于编程不当所引起的。当使用多个线程来访问同一个数据时，很容易“偶然”出现线程安全问题。&quot;
 
-前面在《[Bison眼中的iOS开发多线程是这样的（一）](http://allluckly.cn/多线程/duoxiancheng01)》一文中讲到多线程的优先级，接下来我什么讲讲线程同步与线程通信<br>
+前面在《[Bison眼中的iOS开发多线程是这样的（一）](https://allluckly.cn/%E5%A4%9A%E7%BA%BF%E7%A8%8B/duoxiancheng01)》一文中讲到多线程的优先级，接下来我什么讲讲线程同步与线程通信<br>
 多线程很容易突然出现“错误情况”，这是由于系统的线程调度具有一定的随机性造成的。不过，即使程序偶然出现问题，<br>
 那也是由于编程不当所引起的。当使用多个线程来访问同一个数据时，很容易“偶然”出现线程安全问题。<br>
 
@@ -121,15 +121,9 @@ NSLock* lock;
 
 ----------------------------------------------------------
 
-> [博主app上线啦，快点此来围观吧](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
 
-> 原文地址：[http://allluckly.cn](http://allluckly.cn)<br>
+> 原文地址：[https://allluckly.cn/](https://allluckly.cn/)<br>
 
-好文推荐：[详解持久化Core Data框架的原理以及使用](http://allluckly.cn/持久化/chijiuhua01)<br>
+好文推荐：[详解持久化Core Data框架的原理以及使用](https://allluckly.cn/%E6%8C%81%E4%B9%85%E5%8C%96/chijiuhua01)<br>
 
 版权归©Bison所有 如需转载请保留原文超链接地址！否则后果自负！
-
-
-
-
-

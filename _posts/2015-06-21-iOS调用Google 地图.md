@@ -14,15 +14,12 @@ path: /images
 >&quot;iOS开发就像搬运工，当搬到一定境界的时候就可以偷懒了&quot;
 ><small><cite title="Plato">Bison</cite></small>
 
->![1]({{ site.url }}/images/zjs.jpg)<br>
->[冰之依韩版女装](http://allluckly.taobao.com/)（程序媛福利）
 
 最近做的项目需要和安卓的地图同步，安卓没有使用百度地图，而是用的Google Map.<br>
 说实话有点坑，以前没有和安卓端一起做的时候一般用的苹果自带的地图高德的地图或者百度<br>
 对于Google地图基本上没接触过，主要代码如下<br>
 
 
- > [更多经验请点击](http://www.allluckly.cn/) 
 
 .h 文件
 
@@ -145,7 +142,3 @@ path: /images
 
 
 谷歌Api请到谷歌开发者网站注册，填写相关你自己的app信息自然就有apikey了<br>
-
-
-> [博主app上线了，赶紧点此来围观吧😄](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
-

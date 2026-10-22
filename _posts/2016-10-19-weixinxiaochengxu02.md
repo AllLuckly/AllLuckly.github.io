@@ -169,14 +169,11 @@ data: {
 [demo下载](https://github.com/AllLuckly/IT-Blog_Wechat)
 
 
-本文为[Bison](blog.allluckly.cn)原创，转载请注明出处，否则将追究法律责任
+本文为[Bison](https://allluckly.cn/)原创，转载请注明出处，否则将追究法律责任
 
 
 ----------------------------------------------------------
 
-> [学习iOS开发的app上线啦，点此来围观吧](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
 
-> [更多经验请点击](https://allluckly.cn)<br>
 
 好文推荐：[分分钟解决iOS开发中App启动动画广告的功能](https://allluckly.cn/lblaunchimagead/LBLaunchImageAd)<br>
-

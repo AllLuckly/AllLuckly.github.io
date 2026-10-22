@@ -15,8 +15,6 @@ path: /images
 >&quot;充实自我，提升自我的价值；唯有多学&quot;
 ><small><cite title="Plato">Bison</cite></small>
 
->![1]({{ site.url }}/images/zjs.jpg)<br>
->[冰之依韩版女装](http://allluckly.taobao.com/)（程序媛福利）
 
 `Swift`对于一门新的iOS编程语言，他的崛起是必然的<br>
 
@@ -204,15 +202,8 @@ override func applyLayoutAttributes(layoutAttributes: UICollectionViewLayoutAttr
 
 版权归©Bison所有 任何转载请标明出处！
 
-> [更多经验请点击](http://www.allluckly.cn/)
 
-> [博主app上线了，赶紧点此来围观吧😄](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
 
 <br>
  >最终效果图如下<br>
-![(LBPersonalPageDemo)](https://github.com/AllLuckly/AllLuckly.github.io/blob/master/images/blog/Swift_CollTionView.gif?raw=true)<br><br><br>
-
-
-
-
-
+![UICollectionView 示例效果](/images/blog/Swift_CollTionView.gif)<br><br><br>

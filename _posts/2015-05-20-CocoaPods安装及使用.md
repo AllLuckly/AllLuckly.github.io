@@ -17,8 +17,6 @@ path: /images
 
 >&quot;The beginning is the most important part of the work.&quot;
 ><small><cite title="Plato">Plato</cite></small>
->![1]({{ site.url }}/images/zjs.jpg)<br>
->[冰之依韩版女装](http://allluckly.taobao.com/)（程序媛福利）
 1.安装Brew
 
 `ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`  
@@ -74,9 +72,3 @@ pod "SDWebImage", "~> 2.0"  `
 自动补齐功能马上就好使了。
 
 你也许会郁闷，为什么会出现.xcworkspace文件呢。这正是你刚刚运行`$ pod install`命令产生的新文件。除了这个文件，你会发现还多了另外一个文件“Podfile.lock”和一个文件夹“Pods”。<br>
-
-> [博主app上线了，赶紧点此来围观吧😄](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
-
-
-
-

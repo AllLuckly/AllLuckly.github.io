@@ -96,7 +96,7 @@ iOS开发平台提供了非常优秀的多线程支持，程序可以通过很�
 
 接下来Bison将分别讲解iOS开发多线程中的用法
 
-##NSThread
+## NSThread
 
 iOS使用`NSThread `类代表线程，创建新线程也就是创建`NSThread `对象。
 创建`NSThread `有俩种方式。
@@ -177,7 +177,7 @@ iOS使用`NSThread `类代表线程，创建新线程也就是创建`NSThread `�
 当程序创建了一个线程之后，该线程就处于新建状态，此时它和其他Objective-C对象一样，仅仅由系统为其分配了内存，并初始化了其他成员变量的值。此时的线程对象没有表现出任何线程的动态特征，程序也不会执行线程的线程执行体。
 当线程对象调用了`start`方法之后，该线程处于就绪状态，系统会为其创建方法调用栈和程序计数器，处于这种状态中的线程并没有开始运行，它只是表示该线程可以运行了。至于该线程何时运行，取决于系统的调度。
 
-####终止子线程
+#### 终止子线程
 
 线程会以如下3中方式之一结束，结束后就处于死亡状态。
 
@@ -296,19 +296,13 @@ NSThread* thread;
 {% endhighlight %}
 今天暂时写到这吧....，有点长了😄
 
-> [Bison眼中的iOS开发多线程是这样的（二）](http://allluckly.cn/多线程/duoxiancheng02)
+> [Bison眼中的iOS开发多线程是这样的（二）](https://allluckly.cn/%E5%A4%9A%E7%BA%BF%E7%A8%8B/duoxiancheng02)
 
 ----------------------------------------------------------
 
-> [博主app上线啦，快点此来围观吧](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
 
-> 原文地址：[http://allluckly.cn](http://allluckly.cn)<br>
+> 原文地址：[https://allluckly.cn/](https://allluckly.cn/)<br>
 
-好文推荐：[详解持久化Core Data框架的原理以及使用](http://allluckly.cn/持久化/chijiuhua01)<br>
+好文推荐：[详解持久化Core Data框架的原理以及使用](https://allluckly.cn/%E6%8C%81%E4%B9%85%E5%8C%96/chijiuhua01)<br>
 
 版权归©Bison所有 如需转载请保留原文超链接地址！否则后果自负！
-
-
-
-
-

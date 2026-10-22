@@ -22,9 +22,10 @@ sitemap: false
   {% endfor %}
   {% for entry in site.posts %}
     {% unless entry.sitemap == false or entry.noindex or entry.published == false %}
+    {% assign entry_update = site.data.technical_updates[entry.path] %}
   <url>
     <loc>{{ entry.url | replace: '/index.html', '/' | absolute_url | xml_escape }}</loc>
-    <lastmod>{{ entry.modified | default: entry.date | date_to_xmlschema }}</lastmod>
+    <lastmod>{{ entry.modified | default: entry_update.updated | default: entry.date | date_to_xmlschema }}</lastmod>
   </url>
     {% endunless %}
   {% endfor %}
