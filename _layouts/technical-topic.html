@@ -1,0 +1,24 @@
+---
+layout: studio
+technical: true
+section: journal
+---
+{% assign technical_topic = site.data.technical_topics | where: 'id', page.topic_id | first %}
+{% assign technical_posts = site.posts | where: 'layout', 'post' %}
+{% assign topic_count = 0 %}{% for post in technical_posts %}{% assign article_data = site.data.technical_articles[post.path] %}{% if article_data.topic == page.topic_id %}{% assign topic_count = topic_count | plus: 1 %}{% endif %}{% endfor %}
+<div class="wrap technical-directory technical-topic-page" data-technical-library>
+  <nav class="breadcrumbs" aria-label="面包屑"><a href="{{ '/' | relative_url }}">首页</a><span aria-hidden="true">/</span><a href="{{ '/journal/' | relative_url }}">开发笔记</a><span aria-hidden="true">/</span><span aria-current="page">{{ technical_topic.name | escape }}</span></nav>
+  <header class="technical-directory-header"><p class="eyebrow">DEVELOPMENT NOTES · {{ topic_count }} 篇</p><h1>{{ technical_topic.name | escape }}</h1><p>{{ technical_topic.lead | escape }}</p></header>
+  <div class="technical-topic-layout">
+    <aside class="technical-topic-navigation"><nav class="technical-topic-links" aria-label="技术主题"><h2>浏览主题</h2><ul>{% for topic in site.data.technical_topics %}<li><a href="{{ topic.url | relative_url }}"{% if topic.id == page.topic_id %} aria-current="page"{% endif %}>{{ topic.name | escape }}</a></li>{% endfor %}</ul><a class="technical-back-link" href="{{ '/journal/' | relative_url }}">全部开发笔记 <span aria-hidden="true">→</span></a></nav></aside>
+    <div class="technical-topic-main">
+      <section class="technical-reading-advice" aria-labelledby="technical-reading-title"><h2 id="technical-reading-title">怎么读这一组</h2><ol>{% for advice in technical_topic.reading %}<li>{{ advice | escape }}</li>{% endfor %}</ol><p>这是 2015–2017 年的历史记录，示例未在本次整理中重新运行验证。先核对文章日期和版本说明，再决定哪些思路适合当前项目。</p></section>
+      {{ content }}
+      <section class="technical-library" aria-labelledby="technical-library-title"><div class="technical-library-heading"><h2 id="technical-library-title">主题文章</h2><span>{{ topic_count }} 篇 · 新到旧</span></div>
+        <form class="technical-search" role="search" aria-label="搜索本主题文章" data-technical-controls hidden><label for="technical-query">在本主题中查找</label><div class="technical-search-fields"><input id="technical-query" type="search" data-technical-query placeholder="输入标题、摘要或关键词" autocomplete="off" aria-describedby="technical-search-help"><button type="reset" data-technical-reset hidden>清空搜索</button></div><p id="technical-search-help">多个关键词用空格分隔；所有关键词都匹配才会显示。</p><p class="technical-search-status" role="status" aria-live="polite" data-technical-status></p></form>
+        <ul class="technical-list" role="list">{% for post in technical_posts %}{% assign article_data = site.data.technical_articles[post.path] %}{% if article_data.topic == page.topic_id %}{% include technical-row.html post=post %}{% endif %}{% endfor %}</ul>
+        <div class="technical-empty" data-technical-empty hidden><h3>这个主题里没有匹配文章</h3><p>减少关键词再试一次，或到<a href="{{ '/journal/' | relative_url }}">全部开发笔记</a>中查找。</p><button type="button" data-technical-reset>清空搜索</button></div>
+      </section>
+    </div>
+  </div>
+</div>

@@ -16,42 +16,41 @@ path: /images/blog/Alamofire
 ><small><cite title="Plato">Bison</cite></small>
 
 
->[冰之依韩版女装](http://allluckly.taobao.com/)（程序媛福利）<br>
 
 
 <br>
 
 
-##第一部分，配置项目
+## 第一部分，配置项目
 在此只讲纯手打拉第三方框架的方法，`Pods`的自行百度哦！不懂`Pods`的可以点击传送
-[传送门](http://allluckly.cn/cocoapods/CocoaPods%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8/)
+[传送门](https://allluckly.cn/cocoapods/CocoaPods%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8)
 首先我们创建一个工程如下图
 
-![1]({{ site.url }}/images/1.png)<br>
+![1]({{ site.url }}/images/blog/Alamofire/1.png)<br>
 
 然后把下载的`Alamofire`解压文件全部放进创建的项目文件夹中，如下图
 
-![2]({{ page.path }}/2.png)<br>
+![2]({{ '/images/blog/Alamofire' | relative_url | uri_escape }}/2.png)<br>
 
 关键时刻到了哦，集中精神，注意！！！
 
-![3]({{ page.path }}/3.png)<br>
+![3]({{ '/images/blog/Alamofire' | relative_url | uri_escape }}/3.png)<br>
 
 这个图以后呢，就是最重要的时候了，请看好红色框框的部分，千万不要选择错了哦！！！
 
-![4]({{ page.path }}/4.jpg)<br>
+![4]({{ '/images/blog/Alamofire' | relative_url | uri_escape }}/4.jpg)<br>
 
 
 接着我们要把`Alamofire`的静态库加到工程里面来，具体操作如下图
 
-![5]({{ page.path }}/5.png)<br>
+![5]({{ '/images/blog/Alamofire' | relative_url | uri_escape }}/5.png)<br>
 
 再然后呢，我们导入`Alamofire`的头文件，运行下，看是否报错，不报错呢，我们导入的文件配置工程就是对的！
-####PS
+#### PS
 告诉大家一个小秘密，Bison发现第三方框架很多都是这个样子导入的哦！例如`HanekeSwift`
 
 
-##第二部分，Bison教你怎么使用`Alamofire`
+## 第二部分，Bison教你怎么使用`Alamofire`
 
 {% highlight css %}
 
@@ -114,19 +113,11 @@ func reloadData(){
 
 到此我们的教程就结束了，有什么问题可以留言哦！会抽空解答大家的疑问<br>
 
-> [更多经验请点击](http://www.allluckly.cn/)<br>
 
-> [博主app上线了，赶紧点此来围观吧😄](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
 
 好文推荐：[iOS开发内购全套图文教程](http://www.jianshu.com/p/05a3087cd796)<br>
 
-原文在：http://www.allluckly.cn/
+原文在：https://allluckly.cn/
 
 <br>
 版权归©Bison所有 如需转载请保留原文超链接地址！否则后果自负！
-
-
-
-
-
-

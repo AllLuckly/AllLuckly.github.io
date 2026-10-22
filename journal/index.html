@@ -1,7 +1,21 @@
 ---
 layout: studio
 title: 开发笔记与技术文章归档
-description: Bison 的 iOS 开发、Swift、FFmpeg 与独立开发技术文章归档，保留原始发表日期与链接。
+description: 按 UIKit 与图形、Swift 与运行时、并发性能、数据网络、工程发布、音视频和 Web 七个主题，查阅 Bison 博客 2015–2017 年的技术记录与转载文章。
 permalink: /journal/
+technical: true
+section: journal
+modified: 2026-10-23
 ---
-<section class="wrap section page-intro"><p class="eyebrow">THE ARCHIVE</p><h1>写代码，也写下来。</h1><p>保留每个阶段的探索。历史技术文章请结合其发表日期阅读。</p><div class="journal-search" hidden data-journal-search><label for="journal-query">查找文章</label><input id="journal-query" type="search" placeholder="输入标题或分类，例如 Swift" autocomplete="off"><p role="status" aria-live="polite" data-search-status></p></div><div class="journal-list">{% for post in site.posts %}{% unless post.app_id %}<article data-journal-item><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%Y.%m.%d' }}</time><div><h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2><span>{{ post.categories | join: ' · ' }}</span></div><span aria-hidden="true">↗</span></article>{% endunless %}{% endfor %}</div></section>
+{% assign technical_posts = site.posts | where: 'layout', 'post' %}
+<div class="wrap technical-directory" data-technical-library>
+  <nav class="breadcrumbs" aria-label="面包屑"><a href="{{ '/' | relative_url }}">首页</a><span aria-hidden="true">/</span><span aria-current="page">开发笔记</span></nav>
+  <header class="technical-directory-header"><p class="eyebrow">DEVELOPMENT NOTES · 2015–2017</p><h1>问题记下来，思路留下来。</h1><p>从界面动画到音视频，把 {{ technical_posts.size }} 篇旧笔记按主题重新整理。原始发布日期、文章地址和技术代码保留，方便沿着一个问题继续找下去。</p><p class="technical-archive-note">这些文章记录的是当时的开发环境；本次整理未重新运行验证示例。每篇文章单独标明署名、出处和需要留意的版本信息。</p></header>
+  <section class="technical-topic-overview" aria-labelledby="technical-topics-title"><h2 id="technical-topics-title">先选一个主题</h2><div class="technical-topic-grid">{% for topic in site.data.technical_topics %}{% assign topic_count = 0 %}{% for post in technical_posts %}{% assign article_data = site.data.technical_articles[post.path] %}{% assign article_topic = article_data.topic | default: 'web-notes' %}{% if article_topic == topic.id %}{% assign topic_count = topic_count | plus: 1 %}{% endif %}{% endfor %}<a class="technical-topic-card" href="{{ topic.url | relative_url }}"><span class="technical-topic-number">0{{ forloop.index }} <span>{{ topic_count }} 篇</span></span><h3>{{ topic.name | escape }}</h3><p>{{ topic.description | escape }}</p><span class="technical-topic-cta">进入主题 <span aria-hidden="true">→</span></span></a>{% endfor %}</div></section>
+  <section class="technical-library" aria-labelledby="technical-library-title">
+    <div class="technical-library-heading"><h2 id="technical-library-title">全部文章</h2><span>{{ technical_posts.size }} 篇 · 按主题归档</span></div>
+    <form class="technical-search" role="search" aria-label="搜索开发笔记" data-technical-controls hidden><label for="technical-query">查找标题、摘要或关键词</label><div class="technical-search-fields"><input id="technical-query" type="search" data-technical-query placeholder="例如：Swift 动画" autocomplete="off" aria-describedby="technical-search-help"><button type="reset" data-technical-reset hidden>清空搜索</button></div><p id="technical-search-help">可用空格组合多个关键词，例如“Swift 动画”；所有关键词都匹配才会显示。</p><p class="technical-search-status" role="status" aria-live="polite" data-technical-status></p></form>
+    <div class="technical-library-sections">{% for topic in site.data.technical_topics %}<section class="technical-library-section" data-technical-section aria-labelledby="topic-{{ topic.id }}"><header><h3 id="topic-{{ topic.id }}">{{ topic.name | escape }}</h3><a href="{{ topic.url | relative_url }}">导读与完整目录 <span aria-hidden="true">→</span></a></header><ul class="technical-list" role="list">{% for post in technical_posts %}{% assign article_data = site.data.technical_articles[post.path] %}{% assign article_topic = article_data.topic | default: 'web-notes' %}{% if article_topic == topic.id %}{% include technical-row.html post=post heading='h4' %}{% endif %}{% endfor %}</ul></section>{% endfor %}</div>
+    <div class="technical-empty" data-technical-empty hidden><h3>没有找到匹配文章</h3><p>试试一个较短的词，或去掉版本号。也可以清空搜索，继续按主题浏览。</p><button type="button" data-technical-reset>查看全部文章</button></div>
+  </section>
+</div>

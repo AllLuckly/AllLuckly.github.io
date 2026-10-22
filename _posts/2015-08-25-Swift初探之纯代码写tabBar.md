@@ -15,8 +15,6 @@ path: /images
 >&quot;充实自我，提升自我的价值；唯有多学&quot;
 ><small><cite title="Plato">Bison</cite></small>
 
->![1]({{ site.url }}/images/zjs.jpg)<br>
->[冰之依韩版女装](http://allluckly.taobao.com/)（程序媛福利）
 
 最近的项目新版本基本完成了,闲来无事学习学习新出的语言Swift。
 对于有OC基础的人来说学习Swift还是很简单的，下面是我自学写的Tabbar，当<br>
@@ -25,7 +23,6 @@ path: /images
 
 代码如下<br>
 
- > [更多经验请点击](http://www.allluckly.cn/)
 
 核心代码
 
@@ -66,9 +63,7 @@ return tc;
 
 {% endhighlight %}
 
-> [博主app上线了，赶紧点此来围观吧😄](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
 
 > [点击下载Demo](https://github.com/AllLuckly/LBSwift_TabBar) <br>
 
 ![(LBSwift_TabBar)](https://github.com/AllLuckly/LBSwift_TabBar/blob/master/123.gif?raw=true)
-

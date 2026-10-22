@@ -94,6 +94,6 @@ jsCodeLocation = [NSURL URLWithString:@"http://localhost:8081/index.ios.bundle"]
 
 ![1]({{ site.url }}/images/blog/React Native/4.png)<br>
 
-参考文档:[react-native官方文档]([https://facebook.github.io/react-native/docs/getting-started.html#content](https://facebook.github.io/react-native/docs/getting-started.html#content))
+参考文档:[react-native官方文档](https://facebook.github.io/react-native/docs/getting-started.html#content)
 
 有问题欢迎留言，对你有帮助随手点喜欢。后续如果有时间的话，会一直更新学习React Native的一些心得与体会。

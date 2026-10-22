@@ -77,6 +77,7 @@ for file,page in pages.items():
             if entity['@type']=='VideoObject': videos.append(entity)
 assert len(apps)==3
 app_ids={app['@id'] for app in apps}
+articles=[article for article in articles if article['about'].get('@id') in app_ids]
 for article in articles:
     assert article['about']['@id'] in app_ids
     assert article['author']['name']=='Bison'

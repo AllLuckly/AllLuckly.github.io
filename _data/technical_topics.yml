@@ -1,0 +1,63 @@
+- id: uikit-graphics
+  name: UIKit 与图形动画
+  url: /journal/topics/uikit-graphics/
+  description: 布局、列表、手势、富文本，以及 UIView、Core Animation 与图形绘制。
+  lead: 一个界面效果，往往牵涉布局、事件和绘制三件事。这组文章从具体控件出发，记录当时如何实现列表、富文本、转场和动画，适合按手头的问题挑着读。
+  reading:
+    - 先找对应的控件或交互：列表高度、事件传递、输入框和弹出视图，比从动画代码直接开始更容易定位问题。
+    - 读动画时把初始状态、最终状态、时间和坐标变换分开记录，再比较 UIView 动画、关键帧和 Core Animation 的写法。
+    - Core Text、Core Graphics 和波浪效果可以接着读；留意示例的坐标系、绘制范围及 Swift 版本，不要只照搬视觉参数。
+- id: swift-runtime
+  name: Swift 与运行时
+  url: /journal/topics/swift-runtime/
+  description: Swift 语言实践、Objective-C 消息机制、KVO、Block 与代码组织。
+  lead: 从 Swift 2、Swift 3 的学习笔记，到 Objective-C 运行时与设计模式，这里保留的是理解语言行为的过程。语法会变化，追问“这段代码为什么这样执行”仍然有用。
+  reading:
+    - 初读可从协议代理、Block 与 Swift 常见陷阱开始，先分清值、引用、闭包捕获和对象生命周期。
+    - 看 runtime 文章时，按属性与变量、消息机制、字典转模型的顺序梳理；把运行时能力与具体项目里是否需要使用分开考虑。
+    - 模板、单例、享元与职责划分适合对照阅读。先写出要解决的重复代码或共享状态问题，再判断模式是否合适。
+- id: concurrency-performance
+  name: 并发与性能
+  url: /journal/topics/concurrency-performance/
+  description: 多线程、RunLoop、线程保活、界面卡顿与性能排查。
+  lead: 这一组围绕任务在哪执行、界面为何卡顿展开。既有多线程基础，也有 RunLoop 和检测手段，适合把执行顺序画清楚，再回到代码核对。
+  reading:
+    - 多线程系列按一、二、三阅读，区分任务、队列、线程和同步等待；遇到嵌套调用时，先写出可能的执行顺序。
+    - 再读 RunLoop 与线程保活，关注线程在什么情况下等待、被什么事件唤醒，而不是把“保活”当成通用解决方案。
+    - 卡顿检测和 UIKit 调优要联系实际负载来看：先明确测量对象，再比较耗时、调用栈和屏幕表现，旧示例的数值不作为当前设备结论。
+- id: data-network
+  name: 数据与网络
+  url: /journal/topics/data-network/
+  description: Core Data、缓存、网络请求、即时通讯、推送与系统服务接入。
+  lead: 从本地数据到远端消息，这些笔记记录了持久化、请求封装、推送和即时通讯的实现思路。阅读时先分清数据属于哪一层，再看每段代码负责什么。
+  reading:
+    - 本地数据可以从 Core Data、归档与缓存读起，分别留意保存格式、更新时机和失效策略；它们解决的并不是同一种问题。
+    - 网络部分可先看 NSURLSession 和请求架构，再读 CocoaAsyncSocket 的连接流程，沿着发起、回调、失败和重试梳理状态。
+    - 推送、通讯录、地图、支付等接入记录受系统权限和第三方服务变化影响较大。理解历史流程后，应另查服务方当前文档。
+- id: tooling-release
+  name: 工程工具与发布
+  url: /journal/topics/tooling-release/
+  description: CocoaPods、Git、静态库、Xcode、测试、适配与应用发布记录。
+  lead: 写完功能之后，还有依赖、构建、测试和发布。这组文章保留了当年的工具使用与排错经历，适合寻找问题的来路，也提醒自己区分项目配置与机器环境。
+  reading:
+    - 依赖与打包可从 CocoaPods 安装、提交代码到 CocoaPods、静态库构建串起来看，分别记录工具版本、产物和配置文件。
+    - 遇到构建或测试问题，先对照 Xcode 版本与目标系统，再看 Git 错误、测试技巧和适配笔记；旧插件方案尤其需要确认支持情况。
+    - 审核、内购和发布文章用于了解历史处理思路。实际提交前，以 Apple 当前规则和项目的真实配置为准。
+- id: audio-video
+  name: 音视频开发
+  url: /journal/topics/audio-video/
+  description: FFmpeg 编译、H.264 解码、音视频采集、推流与播放器集成。
+  lead: 这里从 FFmpeg 的构建产物出发，延伸到解码、摄像头与麦克风采集、推流和播放。读这些旧记录时，先把媒体数据的流向连起来，再研究每个接口。
+  reading:
+    - 先看 FFmpeg-iOS 编译记录，认清头文件、静态库、目标架构与脚本各自的作用；原构建环境和依赖版本已经是历史信息。
+    - H.264 解码与采集文章可以对照阅读：分别记下输入格式、时间信息、解码后的数据和资源释放位置。
+    - 最后看推流封装与 ijkplayer 集成，把采集、编码、传输和播放分成不同环节。旧地址、协议配置和依赖应在使用前重新核查。
+- id: web-notes
+  name: Web 与开发随笔
+  url: /journal/topics/web-notes/
+  description: WebView、JavaScript 交互、小程序、博客维护、源码整理与开发随笔。
+  lead: 原生应用之外，还有网页交互、小程序和博客本身。这一组也收录源码推荐与阶段总结，既方便回查具体问题，也保留当时的学习线索。
+  reading:
+    - 网页交互可从 WebView 的基本使用读到 JavaScript 调用原生，重点看职责边界和数据如何传递；旧 UIWebView 示例不作为当前实现建议。
+    - 小程序从零开始系列按一、二、三阅读，先理解页面、数据与事件之间的关系，再对照如今的开发工具和平台文档。
+    - 源码推荐、博客收录与年度总结按发表时间看更合适。它们反映当时的项目与工具状态，外链可用性和收录结果需要另行确认。

@@ -1,0 +1,14 @@
+{% assign row_post = include.post %}
+{% assign row_data = site.data.technical_articles[row_post.path] %}
+{% assign row_keywords = row_data.keywords | join: ' ' %}
+{% assign row_summary = row_data.summary | default: '' %}
+{% assign row_search = row_post.title | append: ' ' | append: row_summary | append: ' ' | append: row_keywords %}
+<li class="technical-row" data-technical-item data-search-text="{{ row_search | escape }}">
+  <time datetime="{{ row_post.date | date_to_xmlschema }}">{{ row_post.date | date: '%Y-%m-%d' }}</time>
+  <div class="technical-row-copy">
+    {% if include.heading == 'h4' %}<h4><a href="{{ row_post.url | relative_url }}">{{ row_post.title | escape }}</a></h4>{% else %}<h3><a href="{{ row_post.url | relative_url }}">{{ row_post.title | escape }}</a></h3>{% endif %}
+    {% if row_data.summary %}<p>{{ row_data.summary | escape }}</p>{% endif %}
+    {% if row_data.author_name or row_data.keywords.size > 0 %}<div class="technical-row-meta">{% if row_data.author_name %}<span>{{ row_data.author_name | escape }}</span>{% endif %}{% if row_data.keywords.size > 0 %}<span>{{ row_data.keywords | slice: 0, 3 | join: ' · ' | escape }}</span>{% endif %}</div>{% endif %}
+  </div>
+  <span class="technical-row-arrow" aria-hidden="true">→</span>
+</li>

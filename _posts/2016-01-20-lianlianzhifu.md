@@ -44,7 +44,7 @@ NSDictionary* signedDic = [payUtil signedOrderDic:orderParam andSignKey:md5key_o
 ```
 <br>
 
-###SDK可配置部分<br>
+### SDK可配置部分<br>
 
 iOS SDK可以通过修改资源bundle进行定制， 因为是在bundle里面，请在修改好以后clean proj，这样才会生效。<br>
 
@@ -62,7 +62,7 @@ iOS SDK可以通过修改资源bundle进行定制， 因为是在bundle里面，
 
 修改的地方如下截图：<br>
 
-![2]({{ page.path }}/blog/lianlianzhifu.png)<br>
+![2]({{ '/images' | relative_url | uri_escape }}/blog/lianlianzhifu.png)<br>
 
 确认按钮：#a-button<br>
 取消按钮：#b-button<br>
@@ -71,19 +71,19 @@ iOS SDK可以通过修改资源bundle进行定制， 因为是在bundle里面，
 
 官方原来的效果是下面这样的：<br>
 
-![3]({{ page.path }}/blog/lianlianzhifu01.png)<br>
+![3]({{ '/images' | relative_url | uri_escape }}/blog/lianlianzhifu01.png)<br>
 
 修改后是这样的：<br>
 
-![4]({{ page.path }}/blog/lianlianzhifu02.png)<br>
+![4]({{ '/images' | relative_url | uri_escape }}/blog/lianlianzhifu02.png)<br>
 <br>
 
-###参数字段部分<br>
+### 参数字段部分<br>
 
 参数说明在demo中有，可以参考。字段名和wap不一致，请参考demo中的参数说明，参数中的user_id 不是商户号，是商户自己体系中的用户编号，前置卡输入时，no_agree是通过API查询得到的绑卡序号
 <br>
 
-##使用部分<br>
+## 使用部分<br>
 
 Demo中的输入项，是用来测试各种支付条件，包括认证支付（输入姓名，身份证），前置支付（输入卡号，协议号）。不是必须，请根据自己的支付方式测试。
 支持银行数量，是根据支付类型以及商户来，可以配置，请联系运营。
@@ -91,7 +91,7 @@ Demo中的输入项，是用来测试各种支付条件，包括认证支付（�
 <br>
 
 
-###常见问题<br>
+### 常见问题<br>
 
 签名请尽量使用服务器端签名，假如使用客户端签名，请使用Demo中的payutil<br>
 
@@ -140,11 +140,11 @@ Demo中的输入项，是用来测试各种支付条件，包括认证支付（�
 
 后面持续遇到到坑有必需申请商户产品配置表如下图：
 
-![3]({{ page.path }}/blog/lianlianzhifu04.jpg)<br>
+![3]({{ '/images' | relative_url | uri_escape }}/blog/lianlianzhifu04.jpg)<br>
 
 还有连连通银商户配置表如下图：
 
-![3]({{ page.path }}/blog/lianlianzhifu03.png)<br>
+![3]({{ '/images' | relative_url | uri_escape }}/blog/lianlianzhifu03.png)<br>
 
 最最坑爹的是“风险控制参数”，需要8个之多，而demo才写了一个，也没说要写其他的，参数如下：<br>
 
@@ -168,17 +168,9 @@ user_info_identify_type 实名认证方式
 
 ----------------------------------------------------------
 
-> [博主app上线啦，快点此来围观吧](https://itunes.apple.com/us/app/it-blog-zi-xueios-kai-fa-jin/id1067787090?l=zh&ls=1&mt=8)<br>
 
-> 好文推荐：[iOS开发之CollectionViewFlowLayout实现LOL皮肤选择动画](http://allluckly.cn/投稿/tuogao07)<br>
+> 好文推荐：[iOS开发之CollectionViewFlowLayout实现LOL皮肤选择动画](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao07)<br>
 
-> 原文地址：[http://allluckly.cn](http://allluckly.cn)<br>
+> 原文地址：[https://allluckly.cn/](https://allluckly.cn/)<br>
 
 版权归©Bison所有 如需转载请保留原文超链接地址！否则后果自负！
-
-
-
-
-
-
-

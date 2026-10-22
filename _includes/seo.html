@@ -8,10 +8,17 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
 {%- assign seo_website_id = seo_home | append: '#website' -%}
 {%- assign seo_owner = site.owner.name | default: 'Bison' -%}
 {%- assign seo_language = page.lang | default: site.lang | default: 'zh-CN' -%}
+{%- assign seo_technical = site.data.technical_articles[page.path] -%}
+{%- assign seo_update = site.data.technical_updates[page.path] -%}
+{%- assign seo_modified = page.modified | default: seo_update.updated -%}
+{%- assign seo_topic_id = seo_technical.topic | default: page.topic_id -%}
+{%- assign seo_topic = site.data.technical_topics | where: 'id', seo_topic_id | first -%}
+{%- assign seo_collection = false -%}
+{%- if page.layout == 'technical-topic' or page.url == '/journal/' -%}{%- assign seo_collection = true -%}{%- endif -%}
 {%- assign seo_app = site.data.apps | where: 'id', page.app_id | first -%}
 {%- if page.app_id == nil -%}{%- assign seo_app = nil -%}{%- endif -%}
 {%- assign seo_title = page.seo_title | default: page.title | default: site.title -%}
-{%- assign seo_description = page.description | default: seo_app.description | default: site.description | strip_html | normalize_whitespace | strip -%}
+{%- assign seo_description = seo_technical.summary | default: page.description | default: seo_app.description | default: site.description | strip_html | normalize_whitespace | strip -%}
 {%- if paginator and paginator.page > 1 -%}
   {%- assign seo_title = seo_title | append: ' · 第 ' | append: paginator.page | append: ' 页' -%}
   {%- assign seo_description = seo_description | append: ' 更多文章，第 ' | append: paginator.page | append: ' 页。' -%}
@@ -57,6 +64,8 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
   {%- endunless -%}
   {%- assign seo_image = seo_image | absolute_url -%}
 {%- endif -%}
+{%- comment -%}Legacy theme banners and the site logo are not article illustrations.{%- endcomment -%}
+{%- if seo_technical -%}{%- assign seo_image = nil -%}{%- endif -%}
 {%- if seo_app -%}
   {%- assign seo_app_url = seo_app.url | absolute_url -%}
   {%- assign seo_app_id = seo_app_url | append: '#app' -%}
@@ -75,7 +84,7 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
 {% if seo_image %}<meta property="og:image" content="{{ seo_image | escape }}">
 <meta property="og:image:alt" content="{{ page.image_alt | default: seo_title | escape }}">{% endif %}
 {% if seo_article and page.date %}<meta property="article:published_time" content="{{ page.date | date_to_xmlschema }}">{% endif %}
-{% if seo_article and page.modified %}<meta property="article:modified_time" content="{{ page.modified | date_to_xmlschema }}">{% endif %}
+{% if seo_article and seo_modified %}<meta property="article:modified_time" content="{{ seo_modified | date_to_xmlschema }}">{% endif %}
 <meta name="twitter:card" content="{% if seo_image %}summary_large_image{% else %}summary{% endif %}">
 <meta name="twitter:title" content="{{ seo_title | escape }}">
 <meta name="twitter:description" content="{{ seo_description | escape }}">
@@ -102,7 +111,8 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
       "@type": "Person",
       "@id": {{ seo_person_id | jsonify }},
       "name": {{ seo_owner | jsonify | replace: '<', '\u003c' }},
-      "url": {{ '/about/' | absolute_url | jsonify }}
+      "url": {{ '/about/' | absolute_url | jsonify }},
+      "sameAs": ["https://github.com/AllLuckly"]
     }
     {% if seo_article %},
     {
@@ -115,12 +125,44 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
       "inLanguage": {{ seo_language | jsonify }},
       "isPartOf": { "@id": {{ seo_website_id | jsonify }} },
       "publisher": { "@id": {{ seo_person_id | jsonify }} }
-      {% if page.author.name %}, "author": { "@type": "Person", "name": {{ page.author.name | jsonify | replace: '<', '\u003c' }}{% if page.author.url %}, "url": {{ page.author.url | absolute_url | jsonify }}{% endif %} }{% elsif page.author %}, "author": { "@type": "Person", "name": {{ page.author | jsonify | replace: '<', '\u003c' }} }{% elsif page.layout == 'work' %}, "author": { "@id": {{ seo_person_id | jsonify }}, "name": {{ seo_owner | jsonify | replace: '<', '\u003c' }} }{% endif %}
+      {% if seo_technical %}
+        {% if seo_technical.author_name %}, "author": { "@type": {{ seo_technical.author_type | default: 'Person' | jsonify }}, "name": {{ seo_technical.author_name | jsonify | replace: '<', '\u003c' }}{% if seo_technical.author_url %}, "url": {{ seo_technical.author_url | absolute_url | jsonify }}{% endif %} }{% endif %}
+        {% if seo_topic %}, "articleSection": {{ seo_topic.name | jsonify }}, "about": { "@type": "DefinedTerm", "@id": {{ seo_topic.url | absolute_url | append: '#topic' | jsonify }}, "name": {{ seo_topic.name | jsonify }} }{% endif %}
+        {% if seo_technical.keywords %}, "keywords": {{ seo_technical.keywords | jsonify | replace: '<', '\u003c' }}{% endif %}
+        {% if seo_technical.source_url %}, "citation": {{ seo_technical.source_url | jsonify | replace: '<', '\u003c' }}{% endif %}
+      {% elsif page.author.name %}, "author": { "@type": "Person", "name": {{ page.author.name | jsonify | replace: '<', '\u003c' }}{% if page.author.url %}, "url": {{ page.author.url | absolute_url | jsonify }}{% endif %} }{% elsif page.author %}, "author": { "@type": "Person", "name": {{ page.author | jsonify | replace: '<', '\u003c' }} }{% elsif page.layout == 'work' %}, "author": { "@id": {{ seo_person_id | jsonify }}, "name": {{ seo_owner | jsonify | replace: '<', '\u003c' }} }{% endif %}
       {% if page.date %}, "datePublished": {{ page.date | date_to_xmlschema | jsonify }}{% endif %}
-      {% if page.modified or page.date %}, "dateModified": {{ page.modified | default: page.date | date_to_xmlschema | jsonify }}{% endif %}
+      {% if seo_modified or page.date %}, "dateModified": {{ seo_modified | default: page.date | date_to_xmlschema | jsonify }}{% endif %}
       {% if seo_image %}, "image": {{ seo_image | jsonify }}{% endif %}
       {% if seo_app %}, "about": { "@id": {{ seo_app_id | jsonify }} }{% endif %}
       {% if seo_video %}, "video": { "@id": {{ seo_video_id | jsonify }} }{% endif %}
+    }
+    {% endif %}
+    {% if seo_collection %},
+    {
+      "@type": "CollectionPage",
+      "@id": {{ seo_canonical | append: '#collection' | jsonify }},
+      "url": {{ seo_canonical | jsonify }},
+      "name": {{ seo_title | jsonify | replace: '<', '\u003c' }},
+      "description": {{ seo_description | jsonify | replace: '<', '\u003c' }},
+      "inLanguage": {{ seo_language | jsonify }},
+      "isPartOf": { "@id": {{ seo_website_id | jsonify }} },
+      "mainEntity": {
+        "@type": "ItemList",
+        "itemListElement": [
+          {% assign seo_item_count = 0 %}
+          {% for entry in site.posts %}
+            {% assign entry_technical = site.data.technical_articles[entry.path] %}
+            {% if entry_technical %}
+              {% if page.layout != 'technical-topic' or entry_technical.topic == page.topic_id %}
+                {% if seo_item_count > 0 %},{% endif %}
+                {% assign seo_item_count = seo_item_count | plus: 1 %}
+                { "@type": "ListItem", "position": {{ seo_item_count }}, "name": {{ entry.title | jsonify | replace: '<', '\u003c' }}, "url": {{ entry.url | absolute_url | jsonify }} }
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        ]
+      }
     }
     {% endif %}
     {% if seo_video %},
@@ -173,14 +215,18 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
         { "@type": "ListItem", "position": 2, "name": "教程", "item": {{ '/guides/' | absolute_url | jsonify }} },
         { "@type": "ListItem", "position": 3, "name": {{ seo_app.name | jsonify | replace: '<', '\u003c' }}, "item": {{ seo_app.guide_url | absolute_url | jsonify }} },
         {% assign seo_breadcrumb_position = 4 %}
-        {% elsif seo_article %}
-        { "@type": "ListItem", "position": 2, "name": "文章归档", "item": {{ '/posts/' | absolute_url | jsonify }} },
+        {% elsif seo_technical and seo_topic %}
+        { "@type": "ListItem", "position": 2, "name": "开发笔记", "item": {{ '/journal/' | absolute_url | jsonify }} },
+        { "@type": "ListItem", "position": 3, "name": {{ seo_topic.name | jsonify }}, "item": {{ seo_topic.url | absolute_url | jsonify }} },
+        {% assign seo_breadcrumb_position = 4 %}
+        {% elsif seo_article or page.layout == 'technical-topic' %}
+        { "@type": "ListItem", "position": 2, "name": "开发笔记", "item": {{ '/journal/' | absolute_url | jsonify }} },
         {% assign seo_breadcrumb_position = 3 %}
         {% elsif page.layout == 'app' and seo_app %}
         { "@type": "ListItem", "position": 2, "name": "我的应用", "item": {{ '/apps/' | absolute_url | jsonify }} },
         {% assign seo_breadcrumb_position = 3 %}
         {% endif %}
-        { "@type": "ListItem", "position": {{ seo_breadcrumb_position }}, "name": {% if page.layout == 'app' and seo_app %}{{ seo_app.name | jsonify | replace: '<', '\u003c' }}{% else %}{{ seo_title | jsonify | replace: '<', '\u003c' }}{% endif %}, "item": {{ seo_canonical | jsonify }} }
+        { "@type": "ListItem", "position": {{ seo_breadcrumb_position }}, "name": {% if page.layout == 'app' and seo_app %}{{ seo_app.name | jsonify | replace: '<', '\u003c' }}{% elsif page.layout == 'technical-topic' and seo_topic %}{{ seo_topic.name | jsonify }}{% elsif page.url == '/journal/' %}"开发笔记"{% else %}{{ seo_title | jsonify | replace: '<', '\u003c' }}{% endif %}, "item": {{ seo_canonical | jsonify }} }
       ]
     }
     {% endunless %}
