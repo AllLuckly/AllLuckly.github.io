@@ -1,36 +1,60 @@
 ---
-layout: none
+layout: null
+sitemap: false
 ---
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
-<title type="text">{{ site.title }}</title>
-<generator uri="https://github.com/mojombo/jekyll">Jekyll</generator>
-<link rel="self" type="application/atom+xml" href="{{ site.url }}/feed.xml" />
-<link rel="alternate" type="text/html" href="{{ site.url }}" />
-<updated>{{ site.time | date_to_xmlschema }}</updated>
-<id>{{ site.url }}/</id>
-<author>
-  <name>{{ site.owner.name }}</name>
-  <uri>{{ site.url }}/</uri>
-  <email>{{ site.owner.email }}</email>
-</author>
-{% for post in site.posts limit:20 %}
-
-<entry>
-  <title type="html"><![CDATA[{{ post.title | cdata_escape }}]]></title>
-  <link>{% if post.link %}{{ post.link }}{% else %}{{ site.url }}{{ post.url }}{% endif %}</link>
-  <id>{{ site.url }}{{ post.id }}</id>
-  {% if post.modified %}<updated>{{ post.modified | to_xmlschema }}T00:00:00-00:00</updated>
-  <published>{{ post.date | date_to_xmlschema }}</published>
-  {% else %}<published>{{ post.date | date_to_xmlschema }}</published>
-  <updated>{{ post.date | date_to_xmlschema }}</updated>{% endif %}
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="{{ site.lang | default: 'zh-CN' | xml_escape }}" xml:base="{{ '/' | absolute_url | xml_escape }}">
+  <title type="text">{{ site.title | xml_escape }}</title>
+  <subtitle type="text">{{ site.description | strip_html | normalize_whitespace | xml_escape }}</subtitle>
+  <generator uri="https://jekyllrb.com/">Jekyll</generator>
+  <link rel="self" type="application/atom+xml" href="{{ '/feed.xml' | absolute_url | xml_escape }}" />
+  <link rel="alternate" type="text/html" href="{{ '/' | absolute_url | xml_escape }}" />
+  <id>{{ '/feed.xml' | absolute_url | xml_escape }}</id>
+  {% assign feed_updated = '1970-01-01' %}
+  {% assign feed_updated_epoch = feed_updated | date: '%s' | plus: 0 %}
+  {% for post in site.posts %}
+    {% unless post.noindex or post.published == false or post.feed == false %}
+      {% assign post_updated = post.modified | default: post.date %}
+      {% assign post_updated_epoch = post_updated | date: '%s' | plus: 0 %}
+      {% if post_updated_epoch > feed_updated_epoch %}
+        {% assign feed_updated = post_updated %}
+        {% assign feed_updated_epoch = post_updated_epoch %}
+      {% endif %}
+    {% endunless %}
+  {% endfor %}
+  <updated>{{ feed_updated | date_to_xmlschema }}</updated>
   <author>
-    <name>{{ site.owner.name }}</name>
-    <uri>{{ site.url }}</uri>
-    <email>{{ site.owner.email }}</email>
+    <name>{{ site.title | xml_escape }}（内容发布者）</name>
+    <uri>{{ '/about/' | absolute_url | xml_escape }}</uri>
   </author>
-  <content type="html">{{ post.content | xml_escape }}
-  &lt;p&gt;&lt;a href=&quot;{{ site.url }}{{ post.url }}&quot;&gt;{{ post.title }}&lt;/a&gt; was originally published by {{ site.owner.name }} at &lt;a href=&quot;{{ site.url }}&quot;&gt;{{ site.title }}&lt;/a&gt; on {{ post.date | date: "%B %d, %Y" }}.&lt;/p&gt;</content>
-</entry>
-{% endfor %}
+  {% comment %}XML escaping alone does not remove invalid control characters in legacy posts.{% endcomment %}
+  {% assign xml_forbidden_controls = '%00,%01,%02,%03,%04,%05,%06,%07,%08,%0B,%0C,%0E,%0F,%10,%11,%12,%13,%14,%15,%16,%17,%18,%19,%1A,%1B,%1C,%1D,%1E,%1F,%EF%BF%BE,%EF%BF%BF' | split: ',' %}
+  {% assign feed_count = 0 %}
+  {% for post in site.posts %}
+    {% unless post.noindex or post.published == false or post.feed == false %}
+      {% if feed_count < 30 %}
+        {% assign post_canonical = post.url | replace: '/index.html', '/' | absolute_url %}
+        {% assign feed_content = post.content %}
+        {% assign feed_summary = post.description | default: post.excerpt | strip_html | normalize_whitespace %}
+        {% for encoded_control in xml_forbidden_controls %}
+          {% assign xml_control = encoded_control | url_decode %}
+          {% assign feed_content = feed_content | remove: xml_control %}
+          {% assign feed_summary = feed_summary | remove: xml_control %}
+        {% endfor %}
+  <entry xml:base="{{ post_canonical | xml_escape }}">
+    <title type="text">{{ post.title | xml_escape }}</title>
+    <link rel="alternate" type="text/html" href="{{ post_canonical | xml_escape }}" />
+    <id>{{ post_canonical | xml_escape }}</id>
+    <published>{{ post.date | date_to_xmlschema }}</published>
+    <updated>{{ post.modified | default: post.date | date_to_xmlschema }}</updated>
+    {% if post.author %}<author>
+      <name>{{ post.author.name | default: post.author | xml_escape }}</name>
+    </author>{% endif %}
+    <summary type="text">{{ feed_summary | xml_escape }}</summary>
+    <content type="html">{{ feed_content | xml_escape }}</content>
+  </entry>
+        {% assign feed_count = feed_count | plus: 1 %}
+      {% endif %}
+    {% endunless %}
+  {% endfor %}
 </feed>

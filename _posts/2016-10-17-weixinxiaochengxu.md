@@ -93,11 +93,11 @@ iconPath为默认图片路径，selectedIconPath为点击时的图片路径，te
 ```
 <!--文章列表模板 begin-->
 <template name="itmes">
-     <view class="imgs"><image src="{{imgURL}}" class="in-img" background-size="cover" model="scaleToFill"></image></view>
+     <view class="imgs"><image src="{% raw %}{{imgURL}}{% endraw %}" class="in-img" background-size="cover" model="scaleToFill"></image></view>
     <view class="infos">
-      <view class="title">{{title}}</view>
-      <view class="date">{{time}}</view>
-       <view class="classification">{{classification}}</view>
+      <view class="title">{% raw %}{{title}}{% endraw %}</view>
+      <view class="date">{% raw %}{{time}}{% endraw %}</view>
+       <view class="classification">{% raw %}{{classification}}{% endraw %}</view>
     </view>
 </template>
 <!--文章列表模板 begin-->
@@ -154,8 +154,8 @@ cell 和数据源都有了，那就只差一个显示了， 显示在微信小�
 
 ```
 <!--循环渲染列表 begin-->
-<block wx:for="{{newList}}">
-  <template is="itmes" data="{{...item}}" />
+<block wx:for="{% raw %}{{newList}}{% endraw %}">
+  <template is="itmes" data="{% raw %}{{...item}}{% endraw %}" />
 </block>
 <!--循环渲染列表 end-->
 ```
