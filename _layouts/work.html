@@ -12,7 +12,7 @@ layout: studio
   </header>
   {% if page.video.src %}
   <figure class="work-player">
-    <video id="work-video" controls playsinline preload="metadata" poster="{{ page.video.poster | relative_url | escape }}" aria-label="{{ page.video.name | escape }}" aria-describedby="video-description">
+    <video id="work-video" controls playsinline preload="metadata"{% if page.video.width and page.video.height %} width="{{ page.video.width | escape }}" height="{{ page.video.height | escape }}"{% endif %} poster="{{ page.video.poster | relative_url | escape }}" aria-label="{{ page.video.name | escape }}" aria-describedby="video-description">
       <source src="{{ page.video.src | relative_url | escape }}" type="video/mp4">
       {% if page.video.captions %}<track kind="subtitles" src="{{ page.video.captions | relative_url | escape }}" srclang="zh-CN" label="中文步骤" default>{% endif %}
       你的浏览器暂时无法播放此视频，请使用下方链接直接打开。
@@ -21,6 +21,20 @@ layout: studio
       <p id="video-description">{{ page.video.description }}</p>
       {% if page.recording_note %}<p class="recording-note">{{ page.recording_note }}</p>{% endif %}
       <div class="video-links"><a href="{{ page.video.src | relative_url | escape }}">直接打开视频 ↗</a>{% if page.video.captions %}<a href="{{ page.video.captions | relative_url | escape }}" download>下载中文步骤字幕</a>{% endif %}<a href="#creation-notes">阅读文字过程 ↓</a></div>
+      {% if page.video.chapters.size > 0 %}
+      <nav class="video-chapters" aria-label="视频章节" data-video-chapters>
+        <p class="video-chapters-heading">按章节观看</p>
+        <ol>
+          {% for chapter in page.video.chapters %}
+          {% assign chapter_minutes = chapter.start | divided_by: 60 | floor %}
+          {% assign chapter_seconds = chapter.start | modulo: 60 | floor %}
+          <li id="t={{ chapter.start | escape }}"><a href="#t={{ chapter.start | escape }}" data-video-chapter="{{ chapter.start | escape }}" aria-controls="work-video"><span class="video-chapter-time">{% if chapter_minutes < 10 %}0{% endif %}{{ chapter_minutes }}:{% if chapter_seconds < 10 %}0{% endif %}{{ chapter_seconds }}</span><span>{{ chapter.title | escape }}</span></a></li>
+          {% endfor %}
+        </ol>
+        <p class="video-chapter-status" role="status" data-video-chapter-status hidden></p>
+        <noscript><p>章节跳转需要 JavaScript，也可以按标注时间拖动播放器进度条。</p></noscript>
+      </nav>
+      {% endif %}
     </figcaption>
   </figure>
   {% endif %}

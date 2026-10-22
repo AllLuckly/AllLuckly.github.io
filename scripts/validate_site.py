@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Check built metadata and internal links for the new app/tutorial experience."""
 import json
+import math
 import re
 from collections import Counter
 from datetime import datetime
@@ -17,7 +18,7 @@ catalog_by_id = {app['id']: app for app in catalog}
 SITEMAP_NS = {'sm':'http://www.sitemaps.org/schemas/sitemap/0.9','video':'http://www.google.com/schemas/sitemap-video/1.1'}
 class Page(HTMLParser):
     def __init__(self, source):
-        super().__init__(); self.links=[]; self.graphs=[]; self.canonical=[]; self.h1=0; self.ld=False; self.buf=''; self.ids=set(); self.filter_items=[]; self.work_items=[]; self.videos=[]; self.sources=[]; self.tracks=[]; self.robots=[]
+        super().__init__(); self.links=[]; self.graphs=[]; self.canonical=[]; self.h1=0; self.ld=False; self.buf=''; self.ids=set(); self.filter_items=[]; self.work_items=[]; self.videos=[]; self.sources=[]; self.tracks=[]; self.robots=[]; self.chapter_links=[]; self.chapter_label=None
         self.feed(source)
     def handle_starttag(self, tag, attrs):
         attrs=dict(attrs)
@@ -27,6 +28,8 @@ class Page(HTMLParser):
         if tag=='video': self.videos.append(attrs)
         if tag=='source': self.sources.append(attrs)
         if tag=='track': self.tracks.append(attrs)
+        if tag=='a' and 'data-video-chapter' in attrs:
+            attrs['_text']=''; self.chapter_links.append(attrs); self.chapter_label=attrs
         if tag=='h1': self.h1+=1
         if tag=='script' and attrs.get('type')=='application/ld+json': self.ld=True; self.buf=''
         if tag=='link' and attrs.get('rel')=='canonical': self.canonical.append(attrs['href'])
@@ -37,7 +40,9 @@ class Page(HTMLParser):
         if tag=='video' and attrs.get('poster'): self.links.append(attrs['poster'])
     def handle_data(self, data):
         if self.ld: self.buf+=data
+        if self.chapter_label is not None: self.chapter_label['_text']+=data
     def handle_endtag(self, tag):
+        if tag=='a': self.chapter_label=None
         if tag=='script' and self.ld:
             self.graphs.append(json.loads(self.buf)); self.ld=False
 
@@ -189,6 +194,29 @@ for work in source_works:
     article=next(article for article in work_articles if article['url']==canonical)
     assert article['video']['@id']==entity['@id'] and article['about']==entity['about'], f'work/video/app relation differs: {canonical}'
     assert entity['mainEntityOfPage']['@id']==canonical, f'video watch page differs: {canonical}'
+    if 'width' in video or 'height' in video:
+        for key in ['width','height']:
+            assert type(video.get(key)) is int and video[key]>0, f'video {key} must be a positive pixel count: {canonical}'
+            assert player.get(key)==str(video[key]), f'player {key} differs: {canonical}'
+    chapters=video.get('chapters',[])
+    assert isinstance(chapters,list), f'video chapters must be a list: {canonical}'
+    if chapters: assert seconds>=30, f'chapter Clips require a video of at least 30 seconds: {canonical}'
+    clips=entity.get('hasPart',[])
+    assert isinstance(clips,list) and len(clips)==len(chapters)==len(page.chapter_links), f'chapter counts differ: {canonical}'
+    previous_start=-1
+    for chapter,link,clip in zip(chapters,page.chapter_links,clips):
+        assert isinstance(chapter,dict), f'invalid chapter: {canonical}'
+        start=chapter.get('start'); title=chapter.get('title')
+        assert type(start) in [int,float] and math.isfinite(start) and previous_start<start<seconds, f'chapter starts must increase within the video: {canonical}'
+        assert start>=0 and isinstance(title,str) and title.strip(), f'chapter needs a nonempty title and nonnegative start: {canonical}'
+        rendered_start=link.get('data-video-chapter','')
+        assert re.fullmatch(r'\d+(?:\.\d+)?',rendered_start) and float(rendered_start)==start, f'chapter button time differs: {canonical}'
+        assert link.get('href')=='#t='+rendered_start and 't='+rendered_start in page.ids, f'chapter fragment differs: {canonical}'
+        assert link.get('aria-controls')=='work-video', f'chapter must control this player: {canonical}'
+        assert ' '.join(link['_text'].split()).endswith(' '.join(title.split())), f'chapter title must be visible: {canonical}'
+        assert clip.get('@type')=='Clip' and clip.get('name')==title and type(clip.get('startOffset')) in [int,float] and clip['startOffset']==start, f'Clip differs from visible chapter: {canonical}'
+        assert clip.get('url')==canonical+'?t='+rendered_start+'#work-video', f'Clip needs a playable time link: {canonical}'
+        previous_start=start
     assert canonical in urls, f'work missing from sitemap: {canonical}'
     sitemap_entry=next(entry for entry in video_sitemap_entries if entry.findtext('sm:loc',namespaces=SITEMAP_NS)==canonical)
     sitemap_videos=sitemap_entry.findall('video:video',SITEMAP_NS)
