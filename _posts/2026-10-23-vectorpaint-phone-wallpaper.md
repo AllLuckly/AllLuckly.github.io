@@ -73,4 +73,3 @@ PNG 是固定像素输出，提高数字不会增加导入小图片原本没有�
 [画布与导出尺寸]({{ '/guides/vectorpaint-canvas-units/' | relative_url }})、[制作几何主体]({{ '/guides/vectorpaint-geometric-portrait/' | relative_url }})。
 
 依据 [VectorPaint 官方商店说明](https://apps.apple.com/cn/app/id1587272880)与功能入口整理；[Apple 版本信息](https://itunes.apple.com/lookup?id=1587272880&country=cn)核对日期为 2026 年 10 月 23 日，公开版本 1.0.7，最低系统 iOS / iPadOS 17。文中的尺寸、文案和图形是练习建议。
-

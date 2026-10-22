@@ -69,4 +69,3 @@ reading_time: 8
 [修整人物曲线]({{ '/guides/vectorpaint-bezier-nodes/' | relative_url }})、[头像圆形与方形适配]({{ '/guides/vectorpaint-avatar-crops/' | relative_url }})。
 
 依据 [VectorPaint 官方商店说明](https://apps.apple.com/cn/app/id1587272880)与功能入口整理；[Apple 版本信息](https://itunes.apple.com/lookup?id=1587272880&country=cn)核对日期为 2026 年 10 月 23 日，公开版本 1.0.7，最低系统 iOS / iPadOS 17。文中的尺寸、文案和图形是练习建议。
-

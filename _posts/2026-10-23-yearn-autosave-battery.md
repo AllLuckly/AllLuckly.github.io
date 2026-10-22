@@ -69,4 +69,3 @@ reading_time: 8
 继续阅读[即时槽位操作]({{ '/guides/yearn-save-slots/' | relative_url }})与[云端状态检查]({{ '/guides/yearn-icloud-saves/' | relative_url }})。
 
 资料日期：2026 年 10 月 23 日。公开版本依据 [Yearn 商店说明](https://apps.apple.com/cn/app/id6756637059)及 [Apple 版本查询](https://itunes.apple.com/lookup?id=6756637059&country=cn)，为 1.0.2。具体游戏与存档的可用性，请按文中的保存、退出和读回步骤检查。
-

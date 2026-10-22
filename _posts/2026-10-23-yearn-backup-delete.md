@@ -65,4 +65,3 @@ Yearn 启用了系统文件共享。使用 Mac 时，可以连接并信任 iPhon
 继续阅读[云同步的边界]({{ '/guides/yearn-icloud-saves/' | relative_url }})与[原文件与配套关系]({{ '/guides/yearn-rom-formats/' | relative_url }})。文件共享步骤参照 [Apple：通过访达共享文件](https://support.apple.com/zh-cn/119585)。
 
 资料日期：2026 年 10 月 23 日。公开版本依据 [Yearn 商店说明](https://apps.apple.com/cn/app/id6756637059)及 [Apple 版本查询](https://itunes.apple.com/lookup?id=6756637059&country=cn)，为 1.0.2。具体游戏与存档的可用性，请按文中的保存、退出和读回步骤检查。
-

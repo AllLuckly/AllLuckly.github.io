@@ -73,4 +73,3 @@ reading_time: 8
 [字标间距检查]({{ '/guides/vectorpaint-wordmark-spacing/' | relative_url }})、[原稿与独立备份]({{ '/guides/vectorpaint-save-backup/' | relative_url }})。
 
 依据 [VectorPaint 官方商店说明](https://apps.apple.com/cn/app/id1587272880)与功能入口整理；[Apple 版本信息](https://itunes.apple.com/lookup?id=1587272880&country=cn)核对日期为 2026 年 10 月 23 日，公开版本 1.0.7，最低系统 iOS / iPadOS 17。文中的尺寸、文案和图形是练习建议。
-

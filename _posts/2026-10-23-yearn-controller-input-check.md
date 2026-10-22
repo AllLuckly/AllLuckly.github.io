@@ -69,4 +69,3 @@ reading_time: 8
 接着读[系统配对与识别]({{ '/guides/yearn-bluetooth-controller/' | relative_url }})与[触屏输入作对照]({{ '/guides/yearn-virtual-controller/' | relative_url }})。控制器支持范围可参照 [Apple 官方连接说明](https://support.apple.com/zh-cn/111099)。
 
 资料核对于 2026 年 10 月 23 日，公开版本依据 [Yearn 商店页面](https://apps.apple.com/cn/app/id6756637059)及 [Apple 查询接口](https://itunes.apple.com/lookup?id=6756637059&country=cn)，为 1.0.2、iOS / iPadOS 17 起。界面以设备上实际显示的版本为准。
-

@@ -73,4 +73,3 @@ reading_time: 8
 [几何对象基础]({{ '/guides/vectorpaint-basic-shapes/' | relative_url }})、[色块与描边]({{ '/guides/vectorpaint-fill-stroke/' | relative_url }})。
 
 依据 [VectorPaint 官方商店说明](https://apps.apple.com/cn/app/id1587272880)与功能入口整理；[Apple 版本信息](https://itunes.apple.com/lookup?id=1587272880&country=cn)核对日期为 2026 年 10 月 23 日，公开版本 1.0.7，最低系统 iOS / iPadOS 17。文中的尺寸、文案和图形是练习建议。
-

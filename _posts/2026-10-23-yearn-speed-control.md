@@ -69,4 +69,3 @@ reading_time: 8
 接着读[保留存档检查点]({{ '/guides/yearn-save-slots/' | relative_url }})与[运行异常排查]({{ '/guides/yearn-launch-troubleshooting/' | relative_url }})。
 
 资料核对于 2026 年 10 月 23 日，公开版本依据 [Yearn 商店页面](https://apps.apple.com/cn/app/id6756637059)及 [Apple 查询接口](https://itunes.apple.com/lookup?id=6756637059&country=cn)，为 1.0.2、iOS / iPadOS 17 起。界面以设备上实际显示的版本为准。
-

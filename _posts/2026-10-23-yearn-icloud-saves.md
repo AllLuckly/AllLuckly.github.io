@@ -69,4 +69,3 @@ Yearn 的设置提供 iCloud 存档同步入口。使用它时，先把目标定
 继续阅读[保存与读回检查]({{ '/guides/yearn-autosave-battery/' | relative_url }})与[独立文件备份]({{ '/guides/yearn-backup-delete/' | relative_url }})。
 
 资料日期：2026 年 10 月 23 日。公开版本依据 [Yearn 商店说明](https://apps.apple.com/cn/app/id6756637059)及 [Apple 版本查询](https://itunes.apple.com/lookup?id=6756637059&country=cn)，为 1.0.2。具体游戏与存档的可用性，请按文中的保存、退出和读回步骤检查。
-

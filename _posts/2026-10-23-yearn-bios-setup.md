@@ -69,4 +69,3 @@ PS1 管理中涉及的常见名称包括 scph5500.bin、scph5501.bin 和 scph550
 继续阅读[启动错误排查]({{ '/guides/yearn-launch-troubleshooting/' | relative_url }})和[PS1 文件配套]({{ '/guides/yearn-ps1-disc-files/' | relative_url }})。
 
 资料核对：2026 年 10 月 23 日。[Yearn 商店说明](https://apps.apple.com/cn/app/id6756637059)与[Apple 版本查询](https://itunes.apple.com/lookup?id=6756637059&country=cn)显示公开版本为 1.0.2，最低 iOS / iPadOS 17。界面可能随版本变化，具体游戏的运行与保存结果请按步骤检查。
-

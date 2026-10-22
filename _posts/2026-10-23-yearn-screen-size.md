@@ -65,4 +65,3 @@ Yearn 的画面看起来小，可能是手机比例与原主机画面不同，�
 [横屏与双屏布局]({{ '/guides/yearn-landscape-layout/' | relative_url }})、[虚拟手柄调整]({{ '/guides/yearn-virtual-controller/' | relative_url }})。
 
 资料核对于 2026 年 10 月 23 日，公开版本依据 [Yearn 商店页面](https://apps.apple.com/cn/app/id6756637059)及 [Apple 查询接口](https://itunes.apple.com/lookup?id=6756637059&country=cn)，为 1.0.2，最低系统为 iOS / iPadOS 17。界面以设备上实际显示的版本为准。
-

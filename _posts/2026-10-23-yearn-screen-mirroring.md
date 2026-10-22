@@ -67,4 +67,3 @@ reading_time: 8
 系统连接步骤参考 [Apple 屏幕镜像说明](https://support.apple.com/zh-cn/102661)和[镜像连接排查](https://support.apple.com/zh-cn/102587)。
 
 资料核对于 2026 年 10 月 23 日，公开版本依据 [Yearn 商店页面](https://apps.apple.com/cn/app/id6756637059)及 [Apple 查询接口](https://itunes.apple.com/lookup?id=6756637059&country=cn)，为 1.0.2，最低系统为 iOS / iPadOS 17。界面以设备上实际显示的版本为准。
-
