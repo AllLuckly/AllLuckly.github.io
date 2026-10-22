@@ -6,14 +6,14 @@
 
 让读者和搜索系统明确知道：这是什么 App、解决什么问题、怎样完成任务、实际结果如何、在哪里获取。先保证产品事实和原创案例可靠，再优化呈现、抓取与衡量。不能承诺立即被 AI 抓取、引用或推荐。
 
-1. 每个 App 保留一个稳定专题页，清楚写明正式名称、项目别名、开发者关系、平台、适用场景及 App Store 入口。
+1. 每个 App 保留一个稳定专题页，清楚写明正式名称、公开别名、开发者关系、平台、适用场景及 App Store 入口。
 2. 从专题页链接到对应教程和作品；每篇内容解决一个主要任务。保留原技术文章的主题和 URL。
 3. 提供原创截图、步骤、版本与结果；需要视频时补充文字步骤或字幕摘要。
 4. 检查 canonical、内部链接、XML sitemap 和爬虫访问，再观察实际收录、展示与下载入口点击。
 
 ## 产品事实的唯一来源
 
-`_data/apps.yml` 为数组；`id` 是文章 `app_id` 的关联键，当前使用 `pastel`、`man_yue`、`draw_illustration`。字段：`id`、`name`、`alias`、`tagline`、`description`、`url`、`store_url`、`icon`、`category`、`os`、`version`、`guide_url`。
+`_data/apps.yml` 为数组；`id` 是文章 `app_id` 的关联键，当前使用 `pastel`、`man_yue`、`draw_illustration`、`nas_book`、`icouldplay`、`yearn`。产品字段包括 `name`、可选的 `alternate_name`、`tagline`、`description`、`url`、`store_url`、`icon`、`category`、`os`、`version` 与 `verified`；教程字段为 `guide_url`、`guide_intro`、`minimum_guides`。内部关联键不作为对读者展示的产品名。
 
 - 正式产品名、开发者、版本、系统要求和商店链接以已核实来源为准。项目目录名不能直接当作商店名。
 - 产品专题页必须展示结构化数据包含的产品事实；不得在 JSON-LD 偷加正文没有的功能、评分或价格。
@@ -61,6 +61,7 @@ author: Bison
 - `WebSite` 和 `Person` 表达博客及维护者；没有添加虚假的站内搜索 `SearchAction`。
 - 文章用 `BlogPosting`，产品教程的 `about` 指向专题页的 `#app` 实体。
 - 只有 `layout: app` 且关联到有效产品时输出 `SoftwareApplication`。
+- 应用目录、教程目录和学习路线使用 `CollectionPage` 与 `ItemList`，条目和顺序须与可见链接一致；单应用学习路线的 `about` 关联对应 `#app`。
 - `BreadcrumbList` 描述首页、教程栏目与关联产品或文章归档、当前内容的路径；产品页为首页、我的应用、当前 App。
 - 支持图片字符串、`image.path` / `image.url`、旧 `image.feature` / `image.thumb`、`cover` 和 `imagefeature`；旧裸文件名解析到 `/images/`。优先为新文章提供准确封面，而不是长期依赖 App 图标回退。
 - `author` 可为名称，也可为 `{ name: ..., url: ... }`；有明确投稿作者的历史文章应补充该字段，并同步更新可见署名，不用旧 `description` 猜作者。文章没有显式 `author` 时，JSON-LD 仅保留站点发布者，不将 Bison 强行标为原作者。
@@ -82,7 +83,7 @@ Bing 建议用清晰标题、表格、FAQ、事实证据和及时更新增强内
 ## 上线核验清单（待执行）
 
 - [ ] 用与 GitHub Pages 兼容的 Jekyll 构建；确认产物没有未渲染 Liquid、无效 JSON-LD 或 XML 错误。
-- [ ] 检查首页、3 个 App 页、教程、旧文章、404 的桌面和手机显示；正文、署名、链接、图片说明与元数据一致。
+- [ ] 检查首页、6 个 App 页、教程、旧文章、404 的桌面和手机显示；正文、署名、链接、图片说明与元数据一致。
 - [ ] 部署后确认 HTTPS、主域名、旧链接、资源 URL、canonical 一致；关键 URL 返回 200，真正不存在的 URL 返回 404。
 - [ ] 检查线上 `/robots.txt`、`/sitemap.xml`、`/feed.xml`；每个 sitemap URL 都能访问且是预期 canonical，没有草稿、404 或 noindex 页面。
 - [ ] 使用 Google Rich Results Test 检查文章和面包屑；产品页缺少价格/评分时不通过虚构信息修补软件富结果提示。
@@ -108,8 +109,8 @@ Bing 建议用清晰标题、表格、FAQ、事实证据和及时更新增强内
 
 ## 教程库维护
 
-每个 App 的完整目录位于 `/guides/aquarell/`、`/guides/manyue/` 和 `/guides/vectorpaint/`。`series_order` 从 1 连续编号，同一 App 内不重复；目录、上一篇和下一篇都依据该字段排序。新增内容时保持原 URL 稳定，更新必要的相关教程链接。
+每个 App 的完整目录位于 `/guides/aquarell/`、`/guides/manyue/`、`/guides/vectorpaint/`、`/guides/nasbook/`、`/guides/icouldplay/` 和 `/guides/yearn/`。`series_order` 从 1 连续编号，同一 App 内不重复；目录、上一篇和下一篇都依据该字段排序。学习阶段的范围应完整覆盖所有教程且不重叠。新增内容时保持原 URL 稳定，更新必要的相关教程链接。
 
-`/guides/` 的应用筛选与关键词搜索只筛选页面已包含的链接，关闭 JavaScript 仍可阅读全部目录。首页按每个 App 各两篇展示，避免一次集中发布后只出现一种应用。
+`/guides/` 的应用筛选与关键词搜索只筛选页面已包含的链接，关闭 JavaScript 仍可阅读全部目录。搜索包含公开应用名和别名。首页按每个 App 各一篇入门教程展示，避免一次集中发布后只出现一种应用。
 
-运行 `python3 scripts/validate_site.py` 会核验三个应用各至少 20 篇、连续编号、独立标题和 URL、正文规模、内部链接与锚点。字数检查只是发布底线，不能替代功能核对和逐篇编辑；证据维护于 `docs/tutorial-evidence-*.md`。不要用同义改写、重复段落或与任务无关的提醒凑数量和篇幅。
+运行 `python3 scripts/validate_site.py` 会按 `minimum_guides` 核验各应用教程数量（目前原三款各 40 篇、新三款各 20 篇），并检查连续编号、独立标题和 URL、正文规模、阶段覆盖、目录结构化数据、内部链接与锚点。字数检查只是发布底线，不能替代功能核对和逐篇编辑；证据维护于 `docs/tutorial-evidence-*.md`。不要用同义改写、重复段落或与任务无关的提醒凑数量和篇幅。
