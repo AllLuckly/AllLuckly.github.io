@@ -43,6 +43,10 @@ wrangler deploy --config cloudflare/wrangler.toml
 
 ## 真实的可选能力
 
+`/.well-known/api-catalog` 使用 RFC 9727 的 `application/linkset+json`，指向真实的 `/api/openapi.json` 规范与 `/api/` 阅读说明。OpenAPI 只记录现有的公开 GET/HEAD 数据资源：中英文索引与技能目录；索引返回完整数组，关键词在客户端筛选，没有虚构服务端搜索参数。响应使用实际类型，HTML/Markdown 通过 HTTP Link 发现 API 目录与文档。
+
+`/auth.md` 明确说明公开阅读无需账户、密钥、令牌或付款，给出真实读取流程，并区分博客访问与 App 账户/购买。这个文件是访问说明，**不代表实现 auth.md 的注册与凭证发放协议**。本站没有注册/登录服务，不发布不存在的 OAuth、MCP、A2A、签名公钥或支付端点。
+
 `/.well-known/agent-skills/index.json` 按 [Agent Skills Discovery 草案 0.2.0](https://github.com/cloudflare/agent-skills-discovery-rfc)提供一个只读教程查找工作流。它指向实际 SKILL.md，SHA-256 针对最终发布的原始字节；不包含执行脚本、登录或强制推荐。
 
 `assets/js/agent-search.js` 在浏览器原生支持 WebMCP 时注册公开文章关键词搜索；优先检测 `document.modelContext`，兼容旧 `navigator.modelContext`。没有支持时不添加伪接口，不影响普通阅读。执行只在内存搜索同源静态索引，不发送查询词、导航或遥测。Node 测试验证注册与执行逻辑；这不能代替支持浏览器中的原生验证，外部检测也可能受浏览器版本影响。
@@ -66,6 +70,7 @@ python3 scripts/validate_technical.py
 python3 scripts/validate_i18n.py
 node scripts/test_agent_access.mjs
 node scripts/test_agent_search.mjs
+python3 scripts/check_api_catalog.py
 ```
 
 两个生成器幂等，检查模式发现缺页、旧源、缺代码或目录漂移即失败，不把构建时间写成内容更新时间。修改正文后必须重新生成 Markdown；修改 SKILL.md 后必须更新摘要。`agent-markdown/` 的 `.txt` 源通过 Jekyll permalink 输出 Markdown，不能从构建中排除，也不能改成会自动转 HTML 的 `.md` 输入。
@@ -110,3 +115,14 @@ Cloudflare Worker `allluckly-agent-access` 已部署版本 `5c8b5829`，仅关�
 可提交的时间、参数、通过/失败项与限制保存在 [agent-readiness-production.json](agent-readiness-production.json)，完整原始 JSON、事件响应和 HTTP 头证据保存在本机忽略目录 `output/agent-readiness/production-*-scan.*`。13:12:40 的最终 HTTP 复测确认，`5c8b5829` 的首页及英文教程 HTML 304 均保留 `Vary: Accept`，4/4 条检查及主 11 项再次通过。
 
 两次官方扫描对应 `67364f45`；最终版本 `5c8b5829` 只补齐普通 HTML 304 的 `Vary: Accept`，正文与扫描项不变。这是一轮实际线上协议检测，不代表模型已经引用本站或必然推荐 App。
+
+
+## Cloudflare 后台 Diagnostics 的检查范围
+
+后台全量清单与 `content` 预设的总级别不是同一口径。2026-10-23 本轮操作前，后台显示基础 5/5、技术基础 1/3（API Catalog、Auth.md 未找到）、高级集成 2/8（Skills Index、WebMCP 已有）、商务 0/5（可选）；同时段公开 `profile: all` 检测返回 Level 4/5，API Catalog 与 Auth.md 为 FAIL，商务为不适用。不能将前文 content 的 Level 5/5 写成后台全部项目完成。
+
+本轮补充标准目录、规范、可见文档与公开访问说明。发布后在后台点击“重新扫描”，并运行 `python3 scripts/scan_agent_readiness.py --profile all --output output/agent-readiness/diagnostics-after-all.json` 按相同全量口径复测。存在文件的检查通过只说明文件可发现；Auth.md 仍不意味着本站实现注册、发证或 OAuth。
+
+OAuth discovery/protected resource、MCP/A2A 卡、Web Bot Auth 与 DNS-AID 需要对应的真实服务。仅提供内容的博客没有这些服务时，保留实际状态。Cloudflare 原文也说明仅提供内容、没有向其他站点发请求的网站无需 Web Bot Auth。商务协议用于实际付款与交易，本博客公开阅读不收款。
+
+新增数据接口与公开访问说明的规范依据：[API Catalog / RFC 9727](https://www.rfc-editor.org/rfc/rfc9727.html)、[auth.md](https://workos.com/auth-md/docs/auth-md)。后台与公开扫描的完整原始证据保存在本机忽略目录 `output/agent-readiness/diagnostics-*.json` 及其配套事件响应和时间元数据。

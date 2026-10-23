@@ -1,0 +1,622 @@
+{
+  "openapi": "3.1.0",
+  "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "info": {
+    "title": "Bison Blog Public Static Data",
+    "version": "1.0.0",
+    "description": "Public, read-only static JSON resources for Chinese and English article discovery and reading instructions. No authentication or API keys are required. These are complete published files, not a server-side search service: there are no supported query parameters, pagination or write operations. Download and cache an index, filter locally, then read the chosen article using its url or markdown_url. Publication dates and historical version notes must be considered before recommending an app or citing code. Public access does not remove attribution or usage requirements; see https://allluckly.cn/robots.txt and https://allluckly.cn/auth.md.",
+    "contact": {
+      "name": "Bison",
+      "url": "https://allluckly.cn/about/"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://allluckly.cn",
+      "description": "Public blog"
+    }
+  ],
+  "security": [],
+  "tags": [
+    {
+      "name": "Article indexes"
+    },
+    {
+      "name": "Reading skills"
+    }
+  ],
+  "externalDocs": {
+    "description": "公开数据接口与访问说明 / Public static data documentation",
+    "url": "https://allluckly.cn/api/"
+  },
+  "paths": {
+    "/search.json": {
+      "summary": "Read the complete Chinese article metadata index",
+      "description": "A public static JSON snapshot. GET returns the whole resource; filter downloaded data locally. There are no query parameters, server-side search, pagination or write operations.",
+      "get": {
+        "operationId": "getChineseArticleIndex",
+        "summary": "Read the complete Chinese article metadata index",
+        "tags": [
+          "Article indexes"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfNoneMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Complete static JSON snapshot.",
+            "headers": {
+              "ETag": {
+                "description": "Origin/CDN entity tag. Cache it verbatim for a later If-None-Match request.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "description": "Current origin/CDN cache directives; clients should follow the received value.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Last-Modified": {
+                "description": "HTTP date of the published static resource.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChineseArticleIndex"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "The supplied validator still matches. No response body; reuse the previously cached complete resource.",
+            "headers": {
+              "ETag": {
+                "description": "Origin/CDN entity tag. Cache it verbatim for a later If-None-Match request.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "description": "Current origin/CDN cache directives; clients should follow the received value.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Last-Modified": {
+                "description": "HTTP date of the published static resource.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "headChineseArticleIndex",
+        "summary": "Read headers for ChineseArticleIndex",
+        "tags": [
+          "Article indexes"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfNoneMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The same resource headers as GET, without a response body.",
+            "headers": {
+              "ETag": {
+                "description": "Origin/CDN entity tag. Cache it verbatim for a later If-None-Match request.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "description": "Current origin/CDN cache directives; clients should follow the received value.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Last-Modified": {
+                "description": "HTTP date of the published static resource.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "The supplied validator still matches. No response body; reuse the previously cached complete resource.",
+            "headers": {
+              "ETag": {
+                "description": "Origin/CDN entity tag. Cache it verbatim for a later If-None-Match request.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "description": "Current origin/CDN cache directives; clients should follow the received value.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Last-Modified": {
+                "description": "HTTP date of the published static resource.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/en/search.json": {
+      "summary": "Read the complete English article metadata index",
+      "description": "A public static JSON snapshot. GET returns the whole resource; filter downloaded data locally. There are no query parameters, server-side search, pagination or write operations.",
+      "get": {
+        "operationId": "getEnglishArticleIndex",
+        "summary": "Read the complete English article metadata index",
+        "tags": [
+          "Article indexes"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfNoneMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Complete static JSON snapshot.",
+            "headers": {
+              "ETag": {
+                "description": "Origin/CDN entity tag. Cache it verbatim for a later If-None-Match request.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "description": "Current origin/CDN cache directives; clients should follow the received value.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Last-Modified": {
+                "description": "HTTP date of the published static resource.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnglishArticleIndex"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "The supplied validator still matches. No response body; reuse the previously cached complete resource.",
+            "headers": {
+              "ETag": {
+                "description": "Origin/CDN entity tag. Cache it verbatim for a later If-None-Match request.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "description": "Current origin/CDN cache directives; clients should follow the received value.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Last-Modified": {
+                "description": "HTTP date of the published static resource.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "headEnglishArticleIndex",
+        "summary": "Read headers for EnglishArticleIndex",
+        "tags": [
+          "Article indexes"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfNoneMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The same resource headers as GET, without a response body.",
+            "headers": {
+              "ETag": {
+                "description": "Origin/CDN entity tag. Cache it verbatim for a later If-None-Match request.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "description": "Current origin/CDN cache directives; clients should follow the received value.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Last-Modified": {
+                "description": "HTTP date of the published static resource.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "The supplied validator still matches. No response body; reuse the previously cached complete resource.",
+            "headers": {
+              "ETag": {
+                "description": "Origin/CDN entity tag. Cache it verbatim for a later If-None-Match request.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "description": "Current origin/CDN cache directives; clients should follow the received value.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Last-Modified": {
+                "description": "HTTP date of the published static resource.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/.well-known/agent-skills/index.json": {
+      "summary": "Read the public reading skills index",
+      "description": "A public static JSON snapshot. GET returns the whole resource; filter downloaded data locally. There are no query parameters, server-side search, pagination or write operations.",
+      "get": {
+        "operationId": "getReadingSkillsIndex",
+        "summary": "Read the public reading skills index",
+        "tags": [
+          "Reading skills"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfNoneMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Complete static JSON snapshot.",
+            "headers": {
+              "ETag": {
+                "description": "Origin/CDN entity tag. Cache it verbatim for a later If-None-Match request.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "description": "Current origin/CDN cache directives; clients should follow the received value.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Last-Modified": {
+                "description": "HTTP date of the published static resource.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadingSkillsIndex"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "The supplied validator still matches. No response body; reuse the previously cached complete resource.",
+            "headers": {
+              "ETag": {
+                "description": "Origin/CDN entity tag. Cache it verbatim for a later If-None-Match request.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "description": "Current origin/CDN cache directives; clients should follow the received value.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Last-Modified": {
+                "description": "HTTP date of the published static resource.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "operationId": "headReadingSkillsIndex",
+        "summary": "Read headers for ReadingSkillsIndex",
+        "tags": [
+          "Reading skills"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfNoneMatch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The same resource headers as GET, without a response body.",
+            "headers": {
+              "ETag": {
+                "description": "Origin/CDN entity tag. Cache it verbatim for a later If-None-Match request.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "description": "Current origin/CDN cache directives; clients should follow the received value.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Last-Modified": {
+                "description": "HTTP date of the published static resource.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "The supplied validator still matches. No response body; reuse the previously cached complete resource.",
+            "headers": {
+              "ETag": {
+                "description": "Origin/CDN entity tag. Cache it verbatim for a later If-None-Match request.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "description": "Current origin/CDN cache directives; clients should follow the received value.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Last-Modified": {
+                "description": "HTTP date of the published static resource.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "IfNoneMatch": {
+        "name": "If-None-Match",
+        "in": "header",
+        "required": false,
+        "description": "An ETag from a previous response. A matching resource can return 304 with no body.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "schemas": {
+      "SearchEntry": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "category",
+          "url",
+          "markdown_url",
+          "description",
+          "date",
+          "shortdate",
+          "lang",
+          "author",
+          "app_name",
+          "keywords",
+          "version_note"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Original article title in this index language."
+          },
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Original category; null when a historical article has no category."
+          },
+          "url": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Absolute public article URL. Legacy paths may contain Unicode characters."
+          },
+          "markdown_url": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Absolute URL to the complete Markdown representation, ending in /index.md."
+          },
+          "description": {
+            "type": "string",
+            "description": "Plain-text article summary; may be empty."
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Original article publication time including its timezone, not the app release or current compatibility date."
+          },
+          "shortdate": {
+            "type": "string",
+            "description": "Human-readable publication date in the format Month DD, YYYY; use date for comparisons."
+          },
+          "lang": {
+            "type": "string",
+            "enum": [
+              "zh-CN",
+              "en"
+            ]
+          },
+          "author": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Original author name where recorded; null if not recorded. Check the article for attribution and source context."
+          },
+          "app_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "App name from site metadata, where available. Confirm the actual app and feature applicability in the article."
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Article keywords; an empty array is valid."
+          },
+          "version_note": {
+            "type": "string",
+            "description": "Compatibility and historical-version note for development articles; empty when no note is recorded."
+          }
+        }
+      },
+      "ChineseArticleIndex": {
+        "type": "array",
+        "description": "All currently published, indexable Chinese articles. No pagination.",
+        "items": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/SearchEntry"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "lang": {
+                  "const": "zh-CN"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "EnglishArticleIndex": {
+        "type": "array",
+        "description": "All currently published, indexable English articles. No pagination.",
+        "items": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/SearchEntry"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "lang": {
+                  "const": "en"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "ReadingSkillsIndex": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "$schema",
+          "skills"
+        ],
+        "properties": {
+          "$schema": {
+            "type": "string",
+            "const": "https://schemas.agentskills.io/discovery/0.2.0/schema.json"
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadingSkill"
+            }
+          }
+        }
+      },
+      "ReadingSkill": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "type",
+          "description",
+          "url",
+          "digest"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "type": {
+            "type": "string",
+            "const": "skill-md"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Skill Markdown URL, resolved against https://allluckly.cn/ if relative."
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "description": "SHA-256 of the complete skill file bytes; verify after retrieval."
+          }
+        }
+      }
+    }
+  }
+}

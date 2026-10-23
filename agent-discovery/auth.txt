@@ -1,0 +1,63 @@
+---
+layout: null
+permalink: /auth.md
+sitemap: false
+---
+# Public access and authentication for allluckly.cn
+
+All published blog articles, tutorials, videos, Markdown representations and the
+public JSON indexes on https://allluckly.cn are readable without registration,
+sign-in, API keys, access tokens or payment.
+
+This file describes public access only. The site does not implement the auth.md
+agent registration and credential-provisioning protocol, an OAuth authorization
+server, a protected resource server, or a blog account system.
+
+## Read public content
+
+1. Discover content at https://allluckly.cn/llms.txt or the API documentation at
+   https://allluckly.cn/api/.
+2. Use GET or HEAD for published resources. Request an article with
+   `Accept: text/markdown`, or follow its explicit `index.md` link.
+3. Read https://allluckly.cn/search.json for the Chinese index, or
+   https://allluckly.cn/en/search.json for the English index. Each returns the
+   complete public index. Apply keyword filtering locally; query parameters are
+   not a server-side search API.
+4. Preserve canonical URLs, original authorship, publication dates, translation
+   notices and version limits when citing the content.
+
+For example:
+
+```sh
+curl -H 'Accept: text/markdown' https://allluckly.cn/guides/vectorpaint-getting-started/
+curl https://allluckly.cn/en/search.json
+```
+
+## Authentication boundaries
+
+- Registration and credential issuance: not offered by this blog.
+- Login, OAuth/OIDC discovery, token exchange and account provisioning: not
+  applicable to public blog reading.
+- No password, bearer token, cookie, personal information or payment credential
+  should be submitted to this blog to read or search published content.
+- There are no create, update, delete, purchase or other state-changing API
+  operations. Unsupported routes are not alternative authentication endpoints.
+- Accounts, purchases and subscriptions for the listed apps are handled by the
+  relevant app or its official store. A blog app profile is not an app login or
+  payment endpoint.
+
+## Access preferences and availability
+
+Follow https://allluckly.cn/robots.txt and the published Content Signals:
+`search=yes, ai-input=yes, ai-train=no`. These preferences are not credentials
+and do not grant rights beyond the original authors' content rights.
+
+Respect HTTP status codes, reasonable request rates and cache validators.
+Do not treat an error or challenge as authorization to bypass site protections.
+Markdown byte-range requests may return a complete 200 response rather than 206.
+
+## 本站访问说明
+
+本站公开文章、教程、视频与中英文 JSON 索引均无需注册、登录或密钥。
+此文件是公开读取说明，不表示本站提供代理注册、发证、OAuth 或付款服务。
+App 的账户和购买流程由对应 App 或官方商店处理，与博客访问分开。
