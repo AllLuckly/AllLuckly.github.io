@@ -55,7 +55,7 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
   {%- assign seo_image = page.image.feature -%}
 {%- elsif page.image.thumb -%}
   {%- assign seo_image = page.image.thumb -%}
-{%- elsif page.image -%}
+{%- elsif page.image and page.image.first == nil -%}
   {%- assign seo_image = page.image -%}
 {%- elsif page.cover -%}
   {%- assign seo_image = page.cover -%}
@@ -63,8 +63,6 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
   {%- assign seo_image = page.imagefeature -%}
 {%- elsif seo_app.icon -%}
   {%- assign seo_image = seo_app.icon -%}
-{%- elsif site.logo -%}
-  {%- assign seo_image = site.logo -%}
 {%- endif -%}
 {%- if seo_image and seo_image != '' -%}
   {%- assign seo_image_start = seo_image | slice: 0, 1 -%}
@@ -73,8 +71,20 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
   {%- endunless -%}
   {%- assign seo_image = seo_image | absolute_url -%}
 {%- endif -%}
+{%- if seo_image == '' -%}{%- assign seo_image = nil -%}{%- endif -%}
 {%- comment -%}Legacy theme banners and the site logo are not article illustrations.{%- endcomment -%}
 {%- if seo_technical -%}{%- assign seo_image = nil -%}{%- endif -%}
+{%- comment -%}Theme utility-page banners are decorative, not link-preview artwork.{%- endcomment -%}
+{%- if page.layout == 'page' or page.layout == 'pageminimal' -%}{%- assign seo_image = nil -%}{%- endif -%}
+{%- assign seo_share_image = seo_image | default: site.social_image | absolute_url -%}
+{%- assign seo_brand_image = site.logo | prepend: '/images/' | absolute_url -%}
+{%- if seo_image -%}
+  {%- assign seo_share_alt = page.image_alt | default: seo_title -%}
+{%- elsif content_lang == 'en' -%}
+  {%- assign seo_share_alt = 'Bison — Creative & Development Notes' -%}
+{%- else -%}
+  {%- assign seo_share_alt = 'Bison 的创作与开发笔记' -%}
+{%- endif -%}
 {%- if seo_app -%}
   {%- assign seo_app_url = seo_app.url | absolute_url -%}
   {%- assign seo_app_id = canonical_app.url | absolute_url | append: '#app' -%}
@@ -94,15 +104,19 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
 <meta property="og:description" content="{{ seo_description | escape }}">
 <meta property="og:url" content="{{ seo_canonical | escape }}">
 <meta property="og:site_name" content="{{ locale_title | escape }}">
-{% if seo_image %}<meta property="og:image" content="{{ seo_image | escape }}">
-<meta property="og:image:alt" content="{{ page.image_alt | default: seo_title | escape }}">{% endif %}
+<meta property="og:image" content="{{ seo_share_image | escape }}">
+{% if seo_share_image contains 'https://' %}<meta property="og:image:secure_url" content="{{ seo_share_image | escape }}">{% endif %}
+<meta property="og:image:alt" content="{{ seo_share_alt | escape }}">
+{% unless seo_image %}<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">{% endunless %}
 {% if seo_article and page.date %}<meta property="article:published_time" content="{{ page.date | date_to_xmlschema }}">{% endif %}
 {% if seo_article and seo_modified %}<meta property="article:modified_time" content="{{ seo_modified | date_to_xmlschema }}">{% endif %}
-<meta name="twitter:card" content="{% if seo_image %}summary_large_image{% else %}summary{% endif %}">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ seo_title | escape }}">
 <meta name="twitter:description" content="{{ seo_description | escape }}">
-{% if seo_image %}<meta name="twitter:image" content="{{ seo_image | escape }}">
-<meta name="twitter:image:alt" content="{{ page.image_alt | default: seo_title | escape }}">{% endif %}
+<meta name="twitter:image" content="{{ seo_share_image | escape }}">
+<meta name="twitter:image:alt" content="{{ seo_share_alt | escape }}">
 {% if site.owner.twitter and site.owner.twitter != '' %}<meta name="twitter:creator" content="@{{ site.owner.twitter | remove: '@' | escape }}">{% endif %}
 {% if site.google_verify and site.google_verify != '' %}<meta name="google-site-verification" content="{{ site.google_verify | escape }}">{% endif %}
 {% if site.bing_verify and site.bing_verify != '' %}<meta name="msvalidate.01" content="{{ site.bing_verify | escape }}">{% endif %}
@@ -118,7 +132,8 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
       "name": {{ locale_title | jsonify | replace: '<', '\u003c' }},
       "description": {{ locale_description | jsonify | replace: '<', '\u003c' }},
       "inLanguage": ["zh-CN", "en"],
-      "publisher": { "@id": {{ seo_person_id | jsonify }} }
+      "publisher": { "@id": {{ seo_person_id | jsonify }} },
+      "image": { "@type": "ImageObject", "url": {{ seo_brand_image | jsonify }}, "width": 512, "height": 512 }
     },
     {
       "@type": "Person",
