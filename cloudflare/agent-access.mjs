@@ -6,6 +6,10 @@ import manifest from '../agent-markdown/manifest.json' with {type: 'json'};
 
 const POLICY = 'search=yes, ai-input=yes, ai-train=no';
 const ORIGIN = 'https://allluckly.cn';
+const discoveryTypes = new Map([
+  ['/.well-known/api-catalog', 'application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"'],
+  ['/api/openapi.json', 'application/vnd.oai.openapi+json'],
+]);
 const pages = new Map();
 for (const [canonical, markdown] of Object.entries(manifest.routes)) {
   const page = {canonical: new URL(canonical, ORIGIN).href, markdown: new URL(markdown, ORIGIN).href};
@@ -45,6 +49,9 @@ function decorate(response, url, markdown, head, page) {
   // The site's declared policy also prevents the converter's permissive default
   // from accidentally granting training permission for attributed guest posts.
   headers.set('Content-Signal', POLICY);
+  const resourceType = discoveryTypes.get(url.pathname);
+  const discoveryType = resourceType && (response.status === 304 || (response.status === 200 && /^(application\/(json|octet-stream|linkset\+json|vnd\.oai\.openapi\+json)|text\/plain)(;|$)/i.test(headers.get('Content-Type') || ''))) ? resourceType : null;
+  if (discoveryType) headers.set('Content-Type', discoveryType);
   if (markdown) {
     headers.set('Content-Type', 'text/markdown; charset=utf-8');
     headers.set('X-Robots-Tag', 'noindex, follow');
@@ -53,13 +60,14 @@ function decorate(response, url, markdown, head, page) {
     headers.set('Accept-Ranges', 'none');
     headers.delete('Content-Range');
   }
-  if ((page && response.status === 304) || /text\/html|text\/markdown/i.test(headers.get('Content-Type') || '')) {
+  if ((discoveryType && [200, 304].includes(response.status)) || (page && response.status === 304) || /text\/html|text\/markdown/i.test(headers.get('Content-Type') || '')) {
     addVary(headers, 'Accept');
     const links = ['</sitemap.xml>; rel="sitemap"; type="application/xml"', '</llms.txt>; rel="describedby"; type="text/plain"', '</.well-known/agent-skills/index.json>; rel="describedby"; type="application/json"'];
     if (page && response.status < 400) {
       links.unshift(`<${page.canonical}>; rel="canonical"`);
       if (!url.pathname.endsWith('/index.md')) links.push(`<${page.markdown}>; rel="alternate"; type="text/markdown"`);
     }
+    links.push('</.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"', '</api/openapi.json>; rel="service-desc"; type="application/vnd.oai.openapi+json"', '</api/>; rel="service-doc"; type="text/html"', '</auth.md>; rel="describedby"; type="text/markdown"; title="Public access and authentication"');
     const prior = headers.get('Link');
     headers.set('Link', [prior, ...links].filter(Boolean).join(', '));
   }
@@ -100,7 +108,8 @@ export async function handle(request, originFetch = fetch) {
     }
   }
   let originRequest = request;
-  if (page && url.pathname.endsWith('/index.md')) {
+  const publicMarkdown = (page && url.pathname.endsWith('/index.md')) || url.pathname === '/auth.md';
+  if (publicMarkdown) {
     const headers = new Headers(request.headers);
     headers.delete('Range');
     headers.delete('If-Range');
@@ -108,7 +117,7 @@ export async function handle(request, originFetch = fetch) {
     originRequest = new Request(request, {headers});
   }
   const response = await originFetch(originRequest);
-  const directMarkdown = page && asset && url.pathname.endsWith('/index.md') && (response.status === 304 || (response.status === 200 && /^(text\/(plain|markdown)|application\/octet-stream)(;|$)/i.test(response.headers.get('Content-Type') || '')));
+  const directMarkdown = publicMarkdown && (response.status === 304 || (response.status === 200 && /^(text\/(plain|markdown)|application\/octet-stream)(;|$)/i.test(response.headers.get('Content-Type') || '')));
   return decorate(response, url, directMarkdown, head, page);
 }
 

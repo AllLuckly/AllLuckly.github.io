@@ -1,0 +1,68 @@
+---
+layout: studio
+title: 公开数据接口
+description: 博客的中文与英文文章索引、阅读技能目录和 OpenAPI 说明。无需登录，下载静态 JSON 后在本地筛选，再读取文章正文。
+lang: zh-CN
+permalink: /api/
+---
+<section class="wrap about-page">
+  <header class="about-header">
+    <p class="eyebrow">PUBLIC DATA</p>
+    <h1>公开数据接口</h1>
+    <p class="about-intro">给站内搜索、阅读工具和 AI 阅读器用的几个数据入口。这里返回已经生成好的文件：取回索引，在本地筛选，再打开需要的文章。</p>
+  </header>
+  <article class="prose">
+    <p lang="en">Public, read-only static JSON resources. Download an index, filter it locally, then follow an article's <code>url</code> or <code>markdown_url</code>. No authentication, server-side search, query parameters or pagination.</p>
+
+    <h2 id="article-index">文章索引</h2>
+    <p>两个入口分别返回该语言的完整文章元数据数组，包含教程、作品和开发笔记。内容随网站发布更新；<code>date</code> 是文章原始发表时间，不能当作应用当前版本的证明。</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th scope="col">地址</th><th scope="col">返回内容</th></tr></thead>
+      <tbody>
+        <tr><td><a href="/search.json"><code>/search.json</code></a></td><td>中文文章，<code>lang</code> 为 <code>zh-CN</code></td></tr>
+        <tr><td><a href="/en/search.json"><code>/en/search.json</code></a></td><td>英文文章，<code>lang</code> 为 <code>en</code></td></tr>
+      </tbody>
+    </table></div>
+    <p>使用 <code>GET</code> 读取 JSON，使用 <code>HEAD</code> 查看响应头。没有关键词查询、分页或排序参数；添加 <code>?q=…</code> 不会执行搜索。需要筛选时，在自己的程序里处理返回的数组。例如，读取英文索引后查找包含 “VectorPaint” 的文章：</p>
+    <pre><code class="language-javascript">const response = await fetch('https://allluckly.cn/en/search.json');
+if (!response.ok) throw new Error(`HTTP ${response.status}`);
+const articles = await response.json();
+const query = 'vectorpaint';
+const matches = articles.filter(article =&gt;
+  [article.title, article.description, ...(article.keywords || [])]
+    .join(' ').toLocaleLowerCase().includes(query)
+);
+console.log(matches.slice(0, 5));</code></pre>
+
+    <h3>字段怎么读</h3>
+    <div class="table-scroll"><table>
+      <thead><tr><th scope="col">字段</th><th scope="col">含义</th></tr></thead>
+      <tbody>
+        <tr><td><code>title</code>、<code>description</code></td><td>文章标题和纯文本摘要。</td></tr>
+        <tr><td><code>url</code>、<code>markdown_url</code></td><td>文章网页和可直接读取的 Markdown 正文绝对地址。</td></tr>
+        <tr><td><code>date</code>、<code>shortdate</code></td><td>带时区的发表时间和用于展示的英文日期字符串。比较时间请用 <code>date</code>。</td></tr>
+        <tr><td><code>lang</code>、<code>category</code></td><td>内容语言和原文分类；部分历史文章的分类为 <code>null</code>。</td></tr>
+        <tr><td><code>author</code></td><td>原作者姓名。缺少署名时为 <code>null</code>；引用时请以正文署名与来源说明为准。</td></tr>
+        <tr><td><code>app_name</code>、<code>keywords</code></td><td>应用名和关键词数组，用来辅助筛选。是否适用于某个应用，应再核对正文；<code>keywords</code> 可以是空数组。</td></tr>
+        <tr><td><code>version_note</code></td><td>历史技术文章的版本限制说明，没有说明时为空字符串。旧代码和旧 API 请先核对当前文档。</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="reading-skills">阅读技能目录</h2>
+    <p><a href="/.well-known/agent-skills/index.json"><code>/.well-known/agent-skills/index.json</code></a> 返回阅读技能的名称、说明、文件地址与 SHA-256 摘要。<code>url</code> 可能是站内相对路径，请以 <code>https://allluckly.cn/</code> 为基址解析后读取，再用 <code>digest</code> 核对下载文件的完整字节。</p>
+    <p>目前的技能说明如何查找教程、视频和历史技术文章，以及如何保留作者、版本限制与引用链接。它是公开的操作说明文件，不会调用后台服务或代替用户操作。</p>
+
+    <h2 id="access">访问与缓存</h2>
+    <p>这些入口匿名可读，不需要账号、API Key、Cookie 或授权头。站点没有写入 API；应用中的个人书库、播放记录等内容也不在这些索引中。详细访问边界见 <a href="/auth.md">访问说明</a>。</p>
+    <p>索引是完整快照，建议缓存并复用。可保存响应的 <code>ETag</code>，下次通过 <code>If-None-Match</code> 发起条件请求；未变化时会返回没有正文的 <code>304</code>，继续使用已缓存内容。缓存时长请以实际 <code>Cache-Control</code> 为准，不必反复下载同一文件。</p>
+    <p>请沿文章链接读取正文后再引用。历史转载保留原作者与来源；可公开访问不代表可以去掉署名、整站转载或用于训练，使用偏好见 <a href="/robots.txt">robots.txt</a>。</p>
+
+    <h2 id="discovery">机器发现入口</h2>
+    <ul>
+      <li><a href="/.well-known/api-catalog" rel="api-catalog">API Catalog</a>：RFC 9727 的 Linkset JSON 目录，列出上面三个真实资源。</li>
+      <li><a href="/api/openapi.json" rel="service-desc">OpenAPI 3.1</a>：路径、GET / HEAD 方法与响应结构。</li>
+      <li><a href="/llms.txt">中文阅读目录</a>、<a href="/en/llms.txt">English reading index</a>：按应用和主题继续阅读。</li>
+    </ul>
+    <p>本页只描述公开静态数据，不提供 OAuth、MCP 服务、支付或创建内容的操作。目录格式参考 <a href="https://www.rfc-editor.org/rfc/rfc9727.html">RFC 9727</a>，接口描述使用 <a href="https://spec.openapis.org/oas/v3.1.0.html">OpenAPI 3.1</a>。</p>
+  </article>
+</section>

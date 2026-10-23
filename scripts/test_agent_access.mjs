@@ -120,6 +120,28 @@ result = await handle(req(article, {Accept: 'text/html', 'If-None-Match': '"html
 assert.equal(result.status, 304);
 assert.match(result.headers.get('Vary'), /Accept/);
 assert.equal(result.headers.has('Content-Type'), false);
+// Discovery documents retain their real bytes, status and own validators.
+for (const [path, type] of [['/.well-known/api-catalog', 'application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"'], ['/api/openapi.json', 'application/vnd.oai.openapi+json']]) {
+  for (const status of [200, 304, 404]) {
+    const response = await handle(req(path), async () => new Response(status === 304 ? null : '{}', {status, headers: {'Content-Type': status === 404 ? 'text/html' : 'application/octet-stream', ETag: '"catalog-v1"'}}));
+    assert.equal(response.status, status);
+    assert.equal(response.headers.get('ETag'), '"catalog-v1"');
+    assert.equal(response.headers.get('Content-Type'), status === 404 ? 'text/html' : type);
+    if (status !== 404) assert.match(response.headers.get('Link'), /rel="api-catalog"/);
+    assert.equal(await response.text(), status === 304 ? '' : '{}');
+  }
+  const fallback = await handle(req(path), async () => new Response('<h1>Unavailable</h1>', {headers: {'Content-Type': 'text/html'}}));
+  assert.equal(fallback.headers.get('Content-Type'), 'text/html');
+}
+result = await handle(req('/auth.md', {Range: 'bytes=0-9', 'If-Range': '"auth-v1"'}), async request => {
+  assert.equal(request.headers.has('Range'), false);
+  assert.equal(request.headers.has('If-Range'), false);
+  return new Response('# Public access\nNo authentication is required.', {headers: {'Content-Type': 'text/plain'}});
+});
+assert.equal(result.status, 200);
+assert.match(result.headers.get('Content-Type'), /^text\/markdown/);
+assert.equal(result.headers.get('Accept-Ranges'), 'none');
+assert.match(await result.text(), /No authentication is required/);
 const before = requests.length;
 await handle(req('/en/', {}, 'POST'), mockFetch);
 assert.equal(requests.length, before + 1);
