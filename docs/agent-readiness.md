@@ -107,4 +107,6 @@ Cloudflare Worker `allluckly-agent-access` 已部署版本 `5c8b5829`，仅关�
 
 13:10:56–13:11:03，另一次显式选择 8 项的检测全部通过：上述 6 项，以及 Agent Skills、WebMCP。扫描器识别有效的技能目录与 `search_blog_articles` 原生搜索工具。扫描器还列出两个非本站源码注册的浏览器工具；本站只主张提供自己的搜索工具，不将检测环境里的其他能力计为本站实现。
 
-可提交的时间、参数、通过/失败项与限制保存在 [agent-readiness-production.json](agent-readiness-production.json)，完整原始 JSON、事件响应和 HTTP 头证据保存在本机忽略目录 `output/agent-readiness/production-*-scan.*`。两次官方扫描对应 `67364f45`；最终版本 `5c8b5829` 只补齐普通 HTML 304 的 `Vary: Accept`，正文与扫描项不变。这是一轮实际线上协议检测，不代表模型已经引用本站或必然推荐 App。
+可提交的时间、参数、通过/失败项与限制保存在 [agent-readiness-production.json](agent-readiness-production.json)，完整原始 JSON、事件响应和 HTTP 头证据保存在本机忽略目录 `output/agent-readiness/production-*-scan.*`。13:12:40 的最终 HTTP 复测确认，`5c8b5829` 的首页及英文教程 HTML 304 均保留 `Vary: Accept`，4/4 条检查及主 11 项再次通过。
+
+两次官方扫描对应 `67364f45`；最终版本 `5c8b5829` 只补齐普通 HTML 304 的 `Vary: Accept`，正文与扫描项不变。这是一轮实际线上协议检测，不代表模型已经引用本站或必然推荐 App。
