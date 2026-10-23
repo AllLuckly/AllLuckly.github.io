@@ -1,0 +1,75 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-ftp-source/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay FTP sources: test connections and playback with a small folder'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-ftp-source/
+agent_source_sha256: 7cc62d65e16b3bbaadd134601ac1923c43eda90ed17e8ecbed9b94bb3439a919
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay FTP sources: test connections and playback with a small folder
+
+Language: en
+Canonical: [iCouldPlay FTP sources: test connections and playback with a small folder](<https://allluckly.cn/en/guides/icouldplay-ftp-source/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ftp-source/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ftp-source/>)
+Published: 2026-10-23T00:00:00+08:00
+Modified: 2026-10-23T10:34:08+08:00
+Author: Bison
+
+Add an FTP source and check login, base directory, subfolders and actual video access separately, understanding the differences and limits of FTP, FTPS and SFTP.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-ftp-source/>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+FTP verification cannot stop at a successful login. Listing directories, entering subfolders, and playing video are separate stages, and one working stage does not prove all others. For an existing FTP service, use a shallow test directory to determine suitability for the current iCouldPlay version instead of assuming compatibility with every server behavior.
+
+## Confirm the actual service protocol first
+
+Ask the administrator whether the service is FTP, FTPS, or SFTP; similar names do not make them interchangeable. FTP and SFTP are separate source types in iCouldPlay. Do not enter an SFTP port into the FTP form and expect automatic detection. If encrypted FTP is required, confirm that the current app version and server method work together rather than assuming a “Secure” switch verifies every encryption mode.
+
+Start with a regular FTP test service on your trusted network. Do not use important credentials over untrusted plaintext connections. Prepare a read-only test account, explicit host and port, and an accessible base directory. Common default ports are only starting points; use the actual server configuration.
+
+## Create an unambiguous test directory
+
+Within the account's accessible area, prepare `VideoTest` and place a small MP4 directly inside it, then create a `Subfolder` for the second video. Give the files distinct names and slightly different durations to verify an actual directory change. First confirm in another reliable client that the account can see and read both files, ruling out permissions or path errors in the test directory itself.
+
+Do not begin with deeply nested Chinese paths, thousands of files, and huge videos together. Establish a baseline with a simple path, then introduce real-world complexity one item at a time. This does not require renaming everything; it minimizes variables to locate the failure in connection, directories, or media reading.
+
+## Complete the FTP form field by field
+
+Open Sources in iCouldPlay, add a file source, and choose FTP. Name it something like “FTP Test Library,” enter the server address, the administrator-provided port, and test-account credentials. The base path defines the starting point after login. If the account already uses the test directory as its root, you can use `/`; do not copy the server operating system's absolute disk path directly into it.
+
+Check that the host field does not accidentally include a filename, webpage path, or another protocol prefix. For passwords with special characters, watch for keyboard substitutions of quotes or inserted spaces. Confirm the source protocol before saving: a working SSH connection does not imply FTP will work.
+
+## Check the connection result in three stages
+
+First test login alone, noting whether failure occurs immediately after submission or after a long wait. Next inspect the base directory and confirm that its first video lists. Then enter the subfolder and confirm that the second video appears rather than the root contents again. The list must match the real server structure; a few visible filenames are insufficient.
+
+If the root lists but subfolders fail, record that result rather than immediately scanning the whole source. Temporarily place the test video in a clearly readable shallow directory to check playback. For regular organization, choose a method the current version can access reliably. Do not blindly increase account privileges to solve directory compatibility problems.
+
+## Then check actual video playback
+
+Open the small video from a clearly visible directory and check the beginning, audio, and a seek to the middle. If it lists but will not play, directory access and media reading still differ. Do not treat it as locally imported or expect offline playback. FTP connection status is not proof of a finished download, and offline availability is not a completion criterion here.
+
+Play the same file after local import, or access it through another configured protocol on the same server. If local playback works but FTP fails, record the protocol, directory depth, file size, and symptoms, then choose a working access method. Refer to [SMB file source](<https://allluckly.cn/en/guides/icouldplay-smb-nas/>) or [WebDAV file source](<https://allluckly.cn/en/guides/icouldplay-webdav-cloud/>)for a same-file comparison rather than changing the video content too.
+
+## Identify problems that appear after login
+
+Some FTP services' listings and data transfers depend on server network configuration, so login may succeed while directory or file requests wait. Compare another client on the same network and consult server guidance instead of repeatedly changing the password in iCouldPlay. If all clients stall during data reading, the likely scope is server or network. If only this app fails, retain that compatibility limitation.
+
+Verify the base path separately. The account's apparent root may already be restricted to a share, so repeating the full system path can point somewhere nonexistent. Begin at the account-visible root, enter directories one level at a time, and record results. Distinguish an actually empty directory from a failed listing; an empty list is not grounds for deleting server content.
+
+## Decide whether to use it for the full media library
+
+Expand only after login, root listing, subfolder access, and small-video playback all behave as expected. Add a few files, check that listings and playback remain consistent, then introduce larger videos. If a stage cannot pass reliably, keep FTP for its verified limited use and choose another supported source that works in actual testing. One protocol does not justify repeatedly rebuilding the whole library.
+
+**Does enabling “Secure Connection” mean SFTP?** No. SFTP is a separate protocol with its own entry point. Whether encryption options in the FTP form meet a service's needs must be checked against the version and server method. Confirm protocol and encryption requirements with the administrator rather than inferring compatibility from a switch label.
+
+**Why does this tutorial not guarantee playback of every FTP video?** Protocol support in the store describes a capability range; actual behavior still depends on directory implementation, server configuration, and media format. Testing each stage separately produces reproducible results suited to your environment, unlike assuming FTP support guarantees everything works.
+
+## Sources and version
+
+Based on [iCouldPlay official store description](<https://apps.apple.com/cn/app/id6755653178>)for public FTP／SFTP capabilities and existing connection controls. The public version checked on October 23, 2026 was 1.1.0. Directory browsing and playback still require separate checks after connection; FTPS, offline downloads, and nested directories may vary with client version and server configuration.
+{% endraw %}

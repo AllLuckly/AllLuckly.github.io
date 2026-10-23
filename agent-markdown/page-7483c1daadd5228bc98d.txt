@@ -1,0 +1,82 @@
+---
+layout: null
+permalink: /静态库/iOS开发打包静态库.a文件/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 【iOS开发】打包静态库.a文件
+agent_source_url: https://allluckly.cn/%E9%9D%99%E6%80%81%E5%BA%93/iOS%E5%BC%80%E5%8F%91%E6%89%93%E5%8C%85%E9%9D%99%E6%80%81%E5%BA%93.a%E6%96%87%E4%BB%B6
+agent_source_sha256: 1a4c01238d36155cced07c9cd110ac2a9616099c372102f7ff456adc833c083f
+agent_generator_version: 1
+---
+{% raw %}# 【iOS开发】打包静态库.a文件
+
+语言：zh-CN
+原文：[【iOS开发】打包静态库.a文件](<https://allluckly.cn/%E9%9D%99%E6%80%81%E5%BA%93/iOS%E5%BC%80%E5%8F%91%E6%89%93%E5%8C%85%E9%9D%99%E6%80%81%E5%BA%93.a%E6%96%87%E4%BB%B6>)
+中文：[中文 HTML](<https://allluckly.cn/%E9%9D%99%E6%80%81%E5%BA%93/iOS%E5%BC%80%E5%8F%91%E6%89%93%E5%8C%85%E9%9D%99%E6%80%81%E5%BA%93.a%E6%96%87%E4%BB%B6>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-06-10-packaging-an-ios-static-library-as-an-a-file/>)
+发布于: 2015-06-10T00:00:00+08:00
+内容更新于: 2026-10-23T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+记录在 Xcode 中分别构建设备和模拟器静态库，再用 lipo 查看架构并合并 .a 文件的流程，解释为何测试时需要匹配目标平台及如何检查生成结果。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文发表于 2015 年，采用分别构建设备和模拟器 .a 库的打包方式。
+
+原文使用 2015 年的 Xcode 界面，分别生成真机和模拟器静态库，再用 lipo 合并。今天交付跨平台二进制时，可对照 Apple 的 XCFramework 文档，分别准备平台及模拟器变体；不要把旧文中的合并命令直接当作当前交付方案。这里没有重新编译旧工程。
+
+- [Apple：创建多平台 XCFramework](<https://developer.apple.com/documentation/xcode/creating-a-multi-platform-binary-framework-bundle>)
+
+阅读说明补充于 2026-10-23
+
+> "iOS开发之怎么生成静态库.a文件." Plato
+
+![0](<https://allluckly.cn/images/Static%20library/1.png>)
+
+![1](<https://allluckly.cn/images/Static%20library/2.png>)
+
+![2](<https://allluckly.cn/images/Static%20library/3.png>)
+
+![3](<https://allluckly.cn/images/Static%20library/4.png>)
+
+![4](<https://allluckly.cn/images/Static%20library/5.png>)
+
+![5](<https://allluckly.cn/images/Static%20library/6.png>)
+
+![10](<https://allluckly.cn/images/Static%20library/13.png>)
+
+![11](<https://allluckly.cn/images/Static%20library/12.png>)
+
+选择iOS Device 这里建议不要连设备，command+b运行
+
+然后选择模拟器 command+b运行
+
+这样就生成了俩个.a文件
+
+![6](<https://allluckly.cn/images/Static%20library/7.png>)
+
+![7](<https://allluckly.cn/images/Static%20library/8.png>)
+
+![8](<https://allluckly.cn/images/Static%20library/9.png>)
+
+![9](<https://allluckly.cn/images/Static%20library/10.png>)
+
+![10](<https://allluckly.cn/images/Static%20library/11.png>)
+
+没用真机测试的话用模拟器.a文件测试。否则会报错。
+
+下面是真机和模拟机.a文件合并
+
+` cd + .a 路径  `
+
+`lipo -info .a文件名`可以看到该文件信息  
+ `lipo -create  xxx/.a文件  xxx/.a文件  -output xxx.a文件`
+
+`xxx/.a`文件 指的是真机.a文件路径和模拟器.a文件路径
+
+`xxx.a`文件 指的是生成的.a文件
+
+生成的新文件是原来文件的2倍大，然后测试是否成功了。
+{% endraw %}

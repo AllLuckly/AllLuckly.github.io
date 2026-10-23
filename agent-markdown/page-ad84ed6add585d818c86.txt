@@ -1,0 +1,81 @@
+---
+layout: null
+permalink: /en/guides/manyue-kavita-library/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Connect ManYue to Kavita: sign in and check library permissions'
+agent_source_url: https://allluckly.cn/en/guides/manyue-kavita-library/
+agent_source_sha256: 48957b77aacfd82f680a448141072d9819877186b6fd7f2873b7a647f484e856
+agent_generator_version: 1
+---
+{% raw %}# Connect ManYue to Kavita: sign in and check library permissions
+
+Language: en
+Canonical: [Connect ManYue to Kavita: sign in and check library permissions](<https://allluckly.cn/en/guides/manyue-kavita-library/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-kavita-library/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-kavita-library/>)
+Published: 2026-10-22T00:00:00+08:00
+Modified: 2026-10-23T10:34:07+08:00
+Author: Bison
+
+Enter the address and account for the Kavita service, check shared libraries, chapters and download permissions, and avoid copying another client’s connection method without checking it.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-kavita-library/>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+When connecting to Kavita, it is easy to confuse the server base address, the OPDS address, and links intended for other clients. ManYue's Kavita connection uses the appropriate service endpoint and account login; you do not need to try every possible link. First confirm that the same account can read one comic, then enter the details for the selected service type. This makes troubleshooting much simpler.
+
+## Confirm that account setup is complete
+
+Sign in to the service website with your own Kavita account and find the comic you plan to read. If the account is still at the invitation or setup stage, first complete the steps the server requires. Confirm that the target library is shared with this account. Do not substitute an administrator's access scope for that of an ordinary user: different accounts on the same server may see different content.
+
+Kavita also distinguishes permissions such as login and downloading. Download permission affects third-party clients that support downloads; being able to browse the website does not mean you can download every file. Ask the server administrator to make any necessary changes. For the specific rules, see [Kavita user permissions documentation](<https://wiki.kavitareader.com/guides/admin-settings/users/>). You must also check the server-library entitlement for your current ManYue account.
+
+## Choose Kavita rather than generic OPDS
+
+Open the add-connection screen in ManYue's server library and choose Kavita as the service type. Enter a display name, server address, username, and password, then connect and save. Use your Kavita account here. Do not use another service's API Key as the password or copy an entire dedicated link from an OPDS client.
+
+Example address `https://kavita.example.com/books/` is only a placeholder. If the actual service uses a subpath, retain the correct subpath; if it does not, do not add one. Do not use a comic's details-page address or manually construct a login endpoint. Put credentials in their separate fields. In public discussions, describe only the address structure and do not post real usernames or passwords.
+
+## Find a specific chapter in the library
+
+After connecting, find the title you checked on the website, open its details, and verify its volumes, chapters, or groups. The server's organization affects the names and hierarchy the client receives. If an expected chapter is missing, first check whether it exists on the website instead of immediately importing the original file into ManYue again.
+
+Choose a chapter that actually contains pages as your sample. Check the beginning, then the middle and end. Catalogs, covers, and body pages are separate checks. Seeing only a cover is not enough to confirm page access. For files newly added to the server, let the server finish identifying them before refreshing the client. The client cannot supply catalog data that does not yet exist on the server.
+
+## When login works but images do not appear
+
+First determine whether the problem affects only one title or chapter. Test a small sample from the same library, then check the corresponding content on the website with the same account. If every title fails, prioritize the connection path, account status, and service availability. If only individual titles fail, record their names and chapters and continue checking the files and the server's processing results.
+
+If the service sits behind a reverse proxy or an additional web login layer, seeing a login page in a browser does not prove that the app's page requests can get through. Ask the administrator to check the service base path and relevant requests. Do not conceal the problem by disabling all certificate checks. After changing a password, update the connection credentials accordingly. Covers still visible in an old session do not prove that new requests have been authorized.
+
+## Example: prepare a shared series for a tablet
+
+Suppose the server has a Personal Short Works series and the ordinary account can access only that library. Open a chapter in the web interface and note its name. Connect ManYue to Kavita with the same account, locate the series, and open that chapter. Check beginning, middle, and end, then try any download supported by the item and inspect Download Management.
+
+If downloading is denied but online reading works, first ask the administrator whether your account has download permission. Do not add an administrator account as a temporary way around the established restrictions. Once the permissions are confirmed, retry the same small sample and expand to more chapters only after it succeeds. Finally, open the local copy without a network connection. This clearly separates server access from offline preparation on the device.
+
+## Checks and later changes
+
+When finished, reopen the saved connection and confirm that the library loads, the expected chapters are present, online reading works, and the content you need has been downloaded and checked without a network connection. Record the server version, app version, and scope of your checks in your own maintenance notes. After a server update, repeat the same small test instead of judging the new configuration solely from past experience.
+
+The web reader's layout settings, Kavita's own bookmarks, and a third-party client's local settings should not be treated as the same feature. Likewise, do not equate ManYue shelf groups with server-side library management. Check what each system controls separately, particularly for progress, favorites, and device migration. Verify the actual results instead of assuming automatic interoperability.
+
+### Why can I see only some of the books on the server?
+
+First check the libraries shared with the current account and any restrictions. Different accounts may have different access scopes; the client is not required to show everything an administrator can see. After confirming the account, check whether the server has recognized the missing titles.
+
+### I already have an OPDS link. Do I need to configure Kavita again?
+
+That depends on the connection method you choose. For the Kavita type used in this article, fill in the base address and account fields. For the OPDS type, follow the rules for catalogs and page-streaming extensions. Do not interchange these addresses casually: even with the same authentication information, they may provide different capabilities.
+
+## What to read next
+
+- [The difference between an OPDS address and a page-streaming extension](<https://allluckly.cn/en/guides/manyue-opds-pse-library/>).
+- [Record the exact stage at which the connection fails](<https://allluckly.cn/en/guides/manyue-server-connection-troubleshooting/>).
+- [Manage server download tasks](<https://allluckly.cn/en/guides/manyue-download-queue/>).
+
+## Sources and version
+
+Checked on October 22, 2026: ManYue 2.0.2 for iPhone / iPad. Based on [the public description on the China App Store](<https://apps.apple.com/cn/app/id6753895889>), [Apple release lookup](<https://itunes.apple.com/lookup?id=6753895889&country=cn>) and the corresponding feature entry points. Interface labels may change with the version. Feature access is determined by the app’s current purchase screen.
+{% endraw %}

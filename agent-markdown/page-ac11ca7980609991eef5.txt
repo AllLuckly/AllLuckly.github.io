@@ -1,0 +1,73 @@
+---
+layout: null
+permalink: /en/journal/2015-12-28-bison-s-collection-of-solutions-to-common-git-errors/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Bison's collection of solutions to common Git errors
+agent_source_url: https://allluckly.cn/en/journal/2015-12-28-bison-s-collection-of-solutions-to-common-git-errors/
+agent_source_sha256: 517548042e00cffedc0214b2bb9c5775c8ff5917ecbaddaabfaab4b378be968f
+agent_generator_version: 1
+---
+{% raw %}# Bison's collection of solutions to common Git errors
+
+Language: en
+Canonical: [Bison's collection of solutions to common Git errors](<https://allluckly.cn/en/journal/2015-12-28-bison-s-collection-of-solutions-to-common-git-errors/>)
+中文：[中文 HTML](<https://allluckly.cn/sdk/git01>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-12-28-bison-s-collection-of-solutions-to-common-git-errors/>)
+Published: 2015-12-28T00:00:00+08:00
+Modified: 2026-10-23T10:34:11+08:00
+Author: [Bison](<https://allluckly.cn/about/>)
+
+Collects index-lock errors and warnings about Git's default push behaviour, with error screenshots and the configuration commands used at the time. It supports reviewing troubleshooting by error type; inspect the current repository state before applying a command.
+
+Git troubleshooting notes collected by Bison.
+
+English translation of the [Chinese original](<https://allluckly.cn/sdk/git01>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Records Git issues on Windows 7 and the default push settings used at the time.
+
+> "I have been using Windows 7 recently, and some tasks require `Git`. At first, I resisted."
+
+I have been using Windows 7 recently, and some tasks require `Git`. I resisted at first, but had no choice but to give it a go. Here are some problems I encountered while using `Git` and how I solved them.
+
+### -NO.1: Running ` git add  ` on a file produces the following error.
+
+```css
+If no other git process is currently running, this probably means a
+git process crashed in this repository earlier. Make sure no other git
+process is running and remove the file manually to continue.
+```
+
+#### Solution: `rm -f ./.git/index.lock`
+
+### -NO.2: Running ` git push  ` produces the following warning.
+
+```css
+warning: push.default is unset; its implicit value is changing in
+Git 2.0 from 'matching' to 'simple'. To squelch this message
+and maintain the current behavior after the default changes, use:
+
+git config --global push.default matching
+
+To squelch this message and adopt the new behavior now, use:
+
+git config --global push.default simple
+```
+
+#### Solution: run `git config --global push.default matching`, then run git push again.
+
+### -NO.3 A git commit produces the following error:
+
+```css
+fatal: Unable to create ‘project_path/.git/index.lock’: File exists. exists
+```
+
+#### Solution: `rm -f ./.git/index.lock`
+
+These are all the issues I have encountered so far. I will update this whenever new ones arise.
+
+Recommended reading: [Integrating a Baidu Mobile SSP launch ad in one minute](<https://allluckly.cn/en/journal/2015-12-26-integrating-a-baidu-mobile-ssp-launch-ad-in-one-minute/>)
+
+Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.
+{% endraw %}

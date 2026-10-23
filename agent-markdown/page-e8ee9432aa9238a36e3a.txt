@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /en/guides/nasbook-smb-library/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Connect Book Isle to SMB: browse NAS ebooks on a home network'
+agent_source_url: https://allluckly.cn/en/guides/nasbook-smb-library/
+agent_source_sha256: 80dd3be16d8da78e9d86196bff06794f23769c24250c2b07c88c49ae34cb0a17
+agent_generator_version: 1
+---
+{% raw %}# Connect Book Isle to SMB: browse NAS ebooks on a home network
+
+Language: en
+Canonical: [Connect Book Isle to SMB: browse NAS ebooks on a home network](<https://allluckly.cn/en/guides/nasbook-smb-library/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/nasbook-smb-library/>)
+English: [English HTML](<https://allluckly.cn/en/guides/nasbook-smb-library/>)
+Published: 2026-10-23T00:00:00+08:00
+Modified: 2026-10-23T10:34:08+08:00
+Author: Bison
+
+Enter the SMB server, share name and internal path separately, then check folder access, one-book download and the limits of local-network and offline availability.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/nasbook-smb-library/>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+If you already manage ebooks in shared folders at home, use SMB in Book Isle to connect to the NAS. Compared with WebDAV, distinguishing the server address, share name, and path within the share is especially important. Putting them in the wrong fields is a common reason files are missing.
+
+## Confirm the share structure on the NAS first
+
+Prepare a NAS or computer with SMB enabled and an account allowed to read ebooks. Suppose the server address is `192.168.1.20`, the share name is `Books`, and the books are in the share's `Reading/Test` folder. This only illustrates the hierarchy. Use your actual device configuration rather than copying an address that does not exist.
+
+On another working device, first confirm that the same account can enter the share and open the practice EPUB. Prefer a small file so the first connection does not combine a huge PDF download with network-performance problems. Book Isle's NAS features require Collector Pro. Even with membership, the server must be online and grant the account read permission.
+
+## Create a clearly named connection
+
+In Settings, open NAS Connections, add a connection, and choose SMB. Name it something like Living-Room NAS — Ebooks. Enter the server hostname or IP and use the server's port setting or the interface's default handling. In the share field, enter `Books`, and put the directory inside the share in the path field. Avoid repeating the full network path in every field.
+
+Use dedicated username and password fields. If the share field is empty and the interface supports listing shares, browse the server's share list level by level to identify its name. If the server does not permit listing all shares, explicitly enter the name supplied by the administrator. Seeing a server does not mean it allows anonymous access or exposes every share to the current account.
+
+## Check directories level by level after testing
+
+Tap Test Connection, inspect the result, and save. Open the connection, view the share root, and enter the practice folder to compare filenames and counts. If you expect three books but see unrelated content, check the share and path before scanning the whole drive. Keeping access within a known directory reduces accidental imports of other material.
+
+For an empty list, determine whether the directory is genuinely empty, the account can see only part of it, or the path is one level off. The SMB share name may differ from the NAS's local disk directory. The server-internal `/volume...` path generally cannot be copied directly as the client's share name. Use the actual published share name as the entry point the client understands.
+
+## Download one book and verify reading
+
+Select the known EPUB and choose Download to Shelf, confirming the import preview if shown. Wait for completion, then open the body from the local shelf. Read two or three pages, enter a later chapter, and exit and reopen. This checks that the file is not only partly downloaded and that a reading record is established normally.
+
+Then temporarily disconnect the network and reopen the book. If only its cover appears and the body will not open, check download completion and whether you opened a local record or remote entry. An SMB directory cache does not automatically become an offline library. Distinguish files actually downloaded from files merely browsed.
+
+## Keep the connection stable on your home network
+
+If the router changes the server's address, the connection may fail after a few days. Ask the network administrator to maintain a stable address or hostname through the existing setup, then update Book Isle. Do not respond to an expired address by adding a long list of identically named connections, which makes identifying the working one harder.
+
+After the phone switches to cellular data, a home LAN address is usually no longer directly reachable. Remote access must come from your network deployment; SMB support in the app does not automatically traverse your home network. This article does not recommend exposing SMB directly to the public internet for reading. If a secure remote network method already exists, follow its instructions and test the connection.
+
+## Diagnose according to the symptom
+
+For authentication errors, check account permissions rather than only changing the port. For timeouts, check network and service status rather than book names. If directories list but downloads fail, inspect file permissions, moved files, and interrupted transfers. These are different layers; changing one configuration at a time makes results easier to judge.
+
+If a computer can read the share but the phone cannot, compare their accounts and networks. The computer may have saved different credentials with broader permissions, making the same share appear accessible. Also watch for guest Wi-Fi client isolation: both devices may reach the internet without reaching each other. Retaining the error text is more useful than reporting only that it will not open.
+
+## Frequently asked questions
+
+**Can a share name contain Chinese characters?** Use the name actually published by the server and retain every path character. Navigate by known names level by level to avoid missing spaces or slashes in manually assembled paths. Check the path first after an error; there is no need to rename the entire NAS share for this tutorial.
+
+**Will Book Isle automatically organize NAS files?** This SMB entry point is for browsing and downloading. Move remote files, reorganize directories, or edit original books through the NAS file-management tool, then recheck the connection path. Shelf tags and reading states organize local records; they do not become remote folders.
+
+**Can I turn off the NAS after downloading?** For the individual book that finished downloading and opened locally, disconnect to verify. Other undownloaded books still need the server. One successful book does not prove the entire directory is available offline.
+
+## Continue using your private library
+
+For access through an HTTPS service, see [WebDAV connection](<https://allluckly.cn/en/guides/nasbook-webdav-library/>); if the NAS holds a complete Calibre directory, continue with [The metadata.db library method](<https://allluckly.cn/en/guides/nasbook-calibre-database/>). Verify either approach on a small scope before expanding the reading library.
+
+## Sources and version
+
+Information checked on October 23, 2026. The public release is Book Isle 1.1.3, requiring iOS / iPadOS 15.6 or later. This guide is based on public feature descriptions and their entry points. Interface labels may change with the version. See [Official App Store description](<https://apps.apple.com/cn/app/id6766198898>) and [Apple release information](<https://itunes.apple.com/lookup?id=6766198898&country=cn>).
+{% endraw %}

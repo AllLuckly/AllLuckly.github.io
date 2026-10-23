@@ -83,6 +83,8 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
 <title>{{ seo_title | escape }}{% if seo_title != locale_title %} · {{ locale_title | escape }}{% endif %}</title>
 <meta name="description" content="{{ seo_description | escape }}">
 <link rel="canonical" href="{{ seo_canonical | escape }}">
+{% if translation_pair %}{% assign agent_path = page.url | replace: '/index.html', '/' %}{% assign agent_last = agent_path | slice: -1, 1 %}{% if agent_last == '/' %}{% assign agent_path_length = agent_path.size | minus: 1 %}{% assign agent_path = agent_path | slice: 0, agent_path_length %}{% endif %}<link rel="alternate" type="text/markdown" href="{{ agent_path | append: '/index.md' | absolute_url | escape }}" title="{% if content_lang == 'en' %}Read as Markdown{% else %}Markdown 正文{% endif %}">{% endif %}
+<link rel="describedby" type="text/plain" href="{{ locale_prefix | append: '/llms.txt' | absolute_url }}" title="{% if content_lang == 'en' %}Content reading index{% else %}内容阅读目录{% endif %}">
 {% if translation_pair %}<link rel="alternate" hreflang="zh-CN" href="{{ translation_pair.zh_url | absolute_url | escape }}">
 <link rel="alternate" hreflang="en" href="{{ translation_pair.en_url | absolute_url | escape }}">{% endif %}
 {% if page.noindex or seo_empty_works or page.url == '/404.html' %}<meta name="robots" content="noindex, follow">{% else %}<meta name="robots" content="index, follow, max-image-preview:large">{% endif %}

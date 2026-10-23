@@ -1,0 +1,75 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-webdav-cloud/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Connect iCouldPlay to WebDAV: enter the address, folder and account correctly'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-webdav-cloud/
+agent_source_sha256: 541291a0077fcfafd6983f040435d2aff543b0a412098d35a1d5f11da54cfc33
+agent_generator_version: 1
+---
+{% raw %}# Connect iCouldPlay to WebDAV: enter the address, folder and account correctly
+
+Language: en
+Canonical: [Connect iCouldPlay to WebDAV: enter the address, folder and account correctly](<https://allluckly.cn/en/guides/icouldplay-webdav-cloud/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-webdav-cloud/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-webdav-cloud/>)
+Published: 2026-10-23T00:00:00+08:00
+Modified: 2026-10-23T10:34:08+08:00
+Author: Bison
+
+Distinguish a WebDAV service address, webpage sharing link and base path, then verify login, directory access and playback of the same file.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-webdav-cloud/>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+WebDAV turns compatible storage into an iCouldPlay file source, but opening a share webpage in a browser does not mean you have a WebDAV address. Start with the provider's address and account, distinguish protocol, path, and permissions, and test actual playback in a small folder. Do not repeatedly try an ordinary webpage download link as server configuration.
+
+## Confirm three details with the service provider
+
+Prepare the full WebDAV address, username, and password or service-specific credentials. The NAS, cloud-storage service, or administrator should explicitly provide the address, which may include a port and path, for example `https://dav.example.com/media/`. This domain is only an example and cannot be used directly. If the service only supplies a webpage share link, confirm that it actually supports WebDAV. iCouldPlay does not convert arbitrary webpages into a file protocol.
+
+Create a server-side test folder with two short videos and confirm the account has read permission. If the service uses an app-specific password, follow its guidance rather than using a web verification code as a permanent password. Note any port and trailing path in the address to avoid appending the same directory again in the base-path field.
+
+## Enter the complete protocol prefix
+
+In iCouldPlay Sources, add a file source and choose WebDAV. Give it a clear name such as “Home Cloud Video,” then enter the complete `https://` or the service-required `http://` address. Do not omit the protocol and guess what the app will choose. Explicitly entering HTTPS when required reduces the risk of using the wrong protocol.
+
+Use credentials for this WebDAV service. Initially, the base path can remain `/`provided the service address already points to the right entry. If the administrator provides a service root and a separate directory, follow those instructions for the base path. Do not enter `media` at both the address ending and the base-path field, producing a duplicated directory and then mistaking the result for an empty server library.
+
+## Confirm folders one level at a time after connecting
+
+Test and add the source, then wait for the result. On success, open folder selection, compare directory names with the server, and enter the test folder. If login succeeds but the list is empty, first check the account-visible root, base path, and permissions. Files visible to a browser administrator may not be accessible to the playback account.
+
+Save one selected folder first and scan as prompted. Avoid starting at a root containing all backups, photos, and system files: broad scans take time and obscure failures. After scanning, switch the library to this WebDAV source and confirm entries came from the correct folder, not earlier local videos or another network source.
+
+## Test directory and video reading separately
+
+Open an ordinary video of a few dozen megabytes, check picture and sound at the beginning, and seek to the middle. Listing directories and reading video data are separate requests. A server may permit one but limit the other, or handle large files, request rates, and random reads differently. A successful connection test alone does not verify the entire playback chain.
+
+If the video keeps loading, confirm server-side file integrity and read permissions, then compare with a local copy. If local works, record whether remote playback fails completely, starts slowly, or stalls after seeking. These suggest different scopes; detailed troubleshooting is in [Diagnosing streaming buffering](<https://allluckly.cn/en/guides/icouldplay-network-buffering/>).
+
+## Recognize common address errors
+
+A common error is entering an administration-dashboard address as WebDAV. A dashboard usually returns a login webpage, while the protocol entry must list directories. Another is a share link with temporary parameters that later expires. Use a stable WebDAV entry supplied by the provider rather than storing a one-time download address as a permanent source.
+
+For certificate or HTTPS failures, check that domain, protocol, port, and certificate agree rather than hiding the issue by arbitrarily switching to HTTP. LAN and remote access can use different addresses, but name them separately rather than assuming one remains reachable after every network change. This tutorial checks supplied connection conditions and does not require server-security changes.
+
+## Name sources to distinguish multiple entry points
+
+If storage has separate home and remote access methods, label the sources accordingly and test both with the same file. They may point to the same videos, so similar library entries do not necessarily mean files were copied. Inspect each entry's source before deciding whether to retain both connections.
+
+Record the old address and scanned directories before editing a source. Old entries may still point to previous locations after a base-path change; connection edits do not automatically migrate every record. Follow the current refresh or scan workflow, confirm playback from the new directory, and then organize old sources. Read source-deletion confirmations too, distinguishing effects on connections, media records, and files.
+
+## Questions and final checks
+
+**Why can I sign in with a browser but not iCouldPlay?** The browser may use web sessions, verification codes, or another authentication method. WebDAV needs an explicitly supported protocol entry and credentials. Ask the provider whether WebDAV is enabled rather than repeatedly changing the browser password. A reachable webpage does not replace protocol verification.
+
+**Is WebDAV always suitable for high-bitrate video?** Protocol support does not guarantee sufficient bandwidth. Service throttling, home upload speed, mobile network, file size, and seeking support all affect the experience. Establish a baseline with a small file before larger tests. For a home NAS, also compare the [SMB connection tutorial](<https://allluckly.cn/en/guides/icouldplay-smb-nas/>)and choose the method that suits your environment.
+
+After connecting, you should know the complete address, whether the base path is duplicated, the account's accessible scope, and the playback results for both test videos. Keeping these details makes later network changes easier to diagnose without guessing every field again.
+
+## Sources and version
+
+Based on [iCouldPlay official App Store page](<https://apps.apple.com/cn/app/id6755653178>)for public WebDAV support and existing connection controls. The public version checked on October 23, 2026 was 1.1.0. Authentication, throttling, and path rules follow provider guidance; the interface may vary by version.
+{% endraw %}

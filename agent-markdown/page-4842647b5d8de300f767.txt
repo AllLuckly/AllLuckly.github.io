@@ -1,0 +1,424 @@
+---
+layout: null
+permalink: /en/journal/2016-11-07-bitwise-operations-in-ios/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Bitwise Operations in iOS
+agent_source_url: https://allluckly.cn/en/journal/2016-11-07-bitwise-operations-in-ios/
+agent_source_sha256: 3939104f6df765a2d936d2ffd73ae9a9697e133af02abefa43172b9964e777b2
+agent_generator_version: 1
+---
+{% raw %}# Bitwise Operations in iOS
+
+Language: en
+Canonical: [Bitwise Operations in iOS](<https://allluckly.cn/en/journal/2016-11-07-bitwise-operations-in-ios/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao69>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-11-07-bitwise-operations-in-ios/>)
+Published: 2016-11-07T00:00:00+08:00
+Modified: 2026-10-23T10:52:09+08:00
+Author: Sindri
+
+Introduces bitwise AND, OR, XOR, and NOT, using packed RGBA colors and state flags as examples. It then explains how enumerations and masks can store and query several states together.
+
+Originally credited to Sindri; edited and archived by Bison.
+
+[Source listed in the original](<http://www.jianshu.com/p/36ba5d65804f>)
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao69>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Read API, dependency and tool details in the context of the original publication date.
+
+Editor: [Bison](<https://allluckly.cn/en/>)  
+ Source: [Sindri’s Notes](<http://www.jianshu.com/p/36ba5d65804f>)
+
+## Introduction
+
+Modern computer circuits have only two states, `通电/没电`, represented as `0/1`. All data is stored in binary according to a specific encoding.
+
+Directly manipulating these binary digits is bitwise computation. In iOS, nearly all such operations hide their details through enum-based argument passing:
+
+```
+typedef NS_OPTIONS(NSUInteger, UIRectEdge) {
+    UIRectEdgeNone   = 0,
+    UIRectEdgeTop    = 1 << 0,
+    UIRectEdgeLeft   = 1 << 1,
+    UIRectEdgeBottom = 1 << 2,
+    UIRectEdgeRight  = 1 << 3,
+    UIRectEdgeAll    = UIRectEdgeTop | UIRectEdgeLeft | UIRectEdgeBottom | UIRectEdgeRight
+} NS_ENUM_AVAILABLE_IOS(7_0);
+```
+
+Bitwise operations are extremely efficient. Modern compilers already optimise extensively, but sensible bitwise use can improve readability and execution efficiency.
+
+## Basic arithmetic
+
+Before explaining bitwise operations, I will briefly discuss how the CPU performs calculations. If you already understand `CPU` computation, skip this section.
+
+When `int sum = 11 + 79` executes, the computer adds the binary digits of the two numbers and carries as needed:
+
+```
+11:  0 0 0 0 1 0 1 1
+79:  0 1 0 0 1 1 1 1
+————————————————————
+90:  0 1 0 1 1 0 1 0
+```
+
+The time a CPU takes to add two numbers is commonly called one clock cycle. A 2.0GHz CPU can perform `2.0*1024*1024*1024` clock cycles per second. To compare multiplication with addition, consider the binary results of `11*2` and `11*4`:
+
+```
+11:  0 0 0 0 1 0 1 1  *  2
+————————————————————
+22:  0 0 0 1 0 1 1 0
+
+11:  0 0 0 0 1 0 1 1  *  4
+————————————————————
+44:  0 0 1 0 1 1 0 0
+```
+
+Multiplying a number by `2的N次幂` is equivalent to shifting its binary representation left by `N` bits. In code, `num << N` shifts `num` left by `N` positions, equivalent to:
+
+```
+for (int idx = 0; idx < N; idx++) {
+    num *= 2;
+}
+```
+
+If neither multiplier is a `2的N次幂`, the compiler decomposes one value into a sum of `2的N次幂` values. For example, for `37 * 69`, the CPU decomposes `37` into `32+4+1`, then calculates through `(69<<5) + (69<<2) + (69<<0)`. Multiplying two numbers therefore usually takes around ten clock cycles. Similarly, `num >> N` is equivalent to:
+
+```
+for (int idx = 0; idx < N; idx++) {
+    num /= 2;
+}
+```
+
+Division takes far more clock cycles than multiplication, mostly spent decomposing values into `2的N次幂`. Floating-point calculations are more complex still, so here is a brief discussion of precision. A `float` occupies `32bit`: the first bit represents the sign, `2~13位` the integer portion, and `14~32位` the fractional part and scientific-notation indicator. This description may not be exact; it is intended only as a rough introduction. Binary fractional digits still have the `2的N次幂` property. Suppose the following binary digits belong to a fractional part:
+
+```
+1 0 1 1 1 0 0 1
+```
+
+That fractional part equals `1/2 + 1/4 + 1/8 + 1/16 + 1/128 = 0.9453125`. When an irregular decimal such as `3.1415926535898` is stored, its fractional portion is decomposed into many `2的N次幂` values. Since the available fractional bits are finite, a precision difference appears when the decomposed `N` exceeds what can be stored. This calculation also consumes clock cycles, which is why extensive floating-point work such as `(cell动态计算)` can cause stuttering. For a decimal with many digits, storing it as a string can therefore be a better choice.
+
+## Bitwise operators
+
+The operators include:
+
+| Meaning | Operator |
+| --- | --- |
+| Left shift | « |
+| Right shift | » |
+| Bitwise OR | ︳ |
+| Bitwise AND | & |
+| Bitwise NOT | ~ |
+| Bitwise XOR | ^ |
+
+- & operation
+
+   
+
+  ```
+    0 0 1 0 1 1 1 0    46
+    1 0 0 1 1 1 0 1    157
+    ———————————————
+    0 0 0 0 1 1 0 0    12
+  ```
+- | Operation |
+  | --- |
+
+   
+
+  ```
+    0 0 1 0 1 1 1 0    46
+    1 0 0 1 1 1 0 1    157
+    ———————————————
+    1 0 1 1 1 1 1 1    191
+  ```
+- ~ operation
+
+   
+
+  ```
+    0 0 1 0 1 1 1 0    46
+    ———————————————
+    1 1 0 1 0 0 0 1    225
+  ```
+- ^ operation
+
+   
+
+  ```
+    0 0 1 0 1 1 1 0    46
+    1 0 0 1 1 1 0 1    157
+    ———————————————
+    1 0 1 1 0 0 1 1    179
+  ```
+
+## Colour storage
+
+Reasons for bitwise operations include: 1. More concise code 2. Greater efficiency 3. Less memory
+
+How might we store an image in the `RGB` color space directly? An image consists of pixels, each expressing its own color, so we need a class representing one pixel:
+
+```
+@interface Pixel
+
+@property (nonatomic, assign) CGFloat red;
+@property (nonatomic, assign) CGFloat green;
+@property (nonatomic, assign) CGFloat blue;
+@property (nonatomic, assign) CGFloat alpha;
+
+@end
+```
+
+On a 4.7-inch screen, a launch image needs `750*1334` such objects. Ignoring other data, the variables alone occupy `750*1334*4*8` = `32016000` bytes. In practice, however, images generally pack the four `RGBA` properties into one `int` or a similar variable using fewer bytes.
+
+Color values range from `0~255`, that is, `2^1 ~ 2^8-1`, fitting within one byte. Left shifts can therefore place one color value in each byte:
+
+```
+- (int)rgbNumberWithRed: (int)red green: (int)green blue: (int)blue alpha: (float)alpha {
+    int bitPerByte = 8;
+    int maxNumber = 255;
+
+    int alphaInt = alpha * maxNumber;
+    int rgbNumber = (red << (bitPerByte*3)) + (green << (bitPerByte*2)) + (blue << bitPerByte) + alphaInt;
+}
+```
+
+Likewise, shift right until the required data occupies the last byte, then extract it with `0xff`:
+
+```
+- (void)obtainRGBA: (int)rgbNumber {
+    int mask = 0xff;
+    int bitPerByte = 8;
+
+    double alphaInt = (rgbNumber & mask) / 255.0;
+    int blue = ((rgbNumber >> bitPerByte) & mask);
+    int green = ((rgbNumber >> (bitPerByte*2)) & mask);
+    int red = ((rgbNumber >> (bitPerByte*3)) & mask);
+}
+```
+
+Compared with class-based storage, bitwise storage wins decisively in efficiency and memory usage.
+
+## Applications of bitwise operations
+
+Apple uses bitwise design in class-object structures: each object has an integer identifier,`flags`, whose different bits record weak references, initialisation and other flags. Extract this stored information using`&`, `|`operators to extract it. These appear in [Runtime source](<http://opensource.apple.com>). Here is pseudocode; do not take the parameter names literally.
+
+```
+#define IS_TAGGED_POINTER (1 << 12);
+#define HAS_WEAK_REFERENCE (1 << 13);
+
+inline void objc_object::free() {
+    if (this->flags | HAS_WEAK_REFERENCE) {
+      ///  set all weak reference point to nil
+    }
+}
+
+inline int objc_object::retainCount() {
+    if (this.flags | IS_TAGGED_POINTER) {
+      return (int)INT_MAX;
+    } else {
+      return this->retainCount;
+    }
+}
+
+......
+```
+
+Following Apple’s approach, define an enum for common app permissions to obtain authorisation status:
+
+```
+typedef NS_ENUM(NSInteger, LXDAuthorizationType)
+{
+    LXDAuthorizationTypeNone = 0,
+    LXDAuthorizationTypePush = 1 << 0,  ///<    推送授权
+    LXDAuthorizationTypeLocation = 1 << 1,  ///<    定位授权
+    LXDAuthorizationTypeCamera = 1 << 2,    ///<    相机授权
+    LXDAuthorizationTypePhoto = 1 << 3,     ///<    相册授权
+    LXDAuthorizationTypeAudio = 1 << 4,  ///<    麦克风授权
+    LXDAuthorizationTypeContacts = 1 << 5,  ///<    通讯录授权
+};
+```
+
+Declare a global permissions variable to retain different authorization states. When the app has a permission, use `|` to set the corresponding bit to `1`. Otherwise, invert the relevant permission enum with `~`, then use `&` to clear its bit. Create a helper class to retrieve and update these states:
+
+```
+/*!
+ *  @brief  获取应用授权信息工具，最低使用版本：iOS8.0
+ */
+NS_CLASS_AVAILABLE_IOS(8_0) @interface LXDAuthObtainTool : NSObject
+
+/// 获取当前应用权限
++ (LXDAuthorizationType)obtainAuthorization;
+/// 更新应用权限
++ (void)updateAuthorization;
+
+@end
+
+
+#pragma mark -  LXDAuthObtainTool.m
+static LXDAuthorizationType kAuthorization;
+
+@implementation LXDAuthObtainTool
+
++ (void)initialize
+{
+    kAuthorization = LXDAuthorizationTypeNone;
+    [self updateAuthorization];
+}
+
+/// 获取当前应用权限
++ (LXDAuthorizationType)obtainAuthorization
+{
+    return kAuthorization;
+}
+
+/// 更新应用权限
++ (void)updateAuthorization
+{
+    /// 推送
+    if ([UIApplication sharedApplication].currentUserNotificationSettings.types == UIUserNotificationTypeNone) {
+        kAuthorization &= (~LXDAuthorizationTypePush);
+    } else {
+        kAuthorization |= LXDAuthorizationTypePush;
+    }
+    /// 定位
+    if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedAlways || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse) {
+        kAuthorization |= LXDAuthorizationTypeLocation;
+    } else {
+        kAuthorization &= (~LXDAuthorizationTypeLocation);
+    }
+    /// 相机
+    if ([AVCaptureDevice authorizationStatusForMediaType: AVMediaTypeVideo] == AVAuthorizationStatusAuthorized) {
+        kAuthorization |= LXDAuthorizationTypeCamera;
+    } else {
+        kAuthorization &= (~LXDAuthorizationTypeCamera);
+    }
+    /// 相册
+    if ([PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
+        kAuthorization |= LXDAuthorizationTypePhoto;
+    } else {
+        kAuthorization &= (~LXDAuthorizationTypePhoto);
+    }
+    /// 麦克风
+    [[AVAudioSession sharedInstance] requestRecordPermission: ^(BOOL granted) {
+        if (granted) {
+            kAuthorization |= LXDAuthorizationTypeAudio;
+        } else {
+            kAuthorization &= (~LXDAuthorizationTypeAudio);
+        }
+    }];
+    /// 通讯录
+    if ([UIDevice currentDevice].systemVersion.doubleValue >= 9) {
+        if ([CNContactStore authorizationStatusForEntityType: CNEntityTypeContacts] == CNAuthorizationStatusAuthorized) {
+            kAuthorization |= LXDAuthorizationTypeContacts;
+        } else {
+            kAuthorization &= (~LXDAuthorizationTypeContacts);
+        }
+    } else {
+        if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized) {
+            kAuthorization |= LXDAuthorizationTypeContacts;
+        } else {
+            kAuthorization &= (~LXDAuthorizationTypeContacts);
+        }
+    }
+}
+
+@end
+```
+
+When a permission is needed, such as opening Photos, check it directly with `&`:
+
+```
+- (void)openCamera {
+    LXDAuthorizationType type = [LXDAuthObtainTool obtainAuthorization];
+    if (type & LXDAuthorizationTypeCamera) {
+        ///  open camera
+    } else {
+        /// alert
+    }
+}
+```
+
+Bitwise operations offer compact storage and efficiency, but do more than that. My project needs to download all monetary data after login. The main problem is:
+
+> The `AFN2.3+` request library does not support synchronous requests, making it cumbersome to determine when a group of request tasks has finished.
+
+Since an `NSInteger` contains 8 bytes, or 64 bits, I use each bit to represent the completion state of one request. With `N(<64)` data-sync interfaces after login, we can declare a state value representing completion of all requests:
+
+```
+NSInteger complete = 0;
+for (int idx = 0; idx < N; idx++) {
+    complete |= (1 << idx);
+}
+```
+
+Then use a flag variable, `flags`, to track current request completion. Set the corresponding bit to `1` when each data-sync task finishes:
+
+```
+__block NSInteger flags = 0;
+NSArray<NSString *> * urls = @[......];
+NSArray<NSDictionary *> * params = @[......];    
+
+for (NSInteger idx = 0; idx < urls.count; idx++) {
+    NSString * url = urls[idx];
+    NSDictionary * param = params[idx];
+
+    [LXDDataSyncTool syncWithUrl: url params: param complete: ^{
+        flags |= (1 << idx);
+        if ( (flags ^ complete) == 0 ) {
+            [self completeDataSync];
+        }
+    }];
+}
+```
+
+## Bitwise operations and algorithms
+
+With high-level languages widely used, bitwise operations are often hidden inside abstractions, so many developers may not use them directly in projects. In the `基础计算` section above, I said adding two numbers takes one clock cycle. Although `CPU` register reads and writes require additional cycles, their cost is usually constant and can be disregarded here.
+
+Since bitwise operations also generally finish in one clock cycle, algorithm developers favour them. For example, swapping two variables usually looks like:
+
+```
+int sum = a;
+a = b;
+b = sum;
+```
+
+Alternatively:
+
+```
+a = a + b;
+b = a - b;
+a = a - b;
+```
+
+Bitwise operations require neither arithmetic nor temporary variables:
+
+```
+a ^= b;
+b = a ^ b;
+a = a ^ b;
+```
+
+The code above is similar to the second approach: combine `a` and `b` into one variable, then eliminate `a` and `b` respectively. The `^` operation sets matching bits to 0, so `b^b` equals 0.
+
+> Advanced exercise: find the only unpaired integer in an array where every other number appears twice.
+
+From swapping `a` and `b` without an intermediate variable above, we can derive this minimal code:
+
+```
+- (int)singleDog(int * nums) {
+    int singleDog = 0;
+    for (int idx = 0; idx < sizeof(nums)/sizeof(int); idx++) {
+        singleDog ^= nums[idx];
+    }
+    return singleDog;
+}
+```
+
+---
+
+Recommended reading: [Implement an iOS launch-screen advertisement in minutes](<https://allluckly.cn/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/>)
+{% endraw %}

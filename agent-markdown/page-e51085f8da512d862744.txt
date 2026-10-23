@@ -1,0 +1,378 @@
+---
+layout: null
+permalink: /投稿/tuogao33/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: Swift之实现类似于格瓦拉启动页中的放大转场动画
+agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao33
+agent_source_sha256: 1176ccd149e5889401331b5799e64967403492a6223562cdd8d36c5e6cb4384b
+agent_generator_version: 1
+---
+{% raw %}# Swift之实现类似于格瓦拉启动页中的放大转场动画
+
+语言：zh-CN
+原文：[Swift之实现类似于格瓦拉启动页中的放大转场动画](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao33>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao33>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-03-17-a-circular-expanding-transition-in-swift-inspired-by-gewara/>)
+发布于: 2016-03-17T00:00:00+08:00
+内容更新于: 2016-03-17T00:00:00+08:00
+署名：HenryCheng
+
+从普通导航 push 过渡到圆形放大转场，利用 CALayer 遮罩控制页面显露范围，再加入手势驱动动画；正文以 Swift 展开，并提供 Objective-C 示例参照。
+
+原文署名HenryCheng，Bison 编辑收录。
+
+[原文所列来源](<http://www.jianshu.com/p/8c29fce5a994>)
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文发表于 2016 年，使用当时的 Swift 与导航转场代理接口。
+
+编辑：[Bison](<https://allluckly.cn/>)  
+ 投稿：[HenryCheng](<http://www.jianshu.com/p/8c29fce5a994>)
+
+> "用过格瓦拉电影，或者其他app可能都知道，一种点击按钮用放大效果实现转场的动画现在很流行，效果大致如下:"
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao33/1.gif>)
+
+本文主讲SWIFT版，OC版在后面会留下Demo下载
+
+在iOS中，在同一个导航控制器你可以自定义转场动画实现两个viewController之间的过渡。实际上在iOS7之后，通过实现
+
+```
+UIViewControllerAnimatedTransitioning或者UIViewControllerContextTransitioning协议，
+```
+
+就可以简单的自定义转场动画，比如一个NavigationController的push和pop。还有一点你需要知道的是，我如果有一个矩形， 有一个圆，想要在这个矩形上剪出和圆大小相同的面积，那么就要用到CALayer的mask属性，下面用图表达可能会直观些：
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao33/2.png>)
+
+现在可能你对mask属性有一点了解了，下面代码的实现中你将会看到具体的实现过程。先做这么多了解，下面开始一步步实现效果。
+
+## 开始实现简单的push效果
+
+新建工程，这里用的是Swift，选中storyboard,然后加上一个导航，如下
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao33/3.png>)  
+ 然后效果如下
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao33/4.png>)
+
+把右侧的Shows Navigation Bar去掉，因为这个demo里面并不需要导航栏，同时保证Is Instal View Controller是被勾上的（不知道的童鞋可以去掉看一下效果），这里默认的都是勾选上的。然后在新建一个viewController，并设置其继承于ViewController，如下
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao33/5.png>)
+
+然后在两个VC上分别在同样的位置添加两个完全相同的按钮，位置约束在右上角距离右边和上边分别为20，20的距离，为了区分，将这两个VC设置不同的背景色，如下
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao33/6.png>)
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao33/7.png>)
+
+然后右键一直按住第一个按钮拖拽至第二个VC（也就是黄色背景的）点击show  
+ ![1](<https://allluckly.cn/images/blog/tuogao/tougao33/8.png>)
+
+这时候两个VC之间就会出现一条线，然后点击线中间，设置identifier为PushSegue，这里设置一个标识符，为后面的跳转做准备，效果如下：
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao33/9.png>)
+
+将两个按钮连接成ViewController的同一个属性，名为popBtn，然后将第二个VC的按钮实现一个点击方法（因为我们要pop回来）名为popClick，如下
+
+```
+import UIKit
+
+class ViewController: UIViewController {
+
+    @IBOutlet weak var popBtn: UIButton!
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view, typically from a nib.
+    }
+
+    @IBAction func popClick(sender: AnyObject) {
+
+        self.navigationController?.popViewControllerAnimated(true)
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+
+}
+```
+
+最后，分别在两个VC的中间添加一个imageView，最后的效果图如下
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao33/10.png>)
+
+如果到这里你还没错的话，那么运行一下你的工程，运行的效果将会是这样
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao33/11.gif>)
+
+没错，也就是一个简单的push效果，现在准备工作已经做好了，想要实现放大效果的动画，还要继续往下进行。
+
+## 开始实现放大效果
+
+通过上面的步骤，我们已经做好了准备工作，我们还要知道的一点是，要想自定义导航的push或pop效果，需要实现UINavigationControllerDelegate协议里面的
+
+```
+func navigationController(navigationController: UINavigationController,
+interactionControllerForAnimationController animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+    return nil
+}
+```
+
+这个协议方法，我们先新建一个继承于NSObject的名为HWNavigationDelegate的一个类，然后引入UINavigationControllerDelegate,实现上面的协议方法，使返回值暂时为nil（从上面代码中可以看出返回值是一个可选值，所以这里可以先用nil，待会再具体实现）。然后你的HWNavigationDelegate里面的代码大致如下
+
+```
+//
+//  HWNavigationDelegate.swift
+//  HWAnimationTransition_Swift
+//
+//  Created by HenryCheng on 16/3/16.
+//  Copyright © 2016年 www.igancao.com. All rights reserved.
+//
+
+import UIKit
+
+class HWNavigationDelegate: NSObject, UINavigationControllerDelegate {
+
+    func navigationController(navigationController: UINavigationController, animationControllerForOperation operation: UINavigationControllerOperation, fromViewController fromVC: UIViewController, toViewController toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+
+        return nil;
+    }
+}
+```
+
+现在继续打开storyboard，然后在右下角搜索Object，并将其拖拽至左边Navigation Controller Source里，  
+ ![1](<https://allluckly.cn/images/blog/tuogao/tougao33/12.png>)
+
+并在选中Object，在右边将其类改成刚刚创建的HWNavigationDelegate
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao33/13.png>)  
+ 最后在左侧，点击UINavigationController，并将其delegate设置为刚才的Object
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao33/14.png>)
+
+现在上面HWNavigationDelegate里面导航的协议方法的返回值还是nil，我们需要创建一个实现动画效果的类，并使其返回，这里我们新建一个同样继承于NSObject的名为HWTransitionAnimator的类，并使其实现UIViewControllerAnimatedTransitioning协议，和其中的协议方法，为了便于阅读，这里贴出所有的代码，
+
+```
+//
+//  HWTransitionAnimator.swift
+//  HWAnimationTransition_Swift
+//
+//  Created by HenryCheng on 16/3/16.
+//  Copyright © 2016年 www.igancao.com. All rights reserved.
+//
+
+import UIKit
+
+class HWTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+    weak var transitionContext: UIViewControllerContextTransitioning?
+
+    func transitionDuration(transitionContext: UIViewControllerContextTransitioning?) -> NSTimeInterval {
+
+        return 0.5
+    }
+
+    func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
+
+        self.transitionContext = transitionContext
+
+        let containerView = transitionContext.containerView()
+        let fromVC = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey) as! ViewController
+        let toVC = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey) as! ViewController
+        let button = fromVC.popBtn
+
+        containerView?.addSubview(toVC.view)
+
+        let circleMaskPathInitial = UIBezierPath(ovalInRect: button.frame)
+        let extremePoint = CGPoint(x: button.center.x - 0, y: button.center.y - CGRectGetHeight(toVC.view.bounds))
+        let radius = sqrt((extremePoint.x * extremePoint.x) + (extremePoint.y * extremePoint.y))
+        let circleMaskPathFinal = UIBezierPath(ovalInRect: CGRectInset(button.frame, -radius, -radius))
+
+        let maskLayer = CAShapeLayer()
+        maskLayer.path = circleMaskPathFinal.CGPath
+        toVC.view.layer.mask = maskLayer
+
+        let maskLayerAnimation = CABasicAnimation(keyPath: "path")
+        maskLayerAnimation.fromValue = circleMaskPathInitial.CGPath
+        maskLayerAnimation.toValue = circleMaskPathFinal.CGPath
+        maskLayerAnimation.duration = self.transitionDuration(transitionContext)
+        maskLayerAnimation.delegate = self
+        maskLayer.addAnimation(maskLayerAnimation, forKey: "path")
+
+    }
+
+    override func animationDidStop(anim: CAAnimation, finished flag: Bool) {
+
+        self.transitionContext?.completeTransition(!self.transitionContext!.transitionWasCancelled())
+        self.transitionContext?.viewControllerForKey(UITransitionContextFromViewControllerKey)?.view.layer.mask = nil
+    }
+
+}
+```
+
+关于上面的所有代码，其中
+
+```
+func animateTransition(transitionContext: UIViewControllerContextTransitioning)，
+func animateTransition(transitionContext: UIViewControllerContextTransitioning)
+```
+
+分别是设置时间和动画过程的方法，都是
+
+```
+UIViewControllerAnimatedTransitioning的协议方法，
+func animationDidStop是实现动画结束后的操作，
+```
+
+这里动画结束后需要做取消动画和将fromViewController释放掉的操作。里面的
+
+```
+let circleMaskPathInitial = UIBezierPath(ovalInRect: button.frame)
+let extremePoint = CGPoint(x: button.center.x - 0, y: button.center.y - CGRectGetHeight(toVC.view.bounds))
+let radius = sqrt((extremePoint.x * extremePoint.x) + (extremePoint.y * extremePoint.y))
+let circleMaskPathFinal = UIBezierPath(ovalInRect: CGRectInset(button.frame, -radius, -radius))
+
+let maskLayer = CAShapeLayer()
+maskLayer.path = circleMaskPathFinal.CGPath
+toVC.view.layer.mask = maskLayer
+```
+
+这段代码，下面第二段代码的maskLayer这个上面开始的时候就说过了，第一段代码其实就是一个计算的过程，求出最后大圆效果的半径，原理如图（粗糙的画了一下，画得不好见谅^\_^）
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao33/15.jpg>)
+
+最后将刚才HWNavigationDelegate里的协议方法返回值修改成HWTransitionAnimator的对象就可以了
+
+```
+func navigationController(navigationController: UINavigationController, animationControllerForOperation operation: UINavigationControllerOperation, fromViewController fromVC: UIViewController, toViewController toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+
+    return HWTransitionAnimator()
+}
+```
+
+如果上面步骤，你操作没错的话，运行工程效果如下
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao33/16.gif>)
+
+## 添加手势引导动画
+
+```
+添加手势实现动画效果，我们在刚才的<br>
+HWNavigationDelegate类里实现
+UINavigationControllerDelegate的另外一个斜一方法
+func navigationController(navigationController: UINavigationController,
+interactionControllerForAnimationController animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+    return self.interactionController
+}
+```
+
+这里的
+
+```
+self.interactionController
+```
+
+就是我们的导航控制器，如下图
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao33/17.png>)
+
+然后重写awakeFromNib()方法，关于整个HWNavigationDelegate最后的代码实现，如下  
+ // // HWNavigationDelegate.swift // HWAnimationTransition\_Swift // // Created by HenryCheng on 16/3/16. // Copyright © 2016年 www.igancao.com. All rights reserved. //
+
+```
+import UIKit
+
+class HWNavigationDelegate: NSObject, UINavigationControllerDelegate {
+
+    @IBOutlet weak var navigationController: UINavigationController!
+    var interactionController: UIPercentDrivenInteractiveTransition?
+
+    func navigationController(navigationController: UINavigationController,
+    interactionControllerForAnimationController animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+        return self.interactionController
+    }
+
+    func navigationController(navigationController: UINavigationController, animationControllerForOperation operation: UINavigationControllerOperation, fromViewController fromVC: UIViewController, toViewController toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+
+        return HWTransitionAnimator()
+        //        return nil;
+    }
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        let panGesture = UIPanGestureRecognizer(target: self, action: Selector("panned:"))
+        self.navigationController.view.addGestureRecognizer(panGesture)
+    }
+
+    func panned(gestureRecognizer: UIPanGestureRecognizer) {
+        switch gestureRecognizer.state {
+        case .Began:
+
+            self.interactionController = UIPercentDrivenInteractiveTransition()
+            if self.navigationController?.viewControllers.count > 1 {
+                self.navigationController?.popViewControllerAnimated(true)
+            } else {
+                self.navigationController?.topViewController!.performSegueWithIdentifier("PushSegue", sender: nil)
+            }
+        case .Changed:
+
+        let translation = gestureRecognizer.translationInView(self.navigationController!.view)
+        let completionProgress = translation.x / CGRectGetWidth(self.navigationController!.view.bounds)
+        self.interactionController?.updateInteractiveTransition(completionProgress)
+        case .Ended:
+
+            if (gestureRecognizer.velocityInView(self.navigationController!.view).x > 0) {
+                self.interactionController?.finishInteractiveTransition()
+            } else {
+                self.interactionController?.cancelInteractiveTransition()
+            }
+            self.interactionController = nil
+
+        default:
+            self.interactionController?.cancelInteractiveTransition()
+            self.interactionController = nil
+        }
+    }
+}
+```
+
+这里需要注意的是gestureRecognizer的几个状态
+
+1、Begin ：手势被识别时时，初始化
+
+```
+UIPercentDrivenInteractiveTransition
+```
+
+实例对象和设置属性，比如如果是第一个VC就实现push，反之则是pop
+
+2、Changed：开始手势到结束手势的一个过程，上面代码中是根据偏移量改变
+
+```
+self.interactionController
+```
+
+的位置
+
+3、Ended：手势结束以后的操作，设置动画结束或者取消动画，最后将
+
+self.interactionController
+
+置为nil
+
+4、default：其他的状态运行你的工程，拖拽屏幕时效果如下
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao33/18.gif>)
+
+## 最后
+
+由于最近工作比较忙，好久没有写博客了，趁着这回功夫将这个小动画分享一下，希望大家喜欢，时间不早了，该回去休息了（在公司加班完成的，喜欢的就star一下吧），最后，这里只是swift版本的代码，同时如果你需要全部代码的话，你可以在下面下载
+
+1、[swift版本](<https://github.com/Loveway/HWAnimationTransition_Swift>) 2、[OC版本](<https://github.com/Loveway/HWAnimationTransition_OC>)
+
+---
+
+好文推荐：[菜鸟程序员2015年年终总结](<https://allluckly.cn/%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/zongjie2015>)
+{% endraw %}

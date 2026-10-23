@@ -1,0 +1,80 @@
+---
+layout: null
+permalink: /en/journal/2015-05-20-installing-and-using-cocoapods-for-ios-development/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Installing and using CocoaPods for iOS development
+agent_source_url: https://allluckly.cn/en/journal/2015-05-20-installing-and-using-cocoapods-for-ios-development/
+agent_source_sha256: ed6b0e5b2dc31e86805944ca15fb6683328b9cc9b0cf4f3f68dd71d93b64e15c
+agent_generator_version: 1
+---
+{% raw %}# Installing and using CocoaPods for iOS development
+
+Language: en
+Canonical: [Installing and using CocoaPods for iOS development](<https://allluckly.cn/en/journal/2015-05-20-installing-and-using-cocoapods-for-ios-development/>)
+中文：[中文 HTML](<https://allluckly.cn/cocoapods/CocoaPods%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-05-20-installing-and-using-cocoapods-for-ios-development/>)
+Published: 2015-05-20T00:00:00+08:00
+Modified: 2026-10-23T10:34:09+08:00
+Author: [Bison](<https://allluckly.cn/about/>)
+
+Starting with Ruby and CocoaPods installation, this article explains how to find dependencies, write a Podfile, install pods and open the generated workspace. It also records a fix for header completion, illustrating an early iOS dependency-management workflow.
+
+Originally credited to Bison. Content is retained as published.
+
+English translation of the [Chinese original](<https://allluckly.cn/cocoapods/CocoaPods%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Published in 2015. The examples use iOS 7.0, SDWebImage 2.0 and the Ruby mirror address used at the time.
+
+The original article records the installation process in 2015, including the Ruby mirror, Podfile and Xcode settings used at the time. When setting up an environment now, start with the official CocoaPods installation guide rather than copying the old mirror address. This article is retained to explain the relationship between the Podfile, Pods, Podfile.lock and workspace. The old steps have not been rerun with the current toolchain.
+
+- [CocoaPods official installation guide](<https://guides.cocoapods.org/using/getting-started.html>)
+
+Reading notes added on 2026-10-23
+
+> "The beginning is the most important part of the work." Plato 1. Install Brew
+
+`ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"` 2. Update Ruby
+
+`brew install ruby`
+
+3. Install CocoaPods
+
+First run `sudo gem install cocoapods`. If nothing happens, run `gem sources --remove https://rubygems.org/`. Wait until it responds, then enter `gem sources -a http://ruby.taobao.org/`. To verify that Taobao is your only Ruby mirror, use the following command:
+
+`gem sources -l`
+
+The command above has succeeded only when the following text appears in the terminal: *\*\* CURRENT SOURCES \*\**
+
+http://ruby.taobao.org/ Now run `sudo gem install cocoapods` in Terminal again.
+
+Wait a dozen or so seconds, then run `pod setup`.
+
+4. Use the Search command to check whether the third-party library you need exists!
+
+`pod search SDWebImage `
+
+5. Create a Podfile
+
+Use `cd` followed by the project path, then create the file.
+
+`touch Podfile`
+
+1. Enter the following in the Podfile: ` platform :ios, '7.0'
+pod "SDWebImage", "~> 2.0"   `
+
+7. Finally, use `esc  :wq`.
+
+1. Run ` pod install  `.
+
+To add another third-party framework through CocoaPods, run `pod search` followed by its name, add the latest version to the Podfile, and run `pod install`.
+
+Pay attention to the last sentence: from now on, open the project with .xcworkspace rather than the previous .xcodeproj file.
+
+Fixing missing autocomplete for third-party header imports when using `CocoaPods`
+
+Open `Target -> Build Settings` and find `\”User Header Search Paths\”`. Add `"${SRCROOT}"` and select `\”Recursive\”` so Xcode searches the project directory recursively. Autocomplete should then work immediately.
+
+You may wonder why an .xcworkspace file appeared. It was created by the `$ pod install` command you just ran. You will also find a new Podfile.lock file and a Pods folder.
+{% endraw %}

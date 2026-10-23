@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-ugreen-library/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Connect iCouldPlay to UGREEN video: check service addresses and media access'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-ugreen-library/
+agent_source_sha256: b8ff0996f9733a6ceec35a6f3cd341754e5feece235903e806097874876c312d
+agent_generator_version: 1
+---
+{% raw %}# Connect iCouldPlay to UGREEN video: check service addresses and media access
+
+Language: en
+Canonical: [Connect iCouldPlay to UGREEN video: check service addresses and media access](<https://allluckly.cn/en/guides/icouldplay-ugreen-library/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ugreen-library/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ugreen-library/>)
+Published: 2026-10-23T00:00:00+08:00
+Modified: 2026-10-23T10:34:08+08:00
+Author: Bison
+
+Follow UGREEN video support in iCouldPlay 1.1.0, distinguish NAS administration and video-service addresses, then verify login, libraries and playback in order.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-ugreen-library/>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+The public release notes for iCouldPlay 1.1.0 added UGREEN Cloud video-server support. Still distinguish three entry points: NAS device management, file sharing, and the video service. Being able to log in to the device administration interface does not make that address the media interface the player needs. This guide starts with an enabled video service and checks the connection step by step, without presenting one default port as a fixed configuration for every UGREEN device.
+
+## First confirm that the device has a working video service
+
+On your UGREEN device or in its official client, confirm that the video service is enabled, a media library exists, and at least one movie plays correctly. Note the device system and video service versions, and prepare an account for iCouldPlay. If the service has not scanned any content yet, organize the server first before connecting a third-party player.
+
+Prepare a short film or an easily checked movie as a sample, and note its library name, title, and duration. A file existing on disk does not automatically mean the video service has added it to a library. The file system, service scan, and user permissions are three stages; an unfinished stage can leave the client with an empty result.
+
+## Check the video-service address, not the administration interface
+
+Obtain the video service's host, port, protocol, and account from the device's actual configuration or its administrator. The current iCouldPlay entry provides a port suggestion, but this is only a form starting point and must be checked against the service settings. Device model, system version, containers, and proxy configuration can change access details. Do not copy someone else's port merely because the brand matches.
+
+The host can be a local-network address or a configured domain name, but should not include a movie's web detail-page path. The NAS administration interface, remote-login portal, and video service may use different ports and authentication methods. If you only have the device login URL and no media-service information, check the official management interface instead of repeatedly trying common ports in the player.
+
+## Select the corresponding service type in iCouldPlay
+
+Open “Sources,” add a media server, and find the UGREEN video service or the corresponding UGREEN Cloud video name in your version. Localization may change the wording, but choose an explicit UGREEN media-service type, rather than SMB or WebDAV merely because it looks similar. A source name such as “UGREEN Home Cinema” helps distinguish a media library connection from a file directory later.
+
+Enter the server host, port, username, and password, setting HTTPS according to the actual service requirements. Use an account authorized to access the video library; access to the device administration page alone does not prove sufficient permissions. Before submitting, check spaces around the address and all numbers. Save after a successful test rather than changing every field at once after a failure.
+
+## First verify visibility within one library
+
+Open the new source and compare its library names with the original service. Start with the library containing your prepared sample and check its poster, title, and duration. If the account only has access to family videos, do not expect all of the administrator's movie libraries to appear automatically. Checking the same account in the original service quickly distinguishes permissions from client compatibility.
+
+If the list is empty, first confirm that the server scan has finished, then check the account's library permissions and the current address. Do not immediately switch to a device administrator account for permanent use or expose every directory just to see content. The player needs explicit media access, not all device-management capabilities.
+
+## Test metadata retrieval separately from video playback
+
+Once posters and descriptions appear, open the sample movie, check the beginning, then seek to the middle. Successful metadata retrieval only proves that some interfaces work; the actual video address, authentication, and data reading may still depend on the service version. If the list works but playback fails, play the same item in the original client to confirm that the file is online and readable by the service.
+
+If the original client works but iCouldPlay does not, record the device system, video service version, iCouldPlay version, movie container, and failure stage. Do not simply conclude that “this brand is unsupported,” or assume every firmware combination must work because support appears in release notes. Keep the specific service version as a troubleshooting condition.
+
+## Verify the home network before considering access away from home
+
+Complete the first connection on the same local network where possible, reducing variables from remote proxies, external addresses, and network switching. Away from home, a local host address usually cannot be reached directly. Use a remote-access method you have already configured and verified rather than expecting iCouldPlay's source record to provide tunneling automatically. Do not temporarily disable authentication or expose device services just for the tutorial.
+
+To compare file reading, access the same test video through an enabled [SMB file source](<https://allluckly.cn/en/guides/icouldplay-smb-nas/>). These methods organize content differently: a media service supplies libraries and metadata, while SMB supplies directories and files. Comparing playback can narrow the problem, but does not mean their posters, progress, or permissions will automatically remain synchronized.
+
+## How to record useful compatibility results
+
+Four lines are enough for a useful test record: service version and network, libraries visible to the account, sample movie details, and playback-start and seeking results. Keep passwords, authorization data, and complete private addresses out of public support screenshots. “The library is visible, but this movie fails to start” is more useful than “It won't connect,” and avoids repeating steps already passed.
+
+If the current service combination is unstable, keep watching in the original client or use another file protocol verified in your environment. Compare a small sample before migrating; one connection entry is not a reason to rebuild all your media metadata. For the difference between media servers and file sources, also see [Emby connection guide](<https://allluckly.cn/en/guides/icouldplay-emby-library/>)to check permissions and playback as separate stages.
+
+## Common questions and completion checks
+
+**Can every UGREEN NAS connect using the same port?** No. Form defaults differ from the actual configuration of a particular device. Check whether the service is installed, its version, network mapping, and authentication. Use the working entry point of your own video service rather than substituting the device administration address.
+
+**Why test when the store description says it is supported?** Public support descriptions establish the feature's direction and release scope, but cannot cover every device configuration. Connection, library permissions, and the playback data path are different stages. Testing each helps determine whether your combination suits long-term use. Completion means that the same account can see the expected library and play and seek through a sample, not simply that “Added” appears.
+
+## Sources and version
+
+Based on [Official iCouldPlay store page and version history](<https://apps.apple.com/cn/app/id6755653178>)and the existing UGREEN video-service entry. The public version checked on October 23, 2026 was 1.1.0, whose release notes include UGREEN Cloud video-server support. Use your own service configuration for device addresses, permissions, and firmware differences, and check connection and playback separately.
+{% endraw %}

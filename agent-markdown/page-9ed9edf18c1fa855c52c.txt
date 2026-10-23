@@ -1,0 +1,191 @@
+---
+layout: null
+permalink: /投稿/tuogao08/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发之视觉差动画效果详解
+agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao08
+agent_source_sha256: 5cad6eb1a3a6c6b2e96bbf09d6fec04f4794ea9c21f3728d84cf4a22573eaebd
+agent_generator_version: 1
+---
+{% raw %}# iOS开发之视觉差动画效果详解
+
+语言：zh-CN
+原文：[iOS开发之视觉差动画效果详解](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao08>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao08>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-01-22-understanding-parallax-animation-in-ios/>)
+发布于: 2016-01-22T00:00:00+08:00
+内容更新于: 2016-01-22T00:00:00+08:00
+署名：WzxJiang
+
+把视差效果拆成多层视图的位置关系，通过拖动中间层、补偿文字层偏移和裁剪越界内容，让文字相对底层保持不动，解释遮挡与位移如何共同形成视觉差。
+
+原文署名WzxJiang，Bison 编辑收录。
+
+[原文所列来源](<http://www.jianshu.com/p/aeb56b51032d>)
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。涉及的 API、依赖和工具版本请结合发表日期阅读。
+
+编辑：[Bison](<https://allluckly.cn/>)  
+ 投稿：[WzxJiang](<http://www.jianshu.com/p/aeb56b51032d>)
+
+> "之前家里有事，回家了快7天，今天终于回来上班了…今天给大家讲解一下视觉差动画"
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao08/1.png>)
+
+视觉差动画可能不太实用，但它能为你的App增加亮点，而且它对技术的要求十分简单，只是逻辑不好理解。 先放效果图:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao08/1.gif>)
+
+让我们来分解它
+
+> 首先我们得知道在这个View中的组成:
+
+> 最底层的三个黑字Label加在一个View上
+
+> 遮挡黑块View上放着另外三个白字Label.
+
+> 没错，其实这个上面有每每两份重复的Label。
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao08/2.png>)
+
+这就是这个视觉差动画的奥秘。
+
+但是这样还不行，所有的最外层的Label会挡住底层Label，所以我们还需要`view.clipsToBounds = YES;`  
+ ![1](<https://allluckly.cn/images/blog/tuogao/tougao08/3.png>)
+
+下面讲解一下代码:
+
+```
+
+/**
+*  最外层的View
+*/
+@property(nonatomic,strong) UIView * labelView;
+
+/**
+*  中间的View
+*/
+@property(nonatomic,strong) UIView * midView;
+
+/**
+*  单个格子的高度
+*/
+@property(nonatomic,assign) CGFloat  height;
+
+```
+
+初始化代码:
+
+```
+- (instancetype)initWithFrame:(CGRect)frame andTitleArr:(NSArray *)titleArr
+{
+    if (self == [super initWithFrame:frame])
+    {
+        self.backgroundColor = [UIColor whiteColor];
+
+        _height = self.frame.size.height / titleArr.count;
+
+        //添加最里层Label
+        for (int i = 0;i < titleArr.count ; i++)
+        {
+        [self addSubview:[self returnLabel:titleArr[i] andFrame:CGRectMake(0, i*_height, self.frame.size.width, _height) andColor:[UIColor blackColor]]];
+        }
+
+        _midView = ({
+            UIView * midView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.frame.size.width, _height)];
+            midView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.8];
+            //设置不显示超出的部分
+            midView.clipsToBounds = YES;
+            midView.userInteractionEnabled = YES;
+            midView;
+        });
+
+        [self addSubview:_midView];
+
+        _labelView = ({
+            UIView * labelView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, _midView.frame.size.width, _midView.frame.size.height)];
+            for (int i = 0;i < titleArr.count ; i++)
+            {
+                [labelView addSubview:[self returnLabel:titleArr[i] andFrame:CGRectMake(0, i*_height, self.frame.size.width, _height) andColor:[UIColor whiteColor]]];
+            }
+                labelView;
+
+        });
+
+        [_midView addSubview:_labelView];
+
+        //添加拖动手势
+        UIPanGestureRecognizer * pan = [[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(pan:)];
+        [_midView addGestureRecognizer:pan];
+
+    }
+        return self;
+}
+//自定义一个快速创建Label的方法 避免重复代码
+- (UILabel *)returnLabel:(NSString *)title andFrame:(CGRect)rect andColor:(UIColor *)color
+{
+    UILabel * label = [[UILabel alloc]initWithFrame:rect];
+    label.font = [UIFont boldSystemFontOfSize:20];
+    label.textColor = color;
+    label.text = title;
+    label.textAlignment = NSTextAlignmentCenter;
+    return label;
+}
+
+```
+
+拖动方法代码
+
+```
+-(void)pan:(UIPanGestureRecognizer *)sender
+{
+    CGPoint pt = [sender translationInView:self];
+
+    CGPoint midCenter = _midView.center;
+    CGPoint labelCenter = _labelView.center;
+
+    midCenter.y += pt.y;
+    labelCenter.y -= pt.y;
+
+    //边界
+    if (midCenter.y > self.frame.size.height - _height/2.0)
+    {
+        midCenter.y = self.frame.size.height - _height/2.0 ;
+        labelCenter.y = -self.frame.size.height + _height*1.5;
+    }
+    if (midCenter.y < _height/2.0)
+    {
+        midCenter.y = _height/2.0 ;
+        labelCenter.y = _height/2.0;
+    }
+
+    _midView.center = midCenter;
+    _labelView.center = labelCenter;
+
+    [sender setTranslation:CGPointZero inView:self];
+}
+```
+
+拖动方法的难点在于，我们其实是希望\_labelView对最底层的相对位置是不动的，但是要遮挡超出\_midView的部分，那么肯定\_labelView是加在\_midView上的，midView.clipsToBounds = YES也是必须的，那我拖动\_midView的时候，\_labelView的位置也改动了，所以我们这里要
+
+```
+midCenter.y += pt.y;
+labelCenter.y -= pt.y;
+
+```
+
+这样来弥补\_labelView的位移，使它相对最底层的相对位置不动。
+
+这样就完成了这个动画效果
+
+如果你有更好的方法，欢迎一起讨论！  
+ 完整代码
+
+> [GitHub,点我啊](<https://github.com/Wzxhaha/WZXScrollChangeTextColor>)
+
+---
+
+好文推荐：[iOS开发之详解连连支付集成](<https://allluckly.cn/ios%E6%94%AF%E4%BB%98/lianlianzhifu>)
+{% endraw %}

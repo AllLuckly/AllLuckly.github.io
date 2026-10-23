@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /en/guides/manyue-lanraragi-library/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Connect ManYue to LANraragi: archives, tags and a personal comic library'
+agent_source_url: https://allluckly.cn/en/guides/manyue-lanraragi-library/
+agent_source_sha256: 970619565ed4e23c5d2e4e55e331304578b6a0b97b138fa76ff3facd28fbf790
+agent_generator_version: 1
+---
+{% raw %}# Connect ManYue to LANraragi: archives, tags and a personal comic library
+
+Language: en
+Canonical: [Connect ManYue to LANraragi: archives, tags and a personal comic library](<https://allluckly.cn/en/guides/manyue-lanraragi-library/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-lanraragi-library/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-lanraragi-library/>)
+Published: 2026-10-23T00:00:00+08:00
+Modified: 2026-10-23T10:34:08+08:00
+Author: Bison
+
+Use the native LANraragi connection, check the API key, archive-to-chapter mapping, tag search and page indexes, and establish the scope of local progress and offline downloads.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-lanraragi-library/>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+LANraragi focuses on comic archives and tag management. ManYue can read your archive library through its native service entry, with each archive usually mapped to one work and one chapter. This guide connects a small archive first, focusing on the service root address, API key, and page index.
+
+## Prepare an archive whose indexing is complete
+
+In your LANraragi service, confirm that the practice archive opens with the correct page order and count. Use a short CBZ you made or are authorized to read, and give it a clear title and two or three accurate tags, such as its subject and author. Later, search by title and tag separately to confirm the metadata belongs to this archive. While an archive is still importing or indexing, page information may not be ready. Wait for server processing to settle before connecting the client.
+
+Record the server root address and access mode. Public read access differs from authenticated access; an API Key may be required when restrictions are enabled. Native server libraries in ManYue fall within Ultra, while server access control remains determined by your deployment. Do not use the web administration password directly as an API key.
+
+## Add a LANraragi library
+
+In “Library” → “Manage Libraries,” add a library and choose LANraragi as the service type. Enter a name and the server root address, with a structure such as `http://192.168.1.20:3000/`. Use the actual address of your deployment, without appending a particular archive page or manually adding an API path.
+
+When a reverse proxy uses a subpath, keep the correct prefix. For a service requiring a key, put the original API Key in the dedicated field without extra manual encoding or placing it in the address. Whether a publicly readable service allows an empty key depends on its server settings. Seeing the home page does not prove that every API allows anonymous access.
+
+## Find the sample by title and tag after connecting
+
+Submit “Connect and Save,” then wait for access validation and library loading. Search the practice archive's title first, then try its existing tags or author information. Search relates to the currently loaded library, not the entire internet. If the catalog is still loading, wait or check progress before deciding that works are missing.
+
+A LANraragi archive differs from a serialized comic website's multi-chapter structure. One compressed archive may be a volume or short work, so one chapter in the client does not necessarily mean other chapters are missing. Compare the page count and images inside the archive rather than expecting it to split automatically into many chapters by story scene.
+
+## Open the archive and check page order
+
+Open the archive details and start reading, checking the first, middle, and last pages. Page order comes from the server archive and index. If it is wrong, view the same archive in LANraragi's own reader first. If both are wrong, fix source archive naming or the server index rather than repeatedly changing reading direction in ManYue to disguise the issue.
+
+If the cover loads but pages fail, first confirm that indexing is complete, the archive file still exists, and the current account can read it. Covers and individual pages are separate requests; a visible cover does not prove the entire archive access path works. Refresh items whose indexing is unfinished later instead of immediately deleting the server's only original file.
+
+## The scope of downloads and reading records
+
+For offline reading, explicitly download the target archive or relevant chapter in ManYue, wait for completion, then open it with networking disabled. The server retaining an archive, the phone displaying its catalog, and the phone saving its pages are three different states. Especially when NAS storage is ample but phone space is limited, download for near-term reading instead of copying the entire library.
+
+With the current native LANraragi connection, reading progress and favorites are mainly managed locally in ManYue. Do not assume Suwayomi's server-side progress capabilities apply. Reading to page ten in ManYue does not mean the LANraragi web interface will show the same position. Synchronizing reading information across devices also requires the relevant functions actually provided by ManYue.
+
+## Key changes and server migration
+
+After changing the server's API Key, update credentials through the current connection interface and verify the original practice archive again. Do not change the address, account, and key simultaneously and conclude that every relationship is correct from one successful result. If the address now points to an entirely different service, create a separate connection and retain the original source relationships for downloads and history, rather than merging same-named archives into one record.
+
+Credentials may not transfer to a new device with an ordinary data backup. If the new device shows a connection name but cannot access it, restore valid authentication before checking directories. Keep keys out of public screenshots and tutorial examples. When asking for help, describe only the authentication mode, error type, and necessary redacted address structure.
+
+## Frequently asked questions
+
+**Are the API Key and administrator password interchangeable?** No. They serve different authentication purposes. Obtain an API Key according to the server settings and enter it in the dedicated field. Trying the administration password will not make the native interface accept it automatically.
+
+**Why does an archive have only one chapter?** This integration maps archives to works and chapters; the images inside are the actual pages. Judge completeness by page count and content rather than chapter-button count alone.
+
+**Why does search not change immediately after tags are updated?** The client needs to refresh the relevant library data, and search may operate on a loaded snapshot. First confirm that the server saved the tags, then refresh the current connection instead of repeatedly adding same-named connections to obtain the change.
+
+## Continue managing your private archives
+
+When multiple libraries become mixed together, see [Sources and personal display scope](<https://allluckly.cn/en/guides/manyue-server-library-scope/>); for questions about archive page order, see [Formats and page order](<https://allluckly.cn/en/guides/manyue-formats-and-page-order/>). To take downloaded content with you, continue with [Batch export](<https://allluckly.cn/en/guides/manyue-batch-export/>).
+
+## Sources and version
+
+Information checked on October 23, 2026. The public release is ManYue 2.0.2, requiring iOS / iPadOS 15.0 or later. This guide is based on public feature descriptions and their entry points; available options depend on the installed version. See [Official App Store description](<https://apps.apple.com/cn/app/id6753895889>) and [Apple release information](<https://itunes.apple.com/lookup?id=6753895889&country=cn>).
+{% endraw %}

@@ -1,0 +1,282 @@
+---
+layout: null
+permalink: /en/journal/2016-07-05-javascript-and-native-ios-interaction-with-javascriptcore/index.md
+sitemap: false
+noindex: true
+lang: en
+title: JavaScript and Native iOS Interaction with JavaScriptCore
+agent_source_url: https://allluckly.cn/en/journal/2016-07-05-javascript-and-native-ios-interaction-with-javascriptcore/
+agent_source_sha256: 9fd0646d245079c6549bb08a536ad74638f5a70f577adc58a4e34a36bfc421de
+agent_generator_version: 1
+---
+{% raw %}# JavaScript and Native iOS Interaction with JavaScriptCore
+
+Language: en
+Canonical: [JavaScript and Native iOS Interaction with JavaScriptCore](<https://allluckly.cn/en/journal/2016-07-05-javascript-and-native-ios-interaction-with-javascriptcore/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao53>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-07-05-javascript-and-native-ios-interaction-with-javascriptcore/>)
+Published: 2016-07-05T00:00:00+08:00
+Modified: 2026-10-23T10:45:04+08:00
+Author: Sindri
+
+Compares early UIWebView URL interception with JavaScriptCore. Using JSContext, it introduces executing JavaScript from native code, registering native methods, and passing data between the two environments.
+
+Originally credited to Sindri; edited and archived by Bison.
+
+[Source listed in the original](<http://www.jianshu.com/p/b01d619c3cdd>)
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao53>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. The article is organized around the introduction of JavaScriptCore in iOS 7 and uses the WebView interaction approaches of that period.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao53/1.jpeg>)
+
+Hybrid development is growing at an unprecedented rate, with cross-platform development and hot updates establishing its importance. Although web interfaces still lag behind native apps in interaction, animation, and other areas, more companies will undoubtedly adopt hybrid development. On iOS, this history divides into the difficult period before iOS7 and the golden era afterward, marked by the `JavaScriptCore` framework.
+
+Editor: [Bison](<https://allluckly.cn/en/>)  
+ Contributor: [Sindri’s Notes](<http://www.jianshu.com/p/b01d619c3cdd>)
+
+## The difficult era
+
+I was fortunate to avoid pre-iOS7 versions, so I know those difficult years only through a senior developer's stories. The only way to interact with web interfaces then was `UIWebView`. Setting aside its own memory-leak problems, here is some code that developer wrote:
+
+```
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
+{
+    NSString * address = request.URL.absoluteString;
+    for (NSString * black in _blackList) {
+        if ([address containsString: black]) {
+            return NO;
+        }
+    }
+    for (NSString * event in _eventList) {
+        if ([address containsString: event]) {
+            SEL callback = NSSelectorFromString(_callbacks[event]);
+            [self performSelector: callback];
+            return [event containsString: @"shouldOpen=1"];
+        }
+    }
+    return YES;
+}
+```
+
+At the time, developers made frontend events trigger URL navigation and used special characters in the URL to choose an action. Several data collections were needed to store handlers for those characters. Exchanging data with the frontend meant concatenating every parameter into the request URL—quite a mess. Another interaction method was
+
+```
+stringByEvaluatingJavaScriptFromString
+```
+
+method to execute `js` code.
+
+## JavaScriptCore
+
+`JavaScriptCore` is a set of tools for parsing `JS` code and supplies its execution environment: [open-source framework](<https://github.com/phoboslab/JavaScriptCore-iOS>)greatly simplifies interaction. Next, I will explain the corresponding methods for calls from the project to `JS` code, and calls in the other direction.
+
+> Calling JS code from the project
+
+- **JSContext**
+
+   
+
+  A `JSContext` object is the global execution environment for `JavaScript`, providing code execution and method-registration interfaces. The following creates a `JSContext` and adds some `JS` code to that environment.
+
+   
+
+  ```
+  let context = JSContext()
+  context.evaluateScript(" var age = 22 ")
+  context.evaluateScript(" var name = 'SindriLin' ")
+  context.evaluateScript(" var birth = 1993-01-01 ")
+  context.evaluateScript(" var createPerson = 
+      function(age, name, birth) 
+      { 
+          return {'age': age, 'name': name, 'birth': birth}
+      } ")
+  context.evaluateScript(" var codeDescription = 'The code create three value and a function to create a dictionary stored person information' ")
+  ```
+
+   
+
+  Errors such as syntax errors may occur while `JS` runs. The following code handles them:
+
+   
+
+  ```
+  context?.exceptionHandler = { context, exception in 
+        print("Java Script Run Error: \(exception)")
+  }
+  ```
+- **JSValue**
+
+   
+
+  `JSValue` is the value returned by `JSContext` operations, wrapping almost every data type, including errors and `IMP` pointers. The `JSValue` class provides several `toXXXX` methods for conversion to `iOS` types, along with `call` methods for invoking functions. The following retrieves existing variables from a `JSContext` environment and creates a dictionary holding `person` information.
+
+   
+
+  ```
+    let age = context?.objectForKeyedSubscript("age")
+    let name = context?.objectForKeyedSubscript("name")
+    let birth = context?.objectForKeyedSubscript("birth")
+    let createFunction = context?.objectForKeyedSubscript("createPerson")
+    let codeDescription = context?.objectForKeyedSubscript("codeDescription")
+    let person = createFunction.call(withArguments: [age.toInt32(), name.toString(), birth.toString()])
+    
+    let personInfo = "name: \(person["name"]) age: \(person["age"] and birth: \(person["birth"])"
+    print("The javaScript code description: \(codeDescription.toString())")
+    print("The created person \(personInfo) ")
+  ```
+
+   
+
+  The example shows that once we know the function to call in the `JS` code, `JSContext + JSValue` lets us invoke web-interface methods easily from the project, without constructing long parameter strings and passing them through URL links.
+
+   
+
+  > Calling project code from JS
+
+   
+
+  `JavaScript` can access objects and methods in our code in two ways: `Blocks` and `JSExport`.
+
+   
+
+  - **Blocks**
+
+     
+
+    Custom `block` code can be exposed through `JSContext` as a callable function pointer in `JS`. A pitfall is that `Swift` closures cannot undergo that conversion directly. In `Swift`, the process is therefore `Closure` → `block` → `function pointer`. Converting a closure into a `block` requires the important annotation `@convention`.
+
+     
+
+    ```
+    let stringConvert: @convention(block) (String)->String = {
+        let pinyin = NSMutableString(string: $0) as CFMutableString
+        CFStringTransform(pinyin, nil, kCFStringTransformToLatin, false)
+        CFStringTransform(pinyin, nil, kCFStringTransformStripCombiningMarks, false)
+        return pinyin as String
+    }      
+    
+    let convertObjc = unsafeBitCast(stringConvert, to: AnyObject.self)
+    context?.setObject(convertObjc, forKeyedSubscript: "convertFunc")
+    let convertFunc = context?.objectForKeyedSubscript("convertFunc")
+    print("林欣达的拼音是\(convertFunc.call(withArguments: ["林欣达"]).toString())")
+    ```
+
+     
+
+    Now, when the web interface's `JS` button handler calls `convertFunc()`, the code in this `closure` executes. Be careful: closure capture can retain the `JSContext` and prevent its release. Use `JSContext.current()` to obtain the current context and address the reference issue.
+  - **JSExport**
+
+     
+
+    In `JS`, calls to `iOS` methods use methods of a protocol derived from `JSExport`. All methods in the derived protocol are automatically exposed to `JavaScript`, as demonstrated below.
+
+   
+
+  ## Putting it into practice
+
+   
+
+  I wrote some `JS` for this article's demo. Here are the code and its result. Note that the button's `onclik` specifies the click-response event:
+
+   
+
+  ```
+  <!DOCTYPE html>
+  <html>
+      <head>
+          <meta charset="UTF-8">
+      </head>
+      <body>
+          <div style="margin-top: 20px">
+              <h2 align="center" style="color:#ff0000">JS与iOS交互</h2>
+              <input type="button" value="点击后切换控制器的背景颜色" onclick="sindrilin.call()">
+          </div>
+          <div style="color:#7BBDE5">
+              <br />
+              <br />
+              账户：
+              <input id="account" type="text">
+              <br />
+              密码：
+              <input id="password" type="password">
+          </div>
+          <div>
+              <input type="button" value="登录" onclick="login()">
+          </div>
+      
+          <script>
+          
+              var login = function()
+              {
+                  account = document.getElementById("account")
+                  password = document.getElementById("password")
+                  var accountInfo = JSON.stringify({"account": account.value, "password": password.value});
+                  sindrilin.login(accountInfo);
+              }
+      
+              var alertFromIOS = function(message)
+              {
+                      alert(message)
+              }
+      
+          </script>
+      </body>
+  </html>
+  ```
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao53/2.jpeg>)
+
+First load this `HTML` file and obtain the global execution environment. For nearly all `HTML` files, the `keyPath` used to obtain that environment is the same:
+
+```
+  let jsPath = Bundle.main().pathForResource("interaction", ofType: "html")
+  webView.loadRequest(URLRequest(url: URL(fileURLWithPath: jsPath!)))
+  interactionContext = webView.value(forKeyPath: "documentView.webView.mainFrame.javaScriptContext") as? JSContext
+  interactionContext?.exceptionHandler = {
+      print("Interaction Error: \($1?.toString())")
+  }
+```
+
+In the `HTML`, clicking the top button calls `sindrilin.call()`, which our view controller must ultimately handle. We can split this string into two parts like `Target-Action`: `sindrilin` identifies the responder, and `call()` the action. Set the `Target` as follows:
+
+```
+  interactionContext?.setObject(self, forKeyedSubscript: "sindrilin")   响应者已经有了，那么响应事件也要我们实现代码，这里就需要用到`JSExport`协议了。所有这种类似`Target-Action`的事件触发都会通过这个协议获取方法实现，因此我们需要自定义响应协议以及响应事件。对于有参数的方法我们需要用`@objc(name)`的方式给方法起`OC`式的方法名，才能保证能被正确调用响应：
+
+  @objc protocol LXDInteractionExport: JSExport {
+      func call()                                    ///响应sindrilin.call()
+      @objc(login:) func login(accountInfo: String)  ///响应sindrilin.login(accountInfo)
+  }
+  
+  extension ViewController: LXDInteractionExport {
+      func call() {
+          print("call from html button clicked")
+          view.backgroundColor = UIColor(red: CGFloat(arc4random() % 256) / 255, green: CGFloat(arc4random() % 256) / 255, blue: CGFloat(arc4random() % 256) / 255, alpha: 1)
+      }
+  
+      func login(accountInfo: String) {
+          do {
+              if let JSON: [String: String] = try JSONSerialization.jsonObject(with: accountInfo.data(using: String.Encoding.utf8)!, options: JSONSerialization.ReadingOptions()) as? [String: String] {
+                  print("JSON: \(JSON)")
+                  let alert = interactionContext?.objectForKeyedSubscript("alertFromIOS")
+                  let message = "The alert from javascript call\naccount: \(JSON["account"]) and password: \(JSON["password"])"
+                  _ = alert?.call(withArguments: [message])
+              }
+          } catch {
+              print("Error: \(error)")
+          }      
+      }
+  }
+```
+
+After entering a username and password in the frontend interface, clicking Log In calls `login(accountInfo: String)` method and assembles the username and password into a `JSON` string. In the response method, I parse the relevant user-information fields, assemble a new string, and call `JS`'s dialog function to display a response [Demo download](<https://github.com/JustKeepRunning/LXDJavaScriptCoreDemo>)
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao53/3.gif>)
+
+Follow [iOS development](<http://www.jianshu.com/notebooks/2348850/latest>)collection for more articles
+
+---
+
+Recommended reading: [Adding a launch advertisement to an iOS app](<https://allluckly.cn/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/>)
+{% endraw %}

@@ -1,0 +1,78 @@
+---
+layout: null
+permalink: /iOS开发之检测设备锁屏/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发之检测设备锁屏
+agent_source_url: https://allluckly.cn/iOS%E5%BC%80%E5%8F%91%E4%B9%8B%E6%A3%80%E6%B5%8B%E8%AE%BE%E5%A4%87%E9%94%81%E5%B1%8F
+agent_source_sha256: 087e7b39c65b54755c838b3688d734286704e8202ff2b4dd43c7118c17aff2c1
+agent_generator_version: 1
+---
+{% raw %}# iOS开发之检测设备锁屏
+
+语言：zh-CN
+原文：[iOS开发之检测设备锁屏](<https://allluckly.cn/iOS%E5%BC%80%E5%8F%91%E4%B9%8B%E6%A3%80%E6%B5%8B%E8%AE%BE%E5%A4%87%E9%94%81%E5%B1%8F>)
+中文：[中文 HTML](<https://allluckly.cn/iOS%E5%BC%80%E5%8F%91%E4%B9%8B%E6%A3%80%E6%B5%8B%E8%AE%BE%E5%A4%87%E9%94%81%E5%B1%8F>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-07-31-detecting-device-locking-in-an-ios-app/>)
+发布于: 2015-07-31T00:00:00+08:00
+内容更新于: 2015-07-31T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+针对嵌入游戏在锁屏时出现异常的场景，记录监听 SpringBoard 锁屏通知的代码与回调处理。文章保留当时的排障思路，接口使用条件需要单独核实。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文发表于 2015 年，示例监听 com.apple.springboard 锁屏通知。
+
+> "身体是革命的本钱，多锻炼才是王道" Bison
+
+最近的项目里面有镶嵌的游戏，一进入锁屏app就会崩溃。 寻求解决之策，找了很久。
+
+代码如下
+
+核心代码
+
+```css
+#define NotificationLock CFSTR("com.apple.springboard.lockcomplete")
+
+#define NotificationChange CFSTR("com.apple.springboard.lockstate")
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+
+    
+    [self lookLockScreen];
+
+    return YES;
+    
+}
+
+- (void)lookLockScreen
+{
+    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, screenLockStateChanged, NotificationLock, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+
+    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, screenLockStateChanged, NotificationChange, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+
+
+}
+
+static void screenLockStateChanged(CFNotificationCenterRef center,void* observer,CFStringRef name,const void* object,CFDictionaryRef userInfo)
+
+{
+
+    NSString* lockstate = (__bridge NSString*)name;
+
+    if ([lockstate isEqualToString:(__bridge  NSString*)NotificationLock]) {
+
+        //锁屏
+        NSLog(@"locked.");
+
+    } else {
+        //锁屏状态改变
+        NSLog(@"lock state changed.");
+
+    }
+
+}
+```
+{% endraw %}

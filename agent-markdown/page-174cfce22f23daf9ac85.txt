@@ -1,0 +1,268 @@
+---
+layout: null
+permalink: /ffmpeg/ffmpeg4/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: FFmpeg-iOS获取摄像头麦克风
+agent_source_url: https://allluckly.cn/ffmpeg/ffmpeg4
+agent_source_sha256: f9e21b05b3ed6a9aaf312c66d7fc733b9da9271f4ceaa78b0ab85de0fb677e46
+agent_generator_version: 1
+---
+{% raw %}# FFmpeg-iOS获取摄像头麦克风
+
+语言：zh-CN
+原文：[FFmpeg-iOS获取摄像头麦克风](<https://allluckly.cn/ffmpeg/ffmpeg4>)
+中文：[中文 HTML](<https://allluckly.cn/ffmpeg/ffmpeg4>)
+English: [English HTML](<https://allluckly.cn/en/journal/2017-07-20-camera-and-microphone-capture-with-ffmpeg-ios/>)
+发布于: 2017-07-20T00:00:00+08:00
+内容更新于: 2026-10-23T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+先使用 FFmpeg 的设备输入能力列出摄像头和麦克风，再给出 iOS 原生摄像头采集的实现示例，对照展示媒体设备枚举与系统采集会话的基本配置过程。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文发表于 2017 年，设备输入与采集代码采用当时的 FFmpeg 和 AVFoundation 接口。
+
+原文并列展示 FFmpeg 的设备输入和 iOS AVCaptureSession 采集代码。重做实验时，应分别核对设备选择、输入格式和应用权限，不能把桌面设备编号直接套到手机上。官方设备文档可用于核对 avfoundation 选项；本文示例未在当前设备重新验证。
+
+- [FFmpeg：avfoundation 输入设备](<https://ffmpeg.org/ffmpeg-devices.html#avfoundation>)
+
+阅读说明补充于 2026-10-23
+
+历史配图暂不可用，[保留原图地址](<http://upload-images.jianshu.io/upload_images/671504-ada1e50c34918b9b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240>)供查阅。 [Mac编译ffmpeg获取FFmpeg-iOS](<https://allluckly.cn/ffmpeg/ffmpeg1>) [ffmpeg的H.264解码](<https://allluckly.cn/ffmpeg/ffmpeg2>) [FFmpeg-iOS推流器的简单封装](<https://allluckly.cn/ffmpeg/ffmpeg3>)
+
+今天咱来讲讲在iOS 平台上利用ffmpeg获取到摄像头和麦克风，代码很少，后面再加上iOS 自带的获取摄像头的例子;
+
+## FFmpeg获取摄像头麦克风
+
+- 首先导入必要的头文件
+
+```
+#include <stdio.h>
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+#include <libavdevice/avdevice.h>
+    
+#ifdef __cplusplus
+};
+#endif
+
+```
+
+具体代码简单封装了一下，如下：
+
+```
+- (void)showDevice{
+    avdevice_register_all();
+    AVFormatContext *pFormatCtx = avformat_alloc_context();
+    AVDictionary* options = NULL;
+    av_dict_set(&options,"list_devices","true",0);
+    AVInputFormat *iformat = av_find_input_format("avfoundation");
+    printf("==AVFoundation Device Info===\n");
+    avformat_open_input(&pFormatCtx,"",iformat,&options);
+    printf("=============================\n");
+    if(avformat_open_input(&pFormatCtx,"0",iformat,NULL)!=0){
+        printf("Couldn't open input stream.\n");
+        return ;
+    }
+    
+}
+```
+
+运行一下可以看到日志区域的打印信息如下：
+
+```
+==AVFoundation Device Info===
+2017-07-20 16:59:36.325150+0800 LBffmpegDemo[2040:821433] [MC] System group container for systemgroup.com.apple.configurationprofiles path is /private/var/containers/Shared/SystemGroup/systemgroup.com.apple.configurationprofiles
+2017-07-20 16:59:36.326529+0800 LBffmpegDemo[2040:821433] [MC] Reading from public effective user settings.
+[AVFoundation input device @ 0x145d0100] AVFoundation video devices:
+[AVFoundation input device @ 0x145d0100] [0] Back Camera
+[AVFoundation input device @ 0x145d0100] [1] Front Camera
+[AVFoundation input device @ 0x145d0100] AVFoundation audio devices:
+[AVFoundation input device @ 0x145d0100] [0] iPhone 麦克风
+=============================
+[avfoundation @ 0x153ef800] Selected framerate (29.970030) is not supported by the device
+[avfoundation @ 0x153ef800] Supported modes:
+[avfoundation @ 0x153ef800]   192x144@[1.000000 30.000000]fps
+[avfoundation @ 0x153ef800]   192x144@[1.000000 30.000000]fps
+[avfoundation @ 0x153ef800]   352x288@[1.000000 30.000000]fps
+[avfoundation @ 0x153ef800]   352x288@[1.000000 30.000000]fps
+[avfoundation @ 0x153ef800]   480x360@[1.000000 30.000000]fps
+[avfoundation @ 0x153ef800]   480x360@[1.000000 30.000000]fps
+[avfoundation @ 0x153ef800]   640x480@[1.000000 30.000000]fps
+[avfoundation @ 0x153ef800]   640x480@[1.000000 30.000000]fps
+[avfoundation @ 0x153ef800]   960x540@[1.000000 30.000000]fps
+[avfoundation @ 0x153ef800]   960x540@[1.000000 30.000000]fps
+[avfoundation @ 0x153ef800]   1280x720@[1.000000 30.000000]fps
+[avfoundation @ 0x153ef800]   1280x720@[1.000000 30.000000]fps
+[avfoundation @ 0x153ef800]   1280x720@[1.000000 60.000000]fps
+[avfoundation @ 0x153ef800]   1280x720@[1.000000 60.000000]fps
+[avfoundation @ 0x153ef800]   1920x1080@[1.000000 30.000000]fps
+[avfoundation @ 0x153ef800]   1920x1080@[1.000000 30.000000]fps
+[avfoundation @ 0x153ef800]   2592x1936@[1.000000 20.000000]fps
+[avfoundation @ 0x153ef800]   2592x1936@[1.000000 20.000000]fps
+[avfoundation @ 0x153ef800]   3264x2448@[1.000000 20.000000]fps
+[avfoundation @ 0x153ef800]   3264x2448@[1.000000 20.000000]fps
+Couldn't open input stream.
+
+```
+
+显然获取到了我们的设备，前后摄像头，和麦克风；下面我们看看系统自带的获取摄像头的例子：
+
+## iOS系统自带获取摄像头
+
+- 首先导入必须的头文件
+
+```
+#import <AVFoundation/AVFoundation.h>
+#import <UIKit/UIKit.h>
+```
+
+- 然后是一些全局的属性
+
+```
+@property(nonatomic, strong) AVCaptureSession                *captureSession;
+@property(nonatomic, strong) AVCaptureDevice                 *captureDevice;
+@property(nonatomic, strong) AVCaptureDeviceInput            *captureDeviceInput;
+@property(nonatomic, strong) AVCaptureVideoDataOutput        *captureVideoDataOutput;
+@property(nonatomic, assign) CGSize                          videoSize;
+@property(nonatomic, strong) AVCaptureConnection             *videoCaptureConnection;
+@property(nonatomic, strong) AVCaptureVideoPreviewLayer      *previewLayer;
+
+```
+
+- 最后是简单封装的代码
+
+```
+- (void)getMovieDevice:(UIView *)view{
+    self.captureSession = [[AVCaptureSession alloc] init];
+    //    captureSession.sessionPreset = AVCaptureSessionPresetMedium;
+    self.captureSession.sessionPreset = AVCaptureSessionPreset1920x1080;
+    
+    self.videoSize = [self getVideoSize:self.captureSession.sessionPreset];
+    
+    self.captureDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    
+    NSError *error = nil;
+    self.captureDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:self.captureDevice error:&error];
+    
+    if([self.captureSession canAddInput:self.captureDeviceInput])
+        [self.captureSession addInput:self.captureDeviceInput];
+    else
+        NSLog(@"Error: %@", error);
+    
+    dispatch_queue_t queue = dispatch_queue_create("myEncoderH264Queue", NULL);
+    
+    self.captureVideoDataOutput = [[AVCaptureVideoDataOutput alloc] init];
+    [self.captureVideoDataOutput setSampleBufferDelegate:self queue:queue];
+    
+#if encodeModel
+    // nv12
+    NSDictionary *settings = [[NSDictionary alloc] initWithObjectsAndKeys:
+                              [NSNumber numberWithUnsignedInt:kCVPixelFormatType_420YpCbCr8BiPlanarFullRange],
+                              kCVPixelBufferPixelFormatTypeKey,
+                              nil];
+#else
+    // 32bgra
+    NSDictionary *settings = [[NSDictionary alloc] initWithObjectsAndKeys:
+                              [NSNumber numberWithUnsignedInt:kCVPixelFormatType_32BGRA],
+                              kCVPixelBufferPixelFormatTypeKey,
+                              nil];
+#endif
+    
+    self.captureVideoDataOutput.videoSettings = settings;
+    self.captureVideoDataOutput.alwaysDiscardsLateVideoFrames = YES;
+    
+    if ([self.captureSession canAddOutput:self.captureVideoDataOutput]) {
+        [self.captureSession addOutput:self.captureVideoDataOutput];
+    }
+    
+    // 保存Connection，用于在SampleBufferDelegate中判断数据来源（是Video/Audio？）
+    self.videoCaptureConnection = [self.captureVideoDataOutput connectionWithMediaType:AVMediaTypeVideo];
+    
+#pragma mark -- AVCaptureVideoPreviewLayer init
+    self.previewLayer = [AVCaptureVideoPreviewLayer layerWithSession:self.captureSession];
+    self.previewLayer.frame = view.layer.bounds;
+    self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill; // 设置预览时的视频缩放方式
+    [[self.previewLayer connection] setVideoOrientation:AVCaptureVideoOrientationPortrait]; // 设置视频的朝向
+    [self.captureSession startRunning];
+    [view.layer addSublayer:self.previewLayer];
+}
+
+- (CGSize)getVideoSize:(NSString *)sessionPreset {
+    CGSize size = CGSizeZero;
+    if ([sessionPreset isEqualToString:AVCaptureSessionPresetMedium]) {
+        size = CGSizeMake(480, 360);
+    } else if ([sessionPreset isEqualToString:AVCaptureSessionPreset1920x1080]) {
+        size = CGSizeMake(1920, 1080);
+    } else if ([sessionPreset isEqualToString:AVCaptureSessionPreset1280x720]) {
+        size = CGSizeMake(1280, 720);
+    } else if ([sessionPreset isEqualToString:AVCaptureSessionPreset640x480]) {
+        size = CGSizeMake(640, 480);
+    }
+    
+    return size;
+}
+
+#pragma mark --  AVCaptureVideo(Audio)DataOutputSampleBufferDelegate method
+- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
+{
+    
+    // 这里的sampleBuffer就是采集到的数据了，但它是Video还是Audio的数据，得根据connection来判断
+    if (connection == self.videoCaptureConnection) {
+        
+        // Video
+        //        NSLog(@"在这里获得video sampleBuffer，做进一步处理（编码H.264）");
+        
+        
+#if encodeModel
+        // encode
+        
+#else
+        CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+        
+        //        int pixelFormat = CVPixelBufferGetPixelFormatType(pixelBuffer);
+        //        switch (pixelFormat) {
+        //            case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
+        //                NSLog(@"Capture pixel format=NV12");
+        //                break;
+        //            case kCVPixelFormatType_422YpCbCr8:
+        //                NSLog(@"Capture pixel format=UYUY422");
+        //                break;
+        //            default:
+        //                NSLog(@"Capture pixel format=RGB32");
+        //                break;
+        //        }
+        
+        CVPixelBufferLockBaseAddress(pixelBuffer, 0);
+        
+        // render
+        [openglView render:pixelBuffer];
+        
+        CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+#endif
+    }
+    //    else if (connection == _audioConnection) {
+    //        
+    //        // Audio
+    //        NSLog(@"这里获得audio sampleBuffer，做进一步处理（编码AAC）");
+    //    }
+    
+}
+```
+
+[LBffmpegDemo下载地址](<https://github.com/AllLuckly/LBffmpegDemo>)
+
+到此iOS平台获取摄像头告一段落，有时间再慢慢写FFmpeg在iOS平台的一些其他的使用方法；有对ffmpeg感兴趣的朋友可以关注我！😄
+
+---
+
+好文推荐：[ffmpeg-iOS推流器](<https://allluckly.cn/ffmpeg/ffmpeg3>)
+{% endraw %}

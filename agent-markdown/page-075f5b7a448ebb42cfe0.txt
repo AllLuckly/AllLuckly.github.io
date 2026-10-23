@@ -1,0 +1,187 @@
+---
+layout: null
+permalink: /投稿/tuogao16/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发仿微信(WeChat)系列(四)
+agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao16
+agent_source_sha256: 5fa5ed2dac26b1e5a79132610e7d226cc712c54758f4fe4436b3cf26c1f0bb53
+agent_generator_version: 1
+---
+{% raw %}# iOS开发仿微信(WeChat)系列(四)
+
+语言：zh-CN
+原文：[iOS开发仿微信(WeChat)系列(四)](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao16>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao16>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-02-03-building-a-wechat-style-ios-app-part-4/>)
+发布于: 2016-02-03T00:00:00+08:00
+内容更新于: 2016-02-03T00:00:00+08:00
+署名：[WzxJiang](<http://www.jianshu.com/users/389c20d5a244/latest_articles>)
+
+仿微信项目开始接入云端存储与即时通信依赖，封装登录和注册方法，并记录查询用户数据时的排错过程。正文包含早期密码字段试验，适合作为历史开发记录。
+
+原文署名WzxJiang，Bison 编辑收录。
+
+[原文所列来源](<http://www.jianshu.com/users/389c20d5a244/latest_articles>)
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文采用当时的 LeanCloud 相关接口，并记录自行增加 passWord 字段的试验；不作为账号安全方案。
+
+编辑：[Bison](<https://allluckly.cn/>)  
+ 投稿：[WzxJiang](<http://www.jianshu.com/users/389c20d5a244/latest_articles>)
+
+> "今天刚回家，中午、晚上吃了两趟酒席，再加上的确被LearnCloud坑到了…所以今天加的内容不多:"
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao12/1.png>)
+
+今天完成的部分
+
+－ 导入了LeadCloud的存储(不会后端)以及IM(尝尝鲜)的动态库
+
+－ 写了登录和注册的方法（开始加网络了）
+
+对于一个不会后端的iOS独立开发来说, LearnCloud还是挺好的，够免费，够简单。这里我就不讲怎么导入了它的动态库了，直接讲讲我怎么通过它写的登录注册，以及遇到的坑.
+
+- 我们一步一步来
+
+创建一个NSObject类:WWeChatApi.
+
+- 创建一个单例
+
+```css
++ (WWeChatApi *)giveMeApi
+{
+    static WWeChatApi * api = nil;
+    if (api == nil) {
+        api = [[WWeChatApi alloc]init];
+    }
+    return api;
+}
+```
+
+- 先写登录方法（坑就在这）
+
+```
+- (void)loginWithUserName:(NSString *)userName andPassWord:(NSString *)passWord andSuccess:(void (^)(id))successBlock andFailure:(void (^)(NSError *))failureBlock
+{
+    AVQuery *query = [AVQuery queryWithClassName:@"_User"];
+
+    [query whereKey:@"username" equalTo:userName];
+
+    [query whereKey:@"password" equalTo:passWord];
+
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) {
+            if (objects.count>0)
+            {
+                successBlock(nil);
+            }
+        } else {
+            failureBlock(error);
+        }
+    }];
+}
+```
+
+这里的AVQuery是LearnCloud的方法，暂时不管。
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao16/1.png>)
+
+```
+//这里也是LearnCloud动态库的方法
+//@"username"的值等于@"WzxJiang" And @"password"的值等于@"123456"
+[query whereKey:@"username" equalTo:@“WzxJiang”];
+
+[query whereKey:@"password" equalTo:@"123456"];
+```
+
+```
+//然后通过这个方法获取符合的AVObject Arr
+[query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+    if (!error) {
+        if (objects.count>0)
+        {
+            successBlock(nil);
+        }
+    } else {
+        failureBlock(error);
+    }
+}];
+```
+
+讲道理的话这里是没有问题的，能取出唯一符合的一个AVObject，但是这里竟然取出来是空！
+
+调试很久后发现。。
+
+```
+[query whereKey:@"password" equalTo:@"123456"]
+```
+
+这里的password竟然不可以用whereKey: equalTo方法…  
+ 你这肯定是逗我！自带password不能判断，那我怎么做登录判断！
+
+解决办法:在LearnCloud后台中自己加了个passWord的类，用这个来储存密码，(password竟然还不能删)
+
+- 注册
+
+```
+- (void)registerWithUserName:(NSString *)userName andPassWord:(NSString *)passWord andSuccess:(void (^)(id response))successBlock andFailure:(void (^)(NSError * error))failureBlock
+{
+    AVObject * user = [AVObject objectWithClassName:@"_User"];
+
+    user[@"username"] = userName;
+
+    user[@"password"] = @"123";
+
+    user[@"passWord"] = passWord;
+
+    AVQuery *query = [AVQuery queryWithClassName:@"_User"];
+
+    [query whereKey:@"username" equalTo:userName];
+
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) {
+            if (objects.count == 0)
+            {
+                [user saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                    if (successBlock)
+                    {
+                    successBlock(nil);
+                    }
+                    else
+                    {
+                    failureBlock(error);
+                    }
+                }];
+            
+            }
+            else
+            {
+                failureBlock(nil);
+            }
+            } else {
+                failureBlock(error);
+            }
+        }];
+}
+```
+
+这里的注册又是有个坑，
+
+```
+user[@"password"] = @"123"，password
+```
+
+不给个值，不让注册…
+
+好了今天就到这了!
+
+目前的代码(将持续更新直至完成)  
+ [GitHub:WzxJiang](<https://github.com/Wzxhaha/WWeChat>)
+
+如果你有建议或者疑问欢迎评论！
+
+---
+
+好文推荐：[菜鸟程序员2015年年终总结](<https://allluckly.cn/%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/zongjie2015>)
+{% endraw %}

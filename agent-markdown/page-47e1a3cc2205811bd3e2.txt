@@ -1,0 +1,81 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-network-buffering/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Troubleshoot iCouldPlay streaming stalls: files, networks and servers'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-network-buffering/
+agent_source_sha256: a66e13f92ef75577dbc13f8069732c33d686ff66896246514acbc4263a734c4e
+agent_generator_version: 1
+---
+{% raw %}# Troubleshoot iCouldPlay streaming stalls: files, networks and servers
+
+Language: en
+Canonical: [Troubleshoot iCouldPlay streaming stalls: files, networks and servers](<https://allluckly.cn/en/guides/icouldplay-network-buffering/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-network-buffering/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-network-buffering/>)
+Published: 2026-10-23T00:00:00+08:00
+Modified: 2026-10-23T10:34:08+08:00
+Author: Bison
+
+Compare local and remote playback of one video to locate buffering, failed seeking and disconnections, checking local and remote networks, server transcoding and file bitrate.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-network-buffering/>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+Remote stuttering can mean files arrive too slowly or the device cannot process them quickly enough. Distinguish waiting for data from uneven playback of available frames before checking each stage. This is more effective than repeatedly clearing caches. The tutorial covers playback from your own NAS, WebDAV, or media server to iCouldPlay.
+
+## Record how buffering occurs
+
+Choose a video that reproduces the problem easily and note the position. Does it wait immediately on opening, stop after playing for a while, or fail only when seeking? If a buffering message appears, note whether audio and picture stop together.
+
+Repeated failure at one position suggests checking the file; pauses at changing positions call for observing network and service state. This is a clue, not a conclusion. Play continuously for a minute or two and then make one deliberate seek, avoiding rapid dragging that confuses the observation.
+
+Record the source too: local file, LAN SMB, remote WebDAV, or a server such as Emby. Even if these point to one hard drive, their network routes and server processing can differ. Do not summarize every result as a NAS failure.
+
+## Step one: compare with a complete local copy
+
+Obtain a complete copy of the same video from your own server and import it using [Getting started with local video](<https://allluckly.cn/en/guides/icouldplay-getting-started/>). Check file size and duration, then play, pause, and seek at the same timestamp. Keep subtitles, audio track, and playback speed unchanged during comparison.
+
+If the local copy fails at the same point too, first follow [Playback compatibility troubleshooting](<https://allluckly.cn/en/guides/icouldplay-player-engine/>)to check the file and encoding. If local continuous playback is normal but remote playback pauses, focus on transfer. Changing subtitle colors or posters repeatedly will not explain why data arrives late.
+
+The local copy must truly be complete, not a cloud placeholder. A downloading video may play at the start and fail later, resembling unstable remote buffering. Confirm download completion and open several positions offline before comparing.
+
+## Step two: separate LAN and internet playback
+
+At home, confirm the phone and NAS are on mutually reachable networks. Start with a LAN address to avoid routing through the internet or a relay while sitting beside the router. For connection details, see [SMB tutorial](<https://allluckly.cn/en/guides/icouldplay-smb-nas/>) or [WebDAV tutorial](<https://allluckly.cn/en/guides/icouldplay-webdav-cloud/>).
+
+If a video works on the LAN but stutters away from home, focus on home upload capacity, the current mobile network, and the remote route. Your home server uploads when you watch elsewhere, so advertised broadband download speed alone is irrelevant. A relay may also deliver different speeds from a direct connection.
+
+If LAN playback also stutters, compare closer to the router, pause your large file transfers, and replay the same segment. Full wireless signal bars describe a connection state, not guaranteed sustained throughput. If the NAS is wired and the phone wireless, consider both links separately.
+
+## Step three: understand bitrate and speed units
+
+Transfer requirements relate to bitrate. About 80 Mbps corresponds to roughly 10 MB/s, with overhead and short-term variation still to consider. Network speed tests use Mbps while download tools may show MB/s; comparing their numbers directly introduces an eightfold difference.
+
+File size divided by duration only estimates average demand. A roughly 5 GB, 90-minute file is about 7.4 Mbps using decimal units, but complex scenes may demand more momentarily. Average speed barely meeting that value does not guarantee stable playback of every segment.
+
+If low-bitrate files are stable and high-bitrate files buffer frequently, investigate sustained reading capacity before declaring a container unsupported. Compare files with known origins and parameters; “both are HD” or “both are large” rarely supports a useful conclusion.
+
+## Step four: check for extra server processing
+
+Emby, Jellyfin, or Plex may send a file directly or convert video, audio, or subtitles first. If you administer the server, inspect the current session's actual method and any obvious processing wait. A visible movie poster in iCouldPlay is insufficient.
+
+If the server is transcoding, its processing capacity rather than the phone's network may be the bottleneck. Compare a short video known to play directly and see whether waiting decreases. Do not change many transcoding settings together; return to the same segment after each change to judge improvement.
+
+For direct SMB or WebDAV access, also check whether disk wake-up, busy scans, or other large tasks affect reading. A long first opening followed by smooth playback differs from pauses every few seconds; record them separately.
+
+## Investigate seeking failures and mid-playback disconnections
+
+Playback from the beginning but failure when seeking may involve file indexes, remote random access, or server processing. Seek to the same point in the local copy first. If that works, test seeking in another video from the same source. Allow normal response time after each seek instead of dragging through a dozen positions repeatedly.
+
+For disconnection after a fixed interval, record the duration and whether reopening restores playback immediately. Server sessions, expiring remote addresses, and network transitions may contribute. If the issue always occurs when the phone switches from Wi-Fi to mobile data, investigate that transition rather than rescanning the whole library first.
+
+If pausing background downloads helps, resume one task and compare to confirm bandwidth competition. Understand cache versus offline copies before clearing anything, so videos prepared for travel are not removed too. Clearing files usually cannot fix a server's inability to return data continuously.
+
+## Keep a short record of the results
+
+Finish with four short records: whether the local copy works, whether LAN playback works, whether remote playback works, and when failure occurs. Add file parameters and source type to narrow the scope substantially. If the cause remains unknown, this record supports further troubleshooting better than “it sometimes stutters.”
+
+Information checked on October 23, 2026. The public release is iCouldPlay 1.1.0, requiring iOS / iPadOS 13.0 or later. See [Official App Store description](<https://apps.apple.com/cn/app/id6755653178>) and [Apple release information](<https://itunes.apple.com/lookup?id=6755653178&country=cn>). Speed conversions explain transfer requirements; they are not measured results for a particular device or network.
+{% endraw %}

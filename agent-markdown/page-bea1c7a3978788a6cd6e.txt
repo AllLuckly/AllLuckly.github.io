@@ -1,0 +1,121 @@
+---
+layout: null
+permalink: /en/journal/2015-09-23-getting-started-with-xmpp-step-by-step/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Getting started with XMPP, step by step
+agent_source_url: https://allluckly.cn/en/journal/2015-09-23-getting-started-with-xmpp-step-by-step/
+agent_source_sha256: 4f18c1b4426b00ed5794a01844d4c687edfd8250237f1b07267cf6d26842d6f5
+agent_generator_version: 1
+---
+{% raw %}# Getting started with XMPP, step by step
+
+Language: en
+Canonical: [Getting started with XMPP, step by step](<https://allluckly.cn/en/journal/2015-09-23-getting-started-with-xmpp-step-by-step/>)
+中文：[中文 HTML](<https://allluckly.cn/ios%E4%B9%8Bxmpp/%E4%B8%80%E7%82%B9%E4%B8%80%E6%BB%B4%E6%85%A2%E6%85%A2%E7%9A%84%E6%8F%AD%E5%BC%80XMPP%E7%9A%84%E7%A5%9E%E7%A7%98%E9%9D%A2%E7%BA%B1>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-09-23-getting-started-with-xmpp-step-by-step/>)
+Published: 2015-09-23T00:00:00+08:00
+Modified: 2026-10-23T10:44:59+08:00
+Author: [Bison](<https://allluckly.cn/about/>)
+
+Records the initial integration of XMPP chat: importing dependencies, connecting to Openfire with user information, handling registration and sign-in authentication, and processing message callbacks. Client-side code accompanies the connection and messaging workflow.
+
+Originally credited to Bison. Content is retained as published.
+
+English translation of the [Chinese original](<https://allluckly.cn/ios%E4%B9%8Bxmpp/%E4%B8%80%E7%82%B9%E4%B8%80%E6%BB%B4%E6%85%A2%E6%85%A2%E7%9A%84%E6%8F%AD%E5%BC%80XMPP%E7%9A%84%E7%A5%9E%E7%A7%98%E9%9D%A2%E7%BA%B1>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Read API, dependency and tool details in the context of the original publication date.
+
+> “Enrich yourself and increase your value by continuing to learn.” Bison
+
+I will not go into what `XMPP` does here; I am only beginning to learn it myself. First, drag `XMPP` into the project, then add the required frameworks: `CFNetwork.framework` `Security.framework` `libxml2.dylib` `libresolv.dylib` `SystemConfiguration.framework` `CoreLocation.framework` `AudioToolbox.framework` `AVFoundation.framework` Run the project; if there are no errors, the setup is correct. For chat in our app, we first need to log in and obtain the user's information. Once we have it, check whether the user already exists in `Openfire`. If not, register the user; otherwise, assign the values automatically and log in to `Openfire`. `[self XmppLogin:dic];`
+
+```css
+#pragma mark 登陆xmpp
+-(void)XmppLogin:(NSDictionary*)userdic{
+    App.IM_Account =  [NSString stringWithFormat:@"Bison%@",App.UserId];//拼上前缀
+    App.IM_Password =  @"**************";
+    [[JEXMPP Shared] XmppLogin];
+}
+```
+
+```css
+#pragma mark -  登录 退出
+-(BOOL)XmppLogin{
+    if (![XMPP_Stream isDisconnected]) {
+        return YES;
+    }
+    [XMPP_Stream setHostName:kIM_Host];//设置服务器
+    [XMPP_Stream setHostPort:[kIM_Port intValue]];//设置端口
+
+    NSLog(@"jid:%@ ps:%@",App.IM_Account,App.IM_Password);
+    if (App.IM_Account == nil || App.IM_Password == nil) {
+        return NO;
+    }
+
+ XMPPJID *myjid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@@%@",App.IM_Account,kIM_Domain] resource:@"jp"];//设置了 jid 的 resource 即限制了多点登陆
+    
+    NSError *error ;
+    [XMPP_Stream setMyJID:myjid];
+    if (![XMPP_Stream connectWithTimeout:XMPPStreamTimeoutNone error:&error]) {
+        NSLog(@"my connected error : %@",error.description);
+        return NO;
+    }
+    return YES;
+}
+```
+
+Next, verify whether the user has logged in to `Openfire`.
+
+```css
+//将要连上
+- (void)xmppStreamWillConnect:(XMPPStream *)sender{
+    NSLog(@"==xmppStreamWillConnect");
+}
+//连上了 还要验证密码
+- (void)xmppStreamDidConnect:(XMPPStream *)sender{
+    NSLog(@"xmppStreamDidConnect");
+    if (App.IM_Password) {
+        NSError *error ;
+        if (![XMPP_Stream authenticateWithPassword:App.IM_Password error:&error]) {
+            NSLog(@"error authenticate : %@",error.description);
+        }
+    }
+}
+
+//突然掉线了
+- (void)xmppReconnect:(XMPPReconnect *)sender didDetectAccidentalDisconnect:(SCNetworkReachabilityFlags)reachabilityFlags {
+    NSLog(@"didDetectAccidentalDisconnect : \n %u ", reachabilityFlags);
+}
+//YES 重连 
+- (BOOL)xmppReconnect:(XMPPReconnect *)sender shouldAttemptAutoReconnect:(SCNetworkReachabilityFlags)reachabilityFlags{
+    NSLog(@"shouldAttemptAutoReconnect : \n %u ", reachabilityFlags);
+    return YES;
+}
+
+#pragma mark 发送 成功  失败
+- (void)xmppStream:(XMPPStream *)sender didSendMessage:(XMPPMessage *)message{
+
+}
+//发送失败
+- (void)xmppStream:(XMPPStream *)sender didFailToSendMessage:(XMPPMessage *)message error:(NSError *)error{
+
+}
+//发送 成功或失败的 反馈给聊天页面
+-(void)XmppSend_Status:(NSInteger)status Msg:(JEChatMessage *)msg{
+    NSLog(@"XmppSend_Status 消息发送:%@ \n内容:%@", status == 1 ? @"成功" : @"失败",msg.TextContent);
+   
+   
+}
+
+#pragma mark 接收消息
+- (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message{
+    NSLog(@"%@\n 来新消息了\n from:%@\n to:%@\n type:%@\n message:%@\n body:%@",message,[[message attributeForName:@"from"] stringValue],[[message attributeForName:@"to"] stringValue],[[message attributeForName:@"type"] stringValue],[[message attributeForName:@"message"] stringValue],[[message elementForName:@"body"] stringValue]);
+}
+```
+
+That is all for today.  
+ Please point out any shortcomings; I have only recently started working with XMPP too.  
+ Copyright © Bison. Please credit the source when reproducing this article!
+{% endraw %}

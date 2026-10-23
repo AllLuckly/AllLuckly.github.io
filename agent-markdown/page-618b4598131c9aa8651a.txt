@@ -1,0 +1,71 @@
+---
+layout: null
+permalink: /uitabview/自动计算tabview中label的高度/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发自动计算tabview中label的高度
+agent_source_url: https://allluckly.cn/uitabview/%E8%87%AA%E5%8A%A8%E8%AE%A1%E7%AE%97tabview%E4%B8%ADlabel%E7%9A%84%E9%AB%98%E5%BA%A6
+agent_source_sha256: e6760ba94ed2f6689848d8d6e1ca178821c8cb0d598f3c3a604ba84933f905b6
+agent_generator_version: 1
+---
+{% raw %}# iOS开发自动计算tabview中label的高度
+
+语言：zh-CN
+原文：[iOS开发自动计算tabview中label的高度](<https://allluckly.cn/uitabview/%E8%87%AA%E5%8A%A8%E8%AE%A1%E7%AE%97tabview%E4%B8%ADlabel%E7%9A%84%E9%AB%98%E5%BA%A6>)
+中文：[中文 HTML](<https://allluckly.cn/uitabview/%E8%87%AA%E5%8A%A8%E8%AE%A1%E7%AE%97tabview%E4%B8%ADlabel%E7%9A%84%E9%AB%98%E5%BA%A6>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-05-17-calculating-label-heights-automatically-in-a-table-view/>)
+发布于: 2015-05-17T00:00:00+08:00
+内容更新于: 2015-05-17T00:00:00+08:00
+
+通过字体、限制宽度与文本测量计算标签所需高度，再在 UITableView 行高回调中增加留白，展示手动处理多行文字与列表单元格高度的代码思路。
+
+原文未明确署名，作为历史文章归档。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文发表于 2015 年，示例使用 sizeWithFont 手动测量文本。
+
+自动计算tabview中label的高度的方法
+
+```css
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if(tableView == kindTableView)
+    {
+        NSInteger section = indexPath.section;
+
+        customCell *cell = (customCell *)[tableView dequeueReusableCellWithIdentifier:customCellView];
+        if (cell == nil) {
+        [[NSBundle mainBundle] loadNibNamed:@"customCell" owner:self options:nil];
+        cell = _customCell;
+    }
+
+        FileListItem * item = [cuArray objectAtIndex:indexPath.row];
+        cell.textLabel.text = item.name;
+
+        //主要是这里，上面的按平常各自的习惯写
+        cell.textLabel.lineBreakMode = NSLineBreakByWordWrapping;
+        cell.textLabel.numberOfLines = 0;
+        cell.textLabel.font = [UIFont fontWithName:@"Helvetica" size:17.0];
+        UIFont *cellFont = [UIFont fontWithName:@"Helvetica" size:17.0];
+        CGSize constraintSize = CGSizeMake(280.0f, MAXFLOAT);
+        CGSize labelSize = [cell.textLabel.text sizeWithFont:cellFont constrainedToSize:constraintSize lineBreakMode:NSLineBreakByWordWrapping];
+
+        CGRect frame = cell.textLabel.frame;
+        cell.textLabel.frame = CGRectMake(frame.origin.x, ((labelSize.height + 20)-frame.size.height)/2, frame.size.width, frame.size.height);
+
+    }
+    return cell;
+
+}
+
+
+//设置cell每行间隔的高度
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    NSString *cellText = item.name;
+    UIFont *cellFont = [UIFont fontWithName:@"Helvetica" size:17.0];
+    CGSize constraintSize = CGSizeMake(280.0f, MAXFLOAT);
+    CGSize labelSize = [cellText sizeWithFont:cellFont constrainedToSize:constraintSize lineBreakMode:NSLineBreakByWordWrapping];
+
+    return labelSize.height + 20;
+} 
+```
+{% endraw %}

@@ -1,0 +1,59 @@
+---
+layout: null
+permalink: /mac/Mac-OS01/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: Mac OS开发系列之NSImageView
+agent_source_url: https://allluckly.cn/mac/Mac-OS01
+agent_source_sha256: 0d9fedcece0a6996c8145a7747b5e8608663ad52d5d88a3e97f1d654c1b663c9
+agent_generator_version: 1
+---
+{% raw %}# Mac OS开发系列之NSImageView
+
+语言：zh-CN
+原文：[Mac OS开发系列之NSImageView](<https://allluckly.cn/mac/Mac-OS01>)
+中文：[中文 HTML](<https://allluckly.cn/mac/Mac-OS01>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-11-23-mac-development-series-nsimageview/>)
+发布于: 2015-11-23T00:00:00+08:00
+内容更新于: 2015-11-23T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+以 macOS 图片视图为例，展示 NSImageView 的创建、图片赋值及添加到界面的过程，再通过启用图层、设置圆角与边框完成圆形头像样式。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。涉及的 API、依赖和工具版本请结合发表日期阅读。
+
+> "iOS技术分享,iOS开发,iOS开发技巧,iOS开发博客" Bison
+
+最近研究下Mac开发的一些技巧，有兴趣的朋友关注我就对了！ 争取在工作之余把Mac开发给拿下！
+
+```css
+//初始化NSImageView并设置它的大小
+NSImageView *imgView = [[NSImageView alloc]initWithFrame:CGRectMake(self.view.frame.size.width/2-35, 100, 70, 70)];
+//给图片赋值和iOS开发是一样的
+imgView.image = [NSImage imageNamed:@"1"];
+
+[self.view addSubview:imgView];
+
+//设置圆角
+imgView.wantsLayer = YES;
+imgView.layer.cornerRadius = 35.0f;
+imgView.layer.borderWidth = 2;
+imgView.layer.borderColor = [NSColor greenColor].CGColor;
+imgView.layer.masksToBounds = YES;
+```
+
+最终效果图如下
+
+![2](<https://allluckly.cn/images/NSimgView.png>)
+
+> [连载系列－－－－请持续关注](<https://allluckly.cn/>)
+
+好文推荐：[iOS开发内购全套图文教程](<http://www.jianshu.com/p/05a3087cd796>)
+
+原文在：https://allluckly.cn/
+
+版权归©Bison所有 如需转载请保留原文超链接地址！否则后果自负！
+{% endraw %}

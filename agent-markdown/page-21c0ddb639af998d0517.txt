@@ -1,0 +1,57 @@
+---
+layout: null
+permalink: /uiscrollview/类似折800功能中的一个小Demo/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发类似折800功能中的一个小Demo
+agent_source_url: https://allluckly.cn/uiscrollview/%E7%B1%BB%E4%BC%BC%E6%8A%98800%E5%8A%9F%E8%83%BD%E4%B8%AD%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8FDemo
+agent_source_sha256: 89ccb703b787fa458f1b9dd97b5a237b7694b7abe8510943268b534aef28107f
+agent_generator_version: 1
+---
+{% raw %}# iOS开发类似折800功能中的一个小Demo
+
+语言：zh-CN
+原文：[iOS开发类似折800功能中的一个小Demo](<https://allluckly.cn/uiscrollview/%E7%B1%BB%E4%BC%BC%E6%8A%98800%E5%8A%9F%E8%83%BD%E4%B8%AD%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8FDemo>)
+中文：[中文 HTML](<https://allluckly.cn/uiscrollview/%E7%B1%BB%E4%BC%BC%E6%8A%98800%E5%8A%9F%E8%83%BD%E4%B8%AD%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8FDemo>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-06-15-a-small-ios-scrolling-demo-inspired-by-zhe800/>)
+发布于: 2015-06-15T00:00:00+08:00
+内容更新于: 2015-06-15T00:00:00+08:00
+
+以仿折800的滚动交互为例，记录拖动开始时的 contentOffset，并在滚动回调中比较偏移量来判断方向，附示例工程供对照查看界面的联动效果。
+
+原文未明确署名，作为历史文章归档。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。涉及的 API、依赖和工具版本请结合发表日期阅读。
+
+> "The beginning is the most important part of the work." Plato
+
+–核心代码–
+
+```css
+-(void)scrollViewWillBeginDragging:(UIScrollView*)scrollView{
+
+    //使用的时候用全局变量
+    CGFloat lastContentOffset = scrollView.contentOffset.y;
+}
+
+
+-( void )scrollViewDidScroll:( UIScrollView *)scrollView {
+    
+    if (scrollView.contentOffset.y < lastContentOffset )
+    {
+
+        //向上
+        NSLog(@"向上");
+
+    } else if (scrollView. contentOffset.y >lastContentOffset ){
+        //向下
+        NSLog(@"向下");
+    }
+}
+```
+
+> [点此—\>Demo下载地址](<https://github.com/AllLuckly/LBMoviesPossession>)
+
+![(LBMoviesPossession)](<https://github.com/AllLuckly/LBMoviesPossession/blob/master/Move.gif?raw=true>)
+{% endraw %}

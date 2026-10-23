@@ -1,0 +1,101 @@
+---
+layout: null
+permalink: /ios之国际化/On-the-experience-of-the-international-experience-of-iOS/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发之多国语言国际化经验浅谈
+agent_source_url: https://allluckly.cn/ios%E4%B9%8B%E5%9B%BD%E9%99%85%E5%8C%96/On-the-experience-of-the-international-experience-of-iOS
+agent_source_sha256: 497249659c457113974c2afc58ada49ed9b0c0c53408819d59947d678506a0d4
+agent_generator_version: 1
+---
+{% raw %}# iOS开发之多国语言国际化经验浅谈
+
+语言：zh-CN
+原文：[iOS开发之多国语言国际化经验浅谈](<https://allluckly.cn/ios%E4%B9%8B%E5%9B%BD%E9%99%85%E5%8C%96/On-the-experience-of-the-international-experience-of-iOS>)
+中文：[中文 HTML](<https://allluckly.cn/ios%E4%B9%8B%E5%9B%BD%E9%99%85%E5%8C%96/On-the-experience-of-the-international-experience-of-iOS>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-09-29-practical-lessons-from-localising-an-ios-app/>)
+发布于: 2015-09-29T00:00:00+08:00
+内容更新于: 2015-09-29T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+总结多语言项目中翻译文件整理、按钮文字长度、语言地区代码和本地化图片命名的实际问题，重点记录 iOS 9 语言标识变化对中文判断逻辑的影响。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文明确记录 iOS 9 为语言标识增加地区代码时的适配经历。
+
+> "努力、努力、再努力，今天的付出，乃明天的收获" Bison
+
+iOS多国语言国际化由于我个人也是第一次做，所以遇到了很多问题，  
+ 在此我把我所遇到的一些问题分享给大家。  
+ 最基础的怎么进行多国语言国际化在此就不老生常谈了，有兴趣的朋友可自行百度。  
+
+ 1.首先我们说下翻译的格式：`"你好" = "hello"`;  
+ 我们可以把需要翻译的文档制作成`"你好" = "";`这种Word文档  
+ 每一种语言一个Word文档，这样你会发现，你做国际化的时候会快很多，  
+ 不必到处找啊找的，我们这次搞得就是表格样式的，坑死人了，放翻译文档放的手都软了；  
+
+ 2.我们尽量把同一个`VC`的词语翻译成差不多长的其他语言。  
+ 大家可以想象一下如果你的一个布局里面有一排按钮，等分排练的，  
+ 然后翻译的`title`一个好长一个非常短的，我们该这么去适配呢？而我们 最简单的做法是  
+ `btn.titleLabel.adjustsFontSizeToFitWidth = YES;` 想象一下当时我是有多痛苦了吗？所以说，当你看到这篇文章的时候说明你很庆幸，  
+ 至少下次你遇到这样的需求你可以及时的和翻译说。  
+
+ 3.由于某些国家的语言有很多种不同的系列，导致测试的时候会出现，这种语言缺失，  
+ 其实不然，只是你在选择语言的时候少选了他的语种，就像中文一样，有简体和繁体中文。  
+ 我这里最常见的有这么几种：  
+ 西班牙语（最坑爹，我选了3个才搞定）  
+ 丹麦语  
+ 俄语  
+ 葡萄牙语  
+ 意大利语
+
+4.当初做项目的时候没管那么多，直接是只考虑了中文，然而国际版我们的项目需要  
+ 减少一个`tabBarItem`所以通过判断是否为中文来判断的具体写法是写了个单例的类然  
+ 后写的方法：
+
+```css
+//判断是否为中文简体
+- (BOOL)isSimpleChinese
+{
+    NSString *language = [[NSLocale preferredLanguages] firstObject];
+    if ([language isEqualToString:@"zh-Hans"]) {
+          return 1;
+    }else{
+        return 0;
+    }
+}
+```
+
+然而我们的运气貌似有点差，刚好碰上的iOS9升级，失效了，打开代码断点看看，  
+ 原来是苹果IOS9增加了语言后面的地区代码，原来的`zh-Hanz`变成了`zh-Hanz-CN`  
+ 能怎么办呢？当然是改代码咯。。。。下面是改过的代码
+
+```css
+//判断是否为中文简体
+- (BOOL)isSimpleChinese
+{
+    NSString *language = [[NSLocale preferredLanguages] firstObject];
+    if ([language hasPrefix:@"zh-Hans"]) {
+            return 1;
+        }else {
+            return 0;
+        }
+}
+```
+
+仔细的你是否发现了代码的不同之处啊？
+
+5.国际化一些有图片的地方，我们需要特别注意下取名哦，比如：  
+ `hello_en@2x.png`（英语）  
+ 这样做的好处就是我们替换图片的时候只要判断下后缀是否是`en`  
+ 就可以判断当前语言所需的图片下面我截个图给大家瞧瞧
+
+历史配图暂不可用，[保留原图地址](<http://upload-images.jianshu.io/upload_images/671504-cc907a133a676790.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240>)供查阅。  
+ 记得叫美工改好名字哦，我们用起来的时候就会方便快捷！
+
+暂时就发现这么多，大家有什么需要补充的也可以邮箱给我。
+
+版权归©Bison所有 任何转载请标明出处！
+{% endraw %}

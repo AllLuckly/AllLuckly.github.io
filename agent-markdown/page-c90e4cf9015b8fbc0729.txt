@@ -1,0 +1,492 @@
+---
+layout: null
+permalink: /en/journal/2016-10-27-balancing-code-responsibilities-in-ios/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Balancing Code Responsibilities in iOS
+agent_source_url: https://allluckly.cn/en/journal/2016-10-27-balancing-code-responsibilities-in-ios/
+agent_source_sha256: fba4d7528267d9c975183cdde3ad4c0051db2082b343541d0d3e1ca6f65b73c4
+agent_generator_version: 1
+---
+{% raw %}# Balancing Code Responsibilities in iOS
+
+Language: en
+Canonical: [Balancing Code Responsibilities in iOS](<https://allluckly.cn/en/journal/2016-10-27-balancing-code-responsibilities-in-ios/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao68>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-10-27-balancing-code-responsibilities-in-ios/>)
+Published: 2016-10-27T00:00:00+08:00
+Modified: 2026-10-23T10:34:15+08:00
+Author: Sindri
+
+Uses an example project to examine oversized MVC controllers and the responsibilities of views, models, and controllers. It extracts repeated logic and reassigns functionality, emphasizing clear ownership of code before switching architecture labels.
+
+Originally credited to Sindri; edited and archived by Bison.
+
+[Source listed in the original](<http://www.jianshu.com/p/92d086b8efd8>)
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao68>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Read API, dependency and tool details in the context of the original publication date.
+
+MVC is a software architectural pattern that divides a system into three basic parts: Model, View, and Controller. It aims to support flexible program design, simplify later modifications and extensions, and make parts of the program reusable.
+
+Editor: [Bison](<https://allluckly.cn/en/>)  
+ Source: [Sindri’s Notes](<http://www.jianshu.com/p/92d086b8efd8>)
+
+The title is awkward, but after much thought I could not find a better one. This article owes part of its inspiration to [An analysis of the current state of iOS apps](<http://www.jianshu.com/p/a51d66383eb9>), and the title comes from its phrase “distribute code responsibilities evenly among different functional classes.” Readers of my articles may know that I mainly use `MVC` for most development. My projects have not been particularly large, and sensible division of responsibilities has kept them in good shape, so I have not developed projects with other architectures. If you are in a similar position, you should still study other patterns even if you do not use them.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao68/1.jpg>)
+
+Briefly, I have wanted to write this article for a long time. The idea arose during conversations while interviewing iOS developers. The dialogue below is a composite I put together, not a portrayal of a particular person:
+
+> Q: Your project uses MVVM. Why did you choose that structure?
+
+> A: During development, controller code kept growing beyond a thousand lines. We felt the controllers had too many responsibilities, so we used ViewModels to separate them.
+
+> Q: Can you describe your controllers' responsibilities, or show some source code?
+
+> The interviewee opens the source code on a computer.
+
+Ultimately, I do not think the interviewee needs `MVVM` to improve their architecture. Opinions may differ here, but their unreasonable division of responsibilities caused `View` and `Model` layer contains almost no business logic, leaving the controller unbalanced and bloated. In this situation, even using `ViewModel` separates the controller's code, but at most it merely `将垃圾挪到另一个地方罢了`. In [Thoughts on MVC architecture](<http://www.jianshu.com/p/4847c9a1e19b>)I discussed my understanding of `MVC` three modules' responsibilities. When you want to change `MVC` into `MVX` with another structure, first consider whether your code's responsibilities are balanced.
+
+## Developer Xiaoming's project
+
+Before we begin, I strongly recommend `《重构-改善既有代码的设计》` (Refactoring: Improving the Design of Existing Code) again. A good book or article should offer a different impression each time you return to it.
+
+Usually, duplicate code is the chief cause of bloat. For example, I once saw the following screen and its logic:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao68/2.jpg>)
+
+```
+@interface XXXViewController
+
+@property (weak, nonatomic) IBOutlet UIButton * rule1;
+@property (weak, nonatomic) IBOutlet UIButton * rule2;
+@property (weak, nonatomic) IBOutlet UIButton * rule3;
+@property (weak, nonatomic) IBOutlet UIButton * rule4;
+
+@end
+
+@implementation XXXViewController
+
+- (IBAction)actionToClickRule1: (id)sender {
+    [_rule1 setSelected: YES];
+    [_rule2 setSelected: NO];
+    [_rule3 setSelected: NO];
+    [_rule4 setSelected: NO];
+}
+
+- (IBAction)actionToClickRule2: (id)sender {
+    [_rule1 setSelected: NO];
+    [_rule2 setSelected: YES];
+    [_rule3 setSelected: NO];
+    [_rule4 setSelected: NO];
+}
+
+- (IBAction)actionToClickRule1: (id)sender {
+    [_rule1 setSelected: NO];
+    [_rule2 setSelected: NO];
+    [_rule3 setSelected: YES];
+    [_rule4 setSelected: NO];
+}
+
+- (IBAction)actionToClickRule1: (id)sender {
+    [_rule1 setSelected: NO];
+    [_rule2 setSelected: NO];
+    [_rule3 setSelected: NO];
+    [_rule4 setSelected: YES];
+}
+
+@end
+```
+
+Do not rush to laugh at code like this; we have written similar code ourselves. It is the most obvious kind of duplication: lengthy, meaningless, and taking up space. Repeated code is often scattered across classes and gradually makes the project unwieldy. Before discussing whether the architecture needs improvement, ask whether you first need to remove this clutter.
+
+For example, Xiaoming builds a business-facing app where merchants can add promotions with start and end dates:
+
+```
+@interface Promotion: NSObject
+
++ (instancetype)currentPromotion;
+
+@property (readonly, nonatomic) CGFloat discount;
+@property (readonly, nonatomic) NSDate * start;
+@property (readonly, nonatomic) NSDate * end;
+
+@end
+```
+
+Since a merchant can have only one promotion at a time, Xiaoming makes the promotion a singleton. Other modules retrieve it to calculate discounted prices:
+
+```
+//  module A
+Promotion * promotion = [Promotion currentPromotion];
+NSDate * now = [NSDate date];
+CGFloat discountAmount = _order.amount;
+if ([now timeIntervalSinceDate: promotion.start] > 0 && [now timeIntervalSinceDate: promotion.end] < 0) {
+    discountAmount *= promotion.discount;
+}
+
+//  module B
+Promotion * promotion = [Promotion currentPromotion];
+NSDate * now = [NSDate date];
+if ([now timeIntervalSinceDate: promotion.start] > 0 && [now timeIntervalSinceDate: promotion.end] < 0) {
+    [_cycleDisplayView display: @"全场限时%g折", promotion.discount*10];
+}
+
+//  module C
+...
+```
+
+While optimizing after development, Xiaoming noticed this repeated code in several modules. He wrote an `NSDate` extension to simplify it and added a safety check:
+
+```
+@implementation NSDate (convenience)
+
+- (BOOL)betweenFront: (NSDate *)front andBehind: (NSDate *)behind {
+    if (!front || !behind) { return NO; }
+    return ([self timeIntervalSinceDate: front] > 0 && [self timeIntervalSinceDate: behind] < 0);
+}
+
+@end
+
+//  module A
+Promotion * promotion = [Promotion currentPromotion];
+NSDate * now = [NSDate date];
+CGFloat discountAmount = _order.amount;
+if ([now betweenFront: promotion.start andBehind: promotion.end]) {
+    discountAmount *= promotion.discount;
+}
+
+//  module B
+Promotion * promotion = [Promotion currentPromotion];
+NSDate * now = [NSDate date];
+if ([now betweenFront: promotion.start andBehind: promotion.end]) {
+    [_cycleDisplayView display: @"全场限时%g折", promotion.discount*10];
+}
+```
+
+Some time later, the product manager told Xiaoming that merchants needed several different promotions rather than only one. Xiaoming decided to remove the singleton nature of `Promotion` and introduce a manager singleton:
+
+```
+@interface PromotionManager: NSObject
+
+@property (readonly, nonatomic) NSArray<Promotion *> * promotions
+
++ (instancetype)sharedManager;
+- (void)requestPromotionsWithComplete: (void(^)(PromotionManager * manager))complete;
+
+@end
+
+//  module A
+- (void)viewDidLoad {
+    PromotionManager * manager = [PromotionManager sharedManager];
+    if (manager.promotions) {
+        [manager requestPromotionsWithComplete: ^(PromotionManager * manager) {
+            _promotions = manager.promotions;
+            [self calculateOrder];
+        }
+    } else {
+        _promotions = manager.promotions;
+        [self calculateOrder];
+    }
+}
+
+- (void)calculateOrder {
+    CGFloat orderAmount = _order.amount;
+    for (Promotion * promotion in _promotions) {
+        if ([[NSDate date] betweenFront: promotion.start andBehind: promotion.end]) {
+            orderAmount *= promotion.discount;
+        }
+    }
+}
+```
+
+Requirements grew over time. One day, the product manager wanted merchants to enable and disable promotions freely, so `Promotion` gained an `isActived` property. Other modules now checked both time and activation. Later, `synchronize` determined whether a promotion could combine with others. Most recently, discounts expanded to fixed reductions and spending-threshold offers, producing the following code:
+
+```
+@interface Promotion: NSObject
+
+@property (assign, nonatomic) BOOL isActived;
+@property (assign, nonatomic) BOOL synchronize;
+@property (assign, nonatomic) CGFloat discount;
+@property (assign, nonatomic) CGFloat discountCondition;
+@property (assign, nonatomic) DiscountType discountType;
+@property (assign, nonatomic) PromotionType promotionType;
+
+@property (readonly, nonatomic) NSDate * start;
+@property (readonly, nonatomic) NSDate * end;
+
+@end
+
+//  module A
+- (void)viewDidLoad {
+    PromotionManager * manager = [PromotionManager sharedManager];
+    if (manager.promotions) {
+        [manager requestPromotionsWithComplete: ^(PromotionManager * manager) {
+            _promotions = manager.promotions;
+            [self calculateOrder];
+        }
+    } else {
+        _promotions = manager.promotions;
+        [self calculateOrder];
+    }
+}
+
+- (void)calculateOrder {
+    CGFloat orderAmount = _order.amount;
+    NSMutableArray * fullPromotions = @[].mutableCopy;
+    NSMutableArray * discountPromotions = @[].mutableCopy;
+    for (Promotion p in _promotions) {
+        if (p.isActived && [[NSDate date] betweenFront: p.start andBehind: p.end]) {
+            if (p.promotionType == PromotionTypeFullPromotion) {
+                [fullPromotions addObject: p];
+            } else if (p.promotionType == PromotionTypeDiscount) {
+                [discountPromotions addObject: p];
+            }
+        }
+    }
+
+    Promotion * syncPromotion = nil;
+    Promotion * singlePromotion = nil;
+    for (Promotion * p in fullPromotions) {
+        if (p.synchronize) {
+            if (p.discountCondition != 0) {
+                if (p.discountCondition > syncPromotion.discountCondition) {
+                    syncPromotion = p;
+                }
+            } else {
+                if (p.discount > syncPromotion.discount) {
+                    syncPromotion = p;
+                }
+            }
+        } else {
+            if (p.discountCondition != 0) {
+                if (p.discountCondition > singlePromotion.discountCondition) {
+                    singlePromotion = p;
+                }
+            } else {
+                if (p.discount > singlePromotion.discount) {
+                    singlePromotion = p;
+                }
+            }
+        }
+    }
+    //  find discount promotions
+    ......
+}
+```
+
+By now, retrieving promotion information cost each module a long block of highly repetitive code. A colleague suggested changing the architecture and moving it out of controllers into a `ViewModel`. But the purpose of `ViewModel` here was essentially the same as Xiaoming's earlier `NSDate` extension. The `View` and `Model` were doing almost nothing, while nearly all logic kept bloating the controller. After carefully reviewing everything, Xiaoming concluded that confused responsibilities were the main problem: the code could not be cleanly separated into `VC` modules. The solution should begin by dividing logical responsibilities.
+
+First, Xiaoming noticed that `Promotion` only stored promotion information and performed no logic. The controller's business logic for checking validity and calculating discounts could belong to `Promotion`:
+
+```
+@interface Promotion: NSObject
+
+- (BOOL)isEffective;
+- (BOOL)isWorking;
+- (CGFloat)discountAmount: (CGFloat)amount;
+
+@end
+
+@implementation Promotion
+
+- (BOOL)isEffective {
+    return [[NSDate date] betweenFront: _start andBehind: _end];
+}
+
+- (BOOL)isWorking {
+    return ( [self isEffective] && _isActived );
+}
+
+- (CGFloat)discountAmount: (CGFloat)amount {
+    if ([self isWorking]) {
+        if (_promotionType == PromotionTypeDiscount) {
+            return [self calculateDiscount: amount];
+        } else {
+            if (amount < _discountCondition) { return amount; }
+            return [self calculateDiscount: amount];
+        }
+    }
+    return amount;
+}
+
+#pragma mark - Private
+- (CGFloat)calculateDiscount: (CGFloat)amount {
+    if (_discountType == DiscountTypeCoupon) {
+        return amount - _discount;
+    } else {
+        return amount * _discount;
+    }
+}
+
+@end
+```
+
+He also found that `PromotionManager` mixed two responsibilities: network requests and data management. One needed extracting, so requests became `PromotionRequest`. The existing manager only retrieved data, so he added create, delete, update, and preliminary promotion-filtering operations:
+
+```
+#pragma mark -  PromotionManager.h
+@class PromotionManager;
+typeof void(^PromotionRequestComplete)(PromotionManager * manager);
+
+@interface PromotionRequest: NSObject
+
++ (void)requestPromotionsWithComplete: (PromotionRequestComplete)complete;
++ (void)insertPromotion: (Promotion *)promotion withComplete: (PromotionRequestComplete)complete;
++ (void)updatePromotion: (Promotion *)promotion withComplete: (PromotionRequestComplete)complete;
++ (void)deletePromotion: (Promotion *)promotion withComplete: (PromotionRequestComplete)complete;
+
+@end
+
+
+@interface PromotionManager: NSObject
+
++ (instancetype)sharedManager;
+
+- (NSArray<Promotion *> *)workingPromotions;
+- (NSArray<Promotion *> *)effectivePromotions;
+- (NSArray<Promotion *> *)fullPromotions;
+- (NSArray<Promotion *> *)discountPromotions;
+
+- (void)insertPromotion: (Promotion *)promotion;
+- (void)updatePromotion: (Promotion *)promotion;
+- (void)deletePromotion: (Promotion *)promotion;
+
+@end
+
+
+
+#pragma mark -  PromotionManager.m
+@interface PromotionManager ()
+
+@property (nonatomic, strong) NSArray<Promotion *> * promotions;
+
+@end
+
+@implementation PromotionManager
+
++ (instancetype)sharedManager { ... }
+
+- (NSArray<Promotion *> *)fullPromotions {
+    return [self filterPromotionsWithType: PromotionTypeFullPromote];
+}
+
+- (NSArray<Promotion *> *)discountPromotions {
+    return [self filterPromotionsWithType: PromotionDiscountPromote];
+}
+
+- (NSArray<Promotion *> *)workingPromotions {
+    return _promotions.filter(^BOOL(Promotion * p) {
+        return (p.isWorking);
+    });
+}
+
+- (NSArray<Promotion *> *)effectivePromotions {
+    return _promotions.filter(^BOOL(Promotion * p) {
+        return (p.isEffective);
+    });
+}
+
+- (NSArray<Promotion *> *)filterPromotionsWithType: (PromotionType)type {
+    return [self workingPromotions].filter(^BOOL(Promotion * p) {
+        return (p.promotionType == type);
+    });
+}
+
+- (void)insertPromotion: (Promotion *)promotion { 
+    if ([_promotions containsObject: promotion]) {
+        [PromotionRequest updatePromotion: promotion withComplete: nil];
+    } else {
+        [PromotionRequest insertPromotion: promotion withComplete: nil];
+    }
+ }
+
+- (void)updatePromotion: (Promotion *)promotion { 
+    if ([_promotions containsObject: promotion]) {
+        [PromotionRequest updatePromotion: promotion withComplete: nil];
+    }
+ }
+
+- (void)deletePromotion: (Promotion *)promotion { 
+    if ([_promotions containsObject: promotion]) {
+        [PromotionRequest deletePromotion: promotion withComplete: nil];
+    }
+}
+
+- (void)obtainPromotionsFromJSON: (id)JSON { ... }
+
+@end
+```
+
+Finally, other modules contained extensive logic for finding the best promotion, made larger by threshold-based and ordinary offers. Xiaoming created `PromotionCalculator` to expose methods for selecting the best offer and calculating the best price:
+
+```
+@interface PromotionCalculator: NSObject
+
++ (CGFloat)calculateAmount: (CGFloat)amount;
++ (Promotion *)bestFullPromotion: (CGFloat)amount;
++ (Promotion *)bestDiscountPromotion: (CGFloat)amount;
+
+@end
+
+@implementation PromotionCalculator
+
++ (CGFloat)calculateAmount: (CGFloat)amount {
+    Promotion * bestFullPromotion = [self bestFullPromotion: amount];
+    Promotion * bestDiscountPromotion = [self bestDiscountPromotion: amount];
+    if (bestFullPromotion.synchronize && bestDiscountPromotion.synchronize) {
+        return [bestFullPromotion discountAmount: [bestDiscountPromotion discountAmount: amount]];
+    } else {
+        return MAX([bestDiscountPromotion discountAmount: amount], [bestFullPromotion discountAmount: amount]);
+    }
+}
+
++ (Promotion *)bestFullPromotion: (CGFloat)amount {
+    PromotionManager * manager = [PromotionManager sharedManager];
+    return [self bestPromotionInPromotions: [manager fullPromotions] amount: amount];
+}
+
++ (Promotion *)bestDiscountPromotion: (CGFloat)amount {
+    PromotionManager * manager = [PromotionManager sharedManager];
+    return [self bestPromotionInPromotions: [manager discountPromotions] amount: amount];
+}  
+
++ (Promotion *)bestPromotionInPromotions: (NSArray *)promotions amount: (CGFloat)amount {
+    CGFloat discount = amount;
+    Promotion * best = nil;
+    for (Promotion * promotion in promotions) {
+        CGFloat tmp = [promotion discountAmount: amount];
+        if (tmp < discount) {
+            discount = tmp;
+            best = promotion;
+        }
+    }
+    return best;
+}
+
+@end
+```
+
+After distributing this logic to the appropriate places, Xiaoming is surprised to find that other modules need only a few lines for their calculations:
+
+```
+- (void)viewDidLoad {
+    [PromotionRequest requestPromotionsWithComplete: ^(PromotionManager * manager) {
+        _discountAmount = [PromotionCalculator calculateAmount: _order.amount];
+    }];
+} 这时候代码职责的结构图，小明成功的均衡了不同组件之间的代码职责，避免了改变项目原架构带来的风险以及不必要的工作：
+```
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao68/3.jpg>)
+
+## Closing thoughts
+
+This is my second article on `MVC`, and I still want to emphasize that `MVC` has real limitations that emerge in large projects—though I am a novice who has not developed a large one. If your project's layers are well separated, do not hesitate when an architectural change becomes appropriate. But if the problem is merely repeated useless code or all logic stuffed into controllers, changing architecture only redistributes the mess.
+
+---
+
+Recommended reading: [Implement an iOS launch-screen advertisement in minutes](<https://allluckly.cn/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/>)
+{% endraw %}

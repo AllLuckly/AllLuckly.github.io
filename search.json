@@ -1,13 +1,10 @@
 ---
+layout: null
+sitemap: false
 ---
 [
-	{% for post in site.posts %}
-		{
-		  "title"      : "{{ post.title | escape }}",
-		  "category"   : "{{ post.category }}",
-		  "url"        : "{{ site.url }}{{ post.url }}",
-		  "date"       : "{{ post.date }}",
-		  "shortdate"  : "{{ post.date | date: '%B %d, %Y' }}"
-		} {% if forloop.last %}{% else %},{% endif %}
-	{% endfor %}
+{%- assign entries = site.posts | where_exp: 'entry', 'entry.noindex != true' | where_exp: 'entry', 'entry.published != false' -%}
+{%- for post in entries -%}
+{% include search-entry.json lang='zh-CN' %}{% unless forloop.last %},{% endunless %}
+{%- endfor -%}
 ]

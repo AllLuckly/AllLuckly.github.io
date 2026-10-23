@@ -1,0 +1,145 @@
+---
+layout: null
+permalink: /en/journal/2016-02-01-building-a-wechat-style-ios-app-part-3/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Building a WeChat-style iOS app, part 3
+agent_source_url: https://allluckly.cn/en/journal/2016-02-01-building-a-wechat-style-ios-app-part-3/
+agent_source_sha256: f859407c68f99621ecccbe77e64e8ef4db2f7091e1431eb95d517efab8078006
+agent_generator_version: 1
+---
+{% raw %}# Building a WeChat-style iOS app, part 3
+
+Language: en
+Canonical: [Building a WeChat-style iOS app, part 3](<https://allluckly.cn/en/journal/2016-02-01-building-a-wechat-style-ios-app-part-3/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao15>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-02-01-building-a-wechat-style-ios-app-part-3/>)
+Published: 2016-02-01T00:00:00+08:00
+Modified: 2026-10-23T10:34:13+08:00
+Author: [WzxJiang](<http://www.jianshu.com/users/389c20d5a244/latest_articles>)
+
+Continues the main interface by exposing constraints from xib files and adjusting their constant values for the screen. It also refines navigation-bar button positions and loads images with SDWebImage placeholders.
+
+Originally credited to WzxJiang; edited and archived by Bison.
+
+[Source listed in the original](<http://www.jianshu.com/users/389c20d5a244/latest_articles>)
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao15>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Read API, dependency and tool details in the context of the original publication date.
+
+Editor: [Bison](<https://allluckly.cn/en/>)  
+ Contributor: [WzxJiang](<http://www.jianshu.com/users/389c20d5a244/latest_articles>)
+
+> "I did not update the article yesterday because I had to upload an internal testing build for work. Our New Year holiday begins tomorrow. I will arrive home on 2/2 and resume updates on 2/3!:"
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao12/1.png>)
+
+Completed today
+
+— Complete the UI for all main screens, without implementing their functionality.
+
+— Update the project's images. Forgive me for only just learning how to extract an ipa…
+
+Result
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao15/1.gif>)
+
+The code is still fairly simple, so I will discuss only the parts I find useful.  
+ How to adjust constraints for the resolution
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao15/1.png>)
+
+The Chat screen needs a custom cell. I created it with a xib, but the AutoLayout constraints could not change with screen resolution. Here is how I handled that.
+
+```css
+/**
+*  avaterImgView高度约束
+*/
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *avaterImgViewHeight;
+
+/**
+*  avaterImgView宽度约束
+*/
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *avaterImgViewWidth;
+```
+
+Drag the constraint you want to change from the xib into the .h file.  
+ Then add the method.
+
+```css
+//更改约束
+- (void)changeConstraints
+{
+    _avaterImgViewHeight.constant = WGiveHeight(45);
+    _avaterImgViewWidth.constant = WGiveHeight(45);
+}
+```
+
+This lets us change an AutoLayout constant dynamically. If you know a better approach, I would appreciate your advice!
+
+How to fine-tune the position of a native self.navigationItem.XXXBarButtonItem(image)  
+ Before fine-tuning:  
+ ![1](<https://allluckly.cn/images/blog/tuogao/tougao15/2.png>)
+
+Before fine-tuning  
+ Fine-tuning method:
+
+```css
+[self.navigationItem.rightBarButtonItem setImageInsets:UIEdgeInsetsMake(0, WGiveWidth(-3), 0, WGiveWidth(5))];
+```
+
+After fine-tuning:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao15/3.png>)
+
+After fine-tuning
+
+The SDWebImage method I use most often
+
+Import the header file.
+
+```css
+#import "UIImageView+WebCache.h"
+
+[self.avaterImgView setImageWithURL:[NSURL URLWithString:_model.avatar] placeholderImage:[UIImage imageNamed:@"avater.jpg"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+
+}];
+```
+
+This method displays placeholderImage until the actual image loads.
+
+- How to obtain an app's assets
+
+1. First, back up the app from your phone to iTunes.
+
+2. Find the app, then choose Show in Finder.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao15/4.png>)
+
+3. Change the ipa file extension to ZIP.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao15/5.png>)
+
+4. Extract it.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao15/6.png>)  
+ Screenshot 2016-01-31 at 1.46.21 PM.png 5. Right-click the WeChat file and choose Show Package Contents.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao15/7.png>)
+
+That is all for today. Time to pack up and go home for the New Year!
+
+The 2/3 update will add network data. I am considering a LeadCloud cloud server for now. If you know a better option, please recommend it!
+
+Current code, to be updated until the project is complete
+
+[GitHub:WzxJiang](<https://github.com/Wzxhaha/WWeChat>)
+
+If you have suggestions or questions, please leave a comment!
+
+---
+
+Recommended reading: [Integrating LianLian Pay into an iOS app](<https://allluckly.cn/en/journal/2016-01-20-integrating-lianlian-pay-into-an-ios-app/>)
+{% endraw %}

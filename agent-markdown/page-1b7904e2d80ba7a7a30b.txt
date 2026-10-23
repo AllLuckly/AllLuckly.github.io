@@ -1,0 +1,98 @@
+---
+layout: null
+permalink: /iOS开发如何实现长微博/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发如何实现长微博的功能
+agent_source_url: https://allluckly.cn/iOS%E5%BC%80%E5%8F%91%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%95%BF%E5%BE%AE%E5%8D%9A
+agent_source_sha256: aa0107dc780fe81d16f22c2143a7050e532957e12b4f54873b91419d5cd12fb6
+agent_generator_version: 1
+---
+{% raw %}# iOS开发如何实现长微博的功能
+
+语言：zh-CN
+原文：[iOS开发如何实现长微博的功能](<https://allluckly.cn/iOS%E5%BC%80%E5%8F%91%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%95%BF%E5%BE%AE%E5%8D%9A>)
+中文：[中文 HTML](<https://allluckly.cn/iOS%E5%BC%80%E5%8F%91%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%95%BF%E5%BE%AE%E5%8D%9A>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-07-15-creating-long-form-weibo-images-in-an-ios-app/>)
+发布于: 2015-07-15T00:00:00+08:00
+内容更新于: 2015-07-15T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+把长文字转为图片来实现长微博展示，代码围绕文本宽度、字号、所需高度与图像绘制展开，适合了解固定宽度下生成长图的早期 UIKit 做法。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。涉及的 API、依赖和工具版本请结合发表日期阅读。
+
+> "iOS开发就像搬运工，当搬到一定境界的时候就可以偷懒了" Bison
+
+在iOS开发中我们该如何去实现长微博的功能呢？  
+ 说白了就是将文字也转成图片的形式来显示  
+ 下面请看代码
+
+```css
+#define CONTENT_MAX_WIDTH   300.0f
+
++(UIImage *)imageFromText:(NSArray*)arrContent withFont:(CGFloat)fontSize withTextColor:(UIColor *)textColor withBgImage:(UIImage *)bgImage withBgColor:(UIColor *)bgColor
+{
+// 设置字体类型和大小
+
+    UIFont *font = [UIFont fontWithName:@"Heiti SC" size:fontSize];
+    NSMutableArray *arrHeight = [[NSMutableArray alloc] initWithCapacity:arrContent.count];
+
+    CGFloat fHeight = 0.0f;
+    for (NSString *sContent in arrContent) {
+        CGSize stringSize = [sContent sizeWithFont:font constrainedToSize:CGSizeMake(CONTENT_MAX_WIDTH, 10000) lineBreakMode:NSLineBreakByWordWrapping];
+        [arrHeight addObject:[NSNumber numberWithFloat:stringSize.height]];
+
+        fHeight += stringSize.height;
+    }
+
+    CGSize newSize = CGSizeMake(CONTENT_MAX_WIDTH+20, fHeight+50);
+
+
+    // 创建一个可拉伸的图像的背景上画
+    UIGraphicsBeginImageContextWithOptions(newSize,NO,0.0);
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+
+
+    //如果设置了背景图片
+    if(bgImage){
+        UIImage* stretchedTopImage = [bgImage stretchableImageWithLeftCapWidth:0 topCapHeight:0];
+        [stretchedTopImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    }else{
+        if(bgColor){
+            //填充背景颜色
+            [bgColor set];
+            UIRectFill(CGRectMake(0, 0, newSize.width, newSize.height));
+        }
+    }
+
+        CGContextSetCharacterSpacing(ctx, 10);
+        CGContextSetTextDrawingMode (ctx, kCGTextFill);
+        [textColor set];
+
+
+        int nIndex = 0;
+        CGFloat fPosY = 20.0f;
+        for (NSString *sContent in arrContent) {
+        NSNumber *numHeight = [arrHeight objectAtIndex:nIndex];
+        CGRect rect = CGRectMake(10, fPosY, CONTENT_MAX_WIDTH , [numHeight floatValue]);
+
+
+        [sContent drawInRect:rect withFont:font lineBreakMode:NSLineBreakByWordWrapping alignment:NSTextAlignmentLeft];
+
+        fPosY += [numHeight floatValue];
+        nIndex++;
+    }
+
+    // 传递图像
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    return image;
+
+}
+```
+{% endraw %}

@@ -1,0 +1,138 @@
+---
+layout: null
+permalink: /ocr/back/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发之OCR光学识别储蓄卡以及信用卡
+agent_source_url: https://allluckly.cn/ocr/back
+agent_source_sha256: d8a39a861ce63f515f6744fb5ca8708df6fe0b4a74db67236ce84bc808f24577
+agent_generator_version: 1
+---
+{% raw %}# iOS开发之OCR光学识别储蓄卡以及信用卡
+
+语言：zh-CN
+原文：[iOS开发之OCR光学识别储蓄卡以及信用卡](<https://allluckly.cn/ocr/back>)
+中文：[中文 HTML](<https://allluckly.cn/ocr/back>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-12-07-ocr-for-debit-and-credit-cards-in-ios-development/>)
+发布于: 2015-12-07T00:00:00+08:00
+内容更新于: 2015-12-07T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+围绕扫描卡号的需求介绍 card.io SDK 的导入、链接参数、代理设置和识别回调，并给出 Objective-C 与 Swift 示例；正文说明此次选用的是信用卡识别方案。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文注明 Xcode 7.1，并明确所选方案用于扫描信用卡。
+
+> "iOS技术分享,iOS开发,iOS开发技巧,iOS开发博客" Bison
+
+最近由于公司需要一个扫描银行卡获取卡号的功能，网上找了很多相关的资料，完全扫描银行卡  
+ 获取卡号信息的都是价格贵的不得了的，而且仅仅只是授权而已，在此咱退而求次，找到一个可  
+ 以扫描信用卡的第三方框架，给大家伙分享一下，只能扫描信用卡……o.0。  
+ 框架的名字叫`CardIO`  
+ [下载地址](<https://github.com/AllLuckly/card.io-iOS-SDK>)  
+ 在这里主要给大家演示一下怎么集成的，各位看官可得注意咯！  
+ 我的xcode是7.1版本的，首先是把框架整个拉进自己的工程，然后在  
+ TARGETS—Build Phases—Link Binary With Libraries  
+ 里边分别加入下面这几个框架  
+ `Accelerate.framework`  
+ `MobileCoreServices.framework`  
+ `CoreMedia.framework`  
+ `AudioToolbox.framework`  
+ `AVFoundation.framework`  
+ 再在TARGETS—Build Settings—Other Linker Flags中添加`-ObjC`和`-lc++`
+
+然后在我们需要调用的`VC`中导入头文件  
+ `#import "CardIO.h"`  
+ `#import "CardIOPaymentViewControllerDelegate.h"`  
+ 加上代理`CardIOPaymentViewControllerDelegate`
+
+然后是实现的方法
+
+## OC版
+
+```css
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    [CardIOUtilities preload];
+}
+
+//开始调用扫描
+- (IBAction)begin:(id)sender {
+
+    CardIOPaymentViewController *scanViewController = [[CardIOPaymentViewController alloc] initWithPaymentDelegate:self];
+
+    [self presentViewController:scanViewController animated:YES completion:nil];
+}
+
+
+//取消扫描
+- (void)userDidCancelPaymentViewController:(CardIOPaymentViewController *)scanViewController
+
+{
+
+
+    [scanViewController dismissViewControllerAnimated:YES completion:nil];
+
+}
+
+//扫描完成
+-(void)userDidProvideCreditCardInfo:(CardIOCreditCardInfo *)info inPaymentViewController:(CardIOPaymentViewController *)scanViewController
+
+{
+
+    //扫描结果
+    NSLog(@"Received card info. Number: %@, expiry: %02i/%i, cvv: %@.", info.redactedCardNumber, info.expiryMonth, info.expiryYear, info.cvv);
+
+    [scanViewController dismissViewControllerAnimated:YES completion:nil];
+
+}
+```
+
+## SWIFT版
+
+```css
+import UIKit
+
+class ViewController: UIViewController, CardIOPaymentViewControllerDelegate {
+
+@IBOutlet weak var resultLabel: UILabel!
+override func viewDidLoad() {
+    super.viewDidLoad()
+    
+    CardIOUtilities.preload()
+}
+
+//开始调用扫描
+@IBAction func scanCard(sender: AnyObject) {
+    let cardIOVC = CardIOPaymentViewController(paymentDelegate: self)
+    cardIOVC.modalPresentationStyle = .FormSheet
+    presentViewController(cardIOVC, animated: true, completion: nil)
+}
+//取消扫描
+func userDidCancelPaymentViewController(paymentViewController: CardIOPaymentViewController!) {
+    resultLabel.text = "user canceled"
+    paymentViewController?.dismissViewControllerAnimated(true, completion: nil)
+}
+//扫描完成
+func userDidProvideCreditCardInfo(cardInfo: CardIOCreditCardInfo!, inPaymentViewController paymentViewController: CardIOPaymentViewController!) {
+    if let info = cardInfo {
+        let str = NSString(format: "Received card info.\n Number: %@\n expiry: %02lu/%lu\n cvv: %@.", info.redactedCardNumber, info.expiryMonth, info.expiryYear, info.cvv)
+        resultLabel.text = str as String
+    }
+        paymentViewController?.dismissViewControllerAnimated(true, completion: nil)
+    }  
+}
+```
+
+到此就大功告成了，老外封装的东西还是非常给力的，希望可以找到扫描银行卡比较好用的第三方。  
+ 最终的效果，识别的非常准确哦
+
+![1](<https://allluckly.cn/images/backing.png>)
+
+好文推荐：[iOS开发内购全套图文教程](<https://allluckly.cn/ios%E6%94%AF%E4%BB%98/iOS%E5%BC%80%E5%8F%912015%E5%B9%B4%E6%9C%80%E6%96%B0%E5%86%85%E8%B4%AD%E6%95%99%E7%A8%8B>)
+
+版权归©Bison所有 如需转载请保留原文超链接地址！否则后果自负！
+{% endraw %}

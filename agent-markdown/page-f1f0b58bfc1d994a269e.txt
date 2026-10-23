@@ -1,0 +1,243 @@
+---
+layout: null
+permalink: /en/journal/2016-01-25-do-you-need-alamofire-trying-nsurlsession-instead/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Do you need Alamofire? Trying NSURLSession instead
+agent_source_url: https://allluckly.cn/en/journal/2016-01-25-do-you-need-alamofire-trying-nsurlsession-instead/
+agent_source_sha256: fcd8544520e6915f6f380786f838358338fbdcdc5477a1f27941abb12d87929b
+agent_generator_version: 1
+---
+{% raw %}# Do you need Alamofire? Trying NSURLSession instead
+
+Language: en
+Canonical: [Do you need Alamofire? Trying NSURLSession instead](<https://allluckly.cn/en/journal/2016-01-25-do-you-need-alamofire-trying-nsurlsession-instead/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao10>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-01-25-do-you-need-alamofire-trying-nsurlsession-instead/>)
+Published: 2016-01-25T00:00:00+08:00
+Modified: 2026-10-23T10:34:12+08:00
+Author: 大石头布
+
+Introduces NSURLSession through a simple data request, distinguishes data, download and upload tasks, and compares default, ephemeral and background configurations. It connects those choices with caching, cookies and the organisation of network tasks.
+
+Originally credited to 大石头布; edited and archived by Bison.
+
+[Source listed in the original](<http://www.jianshu.com/p/e9acff2d990f>)
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao10>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Published in 2016. The article retains the Swift syntax and NSURLSession naming used at the time.
+
+Editor: [Bison](<https://allluckly.cn/en/>)  
+ Contributor: [大石头布](<http://www.jianshu.com/p/e9acff2d990f>)
+
+> "Many developers automatically reach for Alamofire whenever they need network requests. I am not saying it is a bad library, but it is a third-party dependency: you must learn its usage and add its code. Why not try NSURLSession? NSURLConnection used to be inconvenient, which made third-party libraries attractive, but NSURLSession is now easy to use. Why not spend the time you would use learning Alamofire on NSURLSession instead? A third-party library may offer helpful enhancements for json processing, but sometimes all we need are get, put, post, and delete requests, plus downloading, uploading, and resumable downloads. NSURLSession is already sufficient for those."
+
+The simplest call
+
+```
+
+if let url = NSURL(string: "https://httpbin.org/get") {
+
+    NSURLSession.sharedSession().dataTaskWithURL(url){ data, response, error in
+
+    //...
+
+}.resume()
+
+}
+
+```
+
+Take a url, use the default session to process it, and receive the desired data.
+
+> Calling resume(): NSURLSession does not start by default. You must explicitly call resume() before the request begins.
+
+NSURLSession does not perform requests itself; it creates tasks to make network requests. One NSURLSession can create several tasks, which share cache and cookie data. Let us look at the task types it can create.
+
+- NSURLSessionDataTask: This is the DataTask created in our first example. It mainly retrieves simple server data, such as JSON. In fact, it is not limited to fetching data; it can modify or create data too, using put or post.
+- NSURLSessionDownloadTask: This task primarily downloads files. It provides more support for large-file requests, including download progress and resuming interrupted downloads.
+- NSURLSessionUploadTask: The counterpart to a download task, this task mainly sends file data to a server.
+
+Image sourced from the web  
+ ![1](<https://allluckly.cn/images/blog/tuogao/tougao10/1.png>)
+
+Is NSURLSession available only through NSURLSession.sharedSession()? No. NSURLSession is powerful and highly configurable.
+
+### NSURLSessionConfiguration
+
+We can also create an NSURLSession through NSURLSessionConfiguration. There are three configuration types to choose from.
+
+- defaultSessionConfiguration — Uses shared cache and cookie information. This is the default configuration behavior of NSURLSessionConfiguration.
+- ephemeralSessionConfiguration — Does not store cache, cookie, or authentication information. It is effectively a private session; in a browser product, it corresponds to private browsing mode.
+- backgroundSessionConfiguration — This configuration allows network operations to continue when your application moves to the background.
+
+The overall structure looks roughly like this.
+
+Image sourced from the web  
+ ![1](<https://allluckly.cn/images/blog/tuogao/tougao10/2.png>)
+
+`NSURLSessionConfiguration` You can also configure session properties such as timeout and cache, or add http headers. See [Here,](<https://developer.apple.com/library/mac/documentation/Foundation/Reference/NSURLSessionConfiguration_class/index.html#//apple_ref/occ/cl/NSURLSessionConfiguration>)Consult the complete configuration options.
+
+Let us try creating a task.
+
+```
+//定义一个默认的session
+lazy var defaultSession = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration())
+//获取data的task
+var dataTask:NSURLSessionDataTask?
+
+/**
+任务
+*/
+func doTask(){
+    guard let url = NSURL(string: "http://your.url") else { return }
+    dataTask = defaultSession.dataTaskWithURL(url)
+    dataTask?.resume()
+}
+```
+
+This example is much like the simple one above, except that we create our own session and separate the steps.
+
+Let us see how to configure it.
+
+```
+func doTask2(){
+    let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
+    configuration.timeoutIntervalForRequest = 10 //超时时间
+    configuration.requestCachePolicy = .UseProtocolCachePolicy //缓存策略
+    configuration.HTTPAdditionalHeaders = ["Content-Type":"application/json"] //header 配置
+
+    //更多配置详见官方文档...
+
+    let defaultSession2 = NSURLSession(configuration:configuration)
+    //获取data的task
+    var dataTask:NSURLSessionDataTask?
+
+    guard let url = NSURL(string: "http://your.url") else { return }
+    let request = NSMutableURLRequest(URL: url)
+    request.HTTPMethod = "get" //post put delete 等
+    //还有很多可以设置  更多设置 详细 command + 点击 NSMutableURLRequest  就可以看到了
+
+    dataTask = defaultSession2.dataTaskWithRequest(request, completionHandler: { (data, response, error) -> Void in
+
+    //操作数据
+
+    })
+
+    dataTask?.resume() //开启任务
+}
+```
+
+We can configure the configuration and request objects to achieve the behavior we want.
+
+Request operations are task-based. A task can also be cancelled.
+
+What about downloading?
+
+```
+
+lazy var downloadsSession:NSURLSession = {
+    let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
+
+    //delegateQueue设置为nil session会自己创建一个串行的队列
+    return NSURLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+}()
+下载创建session和普通的请求差不多，我们这里添加了代理就可以拿到下载进度
+
+func doDownload(){
+    guard let url = NSURL(string: "http://your.download.url") else { return }
+    let downloadTask = downloadsSession.downloadTaskWithURL(url)
+    downloadTask.resume()
+}
+
+```
+
+A completion callback can use either a closure or a delegate. To receive download progress, however, you must use a delegate.
+
+```
+class yourClass:NSURLSessionDownloadDelegate{
+    func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didFinishDownloadingToURL location: NSURL) {
+
+        print("下载完成")
+        if let originalURL = downloadTask.originalRequest?.URL?.absoluteString,destinationURL = localFilePathForUrl(originalURL){
+            print("本地的临时地址 : \(destinationURL)")
+
+            let fileManager = NSFileManager.defaultManager()
+
+        do {
+            try fileManager.removeItemAtURL(destinationURL)
+
+        } catch let error as NSError {
+            print("Error: \(error.localizedDescription)")
+        }
+
+        do {
+            try fileManager.copyItemAtURL(location, toURL: destinationURL)
+        } catch let error as NSError {
+            print("Error: \(error.localizedDescription)")
+        }
+
+        }
+    }
+
+
+    /**
+    监控下载进度
+    */
+    func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+
+        if let downloadUrl = downloadTask.originalRequest?.URL?.absoluteString,download = activeDownloads[downloadUrl]{
+
+                download.progress =  Float(totalBytesWritten)/Float(totalBytesExpectedToWrite)
+                let totalSize = NSByteCountFormatter.stringFromByteCount(totalBytesExpectedToWrite, countStyle: NSByteCountFormatterCountStyle.Binary)
+                if let trackIndex = trackIndexForDownloadTask(downloadTask),trackCell = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: trackIndex, inSection: 0)) as? TrackCell{
+
+
+                }
+
+        }
+
+}
+```
+
+You can also cancel during a download by calling task.cancel() directly.
+
+If you need to pause it,
+
+```
+task.cancelByProducingResumeData { data in
+    if data != nil {
+        //将data保存本地 或者 内存 
+    }
+}
+```
+
+Resume the download.
+
+```
+//resumeData 为上次保存的data
+task = downloadsSession.downloadTaskWithResumeData(resumeData)
+
+task.resume()
+```
+
+For uploads, refer to the download approach…
+
+References for this article and recommended further reading
+
+http://www.raywenderlich.com/110458/nsurlsession-tutorial-getting-started
+
+http://swiftcafe.io/2015/12/20/nsurlsession/
+
+http://swiftcafe.io/2015/12/23/nsurlsession-app/
+
+http://www.jianshu.com/p/fb5aaeac06ef
+
+I recommend this raywenderlich article; it explains things in great detail.
+
+---
+
+Recommended reading: [Integrating LianLian Pay into an iOS app](<https://allluckly.cn/en/journal/2016-01-20-integrating-lianlian-pay-into-an-ios-app/>)
+{% endraw %}

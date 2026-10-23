@@ -1,0 +1,64 @@
+---
+layout: null
+permalink: /第三方登陆/第三方登录/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发第三方登录没安装对应的APP时，图标禁止点击且颜色变灰
+agent_source_url: https://allluckly.cn/%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E9%99%86/%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%BD%95
+agent_source_sha256: 32cd5cf4c13b260485996126510805dc26d36b4f573f1ca8aaa084200dcbd4b6
+agent_generator_version: 1
+---
+{% raw %}# iOS开发第三方登录没安装对应的APP时，图标禁止点击且颜色变灰
+
+语言：zh-CN
+原文：[iOS开发第三方登录没安装对应的APP时，图标禁止点击且颜色变灰](<https://allluckly.cn/%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E9%99%86/%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%BD%95>)
+中文：[中文 HTML](<https://allluckly.cn/%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E9%99%86/%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%BD%95>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-05-18-disabling-and-dimming-third-party-sign-in-buttons-when-the-app-is-not-installed/>)
+发布于: 2015-05-18T00:00:00+08:00
+内容更新于: 2015-05-18T00:00:00+08:00
+
+以 QQ 和微信登录按钮为例，检测设备是否安装对应应用，再决定隐藏按钮或禁用点击并置灰，记录当时第三方登录入口随安装状态调整的界面处理方式。
+
+原文未明确署名，作为历史文章归档。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文发表于 2015 年，审核背景与第三方 SDK 调用方式保留为历史记录。
+
+最近苹果审核出新规则，不能引导用户安装第三方软件，所以第三方登录时，不能提醒用户未安装该软件。最好的办法是隐藏或者禁止点击而且颜色变灰，下面是代码，放在登录VC的 `viewDidLoad` 方法中即可！注释部分是隐藏图标的。主要就写了QQ和微信的例子。
+
+//判断第三方登录 是否安装APP，没安装则禁止点击图标变灰
+
+```css
+- (void)isHidenThirdBtn
+{
+    BOOL WXinstalled =  [WXApi isWXAppInstalled];
+    BOOL QQinstalled = [TencentOAuth  iphoneQQInstalled];
+    //  [WeiboSDK isWeiboAppInstalled]
+
+    if (!WXinstalled && !QQinstalled) {
+        //        self.WeiBoBtn.center = self.WeiXinBtn.center;
+        //        self.WeiBoLa.center = self.WeiXinLa.center;
+
+        self.WeiXinBtn.enabled = NO;
+        //        self.WeiXinLa.hidden = YES;
+        self.QQBtn.enabled = NO;
+        //        self.QQLa.hidden = YES;
+    }
+
+    if (!WXinstalled && QQinstalled) {
+        //        self.WeiXinBtn.hidden = YES;
+        self.WeiXinBtn.enabled = NO;
+        //        self.WeiXinLa.hidden = YES;
+    }
+
+
+    if (WXinstalled && !QQinstalled) {
+        //        self.WeiXinBtn.center = self.QQBtn.center;
+        //        self.WeiXinLa.center = self.QQLa.center;
+        self.QQBtn.enabled = NO;
+        //        self.QQLa.hidden = YES;
+    }
+
+}
+```
+{% endraw %}

@@ -1,0 +1,161 @@
+---
+layout: null
+permalink: /源码推荐/yuanma02/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: Github源码推荐:(01.04):iOS开发蓝牙,启动动画,自定义Tabbar
+agent_source_url: https://allluckly.cn/%E6%BA%90%E7%A0%81%E6%8E%A8%E8%8D%90/yuanma02
+agent_source_sha256: 6b68c0414456a0f6ffb13df2eab19fb2f0cd30d0eb588c785f6014cc9fb09f77
+agent_generator_version: 1
+---
+{% raw %}# Github源码推荐:(01.04):iOS开发蓝牙,启动动画,自定义Tabbar
+
+语言：zh-CN
+原文：[Github源码推荐:(01.04):iOS开发蓝牙,启动动画,自定义Tabbar](<https://allluckly.cn/%E6%BA%90%E7%A0%81%E6%8E%A8%E8%8D%90/yuanma02>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%BA%90%E7%A0%81%E6%8E%A8%E8%8D%90/yuanma02>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-01-04-github-source-code-picks-january-4-bluetooth-launch-animations-and-a-custom-tab-bar/>)
+发布于: 2016-01-04T00:00:00+08:00
+内容更新于: 2016-01-04T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+选编 BabyBluetooth 蓝牙框架、CLClipImageView 启动动画和 CYLTabBarController 标签栏，提供项目入口及部分用法，并区分蓝牙中心与外设两种工作模式。
+
+Bison 整理的历史资料，所列项目归各自作者。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。涉及的 API、依赖和工具版本请结合发表日期阅读。
+
+> "iOS开发蓝牙框架，以及酷炫的启动动画，还有低耦合的自定义的TabBar"
+
+- NO.1 国内最全面的iOS蓝牙开发框架━━∝∞ ∝∞┅┉┉[下载](<https://github.com/coolnameismy/BabyBluetooth>)
+
+> 暂无效果图  
+>  具体用法如下
+
+### 中心模式 central model
+
+> app作为中心，连接其他BLE4.0外设
+
+```css
+//导入.h文件和系统蓝牙库的头文件
+#import "BabyBluetooth.h"
+//定义变量
+BabyBluetooth *baby;
+
+-(void)viewDidLoad {
+    [super viewDidLoad];
+
+    //初始化BabyBluetooth 蓝牙库
+    baby = [BabyBluetooth shareBabyBluetooth];
+    //设置蓝牙委托
+    [self babyDelegate];
+    //设置委托后直接可以使用，无需等待CBCentralManagerStatePoweredOn状态
+    baby.scanForPeripherals().begin();
+}
+
+//设置蓝牙委托
+-(void)babyDelegate{
+
+    //设置扫描到设备的委托
+    [baby setBlockOnDiscoverToPeripherals:^(CBCentralManager *central, CBPeripheral *peripheral, NSDictionary *advertisementData, NSNumber *RSSI) {
+        NSLog(@"搜索到了设备:%@",peripheral.name);
+    }];
+
+    //过滤器
+    //设置查找设备的过滤器
+    [baby setFilterOnDiscoverPeripherals:^BOOL(NSString *peripheralName) {
+    //设置查找规则是名称大于1 ， the search rule is peripheral.name length > 1
+    if (peripheralName.length >1) {
+        return YES;
+    }
+        return NO;
+    }];
+
+//.......
+}
+```
+
+```css
+//导入.h文件和系统蓝牙库的头文件
+#import "BabyBluetooth.h"
+//定义变量
+BabyBluetooth *baby;
+
+-(void)viewDidLoad {
+    [super viewDidLoad];
+
+    //配置第一个服务s1
+    CBMutableService *s1 = makeCBService(@"FFF0");
+    //配置s1的3个characteristic
+    makeCharacteristicToService(s1, @"FFF1", @"r", @"hello1");//读
+    makeCharacteristicToService(s1, @"FFF2", @"w", @"hello2");//写
+    makeCharacteristicToService(s1, genUUID(), @"rw", @"hello3");//可读写,uuid自动生成
+    makeCharacteristicToService(s1, @"FFF4", nil, @"hello4");//默认读写字段
+    makeCharacteristicToService(s1, @"FFF5", @"n", @"hello5");//notify字段
+    //配置第一个服务s2
+    CBMutableService *s2 = makeCBService(@"FFE0");
+    makeStaticCharacteristicToService(s2, genUUID(), @"hello6", [@"a" dataUsingEncoding:NSUTF8StringEncoding]);//一个含初值的字段，该字段权限只能是只读
+
+    //实例化baby
+    baby = [BabyBluetooth shareBabyBluetooth];
+    //配置委托
+    [self babyDelegate];
+    //启动外设
+    baby.bePeripheral().addServices(@[s1,s2]).startAdvertising();
+}
+
+//设置蓝牙外设模式的委托
+-(void)babyDelegate{
+
+    //设置添加service委托 | set didAddService block
+    [baby peripheralModelBlockOnPeripheralManagerDidUpdateState:^(CBPeripheralManager *peripheral) {
+    NSLog(@"PeripheralManager trun status code: %ld",(long)peripheral.state);
+    }];
+
+    //设置添加service委托 | set didAddService block
+    [baby peripheralModelBlockOnDidStartAdvertising:^(CBPeripheralManager *peripheral, NSError *error) {
+    NSLog(@"didStartAdvertising !!!");
+    }];
+
+    //设置添加service委托 | set didAddService block
+    [baby peripheralModelBlockOnDidAddService:^(CBPeripheralManager *peripheral, CBService *service, NSError *error) {
+    NSLog(@"Did Add Service uuid: %@ ",service.UUID);
+    }];
+
+//.....
+}
+```
+
+### 外设模式 peripheral model
+
+> app模拟一个，BLE4.0外设，可以被其他设备连接和使用  
+>  模拟一个有2个service和6个characteristic的外设
+
+- NO.2 炫酷的启动动画━━∝∞ ∝∞┅┉┉ [下载](<https://github.com/TheBlackApple/CLClipImageView>)  
+
+   ![(allluckly.cn)](<https://github.com/TheBlackApple/CLClipImageView/blob/master/CLClipImageAnimation/2015-12-31%2017_20_56.gif?raw=true>)
+
+> 具体用法如下
+
+```css
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.view.backgroundColor = [UIColor whiteColor];
+    //重点在这里
+    [CLClipImageView addToCurrentView:self.view clipImage:[UIImage imageNamed:@"Default_image"] backgroundImage:@"" animationComplete:^{
+        self.navigationController.navigationBarHidden = NO;
+        [self makeTopView];
+    }];
+}
+```
+
+- NO.3 低耦合的自定义的TabBar━━∝∞ ∝∞┅┉┉[下载](<https://github.com/ChenYilong/CYLTabBarController>)
+
+历史配图暂不可用，[保留原图地址](<https://camo.githubusercontent.com/10b009b8764a0a5eacfd7660fece6627249eb002/687474703a2f2f6935392e74696e797069632e636f6d2f7776787574762e6a7067>)供查阅。
+
+> 具体用法请到下载页查看，作者写的非常的详细，在此不做任何的阐述
+
+好文推荐：[Bison教你1分钟集成百度移动SSP启动广告](<https://allluckly.cn/sdk/baidu01>)
+
+原文地址：[https://allluckly.cn/](<https://allluckly.cn/>)
+{% endraw %}

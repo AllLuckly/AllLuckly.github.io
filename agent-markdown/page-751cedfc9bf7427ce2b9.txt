@@ -1,0 +1,160 @@
+---
+layout: null
+permalink: /en/journal/2015-12-07-github-source-code-picks-december-25-gesture-unlock-a-profile-sdk-and-an-image-carousel/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'GitHub source-code picks, December 25: gesture unlock, a profile SDK and an
+  image carousel'
+agent_source_url: https://allluckly.cn/en/journal/2015-12-07-github-source-code-picks-december-25-gesture-unlock-a-profile-sdk-and-an-image-carousel/
+agent_source_sha256: e974acd22dc812fde87b9c75609b1657b5e43adbc1bd7ecfd82b04dcd23a6b91
+agent_generator_version: 1
+---
+{% raw %}# GitHub source-code picks, December 25: gesture unlock, a profile SDK and an image carousel
+
+Language: en
+Canonical: [GitHub source-code picks, December 25: gesture unlock, a profile SDK and an image carousel](<https://allluckly.cn/en/journal/2015-12-07-github-source-code-picks-december-25-gesture-unlock-a-profile-sdk-and-an-image-carousel/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%BA%90%E7%A0%81%E6%8E%A8%E8%8D%90/yuanma01>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-12-07-github-source-code-picks-december-25-gesture-unlock-a-profile-sdk-and-an-image-carousel/>)
+Published: 2015-12-07T00:00:00+08:00
+Modified: 2026-10-23T10:45:00+08:00
+Author: [Bison](<https://allluckly.cn/about/>)
+
+Collects three open-source components for gesture unlocking, a profile page and an infinite image carousel. Download links and selected integration code help readers identify the component that matches an interface requirement.
+
+Historical resources collected by Bison. The listed projects belong to their respective authors.
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%BA%90%E7%A0%81%E6%8E%A8%E8%8D%90/yuanma01>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. A 2015 source-code selection. Check project interfaces and maintenance status separately.
+
+> "Comprehensive Alipay-style gesture unlock, profile interface integration, infinitely looping image carousel"
+
+> Bison
+
+## - NO.1 A comprehensive Alipay-style gesture unlock –––[Download](<https://github.com/iosdeveloperpanc/PCGestureUnlock>)
+
+![(PCGestureUnlock)](<https://github.com/iosdeveloperpanc/PCGestureUnlock/blob/master/PCGestureUnlock/arrowDirctions.gif?raw=true>)
+
+> Usage is as follows.
+
+```css
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+
+    // 解锁界面  默认clip:YES, arrow:YES
+    PCCircleView *lockView = [[PCCircleView alloc] init];  
+    lockView.delegate = self;
+    self.lockView = lockView;
+    [self.view addSubview:lockView];
+}
+
+#pragma - mark - circleView - delegate
+#pragma mark - circleView - delegate - setting
+- (void)circleView:(PCCircleView *)view type:(CircleViewType)type connectCirclesLessThanNeedWithGesture:(NSString *)gesture
+{
+    NSString *gestureOne = [PCCircleViewConst getGestureWithKey:gestureOneSaveKey];
+
+    // 看是否存在第一个密码
+    if ([gestureOne length]) {
+        NSLog(@"提示再次绘制之前绘制的第一个手势密码");
+    } else {
+        NSLog(@"密码长度不合法%@", gesture);
+    }
+}
+
+- (void)circleView:(PCCircleView *)view type:(CircleViewType)type didCompleteSetFirstGesture:(NSString *)gesture
+{
+    NSLog(@"获得第一个手势密码%@", gesture);
+    // infoView展示对应选中的圆
+}
+
+- (void)circleView:(PCCircleView *)view type:(CircleViewType)type didCompleteSetSecondGesture:(NSString *)gesture result:(BOOL)equal
+{
+    NSLog(@"获得第二个手势密码%@",gesture)；
+    if (equal) {
+        NSLog(@"两次手势匹配！可以进行本地化保存了");
+
+    } else {
+        NSLog(@"两次手势不匹配！");
+    }
+}
+
+#pragma mark - circleView - delegate - login or verify gesture
+- (void)circleView:(PCCircleView *)view type:(CircleViewType)type didCompleteLoginGesture:(NSString *)gesture result:(BOOL)equal
+{
+    // 此时的type有两种情况 Login or verify
+    if (type == CircleViewTypeLogin) {
+        if (equal) {
+            NSLog(@"登陆成功！");
+        } else {
+            NSLog(@"密码错误！");
+        }
+    } else if (type == CircleViewTypeVerify) {
+
+        if (equal) {
+            NSLog(@"验证成功，跳转到设置手势界面");
+
+        } else {
+            NSLog(@"原手势密码输入错误！");
+
+        }
+    }
+}
+```
+
+## - NO.2 Profile interface integration –––[Download](<https://github.com/AllLuckly/LBPersonalPageDemo>)
+
+![(LBPersonalPageDemo)](<https://github.com/AllLuckly/LBPersonalPageDemo/blob/master/123.gif?raw=true>)
+
+> Usage is as follows.
+
+Subclass `LBPersonalPage_VC`.
+
+```css
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    //头像设置
+    self.headImageView.image = [UIImage imageNamed:@"myheadimage.jpeg"];
+    //背景设置
+    self.imageBG.image = [UIImage imageNamed:@"BG.jpg"];
+    //昵称设置
+    self.nameLabel.text = @"BISON";
+}
+
+//右边按钮
+- (void)rightBtnAction{
+    NSLog(@"hello-rig");
+}
+//左边按钮
+- (void)leftBtnAction{
+    NSLog(@"hello-left");
+}
+```
+
+## - NO.3 An infinitely looping image carousel –––[Download](<https://github.com/gsdios/SDCycleScrollView>)
+
+This historical illustration is currently unavailable. [The original image URL is retained](<https://camo.githubusercontent.com/e5c0f0255483caf06271df08982d078c5e2cc432/687474703a2f2f7777342e73696e61696d672e636e2f626d6964646c652f39623831343665646a7731657376797471376c777267323038703066636538322e676966>) for reference.
+
+> Usage is as follows.
+
+Subclass `LBPersonalPage_VC`.
+
+```css
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    // 网络加载图片的轮播器
+    cycleScrollView.imageURLStringsGroup = imagesURLStrings;
+
+    // 本地加载图片的轮播器
+    SDCycleScrollView *cycleScrollView = [SDCycleScrollView cycleScrollViewWithFrame: imagesGroup:图片数组];
+}
+```
+
+Recommended reading: [An illustrated guide to implementing iOS in-app purchases](<https://allluckly.cn/en/journal/2015-06-04-an-illustrated-guide-to-implementing-ios-in-app-purchases/>)
+
+Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.
+{% endraw %}

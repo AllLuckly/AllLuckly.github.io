@@ -1,0 +1,83 @@
+---
+layout: null
+permalink: /en/journal/2015-06-10-packaging-an-ios-static-library-as-an-a-file/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Packaging an iOS static library as an .a file
+agent_source_url: https://allluckly.cn/en/journal/2015-06-10-packaging-an-ios-static-library-as-an-a-file/
+agent_source_sha256: 6757dc25ca85313cc57dbf524361c980f6f8e4519f93822baaa8674aea4f7c8a
+agent_generator_version: 1
+---
+{% raw %}# Packaging an iOS static library as an .a file
+
+Language: en
+Canonical: [Packaging an iOS static library as an .a file](<https://allluckly.cn/en/journal/2015-06-10-packaging-an-ios-static-library-as-an-a-file/>)
+中文：[中文 HTML](<https://allluckly.cn/%E9%9D%99%E6%80%81%E5%BA%93/iOS%E5%BC%80%E5%8F%91%E6%89%93%E5%8C%85%E9%9D%99%E6%80%81%E5%BA%93.a%E6%96%87%E4%BB%B6>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-06-10-packaging-an-ios-static-library-as-an-a-file/>)
+Published: 2015-06-10T00:00:00+08:00
+Modified: 2026-10-23T10:44:58+08:00
+Author: [Bison](<https://allluckly.cn/about/>)
+
+Records a workflow for building separate device and simulator static libraries in Xcode, inspecting their architectures with lipo and combining the .a files. It explains matching the target platform during testing and checking the resulting library.
+
+Originally credited to Bison. Content is retained as published.
+
+English translation of the [Chinese original](<https://allluckly.cn/%E9%9D%99%E6%80%81%E5%BA%93/iOS%E5%BC%80%E5%8F%91%E6%89%93%E5%8C%85%E9%9D%99%E6%80%81%E5%BA%93.a%E6%96%87%E4%BB%B6>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Published in 2015. The packaging workflow builds device and simulator .a libraries separately.
+
+The original article uses the Xcode interface from 2015 to build separate static libraries for physical devices and the simulator, then combines them with lipo. For binary distribution across platforms today, consult Apple's XCFramework documentation and prepare the platform and simulator variants separately. Do not treat the old merging command as a current distribution workflow. The original project has not been recompiled here.
+
+- [Apple: Creating a multi-platform XCFramework](<https://developer.apple.com/documentation/xcode/creating-a-multi-platform-binary-framework-bundle>)
+
+Reading notes added on 2026-10-23
+
+> "iOS development: generating a static .a library." Plato
+
+![0](<https://allluckly.cn/images/Static%20library/1.png>)
+
+![1](<https://allluckly.cn/images/Static%20library/2.png>)
+
+![2](<https://allluckly.cn/images/Static%20library/3.png>)
+
+![3](<https://allluckly.cn/images/Static%20library/4.png>)
+
+![4](<https://allluckly.cn/images/Static%20library/5.png>)
+
+![5](<https://allluckly.cn/images/Static%20library/6.png>)
+
+![10](<https://allluckly.cn/images/Static%20library/13.png>)
+
+![11](<https://allluckly.cn/images/Static%20library/12.png>)
+
+Select iOS Device. I recommend leaving the device disconnected here, then running command+b.
+
+Then select a simulator and run command+b.
+
+This produces two .a files.
+
+![6](<https://allluckly.cn/images/Static%20library/7.png>)
+
+![7](<https://allluckly.cn/images/Static%20library/8.png>)
+
+![8](<https://allluckly.cn/images/Static%20library/9.png>)
+
+![9](<https://allluckly.cn/images/Static%20library/10.png>)
+
+![10](<https://allluckly.cn/images/Static%20library/11.png>)
+
+If you are not testing on a physical device, use the simulator .a file. Otherwise an error occurs.
+
+Next, combine the device and simulator .a files.
+
+` cd + .a 路径  `
+
+Use `lipo -info .a文件名` to inspect the file information. `lipo -create  xxx/.a文件  xxx/.a文件  -output xxx.a文件`
+
+The `xxx/.a` files refer to the paths of the device and simulator .a files.
+
+The `xxx.a` file is the generated .a file.
+
+The new file is twice the size of the original. Then test whether it worked.
+{% endraw %}

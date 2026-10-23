@@ -1,0 +1,143 @@
+---
+layout: null
+permalink: /投稿/tuogao15/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发仿微信(WeChat)系列(三)
+agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao15
+agent_source_sha256: 71ad1fa38441b7d00bf77d066baf171db2a60fa1755c07ce446dd335238debe7
+agent_generator_version: 1
+---
+{% raw %}# iOS开发仿微信(WeChat)系列(三)
+
+语言：zh-CN
+原文：[iOS开发仿微信(WeChat)系列(三)](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao15>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao15>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-02-01-building-a-wechat-style-ios-app-part-3/>)
+发布于: 2016-02-01T00:00:00+08:00
+内容更新于: 2016-02-01T00:00:00+08:00
+署名：[WzxJiang](<http://www.jianshu.com/users/389c20d5a244/latest_articles>)
+
+继续完成仿微信主界面，记录从 xib 暴露约束并按屏幕调整 constant、微调导航栏按钮位置，以及使用 SDWebImage 占位图加载图片的具体做法。
+
+原文署名WzxJiang，Bison 编辑收录。
+
+[原文所列来源](<http://www.jianshu.com/users/389c20d5a244/latest_articles>)
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。涉及的 API、依赖和工具版本请结合发表日期阅读。
+
+编辑：[Bison](<https://allluckly.cn/>)  
+ 投稿：[WzxJiang](<http://www.jianshu.com/users/389c20d5a244/latest_articles>)
+
+> "昨天因为公司的项目要上传内测版本，所以没更新文章。明天开始公司放年假，2月2号到家，2月3号继续更新！:"
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao12/1.png>)
+
+今天完成的部分
+
+－ 完成所有主界面的UI（不包含功能）
+
+－ 更新项目中的图片(原谅我才知道怎么解ipa..)
+
+效果图
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao15/1.gif>)
+
+目前的代码还是比较简单，所以只讲我觉得有用的部分  
+ 怎么按分辨率更改约束!
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao15/1.png>)
+
+Chat界面的Cell肯定是要自定义的，这里我用的是xib创建的，但是AutoLayout加的约束无法按屏幕分辨率更改.这里我是这样解决的.
+
+```css
+/**
+*  avaterImgView高度约束
+*/
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *avaterImgViewHeight;
+
+/**
+*  avaterImgView宽度约束
+*/
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *avaterImgViewWidth;
+```
+
+把要改变的约束从xib拖到.h  
+ 然后加入方法
+
+```css
+//更改约束
+- (void)changeConstraints
+{
+    _avaterImgViewHeight.constant = WGiveHeight(45);
+    _avaterImgViewWidth.constant = WGiveHeight(45);
+}
+```
+
+这样就可以实现动态改变AutoLayout的constant(如果你有更好的办法，希望能指导我！)
+
+怎么微调原生self.navigationItem.XXXBarButtonItem(image) 的位置  
+ 微调前:  
+ ![1](<https://allluckly.cn/images/blog/tuogao/tougao15/2.png>)
+
+微调前  
+ 微调方法:
+
+```css
+[self.navigationItem.rightBarButtonItem setImageInsets:UIEdgeInsetsMake(0, WGiveWidth(-3), 0, WGiveWidth(5))];
+```
+
+微调后:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao15/3.png>)
+
+微调后
+
+SDWebImage第三方库我最常使用的方法
+
+导入头文件
+
+```css
+#import "UIImageView+WebCache.h"
+
+[self.avaterImgView setImageWithURL:[NSURL URLWithString:_model.avatar] placeholderImage:[UIImage imageNamed:@"avater.jpg"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+
+}];
+```
+
+这个方法的作用就是没加载出图片之前会先显示placeholderImage
+
+- 怎么获取一个App的素材
+
+1 首先把手机上的应用备份到iTunes
+
+2 找到应用，然后Show in Finder
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao15/4.png>)
+
+3 把ipa文件的后缀改成ZIP
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao15/5.png>)
+
+4 解压
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao15/6.png>)  
+ 屏幕快照 2016-01-31 下午1.46.21.png 5 右键WeChat文件显示包内容
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao15/7.png>)
+
+好了，今天就到这了，收拾东西回家过年了~
+
+2月3号更新的时候将会加入网络数据,暂时考虑用LeadCloud云服务器，如果有更好的希望能推荐给我！
+
+目前的代码(将持续更新直至完成)
+
+[GitHub:WzxJiang](<https://github.com/Wzxhaha/WWeChat>)
+
+如果你有建议或者疑问欢迎评论！
+
+---
+
+好文推荐：[iOS开发之详解连连支付集成](<https://allluckly.cn/ios%E6%94%AF%E4%BB%98/lianlianzhifu>)
+{% endraw %}

@@ -1,0 +1,182 @@
+---
+layout: null
+permalink: /en/journal/2016-10-17-wechat-mini-programs-from-scratch-part-1/index.md
+sitemap: false
+noindex: true
+lang: en
+title: WeChat Mini Programs from Scratch, Part 1
+agent_source_url: https://allluckly.cn/en/journal/2016-10-17-wechat-mini-programs-from-scratch-part-1/
+agent_source_sha256: 50da87c81bbe1d649a99e430411c8de3a7b7d889615e910f4a3153f4bd4a6953
+agent_generator_version: 1
+---
+{% raw %}# WeChat Mini Programs from Scratch, Part 1
+
+Language: en
+Canonical: [WeChat Mini Programs from Scratch, Part 1](<https://allluckly.cn/en/journal/2016-10-17-wechat-mini-programs-from-scratch-part-1/>)
+中文：[中文 HTML](<https://allluckly.cn/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/weixinxiaochengxu>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-10-17-wechat-mini-programs-from-scratch-part-1/>)
+Published: 2016-10-17T00:00:00+08:00
+Modified: 2026-10-23T10:34:15+08:00
+Author: [Bison](<https://allluckly.cn/about/>)
+
+Builds an IT Blog mini program from an iOS developer's perspective. It explains the roles of app.json, app.js, WXML, and WXSS, configures a TabBar, and uses templates and list rendering to display article data.
+
+Originally credited to Bison. Content is retained as published.
+
+English translation of the [Chinese original](<https://allluckly.cn/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/weixinxiaochengxu>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Published in October 2016, the article explicitly dates from the WeChat Mini Programs closed beta.
+
+![1](<https://allluckly.cn/images/blog/weixinxiaochengxu/20161017/1.png>)
+
+## Introduction
+
+WeChat mini programs are currently in closed beta. Our company's major release has just shipped, so I have some spare time to read the documentation and learn. I hope we can encourage one another; I have noticed myself becoming lazier and less motivated, which is a warning sign. Enough digression: here is a record of what I have learned over the past few days. I hope it helps you. This article was written by an iOS developer [Bison](<https://allluckly.cn/en/>)while teaching myself WeChat mini programs, so I compare many concepts with iOS.
+
+## Getting started
+
+> I will skip project creation; the official documentation should be enough to get you started.
+
+### First, set up the structure of the entire app.
+
+Most apps use a tabbar-based interface. Today, I will recreate the native [IT Blog](<https://itunes.apple.com/cn/app/it-blog-ios-kai-fa-zhe-wen/id1067787090?mt=8>)Next, let us look at [IT blog](<https://itunes.apple.com/cn/app/it-blog-ios-kai-fa-zhe-wen/id1067787090?mt=8>)looks like!
+
+![1](<https://allluckly.cn/images/blog/weixinxiaochengxu/20161017/2.jpg>)
+
+#### First, the tabbar
+
+Here is a brief introduction to the essential directory structure of a WeChat mini program. ![1](<https://allluckly.cn/images/blog/weixinxiaochengxu/20161017/3.png>)
+
+- Borrowing the official explanation:
+
+##### WXSS, or WeiXin Style Sheets, is a styling language for describing WXML component styles.
+
+WXSS determines how WXML components appear. To accommodate front-end developers, it includes most CSS features, with extensions and modifications tailored to WeChat mini programs.
+
+#### app.json configures a WeChat mini program globally, including page-file paths, window appearance, network timeouts, and multiple tabs.
+
+file configures the mini program globally: page paths, window appearance, network timeouts, multiple tabs, and more. It corresponds roughly to AppDelegate in iOS development.
+
+#### app.js contains the mini program's logic.
+
+The directory description above makes it clear where the tabbar belongs: app.json. Here is the code.
+
+```
+{
+  "pages":[
+    "pages/index/index",
+    "pages/logs/logs"
+  ],
+  "window":{
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "WeChat",
+    "navigationBarTextStyle":"black"
+  },
+  "tabBar": {
+    "backgroundColor":"#000000",
+    "list": [{
+      "iconPath":"image/icon_API.png",
+      "selectedIconPath":"image/icon_API_HL.png",
+      "pagePath": "pages/index/index",
+      "text": "首页"
+    }, {
+      "iconPath":"image/icon_component.png",
+      "selectedIconPath":"image/icon_component_HL.png",
+      "pagePath": "pages/about/about",
+      "text": "我的"
+    }]
+  }
+}
+```
+
+![1](<https://allluckly.cn/images/blog/weixinxiaochengxu/20161017/4.png>)
+
+The boxed area above is our tabbar. It accepts a list array; add an entry for each tab you want, up to a maximum of 5. A single tab is unnecessary. This resembles iOS development. Press com + s and compile to see the following result.
+
+![1](<https://allluckly.cn/images/blog/weixinxiaochengxu/20161017/5.png>)
+
+iconPath is the default image path, selectedIconPath is the selected image path, and text is—as you probably guessed—the title below the image.
+
+We have only two tabs for now, mainly to implement the home screen. The target screenshot resembles a tabview layout in iOS. How do we write a tabviewCell-like layout in a WeChat mini program? Here is the code first, followed by an explanation.
+
+```
+<!--文章列表模板 begin-->
+<template name="itmes">
+     <view class="imgs"><image src="{{imgURL}}" class="in-img" background-size="cover" model="scaleToFill"></image></view>
+    <view class="infos">
+      <view class="title">{{title}}</view>
+      <view class="date">{{time}}</view>
+       <view class="classification">{{classification}}</view>
+    </view>
+</template>
+<!--文章列表模板 begin-->
+```
+
+In this code, `<template name="items">`…`</template>` defines a WeChat Mini Program template. What is a template? The official documentation explains it as follows.
+
+#### Templates
+
+WXML provides templates: define a code fragment in a template, then invoke it in different places.
+
+I understand this as equivalent to a cell in iOS development. Once the cell exists, it needs a data source, so we will create a local one for now.
+
+The data mainly lives in the js code. Let us look at it.
+
+```
+//index.js
+//获取应用实例
+var app = getApp()
+Page({
+  data: {
+    newList:[{url:"baidu.com",title:"sdsadsadasdas",classification:"ss",time:"2016-10-17",imgURL:"../../image/wechatHL.png"},
+             {url:"baidu.com",title:"sdsadsadasdassss",classification:"ss",time:"2016-10-17",imgURL:"../../image/wechatHL.png"},
+             {url:"baidu.com",title:"sdsadsadasdas",classification:"12",time:"2016-10-17",imgURL:"../../image/wechatHL.png"},
+             {url:"baidu.com",title:"sdsadsadasdas",classification:"333",time:"2016-10-17",imgURL:"../../image/wechatHL.png"},
+             {url:"baidu.com",title:"sdsadsadasdas",classification:"44",time:"2016-10-17",imgURL:"../../image/wechatHL.png"},
+             {url:"baidu.com",title:"sdsadsadasdas",classification:"44",time:"2016-10-17",imgURL:"../../image/wechatHL.png"},
+             {url:"baidu.com",title:"sdsadsadasdas",classification:"32",time:"2016-10-17",imgURL:"../../image/wechatHL.png"},
+             {url:"baidu.com",title:"sdsadsadasdas",classification:"123",time:"2016-10-17",imgURL:"../../image/wechatHL.png"},
+             {url:"baidu.com",title:"sdsadsadasdas",classification:"456",time:"2016-10-17",imgURL:"../../image/wechatHL.png"},
+             {url:"baidu.com",title:"sdsadsadasdas",classification:"454",time:"2016-10-17",imgURL:"../../image/wechatHL.png"}
+    ]
+  },
+  //事件处理函数
+  bindViewTap: function() {
+    wx.navigateTo({
+      url: '../logs/logs'
+    })
+  }
+
+})
+
+```
+
+`newList` is our data source: an array of dictionaries, each containing the 5 required fields. With the cell and data source ready, only display remains. WeChat Mini Programs use `列表渲染`, or list rendering, for this.
+
+#### List rendering
+
+Bind an array with the wx:for control attribute on a component to render that component repeatedly using each array item's data. By default, the current index is named index, and the current item is named item.
+
+Let us see how list rendering works. Switch to index.wxml and use this code:
+
+```
+<!--循环渲染列表 begin-->
+<block wx:for="{{newList}}">
+  <template is="itmes" data="{{...item}}" />
+</block>
+<!--循环渲染列表 end-->
+```
+
+Press com + s and compile again to see the following result.
+
+![1](<https://allluckly.cn/images/blog/weixinxiaochengxu/20161017/6.gif>)
+
+The mini program's list functionality is now complete. The layout is still messy; in the next article, we will refine the UI to match our target screenshot.
+
+This article is an original work by [Bison](<https://allluckly.cn/en/>). Credit the source when reproducing it; otherwise, legal responsibility will be pursued.
+
+---
+
+Recommended reading: [Implement an iOS launch-screen advertisement in minutes](<https://allluckly.cn/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/>)
+{% endraw %}

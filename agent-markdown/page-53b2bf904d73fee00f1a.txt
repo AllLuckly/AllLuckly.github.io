@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /en/journal/2017-07-11-building-ffmpeg-ios-on-a-mac/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Building FFmpeg-iOS on a Mac
+agent_source_url: https://allluckly.cn/en/journal/2017-07-11-building-ffmpeg-ios-on-a-mac/
+agent_source_sha256: 61e158559322d7329b73dc023bb19ee63b85d141f1b071880d6cb86c5d0f3bc4
+agent_generator_version: 1
+---
+{% raw %}# Building FFmpeg-iOS on a Mac
+
+Language: en
+Canonical: [Building FFmpeg-iOS on a Mac](<https://allluckly.cn/en/journal/2017-07-11-building-ffmpeg-ios-on-a-mac/>)
+中文：[中文 HTML](<https://allluckly.cn/ffmpeg/ffmpeg1>)
+English: [English HTML](<https://allluckly.cn/en/journal/2017-07-11-building-ffmpeg-ios-on-a-mac/>)
+Published: 2017-07-11T00:00:00+08:00
+Modified: 2026-10-23T10:34:16+08:00
+Author: [Bison](<https://allluckly.cn/about/>)
+
+Records preparing gas-preprocessor and yasm on a Mac, then running the FFmpeg-iOS build script. It explains script locations, dependency installation, and output directories to prepare libraries for the later decoding examples.
+
+Originally credited to Bison. Content is retained as published.
+
+English translation of the [Chinese original](<https://allluckly.cn/ffmpeg/ffmpeg1>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Published in 2017, the build output includes Homebrew installation logs from El Capitan. Script and permission settings are retained as historical examples.
+
+This article records a 2017 build of FFmpeg-iOS using a third-party script. Its terminal output reflects the macOS toolchain used at the time. Recheck the script, assembly tools and target architectures against your actual environment. The broad permission settings in the original article should not be treated as default installation steps either. Only reading references have been added here; the build has not been rerun with current Xcode.
+
+- [FFmpeg: Build notes for Darwin platforms](<https://ffmpeg.org/platform.html>)
+
+Reading notes added on 2026-10-23
+
+This historical illustration is currently unavailable. [The original image URL is retained](<http://upload-images.jianshu.io/upload_images/671504-ada1e50c34918b9b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240>) for reference.
+
+I will not explain FFmpeg's uses in detail here. Interested readers can look them up.
+
+Now for the main instructions:
+
+1. Download [gas-preprocessor](<https://github.com/libav/gas-preprocessor>)
+2. From `gas-preprocessor`, copy `gas-preprocessor.pl` into `/usr/local/bin/`.
+3. Enable permissions.
+
+```
+chmod 777 /usr/local/bin/gas-preprocessor.pl
+```
+
+4. Install yasm.
+
+```
+brew install yasm
+```
+
+After installation, the result looks like this:
+
+```
+==> Downloading https://homebrew.bintray.com/bottles/yasm-1.3.0.el_capitan.bottl
+######################################################################## 100.0%
+==> Pouring yasm-1.3.0.el_capitan.bottle.1.tar.gz
+🍺  /usr/local/Cellar/yasm/1.3.0: 44 files, 3.1M
+
+```
+
+5. Download the Mac [FFmpeg build script](<https://github.com/kewlbear/FFmpeg-iOS-build-script>)
+
+6. In Terminal, use cd followed by the folder path to enter the downloaded folder, then run the build script.
+
+```
+./build-ffmpeg.sh
+```
+
+You can now take a drink and wait for compilation. If FFmpeg is not installed, this command installs it automatically, which may take a while. When all compilation completes, it produces the `FFmpeg-iOS` file.
+
+---
+
+Recommended reading: [A beginner developer's review of 2015](<https://allluckly.cn/en/journal/2016-02-01-a-beginner-developer-s-review-of-2015/>)
+{% endraw %}

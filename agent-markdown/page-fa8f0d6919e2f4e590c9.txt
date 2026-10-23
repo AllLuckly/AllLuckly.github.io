@@ -1,0 +1,157 @@
+---
+layout: null
+permalink: /源码推荐/yuanma01/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: Github源码推荐:(12.25):手势解锁,个人SDK集成,无限循环图片轮播
+agent_source_url: https://allluckly.cn/%E6%BA%90%E7%A0%81%E6%8E%A8%E8%8D%90/yuanma01
+agent_source_sha256: 5df84e8391542958190f30c30fc548832591c1c5c4491eda0fb810d55aa29357
+agent_generator_version: 1
+---
+{% raw %}# Github源码推荐:(12.25):手势解锁,个人SDK集成,无限循环图片轮播
+
+语言：zh-CN
+原文：[Github源码推荐:(12.25):手势解锁,个人SDK集成,无限循环图片轮播](<https://allluckly.cn/%E6%BA%90%E7%A0%81%E6%8E%A8%E8%8D%90/yuanma01>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%BA%90%E7%A0%81%E6%8E%A8%E8%8D%90/yuanma01>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-12-07-github-source-code-picks-december-25-gesture-unlock-a-profile-sdk-and-an-image-carousel/>)
+发布于: 2015-12-07T00:00:00+08:00
+内容更新于: 2015-12-07T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+选编手势解锁、个人中心与无限图片轮播三个开源项目，列出下载入口和部分集成代码，便于按界面需求了解对应组件及其使用方式。
+
+Bison 整理的历史资料，所列项目归各自作者。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文为 2015 年源码选编，项目接口与维护状态需要另行核对。
+
+> "最全面最高仿支付宝的手势解锁,最强个人界面集成,无限循环图片轮播"
+
+> Bison
+
+## - NO.1 最全面最高仿支付宝的手势解锁－－－[下载](<https://github.com/iosdeveloperpanc/PCGestureUnlock>)
+
+![(PCGestureUnlock)](<https://github.com/iosdeveloperpanc/PCGestureUnlock/blob/master/PCGestureUnlock/arrowDirctions.gif?raw=true>)
+
+> 具体用法如下
+
+```css
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+
+    // 解锁界面  默认clip:YES, arrow:YES
+    PCCircleView *lockView = [[PCCircleView alloc] init];  
+    lockView.delegate = self;
+    self.lockView = lockView;
+    [self.view addSubview:lockView];
+}
+
+#pragma - mark - circleView - delegate
+#pragma mark - circleView - delegate - setting
+- (void)circleView:(PCCircleView *)view type:(CircleViewType)type connectCirclesLessThanNeedWithGesture:(NSString *)gesture
+{
+    NSString *gestureOne = [PCCircleViewConst getGestureWithKey:gestureOneSaveKey];
+
+    // 看是否存在第一个密码
+    if ([gestureOne length]) {
+        NSLog(@"提示再次绘制之前绘制的第一个手势密码");
+    } else {
+        NSLog(@"密码长度不合法%@", gesture);
+    }
+}
+
+- (void)circleView:(PCCircleView *)view type:(CircleViewType)type didCompleteSetFirstGesture:(NSString *)gesture
+{
+    NSLog(@"获得第一个手势密码%@", gesture);
+    // infoView展示对应选中的圆
+}
+
+- (void)circleView:(PCCircleView *)view type:(CircleViewType)type didCompleteSetSecondGesture:(NSString *)gesture result:(BOOL)equal
+{
+    NSLog(@"获得第二个手势密码%@",gesture)；
+    if (equal) {
+        NSLog(@"两次手势匹配！可以进行本地化保存了");
+
+    } else {
+        NSLog(@"两次手势不匹配！");
+    }
+}
+
+#pragma mark - circleView - delegate - login or verify gesture
+- (void)circleView:(PCCircleView *)view type:(CircleViewType)type didCompleteLoginGesture:(NSString *)gesture result:(BOOL)equal
+{
+    // 此时的type有两种情况 Login or verify
+    if (type == CircleViewTypeLogin) {
+        if (equal) {
+            NSLog(@"登陆成功！");
+        } else {
+            NSLog(@"密码错误！");
+        }
+    } else if (type == CircleViewTypeVerify) {
+
+        if (equal) {
+            NSLog(@"验证成功，跳转到设置手势界面");
+
+        } else {
+            NSLog(@"原手势密码输入错误！");
+
+        }
+    }
+}
+```
+
+## - NO.2 最强个人界面集成－－－[下载](<https://github.com/AllLuckly/LBPersonalPageDemo>)
+
+![(LBPersonalPageDemo)](<https://github.com/AllLuckly/LBPersonalPageDemo/blob/master/123.gif?raw=true>)
+
+> 具体用法如下
+
+继承`LBPersonalPage_VC`
+
+```css
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    //头像设置
+    self.headImageView.image = [UIImage imageNamed:@"myheadimage.jpeg"];
+    //背景设置
+    self.imageBG.image = [UIImage imageNamed:@"BG.jpg"];
+    //昵称设置
+    self.nameLabel.text = @"BISON";
+}
+
+//右边按钮
+- (void)rightBtnAction{
+    NSLog(@"hello-rig");
+}
+//左边按钮
+- (void)leftBtnAction{
+    NSLog(@"hello-left");
+}
+```
+
+## - NO.3 无限循环图片轮播－－－[下载](<https://github.com/gsdios/SDCycleScrollView>)
+
+历史配图暂不可用，[保留原图地址](<https://camo.githubusercontent.com/e5c0f0255483caf06271df08982d078c5e2cc432/687474703a2f2f7777342e73696e61696d672e636e2f626d6964646c652f39623831343665646a7731657376797471376c777267323038703066636538322e676966>)供查阅。
+
+> 具体用法如下
+
+继承`LBPersonalPage_VC`
+
+```css
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    // 网络加载图片的轮播器
+    cycleScrollView.imageURLStringsGroup = imagesURLStrings;
+
+    // 本地加载图片的轮播器
+    SDCycleScrollView *cycleScrollView = [SDCycleScrollView cycleScrollViewWithFrame: imagesGroup:图片数组];
+}
+```
+
+好文推荐：[iOS开发内购全套图文教程](<https://allluckly.cn/ios%E6%94%AF%E4%BB%98/iOS%E5%BC%80%E5%8F%912015%E5%B9%B4%E6%9C%80%E6%96%B0%E5%86%85%E8%B4%AD%E6%95%99%E7%A8%8B>)
+
+版权归©Bison所有 如需转载请保留原文超链接地址！否则后果自负！
+{% endraw %}

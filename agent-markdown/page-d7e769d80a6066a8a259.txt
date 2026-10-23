@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /en/guides/nasbook-webdav-sync/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Book Isle WebDAV sync: continue reading records across two devices'
+agent_source_url: https://allluckly.cn/en/guides/nasbook-webdav-sync/
+agent_source_sha256: 5e732cf1862d6aafc15631942301bd663c39a4ac393b6ab3d05ac52b7ae4d13d
+agent_generator_version: 1
+---
+{% raw %}# Book Isle WebDAV sync: continue reading records across two devices
+
+Language: en
+Canonical: [Book Isle WebDAV sync: continue reading records across two devices](<https://allluckly.cn/en/guides/nasbook-webdav-sync/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/nasbook-webdav-sync/>)
+English: [English HTML](<https://allluckly.cn/en/guides/nasbook-webdav-sync/>)
+Published: 2026-10-23T00:00:00+08:00
+Modified: 2026-10-23T10:34:08+08:00
+Author: Bison
+
+Use two devices and a test note to verify two-way updates, distinguish reading-data sync from original-book downloads, and resolve conflicts using clear evidence.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/nasbook-webdav-sync/>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+Book Isle's WebDAV synchronization stores reading information on your own server, including book metadata, progress, bookmarks, notes, highlights, tags, statistics, and related settings. It does not automatically transfer book files. This article verifies synchronization with two devices and one practice book rather than introducing conflicts across the whole library on the first attempt.
+
+## Prepare two devices and a separate directory first
+
+Call the device with more complete reading records A and the other B. On A, retain exports of important notes and original book files, then prepare a writable WebDAV directory dedicated to reading data. Do not mix synchronization files with your only original ebooks. A separate directory makes purpose and maintenance easier to verify.
+
+Both devices need Collector Pro entitlement for the relevant feature and access to the same target. Book Isle does not require registering a separate cloud account to store books; the remote location here is your chosen WebDAV server. Verify its address, account, directory, and write permissions first. A read-only account that downloads ebooks may not be able to write synchronization data.
+
+## Configure the target on device A first
+
+Go to Settings → Full Sync, enable the relevant synchronization switch, and choose a configured WebDAV connection from the target list. If none is available, first add WebDAV in NAS Connections. An enabled switch only completes configuration; you still need to run synchronization and inspect the result.
+
+Read the page's explanation before choosing a conflict strategy. On the first attempt, avoid global choices such as Overwrite Remote with Local or Keep All Remote without understanding their effects. They make explicit tradeoffs affecting other data. If remote records already exist, determine which copy is newer and more complete before deciding. Overwriting is not an ordinary refresh.
+
+## Use one note for the first upload
+
+On device A, open the practice book, read to chapter two, and save a note with clear text, such as 'Sync check: beginning of chapter two.' Return to synchronization settings and choose Full Sync Now or the current equivalent. Wait for completion and check the latest sync time, result, and errors. If logs are available, inspect whether this run actually finished.
+
+Do not immediately edit the same note on device B. Let A's data reach the remote target reliably before configuring B to reduce conflicts during the first test. Pressing Sync once does not establish success. Network interruptions, missing write permissions, and server storage problems can all end a task in failure. Use its result status.
+
+## Receive and open the same book on device B
+
+Configure the same WebDAV target on device B, synchronize, and check book information and the test note. Obtain the book file separately through local import, NAS, Calibre, or another source. A title and progress accompanied by a download prompt reflect the normal separation between synchronized data and file storage; they do not require deleting and recreating the record.
+
+After obtaining the same file version, open it and compare the chapter and original sentence. Screen dimensions and font sizes can change pagination across devices, so compare chapter-two content and the test note instead of demanding equal page numbers. Different translations or reformatted files cannot be aligned precisely by one progress number either.
+
+## Perform one reverse update too
+
+On device B, append 'Checked on the tablet' to the test note, save, and synchronize. Then synchronize device A and check for that sentence. A complete test covers both directions: A's data reaches B, and B's new edit returns to A. Matching cover lists alone do not prove that reading-record updates work.
+
+Then establish a simple habit: finish reading and confirm synchronization before switching devices, and retrieve the latest data before continuing on the other one. Do not let two offline devices edit the same note for a long time and expect any conflict strategy to infer your intent automatically. Save important rewrites separately before resolving synchronization conflicts.
+
+## Inspect content first when conflicts occur
+
+If unresolved conflicts appear, compare modification times and actual text rather than device names alone. Keep Remote adopts existing server content; Keep Local uses the current device's content. Neither label tells you which is correct. Be especially careful with batch choices for a whole synchronization run. Export important notes first to retain a readable copy.
+
+Sync logs help identify task times and failure types, but do not publish entire logs containing private addresses. For authentication or directory-write errors, repair the connection and retry. For content conflicts, repeatedly refreshing usually cannot make the decision for you. Separate network problems from choices about data to reduce repeated work.
+
+## Frequently asked questions
+
+**Why must a new device still download books after successful synchronization?** Full refers to the scope of synchronized reading data, not a complete copy of every ebook file. Obtain original books separately and maintain your own backups of downloaded local files.
+
+**Do different page numbers on two devices mean synchronization failed?** Reflowable-text page numbers depend on screen size and font size. Compare chapters, nearby text, and bookmarks first. If file versions differ, align the versions before judging. For PDFs, also distinguish file page numbers from printed page numbers.
+
+**Will local notes disappear when membership expires?** The public description separates remote membership features from local reading. Private synchronization pauses after expiration, while local books and local reading remain usable. Export important information regularly rather than treating live synchronization as your only historical backup.
+
+## Companion tutorials
+
+If the server is not connected yet, start with [WebDAV library setup](<https://allluckly.cn/en/guides/nasbook-webdav-library/>); to save information first, see [Export notes and statistics](<https://allluckly.cn/en/guides/nasbook-reading-data-export/>). For relationships between multiple book formats, see [Organize formats of the same book](<https://allluckly.cn/en/guides/nasbook-multiple-formats/>).
+
+## Sources and version
+
+Information checked on October 23, 2026. The public release is Book Isle 1.1.3, requiring iOS / iPadOS 15.6 or later. This guide is based on public feature descriptions and their entry points. Interface labels may change with the version. See [Official App Store description](<https://apps.apple.com/cn/app/id6766198898>) and [Apple release information](<https://itunes.apple.com/lookup?id=6766198898&country=cn>).
+{% endraw %}

@@ -1,0 +1,81 @@
+---
+layout: null
+permalink: /投稿/tougao67/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: Swift3.0学习系列之Swift实战-单例模式
+agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao67
+agent_source_sha256: cd385f498d9cfe2e919f803e1ede0a37cb4294a8e4b9230d00c86ae79d60d160
+agent_generator_version: 1
+---
+{% raw %}# Swift3.0学习系列之Swift实战-单例模式
+
+语言：zh-CN
+原文：[Swift3.0学习系列之Swift实战-单例模式](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao67>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao67>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-10-13-swift-3-0-design-patterns-singleton/>)
+发布于: 2016-10-13T00:00:00+08:00
+内容更新于: 2016-10-13T00:00:00+08:00
+署名：Sindri
+
+介绍 Swift 单例的用途与代价，通过类内静态常量和全局常量两种形式创建共享实例，说明私有构造器、跨模块访问，以及共享可变状态仍需考虑线程安全。
+
+原文署名Sindri，Bison 编辑收录。
+
+[原文所列来源](<http://www.jianshu.com/p/6c9423672d54>)
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文明确讨论 Swift 3.0 之后的单例写法与 dispatch\_once 接口变化。
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao66/1.png>)
+
+编辑：[Bison](<https://allluckly.cn/>)  
+ 来源：[Sindri的小巢](<http://www.jianshu.com/p/6c9423672d54>)
+
+设计模式（Design pattern）是一套被反复使用、多数人知晓的、经过分类编目的、代码设计经验的总结。GoF提出了23种设计模式，本系列将使用Swift语言来实现这些设计模式
+
+## 概述
+
+整个应用生命周期中，只存在唯一一个实例对象的类被称作单例，所以的模块共同使用这一个对象的设计叫做单例模式
+
+单例模式Singleton具有如下优点：
+
+多个模块共用同一个对象，保证了数据的唯一性 统一逻辑功能，具有较高的灵活性 在iOS开发中，本身也会接触到不少的系统单例，例如NSNotificaitonCenter通知中心、UIApplication应用单例等类，在swift中主要使用两种方式进行单例的创建，通常我将用户数据存储为单例方便不同模块访问：
+
+- 方式1，类内部声明静态常量并私有化构造器方法
+
+```
+
+    class UserInfo {
+
+        static let sharedInfo = UserInfo()
+
+        private init() {}
+    }
+
+```
+
+- 方式2，使用全局常量对象
+
+```
+
+    let singleton = UserInfo()
+
+        class UserInfo {
+            class var sharedInfo : UserInfo {
+                return singleton
+            }
+    }
+
+```
+
+对于从OC转过来的开发者而言，dispatch\_once创建的单例更符合他们的习惯，但在Swift3.0后，这个方法本身已经无法使用了，苹果在static let修饰变量的实现中已经使用了dispatch\_once的方式保证了变量只存在一份。
+
+## 总结
+
+单例保证了数据在应用运行期间的唯一性，减少了重复内存的损耗，但如果单例本身内存占用过大时，又是一种负担。另一方面，单例的访问也存在着多线程安全的问题，这需要我们合理的使用线程锁来保证单例的稳定性。
+
+---
+
+好文推荐：[分分钟解决iOS开发中App启动动画广告的功能](<https://allluckly.cn/lblaunchimagead/LBLaunchImageAd>)
+{% endraw %}

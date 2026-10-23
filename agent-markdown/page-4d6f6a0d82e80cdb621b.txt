@@ -1,0 +1,273 @@
+---
+layout: null
+permalink: /en/journal/2016-04-15-building-a-pomodoro-timer-app-for-ios/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Building a Pomodoro timer app for iOS
+agent_source_url: https://allluckly.cn/en/journal/2016-04-15-building-a-pomodoro-timer-app-for-ios/
+agent_source_sha256: 15a0bf6782fb22334398271e794cfe0ed4c517197e3342adc900f3067628a35a
+agent_generator_version: 1
+---
+{% raw %}# Building a Pomodoro timer app for iOS
+
+Language: en
+Canonical: [Building a Pomodoro timer app for iOS](<https://allluckly.cn/en/journal/2016-04-15-building-a-pomodoro-timer-app-for-ios/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao37>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-04-15-building-a-pomodoro-timer-app-for-ios/>)
+Published: 2016-04-15T00:00:00+08:00
+Modified: 2026-10-23T10:34:14+08:00
+Author: 威權在B612等着那阵温柔的风
+
+Connects timers, notification reminders, music playback and a Today Widget in a Pomodoro app. It identifies implementation entry points for card layouts, transitions, xib files and URL Schemes, helping readers follow how the features fit together in the project.
+
+Originally credited to 威權在B612等着那阵温柔的风; edited and archived by Bison.
+
+[Source listed in the original](<http://www.jianshu.com/p/7dedfd704008>)
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao37>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Published in 2016, using the Today Widget, notification and Swift interfaces available at the time.
+
+> "This is a Pomodoro-style app. Next I will show its features, explain their implementations and organise the sources I consulted. Choose a feature and add it to your own app."
+
+Editor: [Bison](<https://allluckly.cn/en/>)  
+ Contributor: [威權在B612等着那阵温柔的风](<http://www.jianshu.com/p/7dedfd704008>)
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao37/1.gif>)
+
+## Introduction
+
+---
+
+App project URL: [Click to download](<https://github.com/PoBlue/25min>)
+
+For this app I investigated existing Pomodoro apps and wrote a Pomodoro App Survey.[article](<http://www.jianshu.com/p/e997bb222409>)
+
+## Article contents
+
+- Timer functionality
+- Notification reminders
+- Music playback
+- Today Widget
+- Custom UICollectionView Layout
+- Custom transitions
+- lldb
+- Read file paths
+- Developing with xib
+- Capsule-shaped Button
+- Using CocoaPods
+- UILabel and URL Scheme
+
+## Timer functionality
+
+### NSTimer
+
+The following code runs timeUp every second.
+
+```
+NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: "timeUp:", userInfo: nil, repeats: true)
+```
+
+Use an if statement in timeUp to implement the timer.
+
+### Actionable notifications
+
+The result is shown below:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao37/2.gif>)
+
+When a notification arrives, users can choose an action directly, avoiding opening the app and navigating to perform it.
+
+The implementation article is here: [Notification reminders — iOS development](<http://www.jianshu.com/p/c46b60f06880>)
+
+This [Item](<https://github.com/PoBlue/25min/blob/master/README.md>) This [File](<https://github.com/PoBlue/25min/blob/master/25%E5%88%86/AppDelegate.swift>)uses this technique.
+
+## Play music
+
+The implementation article is here. [Music player](<http://www.jianshu.com/p/3fb9a8c4b1b1>)
+
+This [Item](<https://github.com/PoBlue/25min/blob/master/README.md>) This [File](<https://github.com/PoBlue/25min/blob/master/25%E5%88%86/convinence.swift>)uses this technique.
+
+## TODAY WIDGET in Notification Centre
+
+The result is:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao37/3.gif>)
+
+This [File](<https://github.com/PoBlue/25min/blob/master/25min/TodayViewController.swift>)uses this technique.
+
+[Tutorial link](<http://www.brianjcoleman.com/tutorial-today-widget-ios8/>)  
+ [App Extension](<http://www.jianshu.com/p/6b6e74095ec4>)
+
+## Rotating card effect
+
+First, here is the effect:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao37/4.gif>)
+
+Because the tutorial is long, I wrote a separate article.  
+ Use collectionView layout with a little mathematics.
+
+This article explains creating your own layout rather than using UICollectionViewFlowLayout.
+
+This [Item](<https://github.com/PoBlue/25min/blob/master/README.md>) This [File](<https://github.com/PoBlue/25min/blob/master/25%E5%88%86/CircularCollectionViewLayout.swift>)uses this technique.
+
+Article link: [Make a UICollectionView rotate like a wheel](<http://www.jianshu.com/p/45f39b70263d>)
+
+## Custom Present ViewController
+
+The result is:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao37/5.gif>)  
+ Tutorial: [Custom presentation transitions](<http://www.jianshu.com/p/23613f2679ef>)  
+ This [Item](<https://github.com/PoBlue/25min/blob/master/README.md>) This [File](<https://github.com/PoBlue/25min/blob/master/25%E5%88%86/CustomPresent.swift>)uses this technique.
+
+## lldb
+
+In this project I frequently use the expression command to pause the app at a breakpoint, change data and test.
+
+As shown, change dimingView’s alpha directly:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao37/6.png>)
+
+Link:
+
+[More LLDB commands](<http://www.dreamingwish.com/article/lldb-usage-a.html>)
+
+## Read every file path in a directory
+
+Use fileManager’s enumeratorAtPath and nextObject() to enumerate.
+
+```
+let appMainBundlePath = NSBundle.mainBundle().bundlePath
+
+func filePathesInDir(dirPath:String) -> [String]{
+    var filePathes = [String]()
+    var fileURL:String
+
+
+    let fileManager = NSFileManager.defaultManager()
+    let enumerator = fileManager.enumeratorAtPath(appMainBundlePath + dirPath)
+
+
+    while let element = enumerator?.nextObject() as? String{
+        if let ext = ext {
+                fileURL = appMainBundlePath + dirPath + "/" + element
+                filePathes.append(fileURL)
+
+    }
+
+    return filePathes
+}
+```
+
+An article about file-path access: [Follow this link](<http://www.hangge.com/blog/cache/detail_765.html>)
+
+## Develop using xib
+
+This makes UI setup quick.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao37/7.jpg>)
+
+Each tutorial uses a demo, making it easy to learn. Links follow:  
+ [Tutorial link](<http://www.ifun.cc/blog/2014/02/22/ioskai-fa-zhi-xibji-qiao-jie-shao/>)
+
+## Capsule-shaped Button
+
+The result is shown below:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao37/8.png>)
+
+Principle: use the layer’s radius, as shown:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao37/9.png>)
+
+Then simply set radius = button height / 2.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao37/10.jpg>)
+
+The code is as follows:
+
+```
+func makeRadiusBtn(btn:UIButton,borderColor:CGColor){
+    let btnH:CGFloat = CGRectGetHeight(btn.bounds)
+
+    btn.layer.borderColor = borderColor
+    btn.layer.borderWidth = 1.0
+    btn.layer.cornerRadius = btnH / 2
+}
+```
+
+For more button effects, such as folded corners, see this blog:  
+ Link:
+
+[Button tutorial](<http://www.wutongwei.com/front/infor_showone.tweb?id=88>)  
+ [timing Button](<https://robots.thoughtbot.com/designing-for-ios-taming-uibutton>)
+
+## Using CocoaPods
+
+Article URL: [CocoaPods usage notes](<http://www.jianshu.com/p/0b6bc7d9b491>)
+
+## Get UIColor from hexadecimal
+
+Since RGB colours online are commonly hexadecimal, supporting that notation in UIColor is useful.
+
+One macro definition meets the requirement.
+
+```
+#define UIColorFromRGB(rgbValue) ［UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0] <br>
+```
+
+Usage is as follows.
+
+```
+self.view.backgroundColor = UIColorFromRGB(0xCECECE);
+```
+
+How it works
+
+```
+#define UIColorFromRGB(rgbValue) \\\\\\\\\\\\\\\\
+[UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 \\\\\\\\\\\\\\\\
+                green:((float)((rgbValue & 0x00FF00) >>  8))/255.0 \\\\\\\\\\\\\\\\
+                 blue:((float)((rgbValue & 0x0000FF) >>  0))/255.0 \\\\\\\\\\\\\\\\
+                alpha:1.0]
+```
+
+Apply masks to extract the corresponding RGB digits, then right-shift using ».
+
+For red, for example, 0xCECECE & 0xFF00000 = 0xCE0000. One hexadecimal zero represents four binary zeros, so 0xCE0000 » 16 = 0xCE. Divide by 0xFF (255) to obtain the proportion.
+
+## UILabel
+
+[Label properties](<http://cnbin.github.io/blog/2015/10/15/ios-label-xiang-jie/>)  
+ [Automatic sizing](<https://www.skyfox.org/uilabel-ajust-font-for-size.html>)
+
+## Set the URL Scheme
+
+For example, I have an app called 25min.
+
+In 25min’s info.plist, add a URL type, set the URL identifier and add URL Schemes. Item 0 under URL Schemes defines the beginning of the URL scheme. ![1](<https://allluckly.cn/images/blog/tuogao/tougao37/11.png>)
+
+Then add the URL Schemes handling method in appDelegate.
+
+```
+//return true 则启动app，false则不启动。
+    func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -> Bool {
+        return true
+    }
+```
+
+Now 25min:// opens the 25min app. Test the URL in Safari to check whether it switches apps.
+
+This [Item](<https://github.com/PoBlue/25min/blob/master/README.md>) This [File](<https://github.com/PoBlue/25min/blob/master/25min/TodayViewController.swift>)uses this technique.
+
+(END And Thank U)
+
+[Here,](<https://github.com/PoBlue/25min/blob/master/README.md>)Includes complete project source code
+
+---
+
+Recommended reading: [Combining AES encryption with Base64 encoding on iOS](<https://allluckly.cn/en/journal/2016-03-30-combining-aes-encryption-with-base64-encoding-on-ios/>)
+{% endraw %}

@@ -1,0 +1,248 @@
+---
+layout: null
+permalink: /en/journal/2016-04-15-apple-s-xcode-testing-documentation-in-chinese-part-2/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Apple's Xcode testing documentation in Chinese, part 2
+agent_source_url: https://allluckly.cn/en/journal/2016-04-15-apple-s-xcode-testing-documentation-in-chinese-part-2/
+agent_source_sha256: c6b2d4f400de91b7b26682b3d62fb717191c6f90de214bc36121da1e77f89a2a
+agent_generator_version: 1
+---
+{% raw %}# Apple's Xcode testing documentation in Chinese, part 2
+
+Language: en
+Canonical: [Apple's Xcode testing documentation in Chinese, part 2](<https://allluckly.cn/en/journal/2016-04-15-apple-s-xcode-testing-documentation-in-chinese-part-2/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao39>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-04-15-apple-s-xcode-testing-documentation-in-chinese-part-2/>)
+Published: 2016-04-15T00:00:00+08:00
+Modified: 2026-10-23T10:34:14+08:00
+Author: 许漠颜
+
+Continues the Chinese translation of Apple's testing documentation with code coverage, command-line testing, Xcode Server continuous integration and UI test recording. It also discusses structuring testable code and migrating from OCUnit to XCTest.
+
+Apple testing documentation translated by 许漠颜, then edited and archived by Bison.
+
+[Source listed in the original](<http://www.jianshu.com/p/1616d9bfbb53>)
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao39>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. The Chinese translation was published in 2016, primarily in the testing-tool context of Xcode 7, iOS 9 and OS X 10.11.
+
+> "Today I finally turned my translation of the official unit-testing documentation into a blog post. First, thanks to the Party, the people, and my parents. I must also thank my department's manager for giving me time to do this."
+
+Editor: [Bison](<https://allluckly.cn/en/>)  
+ Contributor: [许漠颜](<http://www.jianshu.com/p/1616d9bfbb53>)
+
+## Code coverage
+
+Code coverage is an Xcode7 feature that measures and displays how much code executed during tests. It helps determine whether tests exercise the code you expect.
+
+## Viewing code coverage
+
+With coverage enabled, LLVM collects coverage data based on how often methods and functions are reached. Coverage information accompanies correctness and performance test reports for both unit and UI tests. Configure code coverage by editing the scheme's Test action.
+
+1. Open the scheme editor.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao39/1.png>)
+
+2. Select editor scheme.
+
+3. Enable the code-coverage checkbox to collect coverage data.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao39/2.png>)
+
+4. Click close.  
+ Note: enabling coverage adds performance overhead. Whether noticeable or not, it affects execution, but its linear behavior still allows performance comparisons. Enable it for trial runs and consider whether it should remain enabled for the application tests you are performing.
+
+## Configuring code coverage
+
+Code coverage helps assess your tests' value. It answers questions such as:
+
+1. How much code executes when the tests run?  
+ 2. How much code do the tests exercise? In other words, is the test suite sufficient to check all code for correctness and performance?  
+ 3. Which parts of the code were not tested?  
+ After the tests run, Xcode obtains coverage data from LLVM and uses it to create a coverage report in the Report navigator's Coverage pane. It summarizes the test run and lists source files and functions with the coverage percentage of each.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao39/3.png>)
+
+The right side of the source editor shows execution counts for each line and highlights regions not covered by tests.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao39/4.png>)
+
+Coverage annotations on the right show how many times a particular section of code executed during testing.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao39/5.png>)
+
+Methods that were not called during testing are clearly highlighted in the source editor.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao39/6.png>)
+
+## Automated testing workflow
+
+Alongside interactive testing during development, use Xcode Server to automate tests.
+
+## Server-based continuous integration testing
+
+Interactive testing in Xcode helps keep code aligned with its requirements and makes bugs easier to find and fix. A fast suite of functional tests not only checks your work but lets you build a robust application confidently and efficiently. Successful projects often exceed what one developer can implement and maintain alone. Like source control, automated server testing helps development meet the team's needs. Xcode supports server-based continuous integration through Xcode Server, which runs on OS X Server and automates building, analyzing, testing, and archiving an application. Server-based testing offers these benefits:
+
+1. A server can build and test independently, freeing the development machine for implementation and debugging, especially when comprehensive tests take a long time.  
+ 2. All team members can use the same scheme to run the same tests on the server, improving consistency. The entire team can also build the product and generate test reports.  
+ 3. Testing can adapt to the project's and team's needs. For example, run tests whenever someone commits work to source control or at scheduled intervals. Tests can also be started manually as needed.  
+ 4. The server repeatedly runs tests in the same way. Over time, its reports give the team an overview of build problems, warnings, and test results.  
+ 5. Projects can test more destinations with greater automation and less effort than manually operated testing systems. For example, connect any number of iOS devices to the server. With one configuration, the system can build and test libraries, applications, all tests, and multiple iOS simulator versions. Note: when a project spans iOS and Mac OS X, two constraints apply:
+
+1. The server must be running when building and testing OS X projects.
+2. iOS and OS X projects require separate schemes and bots.
+
+## Command-line testing
+
+Xcode's command-line testing lets you write scripts that automate building and testing, taking advantage of an existing build-automation system.
+
+1. Run tests with XcodeBuild  
+ The XcodeBuild command-line tool drives tests just as the Xcode IDE and Xcode service in OS X Server do. Use BuildAction to run XcodeBuild tests and -destination to specify different destinations. For example, to test MyApp locally on OS X “my Mac 64 Bit”, specify the destination and architecture with:  
+ ➢ xcodebuild test -project MyAppProject.xcodeproj -scheme MyApp -destination ‘platform=OS X,arch=x86\_64’ If a development-enabled device is connected, identify it by name or id. For example, with an iPod named “Development iPod touch” connected, test the code using this command:  
+ ➢ xcodebuild test -project MyAppProject.xcodeproj -scheme MyApp -destination ‘platform=iOS,name=Development iPod touch’ Tests can also run in the iOS simulator, allowing you to cover different device form factors and operating-system versions.  
+ ➢ xcodebuild test -project MyAppProject.xcodeproj -scheme MyApp -destination ‘platform=Simulator,name=iPhone,OS=8.1’ The -destination argument can be repeated, allowing one command to test a shared scheme across destinations. For example, the following combines the three examples above into one command:  
+ ➢ \> xcodebuild test -project MyAppProject.xcodeproj -scheme MyApp -destination ‘platform=OS X,arch=x86\_64’ -destination ‘platform=iOS,name=Development iPod touch’ -destination ‘platform=Simulator,name=iPhone,OS=9.0’ If tests fail, XcodeBuild returns a nonzero exit code.  
+ These are the essentials of running tests from the command line. For more information about XcodeBuild, consult its command documentation in Terminal.  
+ ➢ man xcodebuild
+
+2. Use ssh with XcodeBuild
+
+Invoking XcodeBuild through a remote ssh login or from a daemon fails unless the correct session environment exists on the host.  
+ Logging into OS X interactively creates an “Aqua session”. It initializes the infrastructure needed for the interactive environment and for running OS X Apps. Code using UI frameworks, AppKit or UIKit, also requires it. Consequently, OS X-based tests, including simulator tests and OS X app tests, require an Aqua session.  
+ By default, an ssh command-line login to OS X does not create the required session. When using ssh, ensure an “Aqua session” already exists: a user must be logged in on the remote OS X host. The ssh login can then operate as a user with an existing Aqua session on that system.  
+ A user must first be running on the host system before XcodeBuild tests can be launched through ssh. The following runs tests for “MyApp” on a remote host through ssh:  
+ ➢\> ssh localhost ➢\> cd ~/Development/MyAppProject\_Folder ➢\> xcodebuild test -project MyApp.xcodeproj -scheme MyApp -destination ‘platform=Simulator,name=iPhone 6’ Reference: technical notes a target=”\_self” Daemons and Agents/a and a target=”\_self” Daemons and Services Programming Guide.
+
+## Using Xcode Server and Continuous Integration
+
+Xcode Server and continuous integration fit naturally into interactive development. Much of the initial work involves configuring the server and project. Getting started requires three high-level tasks; afterward, work mainly consists of monitoring results and occasional maintenance. This overview summarizes those tasks. See “Xcode Continuous Integration Guide” for details.
+
+## User-interface testing
+
+UI tests verify interface elements' properties and states and interact with the interface. UI recording lets you exercise the App through actions that can be extended with the UI-testing tools. The resulting records provide detailed information, including screenshots when a test fails. UI testing relies on two core technologies: XCTest framework and Accessibility.
+
+XCTest provides UI testing integrated with Xcode. Building UI tests extends what you already know about XCTest and unit tests: create a UI test target, classes, and methods, then use XCTest assertions to verify expectations. They can also integrate with Xcode Server and XcodeBuild. XCTest fully supports Object-C and Swift. Accessibility is the underlying technology that helps people with disabilities use applications. It exposes semantic information describing how to interact with the App. Integrated into UIKit and APPKit, it provides APIs for adjusting behavior and exposing functionality; UI tests use this information. Creating UI tests in source resembles creating unit tests. Add a UI test target to the app; Xcode creates a test group and implementation file containing method templates. You can specify the application to test when creating the target. UI tests find interface objects through queries, synthesize events, and dispatch them to those objects. APIs let tests inspect properties and states and compare them with expected values.
+
+## Requirements
+
+UI testing depends on the operating-system platform as well as tool services and APIs. It requires Xcode7, OS X 10.11 El Capitan, and iOS9. UI testing protects privacy:
+
+iOS devices must be enabled for development and connected to a trusted host.  
+ OS X requires authorization for certain applications in Xcode. The first UI-test run prompts for this automatically.
+
+## Concepts and APIs
+
+UI tests and unit tests differ fundamentally. Unit tests have full access to the application's internal methods, variables, and state. UI tests exercise the application through its interface, exposing the same issues users encounter. The test code, test machinery, and user-interface testing run as a separate application.
+
+## APIs
+
+XCUIApplication. XCUIElement. XCUIElementQuery.
+
+## Getting started with UI recording
+
+Start with UI recording. It generates editable source code for building tests or replaying a particular scenario. Recording is also useful for exploring a new interface and learning to write UI tests. The basic sequence is:
+
+Create a UI test target in the Test navigator. In the generated file, place the cursor inside the test function and start UI recording. The application launches. Perform a sequence of interface actions, and Xcode records them as code in the function body. Stop recording when the actions are complete, then add XCTest assertions.
+
+## Writing UI tests
+
+API tests can test both functionality and performance, and so can UI tests. UI tests operate through the application's interface, checking whether integrated functionality behaves and responds as expected. They work at the event-response level:
+
+1. Find an element.  
+ 2. Know the element's expected behavior.  
+ 3. Tap or click the element to trigger a response.  
+ 4. Determine whether the expected behavior occurred.
+
+XCTest UI tests use the same programming model as unit tests. The overall workflow introduces the core UI-testing APIs and how they operate. The test-class structure provides a setup method, although its use differs from that in a unit-test class.
+
+```
+- (void)setUp {
+    [super setUp];
+    // Put setup code here. This method iscalled before the invocation of each test method in the class.
+    self.continueAfterFailure = NO;
+    [[[XCUIApplication alloc] init] launch];
+}
+```
+
+Self.continueAfterFailure is set to NO by default. A valid UI test depends on earlier steps succeeding; after one fails, later failures may simply follow from that first failure. The setup method also creates and launches an XCUIApplication. UI tests must launch the app before testing, and doing so in setup before each test ensures it is ready. Use UI recording to generate a basic action sequence, then edit it and add XCTest assertions that determine success or failure. Like unit tests, UI tests can measure functionality and performance. A typical pattern is:
+
+1. Use XCUIElementQuery to find the next XCUIElement.  
+ 2. Synthesize an event and send it to XCUIElement.  
+ 3. Use assertions to compare XCUIElement's state with the expected reference state.
+
+## Appendix A: Writing testable code
+
+Xcode's integrated testing support lets you build test bundles for different development workflows. Tests identify potential regressions, check expected success or failure, and verify application behavior. By confirming that objects behave as intended, they improve code stability. Of course, the stability gained depends on the quality of your tests, and the ease of writing good tests depends on how you write the application. Designing code for testing helps. Follow the guidelines below to make code testable and reduce the difficulty of writing effective tests.
+
+## Guidelines
+
+1. Define API requirements.  
+ Define requirements and structure for every method or function added to the project. Requirements include input and output ranges, thrown exceptions, constraints, and return-value types, particularly when returning instances. Clearly defining requirements and ensuring the implementation meets them helps produce robust, safe code.  
+ 2. Test as you write  
+ Whenever you design and write a method or function, write one or more tests to ensure it meets its API requirements. Remember that testing existing code is much harder than writing tests alongside new code.  
+ 3. Check boundary conditions  
+ If a method's parameter must lie within a range, test both boundaries. For example, for an integer parameter restricted to 0 through 100 inclusive, pass 0, 50, and 100 in the tests.  
+ 4. Use negative tests  
+ Negative tests verify that code responds appropriately to errors, invalid or unexpected input, returned error codes, and exceptions. For example, if an integer parameter must be in the inclusive range 1–100, write tests passing −1 and 101 to ensure the program throws an exception or returns an error code.  
+ 5. Write comprehensive test cases.  
+ Comprehensive tests combine code modules to exercise more complex API behavior. Simple isolated tests are valuable, but combining operations can reveal additional problems under more realistic conditions. For example, rather than merely adding an object to an array, create an array, add several objects, remove some through different methods, and verify both the collection and the remaining object count.  
+ 6. Cover bug fixes with test cases  
+ Whenever you fix a bug, write one or more test cases that verify the fix.
+
+## Appendix B: Transitioning from OCUnit to XCTest
+
+XCTest was introduced in Xcode5 as a modern successor to OCUnit. It integrates more closely with Xcode and provides a foundation for future testing improvements. Many of its features resemble OCUnit's.
+
+## OCUnit and XCTest compatibility
+
+OCUnit has underpinned Xcode testing since Xcode2.1, so many existing projects use it. They can continue doing so because Xcode5 provides equivalent capabilities for OCUnit- and XCTest-based projects. Existing OCUnit projects opened in Xcode 5 remain compatible with current iOS and OS X versions, as well as versions before iOS 7 and OS X v10.8. OCUnit tests run on iOS 6 and iOS 7, making it a viable choice for older deployment targets. It is also useful when maintaining an application that must move from Xcode 5 back to an earlier Xcode version.  
+ If development primarily targets iOS 7 or later, OS X v10.8 or later, or both, converting the project to XCTest is the right choice.  
+ Note: OCUnit was deprecated in Xcode5.1.
+
+## Transitioning from OCUnit to XCTest
+
+Converting OCUnit to XCTest is a complex operation involving source files, test classes, and project settings. Xcode5 provides a conversion assistant: choose Edit \> Refactor \> Convert OCUnit to XCTest. Use it to migrate the project successfully.  
+ The OCUnit-to-XCTest conversion tool works target by target. It examines the selected targets and tells you whether they can run with XCTest after automatic conversion.  
+ Note: when migrating from OCUnit to XCTest, place all targets in one project.  
+ Updating a project from OCUnit to XCTest:
+
+1. Select the edit menu on the toolbar.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao39/7.png>)
+
+Choose a scheme from the menu that appears.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao39/8.png>)
+
+2. Choose Edit \> Convert \> To XCTest.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao39/9.png>)
+
+3. Click Next to continue to the next sheet.  
+ 4. Select the test target in the sheet that appears.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao39/10.png>)
+
+Click a target's name to see how it will be configured after conversion to XCTest.  
+ 5. Click Next. A FileMerge interface appears, letting you compare files and evaluate source changes.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao39/11.png>)
+
+The updated source appears on the left and the original on the right. Review the proposed changes and discard any you consider problematic. 6. If satisfied with all changes, click Save. Xcode writes them to the files.
+
+## Converting manually from OCUnit to XCTest
+
+If a project's OCUnit tests cannot be converted automatically, perform the conversion manually as follows:
+
+1. Add a new XCTest test target to the project.  
+ 2. Add test classes and methods to your test files.  
+ 3. Edit the test classes to import #import XCTest/XCTest.h and use assertions in their methods.  
+ This approach ensures the project settings correctly configure the XCTest target.
+
+---
+
+Recommended reading: [Combining AES encryption with Base64 encoding on iOS](<https://allluckly.cn/en/journal/2016-03-30-combining-aes-encryption-with-base64-encoding-on-ios/>)
+{% endraw %}
