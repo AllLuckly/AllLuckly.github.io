@@ -1,0 +1,95 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Connect ManYue to SMB: browse NAS comics and keep offline copies'
+description: Check the SMB host, share name and account permissions, choose a library folder and verify access,
+  then establish what remains available outside the local network.
+permalink: /en/guides/manyue-smb-library/
+date: 2026-10-22 00:00:00 +0800
+modified: 2026-10-22 00:00:00 +0800
+category: Tutorials
+level: Intermediate
+series_order: 11
+topic: Server libraries
+reading_time: 6
+lang: en
+source_path: _posts/2026-10-22-manyue-smb-library.md
+source_url: /guides/manyue-smb-library/
+translation_method: machine-assisted
+translation_source_sha256: a2218e34018f4f2a7fe2da60a9862921dbed411daadef3bed402701b1b9e9b5e
+excerpt: Check the SMB host, share name and account permissions, choose a library folder and verify access, then
+  establish what remains available outside the local network.
+translation_date: '2026-10-23T02:34:07+00:00'
+---
+{% raw %}
+<p>If your home NAS already exposes SMB, choose its comic folder directly in ManYue. Follow host → share → folder → sample → local download. Start with a small directory before adding frequently used libraries for clearer browsing.</p>
+<h2 id="连接前分清主机共享和子目录">Separate host, share and subfolder before connecting</h2>
+<p>Ask the administrator for host, share, account, allowed directory and any required domain. The host provides the service; the share exposes an allowed file range; subfolders live beneath it. A management webpage, complete browser URL or local computer path is not an SMB host.</p>
+<p>This article uses <code class="language-plaintext highlighter-rouge">nas.example.com</code>, <code class="language-plaintext highlighter-rouge">Comics</code>  and  <code class="language-plaintext highlighter-rouge">reader_example</code> are placeholder host, share and account values, not working services. Connect the device to a network reaching the NAS, not an isolated guest network. Check current purchase-page SMB requirements separately from legitimate server read permissions.</p>
+<h2 id="在远程书库选择-smb">Choose SMB in remote libraries</h2>
+<p>Add a remote library, choose SMB and fill each connection field. Keep a recognisable purpose name in your own notes and credentials separately. Check host and account before connecting. Fill a domain only if the server requires it and the administrator supplies it; do not guess to populate every field.</p>
+<p>After connecting, choose the share and then comic directory. Login and visibility of the target share are separate stages. If absent, ask the administrator to check assigned shares; shelf setup can wait until file listings work.</p>
+<p>For initial setup, verify the administrator’s information step by step:</p>
+<table>
+<thead>
+<tr>
+<th>Location</th>
+<th>Information to use</th>
+<th>Common checks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Host field</td>
+<td>NAS hostname or address</td>
+<td>Whether the current network reaches this device</td>
+</tr>
+<tr>
+<td>Account field</td>
+<td>An authorised share account and password</td>
+<td>Whether login succeeds</td>
+</tr>
+<tr>
+<td>Domain field, if present</td>
+<td>Domain information actually required by the server</td>
+<td>whether it matches this account’s login method</td>
+</tr>
+<tr>
+<td>Share selection</td>
+<td>The target share listed after login</td>
+<td>Whether the account can access this share</td>
+</tr>
+<tr>
+<td>Folder selection</td>
+<td>The actual comic folder inside the share</td>
+<td>Whether the chosen sample can be found</td>
+</tr>
+</tbody>
+</table>
+<p>After saving, return to the server list and reopen the SMB connection to verify repeatability. If the second attempt enters another folder, check saved server and library scope before importing.</p>
+<h2 id="从小目录建立书库">Build a library from a small directory</h2>
+<p>Choose a library folder containing only a few comics. Match filenames to the NAS and use an ordinary CBZ or PDF sample. Do not scan the whole share containing work documents, backups and photos initially; a small scope makes failures easier to locate.</p>
+<p>Refresh the relevant library after folder changes. Restore a sleeping NAS or disconnected network before judging files invalid. Temporary unavailability does not mean deletion, so do not immediately clear every unavailable record. Verify server online → share listed → file readable.</p>
+<h2 id="选择在线阅读或下载到本地">Choose online reading or local download</h2>
+<p>Open the sample and inspect distant pages to confirm real loading. Online reading depends on the current NAS connection; leaving Wi-Fi, leaving the network or NAS sleep changes access. Cached covers and read pages are not complete offline copies.</p>
+<p>Use the item’s download action, wait for completion in download management and open it locally. Disconnect and inspect beginning, middle, end and intended chapters. Queue records, favourites and files serve different purposes; one checkmark or cover does not prove offline preparation is complete.</p>
+<h2 id="实例家庭-nas-的每周阅读目录">Example: weekly reading on a home NAS</h2>
+<p>Suppose your NAS has <code class="language-plaintext highlighter-rouge">Comics</code> share, containing <code class="language-plaintext highlighter-rouge">ToRead</code>  and  <code class="language-plaintext highlighter-rouge">Archive</code>. First connect through SMB and choose <code class="language-plaintext highlighter-rouge">ToRead</code> with your own short comic to verify online reading. Download two books for the week and test without networking. Browse the share remotely day to day, and open these two locally when commuting.</p>
+<p>Working on home Wi-Fi but failing on cellular first indicates a changed access path, not corrupt files. Retain the working local connection and use offline copies outside. If remote access is needed, use your own managed network solution; this tutorial does not recommend exposing SMB ports publicly for the example.</p>
+<h2 id="完成检查与权限边界">Final checks and permission limits</h2>
+<p>Reopen the saved connection, enter the correct share, read the sample and complete needed downloads. Before clearing local files, confirm NAS originals and account access remain. Removing an app connection is not deleting the server library; retaining its name cannot restore moved remote files.</p>
+<h3 id="账号可以登录-nas-网页为什么-smb-仍失败">Why does NAS web login work but SMB fail?</h3>
+<p>Web administration and file-share permissions may differ. Check SMB activation, account access to the share and network reachability. A temporary webpage session is not an SMB credential; administrator webpage access does not grant every protocol permission.</p>
+<h3 id="webdav-和-smb-哪个一定更好">Is WebDAV or SMB always better?</h3>
+<p>There is no universal answer. Choose a correctly configured, stable method whose permissions you understand. Test reading and downloading the same sample, then decide for your network. One speed result does not apply to every NAS or file.</p>
+<h2 id="接下来读什么">What to read next</h2>
+<ul>
+<li><a href="/en/guides/manyue-webdav-library/">Another file-library connection method</a>.</li>
+<li><a href="/en/guides/manyue-download-queue/">Check downloads and failed tasks</a>.</li>
+<li><a href="/en/guides/manyue-server-connection-troubleshooting/">Locate network and permission problems</a>.</li>
+</ul>
+<h2 id="资料来源与版本">Sources and version</h2>
+<p>Checked on October 22, 2026: ManYue 2.0.2 for iPhone / iPad. Based on <a href="https://apps.apple.com/cn/app/id6753895889">the public description on the China App Store</a>, <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn">Apple release lookup</a> and the corresponding feature entry points. Interface labels may change with the version. Feature access is determined by the app’s current purchase screen.</p>
+
+{% endraw %}

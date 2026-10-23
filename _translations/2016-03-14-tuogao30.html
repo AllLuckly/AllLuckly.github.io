@@ -1,0 +1,180 @@
+---
+layout: post
+title: Building a WeChat-style iOS app, part 6
+description: 'Records three issues after integrating chat: matching keyboard animation parameters, managing observers
+  as the app enters and leaves the background, and preserving sign-in state. It includes the handling code and explicitly
+  limits the simplified automatic sign-in example.'
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-03-14 00:00:00 +0800
+technical_translation:
+  topic: data-network
+  summary: 'Records three issues after integrating chat: matching keyboard animation parameters, managing observers
+    as the app enters and leaves the background, and preserving sign-in state. It includes the handling code and
+    explicitly limits the simplified automatic sign-in example.'
+  keywords:
+  - keyboard notifications
+  - instant messaging
+  - app lifecycle
+  - automatic sign-in
+  provenance: contribution
+  author_name: WzxJiang
+  source_url: http://www.jianshu.com/users/389c20d5a244/latest_articles
+  author_url: http://www.jianshu.com/users/389c20d5a244/latest_articles
+  credit: Originally credited to WzxJiang; edited and archived by Bison.
+  version_note: Explicitly describes automatic sign-in as a simplified implementation that does not consider Keychain.
+    Retained as a historical development record.
+  title: Building a WeChat-style iOS app, part 6
+  source_sha256: cef664909f75e17b8040d8a97823335d9d7fc61c094563e69de8eb5971ddae87
+lang: en
+source_path: _posts/2016-03-14-tuogao30.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao30
+permalink: /en/journal/2016-03-14-building-a-wechat-style-ios-app-part-6/
+translation_method: machine-assisted
+translation_source_sha256: cef664909f75e17b8040d8a97823335d9d7fc61c094563e69de8eb5971ddae87
+excerpt: 'Records three issues after integrating chat: matching keyboard animation parameters, managing observers
+  as the app enters and leaves the background, and preserving sign-in state. It includes the handling code and explicitly
+  limits the simplified automatic sign-in example.'
+translation_date: '2026-10-23T02:34:14+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/users/389c20d5a244/latest_articles">WzxJiang</a><br/></p>
+<blockquote>
+<p>"I previously had time to update Github but not to write explanations, so the WWeChat tutorials have been delayed for so long that I hardly know where to resume. I will discuss a few points worth noting. If anything else is unclear, leave a comment, and I will add explanations in the next article.:"</p>
+</blockquote>
+<p><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao12/1.png"/><br/></p>
+<p><br/></p>
+<h3 id="先上当前进度的效果图大体来说加了两个部分">First, here is the current progress. Broadly speaking, I have added two parts:<br/></h3>
+<ul>
+<li>Sign-in and registration: registration is not implemented. The two test accounts are 00000000000 and 11111111111; the password is 123456.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao30/1.gif"/><br/></p>
+<ul>
+<li>IM: Message history and similar features have not been added, but messages can already be sent and received.<br/>
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao30/2.gif"/><br/></li>
+</ul>
+<h3 id="然后是我要讲解的问题">Next are the issues I want to explain.<br/></h3>
+<p>1. Making the keyboard appear and disappear more smoothly<br/>
+2. Handling keyboard show and hide notifications when moving to the background and back to the foreground<br/>
+3. Implementing automatic sign-in<br/></p>
+<h3 id="1--如何让键盘弹入弹出更平滑">1. Making the keyboard appear and disappear more smoothly<br/></h3>
+<p>You should already know how to register for notifications.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//使用NSNotificationCenter 鍵盤出現時
+[[NSNotificationCenter defaultCenter] addObserver:self
+selector:@selector(keyboardWasShown:)
+name:UIKeyboardWillShowNotification object:nil];
+
+//使用NSNotificationCenter 鍵盤隐藏時
+[[NSNotificationCenter defaultCenter] addObserver:self
+selector:@selector(keyboardWillBeHidden:)
+name:UIKeyboardWillHideNotification object:nil];
+</code></pre></div></div>
+<p><br/>
+You probably already know how to get the keyboard height in the notification handler.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NSDictionary* info = [aNotification userInfo];
+CGSize kbSize = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size;
+</code></pre></div></div>
+<p><br/>
+Then use a UIView animation… but that does not look coordinated. We also need its duration and animation curve.<br/>
+    - (void)keyboardWasShown:(NSNotification<em>)aNotification
+    {
+        NSDictionary</em> info = [aNotification userInfo];</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    //键盘尺寸
+    CGSize kbSize = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size;
+    //持续时间
+    CGFloat duration = [[info objectForKey:UIKeyboardAnimationDurationUserInfoKey]floatValue];
+    //动画类型
+    NSInteger anType = [[info objectForKey:UIKeyboardAnimationCurveUserInfoKey]integerValue];
+
+    [UIView animateKeyframesWithDuration:duration delay:0 options:anType animations:^{
+
+        CGRect rect = weakKeyView.frame;
+        rect.origin.y -= kSize.height;
+        weakKeyView.frame = rect;
+
+    } completion:^(BOOL finished) {
+    }];
+
+} &lt;br&gt;
+</code></pre></div></div>
+<p>The resulting animation will be well coordinated.<br/>
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao30/3.gif"/><br/></p>
+<h3 id="2--用键盘出现消失通知在退到后台进进到前台应该做的处理">2. Handling keyboard show and hide notifications when moving to the background and back to the foreground<br/></h3>
+<p>Following the example above, register for keyboard show and hide notifications and make the TextField first responder. Press Home to background the app, then tap it to return. You will find that the components animated in your notification handler have disappeared…<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao30/4.gif"/><br/></p>
+<p>After persistent observation, I found a solution: locate the background- and foreground-entry methods in Appdelegate.m and post notifications from them.<br/>
+    //进入后台
+    - (void)applicationDidEnterBackground:(UIApplication *)application {
+        //创建一个消息对象
+        NSNotification * notice = [NSNotification notificationWithName:@”EnterBackground” object:nil userInfo:nil];
+        //发送消息
+        [[NSNotificationCenter defaultCenter]postNotification:notice];
+    }</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//进入前台
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+    //创建一个消息对象
+    NSNotification * notice = [NSNotification notificationWithName:@"EnterForeground" object:nil userInfo:nil];
+    //发送消息
+    [[NSNotificationCenter defaultCenter]postNotification:notice];
+}
+</code></pre></div></div>
+<p><br/></p>
+<p>Make the chat VC an observer of these two notifications.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)addEnterNofi
+{
+    //进入前台
+    [[NSNotificationCenter defaultCenter] addObserver:self
+    selector:@selector(enterForeground)
+    name:@"EnterForeground" object:nil];
+    //进入后台
+    [[NSNotificationCenter defaultCenter] addObserver:self
+    selector:@selector(enterBackground)
+    name:@"EnterBackground" object:nil];
+} &lt;br&gt;
+</code></pre></div></div>
+<p>In the background-entry handler, unregister from keyboard show and hide notifications.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)enterBackground
+{
+    [[NSNotificationCenter defaultCenter]removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter]removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+}
+</code></pre></div></div>
+<p><br/>
+In the foreground-entry handler, register again for the keyboard show and hide notifications.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    [self addKeyNofi];
+});
+</code></pre></div></div>
+<p><br/>
+This resolves the problem. Be sure to delay roughly 0.5 seconds before registering as an observer again.<br/></p>
+<h3 id="3-自动登录的实现">3. Implementing automatic sign-in<br/></h3>
+<p>This is only a simple automatic sign-in implementation, without considering KeyChain…<br/>
+First, find the VC assigned to self.window.rootViewController in AppDelegate.m and add the following code to that VC's .m file.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)viewWillAppear:(BOOL)animated
+{
+    if ([[NSUserDefaults standardUserDefaults]objectForKey:@"userName"] 
+    &amp;&amp; [[NSUserDefaults standardUserDefaults]objectForKey:@"password"])
+    {
+        //在这写直接登录的方法，帐号密码为取出来的值
+    }
+    else
+    {
+        //在这写手动登录的方法
+    }
+} 在你登录成功的回调中存值&lt;br&gt;
+[[NSUserDefaults standardUserDefaults]setObject:@"你的帐号" forKey:@"userName"];
+[[NSUserDefaults standardUserDefaults]setObject:@"你的密码" forKey:@"password"];
+//同步一下
+[[NSUserDefaults standardUserDefaults]synchronize];
+</code></pre></div></div>
+<p><br/></p>
+<p>That is all for part six. As before, if anything else is unclear, leave a comment and I will explain those parts in the next article.</p>
+<h3 id="完整代码">Complete code<br/></h3>
+<p><a href="https://github.com/Wzxhaha/WWeChat">Download here—GitHub: WzxJiang</a><br/></p>
+<p>If you like the project, please Star or Fork it!<br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-02-01-a-beginner-developer-s-review-of-2015/">A beginner developer's review of 2015</a><br/></p>
+
+{% endraw %}

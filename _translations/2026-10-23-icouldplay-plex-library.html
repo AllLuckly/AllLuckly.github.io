@@ -1,0 +1,51 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'Connect iCouldPlay to Plex: authorise, select a server and check empty libraries'
+description: Authorise the Plex account, enter the real server address and separately check the account, server
+  reachability, library permissions and video playback.
+permalink: /en/guides/icouldplay-plex-library/
+date: 2026-10-23 00:00:00 +0800
+category: Tutorials
+level: Beginner
+series_order: 8
+topic: Servers and library setup
+reading_time: 11
+lang: en
+source_path: _posts/2026-10-23-icouldplay-plex-library.md
+source_url: /guides/icouldplay-plex-library/
+translation_method: machine-assisted
+translation_source_sha256: 5258888dce36f5c24ec8a7b2f7381e132c534a6551376150435bbb05221937f3
+excerpt: Authorise the Plex account, enter the real server address and separately check the account, server reachability,
+  library permissions and video playback.
+translation_date: '2026-10-23T02:34:08+00:00'
+---
+{% raw %}
+<p>Plex connection involves linking the player to a Plex account and actually reaching a media server. Authorization success does not guarantee a reachable address or access to every library. Complete authorization first, then use an explicit server address to verify one library rather than repeatedly entering passwords when signed in but seeing no films.</p>
+<h2 id="准备账号与一台可访问的服务器">Prepare an account and one reachable server</h2>
+<p>In Plex's own interface, confirm the account and which server it owns or has been shared. Choose one already-playable film and record the server display name and library name. If several servers exist, test only one initially rather than mixing old servers, friends' shares, and the home NAS in one attempt.</p>
+<p>Prepare a server address and port reachable from the phone's current network. Plex Media Server commonly uses port 32400, but external mappings or custom deployments can differ. Follow the actual configuration.<a href="https://support.plex.tv/articles/201543147-what-network-ports-do-i-need-to-allow-through-my-firewall/">Plex port guidance</a> This uses an already available service; the tutorial does not require firewall changes or opening public ports.</p>
+<h2 id="从-plex-类型进入授权流程">Start authorization through the Plex source type</h2>
+<p>In iCouldPlay Sources, add a media server and choose Plex. Unlike Emby's username-and-password form, the current Plex entry uses authorization. Start it, follow the prompts to link the account in a browser, then return to iCouldPlay and wait. Confirm that the browser is signed into the intended Plex account, especially on a device previously used by other household members.</p>
+<p>Plex officially describes linking a client with a code: enter the current client's code on the official authorization page, after which the client updates its linked state.<a href="https://support.plex.tv/articles/203395277-connect-app-to-your-plex-account/">Account-linking guidance</a> Follow iCouldPlay's current prompt and code. Do not reuse a code from an expired screenshot or send it to someone else to confirm on your behalf.</p>
+<h2 id="授权成功后填写目标服务器">Enter the target server after successful authorization</h2>
+<p>Return to iCouldPlay and confirm completed authorization, then enter the target server's host, port, and protocol. A source name such as “Home Plex” distinguishes it from others. Here, choosing a server means identifying and entering the one to access. Do not assume authorization always produces an automatic list of every available server; follow your version's actual interface.</p>
+<p>Do not use the <code class="language-plaintext highlighter-rouge">plex.tv</code> account website as your media-server host, or paste a film detail page's long link. The host points to the service storing and serving media; account authorization establishes identity. Neither replaces the other. Match HTTPS to the server's configured access method rather than switching it randomly.</p>
+<h2 id="把授权失败与连接失败分开">Separate authorization failures from connection failures</h2>
+<p>If browser authorization is incomplete, return to that step and check account and code, starting a new attempt if the code expired. If iCouldPlay shows authorization success but server saving fails, check address, port, network, and server operation instead of repeatedly signing in. Recording the exact failing stage is more useful than saying Plex will not connect.</p>
+<p>Reachability may differ on guest Wi-Fi, mobile data, or another LAN. Establish a baseline on the server's network, then test the configured remote address. Linking an account does not create a remote-access route or bring a sleeping or powered-off server online. If the browser authorization page fails, distinguish internet access from local-server access.</p>
+<h2 id="进入媒体库后核对权限与来源">Check permissions and source after opening the library</h2>
+<p>After saving, open the Plex source and compare library names with Plex's original interface under the same account. Sharing may include only some libraries, not every server file. For an empty library, check the authorized account and its access to the target library. A friend seeing more films is not a reason to add the same address repeatedly.</p>
+<p>Find the sample and check title, year, duration, and edition. A normal poster with missing synopsis differs from an entirely empty library. Verify details and playback before reauthorizing merely to obtain artwork. Incorrect server metadata should be corrected server-side by an authorized person; iCouldPlay is not a substitute for the server administration interface.</p>
+<h2 id="用同一影片完成播放对照">Compare playback using the same film</h2>
+<p>Play the sample at the beginning, middle, and end, checking expected audio and subtitles. If the library browses but video fails, play the same entry in the original Plex client first to rule out an offline file or server-reading failure. Then confirm the same media version is used on both sides instead of comparing a high-bitrate version with a smaller one.</p>
+<p>For persistent buffering, record the current network, file size or bitrate clues, and whether waiting occurs at startup or after seeking. Do not assume a subscription or switch will necessarily solve it; server capacity, client format support, and network may all contribute. Continue with <a href="/en/guides/icouldplay-network-buffering/">Streaming-buffering troubleshooting</a> and <a href="/en/guides/icouldplay-player-engine/">Playback format compatibility</a>, changing only one condition at a time.</p>
+<h2 id="常见问题与账号整理">Common questions and account organization</h2>
+<p><strong>What if I authorized the wrong account?</strong> Confirm the relationship between the linked account and target server, then use the current sign-out or reauthorization workflow to switch accounts. Do not put another account's password in the server-host field or copy tokens to bypass the normal process. After relinking, check library scope so old test results are not mixed with the new account.</p>
+<p><strong>If I can see a friend's shared server, can I definitely stream remotely?</strong> Not necessarily. Account permissions are only one condition; server availability, remote address, network, and playback method also affect results. Verify the same account and film in Plex's original interface before comparing iCouldPlay. A shared-server list alone does not prove the data path works.</p>
+<p>At completion, separately confirm account authorization, server address, library permissions, and sample playback. Keep one clearly named source rather than leaving a same-named configuration for every failed attempt. When changing networks later, check the address's scope before editing the source.</p>
+<h2 id="资料来源与版本">Sources and version</h2>
+<p>Based on <a href="https://apps.apple.com/cn/app/id6755653178">Official iCouldPlay App Store page </a>for public Plex support, the existing authorization entry, and the Plex account and port documentation above. iCouldPlay's public version checked on October 23, 2026 was 1.1.0. Authorization and server interfaces may vary by version. After authorization, still check server address, port, and network reachability.</p>
+
+{% endraw %}

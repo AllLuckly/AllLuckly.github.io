@@ -1,0 +1,281 @@
+---
+layout: post
+title: A custom pull-to-refresh control in Swift
+description: Creates a text view in a xib file to cover UIRefreshControl's default appearance, then rotates, recolours
+  and scales the letters in stages. Simulated loading and row insertion connect the beginning and end of the custom
+  refresh workflow.
+category: Development notes
+imagefeature: null
+date: 2016-02-17 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Creates a text view in a xib file to cover UIRefreshControl's default appearance, then rotates, recolours
+    and scales the letters in stages. Simulated loading and row insertion connect the beginning and end of the custom
+    refresh workflow.
+  keywords:
+  - Swift
+  - UIRefreshControl
+  - xib
+  - pull to refresh
+  - UITableView
+  provenance: contribution
+  author_name: 威權在B612等着那阵温柔的风
+  source_url: http://www.jianshu.com/p/61094c18ffd9
+  credit: Originally credited to 威權在B612等着那阵温柔的风; edited and archived by Bison.
+  version_note: Published in 2016, using the Swift and NSTimer example syntax of that period.
+  title: A custom pull-to-refresh control in Swift
+  source_sha256: bf56f189ff24bae03dce433c5316f751f40eae41846ee3290a988e8dbd103440
+lang: en
+source_path: _posts/2016-02-17-tuogao22.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao22
+permalink: /en/journal/2016-02-17-a-custom-pull-to-refresh-control-in-swift/
+translation_method: machine-assisted
+translation_source_sha256: bf56f189ff24bae03dce433c5316f751f40eae41846ee3290a988e8dbd103440
+excerpt: Creates a text view in a xib file to cover UIRefreshControl's default appearance, then rotates, recolours
+  and scales the letters in stages. Simulated loading and row insertion connect the beginning and end of the custom
+  refresh workflow.
+translation_date: '2026-10-23T02:34:13+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/61094c18ffd9">威權在B612等着那阵温柔的风</a><br/></p>
+<blockquote>
+<p>"Swift is accomplishing something remarkable: changing how we program Apple devices by introducing modern paradigms such as functional programming and richer type checking than a purely object-oriented language like Objective-C."</p>
+</blockquote>
+<p><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao22/1.gif"/><br/></p>
+<h3 id="前言">Introduction<br/></h3>
+<p>This article will teach you:<br/></p>
+<ul>
+<li>
+<p>Custom pull-to-refresh<br/></p>
+</li>
+<li>
+<p>Create the animation shown.<br/></p>
+</li>
+<li>
+<p>Insert data into UITableView.<br/></p>
+</li>
+</ul>
+<h3 id="下拉刷新">Pull-to-refresh<br/></h3>
+<p>First, set up a TableView like the one shown. Do that yourself; this article focuses on pull-to-refresh.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao22/2.png"/><br/></p>
+<p>Connect the TableView outlet to ViewController as tblDemo.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@IBOutlet weak var tblDemo: UITableView!
+</code></pre></div></div>
+<p><br/></p>
+<p>Pull-to-refresh requires UIRefreshControl. Add a variable to viewController:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var refreshControl: UIRefreshControl! &lt;br&gt; 然后在viewDidLoad()添加：&lt;br&gt;
+
+refreshControl = UIRefreshControl()
+//设置背景颜色
+refreshControl.backgroundColor = UIColor.redColor()
+//设置菊花转的颜色
+refreshControl.tintColor = UIColor.yellowColor()
+
+//往tableView添加刷新控件
+tblDemo.addSubview(refreshControl) &lt;br&gt;
+</code></pre></div></div>
+<p>Running it gives:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao22/3.gif"/><br/></p>
+<p>Custom pull-to-refresh<br/>
+The principle: UIRefreshControl is a UIView subclass, so add a view directly on top to cover the default spinning refresh indicator.<br/></p>
+<h3 id="1使用xib创建view">1. Create a view with a xib<br/></h3>
+<p>First, create the custom view:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao22/4.png"/><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao22/5.png"/><br/></p>
+<p>Name the file RefreshContents.<br/>
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao22/6.png"/><br/></p>
+<p>Then set the view's size in the right sidebar.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao22/7.png"/><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao22/8.png"/><br/></p>
+<p>Then drag in each Label and set its constraints:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao22/9.png"/><br/></p>
+<p>Give the Labels tags: first “我” is Tag 1, “是” is 2, and so on:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao22/10.png"/><br/></p>
+<h3 id="2覆盖uirefreshcontrol的默认view">2. Cover UIRefreshControl's default view<br/></h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//存储定制好的view和label
+var customView: UIView!
+var labelsArray: Array&lt;UILabel&gt; = []
+
+func loadCustomRefreshContens(){
+    //读取xib里的view
+    let refreshContents = NSBundle.mainBundle().loadNibNamed("RefreshContents", owner: self, options: nil)
+
+    customView = refreshContents[0] as! UIView
+    //按照refreshControl的大小设置view的大小
+    customView.frame = refreshControl.bounds
+
+    //读取view 里 label 到labelsArray
+    for var i=0; i &lt; customView.subviews.count; ++i{
+        labelsArray.append(customView.viewWithTag(i + 1) as! UILabel)
+    }
+
+    //覆盖默认view   
+    refreshControl.addSubview(customView)
+} &lt;br&gt; 接着在viewDidLoad()添加&lt;br&gt;
+
+loadCustomRefreshContents() &lt;br&gt; 运行，下拉就能看到&lt;br&gt;
+</code></pre></div></div>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao22/11.png"/><br/></p>
+<h3 id="3添加动画效果">3. Add animation effects<br/></h3>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao22/12.gif"/><br/></p>
+<p>The animation can be broken into the following two steps:<br/></p>
+<ul>
+<li>
+<p>Starting with the first character, rotate it 45 degrees, change its color, then straighten it and turn it black. Repeat with the next character until the last one.<br/></p>
+</li>
+<li>
+<p>Enlarge all the letters, then return them to normal.<br/></p>
+</li>
+</ul>
+<p>First, define these variables in viewController:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//用来判断是否可以执行动画，防止动画未完时又启动了动画
+var isAnimating = false
+
+var currentColorIndex = 0
+
+var currentLabelIndex = 0 &lt;br&gt; 第一步的实现如下：&lt;br&gt;
+
+func animateRefreshStep1(){
+    isAnimating = true
+
+    UIView.animateWithDuration(0.1, delay: 0.0, options: .CurveLinear, animations: {
+    self.labelsArray[self.currentLabelIndex].transform = CGAffineTransformMakeRotation(CGFloat(M_PI_4))
+    self.labelsArray[self.currentLabelIndex].textColor = self.getNextColor()
+
+
+    }, completion: {(finished) -&gt; Void in
+        UIView.animateWithDuration(0.05, delay: 0.0, options: .CurveLinear, animations: {
+        self.labelsArray[self.currentLabelIndex].transform = CGAffineTransformIdentity
+        self.labelsArray[self.currentLabelIndex].textColor = UIColor.blackColor()
+
+        }, completion: {(fin) -&gt; Void in
+            ++self.currentLabelIndex
+
+            if self.currentLabelIndex &lt; self.labelsArray.count{
+                self.animateRefreshStep1()
+            }
+            else{
+                self.animateRefreshStep2()
+            }
+
+        }
+       )
+    })
+}
+
+//返回下个颜色
+func getNextColor() -&gt; UIColor{
+    var colorsArray: Array&lt;UIColor&gt; = [UIColor.magentaColor(),UIColor.brownColor(),UIColor.yellowColor(),UIColor.redColor(),UIColor.greenColor(),UIColor.blueColor(),UIColor.orangeColor()]
+    if currentColorIndex == colorsArray.count{
+        currentColorIndex = 0
+    }
+
+    let returnColor = colorsArray[currentColorIndex]
+    ++currentColorIndex
+
+    return returnColor
+}
+</code></pre></div></div>
+<p><br/>
+Implementation of the second step:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func animateRefreshStep2(){
+    UIView.animateWithDuration(0.35, delay: 0.0, options: .CurveLinear, animations: {
+        self.labelsArray[0].transform = CGAffineTransformMakeScale(1.5,1.5)
+        self.labelsArray[1].transform = CGAffineTransformMakeScale(1.5,1.5)
+        self.labelsArray[2].transform = CGAffineTransformMakeScale(1.5,1.5)
+        self.labelsArray[3].transform = CGAffineTransformMakeScale(1.5,1.5)
+        self.labelsArray[4].transform = CGAffineTransformMakeScale(1.5,1.5)
+        self.labelsArray[5].transform = CGAffineTransformMakeScale(1.5,1.5)
+        self.labelsArray[6].transform = CGAffineTransformMakeScale(1.5,1.5)
+
+
+    }, completion: {(fin) -&gt; Void in
+    UIView.animateWithDuration(0.25, delay: 0.0, options: .CurveLinear, animations: {
+        self.labelsArray[0].transform = CGAffineTransformIdentity
+        self.labelsArray[1].transform = CGAffineTransformIdentity
+        self.labelsArray[2].transform = CGAffineTransformIdentity
+        self.labelsArray[3].transform = CGAffineTransformIdentity
+        self.labelsArray[4].transform = CGAffineTransformIdentity
+        self.labelsArray[5].transform = CGAffineTransformIdentity
+        self.labelsArray[6].transform = CGAffineTransformIdentity
+
+    }, completion: {(fin) -&gt; Void in
+        //如果还未结束刷新则回到第一步再来一次
+        if self.refreshControl.refreshing{
+            self.currentLabelIndex = 0
+            self.animateRefreshStep1()
+        }else{
+            //完成，设置为原始状态
+            self.isAnimating  = false
+            self.currentLabelIndex = 0
+            for var i = 0; i&lt;self.labelsArray.count; ++i{
+                self.labelsArray[i].textColor = UIColor.blackColor()
+                self.labelsArray[i].transform = CGAffineTransformIdentity
+            }
+        }
+    })
+
+    })
+} &lt;br&gt; 接着就是设置当下拉刷新时启动动画：&lt;br&gt;
+
+func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+    if refreshControl.refreshing{
+        if !isAnimating{
+            animateRefreshStep1()
+        }
+    }
+} &lt;br&gt; 运行就能见到动画效果了。&lt;br&gt;
+</code></pre></div></div>
+<h3 id="4插入数据并且结束下拉刷新">4. Insert data and finish refreshing<br/></h3>
+<p>To simulate loading network data, use NSTimer to introduce a 4-second delay. Then end refreshing and insert the data.</p>
+<p>Define the following function:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func doSomething(){
+    //4秒后触发endOfWork
+    timer = NSTimer.scheduledTimerWithTimeInterval(4.0, target: self, selector: "endOfWork", userInfo: nil, repeats: true)
+}
+
+func endOfWork(){
+    //结束下拉刷新
+    refreshControl.endRefreshing()
+
+    timer.invalidate()
+    timer = nil
+
+    //插入数据
+    insertLoveData()
+}
+
+func insertLoveData(){
+    let lastIndexpath = NSIndexPath(forRow: dataArray.count, inSection: 0)
+
+    //往数据里添加新的数据
+    dataArray.append("其实我也喜欢你")
+
+    //更新tableView数据
+    tblDemo.beginUpdates()
+    tblDemo.insertRowsAtIndexPaths([lastIndexpath], withRowAnimation: .Middle)
+    tblDemo.endUpdates()
+}
+</code></pre></div></div>
+<p><br/>
+Then insert doSomething into scrollViewDidEndDecelerating as follows:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+    if refreshControl.refreshing{
+        if !isAnimating{
+            doSomething()
+            animateRefreshStep1()
+        }
+    }
+} &lt;br&gt; 运行，如下效果：&lt;br&gt;
+</code></pre></div></div>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao22/1.gif"/><br/></p>
+<h3 id="最后">Finally<br/></h3>
+<p>It happened to be Valentine's Day when I wrote this, so I chose a fitting theme. Happy Singles-Torture Day! :)<br/></p>
+<h4 id="end-and-thank-u">(End And Thank U)<br/></h4>
+<p><a href="http://www.appcoda.com/custom-pull-to-refresh/">Reference links</a><br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-01-20-integrating-lianlian-pay-into-an-ios-app/">Integrating LianLian Pay into an iOS app</a><br/></p>
+
+{% endraw %}

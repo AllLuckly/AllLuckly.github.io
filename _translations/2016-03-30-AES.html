@@ -1,0 +1,352 @@
+---
+layout: post
+title: Combining AES encryption with Base64 encoding on iOS
+description: Defines categories for NSData and NSString to demonstrate a workflow combining AES encryption and decryption
+  with Base64 encoding. It notes that the client and server must agree on the same key and provides a complete demonstration
+  project.
+category: Development notes
+imagefeature: null
+date: 2016-03-30 00:00:00 +0800
+technical_translation:
+  topic: data-network
+  summary: Defines categories for NSData and NSString to demonstrate a workflow combining AES encryption and decryption
+    with Base64 encoding. It notes that the client and server must agree on the same key and provides a complete
+    demonstration project.
+  keywords:
+  - AES
+  - Base64
+  - CommonCrypto
+  - NSData
+  - NSString
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Published in 2016. The example uses a CommonCrypto category implementation from that period; Base64
+    serves as encoding in the workflow.
+  title: Combining AES encryption with Base64 encoding on iOS
+  source_sha256: 613d077de6ff47a1cfaf89653ae8b108ddc00242512c707a305b61862283a97a
+lang: en
+source_path: _posts/2016-03-30-AES.md
+source_url: /aes/AES
+permalink: /en/journal/2016-03-30-combining-aes-encryption-with-base64-encoding-on-ios/
+translation_method: machine-assisted
+translation_source_sha256: 613d077de6ff47a1cfaf89653ae8b108ddc00242512c707a305b61862283a97a
+excerpt: Defines categories for NSData and NSString to demonstrate a workflow combining AES encryption and decryption
+  with Base64 encoding. It notes that the client and server must agree on the same key and provides a complete demonstration
+  project.
+translation_date: '2026-10-23T02:34:14+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"App-data security concerns us as developers. Basic MD5/Base64 approaches no longer satisfy current data-security standards. This article briefly introduces combined AES and Base64 encoding, encryption and decryption."</p>
+</blockquote>
+<p>AES, Advanced Encryption Standard, also called Rijndael in cryptography, is a block-cipher standard adopted by the US federal government to replace DES. Widely analysed and used worldwide, it followed a five-year selection process. NIST published it as FIPS PUB 197 on November 26, 2001, and it became effective on May 26, 2002. By 2006 it was among the most popular symmetric-key encryption algorithms.</p>
+<p>The explanation above comes from Baidu Baike.</p>
+<p>Now I will demonstrate usage in code.
+Create an NSData category named AES, producing NSData+AES, then import the following headers:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import &lt;CommonCrypto/CommonDigest.h&gt;
+#import &lt;CommonCrypto/CommonCryptor.h&gt;
+</code></pre></div></div>
+<p><br/>
+Add encryption and decryption methods for external callers. The .h file becomes:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import &lt;Foundation/Foundation.h&gt;
+#import &lt;CommonCrypto/CommonDigest.h&gt;
+#import &lt;CommonCrypto/CommonCryptor.h&gt;
+
+@interface NSData (AES)
+
+//加密
+- (NSData *) AES256_Encrypt:(NSString *)key;
+
+//解密
+- (NSData *) AES256_Decrypt:(NSString *)key;
+
+//追加64编码
+- (NSString *)newStringInBase64FromData;
+
+//同上64编码
++ (NSString*)base64encode:(NSString*)str;
+
+
+@end
+</code></pre></div></div>
+<p><br/></p>
+<p>Implement these methods in order in the .m file:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import "NSData+AES.h"
+
+static char base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+@implementation NSData (AES)
+
+//加密
+- (NSData *) AES256_Encrypt:(NSString *)key{
+    char keyPtr[kCCKeySizeAES256+1];
+    bzero(keyPtr, sizeof(keyPtr));
+    [key getCString:keyPtr maxLength:sizeof(keyPtr) encoding:NSUTF8StringEncoding];
+    NSUInteger dataLength = [self length];
+    size_t bufferSize = dataLength + kCCBlockSizeAES128;
+    void *buffer = malloc(bufferSize);
+    size_t numBytesEncrypted = 0;
+    CCCryptorStatus cryptStatus = CCCrypt(kCCEncrypt, kCCAlgorithmAES128,
+    kCCOptionPKCS7Padding | kCCOptionECBMode,
+    keyPtr, kCCBlockSizeAES128,
+    NULL,
+    [self bytes], dataLength,
+    buffer, bufferSize,
+    &amp;numBytesEncrypted);
+    if (cryptStatus == kCCSuccess) {
+        return [NSData dataWithBytesNoCopy:buffer length:numBytesEncrypted];
+    }
+    free(buffer);
+    return nil;
+}
+
+//解密
+- (NSData *) AES256_Decrypt:(NSString *)key{
+
+    char keyPtr[kCCKeySizeAES256+1];
+    bzero(keyPtr, sizeof(keyPtr));
+    [key getCString:keyPtr maxLength:sizeof(keyPtr) encoding:NSUTF8StringEncoding];
+    NSUInteger dataLength = [self length];
+    size_t bufferSize = dataLength + kCCBlockSizeAES128;
+    void *buffer = malloc(bufferSize);
+    size_t numBytesDecrypted = 0;
+    CCCryptorStatus cryptStatus = CCCrypt(kCCDecrypt, kCCAlgorithmAES128,
+    kCCOptionPKCS7Padding | kCCOptionECBMode,
+    keyPtr, kCCBlockSizeAES128,
+    NULL,
+    [self bytes], dataLength,
+    buffer, bufferSize,
+    &amp;numBytesDecrypted);
+    if (cryptStatus == kCCSuccess) {
+        return [NSData dataWithBytesNoCopy:buffer length:numBytesDecrypted];
+
+    }
+    free(buffer);
+    return nil;
+}
+
+//追加64编码
+- (NSString *)newStringInBase64FromData            
+
+{
+
+    NSMutableString *dest = [[NSMutableString alloc] initWithString:@""];
+
+    unsigned char * working = (unsigned char *)[self bytes];
+
+    int srcLen = (int)[self length];
+
+    for (int i=0; i&lt;srcLen; i += 3) {
+
+        for (int nib=0; nib&lt;4; nib++) {
+
+            int byt = (nib == 0)?0:nib-1;
+
+            int ix = (nib+1)*2;
+
+            if (i+byt &gt;= srcLen) break;
+
+            unsigned char curr = ((working[i+byt] &lt;&lt; (8-ix)) &amp; 0x3F);
+
+            if (i+nib &lt; srcLen) curr |= ((working[i+nib] &gt;&gt; ix) &amp; 0x3F);
+
+            [dest appendFormat:@"%c", base64[curr]];
+
+        }
+
+    }
+
+    return dest;
+
+}
+
+
+
++ (NSString*)base64encode:(NSString*)str
+
+{
+
+    if ([str length] == 0)
+
+    return @"";
+
+    const char *source = [str UTF8String];
+
+    int strlength  = (int)strlen(source);
+
+    char *characters = malloc(((strlength + 2) / 3) * 4);
+
+    if (characters == NULL)
+
+    return nil;
+
+    NSUInteger length = 0;
+
+    NSUInteger i = 0;
+
+    while (i &lt; strlength) {
+
+        char buffer[3] = {0,0,0};
+
+        short bufferLength = 0;
+
+        while (bufferLength &lt; 3 &amp;&amp; i &lt; strlength)
+
+        buffer[bufferLength++] = source[i++];
+
+        characters[length++] = base64[(buffer[0] &amp; 0xFC) &gt;&gt; 2];
+
+        characters[length++] = base64[((buffer[0] &amp; 0x03) &lt;&lt; 4) | ((buffer[1] &amp; 0xF0) &gt;&gt; 4)];
+
+        if (bufferLength &gt; 1)
+
+        characters[length++] = base64[((buffer[1] &amp; 0x0F) &lt;&lt; 2) | ((buffer[2] &amp; 0xC0) &gt;&gt; 6)];
+
+        else characters[length++] = '=';
+
+        if (bufferLength &gt; 2)
+
+        characters[length++] = base64[buffer[2] &amp; 0x3F];
+
+        else characters[length++] = '=';
+
+    }
+
+    NSString *g = [[NSString alloc] initWithBytesNoCopy:characters length:length encoding:NSASCIIStringEncoding freeWhenDone:YES];
+
+
+    return g;
+
+}
+
+
+
+@end
+</code></pre></div></div>
+<p><br/></p>
+<p>That completes the AES+Base64 approach. Next is AES-only string encryption.<br/>
+Similarly, create an NSString category named AES, producing NSString+AES, and import these headers:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import "NSData+AES.h"
+</code></pre></div></div>
+<p><br/>
+Declare the encryption and decryption methods in the .h file as follows:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import &lt;Foundation/Foundation.h&gt;
+#import "NSData+AES.h"
+
+@interface NSString (AES)
+
+//加密
+- (NSString *) AES256_Encrypt:(NSString *)key;
+
+//解密
+- (NSString *) AES256_Decrypt:(NSString *)key;
+
+@end
+</code></pre></div></div>
+<p><br/></p>
+<p>Implementation in the .m file<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//加密
+- (NSString *) AES256_Encrypt:(NSString *)key{
+    const char *cstr = [self cStringUsingEncoding:NSUTF8StringEncoding];
+    NSData *data = [NSData dataWithBytes:cstr length:self.length];
+    //对数据进行加密
+    NSData *result = [data AES256_Encrypt:key];
+
+    //转换为2进制字符串
+    if (result &amp;&amp; result.length &gt; 0) {
+
+    Byte *datas = (Byte*)[result bytes];
+    NSMutableString *output = [NSMutableString stringWithCapacity:result.length * 2];
+    for(int i = 0; i &lt; result.length; i++){
+        [output appendFormat:@"%02x", datas[i]];
+    }
+    return output;
+    }
+    return nil;
+}
+
+//解密
+- (NSString *) AES256_Decrypt:(NSString *)key{
+    //转换为2进制Data
+    NSMutableData *data = [NSMutableData dataWithCapacity:self.length / 2];
+    unsigned char whole_byte;
+    char byte_chars[3] = {'\0','\0','\0'};
+    int i;
+    for (i=0; i &lt; [self length] / 2; i++) {
+    byte_chars[0] = [self characterAtIndex:i*2];
+    byte_chars[1] = [self characterAtIndex:i*2+1];
+    whole_byte = strtol(byte_chars, NULL, 16);
+    [data appendBytes:&amp;whole_byte length:1];
+    }
+
+    //对数据进行解密
+    NSData* result = [data AES256_Decrypt:key];
+    if (result &amp;&amp; result.length &gt; 0) {
+        return [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
+    }
+    return nil;
+}
+</code></pre></div></div>
+<p><br/>
+The encryption files are largely ready. Here is a simple usage example:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import "ViewController.h"
+#import "NSString+AES.h"
+
+@interface ViewController ()
+
+@end
+
+@implementation ViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view, typically from a nib.
+
+    //字符串加密
+    NSString *key = @"12345678";//Key是和后台约定的key哦，不然无法解密....
+
+    NSString *secret = @"aes Bison base64";
+
+
+    NSLog(@"字符串加密---%@",[secret AES256_Encrypt:key]);
+
+    //字符串解密
+    NSLog(@"字符串解密---%@",[[secret AES256_Encrypt:key] AES256_Decrypt:key]);
+
+
+    //NSData加密+base64
+
+    NSData *plain = [secret dataUsingEncoding:NSUTF8StringEncoding];
+
+    NSData *cipher = [plain AES256_Encrypt:key];
+
+    NSLog(@"NSData加密+base64++++%@",[cipher newStringInBase64FromData]);
+
+
+    //解密
+
+    plain = [cipher AES256_Decrypt:key];
+
+    NSLog(@"NSData解密+base64++++%@", [[NSString alloc] initWithData:plain encoding:NSUTF8StringEncoding]);
+
+}
+
+
+@end
+</code></pre></div></div>
+<p><br/></p>
+<p>Running it prints the following:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>2016-03-30 17:31:55.686 AES_256[14242:198853] 字符串加密---07815ca46d20acc3ba4e43d6930c7537496e851a36dbeac34fa30c5796089b02
+2016-03-30 17:31:55.687 AES_256[14242:198853] 字符串解密---aes Bison base64
+2016-03-30 17:31:55.687 AES_256[14242:198853] NSData加密+base64++++B4FcpG0grMO6TkPWkwx1N0luhRo22+rDT6MMV5YImwI
+2016-03-30 17:31:55.687 AES_256[14242:198853] NSData解密+base64++++aes Bison base64
+</code></pre></div></div>
+<p><br/></p>
+<h2 id="值得注意的是key是和后台约定的key哦不然无法解密">The Key must match the key agreed with the backend; otherwise decryption fails.</h2>
+<p>Finally, here is <a href="https://github.com/AllLuckly/LBAES/tree/master">Download the demo</a></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-02-01-a-beginner-developer-s-review-of-2015/">A beginner developer's review of 2015</a><br/></p>
+
+{% endraw %}

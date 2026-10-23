@@ -1,0 +1,52 @@
+---
+layout: post
+title: Disabling the system swipe-back gesture on iOS
+description: Addresses an embedded game unexpectedly revealing navigation and tab bars during a swipe. The article
+  shows where to control the navigation controller's built-in back gesture and records how that interaction was
+  disabled for a particular screen.
+category: Development notes
+imagefeature: picture-37.jpg
+date: 2015-08-17 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Addresses an embedded game unexpectedly revealing navigation and tab bars during a swipe. The article
+    shows where to control the navigation controller's built-in back gesture and records how that interaction was
+    disabled for a particular screen.
+  keywords:
+  - UINavigationController
+  - back gesture
+  - interactivePopGestureRecognizer
+  - embedded games
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  title: Disabling the system swipe-back gesture on iOS
+  source_sha256: afc7d5c919ce96c63797ad67133cc8070d994ea3bd5157ddef25b9dc2a41dd64
+lang: en
+source_path: _posts/2015-08-17-禁止使用系统自带手势滑动返回功能.md
+source_url: /%E7%A6%81%E6%AD%A2%E4%BD%BF%E7%94%A8%E7%B3%BB%E7%BB%9F%E8%87%AA%E5%B8%A6%E6%89%8B%E5%8A%BF%E6%BB%91%E5%8A%A8%E8%BF%94%E5%9B%9E%E5%8A%9F%E8%83%BD
+permalink: /en/journal/2015-08-17-disabling-the-system-swipe-back-gesture-on-ios/
+translation_method: machine-assisted
+translation_source_sha256: afc7d5c919ce96c63797ad67133cc8070d994ea3bd5157ddef25b9dc2a41dd64
+excerpt: Addresses an embedded game unexpectedly revealing navigation and tab bars during a swipe. The article shows
+  where to control the navigation controller's built-in back gesture and records how that interaction was disabled
+  for a particular screen.
+translation_date: '2026-10-23T02:34:09+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"Health is the foundation of everything. Getting more exercise is the way to go."
+<small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p>A recent project contained an embedded game and had this issue: swiping left made the navigation bar and tabbar appear. That led to the code below.</p>
+<p>The code is as follows<br/></p>
+<p>Core code</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span> <span class="nt">禁用返回手势</span><span class="o">,</span><span class="nt">需要开启只需设置为yes即可</span><span class="err">。</span><span class="nt">默认开启</span>  
+
+<span class="nt">if</span> <span class="o">([</span><span class="nt">self</span><span class="nc">.navigationController</span> <span class="nt">respondsToSelector</span><span class="o">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">interactivePopGestureRecognizer</span><span class="p">)])</span> <span class="p">{</span>  
+<span class="nt">self</span><span class="nc">.navigationController.interactivePopGestureRecognizer.enabled</span> <span class="o">=</span> <span class="nt">NO</span><span class="o">;</span>  
+<span class="p">}</span>  </code></pre></figure>
+<p><br/></p>
+
+{% endraw %}

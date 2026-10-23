@@ -1,0 +1,596 @@
+---
+layout: post
+title: Apple's Xcode testing documentation in Chinese, part 1
+description: A Chinese translation of earlier Apple testing documentation covering XCTest project setup, test classes
+  and methods, the test lifecycle, performance tests and UI tests. The test navigator illustrates running cases
+  and inspecting their results.
+category: Development notes
+imagefeature: null
+date: 2016-04-15 00:00:00 +0800
+technical_translation:
+  topic: tooling-release
+  summary: A Chinese translation of earlier Apple testing documentation covering XCTest project setup, test classes
+    and methods, the test lifecycle, performance tests and UI tests. The test navigator illustrates running cases
+    and inspecting their results.
+  keywords:
+  - XCTest
+  - XCTestCase
+  - unit testing
+  - performance testing
+  - UI testing
+  provenance: translation
+  author_name: 许漠颜
+  source_url: http://www.jianshu.com/p/d5fca0185e83
+  credit: Apple testing documentation translated by 许漠颜, then edited and archived by Bison.
+  version_note: The Chinese translation was published in 2016 and covers testing capabilities and interfaces in
+    Xcode 5, 6 and 7.
+  title: Apple's Xcode testing documentation in Chinese, part 1
+  source_sha256: 01d713072331c17860d7c8c4cc855c746eb34245d9f059765aa07e498827c35f
+lang: en
+source_path: _posts/2016-04-15-tuogao38.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao38
+permalink: /en/journal/2016-04-15-apple-s-xcode-testing-documentation-in-chinese-part-1/
+translation_method: machine-assisted
+translation_source_sha256: 01d713072331c17860d7c8c4cc855c746eb34245d9f059765aa07e498827c35f
+excerpt: A Chinese translation of earlier Apple testing documentation covering XCTest project setup, test classes
+  and methods, the test lifecycle, performance tests and UI tests. The test navigator illustrates running cases
+  and inspecting their results.
+translation_date: '2026-10-23T02:34:14+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"Today I finally turned my translation of the official unit-testing documentation into a blog post. First, thanks to the Party, the people, and my parents. I must also thank my department's manager for giving me time to do this."</p>
+</blockquote>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/d5fca0185e83">许漠颜 </a><br/></p>
+<h2 id="xcode测试">Testing in Xcode<br/></h2>
+<h3 id="前言">Introduction<br/></h3>
+<p>    Today I finally turned my translation of the official unit-testing documentation into a blog post. First, thanks to the Party, the people, and my parents, and also my department's manager for giving me time to do this. The translation is not especially polished. Many points are still only concepts to me, which made translation difficult. Unit testing is also much broader than this one official document; it deserves a series of explanations. I will try to put together an initial series this year. I hope these introductions help more people understand testing.</p>
+<h3 id="介绍">Introduction<br/></h3>
+<h3 id="使用xcode测试">Testing with Xcode<br/></h3>
+<p>Xcode provides facilities for extensive software testing. Testing primarily checks a project's robustness and reduces bugs, helping you distribute and sell a product sooner. Checking expected behavior improves user satisfaction. Tests can help you develop faster and avoid wasted effort.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/1.png"/><br/></p>
+<h3 id="目录结构">Contents<br/></h3>
+<p>This document explains the testing features included in Xcode. XCTest is linked automatically when tests are added.</p>
+<p>1. Quick start: Since the introduction of XCTest in Xcode5, configuring project tests has been simplified, and tests can be managed and run automatically from the navigator.<br/>
+2. Performance testing: Xcode6 and later let you track and measure changes in the performance of basic units.<br/>
+3. UI testing: Xcode7 adds the ability to test the user interface.<br/>
+4. Continuous integration and Xcode Server: Run Xcode tests through command scripts or configure bots to run them automatically on Xcode Server on a Mac.<br/>
+5. Modernization: Xcode includes migration support for projects with OCUnit tests.<br/></p>
+<h3 id="前提">Prerequisites<br/></h3>
+<p>You should be familiar with application design and programming concepts.<br/></p>
+<h3 id="快速启动">Quick start<br/></h3>
+<p>The quick start introduces the components of testing to provide a basic understanding.<br/></p>
+<h3 id="介绍测试的导航栏">Introducing the test navigator<br/></h3>
+<p>You will use the test navigator frequently when working on tests.
+It is designed to make writing, managing, running, and reviewing tests easier. Click its icon between Show the Issue Navigator and Show the Debug Navigator. After creating test targets, you will see a navigation view here.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/2.png"/><br/></p>
+<p>The illustrated test navigator displays a hierarchy of bundles, classes, and methods in the test project. The project is a simple calculator whose implementation uses a framework. Its tests appear in the top-level SampleCalcTests bundle.</p>
+<p>Note: Xcode displays test targets in the test navigator after creating them. If tests use data files, images, or other resources, add them to the test bundle and access them at runtime through NSBundle APIs. Use +[NSBundle bundleForClass:] to obtain the correct bundle for the test. An Xcode scheme controls what is built and which available methods run during the Test action. Enable or disable bundles, classes, and methods by selecting them in the test navigator and choosing Enable or Disable from the contextual menu.</p>
+<p>The main bundle in this view is SampleCalcTests. It contains one test class with nine methods. A Run button appears beside each test item. This conveniently brings the tests together, although some third-party tests may not appear in the list. After execution, a red X indicates failure and a green check indicates success. Assertions determine whether each test passes or fails.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/3.png"/><br/></p>
+<p>Click any class or method in the list to open the test class. Both classes and methods display clickable test indicators in the gutter, allowing individual runs.
+At the bottom of the test navigator, you can add tests or narrow the displayed list with a search string.</p>
+<h3 id="为你的app添加测试">Adding tests to your app<br/></h3>
+<p>When creating an application in Xcode5 or later, select the testing checkbox to add tests. The resulting project includes a test bundle, tests, and a template test method. Your project may, however, have been created by an older Xcode version. This section explains what to do when tests are not already present.</p>
+<p>Create a test Target
+Open the test navigator, click the plus button at the bottom-left, and choose New Unit Test Target.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/4.png"/><br/></p>
+<p>In the sheet, select OS X or iOS Unit Testing, click Next, and fill in the relevant details.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/5.png"/><br/></p>
+<p>Click Finish, then open the result. It includes a template test class with two template test methods.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/6.png"/><br/></p>
+<h3 id="运行测试查看结果">Running tests and viewing results<br/></h3>
+<p>You have now added tests to the project and can begin testing something meaningful. First, hover over the SampleCalcTests class in the test navigator and click Run to execute all its test methods. Results appear to the right of method names in the navigator and to the left in the editor.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/7.png"/><br/></p>
+<p>The unit and performance tests pass because they are empty; no assertion fails. Click the diamond beside measureBlock: to display the performance results.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/8.png"/><br/></p>
+<p>This panel lets you set a performance baseline and edit the baseline and maximum STDDREV parameters.</p>
+<h3 id="编辑测试和重新运行">Editing and rerunning tests<br/></h3>
+<p>This sample project is a calculator. You need to check the correctness of addition, subtraction, multiplication, and division, along with its other functions. Add and write tests in the project for whatever you want to test; doing so requires a code structure that supports testing.
+For example, add instance declarations and class imports in SampleCalcTests.m.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import &lt;XCTest/XCTest.h&gt;//
+// Import the application specific header files#import "CalcViewController.h"
+#import "CalcAppDelegate.h"@interface CalcTests : XCTestCase {
+// add instance variables to the CalcTests class@private
+   NSApplication       app;
+   CalcAppDelegate     appDelegate;
+   CalcViewController calcViewController;
+    NSView              calcView;
+}
+@end
+</code></pre></div></div>
+<p>Give the test method a descriptive name, such as testAddition, and add the implementation.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void) testAddition
+{
+    //obtain the app variables for test access
+    App = [NSApplication sharedApplication];
+    calcViewController = (CalcViewController)[[NSApplicationsharedApplication] delegate];
+    calcView = calcViewController.view;
+    //perform two addition tests
+    [calcViewController press:[calcView viewWithTag: 6]];  // 6
+    [calcViewController press:[calcView viewWithTag:13]];  // +
+    [calcViewController press:[calcView viewWithTag: 2]];  // 2
+    [calcViewController press:[calcView viewWithTag:12]];  // =
+    XCTAssertEqualObjects([calcViewController.displayField stringValue],@"8", @"Part 1 failed.");
+    [calcViewController press:[calcView viewWithTag:13]];  // +
+    [calcViewController press:[calcView viewWithTag: 2]];  // 2
+    [calcViewController press:[calcView viewWithTag:12]];  // =
+    XCTAssertEqualObjects([calcViewController.displayField stringValue],@"10", @"Part 2 failed.");
+}
+</code></pre></div></div>
+<p><br/></p>
+<p>Changing test methods updates the test navigator accordingly.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/9.png"/><br/></p>
+<p>After editing, run testAddition from the test navigator or gutter.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/10.png"/><br/></p>
+<p>A failed assertion is highlighted in the test navigator and gutter. Its message makes the problem easy to locate. Fix it, then rerun the test successfully.
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/11.png"/><br/></p>
+<h3 id="使用setup和teardown方法">Using setUp() and tearDown()<br/></h3>
+<p>When Xcode runs a test bundle, it executes all the methods in the test class. If each method needs an initialized object, initializing it separately creates duplicate code. XCTest provides two instance methods for setting up and tearing down test instances. Put shared setup and cleanup there.
+Using setup and teardown is straightforward.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)setup
+
+{
+
+    [super setUp];
+
+    // Put setup code here. This method iscalled before the invocation of each test method in the class.
+
+   // obtain the app variables for test access
+
+  app = [NSApplication sharedApplication];
+
+   calcViewController = (CalcViewController)[[NSApplicationsharedApplication] delegate];
+
+   calcView = calcViewController.view;
+
+}
+</code></pre></div></div>
+<p><br/></p>
+<p>Setup runs before the test method, so the test can use properties that have already been initialized.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/12.png"/><br/></p>
+<h3 id="概要">Overview<br/></h3>
+<p>This brief quick start shows that adding tests is straightforward. There are still a few points to keep in mind:</p>
+<ol>
+<li>Xcode supplies most of the basic test configuration. When you add a new test, it automatically adds these test methods. Individual test methods can be found and run from the test navigator.<br/></li>
+<li>The test navigator makes it easy to find and edit test methods. Run them from the navigator or the gutter; a failed test displays a failure indicator in the gutter.<br/></li>
+<li>One test method can contain several assertions, which together produce a single pass or fail result. Tests can be as simple or complex as needed. Put shared code in the setup and teardown instance methods.<br/></li>
+</ol>
+<h2 id="基础测试">Basic testing<br/></h2>
+<p>Testing checks whether application and library code runs successfully against expected results. After performing operations, a test may inspect an object's instance variables or determine whether particular boundary conditions cause a specific exception.<br/></p>
+<h3 id="定义测试范围">Defining the scope of testing<br/></h3>
+<p>Software is composed of many units: small components combine into larger, more capable components until the project's requirements are met. Good testing covers the behavior of that entire composition. Unit tests usually address smaller, function-level components, while XCTest lets you write tests for components at any level of the hierarchy.<br/></p>
+<p>You decide what constitutes a component under test: a single method or a group of methods serving a basic purpose. For an arithmetic example, see Apple's official demo. Different methods handle interactions between tableView content and the data structure containing list names. Each method contributes to application behavior and can be tested. The component's expected behavior should be fully defined, whether the test succeeds or fails.<br/></p>
+<p>The more thoroughly you divide application behavior into components, the more effectively you can test its details against reference expectations, particularly as the project evolves. A large project with many components needs many tests for comprehensive coverage. Tests should run quickly where possible, although large tests may be slower. When a failure occurs, small, quick tests make diagnosis and repair easier.<br/></p>
+<p>Designing tests for project components is the basis of test-driven development, or TDD: write the test logic before the code it tests. This lets you define requirements and boundary conditions before implementation. After writing the tests, develop algorithms that pass them. Once the code passes, you have a foundation for improvement and confidence that later test runs will detect changes in expected behavior that could introduce product bugs.<br/></p>
+<p>Even without test-driven development, tests help improve features and functionality by reducing bugs introduced during changes. Test a working application to ensure later changes do not alter its behavior. When fixing a bug, add a test to verify the fix. Tests should exercise both expected success and expected failure to cover boundary conditions.<br/></p>
+<h2 id="注意为一个没有考虑到测试的项目添加测试可能会要求重构部分代码来使测试变得更加简单writing-testable-code包含游泳的编写可测试代码的简单指南">Note: Adding tests to a project not designed for testing may require refactoring some code to make it easier to test. Writing Testable Code contains useful, concise guidance.<br/></h2>
+<p>Components may include interactions between parts of your application. Some tests can take a long time, so you may prefer to run them periodically or only on a server. Organize and run tests in different ways to meet different needs.<br/></p>
+<h3 id="性能测试">Performance testing<br/></h3>
+<p>Tests can check a component's functionality and record its performance. XCTest APIs measure time-based performance, allowing you to track improvements or regressions in a method or function.<br/>
+To determine whether a performance test succeeds or fails, it needs a baseline for comparison. The baseline is the average elapsed time calculated across 10 runs. A result that differs too much from that baseline fails.<br/></p>
+<h2 id="注意当你第一次运行性能测试的时候系统会提示失败因为第一次运行的时候基线是未知的一旦你设定了一个测量准线xctest会报告成功或者失败并提示相信的结果信息">Note: The first performance-test run reports failure because the baseline is not yet known. Once a measurement baseline is set, XCTest reports success or failure and provides detailed results.<br/></h2>
+<h3 id="用户界面测试">User-interface testing<br/></h3>
+<p>Functional and performance tests are generally called unit tests, where a unit refers roughly to a component or the smallest module. Unit tests mainly check that related components interact as expected. From a design perspective, they are written during development to capture your expectations.
+Users interact with the interface backed by your source code. Such interactions generally combine an entire subsystem to achieve the expected behavior. These are difficult to cover with unit tests; specialized tests for them are called UI tests.<br/>
+UI tests are closer to the user's experience. Add simulated events, capture the objects' responses, and check correctness and performance in much the same way as unit testing.<br/></p>
+<h3 id="应用程序测试和库测试">Application tests and library tests<br/></h3>
+<p>Xcode supports two kinds of testing: application tests and library tests.<br/>
+Application tests check components of app code, as in Apple's official demo. Use them to ensure that UI controls remain in the expected positions and that controls and controller objects work correctly with model objects.<br/></p>
+<p>Library tests check the behavior of independent code that is not running inside an application. They let you combine and test library components, usually objects and methods. They can also stress-test code under extreme conditions unlikely to occur in a running app. Such tests help produce robust code that behaves correctly even in unexpected circumstances.<br/></p>
+<h3 id="xctest-xcode测试框架">XCTest—the Xcode testing framework<br/></h3>
+<p>XCTest is the testing framework used in Xcode5 and later. If you previously used OCUnit, the two may look similar. XCTest is its more modern replacement, integrates more closely with Xcode, and provides a foundation for future testing improvements. Xcode adds XCTest.framework to your project rather than SenTesting.framework. The framework supplies APIs for designing and running tests in code.<br/></p>
+<h2 id="注意xcode包括一个迁移助手可用来转换包含ocunit测试的项目更多ocunit想xctest转换的详细信息请参阅transitioning-frome-ocunit-to-xctest">Note: Xcode includes a migration assistant for projects containing OCUnit tests. For details on conversion to XCTest, see Transitioning frome OCUnit to XCTest.<br/></h2>
+<h3 id="测试从哪里运行">Where tests run<br/></h3>
+<p>As you begin creating tests, keep these approaches in mind:<br/></p>
+<ol>
+<li>
+<p>Focus on testing the most fundamental functions, model classes, and methods that interact with controllers.
+A high-level application diagram will likely contain Model, View, and Controller categories, a familiar design pattern to Cocoa and Cocoa Touch developers. Writing tests that cover all Model classes gives you confidence that the app's foundations are well tested before you write Controller Classes tests and move into more complex parts of the application.<br/></p>
+</li>
+<li>
+<p>As an alternative starting point when writing a framework or library, begin with the application's interfaces and work inward to its internal classes.<br/></p>
+</li>
+</ol>
+<h2 id="编写测试类与方法">Writing test classes and methods<br/></h2>
+<p>When you use the test navigator to add a test target, Xcode displays its test classes and methods there. A test target contains test classes, which in turn contain test methods.<br/></p>
+<h3 id="测试target测试包测试导航">Test targets, bundles, and the test navigator<br/></h3>
+<p>Before learning to create test classes, examine the test navigator. It is central to creating and running tests.
+The navigator lists the contents of test bundles, displaying test classes and methods hierarchically. The project below has several test targets and shows the nesting of bundles, classes, and methods.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/13.png"/><br/></p>
+<p>A test bundle may contain several test classes. Classes organize tests into related groups by functionality or another purpose. For example, Apple's official demo defines BasicFunctionsTests, AdvancedFunctionsTests, and DisplayTests classes, all within the Mac_Calc_Tests bundle.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/14.png"/><br/></p>
+<p>Some tests share setup and teardown work. Grouping them in a class makes sense and minimizes the code required in each test method.<br/></p>
+<h3 id="创建测试">Creating tests<br/></h3>
+<p>Create a test class with the plus button in the test navigator, then choose New Test Class.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/15.png"/><br/></p>
+<p>Each class you add creates a TestClassName.m file in the project, using the class name entered in the configuration sheet.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/16.png"/><br/></p>
+<h2 id="注意所有的测试类都是xctest框架xctestcase类的子类">Note: Every test class is a subclass of XCTestCase from the XCTest framework.<br/></h2>
+<p>Although Xcode places test classes in the group created for the project's tests by default, you can organize the files however you prefer. After clicking Next, the standard Xcode Add File sheet appears:<br/>
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/17.png"/><br/></p>
+<p>You can add files through the project navigator in the same way. See Adding an Existing File or Folder for details.</p>
+<h2 id="注意当你用xcode5及以上版本创建工程时一个测试target和相关的测试包都会被默认的创建名称根据工程名获得比如创建名为myapp的项目则会自动生成一个名为myapptests的测试包以及一个名为myapptests的测试类关联在myapptestsm实例文件中">Note: Creating a project in Xcode5 or later automatically creates a test target and associated bundle named after the project. For example, MyApp gets a MyAppTests bundle and a MyAppTests test class, associated with the MyAppTests.m implementation file.<br/></h2>
+<h3 id="测试类的结构">The structure of a test class<br/></h3>
+<p>A test class contains the following basic structure:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import &lt;XCTest/XCTest.h&gt;
+
+@interface SampleCalcTests : XCTestCase
+
+@end
+
+@implementation SampleCalcTests
+
+- (void)setUp {
+
+[super setUp];
+
+// Put setup code here. Thismethod is called before the invocation of each test method in the class.
+
+}
+
+- (void)tearDown {
+
+// Put teardown code here. Thismethod is called after the invocation of each test method in the class.
+
+[super tearDown];
+
+}
+
+- (void)testExample {
+
+// This is an example of afunctional test case.
+
+// Use XCTAssert and relatedfunctions to verify your tests produce the correct results.
+
+}
+
+- (void)testPerformanceExample {
+
+// This is an example of aperformance test case.
+
+[self measureBlock:^{
+
+// Put the code you want tomeasure the time of here.
+
+}];
+
+}
+
+@end
+</code></pre></div></div>
+<p><br/></p>
+<p>The test class is implemented in Objective-C. Its implementation includes basic instance methods such as setup and teardown. These methods are required. If all test methods need the same code, customize setup and teardown to contain it; that code runs before and after each method. You may also add class-level setup (+ (void)setUp) and teardown (+ (void)tearDown), which run before and after all methods in the class. Xcode's test execution sequence clarifies their use.<br/></p>
+<h2 id="测试执行的流程">The test execution sequence<br/></h2>
+<p>During a test run, XCTest finds all classes inheriting from XCTestCase and runs their test methods.
+For each class, it first runs the class setup method. It creates a fresh instance for each test method and runs that instance's setup method. After the test method, it runs the instance teardown method. This repeats for every method. After the final instance teardown, Xcode runs the class teardown method and proceeds to the next class. The sequence continues until every method in every test class has run.<br/></p>
+<h2 id="编写测试方法">Writing test methods<br/></h2>
+<p>Write tests as methods in a test class. A test method is an instance method whose name begins with test, takes no parameters, and returns void. For example, TestColorsRed calls project code and uses assertion APIs to report when it does not produce the expected result. A function might return an unexpected value, or an inappropriate method call might throw an exception. See XCTest Assertions for these cases.
+Import the correct headers into the test class so the methods can access the code under test.
+Xcode runs each method independently. Each must therefore prepare and clean up its supporting variables, structures, and objects that interact with the target API. If every test method shares the same setup or cleanup, put it in the setup and teardown instance methods, which always run. See Test Class Structure.</p>
+<p>Here is a test-method template:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)testColorIsRed {
+   // Set up, call test subject API. (Codecould be shared in setUp method.)
+   // Test logic and values, assertions reportpass/fail to testing framework.   // Tear down. (Code could be shared intearDown method.
+}
+</code></pre></div></div>
+<p><br/>
+Here is a simple test that checks whether a CalcView instance was successfully created for SampleCalc. See Quick Start.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void) testCalcView {
+
+   // setup
+
+   app = [NSApplication sharedApplication];
+
+   calcViewController =(CalcViewController)[NSApplication sharedApplication] delegate];
+
+   calcView = calcViewController.view;
+
+   XCTAssertNotNil(calcView, @"Cannot findCalcView instance");
+
+   // no teardown needed
+
+}*
+</code></pre></div></div>
+<p><br/></p>
+<h2 id="编写异步操作测试">Writing tests for asynchronous operations<br/></h2>
+<p>Tests run synchronously: the next one starts only after the previous one ends. Increasingly, however, the code under test executes asynchronously. To handle such methods and components, Xcode6 adds support for sequencing tests of asynchronous execution, waiting for a callback or timeout before completing.
+For example:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Test that the documentis opened. Because opening is asynchronous,
+// use XCTestCase'sasynchronous APIs to wait until the document has
+// finished opening.-(void)testDocumentOpening
+{  // Create anexpectation object.
+    // This test only has one, but it'spossible to wait on multiple expectations.
+   XCTestExpectation documentOpenExpectation = [selfexpectationWithDescription:@"document open"];
+    NSURL URL =[[NSBundle bundleForClass:[self class]]
+                             URLForResource:@"TestDocument"withExtension:@"mydoc"];
+    UIDocumentdoc = [[UIDocument alloc] initWithFileURL:URL];
+    [docopenWithCompletionHandler:^(BOOL success) {
+       XCTAssert(success);
+       // Possibly assert other things here about the document after it hasopened...
+       // Fulfill the expectation-this will cause -waitForExpectation
+        // to invoke its completion handler andthen return.
+       [documentOpenExpectation fulfill];
+    }];
+    // The testwill pause here, running the run loop, until the timeout is hit
+    // or all expectations are fulfilled.
+    [selfwaitForExpectationsWithTimeout:1 handler:^(NSError error) {
+       [doc closeWithCompletionHandler:nil];
+    }];
+}
+</code></pre></div></div>
+<p><br/>
+For more information on asynchronous operations, see XCTestCase+AsynchronousTesting.h in XCTest.framework.<br/></p>
+<h2 id="性能测试-1">Performance testing<br/></h2>
+<p>A performance test runs a code block 10 times and collects the average execution time and standard deviation. The measured average is compared with a baseline to determine success or failure.
+<strong>Note: A baseline is the reference value you specify to determine whether a result passes. The report UI provides controls to set or change it.</strong>
+Performance testing uses the newer XCTest method APIs available from Xcode6 onward.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)testPerformanceExample{
+    // This is an example of a performance testcase.
+    [self measureBlock:^{
+        // Put the code you want to measure thetime of here.
+    }];
+}
+</code></pre></div></div>
+<p><br/></p>
+<p>The example below briefly demonstrates a performance test written for a calculator application. XCTest iterates a measureBlock to measure elapsed time.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void) testAdditionPerformance{
+
+    [self measureBlock:^{
+
+        // set the initial state
+
+        [calcViewController press:[calcViewviewWithTag: 6]];  // 6
+
+        // iterate for 100000 cycles of adding2
+
+        for (int i=0; i&lt;100000; i++) {
+
+           [calcViewController press:[calcViewviewWithTag:13]];  // +
+
+           [calcViewController press:[calcViewviewWithTag: 2]];  // 2
+
+           [calcViewController press:[calcViewviewWithTag:12]];  // =
+
+        }
+
+    }];
+
+}
+</code></pre></div></div>
+<p><br/></p>
+<p>Running a performance test adds information to the test navigator. Click it to see the measured values. The result includes controls to use a measurement as the baseline for future comparisons. Baselines are stored per device configuration, so the same test on different devices has different baselines, depending on processing speed, memory, and other characteristics.<br/>
+Note: Performance tests report failure on the first run, and continue doing so until a baseline is set for the particular device configuration.<br/>
+For further details on performance testing, see XCTestCase.h in XCTest.framework.<br/></p>
+<h2 id="编写ui测试">Writing UI tests<br/></h2>
+<p>Creating XCTest UI tests extends unit testing using the same programming model. See User Interface Testing.<br/></p>
+<h2 id="编写swift测试">Writing Swift tests<br/></h2>
+<p>Swift controllers and models cannot access declarations internal to the app or framework from tests. In Xcode6, testing Swift internal functionality requires going through public entry points, reducing the protection provided by Swift's access controls.<br/>
+Xcode7 provides a solution:<br/>
+For access to Swift internals, testing tells the compiler to generate the necessary access. A new compiler control, -enable, changes this behavior, and Xcode generates accordingly when requested. The behavior is configurable and enabled by default for new projects. It does not require source changes.<br/></p>
+<p>Change the visibility of test entry points by modifying the import declaration. Use the new @testable import attribute in your tests without modifying the application code.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import Cocoa
+@NSApplicationMain
+class AppDelegate: NSObject, NSApplicationDelegate {
+    @IBOutlet weak var window:NSWindow!
+    func foo() {
+        println("Hello,World!")
+    }
+}
+</code></pre></div></div>
+<p><br/>
+To write a test class that can access Appdelegate, change the import in your test code to use @testable.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Importing XCTestbecause of XCTestCase
+import XCTest// Importing AppKitbecause of NSApplication
+import AppKit
+
+// Importing MySwiftAppbecause of AppDelegate
+@testable importMySwiftApp
+class MySwiftAppTests:XCTestCase {
+     func testExample() {
+
+         let appDelegate =NSApplication.sharedApplication().delegate as! AppDelegate
+        *
+
+         appDelegate.foo()
+
+    } 
+}
+</code></pre></div></div>
+<p><br/>
+With this solution, your tests can fully access internal Swift code.<br/></p>
+<h2 id="xctest断言">XCTest assertions<br/></h2>
+<p>Test methods use XCTest assertions to report results to Xcode. All assertions have a similar form: a comparison or logical expression, a failure-result format string, and arguments inserted into that string.<br/>
+Note: The final parameter of every assertion is format…, a format string and a variable argument list. XCTest provides default failure-result strings for all assertions, and arguments may be passed into them. A Format string optionally adds a custom description of the failure, allowing a more specific explanation. This parameter is optional and can be omitted entirely.<br/>
+For example:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertEqualObjects([calcViewController.displayField stringValue], @"8", @"Part 1 failed.");
+</code></pre></div></div>
+<p><br/>
+The assertion says: “Indicate a failure when a string created from the value of the controller’s display field is not the same as the reference string ‘8’”. If it fails, Xcode marks the failure in the test navigator and shows its description in the issues navigator, source editor, and elsewhere. A typical assertion result in the source editor looks like this:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/18.png"/><br/></p>
+<p>A test method may contain several assertions. If any assertion reports a failure, Xcode marks the test as failed.<br/>
+Assertions fall into five categories: unconditional failure, equality, nil, Boolean, and exceptions.<br/></p>
+<h2 id="用类别区分断言">Assertions by category<br/></h2>
+<p>The following sections list XCTest assertions. See XCTestAssertions.h for more information.<br/></p>
+<h3 id="无条件报错">Unconditional failure<br/></h3>
+<p>XCTFail produces an unconditional failure.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTFail(format...)
+</code></pre></div></div>
+<p><br/></p>
+<h3 id="等价测试">Equality tests<br/></h3>
+<p>XCTAssertEqualObjectes: Reports failure when expresson1 is not equal to expresson2, or when one object is nil and the other is not.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertEqualObjects(expression1, expression2, format...)
+</code></pre></div></div>
+<p><br/></p>
+<p>XCTAssertNotEqualObjects: Reports failure when expression1 equals expression2.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertNotEqualObjects(expression1, expression2, format...)
+</code></pre></div></div>
+<p><br/>
+XCTAssertEqual: Reports failure when expression1 is not equal to expression2. This assertion is for C scalar values.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertEqual(expression1, expression2, format...)
+</code></pre></div></div>
+<p><br/>
+XCTAssertNotEqual: Reports failure when expression1 equals expression2. This assertion is for C scalar values.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertNotEqual(expression1, expression2, format...)
+</code></pre></div></div>
+<p><br/>
+XCTAssertEqualWithAccuracy: Reports failure when the difference between expression1 and expression2 exceeds accuracy. This is useful for scalars such as floats and doubles, where small differences prevent exact equality, but works for all scalar values.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertEqualWithAccuracy(expression1, expression2, accuracy, format...)
+</code></pre></div></div>
+<p><br/>
+XCTAssertNotEqualWithAccuracy: Reports failure when the difference between expression1 and expression2 is less than accuracy. This is useful for scalars such as floats and doubles, where small differences prevent exact equality, but works for all scalar values.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertNotEqualWithAccuracy(expression1, expression2, accuracy, format...)
+</code></pre></div></div>
+<p><br/></p>
+<h3 id="nil空测试">Nil tests<br/></h3>
+<p>XCTAssertNil: Reports failure when the expression argument is not nil.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertNil(expression, format...)
+</code></pre></div></div>
+<p><br/>
+XCTAssertNotNil: Reports failure when the expression argument is nil.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertNotNil(expression, format...) &lt;br&gt;
+</code></pre></div></div>
+<h3 id="boolean测试">Boolean tests<br/></h3>
+<p>XCTAssertTrue: Reports failure when expression evaluates to false.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertTrue(expression, format...)
+</code></pre></div></div>
+<p><br/>
+XCTAssert: Reports failure when expression evaluates to false. It is synonymous with XCTAssertTrue.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssert(expression, format...)
+</code></pre></div></div>
+<p><br/>
+XCTAssertFalse: Reports failure when expression evaluates to true.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertFalse(expression, format...)
+</code></pre></div></div>
+<p><br/></p>
+<h3 id="异常测试">Exception tests<br/></h3>
+<p>XCTAssertThrows: Reports failure when expression does not throw an exception.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertThrows(expression, format...)
+</code></pre></div></div>
+<p><br/></p>
+<p>XCTAssertThrowsSpecific: Reports failure when expression does not throw an exception of the specified class.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertThrowsSpecific(expression, exception_class, format...)
+</code></pre></div></div>
+<p><br/></p>
+<p>XCTAssertThrowsSpecificNamed: Reports failure when expression does not throw an exception of the specified class and name. This is useful for AppKit or Foundation APIs that throw an NSException with a specific name, such as NSInvalidArgumentException.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertThrowsSpecificNamed(expression, exception_class, exception_name, format...)
+</code></pre></div></div>
+<p><br/>
+XCTAssertNoThrow: Reports failure when expression throws an exception.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertNoThrow(expression, format...)
+</code></pre></div></div>
+<p><br/>
+XCTAssertNoThrowSpecific: Reports failure when expression throws an exception of the specified class. Other exception types are acceptable and do not cause this assertion to fail.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertNoThrowSpecific(expression, exception_class, format...)
+</code></pre></div></div>
+<p><br/>
+XCTAssertNoThrowSpecificNamed: Reports failure when expression throws an exception of the specified class and name. This is useful for AppKit or Foundation APIs that throw an NSException with a particular name, such as NSInvalidArgumentException.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XCTAssertNoThrowSpecificNamed(expression, exception_class, exception_name, format...)
+</code></pre></div></div>
+<p><br/></p>
+<h3 id="运行测试并查看结果">Running tests and reviewing results<br/></h3>
+<p>The Xcode test navigator makes running tests and reviewing results easy, and several other interactive approaches are available. Which tests run depends on the test targets enabled in the scheme. The navigator lets you control included and enabled targets, classes, and methods directly, without opening the scheme editor.<br/></p>
+<h3 id="运行测试命令">Commands for running tests<br/></h3>
+<p>The test navigator offers quick ways to run tests as part of coding. You can also run them directly from the source editor or the Product menu.<br/></p>
+<h3 id="使用测试导航面板">Using the test navigator<br/></h3>
+<p><br/>
+Hovering over a bundle, class, or method name in the test navigator reveals a Run button. Depending on where you hover, it runs an individual method, all methods in a class, or all tests in a bundle.<br/>
+Hover over a test bundle's name and click the Run button that appears on the right to run all tests in that bundle.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/19.png"/><br/></p>
+<p>Hover over a class name and click the Run button that appears on the right to run every test in that class.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/20.png"/><br/></p>
+<p>Hover over a test method's name and click the Run button on the right to run that individual test.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/21.png"/><br/></p>
+<h3 id="使用源代码编辑器">Using the source editor<br/></h3>
+<p>When a test class is open in the source editor, an indicator appears in the gutter beside each test method. Hover over it to reveal a Run button. Click it to run the method; the indicator then shows success or failure. Hover over it again to rerun the test. This mechanism runs one test at a time.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/22.png"/><br/></p>
+<p>Note: The indicator beside @implementation also applies to the class, letting you run all its tests.<br/></p>
+<h3 id="使用product菜单">Using the Product menu<br/></h3>
+<p>The Product menu includes keyboard shortcuts for running tests directly.<br/>
+Product &gt; Test runs the currently active scheme. Its keyboard shortcut is Conmmand-U.<br/>
+Product &gt; Build for &gt; Testing and Product &gt; Perform Action &gt; Test without Building separate building tests from running them. These shortcuts simplify the build-and-test process. They are particularly useful when checking warnings or errors after changing code, or when you know the current build is up to date and want to speed up testing. The keyboard shortcuts are Shift-Command-U and Control-Command-U, respectively.<br/>
+Product &gt; Perform Action &gt; Test: While editing a test method, this dynamic command shows the method containing the cursor and lets you run it with a keyboard shortcut. Its name reflects the test to run, such as Product &gt; Perform Action &gt; Test testAddition. The shortcut is Control-Opention-Command-U.
+Note: The command also works from selections in a navigator. When a navigator is active, the source editor loses focus and the command takes the navigator's current selection as input. In the test navigator, select a bundle, class, or method; in the project navigator, select a test implementation file such as CalcTests.m.
+Product &gt; Perform Action &gt; Test Again: When a test exposes a problem during debugging or editing, returning to the last test is useful. As with Test, the command includes the test name, for example Product &gt; Perform Action &gt; Test Again testAddition. Its keyboard shortcut is Control-Option-Command-G.<br/></p>
+<h3 id="显示测试结果">Displaying test results<br/></h3>
+<p>XCTest displays results in several places in Xcode. The screenshots below show where to find them.
+After running one test or a group of tests, inspect pass/fail results in the test navigator.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/23.png"/><br/></p>
+<p>If test methods are collapsed into their classes, or classes into their test bundle, the indicator reflects the aggregate state of the enclosed tests. It indicates that at least one method in the class or bundle failed.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/24.png"/><br/></p>
+<p>In the source editor, inspect pass/fail indicators and debugging information.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/25.png"/><br/></p>
+<p>View test-run results in the report navigator.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/26.png"/><br/></p>
+<p>For a performance test, click the value in the time column to open a detailed report. Individual run buttons show details of each of the 10 runs. Edit lets you change the baseline and the maximum standard deviation allowed for a pass.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/27.png"/><br/></p>
+<p>In the log navigator, browse error descriptions and other output summaries. Click the disclosure arrow on the left to expand all details of the test run.
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/28.png"/><br/></p>
+<p>Note: Besides the disclosure triangle on the left, the small icon to the right of a failed test expands further details.
+The debug console presents comprehensive test-run information as text, matching the log navigator. If you are already debugging, your debugging output appears there too.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/29.png"/><br/></p>
+<h2 id="使用schemes方案和test-target测试目标">Using Schemes and Test Targets<br/></h2>
+<p>An Xcode Scheme controls the behavior of the Build, Run, Test, and Debug commands. Xcode5 manages the scheme configuration when you create a Test Target and perform other testing operations in the test navigator—for example, enabling or disabling a method, class, or bundle. Xcode Server and continuous integration require a shared scheme: select its checkbox in Manager Schemes, then export it with your project and source code to a source repository.<br/></p>
+<p>Configure the scheme as follows:<br/></p>
+<p>Choose Scheme menu &gt; Manage Scheme to open the management sheet.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/30.png"/><br/></p>
+<p>This project has two schemes: one builds the app, and the other builds the framework or library. The Share checkbox on the right makes a scheme shared so Xcode Server bots can use it.
+Double-click a scheme in the management sheet to open the Scheme Editor. Its Test action identifies the tests Xcode executes when you issue the test command.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/31.png"/><br/></p>
+<p>Note: The test navigator and configuration/setup assistants associated with test targets, classes, and methods normally maintain all scheme settings for testing.
+For more on using, configuring, and editing schemes, see Scheme Configuration Help or the WWDC 2012 video, Working with Scheme and Projects in Xcode.<br/></p>
+<h3 id="构建测试测试应用测试库">Building tests: testing applications and libraries<br/></h3>
+<p>Application tests run in the app's context and can combine behavior across classes, libraries or frameworks, and app features. Library tests run independently of the app, exercising classes and methods in a library or framework to verify that they meet its defined requirements.<br/>
+The two types of test bundle require different build settings. Creating a test target with the target parameter in the New Target assistant configures these settings. The assistant displays a Target drop-down offering the SampleCalc application and CalcLibrary library.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/32.png"/><br/></p>
+<p>Choose SampleCalc as the build product associated with this test target to configure it for testing an application. Tests run in the application's process. The test name derives from SampleCalc, and you can change it to suit your preference.<br/></p>
+<p>If you select CalcLibrary as the associated build product, the target assistant configures the build settings for testing a library. Xcode launches the test runtime, framework or library, and test code in a process managed by Xcode. The default product name comes from the library target, such as “CalcLibrary Tests.” Again, you can change it to suit your preference.<br/></p>
+<h3 id="默认构建设置">Default build settings<br/></h3>
+<p>In most cases, configuring build settings for application or library testing requires only selecting the correct test target. Xcode manages the settings automatically. If your project needs more complicated build settings, however, understanding Xcode's standard setup for application and library tests is useful.<br/>
+The following demonstration uses the official test demo:
+<br/></p>
+<p>Select SampleCalc in the project navigator to open the project editor, then select the SampleCalc Tests application test target. In General, the Target pop-up menu should show SampleCalc.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/33.png"/><br/></p>
+<p>You can check that these build settings are correct.
+Open Build Settings and search for Bundle Loader. Application tests for SampleCalc are loaded by the SampleCalc App. You can see executable paths for Debug and Release as customized parameters. Searching for Test Host shows the same paths.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/34.png"/><br/></p>
+<p>The project's library target is named CalcLibrary and is associated with the CalcLibraryTests test target.
+Select CalcLibraryTests and inspect General; CalcLibrary is selected as the target.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/35.png"/><br/></p>
+<p>As with an application test target, use the build Settings panel to inspect Bundle Loader and Test Host. The image below shows a search for the Bundle Loader setting.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/36.png"/><br/></p>
+<p>For a library test target, Bundle Loader and Test Host have no associated values. This indicates that Xcode has configured them correctly by default.<br/></p>
+<h2 id="测试的目的">The purpose of testing<br/></h2>
+<p>Application tests run on OS X, physical iOS devices, and the iOS simulator. Library tests run on OS X and the iOS simulator. Xcode Server can run on a Mac running OS X Server with an appropriately configured source repository, shared scheme, and bot. For more on Xcode Server destinations, see Automating the Test Process with Continuous Integration.<br/></p>
+<h2 id="调试测试">Debugging tests<br/></h2>
+<p>All standard Xcode debugging tools are available while running tests.<br/></p>
+<h2 id="测试调试工作流">The test debugging workflow<br/></h2>
+<p>First determine whether a failure comes from a bug in the code under test or in the test method. Failures can reveal several kinds of problems: incorrect assumptions, unmet code requirements, or faulty test code. Debugging may therefore follow different workflows. Since test methods are usually small and direct, start by checking what the test intends to do and how it implements that check.<br/>
+Some common issues worth noting:<br/></p>
+<p>Is the test logic correct? Is its implementation correct? Always check the literal values used as reference expectations for typos and mistakes.<br/>
+What assumptions does the test make? For example, using an incorrect data type in a test method may introduce a range error in the code you are testing.<br/>
+Are you using the correct assertion to report pass or fail? For example, the tested condition may require XCTAssertTure rather than XCTAsserFalse. Such mistakes are easy to make.<br/></p>
+<p>Assuming the premise of your test and the test method are correct, the error must be in the code under test. Locate and fix it.<br/></p>
+<h3 id="具体的测试调试工具">Test-specific debugging tools<br/></h3>
+<p>Xcode has several tools specifically for locating and debugging code during testing.<br/></p>
+<p>Test-failure breakpoint
+In the BreakPoint Navigator, click Add—the plus button—and choose Add Test Failure Breakpoint to create this special breakpoint.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/37.png"/><br/></p>
+<p>This breakpoint interrupts testing when a method triggers a failed assertion. Stopping immediately at the failure helps locate the problem quickly. In testAddition, an incorrect reference string deliberately makes the comparison assertion fail. A test-failure breakpoint detects that assertion and stops execution there.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/38.png"/><br/></p>
+<p>Once the test is interrupted, stop its execution. Set a regular breakpoint before the assertion and run the test again. For convenience, use the Run button in the source-editor gutter. Continue debugging to fix the problem.<br/></p>
+<p>Running tests with project menu commands<br/></p>
+<p>While debugging tests, remember Project &gt; Perform Action &gt; Test Again and Project &gt; Perform Action &gt; Test. They offer convenient ways to rerun the last method after fixing a failure or run the method you are writing. See Using the Product menu for more information.<br/>
+You can always run tests conveniently using the Run button in either the test navigator or the source-editor gutter.<br/></p>
+<p>Assistant editor categories<br/></p>
+<p>The assistant editor includes two specialized categories for working with particular tests.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao38/39.png"/><br/></p>
+<p>Test Callers category: After fixing a method that caused a test to fail, check whether other tests call it and still pass. Open the assistant editor and select the Test Classes category from its menu. The drop-down lets you navigate to tests that call the method and run them to ensure the fix has not introduced other problems.<br/>
+Test Classes Category: Similar to Test Callers, but lists classes containing test methods related to the class being edited in the main source editor. It helps identify opportunities to add tests, such as new methods not yet covered by existing tests.<br/></p>
+<p>Exception breakpoints during testing<br/></p>
+<p>An exception breakpoint normally interrupts test execution when it catches an exception. Such breakpoints are usually disabled during test runs to avoid inappropriate stops at thrown exceptions. Enable one when investigating a particular problem that you want to stop and fix.<br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-03-30-combining-aes-encryption-with-base64-encoding-on-ios/">Combining AES encryption with Base64 encoding on iOS</a><br/></p>
+
+{% endraw %}

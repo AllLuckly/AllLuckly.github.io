@@ -1,0 +1,58 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Connect ManYue to Komga: permissions, series, books and offline checks'
+description: Use your Komga address and account, understand how series and books appear, and verify catalogue access,
+  page-by-page reading and downloads separately.
+permalink: /en/guides/manyue-komga-library/
+date: 2026-10-22 00:00:00 +0800
+modified: 2026-10-22 00:00:00 +0800
+category: Tutorials
+level: Intermediate
+series_order: 12
+topic: Server libraries
+reading_time: 6
+lang: en
+source_path: _posts/2026-10-22-manyue-komga-library.md
+source_url: /guides/manyue-komga-library/
+translation_method: machine-assisted
+translation_source_sha256: ae02d24ffdb90693723ecc01a0fbd503be282bd5b6bb3c29111d6ffa842b8651
+excerpt: Use your Komga address and account, understand how series and books appear, and verify catalogue access,
+  page-by-page reading and downloads separately.
+translation_date: '2026-10-23T02:34:07+00:00'
+---
+{% raw %}
+<p>Komga already manages your comic series, book information, and user permissions, while ManYue provides a reading interface on phones and iPads. You do not need to reimport the server directory as local files when connecting, but you do need an account that can actually access the relevant libraries. Verify one series and one small sample before expanding to the entire collection. This makes permission and path problems easier to identify.</p>
+<h2 id="在服务器端确认一个可用样本">Confirm a working sample on the server</h2>
+<p>Ask the service administrator for the base address and a personal account, and confirm that the account can see the target series. Use that same account on the website to find a comic with actual content, and check its title, page count, and access scope. An administrator's ability to see everything does not prove that an ordinary account has the right permissions. Do not temporarily use someone else's account as a substitute for your own long-term configuration.</p>
+<p>Komga can restrict library sharing, page-by-page access, and file downloads separately. A successful login does not mean every operation is authorized. The server administrator manages these permissions; see  <a href="https://komga.org/docs/guides/user-accounts/">Komga users and permissions documentation</a>. You must also satisfy ManYue's server-library entitlement separately. App membership and a Komga account meet access requirements at different levels.</p>
+<h2 id="在漫阅添加-komga-连接">Add a Komga connection in ManYue</h2>
+<p>Open the server library's add-connection screen, select Komga as the service type, and enter a recognizable name, an HTTP or HTTPS address, a username, and a password. Use the server's base path. If the service is deployed under a subpath, retain the path supplied by the administrator.<code class="language-plaintext highlighter-rouge">https://komga.example.com/library-service/</code> is only a placeholder example here, not a substitute for your actual address.</p>
+<p>Do not paste a particular comic's browser details link, and do not append an API path to the base address yourself. Once the details are correct, choose Connect and Save and wait for validation. If it fails, retain the error text and check the address, account, and service type first instead of changing several fields at once. Put real credentials only in the appropriate fields, not in the connection name or public screenshots.</p>
+<h2 id="理解系列与章节的对应关系">Understand how series and chapters correspond</h2>
+<p>After entering the library, find the series you just checked on the website and open its details. ManYue's Komga connection organizes entries by series, presenting individual books as selectable reading chapters. Several entries under one series cover therefore do not necessarily mean duplicate files; they may correspond to different volumes or books on the server.</p>
+<p>Check the names and order of these entries, then open one. If the order differs from what you expect, inspect the book metadata and volume order on the server instead of repeatedly adding the same connection in the app. The client relies on information supplied by the server. After changing original files or metadata, let the server update first, then refresh the client and inspect the result.</p>
+<h2 id="分别验证封面页面和下载">Verify covers, pages, and downloads separately</h2>
+<p>A loaded cover shows that some metadata or image requests succeeded, but you still need to open the body pages. Turn a few pages, then jump to the middle and end to confirm that page-access permissions and file contents work. If the catalog is visible but the pages cannot be read, describe the failure as 'series can be listed, but pages cannot load.' This lets the administrator check the relevant permissions and specific book rather than reworking the entire account.</p>
+<p>If you need offline access, try the download action offered for the current book and check the result in download management. Komga may permit page-by-page reading without permitting file downloads. If reading works but downloading is denied, check permissions first rather than repeatedly changing the address to bypass restrictions. After an authorized download finishes, still test the local copy without a network connection.</p>
+<h2 id="实例从一个测试系列开始">Example: start with a test series</h2>
+<p>Suppose you create a Short Practice Stories series in your own Komga instance containing two comics you made. First confirm visibility on the website with an ordinary reading account. Then add the connection in ManYue, find the series, and open the first book. After checking its last page, open the beginning of the second book to confirm that the series entries do not mistakenly point to the same file.</p>
+<p>Next, download only the first book and verify that it is readable without a network connection. Keep the second book as an online comparison. You will then know exactly which book is stored on the device and which is merely an entry in the server catalog. After testing, you can connect more libraries without mistaking every cover for offline content.</p>
+<h2 id="以后更换地址或账号时">When changing the address or account later</h2>
+<p>Retain the details of the working connection and read the current interface's guidance about changing the service, address, or account. A change may create a separate connection; the same display name alone does not guarantee that book identifiers and old records are identical. Recheck the same test series after the change. Do not remove your only working connection before confirming that the new one works.</p>
+<p>Server data must be backed up through the server's own management process. ManYue reading-state synchronization does not replace a Komga library backup. Nor should you promise, without verification, that progress will always match in real time across every client and the website. Actual behavior also depends on the service's capabilities and the access method. To continue reading on another device, separately check the target title's state and file availability.</p>
+<h3 id="能登录但列表为空先检查哪里">Where should I look first if login works but the list is empty?</h3>
+<p>First use the same account on the Komga website to check shared libraries and content access, then confirm that the server has finished identifying the sample. Content visible to an administrator may not be shared with this account. There is no need to begin by reinstalling the app or repeatedly recreating the same connection.</p>
+<h3 id="下载失败但在线翻页正常是文件坏了吗">Downloads fail, but online page turning works. Is the file damaged?</h3>
+<p>Not necessarily. Page-by-page access and file downloads may have different permissions. First check whether the account is allowed to download, then examine the task's specific error. Only after permissions and connectivity are working should you investigate the file contents and device storage. Avoid attributing every failure to a damaged file.</p>
+<h2 id="接下来读什么">What to read next</h2>
+<ul>
+<li><a href="/en/guides/manyue-server-connection-troubleshooting/">Troubleshoot catalogs, pages, and downloads separately</a>.</li>
+<li><a href="/en/guides/manyue-offline-preflight/">Check server comics for offline reading</a>.</li>
+<li><a href="/en/guides/manyue-kavita-library/">Connect to Kavita with an account</a>.</li>
+</ul>
+<h2 id="资料来源与版本">Sources and version</h2>
+<p>Checked on October 22, 2026: ManYue 2.0.2 for iPhone / iPad. Based on <a href="https://apps.apple.com/cn/app/id6753895889">the public description on the China App Store</a>, <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn">Apple release lookup</a> and the corresponding feature entry points. Interface labels may change with the version. Feature access is determined by the app’s current purchase screen.</p>
+
+{% endraw %}

@@ -1,0 +1,186 @@
+---
+layout: post
+title: Understanding parallax animation in iOS
+description: Explains parallax through the positions of several view layers. Dragging the middle layer, compensating
+  for the text layer's offset and clipping overflow keeps the text stationary relative to the bottom layer, showing
+  how occlusion and movement combine.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-01-22 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Explains parallax through the positions of several view layers. Dragging the middle layer, compensating
+    for the text layer's offset and clipping overflow keeps the text stationary relative to the bottom layer, showing
+    how occlusion and movement combine.
+  keywords:
+  - parallax animation
+  - clipsToBounds
+  - view hierarchy
+  - drag gestures
+  provenance: contribution
+  author_name: WzxJiang
+  source_url: http://www.jianshu.com/p/aeb56b51032d
+  credit: Originally credited to WzxJiang; edited and archived by Bison.
+  title: Understanding parallax animation in iOS
+  source_sha256: bee95b09d170545744c8f68088a19a15d08eb9448f800a83f0d4b0cd547987d5
+lang: en
+source_path: _posts/2016-01-22-tuogao08.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao08
+permalink: /en/journal/2016-01-22-understanding-parallax-animation-in-ios/
+translation_method: machine-assisted
+translation_source_sha256: bee95b09d170545744c8f68088a19a15d08eb9448f800a83f0d4b0cd547987d5
+excerpt: Explains parallax through the positions of several view layers. Dragging the middle layer, compensating
+  for the text layer's offset and clipping overflow keeps the text stationary relative to the bottom layer, showing
+  how occlusion and movement combine.
+translation_date: '2026-10-23T02:34:12+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/aeb56b51032d">WzxJiang</a><br/></p>
+<blockquote>
+<p>"I was away at home for almost 7 days because of a family matter, and finally returned to work today. Today I will explain a parallax animation."</p>
+</blockquote>
+<p><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao08/1.png"/><br/></p>
+<p>Parallax animation may not always be practical, but it can add a highlight to an app. The technical requirements are simple; the logic is harder to follow.
+First, here is the result:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao08/1.gif"/><br/></p>
+<p>Let’s break it down.<br/></p>
+<blockquote>
+<p>First, understand the components of this view:<br/></p>
+</blockquote>
+<blockquote>
+<p>The three black-text labels at the bottom are added to one view.<br/></p>
+</blockquote>
+<blockquote>
+<p>Another three white-text labels sit on the black overlay view.<br/></p>
+</blockquote>
+<blockquote>
+<p>Yes, each label actually appears twice.<br/></p>
+</blockquote>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao08/2.png"/><br/></p>
+<p>That is the secret behind this parallax animation.<br/></p>
+<p>However, that alone is insufficient: the outer labels cover the lower labels, so we also need to <code class="language-plaintext highlighter-rouge">view.clipsToBounds = YES;</code><br/>
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao08/3.png"/><br/></p>
+<p>Here is an explanation of the code:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+/**
+*  最外层的View
+*/
+@property(nonatomic,strong) UIView * labelView;
+
+/**
+*  中间的View
+*/
+@property(nonatomic,strong) UIView * midView;
+
+/**
+*  单个格子的高度
+*/
+@property(nonatomic,assign) CGFloat  height;
+
+</code></pre></div></div>
+<p>Initialisation code:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (instancetype)initWithFrame:(CGRect)frame andTitleArr:(NSArray *)titleArr
+{
+    if (self == [super initWithFrame:frame])
+    {
+        self.backgroundColor = [UIColor whiteColor];
+
+        _height = self.frame.size.height / titleArr.count;
+
+        //添加最里层Label
+        for (int i = 0;i &lt; titleArr.count ; i++)
+        {
+        [self addSubview:[self returnLabel:titleArr[i] andFrame:CGRectMake(0, i*_height, self.frame.size.width, _height) andColor:[UIColor blackColor]]];
+        }
+
+        _midView = ({
+            UIView * midView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.frame.size.width, _height)];
+            midView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.8];
+            //设置不显示超出的部分
+            midView.clipsToBounds = YES;
+            midView.userInteractionEnabled = YES;
+            midView;
+        });
+
+        [self addSubview:_midView];
+
+        _labelView = ({
+            UIView * labelView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, _midView.frame.size.width, _midView.frame.size.height)];
+            for (int i = 0;i &lt; titleArr.count ; i++)
+            {
+                [labelView addSubview:[self returnLabel:titleArr[i] andFrame:CGRectMake(0, i*_height, self.frame.size.width, _height) andColor:[UIColor whiteColor]]];
+            }
+                labelView;
+
+        });
+
+        [_midView addSubview:_labelView];
+
+        //添加拖动手势
+        UIPanGestureRecognizer * pan = [[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(pan:)];
+        [_midView addGestureRecognizer:pan];
+
+    }
+        return self;
+}
+//自定义一个快速创建Label的方法 避免重复代码
+- (UILabel *)returnLabel:(NSString *)title andFrame:(CGRect)rect andColor:(UIColor *)color
+{
+    UILabel * label = [[UILabel alloc]initWithFrame:rect];
+    label.font = [UIFont boldSystemFontOfSize:20];
+    label.textColor = color;
+    label.text = title;
+    label.textAlignment = NSTextAlignmentCenter;
+    return label;
+}
+
+</code></pre></div></div>
+<p><br/></p>
+<p>Dragging-method code<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-(void)pan:(UIPanGestureRecognizer *)sender
+{
+    CGPoint pt = [sender translationInView:self];
+
+    CGPoint midCenter = _midView.center;
+    CGPoint labelCenter = _labelView.center;
+
+    midCenter.y += pt.y;
+    labelCenter.y -= pt.y;
+
+    //边界
+    if (midCenter.y &gt; self.frame.size.height - _height/2.0)
+    {
+        midCenter.y = self.frame.size.height - _height/2.0 ;
+        labelCenter.y = -self.frame.size.height + _height*1.5;
+    }
+    if (midCenter.y &lt; _height/2.0)
+    {
+        midCenter.y = _height/2.0 ;
+        labelCenter.y = _height/2.0;
+    }
+
+    _midView.center = midCenter;
+    _labelView.center = labelCenter;
+
+    [sender setTranslation:CGPointZero inView:self];
+}
+</code></pre></div></div>
+<p>The difficult part of dragging is keeping _labelView fixed relative to the bottommost layer while clipping anything outside _midView. Thus _labelView must belong to _midView, with midView.clipsToBounds = YES. But dragging _midView also changes _labelView’s position, so we need to<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>midCenter.y += pt.y;
+labelCenter.y -= pt.y;
+
+</code></pre></div></div>
+<p><br/>
+compensate for _labelView’s displacement so its position relative to the bottom layer remains unchanged.<br/></p>
+<p>That completes the animation.<br/></p>
+<p>If you have a better approach, please join the discussion!<br/>
+Complete code<br/></p>
+<blockquote>
+<p><a href="https://github.com/Wzxhaha/WZXScrollChangeTextColor">GitHub: click here</a><br/></p>
+</blockquote>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-01-20-integrating-lianlian-pay-into-an-ios-app/">Integrating LianLian Pay into an iOS app</a><br/></p>
+
+{% endraw %}

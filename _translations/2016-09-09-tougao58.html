@@ -1,0 +1,91 @@
+---
+layout: post
+title: Recreating the Profile Avatar Wave Animation in Baidu Waimai
+description: 'Breaks down the waves around a profile avatar: CADisplayLink drives updates, trigonometric functions
+  generate the curves, and CAShapeLayer draws them. It explains the components needed for a continuous wave animation.'
+category: Development notes
+imagefeature: null
+date: 2016-09-09 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: 'Breaks down the waves around a profile avatar: CADisplayLink drives updates, trigonometric functions
+    generate the curves, and CAShapeLayer draws them. It explains the components needed for a continuous wave animation.'
+  keywords:
+  - CADisplayLink
+  - CAShapeLayer
+  - wave animation
+  - trigonometry
+  provenance: contribution
+  author_name: 乔同X
+  source_url: http://qiaotongxin.cc/2016/08/22/20160822/
+  credit: Originally credited to 乔同X; edited and archived by Bison.
+  title: Recreating the Profile Avatar Wave Animation in Baidu Waimai
+  source_sha256: c32bef1431c304206dbc2833b518627fe4adbca344fc011fec26a3abf99cd7d1
+lang: en
+source_path: _posts/2016-09-09-tougao58.md
+source_url: /%E6%8A%95%E7%A8%BF/tougao58
+permalink: /en/journal/2016-09-09-recreating-the-profile-avatar-wave-animation-in-baidu-waimai/
+translation_method: machine-assisted
+translation_source_sha256: c32bef1431c304206dbc2833b518627fe4adbca344fc011fec26a3abf99cd7d1
+excerpt: 'Breaks down the waves around a profile avatar: CADisplayLink drives updates, trigonometric functions generate
+  the curves, and CAShapeLayer draws them. It explains the components needed for a continuous wave animation.'
+translation_date: '2026-10-23T02:34:15+00:00'
+---
+{% raw %}
+<p>As a diligent young developer who refuses to leave his desk during lunch, ordering food is an essential habit. One day, I noticed the appealing wave effect in the Baidu Waimai APP. It looked better than other delivery apps; Taobao also has a wave effect. That prompted me to work out how to create this kind of “wave”.</p>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Source: <a href="http://qiaotongxin.cc/2016/08/22/20160822/">乔同X's blog</a><br/></p>
+<h2 id="效果演示">Demonstration</h2>
+<p>Baidu Waimai wave effect:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao58/1.gif"/><br/></p>
+<h2 id="你需要知道的">What you need to know</h2>
+<h2 id="cadisplaylink">CADisplayLink</h2>
+<p>Simply put, it is a timer that redraws the interface at the screen's refresh rate. Create it as follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CADisplayLink *timer = [CADisplayLink displayLinkWithTarget:self selector:@selector(wave)];
+[timer addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+</code></pre></div></div>
+<h2 id="cashapelayer">CAShapeLayer</h2>
+<p>A CALayer subclass commonly used with CGPath to draw shapes.</p>
+<p>Create it as follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CAShapeLayer *Layer = [CAShapeLayer layer];
+Layer.frame =  self.bounds;
+Layer.fillColor = self.realWaveColor.CGColor;
+Layer...等属性
+[self.view.layer addSublayer:Layer];
+</code></pre></div></div>
+<h3 id="其优点">Advantages</h3>
+<ul>
+<li>
+<p>Fast, efficient rendering: CAShapeLayer uses hardware acceleration and draws the same shape much faster than Core Graphics.</p>
+</li>
+<li>
+<p>Efficient memory usage: unlike a regular CALayer, CAShapeLayer does not require a backing image, so it uses relatively little memory regardless of size.</p>
+</li>
+<li>
+<p>It is not clipped to the layer's bounds. CAShapeLayer can draw outside them; its path is not clipped like that of a regular CALayer drawn with Core Graphics.</p>
+</li>
+<li>
+<p>It does not become pixelated. Applying a 3D transform to CAShapeLayer does not pixelate it like a regular layer with a backing image.</p>
+</li>
+</ul>
+<h2 id="三角函数">Trigonometric functions</h2>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao58/2.png"/><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao58/3.png"/><br/></p>
+<h2 id="思路实现">Implementation approach</h2>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>UIView –&gt; 2个CAShapeLayer –&gt; imageView.frame.orgin.y调整
+</code></pre></div></div>
+<h2 id="主要代码实现">Main implementation</h2>
+<h3 id="属性方法">Properties and methods</h3>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao58/4.png"/><br/></p>
+<h3 id="实现">Implement</h3>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao58/5.png"/><br/></p>
+<h3 id="调用">Call</h3>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao58/6.png"/><br/></p>
+<h3 id="终">End</h3>
+<p>Final result:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao58/7.gif"/><br/></p>
+<p><a href="https://github.com/Josin22/JSWave">Demo URL</a></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

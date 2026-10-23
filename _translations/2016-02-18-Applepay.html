@@ -1,0 +1,187 @@
+---
+layout: post
+title: Preparing an iOS app for Apple Pay
+description: 'Records early Apple Pay project setup: enabling the capability, creating a Merchant ID and configuring
+  payment-request properties. It also lists questions about country and currency codes; the demonstrated result
+  comes from the simulator identified in the original article.'
+category: Development notes
+imagefeature: null
+date: 2016-02-18 00:00:00 +0800
+technical_translation:
+  topic: tooling-release
+  summary: 'Records early Apple Pay project setup: enabling the capability, creating a Merchant ID and configuring
+    payment-request properties. It also lists questions about country and currency codes; the demonstrated result
+    comes from the simulator identified in the original article.'
+  keywords:
+  - Apple Pay
+  - Merchant ID
+  - payment requests
+  - Capabilities
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Mentions iOS 8.1 and discusses the contemporary context of mainland China, iOS 9.2 and iPhone 6.
+  title: Preparing an iOS app for Apple Pay
+  source_sha256: b508cf9e1c37ca06e64584895360397ed04fede4c2d8c35beac1548b3d16d5cd
+lang: en
+source_path: _posts/2016-02-18-Applepay.md
+source_url: /ios%E6%94%AF%E4%BB%98/Applepay
+permalink: /en/journal/2016-02-18-preparing-an-ios-app-for-apple-pay/
+translation_method: machine-assisted
+translation_source_sha256: b508cf9e1c37ca06e64584895360397ed04fede4c2d8c35beac1548b3d16d5cd
+excerpt: 'Records early Apple Pay project setup: enabling the capability, creating a Merchant ID and configuring
+  payment-request properties. It also lists questions about country and currency codes; the demonstrated result
+  comes from the simulator identified in the original article.'
+translation_date: '2026-10-23T02:34:13+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"This feature has existed since iOS8.1; it simply was not as popular as it is now. It looks set to take off, so e-commerce platforms of all kinds—B2B, P2P, C2C, and X2X—may need this payment feature. Here is a brief exploration."</p>
+</blockquote>
+<p><br/></p>
+<p>First, change the target to iOS 8.1. Support in China requires 9.2 or later and an iPhone6 or later. Turn Apple Pay on in the project's Capabilities; this automatically imports the necessary libraries. Then add and configure an entitlements file, and finally modify or create your App ID.<br/>
+<img alt="1" src="https://allluckly.cn/images/applepay/4.png"/><br/></p>
+<p>As the screenshot indicates, there is no valid Merchant ID yet. We need to create one. Visit Identifiers &gt; Merchant ID in Apple's iOS Developer Center, then follow the steps to create and register a Merchant ID. The process resembles other certificate setup, so I will not explain it in detail here. Below is a reference image of the completed setup.<br/>
+<img alt="1" src="https://allluckly.cn/images/applepay/5.png"/><br/>
+Download and install it, then refresh the project screen we just opened and select the checkbox. The result is shown below.<br/>
+<img alt="1" src="https://allluckly.cn/images/applepay/6.png"/><br/>
+Here is a brief explanation of the code:<br/>
+.h file.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import &lt;UIKit/UIKit.h&gt;
+
+#import &lt;PassKit/PassKit.h&gt;
+
+@interface ViewController : UIViewController &lt;PKPaymentAuthorizationViewControllerDelegate&gt;
+
+@end
+</code></pre></div></div>
+<p><br/>
+.m file<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import "ViewController.h"
+
+@interface ViewController ()
+
+@end
+
+@implementation ViewController
+
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn.frame = CGRectMake(60, 100, 200, 50);
+    btn.center = self.view.center;
+    [btn setBackgroundImage:[UIImage imageNamed:@"ApplePayBTN_64pt__whiteLine_textLogo_"] forState:UIControlStateNormal];
+
+    [btn addTarget:self action:@selector(ApplePay) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:btn];
+
+}
+
+#pragma mark ----支付状态
+- (void)paymentAuthorizationViewController:(PKPaymentAuthorizationViewController *)controller
+didAuthorizePayment:(PKPayment *)payment
+completion:(void (^)(PKPaymentAuthorizationStatus status))completion
+{
+    NSLog(@"Payment was authorized: %@", payment);
+
+    BOOL asyncSuccessful = FALSE;
+    if(asyncSuccessful) {
+        completion(PKPaymentAuthorizationStatusSuccess);
+
+        // do something to let the user know the status
+
+        NSLog(@"支付成功");
+
+    } else {
+        completion(PKPaymentAuthorizationStatusFailure);
+
+        // do something to let the user know the status
+
+        NSLog(@"支付失败");
+
+
+    }
+
+}
+
+#pragma mark ----开始支付
+- (void)ApplePay{
+    if([PKPaymentAuthorizationViewController canMakePayments]) {
+
+    NSLog(@"支持支付");
+
+    PKPaymentRequest *request = [[PKPaymentRequest alloc] init];
+
+    PKPaymentSummaryItem *widget1 = [PKPaymentSummaryItem summaryItemWithLabel:@"鸡蛋"
+    amount:[NSDecimalNumber decimalNumberWithString:@"0.99"]];
+
+    PKPaymentSummaryItem *widget2 = [PKPaymentSummaryItem summaryItemWithLabel:@"苹果"
+    amount:[NSDecimalNumber decimalNumberWithString:@"1.00"]];
+
+    PKPaymentSummaryItem *widget3 = [PKPaymentSummaryItem summaryItemWithLabel:@"2个苹果"
+    amount:[NSDecimalNumber decimalNumberWithString:@"2.00"]];
+
+    PKPaymentSummaryItem *widget4 = [PKPaymentSummaryItem summaryItemWithLabel:@"总金额" amount:[NSDecimalNumber decimalNumberWithString:@"3.99"] type:PKPaymentSummaryItemTypeFinal];
+
+    request.paymentSummaryItems = @[widget1, widget2, widget3, widget4];
+
+    request.countryCode = @"CN";
+    request.currencyCode = @"CNY";//人民币
+    //此属性限制支付卡，可以支付。PKPaymentNetworkChinaUnionPay支持中国的卡 9.2增加的
+    request.supportedNetworks = @[PKPaymentNetworkChinaUnionPay, PKPaymentNetworkMasterCard, PKPaymentNetworkVisa];
+    request.merchantIdentifier = @"merchant.com.example.lbapplepaydemo";
+    /*
+    PKMerchantCapabilityCredit NS_ENUM_AVAILABLE_IOS(9_0)   = 1UL &lt;&lt; 2,   // 支持信用卡
+    PKMerchantCapabilityDebit  NS_ENUM_AVAILABLE_IOS(9_0)   = 1UL &lt;&lt; 3    // 支持借记卡
+    */
+    request.merchantCapabilities = PKMerchantCapabilityCredit;
+    //增加邮箱及地址信息
+    request.requiredBillingAddressFields = PKAddressFieldEmail | PKAddressFieldPostalAddress;
+    PKPaymentAuthorizationViewController *paymentPane = [[PKPaymentAuthorizationViewController alloc] initWithPaymentRequest:request];
+    paymentPane.delegate = self;
+ 
+
+    if (!paymentPane) {
+
+
+
+        NSLog(@"出问题了");
+
+    }
+
+    [self presentViewController:paymentPane animated:YES completion:nil];
+
+
+    } else {
+        NSLog(@"该设备不支持支付");
+    }
+
+}
+
+#pragma mark ----支付完成
+- (void)paymentAuthorizationViewControllerDidFinish:(PKPaymentAuthorizationViewController *)controller
+{
+
+    [controller dismissViewControllerAnimated:TRUE completion:nil];
+}
+
+
+@end
+</code></pre></div></div>
+<p><br/>
+You may encounter the following problems during this process:<br/>
+1. I did not know how to look up countryCode. Here I used China's code.<a href="http://www.unc.edu/~rowlett/units/codes/country.htm">countryCode lookup website</a><br/></p>
+<p>2. I did not know how to look up currencyCode, and I still have not figured it out. The error message listed several, so I picked one at random.<br/></p>
+<p>3. No iPhone6—I am in that group too…<br/></p>
+<p>For other properties I consider important, see the details in the <a href="https://github.com/AllLuckly/LBAppple-PayDemo">Demo </a>The resulting interface is shown below:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/applepay/1.png"/><br/>
+<img alt="1" src="https://allluckly.cn/images/applepay/2.png"/><br/>
+<img alt="1" src="https://allluckly.cn/images/applepay/3.png"/><br/></p>
+<p>All the screenshots above are from the simulator. Please bear with me: I do not own an iPhone6…<br/></p>
+<p>Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.<br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-01-20-integrating-lianlian-pay-into-an-ios-app/">Integrating LianLian Pay into an iOS app</a><br/></p>
+
+{% endraw %}

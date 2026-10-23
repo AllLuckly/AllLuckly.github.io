@@ -1,0 +1,108 @@
+---
+layout: post
+title: Building a WeChat-style iOS app, part 3
+description: Continues the main interface by exposing constraints from xib files and adjusting their constant values
+  for the screen. It also refines navigation-bar button positions and loads images with SDWebImage placeholders.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-02-01 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Continues the main interface by exposing constraints from xib files and adjusting their constant values
+    for the screen. It also refines navigation-bar button positions and loads images with SDWebImage placeholders.
+  keywords:
+  - Auto Layout
+  - xib
+  - UIBarButtonItem
+  - SDWebImage
+  provenance: contribution
+  author_name: WzxJiang
+  source_url: http://www.jianshu.com/users/389c20d5a244/latest_articles
+  author_url: http://www.jianshu.com/users/389c20d5a244/latest_articles
+  credit: Originally credited to WzxJiang; edited and archived by Bison.
+  title: Building a WeChat-style iOS app, part 3
+  source_sha256: 0405f94e62cf7e4065119b6d2f378fd2901b71e931330e5800c605de2de28320
+lang: en
+source_path: _posts/2016-02-01-tuogao15.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao15
+permalink: /en/journal/2016-02-01-building-a-wechat-style-ios-app-part-3/
+translation_method: machine-assisted
+translation_source_sha256: 0405f94e62cf7e4065119b6d2f378fd2901b71e931330e5800c605de2de28320
+excerpt: Continues the main interface by exposing constraints from xib files and adjusting their constant values
+  for the screen. It also refines navigation-bar button positions and loads images with SDWebImage placeholders.
+translation_date: '2026-10-23T02:34:13+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/users/389c20d5a244/latest_articles">WzxJiang</a><br/></p>
+<blockquote>
+<p>"I did not update the article yesterday because I had to upload an internal testing build for work. Our New Year holiday begins tomorrow. I will arrive home on 2/2 and resume updates on 2/3!:"</p>
+</blockquote>
+<p><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao12/1.png"/><br/></p>
+<p>Completed today<br/></p>
+<p>— Complete the UI for all main screens, without implementing their functionality.<br/></p>
+<p>— Update the project's images. Forgive me for only just learning how to extract an ipa…<br/></p>
+<p>Result<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao15/1.gif"/><br/></p>
+<p>The code is still fairly simple, so I will discuss only the parts I find useful.<br/>
+How to adjust constraints for the resolution<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao15/1.png"/><br/></p>
+<p>The Chat screen needs a custom cell. I created it with a xib, but the AutoLayout constraints could not change with screen resolution. Here is how I handled that.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="c">/**
+*  avaterImgView高度约束
+*/</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">weak</span><span class="p">,</span> <span class="n">nonatomic</span><span class="p">)</span> <span class="n">IBOutlet</span> <span class="n">NSLayoutConstraint</span> <span class="err">*</span><span class="n">avaterImgViewHeight</span><span class="p">;</span>
+
+<span class="c">/**
+*  avaterImgView宽度约束
+*/</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">weak</span><span class="p">,</span> <span class="n">nonatomic</span><span class="p">)</span> <span class="n">IBOutlet</span> <span class="n">NSLayoutConstraint</span> <span class="err">*</span><span class="n">avaterImgViewWidth</span><span class="p">;</span></code></pre></figure>
+<p>Drag the constraint you want to change from the xib into the .h file.<br/>
+Then add the method.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="nt">更改约束</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">changeConstraints</span>
+<span class="p">{</span>
+    <span class="err">_avaterImgViewHeight.constant</span> <span class="err">=</span> <span class="err">WGiveHeight(45);</span>
+    <span class="err">_avaterImgViewWidth.constant</span> <span class="err">=</span> <span class="err">WGiveHeight(45);</span>
+<span class="p">}</span></code></pre></figure>
+<p>This lets us change an AutoLayout constant dynamically. If you know a better approach, I would appreciate your advice!<br/></p>
+<p>How to fine-tune the position of a native self.navigationItem.XXXBarButtonItem(image)<br/>
+Before fine-tuning:<br/>
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao15/2.png"/><br/></p>
+<p>Before fine-tuning<br/>
+Fine-tuning method:<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">[</span><span class="nt">self</span><span class="nc">.navigationItem.rightBarButtonItem</span> <span class="nt">setImageInsets</span><span class="nd">:UIEdgeInsetsMake</span><span class="o">(</span><span class="err">0</span><span class="o">,</span> <span class="nt">WGiveWidth</span><span class="o">(</span><span class="nt">-3</span><span class="o">),</span> <span class="err">0</span><span class="o">,</span> <span class="nt">WGiveWidth</span><span class="o">(</span><span class="err">5</span><span class="o">))];</span></code></pre></figure>
+<p>After fine-tuning:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao15/3.png"/><br/></p>
+<p>After fine-tuning<br/></p>
+<p>The SDWebImage method I use most often<br/></p>
+<p>Import the header file.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nf">#import</span> <span class="s1">"UIImageView+WebCache.h"</span>
+
+<span class="o">[</span><span class="nt">self</span><span class="nc">.avaterImgView</span> <span class="nt">setImageWithURL</span><span class="o">:[</span><span class="nt">NSURL</span> <span class="nt">URLWithString</span><span class="nd">:_model</span><span class="nc">.avatar</span><span class="o">]</span> <span class="nt">placeholderImage</span><span class="o">:[</span><span class="nt">UIImage</span> <span class="nt">imageNamed</span><span class="o">:@</span><span class="s1">"avater.jpg"</span><span class="o">]</span> <span class="nt">completed</span><span class="o">:^(</span><span class="nt">UIImage</span> <span class="o">*</span><span class="nt">image</span><span class="o">,</span> <span class="nt">NSError</span> <span class="o">*</span><span class="nt">error</span><span class="o">,</span> <span class="nt">SDImageCacheType</span> <span class="nt">cacheType</span><span class="o">)</span> <span class="p">{</span>
+
+<span class="p">}</span><span class="o">];</span></code></pre></figure>
+<p>This method displays placeholderImage until the actual image loads.<br/></p>
+<ul>
+<li>How to obtain an app's assets<br/></li>
+</ul>
+<p>1. First, back up the app from your phone to iTunes.<br/></p>
+<p>2. Find the app, then choose Show in Finder.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao15/4.png"/><br/></p>
+<p>3. Change the ipa file extension to ZIP.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao15/5.png"/><br/></p>
+<p>4. Extract it.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao15/6.png"/><br/>
+Screenshot 2016-01-31 at 1.46.21 PM.png
+5. Right-click the WeChat file and choose Show Package Contents.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao15/7.png"/><br/></p>
+<p>That is all for today. Time to pack up and go home for the New Year!</p>
+<p>The 2/3 update will add network data. I am considering a LeadCloud cloud server for now. If you know a better option, please recommend it!</p>
+<p>Current code, to be updated until the project is complete</p>
+<p><a href="https://github.com/Wzxhaha/WWeChat">GitHub:WzxJiang</a><br/></p>
+<p>If you have suggestions or questions, please leave a comment!<br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-01-20-integrating-lianlian-pay-into-an-ios-app/">Integrating LianLian Pay into an iOS app</a><br/></p>
+
+{% endraw %}

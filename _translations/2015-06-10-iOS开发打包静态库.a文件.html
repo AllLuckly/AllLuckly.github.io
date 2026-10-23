@@ -1,0 +1,80 @@
+---
+layout: post
+title: Packaging an iOS static library as an .a file
+description: Records a workflow for building separate device and simulator static libraries in Xcode, inspecting
+  their architectures with lipo and combining the .a files. It explains matching the target platform during testing
+  and checking the resulting library.
+imagefeature: ''
+imagecredit: null
+imagecreditlink: ''
+published: true
+date: 2015-06-10 00:00:00 +0800
+technical_translation:
+  topic: tooling-release
+  summary: Records a workflow for building separate device and simulator static libraries in Xcode, inspecting their
+    architectures with lipo and combining the .a files. It explains matching the target platform during testing
+    and checking the resulting library.
+  keywords:
+  - static libraries
+  - lipo
+  - Xcode
+  - device architectures
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  version_note: Published in 2015. The packaging workflow builds device and simulator .a libraries separately.
+  author_url: https://allluckly.cn/about/
+  title: Packaging an iOS static library as an .a file
+  source_sha256: 7bdb1639b6ba4f447c289d4844706ff5d72622366b3921e074de96f9115fdd1c
+category: Development notes
+technical_update_translation:
+  updated: '2026-10-23'
+  note: The original article uses the Xcode interface from 2015 to build separate static libraries for physical
+    devices and the simulator, then combines them with lipo. For binary distribution across platforms today, consult
+    Apple's XCFramework documentation and prepare the platform and simulator variants separately. Do not treat the
+    old merging command as a current distribution workflow. The original project has not been recompiled here.
+  references:
+  - title: 'Apple: Creating a multi-platform XCFramework'
+    url: https://developer.apple.com/documentation/xcode/creating-a-multi-platform-binary-framework-bundle
+lang: en
+source_path: _posts/2015-06-10-iOS开发打包静态库.a文件.md
+source_url: /%E9%9D%99%E6%80%81%E5%BA%93/iOS%E5%BC%80%E5%8F%91%E6%89%93%E5%8C%85%E9%9D%99%E6%80%81%E5%BA%93.a%E6%96%87%E4%BB%B6
+permalink: /en/journal/2015-06-10-packaging-an-ios-static-library-as-an-a-file/
+translation_method: machine-assisted
+translation_source_sha256: 7bdb1639b6ba4f447c289d4844706ff5d72622366b3921e074de96f9115fdd1c
+excerpt: Records a workflow for building separate device and simulator static libraries in Xcode, inspecting their
+  architectures with lipo and combining the .a files. It explains matching the target platform during testing and
+  checking the resulting library.
+translation_date: '2026-10-23T02:44:58+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"iOS development: generating a static .a library."
+<small><cite title="Plato">Plato</cite></small></p>
+</blockquote>
+<p><img alt="0" src="/images/Static%20library/1.png"/><br/></p>
+<p><img alt="1" src="/images/Static%20library/2.png"/><br/></p>
+<p><img alt="2" src="/images/Static%20library/3.png"/><br/></p>
+<p><img alt="3" src="/images/Static%20library/4.png"/><br/></p>
+<p><img alt="4" src="/images/Static%20library/5.png"/><br/></p>
+<p><img alt="5" src="/images/Static%20library/6.png"/><br/></p>
+<p><img alt="10" src="/images/Static%20library/13.png"/><br/></p>
+<p><img alt="11" src="/images/Static%20library/12.png"/><br/></p>
+<p>Select iOS Device. I recommend leaving the device disconnected here, then running command+b.</p>
+<p>Then select a simulator and run command+b.</p>
+<p>This produces two .a files.</p>
+<p><img alt="6" src="/images/Static%20library/7.png"/><br/></p>
+<p><img alt="7" src="/images/Static%20library/8.png"/><br/></p>
+<p><img alt="8" src="/images/Static%20library/9.png"/><br/></p>
+<p><img alt="9" src="/images/Static%20library/10.png"/><br/></p>
+<p><img alt="10" src="/images/Static%20library/11.png"/><br/></p>
+<p>If you are not testing on a physical device, use the simulator .a file. Otherwise an error occurs.</p>
+<p>Next, combine the device and simulator .a files.</p>
+<p><code class="language-plaintext highlighter-rouge">cd + .a 路径 </code><br/></p>
+<p>Use <code class="language-plaintext highlighter-rouge">lipo -info .a文件名</code> to inspect the file information.
+<code class="language-plaintext highlighter-rouge">lipo -create  xxx/.a文件  xxx/.a文件  -output xxx.a文件</code></p>
+<p>The <code class="language-plaintext highlighter-rouge">xxx/.a</code> files refer to the paths of the device and simulator .a files.</p>
+<p>The <code class="language-plaintext highlighter-rouge">xxx.a</code> file is the generated .a file.</p>
+<p>The new file is twice the size of the original. Then test whether it worked.<br/></p>
+
+{% endraw %}

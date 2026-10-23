@@ -1,0 +1,208 @@
+---
+layout: post
+title: Xcode 8 and iOS 10 Compatibility Notes
+description: Collects migration notes on notifications, ATS, privacy permissions, and interface changes in Xcode
+  8 and iOS 10. It also records issues involving logging, fonts, list performance, plugins, and xib warnings, with
+  links to official documentation.
+category: Development notes
+imagefeature: null
+date: 2016-09-22 00:00:00 +0800
+technical_translation:
+  topic: tooling-release
+  summary: Collects migration notes on notifications, ATS, privacy permissions, and interface changes in Xcode 8
+    and iOS 10. It also records issues involving logging, fonts, list performance, plugins, and xib warnings, with
+    links to official documentation.
+  keywords:
+  - iOS 10
+  - Xcode 8
+  - ATS
+  - privacy permissions
+  - migration
+  provenance: contribution
+  author_name: 判若两人丶
+  source_url: http://www.jianshu.com/p/0cc7aad638d9
+  credit: Originally credited to 判若两人丶; edited and archived by Bison.
+  version_note: These notes explicitly concern compatibility with Xcode 8 and iOS 10 and retain the issues and approaches
+    recorded at that time.
+  title: Xcode 8 and iOS 10 Compatibility Notes
+  source_sha256: 5ec4d745e77406a2ce6f3204053bff019996f37eab4584387b77718508a7ecfc
+lang: en
+source_path: _posts/2016-09-22-tougao61.md
+source_url: /%E6%8A%95%E7%A8%BF/tougao61
+permalink: /en/journal/2016-09-22-xcode-8-and-ios-10-compatibility-notes/
+translation_method: machine-assisted
+translation_source_sha256: 5ec4d745e77406a2ce6f3204053bff019996f37eab4584387b77718508a7ecfc
+excerpt: Collects migration notes on notifications, ATS, privacy permissions, and interface changes in Xcode 8 and
+  iOS 10. It also records issues involving logging, fonts, list performance, plugins, and xib warnings, with links
+  to official documentation.
+translation_date: '2026-10-23T02:34:15+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Source: <a href="http://www.jianshu.com/p/0cc7aad638d9">判若两人丶</a><br/></p>
+<h2 id="1notification通知">1. Notification</h2>
+<p>Apple has continually refined Notification since its introduction, but earlier changes were modest. iOS 10 brings a substantial redesign, making UserNotifications easier to use and much more capable.</p>
+<p>Notifications before iOS 9</p>
+<p>1. Some notification methods are difficult to distinguish and easy to confuse, frustrating developers.</p>
+<p>2. Notifications follow different delivery paths depending on whether the application is running.</p>
+<p>3. An app in the foreground cannot display remote notifications directly; additional handling is required.</p>
+<p>4. Delivered notifications cannot be updated, their contents cannot be changed after sending, and presentation is limited to plain text, offering little extensibility.</p>
+<p>Notifications from iOS 10 onward</p>
+<p>1. Notification-related functionality is unified in UserNotifications.framework.</p>
+<p>2. Notifications can now be revoked or updated, and their contents modified in transit.</p>
+<p>3. Notifications are no longer limited to plain text: they can include video, images, and custom presentation.</p>
+<p>4. iOS 10 notifications are easier to use and manage, with substantial improvements for developers.</p>
+<p>5. iOS 10 simplifies permission requests by combining local and remote notification authorization in one method.</p>
+<p>Resources for learning iOS 10 notifications:</p>
+<p><a href="https://developer.apple.com/reference/usernotifications">UserNotifications: Apple's official documentation</a><br/>
+<a href="https://developer.apple.com/videos/play/wwdc2016/707/">– Apple's official video 1</a><br/>
+<a href="https://developer.apple.com/videos/play/wwdc2016/708/">– Apple's official video 2</a><br/>
+<a href="https://developer.apple.com/videos/play/wwdc2016/724/">– Apple's official video 3</a><br/>
+<a href="https://onevcat.com/2016/08/notification/">A Long-Awaited Redesign: Understanding iOS 10 UserNotifications</a>
+<a href="http://www.jianshu.com/p/9b720efe3779">WWDC2016 Session Notes: New Notification Features in iOS 10</a></p>
+<h2 id="2ats的问题">2. ATS issues</h2>
+<p>iOS 9 discourages HTTP by default, although NSAllowsArbitraryLoads can be set to YES to disable ATS. For iOS 10, Apple will no longer allow this ATS bypass from 2017-1-1, effectively requiring HTTPS; otherwise, an App may be rejected. NSExceptionDomains can still allow HTTP for specific domains and help the app pass review.</p>
+<p>Further reading:</p>
+<p><a href="https://onevcat.com/2016/06/ios-10-ats/">ATS issues in iOS 10</a></p>
+<h2 id="3ios-10-隐私权限设置">3. iOS 10 privacy permissions</h2>
+<p>iOS 10 is stricter about privacy permissions. Without the required settings, the app crashes. Many reported crashes can generally be resolved by adding the corresponding Key-Value entries to info.plist.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao61/1.png"/><br/></p>
+<p>The red-underlined Value text above is shown to users. Provide an appropriate explanation; it must not be empty. Most current solutions are similar. See these references:</p>
+<p><a href="http://www.jianshu.com/p/616240463a7a">Supporting iOS 10: Declaring permissions for private data</a></p>
+<h2 id="4xcode-8-运行一堆没用的logs解决办法">4. Suppressing irrelevant logs when running with Xcode 8</h2>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao61/2.png"/><br/></p>
+<p>The image shows numerous irrelevant messages from a newly created, untouched project. I suspect an Xcode 8 issue but have not investigated closely. Set OS_ACTIVITY_MODE : disable as shown:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao61/3.png"/><br/></p>
+<p>Related discussions:</p>
+<p><a href="http://stackoverflow.com/questions/37800790/hide-xcode-8-logs">stackoverflow discussion</a></p>
+<h2 id="5ios-10-uistatusbar方法过期">5. Deprecated UIStatusBar methods in iOS 10</h2>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao61/4.png"/><br/></p>
+<p>Some projects use UIStatusBar properties or methods that are deprecated in iOS 10 and require adaptation. As the image shows, use preferredStatusBar in iOS 10, for example:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//iOS 10 
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleDefault;
+}
+</code></pre></div></div>
+<h2 id="6ios-10-uicollectionview-性能优化">6. UICollectionView performance improvements in iOS 10</h2>
+<p>Developers increasingly rely on UICollectionView, but issues such as stuttering and slow loading remain. iOS 10 further optimizes it. A full explanation would be lengthy, so here are references for further study:
+<a href="http://www.jianshu.com/p/e97780a24224">WWDC2016 Session Notes: New UICollectionView Features in iOS 10</a></p>
+<h2 id="7ios-10-uicolor-新增方法">7. New UIColor methods in iOS 10</h2>
+<p>The official documentation states:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Most graphics frameworks throughout the system, including Core Graphics, Core Image, Metal, and AVFoundation, have substantially improved support for extended-range pixel formats and wide-gamut color spaces. By extending this behavior throughout the entire graphics stack, it is easier than ever to support devices with a wide color display. In addition, UIKit standardizes on working in a new extended sRGB color space, making it easy to mix sRGB colors with colors in other, wider color gamuts without a significant performance penalty.
+
+Here are some best practices to adopt as you start working with Wide Color.
+
+In iOS 10, the UIColor class uses the extended sRGB color space and its initializers no longer clamp raw component values to between 0.0 and 1.0. If your app relies on UIKit to clamp component values (whether you’re creating a color or asking a color for its component values), you need to change your app’s behavior when you link against iOS 10.
+When performing custom drawing in a UIView on an iPad Pro (9.7 inch), the underlying drawing environment is configured with an extended sRGB color space.
+If your app renders custom image objects, use the new UIGraphicsImageRenderer class to control whether the destination bitmap is created using an extended-range or standard-range format.
+If you are performing your own image processing on wide-gamut devices using a lower level API, such as Core Graphics or Metal, you should use an extended range color space and a pixel format that supports 16-bit floating-point component values. When clamping of color values is necessary, you should do so explicitly.
+Core Graphics, Core Image, and Metal Performance Shaders provide new options for easily converting colors and images between color spaces.
+</code></pre></div></div>
+<p>Previously, we used RGB to define colors, with relatively limited variety. The new methods seem intended to improve this. In iOS 10, Apple recommends sRGB for better performance and richer colors. If you have a UIColor category, consider adapting it to sRGB. UIColor adds these two Api methods:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (UIColor *)colorWithDisplayP3Red:(CGFloat)displayP3Red green:(CGFloat)green blue:(CGFloat)blue alpha:(CGFloat)alpha NS_AVAILABLE_IOS(10_0);
+
+- (UIColor *)initWithDisplayP3Red:(CGFloat)displayP3Red green:(CGFloat)green blue:(CGFloat)blue alpha:(CGFloat)alpha NS_AVAILABLE_IOS(10_0);
+## 8.iOS 10 UITextContentType
+// The textContentType property is to provide the keyboard with extra information about the semantic intent of the text document.
+
+@property(nonatomic,copy) UITextContentType textContentType NS_AVAILABLE_IOS(10_0); // default is nil
+</code></pre></div></div>
+<p>In iOS 10, UITextField adds textContentType to indicate the expected semantic meaning of input.</p>
+<p>This property tells the keyboard and system what kind of content the user is expected to enter. For example, identify an email-address field with uitextcontenttypeemailaddress. Providing this semantic information lets the system sometimes choose an appropriate keyboard automatically and improve correction and proactive integration with other text-entry opportunities.</p>
+<h2 id="9ios-10-字体随着手机系统字体而改变">9. Fonts following the system text size in iOS 10</h2>
+<p>Making app labels follow changes to the system text size previously required considerable code. iOS 10 provides adjustsFontForContentSizeCategory for this. I have not implemented it on a physical device because I do not have one; please correct any misunderstanding.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  UILabel *myLabel = [UILabel new];
+
+   /*
+    UIFont 的preferredFontForTextStyle: 意思是指定一个样式，并让字体大小符合用户设定的字体大小。
+   */
+    myLabel.font =[UIFont preferredFontForTextStyle: UIFontTextStyleHeadline];
+
+ /*
+ Indicates whether the corresponding element should automatically update its font when the device’s UIContentSizeCategory is changed.
+ For this property to take effect, the element’s font must be a font vended using +preferredFontForTextStyle: or +preferredFontForTextStyle:compatibleWithTraitCollection: with a valid UIFontTextStyle.
+ */
+     //是否更新字体的变化
+    myLabel.adjustsFontForContentSizeCategory = YES;
+</code></pre></div></div>
+<h2 id="10ios-10-uiscrollview新增refreshcontrol">10. UIScrollView adds refreshControl in iOS 10</h2>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao61/5.png"/><br/></p>
+<p>From iOS 10 onward, UIScrollView subclasses support refresh functionality:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@property (nonatomic, strong, nullable) UIRefreshControl *refreshControl NS_AVAILABLE_IOS(10_0) __TVOS_PROHIBITED;
+</code></pre></div></div>
+<h2 id="11ios-10-判断系统版本正确姿势">11. Checking the system version correctly in iOS 10</h2>
+<p>Checking the system version is common, especially when adapting to iOS 10. But an issue appears, as shown below:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao61/6.png"/><br/></p>
+<p>The answer is:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//值为 1
+[[[[UIDevice currentDevice] systemVersion] substringToIndex:1] integerValue]
+//值为10.000000
+[[UIDevice currentDevice] systemVersion].floatValue,
+//值为10.0
+[[UIDevice currentDevice] systemVersion]
+</code></pre></div></div>
+<p>Use one of the latter two methods to check the system version. I forgot to mention that [[UIDevice currentDevice] systemVersion].floatValue is unreliable too. I vaguely remember 8.3 producing 8.2; regardless, it was unreliable. I recommend [[UIDevice currentDevice] systemVersion].</p>
+<p>In Swift, check as follows:</p>
+<p>if #available(iOS 10.0, *) {
+            // iOS 10.0
+            print(“iOS 10.0”);
+        } else { }</p>
+<p>Reference articles:</p>
+<p><a href="http://www.jianshu.com/p/213b3b96cafe">Common Macro Definitions for Everyday iOS Development</a></p>
+<h2 id="12xcode-8-插件不能用的问题">12. Plugins no longer working in Xcode 8</h2>
+<p>Everyone has upgraded to Xcode 8, but developers dependent on plugins are searching online for a solution. Here is one:
+<a href="http://vongloo.me/2016/09/10/Make-Your-Xcode8-Great-Again/?utm_source=tuicool&amp;utm_medium=referral">Continuing to use plugins in Xcode8</a></p>
+<p>The explanation at the article's end warns that plugins may introduce security issues and cause App Store rejection. I therefore recommend avoiding them. Alternatives exist; adding comment code snippets in Xcode is convenient, for example.</p>
+<h2 id="13ios-10开始项目中有的文字显示不全问题">13. Truncated text in projects starting with iOS 10</h2>
+<p>I tested with Xcode 8 and Xcode 7.3, as shown below:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao61/7.png"/><br/>
+Xcode 8</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao61/8.png"/><br/>
+Xcode 7: create a Label and size it to fit, using font size 17 in both cases. The resulting widths differ. The following values explain why some text is truncated after upgrading to iOS 10:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Xcode 8打印   Xcode 7.3打印
+1个文字宽度：17.5 1个文字宽度：17
+2个文字宽度：35   2个文字宽度：34
+3个文字宽度：52   3个文字宽度：51
+4个文字宽度：69.5 4个文字宽度：68
+5个文字宽度：87   5个文字宽度：85
+6个文字宽度：104  6个文字宽度：102
+7个文字宽度：121.5    7个文字宽度：119
+8个文字宽度：139  8个文字宽度：136
+9个文字宽度：156  9个文字宽度：153
+10个文字宽度：173.5   10个文字宽度：170
+</code></pre></div></div>
+<p>I also tested English letters and found no issue; only Chinese characters were affected. For now, the only solution I know is to adjust the controls individually.</p>
+<h2 id="14xcode-8使用xib-awakefromnib的警告问题">14. The Xib awakeFromNib warning in Xcode 8</h2>
+<p>Updated: 2016-09-18. Before Xcode 8, writing - (void)awakeFromNib {} for Xib initialization this way caused no issue. Xcode 8, however, produces this warning:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao61/9.png"/><br/></p>
+<p>To remove the warning, explicitly add [super awakeFromNib];. Here is the official explanation:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>You must call the super implementation of awakeFromNib to give parent classes the opportunity to perform any additional initialization they require. Although the default implementation of this method does nothing, many UIKit classes provide non-empty implementations. You may call the super implementation at any point during your own awakeFromNib method.
+</code></pre></div></div>
+<h2 id="15xcode-8编译过慢的问题">15. Slow compilation in Xcode 8</h2>
+<p>Updated: 2016-09-20. Many people report slower compilation in Xcode 8, sometimes dramatically slower. Mine feels similar to before. I suspect the computer's state matters: some developers leave machines running for months with many background threads and unnecessary processes. Here are compilation-speed tips if you are interested:</p>
+<p><a href="http://nszzy.me/2016/03/20/reduce-xcode-build-times/">Speeding up Xcode compilation</a></p>
+<h2 id="16ios-10-imagepickercontrollercameraviewtransform问题">16. ImagePickerController.cameraViewTransform issues in iOS 10</h2>
+<p>Updated: 2016-09-21. Many developers report problems with custom cameras and cameraViewTransform no longer working. Information online is limited; here is a reference approach:</p>
+<p>Resolve it by observing AVCaptureSessionDidStartRunningNotification.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  //#import &lt;AVFoundation/AVFoundation.h&gt;
+  //监听
+   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cameraNotification:) name:AVCaptureSessionDidStartRunningNotification object:nil];
+  //监听方法
+  - (void)cameraNotification:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+          // 这里实现
+          imagePickerController.cameraViewTransform = CGAffineTransformMakeTranslation(50,  50);
+      });
+  }
+</code></pre></div></div>
+<ul>
+<li>Use AVFoundation</li>
+</ul>
+<p>UIImagePickerController appears unsuitable for iOS 10, so AVFoundation may solve the problem. References follow:
+<a href="http://stackoverflow.com/questions/39124794/uiimagepickercontrollers-cameraviewtransform-is-ignoring-scaling-and-transla">UIImagePickerController’s cameraViewTransform</a></p>
+<p>This article collects iOS 10 resources and draws on other online articles. I will continue adding iOS 10 material and issues encountered during development.
+<a href="https://developer.apple.com/library/content/releasenotes/General/WhatsNewIniOS/Articles/iOS10.html#//apple_ref/doc/uid/TP40017084-SW1">Apple's official iOS 10 documentation</a></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

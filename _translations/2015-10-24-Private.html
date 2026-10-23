@@ -1,0 +1,163 @@
+---
+layout: post
+title: Integrating an endlessly flipping 3D banner in one minute
+description: Combines left and right swipe gestures with transition animations to cycle through banner images in
+  3D. It covers component import and tap delegation, while explicitly noting that the effect uses a private animation
+  API and is retained as a technical experiment.
+category: Development notes
+imagefeature: BG.jpg
+date: 2015-10-24 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Combines left and right swipe gestures with transition animations to cycle through banner images in 3D.
+    It covers component import and tap delegation, while explicitly noting that the effect uses a private animation
+    API and is retained as a technical experiment.
+  keywords:
+  - Banner
+  - CATransition
+  - gesture interaction
+  - private APIs
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Explicitly uses a private system transition API and states that the approach is unsuitable for apps
+    intended for store release.
+  title: Integrating an endlessly flipping 3D banner in one minute
+  source_sha256: bbc8195d2c6ec535321a01e2133506fd0788b0d2a293a5d9687cc78f5fb8490f
+lang: en
+source_path: _posts/2015-10-24-Private.md
+source_url: /%E5%B9%BF%E5%91%8A%E8%BD%AE%E6%92%AD/Private
+permalink: /en/journal/2015-10-24-integrating-an-endlessly-flipping-3d-banner-in-one-minute/
+translation_method: machine-assisted
+translation_source_sha256: bbc8195d2c6ec535321a01e2133506fd0788b0d2a293a5d9687cc78f5fb8490f
+excerpt: Combines left and right swipe gestures with transition animations to cycle through banner images in 3D.
+  It covers component import and tap delegation, while explicitly noting that the effect uses a private animation
+  API and is retained as a technical experiment.
+translation_date: '2026-10-23T02:44:59+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"iOS technical sharing, iOS development, iOS development tips, iOS development blog"
+<small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p><br/></p>
+<p><span class="technical-missing-image">This historical illustration is currently unavailable. <a href="http://upload-images.jianshu.io/upload_images/671504-4615c325630ecbe1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">The original image URL is retained</a> for reference.</span>
+This is an impressive advertising carousel feature used in many <code class="language-plaintext highlighter-rouge">APP</code> include this feature, such as <code class="language-plaintext highlighter-rouge">礼物说</code> There are a few others whose names I have forgotten.
+Here is a brief explanation of how this feature works.
+First, define the basic controls as follows.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">show3DBannerView</span><span class="p">{</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">_imageArr</span> <span class="err">=</span> <span class="err">@[@"0.jpg",@"1.jpg",@"2.jpg",@"3.jpg",@"4.jpg",@"5.jpg"];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">//定义图片控件</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">_imageView=[[UIImageView</span> <span class="err">alloc]init];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">_imageView.frame=</span> <span class="err">CGRectMake(0,</span> <span class="err">0,</span> <span class="err">MainScreenW,</span> <span class="err">180);</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">_imageView.contentMode=UIViewContentModeScaleAspectFit;</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">_imageView.image=[UIImage</span> <span class="py">imageNamed</span><span class="p">:</span><span class="n">_imageArr</span><span class="p">[</span><span class="m">0</span><span class="p">]];</span><span class="err">//默认图片</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">_imageView.userInteractionEnabled</span> <span class="err">=</span> <span class="err">YES;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">self.userInteractionEnabled</span> <span class="err">=</span> <span class="err">YES;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[self</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">_imageView</span><span class="p">];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">_imageView.tag</span> <span class="err">=</span> <span class="err">10;</span>
+<span class="err">//默认点击第一张</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">UITapGestureRecognizer</span> <span class="err">*doubleTap</span> <span class="err">=</span> <span class="err">[[UITapGestureRecognizer</span> <span class="err">alloc]</span><span class="py">initWithTarget</span><span class="p">:</span><span class="n">self</span> <span class="n">action</span><span class="p">:</span><span class="err">@</span><span class="n">selector</span><span class="p">(</span><span class="n">doDoubleTap</span><span class="p">:)];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[_imageView</span> <span class="py">addGestureRecognizer</span><span class="p">:</span><span class="n">doubleTap</span><span class="p">];</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">//添加手势</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">UISwipeGestureRecognizer</span> <span class="err">*leftSwipeGesture=[[UISwipeGestureRecognizer</span> <span class="err">alloc]</span><span class="py">initWithTarget</span><span class="p">:</span><span class="n">self</span> <span class="n">action</span><span class="p">:</span><span class="err">@</span><span class="n">selector</span><span class="p">(</span><span class="n">leftSwipe</span><span class="p">:)];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">leftSwipeGesture.direction=UISwipeGestureRecognizerDirectionLeft;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[self</span> <span class="py">addGestureRecognizer</span><span class="p">:</span><span class="n">leftSwipeGesture</span><span class="p">];</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">UISwipeGestureRecognizer</span> <span class="err">*rightSwipeGesture=[[UISwipeGestureRecognizer</span> <span class="err">alloc]</span><span class="py">initWithTarget</span><span class="p">:</span><span class="n">self</span> <span class="n">action</span><span class="p">:</span><span class="err">@</span><span class="n">selector</span><span class="p">(</span><span class="n">rightSwipe</span><span class="p">:)];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">rightSwipeGesture.direction=UISwipeGestureRecognizerDirectionRight;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[self</span> <span class="py">addGestureRecognizer</span><span class="p">:</span><span class="n">rightSwipeGesture</span><span class="p">];</span>
+<span class="p">}</span></code></pre></figure>
+<p>Then implement the methods for each gesture.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nf">#pragma</span> <span class="nt">mark</span> <span class="nt">向左滑动浏览下一张图片</span>
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">leftSwipe</span><span class="o">:(</span><span class="nt">UISwipeGestureRecognizer</span> <span class="o">*)</span><span class="nt">gesture</span><span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[self</span> <span class="py">transitionAnimation</span><span class="p">:</span><span class="n">YES</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="nf">#pragma</span> <span class="nt">mark</span> <span class="nt">向右滑动浏览上一张图片</span>
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">rightSwipe</span><span class="o">:(</span><span class="nt">UISwipeGestureRecognizer</span> <span class="o">*)</span><span class="nt">gesture</span><span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[self</span> <span class="py">transitionAnimation</span><span class="p">:</span><span class="n">NO</span><span class="p">];</span>
+<span class="p">}</span></code></pre></figure>
+<p>Now it is time to implement the 3D transition animation.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nf">#pragma</span> <span class="nt">mark</span> <span class="nt">转场动画</span>
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">transitionAnimation</span><span class="o">:(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">isNext</span><span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">//1.创建转场动画对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">CATransition</span> <span class="err">*transition=[[CATransition</span> <span class="err">alloc]init];</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">//2.设置动画类型,注意对于苹果官方没公开的动画类型只能使用字符串，并没有对应的常量定义</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">transition.type=@"cube";</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">//设置子类型</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">if</span> <span class="err">(isNext)</span> <span class="err">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">transition.subtype=kCATransitionFromRight;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="p">}</span><span class="nt">else</span><span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">transition.subtype=kCATransitionFromLeft;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="p">}</span>
+<span class="err"> </span> <span class="err"> </span> <span class="o">//</span><span class="nt">设置动画时常</span>
+<span class="err"> </span> <span class="err"> </span> <span class="nt">transition</span><span class="nc">.duration</span><span class="o">=</span><span class="err">1</span><span class="o">.</span><span class="err">0</span><span class="nt">f</span><span class="o">;</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="o">//</span><span class="err">3</span><span class="nc">.设置转场后的新视图添加转场动画</span>
+<span class="err"> </span> <span class="err"> </span> <span class="nt">_imageView</span><span class="nc">.image</span><span class="o">=[</span><span class="nt">self</span> <span class="nt">getImage</span><span class="nd">:isNext</span><span class="o">];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="o">[</span><span class="nt">_imageView</span><span class="nc">.layer</span> <span class="nt">addAnimation</span><span class="nd">:transition</span> <span class="nt">forKey</span><span class="o">:@</span><span class="s1">"KCTransitionAnimation"</span><span class="o">];</span>
+<span class="err">}</span></code></pre></figure>
+<p>Does something still seem missing? A banner needs images, of course.
+Here is how to obtain them.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nf">#pragma</span> <span class="nt">mark</span> <span class="nt">取得当前图片</span>
+<span class="nt">-</span><span class="o">(</span><span class="nt">UIImage</span> <span class="o">*)</span><span class="nt">getImage</span><span class="o">:(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">isNext</span><span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">if</span> <span class="err">(isNext)</span> <span class="err">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">_currentIndex=(_currentIndex+1)%_imageArr.count;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="p">}</span><span class="nt">else</span><span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">_currentIndex=(_currentIndex-1+_imageArr.count)%(int)_imageArr.count;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="p">}</span>
+<span class="err"> </span> <span class="err"> </span> <span class="nt">NSString</span> <span class="o">*</span><span class="nt">imageName</span> <span class="o">=</span> <span class="nt">_imageArr</span><span class="o">[</span><span class="nt">_currentIndex</span><span class="o">];</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="nt">_imageView</span><span class="nc">.tag</span> <span class="o">=</span> <span class="nt">_currentIndex</span><span class="o">+</span><span class="err">10</span><span class="o">;</span>
+<span class="o">//</span><span class="nt">增加点击手势</span>
+<span class="err"> </span> <span class="err"> </span> <span class="nt">UITapGestureRecognizer</span> <span class="o">*</span><span class="nt">doubleTap</span> <span class="o">=</span> <span class="o">[[</span><span class="nt">UITapGestureRecognizer</span> <span class="nt">alloc</span><span class="o">]</span><span class="nt">initWithTarget</span><span class="nd">:self</span> <span class="nt">action</span><span class="o">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">doDoubleTap</span><span class="p">:)];</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="o">[</span><span class="nt">_imageView</span> <span class="nt">addGestureRecognizer</span><span class="nd">:doubleTap</span><span class="o">];</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="nt">return</span> <span class="o">[</span><span class="nt">UIImage</span> <span class="nt">imageNamed</span><span class="nd">:imageName</span><span class="o">];</span>
+<span class="err">}</span></code></pre></figure>
+<p>Trigger an event by tapping an image</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">doDoubleTap</span><span class="o">:(</span><span class="nt">UITapGestureRecognizer</span><span class="o">*)</span><span class="nt">gesture</span>
+<span class="p">{</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span>   <span class="err">[_delegate</span> <span class="py">ClickImg</span><span class="p">:(</span><span class="n">int</span><span class="p">)</span><span class="n">gesture</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">tag</span><span class="p">];</span>
+<span class="p">}</span></code></pre></figure>
+<h2 id="集成方法">Integration</h2>
+<p>Import the header: <code class="language-plaintext highlighter-rouge">#import "SayGift_3DBanner_View.h"</code>.</p>
+<p>Drag the <code class="language-plaintext highlighter-rouge">SayGift_3DBanner_View</code> files into your project.</p>
+<p>Implement the <code class="language-plaintext highlighter-rouge">ClickImgDelegate</code> delegate.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="err"> </span> <span class="err"> </span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">viewDidLoad</span> <span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[super</span> <span class="err">viewDidLoad];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">SayGift_3DBanner_View</span> <span class="err">*Banner_View</span> <span class="err">=</span> <span class="err">[[SayGift_3DBanner_View</span> <span class="err">alloc]</span><span class="py">initWithFrame</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="m">180</span><span class="p">)];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">Banner_View.delegate</span> <span class="err">=</span> <span class="err">self;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[Banner_View</span> <span class="err">show3DBannerView];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[self.view</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">Banner_View</span><span class="p">];</span>
+
+<span class="p">}</span></code></pre></figure>
+<p><br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="nt">点击了第几张图片</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">ClickImg</span><span class="o">:(</span><span class="nt">int</span><span class="o">)</span><span class="nt">index</span><span class="p">{</span>
+    <span class="err">NSLog(@"点击了第%d张",index);</span>
+<span class="p">}</span></code></pre></figure>
+<h3 id="ps">PS</h3>
+<h4 id="由于转场的动画使用的是系统的私有api所以不能用在需要上架的app里面哦有点遗憾哈想到了一个方法貌似可以绕过苹果的检测上传感觉还可以实行的样子">The transition animation uses a private system <code class="language-plaintext highlighter-rouge">API</code>, so it cannot be used in an <code class="language-plaintext highlighter-rouge">APP</code> intended for App Store release. That is unfortunate. I thought of an approach that might bypass Apple's detection during submission, and it seemed potentially workable.</h4>
+<h3 id="点击demo下载"><a href="https://github.com/AllLuckly/SayGift_3DAdvertisement">Click to download the demo</a></h3>
+<p>Finally, here are screenshots of the result.</p>
+<p><span class="technical-missing-image">This historical illustration is currently unavailable. <a href="http://upload-images.jianshu.io/upload_images/671504-0e4df3c94d09e081.gif?imageMogr2/auto-orient/strip">The original image URL is retained</a> for reference.</span>
+<br/></p>
+<p>Recommended reading: <a href="http://www.jianshu.com/p/05a3087cd796">Integrating Alipay friend sharing in three minutes</a>
+<br/></p>
+<p>Copyright ©Bison. Reproduction without permission is prohibited.<br/></p>
+
+{% endraw %}

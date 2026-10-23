@@ -1,0 +1,80 @@
+---
+layout: post
+published: true
+title: Calculating label heights automatically in a table view
+category: Development notes
+date: 2015-05-17 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Calculates the height a label needs from its font, constrained width and measured text, then adds spacing
+    in the UITableView row-height callback. The code illustrates manual sizing of multiline labels and table-view
+    cells.
+  keywords:
+  - UITableView
+  - UILabel
+  - text measurement
+  - dynamic row heights
+  provenance: archive
+  credit: The original does not clearly identify an author. Retained as a historical article.
+  version_note: Published in 2015. The example measures text manually with sizeWithFont.
+  title: Calculating label heights automatically in a table view
+  source_sha256: 6efbef357086079b39e0c718f40d47f39e6ac3243b89a3063b1bbb09b18a1aeb
+description: Calculates the height a label needs from its font, constrained width and measured text, then adds spacing
+  in the UITableView row-height callback. The code illustrates manual sizing of multiline labels and table-view
+  cells.
+lang: en
+source_path: _posts/2015-5-17-自动计算tabview中label的高度.md
+source_url: /uitabview/%E8%87%AA%E5%8A%A8%E8%AE%A1%E7%AE%97tabview%E4%B8%ADlabel%E7%9A%84%E9%AB%98%E5%BA%A6
+permalink: /en/journal/2015-05-17-calculating-label-heights-automatically-in-a-table-view/
+translation_method: machine-assisted
+translation_source_sha256: 6efbef357086079b39e0c718f40d47f39e6ac3243b89a3063b1bbb09b18a1aeb
+excerpt: Calculates the height a label needs from its font, constrained width and measured text, then adds spacing
+  in the UITableView row-height callback. The code illustrates manual sizing of multiline labels and table-view
+  cells.
+translation_date: '2026-10-23T02:34:11+00:00'
+---
+{% raw %}
+<p>A method for automatically calculating the height of a label in a tabview</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">UITableViewCell</span> <span class="o">*)</span><span class="nt">tableView</span><span class="o">:(</span><span class="nt">UITableView</span> <span class="o">*)</span><span class="nt">tableView</span> <span class="nt">cellForRowAtIndexPath</span><span class="o">:(</span><span class="nt">NSIndexPath</span> <span class="o">*)</span><span class="nt">indexPath</span><span class="p">{</span>
+    <span class="err">if(tableView</span> <span class="err">==</span> <span class="err">kindTableView)</span>
+    <span class="err">{</span>
+        <span class="err">NSInteger</span> <span class="err">section</span> <span class="err">=</span> <span class="err">indexPath.section;</span>
+
+        <span class="err">customCell</span> <span class="err">*cell</span> <span class="err">=</span> <span class="err">(customCell</span> <span class="err">*)[tableView</span> <span class="py">dequeueReusableCellWithIdentifier</span><span class="p">:</span><span class="n">customCellView</span><span class="p">];</span>
+        <span class="err">if</span> <span class="err">(cell</span> <span class="err">==</span> <span class="err">nil)</span> <span class="err">{</span>
+        <span class="err">[[NSBundle</span> <span class="err">mainBundle]</span> <span class="py">loadNibNamed</span><span class="p">:</span><span class="err">@</span><span class="s1">"customCell"</span> <span class="n">owner</span><span class="p">:</span><span class="n">self</span> <span class="n">options</span><span class="p">:</span><span class="n">nil</span><span class="p">];</span>
+        <span class="err">cell</span> <span class="err">=</span> <span class="err">_customCell;</span>
+    <span class="p">}</span>
+
+        <span class="nt">FileListItem</span> <span class="o">*</span> <span class="nt">item</span> <span class="o">=</span> <span class="o">[</span><span class="nt">cuArray</span> <span class="nt">objectAtIndex</span><span class="nd">:indexPath</span><span class="nc">.row</span><span class="o">];</span>
+        <span class="nt">cell</span><span class="nc">.textLabel.text</span> <span class="o">=</span> <span class="nt">item</span><span class="nc">.name</span><span class="o">;</span>
+
+        <span class="o">//</span><span class="nt">主要是这里</span><span class="err">，</span><span class="nt">上面的按平常各自的习惯写</span>
+        <span class="nt">cell</span><span class="nc">.textLabel.lineBreakMode</span> <span class="o">=</span> <span class="nt">NSLineBreakByWordWrapping</span><span class="o">;</span>
+        <span class="nt">cell</span><span class="nc">.textLabel.numberOfLines</span> <span class="o">=</span> <span class="err">0</span><span class="o">;</span>
+        <span class="nt">cell</span><span class="nc">.textLabel.font</span> <span class="o">=</span> <span class="o">[</span><span class="nt">UIFont</span> <span class="nt">fontWithName</span><span class="o">:@</span><span class="s1">"Helvetica"</span> <span class="nt">size</span><span class="o">:</span><span class="err">17</span><span class="o">.</span><span class="err">0</span><span class="o">];</span>
+        <span class="nt">UIFont</span> <span class="o">*</span><span class="nt">cellFont</span> <span class="o">=</span> <span class="o">[</span><span class="nt">UIFont</span> <span class="nt">fontWithName</span><span class="o">:@</span><span class="s1">"Helvetica"</span> <span class="nt">size</span><span class="o">:</span><span class="err">17</span><span class="o">.</span><span class="err">0</span><span class="o">];</span>
+        <span class="nt">CGSize</span> <span class="nt">constraintSize</span> <span class="o">=</span> <span class="nt">CGSizeMake</span><span class="o">(</span><span class="err">280</span><span class="o">.</span><span class="err">0</span><span class="nt">f</span><span class="o">,</span> <span class="nt">MAXFLOAT</span><span class="o">);</span>
+        <span class="nt">CGSize</span> <span class="nt">labelSize</span> <span class="o">=</span> <span class="o">[</span><span class="nt">cell</span><span class="nc">.textLabel.text</span> <span class="nt">sizeWithFont</span><span class="nd">:cellFont</span> <span class="nt">constrainedToSize</span><span class="nd">:constraintSize</span> <span class="nt">lineBreakMode</span><span class="nd">:NSLineBreakByWordWrapping</span><span class="o">];</span>
+
+        <span class="nt">CGRect</span> <span class="nt">frame</span> <span class="o">=</span> <span class="nt">cell</span><span class="nc">.textLabel.frame</span><span class="o">;</span>
+        <span class="nt">cell</span><span class="nc">.textLabel.frame</span> <span class="o">=</span> <span class="nt">CGRectMake</span><span class="o">(</span><span class="nt">frame</span><span class="nc">.origin.x</span><span class="o">,</span> <span class="o">((</span><span class="nt">labelSize</span><span class="nc">.height</span> <span class="o">+</span> <span class="err">20</span><span class="o">)</span><span class="nt">-frame</span><span class="nc">.size.height</span><span class="o">)/</span><span class="err">2</span><span class="o">,</span> <span class="nt">frame</span><span class="nc">.size.width</span><span class="o">,</span> <span class="nt">frame</span><span class="nc">.size.height</span><span class="o">);</span>
+
+    <span class="err">}</span>
+    <span class="nt">return</span> <span class="nt">cell</span><span class="o">;</span>
+
+<span class="err">}</span>
+
+
+<span class="o">//</span><span class="nt">设置cell每行间隔的高度</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">CGFloat</span><span class="o">)</span><span class="nt">tableView</span><span class="o">:(</span><span class="nt">UITableView</span> <span class="o">*)</span><span class="nt">tableView</span> <span class="nt">heightForRowAtIndexPath</span><span class="o">:(</span><span class="nt">NSIndexPath</span> <span class="o">*)</span><span class="nt">indexPath</span><span class="p">{</span>
+    <span class="err">NSString</span> <span class="err">*cellText</span> <span class="err">=</span> <span class="err">item.name;</span>
+    <span class="err">UIFont</span> <span class="err">*cellFont</span> <span class="err">=</span> <span class="err">[UIFont</span> <span class="py">fontWithName</span><span class="p">:</span><span class="err">@</span><span class="s1">"Helvetica"</span> <span class="n">size</span><span class="p">:</span><span class="m">17.0</span><span class="p">];</span>
+    <span class="err">CGSize</span> <span class="err">constraintSize</span> <span class="err">=</span> <span class="err">CGSizeMake(280.0f,</span> <span class="err">MAXFLOAT);</span>
+    <span class="err">CGSize</span> <span class="err">labelSize</span> <span class="err">=</span> <span class="err">[cellText</span> <span class="py">sizeWithFont</span><span class="p">:</span><span class="n">cellFont</span> <span class="n">constrainedToSize</span><span class="p">:</span><span class="n">constraintSize</span> <span class="n">lineBreakMode</span><span class="p">:</span><span class="n">NSLineBreakByWordWrapping</span><span class="p">];</span>
+
+    <span class="err">return</span> <span class="err">labelSize.height</span> <span class="err">+</span> <span class="err">20;</span>
+<span class="p">}</span> </code></pre></figure>
+<p><br/></p>
+
+{% endraw %}

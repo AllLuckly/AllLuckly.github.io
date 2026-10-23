@@ -1,0 +1,326 @@
+---
+layout: post
+title: 'iOS animation: a closer look at layout animation'
+description: Uses an expanding account list and a shrinking button on a login page to demonstrate animating top,
+  height and horizontal-margin constraints. It examines how the view hierarchy and constraint changes work together
+  to produce a continuous transition.
+category: Development notes
+imagefeature: null
+date: 2016-03-23 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Uses an expanding account list and a shrinking button on a login page to demonstrate animating top, height
+    and horizontal-margin constraints. It examines how the view hierarchy and constraint changes work together to
+    produce a continuous transition.
+  keywords:
+  - Auto Layout
+  - layoutIfNeeded
+  - login animation
+  - constraint updates
+  provenance: contribution
+  author_name: Sindri
+  source_url: http://www.jianshu.com/p/2a8787919794
+  credit: Originally credited to Sindri; edited and archived by Bison.
+  title: 'iOS animation: a closer look at layout animation'
+  source_sha256: ac22e40917c5655e447b393cf09f8a011e3e1e9a44e2d375f959eb6ea7999365
+lang: en
+source_path: _posts/2016-03-23-tuogao34.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao34
+permalink: /en/journal/2016-03-23-ios-animation-a-closer-look-at-layout-animation/
+translation_method: machine-assisted
+translation_source_sha256: ac22e40917c5655e447b393cf09f8a011e3e1e9a44e2d375f959eb6ea7999365
+excerpt: Uses an expanding account list and a shrinking button on a login page to demonstrate animating top, height
+  and horizontal-margin constraints. It examines how the view hierarchy and constraint changes work together to
+  produce a continuous transition.
+translation_date: '2026-10-23T02:34:14+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"The title alone may not explain what this article contains. Before continuing with constraint animation, let me show you the effect we will implement."</p>
+</blockquote>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/2a8787919794">Sindri’s Notes</a><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao34/1.gif"/><br/></p>
+<p>Constraint animation is not especially complex. Once you are comfortable with constraints, you can create inventive animations. In the preceding article, <a href="http://www.jianshu.com/p/71603eece322">A first look at Auto Layout animation</a>, we watched the list view's scroll offset and continually adjusted constraints to animate it. That approach effectively assembled a succession of interfaces frame by frame, which is rather cumbersome. Here, we will abandon that approach and instead call <code class="language-plaintext highlighter-rouge">UIView</code> view-redrawing method to implement the animation.</p>
+<p>This article mainly covers the following animations:</p>
+<ul>
+<li>Expanding and collapsing the account-history list</li>
+<li>Transforming the sign-in button when tapped</li>
+<li>The sign-in button's spinning animation after a tap, without a detailed explanation</li>
+</ul>
+<p>In fact, I implemented the spinning animation above using the <code class="language-plaintext highlighter-rouge">CoreAnimation</code> framework together with a timer. This also marks the end of the constraint-animation discussion in this article.</p>
+<h2 id="准备">Preparation</h2>
+<p>First, establish the hierarchy of all controls and build the interface. In the demo, five controls are visible before the animation: the avatar, account field, drop-down button, password field, and sign-in button. A list of saved accounts sits below the account field. We move it into view by changing its top constraint relative to the account field:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao34/2.jpg"/><br/></p>
+<p>Of these controls' constraints, the ones we need to change in code are:</p>
+<ul>
+<li>The history list's top constraint, <code class="language-plaintext highlighter-rouge">listTopConstraint</code>, moves the list downward into view when changed.</li>
+<li>The history list's height constraint, <code class="language-plaintext highlighter-rouge">listHeightConstraint</code>, controls its expansion animation.</li>
+<li>The account field's height constraint, <code class="language-plaintext highlighter-rouge">accountHeightConstraint</code>, determines how far the list moves downward.</li>
+<li>The login button's left and right spacing constraints relative to its parent, <code class="language-plaintext highlighter-rouge">loginLeftConstraint</code> and <code class="language-plaintext highlighter-rouge">loginRightConstraint</code>, shrink the button when changed.</li>
+<li>The login button's height constraint, <code class="language-plaintext highlighter-rouge">loginHeightConstraint</code>, is used to calculate its shrunken width.</li>
+</ul>
+<p>Besides constraint properties, we need some data to support the animation:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@property(assign, nonatomic) BOOL isAnimating;   // 用来判断登录按钮的动画状态
+@property(strong, nonatomic) NSArray * records;  // 列表的数据源，demo中存储五个字符串
+</code></pre></div></div>
+<p>To keep other views from covering the list when it appears, arrange the hierarchy as follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>下拉按钮 &gt; 账户输入框 &gt; 纪录列表 &gt; 头像 = 登录按钮 = 密码输入框
+</code></pre></div></div>
+<h2 id="下拉动画">Drop-down animation</h2>
+<p>I will explain the demo's animations in two sections because their implementations differ substantially. Both could be achieved by directly changing constraint <code class="language-plaintext highlighter-rouge">constant</code> values, but that is not the purpose of this article.</p>
+<p>Tapping the dropdown button produces two animations: a 180° rotation and the list dropping down or disappearing. Normally we would use a <code class="language-plaintext highlighter-rouge">BOOL</code> variable to track whether the list is expanded and choose the animation. However, the sender button already supplies <code class="language-plaintext highlighter-rouge">isSelected</code>. Changing it marks the expansion state. The button-rotation code is therefore:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 点击打开或者隐藏列表
+- (IBAction)actionToOpenOrCloseList:(UIButton *)sender {
+    [self.view endEditing: YES];
+    [self animateToRotateArrow: sender.selected];
+    sender.isSelected ? [self showRecordList] : [self hideRecordList];
+}
+
+/// 按钮转向动画
+- (void)animateToRotateArrow: (BOOL)selected
+{
+    CATransform3D transform = selected ? CATransform3DIdentity : CATransform3DMakeRotation(M_PI, 0, 0, 1);
+    [_dropdownButton setSelected: !selected];
+    [UIView animateWithDuration: 0.25 animations: ^{
+        _dropdownButton.layer.transform = transform;
+    }];
+}
+</code></pre></div></div>
+<p>The code uses the button's <code class="language-plaintext highlighter-rouge">isSelected</code> property to choose expansion or collapse. We adjust listHeightConstraint and listTopConstraint for the list's size and position, and add a pop-out animation when expanding it:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 显示纪录列表
+- (void)showRecordList
+{
+    [UIView animateWithDuration: 0.25 delay: 0 usingSpringWithDamping: 0.4 initialSpringVelocity: 5 options: UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionAllowUserInteraction animations: ^{
+        _listTopConstraint.constant = _accountHeightConstraint.constant;
+        _listHeightConstraint.constant = _accountHeightConstraint.constant * 5;
+    } completion: nil];
+}
+
+/// 隐藏纪录列表
+- (void)hideRecordList
+{
+    [UIView animateWithDuration: 0.25 animations: ^{
+        _listTopConstraint.constant = 0;
+        _listHeightConstraint.constant = 0;
+    } completion: nil];
+}
+</code></pre></div></div>
+<p>Run the code and look at the result. It certainly will not be what you wanted.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao34/3.gif"/><br/></p>
+<p>One interesting aspect of <code class="language-plaintext highlighter-rouge">UIView</code> animation is that changing view properties directly inside its <code class="language-plaintext highlighter-rouge">block</code> produces the expected animation. Changing constraints, however, calculates and displays the final layout immediately, even when the constraint changes are inside the animation <code class="language-plaintext highlighter-rouge">block</code>.</p>
+<p>For this, iOS provides <code class="language-plaintext highlighter-rouge">- (void)layoutIfNeeded</code> on views to refresh the interface immediately. It calls <code class="language-plaintext highlighter-rouge">- (void)layoutSubviews</code> on the current view's subviews to lay them out again. Set the constraint values first, then call <code class="language-plaintext highlighter-rouge">layoutIfNeeded</code> inside the animation to redraw the interface through the transition. The expansion and collapse code becomes:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 显示纪录列表
+- (void)showRecordList
+{
+    _listTopConstraint.constant = _accountHeightConstraint.constant;
+    _listHeightConstraint.constant = _accountHeightConstraint.constant * 5;
+    [UIView animateWithDuration: 0.25 delay: 0 usingSpringWithDamping: 0.4 initialSpringVelocity: 5 options: UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionAllowUserInteraction animations: ^{
+        [self.view layoutIfNeeded];
+    } completion: nil];
+}
+
+/// 隐藏纪录列表
+- (void)hideRecordList
+{
+    _listTopConstraint.constant = 0;
+    _listHeightConstraint.constant = 0;
+    [UIView animateWithDuration: 0.25 animations: ^{
+        [self.view layoutIfNeeded];
+    } completion: nil];
+}
+</code></pre></div></div>
+<p>Run the code again. The history list now animates correctly when expanding and collapsing.</p>
+<h2 id="登录按钮动画">Sign-in button animation</h2>
+<p>Frankly, my favorite part of this demo is the animation after the sign-in button is tapped. Unsurprisingly, it also took the longest to implement.</p>
+<p>As the demo shows, tapping Login produces a spinning progress animation in the button. Implementing it in the controller would involve <code class="language-plaintext highlighter-rouge">layer</code> operations, which should not be the controller's responsibility. I therefore encapsulated the login button and exposed <code class="language-plaintext highlighter-rouge">- (void)start</code> and <code class="language-plaintext highlighter-rouge">- (void)stop</code> so the controller can start and stop the animation. Their implementations follow:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>const NSTimeInterval duration = 1.2;
+///动画开始隐藏文字
+- (void)start
+{
+    [self addAnimate];
+    if (_timer) {
+        [_timer invalidate];
+    }
+    NSTimer * timer = [NSTimer scheduledTimerWithTimeInterval: duration target: self selector: @selector(addAnimate) userInfo: nil repeats: YES];
+    _timer = timer;
+
+    [UIView animateWithDuration: 0.5 animations: ^{
+        _circle.opacity = 1;
+        [self setTitleColor: [UIColor colorWithWhite: 1 alpha: 0] forState: UIControlStateNormal];
+    }];
+}
+
+///动画结束时显示文字
+- (void)stop
+{
+    if (_timer) {
+        [_timer invalidate];
+    }
+
+    [self.circle removeAllAnimations];
+    [UIView animateWithDuration: 0.5 animations: ^{
+        _circle.opacity = 0;
+        [self setTitleColor: [UIColor colorWithWhite: 1 alpha: 1] forState: UIControlStateNormal];
+    }];
+}
+</code></pre></div></div>
+<p>As noted earlier, the button's spinning animation combines a timer with the <code class="language-plaintext highlighter-rouge">CoreAnimation</code> framework. Since this is outside constraint animation, I will not explain its implementation here. Interested readers can inspect it in the article's demo.</p>
+<p>Alongside the button's spinning and text visibility animations, its own dimensions change. It stays centered on the view's x axis after shrinking, so left and right constraints must remain equal. Its height stays unchanged, while its width shrinks to match that height. Given the button's <code class="language-plaintext highlighter-rouge">height</code>, calculate the new side constraints as follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 点击登录动画
+- (IBAction)actionToSignIn:(UIButton *)sender {
+    _isAnimating = !_isAnimating;
+    if (_isAnimating) {
+        [_signInButton start];
+        [self animateToMakeButtonSmall];
+    } else {
+        [_signInButton stop];
+        [self animateToMakeButtonBig];
+    }
+}
+
+///缩小动画
+- (void)animateToMakeButtonSmall {
+    CGFloat height = _loginHeightConstraint.constant;
+    CGFloat screenWidth = CGRectGetWidth(self.view.frame);
+    CGFloat spacingConstant = (screenWidth - height) / 2;
+    _loginLeftConstraint.constant = _loginRightConstraint.constant = spacingConstant;
+
+    [UIView animateWithDuration: 0.15 delay: 0 options: UIViewAnimationOptionCurveEaseOut animations: ^{
+        [self.view layoutIfNeeded];
+    } completion: nil];
+}
+
+///放大动画
+- (void)animateToMakeButtonBig {
+    _loginLeftConstraint.constant = _loginRightConstraint.constant = 0;
+    [UIView animateWithDuration: 0.15 delay: 0 options: UIViewAnimationOptionCurveEaseOut animations: ^{
+        [self.view layoutIfNeeded];
+    } completion: nil];
+}
+</code></pre></div></div>
+<p>We have animated the sign-in button by calculating its left and right spacing. That works, but consider the reasoning behind that animation:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>获取按钮高度和父视图宽度 -&gt; 计算按钮左右间隔 -&gt; 实现动画
+</code></pre></div></div>
+<p><br/>
+But what was our original implementation approach?<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>按钮变小，保持宽高一致 -&gt; 按钮居中 -&gt; 实现动画
+</code></pre></div></div>
+<p><br/>
+That sounds rather absurd. Although the animation works, this is not how we should implement it. To make our intended approach work correctly, follow these steps:</p>
+<p>1. Remove the sign-in button's left and right constraints.</p>
+<p>2. Add an equal-width-and-height constraint.</p>
+<p>3. Add constraints centering the button in its parent view.</p>
+<p>Before these steps, examine the constraint equation and the properties in an <code class="language-plaintext highlighter-rouge">NSLayoutConstraint</code> object that represent its variables:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao34/4.jpg"/><br/></p>
+<p>Using this equation, suppose we want to add a horizontal-centering constraint to a button in the current view. The code to create it is:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NSLayoutConstraint * centerXConstraint = [NSLayoutConstraint 
+        constraintWithItem: _button                   //firstItem
+                 attribute: NSLayoutAttributeCenterX  //firstAttribute
+                 relatedBy: NSLayoutRelationEqual     //relation   
+                    toItem: _button.superview         //secondItem
+                 attribute: NSLayoutAttributeCenterX  //secondAttribute
+                multiplier: 1.0                       //multiplier
+                  constant: 0];                       //constant
+</code></pre></div></div>
+<p>The code above maps layout properties clearly to code. Looking up <code class="language-plaintext highlighter-rouge">NSLayoutConstraint</code> in Xcode also shows that only <code class="language-plaintext highlighter-rouge">constant</code> among these properties is writable. This means you cannot normally change a value such as <code class="language-plaintext highlighter-rouge">multipier</code> to alter a control's width relative to its parent. KVC can do it, but that should not be the solution.</p>
+<p>We therefore need to create new constraints and remove old ones to animate the sign-in button. Before iOS8, this was unquestionably cumbersome: we had to use the </p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)addConstraint:(NSLayoutConstraint *)constraint;
+- (void)addConstraints:(NSArray&lt;__kindof NSLayoutConstraint *&gt; *)constraints;
+- (void)removeConstraint:(NSLayoutConstraint *)constraint;
+- (void)removeConstraints:(NSArray&lt;__kindof NSLayoutConstraint *&gt; *)constraints;
+</code></pre></div></div>
+<p>These methods add and remove constraints. From iOS8 onward, however, <code class="language-plaintext highlighter-rouge">NSLayoutConstraint</code> provides a BOOL property, <code class="language-plaintext highlighter-rouge">active</code>, to control whether a constraint is active. Setting it to <code class="language-plaintext highlighter-rouge">NO</code> deactivates it. Likewise, after creating a constraint, setting <code class="language-plaintext highlighter-rouge">active</code> to <code class="language-plaintext highlighter-rouge">YES</code> activates it automatically. Using the equation above, we can revise the code as follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 缩小按钮
+- (void)animateToMakeButtonSmall {
+    _loginLeftConstraint.active = NO;
+    _loginRightConstraint.active = NO;
+
+    //创建宽高比约束
+    NSLayoutConstraint * ratioConstraint = [NSLayoutConstraint constraintWithItem: _signInButton attribute: NSLayoutAttributeWidth relatedBy: NSLayoutRelationEqual toItem: _signInButton attribute: NSLayoutAttributeHeight multiplier: 1. constant: 0];
+    ratioConstraint.active = YES;
+    _loginRatioConstraint = ratioConstraint;
+
+    //创建居中约束
+    NSLayoutConstraint * centerXConstraint = [NSLayoutConstraint constraintWithItem: _signInButton attribute: NSLayoutAttributeCenterX relatedBy: NSLayoutRelationEqual toItem: _signInButton.superview attribute: NSLayoutAttributeCenterX multiplier: 1. constant: 0.];
+    centerXConstraint.active = YES;
+    _loginCenterXConstraint = centerXConstraint;
+
+    [UIView animateWithDuration: 0.15 delay: 0 options: UIViewAnimationOptionCurveEaseIn animations: ^{
+        [self.view layoutIfNeeded];
+    } completion: nil];
+}
+
+/// 还原按钮
+- (void)animateToMakeButtonBig {
+    _loginCenterXConstraint.active = NO;
+    _loginRatioConstraint.active = NO;
+
+    NSLayoutConstraint * leftConstraint = [NSLayoutConstraint constraintWithItem: _signInButton attribute: NSLayoutAttributeLeading relatedBy: NSLayoutRelationEqual toItem: _signInButton.superview attribute: NSLayoutAttributeLeading multiplier: 1. constant: 25];
+    _loginLeftConstraint = leftConstraint;
+    leftConstraint.active = YES;
+
+    NSLayoutConstraint * rightConstraint = [NSLayoutConstraint constraintWithItem: _signInButton attribute: NSLayoutAttributeTrailing relatedBy: NSLayoutRelationEqual toItem: _signInButton.superview attribute: NSLayoutAttributeTrailing multiplier: 1. constant: -25];
+    _loginRightConstraint = rightConstraint;
+    rightConstraint.active = YES;
+
+    [UIView animateWithDuration: 0.15 delay: 0 options: UIViewAnimationOptionCurveEaseOut animations: ^{
+        [self.view layoutIfNeeded];
+    } completion: nil];
+}
+</code></pre></div></div>
+<p>When animating by adding and removing constraints, remember that once a constraint's <code class="language-plaintext highlighter-rouge">active</code> is set to <code class="language-plaintext highlighter-rouge">NO</code>, reactivating it still leaves it ineffective; it must be recreated.</p>
+<p>I also added <code class="language-plaintext highlighter-rouge">loginRatioConstraint</code> and <code class="language-plaintext highlighter-rouge">loginCenterXConstraint</code> above to reference the new constraints created by each animation, making deactivation easy when stopping. Alternatively, inspect each constraint's two objects and attribute types to locate and deactivate it:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[_signInButton.constraints enumerateObjectsWithOptions: NSEnumerationReverse usingBlock: ^(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    if (obj.firstItem == _signInButton &amp;&amp; obj.firstAttribute == NSLayoutAttributeCenterX) {
+        obj.active = NO;
+    } else if (obj.firstAttribute == NSLayoutAttributeWidth &amp;&amp; obj.secondAttribute == NSLayoutAttributeHeight) {
+        obj.active = NO;
+    }
+}];
+</code></pre></div></div>
+<p>This code is equivalent to the preceding </p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>_loginCenterXConstraint.active = NO;
+_loginRatioConstraint.active = NO;
+</code></pre></div></div>
+<p>Removing constraints through code is more complicated, but it may be needed when encapsulating controls, so it is worth learning. Those comparisons are indeed cumbersome. <code class="language-plaintext highlighter-rouge">NSLayoutConstraint</code> also provides the string property <code class="language-plaintext highlighter-rouge">identifier</code> to identify constraints. In a storyboard, you can view and set it directly in the right-hand inspector:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao34/5.jpg"/><br/></p>
+<p>The condition above can then be simplified to checking the id:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>static NSString * centerXIdentifier = @"centerXConstraint";
+static NSString * ratioIdentifier = @"ratioIdentifier";
+
+/// 缩小按钮
+- (void)animateToMakeButtonSmall {
+    ......
+    //创建宽高比约束
+    NSLayoutConstraint * ratioConstraint  = ...//create ratioConstraint
+    ratioConstraint.identifier = ratioIdentifier;
+
+    //创建居中约束
+    NSLayoutConstraint * centerXConstraint = ...//create centerXConstraint
+    centerXConstraint.identifier = centerXIdentifier;
+    ......
+}
+
+/// 还原按钮
+- (void)animateToMakeButtonBig {
+    ......
+    [_signInButton.constraints enumerateObjectsWithOptions: NSEnumerationReverse usingBlock: ^(__kindof NSLayoutConstraint * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj.identifier isEqualToString: centerXIdentifier]) {
+            obj.active = NO;
+        } else if ([obj.identifier isEqualToString: ratioIdentifier]) {
+            obj.active = NO;
+        }
+    }];
+    ......
+}
+</code></pre></div></div>
+<h2 id="尾言">Closing notes</h2>
+<p>It has been a while since the first constraint-animation article. For a long time I knew nothing about this kind of animation; I only began using it when writing this animation series, and the experience has taught me a great deal. Like the preceding articles, this one marks the end of my discussion of constraint animation. I also mixed Core Animation into the demo, which may reveal the limits of my experience with constraints. I still know and understand far too little about animation; perhaps my imagination cannot yet support my ambitions. Nevertheless, I will keep working toward more impressive, easy-to-use animations.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao34/6.jpg"/><br/></p>
+<p>Mastering constraints should be essential for iOS developers. IB visual development is now indispensable in my daily work and greatly improves efficiency; previously, I created controls entirely in code wherever animation was needed. Meanwhile, iPhone sizes may keep increasing, and <code class="language-plaintext highlighter-rouge">class size</code> and <code class="language-plaintext highlighter-rouge">autolayout</code> are valuable tools for adapting to different screens. I hope this article expands your understanding of constraints.</p>
+<p><a href="https://github.com/JustKeepRunning/LXDAutoLayoutAnimationDemo">Demo for this article</a></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-02-01-a-beginner-developer-s-review-of-2015/">A beginner developer's review of 2015</a><br/></p>
+
+{% endraw %}

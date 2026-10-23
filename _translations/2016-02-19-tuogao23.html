@@ -1,0 +1,97 @@
+---
+layout: post
+title: Restoring old Xcode plug-ins after a version update
+description: Documents historical fixes for plug-ins that stopped loading after an Xcode update or an accidental
+  Skip Bundles selection. It checks compatibility UUIDs, edits plug-in Info.plist files and resets the loading choice.
+category: Development notes
+imagefeature: null
+date: 2016-02-19 00:00:00 +0800
+technical_translation:
+  topic: tooling-release
+  summary: Documents historical fixes for plug-ins that stopped loading after an Xcode update or an accidental Skip
+    Bundles selection. It checks compatibility UUIDs, edits plug-in Info.plist files and resets the loading choice.
+  keywords:
+  - Xcode plug-ins
+  - DVTPlugInCompatibilityUUIDs
+  - Info.plist
+  - defaults
+  provenance: contribution
+  author_name: 许漠颜
+  source_url: http://www.jianshu.com/p/875926697402
+  credit: Originally credited to 许漠颜; edited and archived by Bison.
+  version_note: Compares Xcode 7.1, 7.2 and 7.2.1 and concerns the plug-in loading mechanism used at the time.
+  title: Restoring old Xcode plug-ins after a version update
+  source_sha256: cf9a6d82204d60889017f9304c1f6b69b038597bcc4762117c415b28e03b2599
+lang: en
+source_path: _posts/2016-02-19-tuogao23.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao23
+permalink: /en/journal/2016-02-19-restoring-old-xcode-plug-ins-after-a-version-update/
+translation_method: machine-assisted
+translation_source_sha256: cf9a6d82204d60889017f9304c1f6b69b038597bcc4762117c415b28e03b2599
+excerpt: Documents historical fixes for plug-ins that stopped loading after an Xcode update or an accidental Skip
+  Bundles selection. It checks compatibility UUIDs, edits plug-in Info.plist files and resets the loading choice.
+translation_date: '2026-10-23T02:34:13+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/875926697402">许漠颜</a><br/></p>
+<blockquote>
+<p>“I am a beginner and have never written a plugin, so I do not know why plugins stop working after every update. Based on the required changes, I suspect different versions have different uuids. I compared Xcode 7.1 and 7.2, and their uuids were indeed different.”</p>
+</blockquote>
+<p><br/></p>
+<p>Issues:<br/>
+(1) Plugins stop working after an Xcode update.<br/></p>
+<p>(2) Accidentally selecting Skip Bundles instead of Load Bundles when restarting Xcode.<br/></p>
+<p>Issue (1): I am a beginner and have never written a plugin, so I do not know why plugins stop working after every update. Based on the required changes, I suspect it relates to different uuids for different versions. I compared Xcode 7.1 and 7.2, and their uuids were indeed different. However, the recent 7.2.1 update has the same uuid as 7.2, yet the problem remains. I therefore do not know whether uuid is actually the cause. If you know, please reply.<br/></p>
+<p>Issue (2): after configuring the uuid in the plugin's DVTPlugInCompatibilityUUIDs, restarting Xcode presents Load Bundles and Skip Bundles once. Naturally, selecting Skip Bundles leaves the plugin unavailable.<br/></p>
+<p>Solution to issue (1): first, open the terminal and enter:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>defaults read /Applications/Xcode.app/Contents/Info.plist DVTPlugInCompatibilityUUID
+</code></pre></div></div>
+<p>to obtain the uuid. Then go to<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~/Library/Application Support/Developer/Shared/Xcode/Plug-ins
+</code></pre></div></div>
+<p><br/>
+directory, find the desired plugin, choose Show Package Contents → Contents → Info.plist, and add the obtained uuid under DVTPlugInCompatibilityUUIDs.<br/></p>
+<p>Solution to issue (2): similarly, obtain the Mac's uuid, remove the matching entry under DVTPlugInCompatibilityUUIDs, and add the uuid again.<br/></p>
+<p>Restarting Xcode should then restore the plugins. However, this method becomes troublesome when many plugins are installed.<br/></p>
+<p>Simpler approach: the first case occurs after updating Xcode. Open the terminal and enter<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist -maxdepth 3 | xargs -I{} defaults write {} DVTPlugInCompatibilityUUIDs -array-add `defaults read /Applications/Xcode.app/Contents/Info.plist DVTPlugInCompatibilityUUID`（注意的是我们在打开Xcode的情况下输入命令，然后重新启动Xcode）。
+</code></pre></div></div>
+<p><br/></p>
+<p>Simpler approach: the second case occurs after completing the first procedure but accidentally clicking skip bundles on restart. Open the terminal and enter<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist -maxdepth 3 | xargs -I{} defaults delete {} DVTPlugInCompatibilityUUIDs
+
+</code></pre></div></div>
+<p><br/>
+Then restart Xcode and run<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist -maxdepth 3 | xargs -I{} defaults write {} DVTPlugInCompatibilityUUIDs -array-add `defaults read /Applications/Xcode.app/Contents/Info.plist DVTPlugInCompatibilityUUID`
+
+</code></pre></div></div>
+<p><br/>
+command, then restart Xcode once more.<br/></p>
+<p>Explanation of the command line:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist 找到目录Plug-in下名字Info.plist的文件
+
+-maxdepth 3 |寻找的范围是三层文件夹&lt;br&gt;
+
+xargs -I{} 将得到的info.plist文件的集合复制给{}&lt;br&gt;
+
+defaults delete {} DVTPlugInCompatibilityUUIDs 删除掉plist文件下的DVTPlugInCompatibilityUUIDs参数
+
+
+defaults write {} DVTPlugInCompatibilityUUIDs -array-add ''在DVTPlugInCompatibilityUUIDs Array下添加key
+
+
+defaults read /Applications/Xcode.app/Contents/Info.plist DVTPlugInCompatibilityUUID 获取Mac的uuid
+
+</code></pre></div></div>
+<p><br/></p>
+<p>Some explanations here may be inaccurate, but following these steps will restore the plugins.<br/></p>
+<p>You can also use defaults write, defaults read, and defaults delete to work with other files on the Mac.<br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-02-18-preparing-an-ios-app-for-apple-pay/">Preparing an iOS app for Apple Pay</a><br/></p>
+
+{% endraw %}

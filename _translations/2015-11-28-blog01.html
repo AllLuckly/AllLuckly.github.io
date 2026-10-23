@@ -1,0 +1,89 @@
+---
+layout: post
+title: A technical blog can be more than a website
+description: Records an experiment in wrapping a personal technical blog as an iOS app. UIWebView displays the home
+  and category pages and handles loading callbacks, while search and interaction-stutter issues remain documented
+  as unresolved at the time.
+category: Development notes
+imagefeature: BG.jpg
+date: 2015-11-28 00:00:00 +0800
+technical_translation:
+  topic: web-notes
+  summary: Records an experiment in wrapping a personal technical blog as an iOS app. UIWebView displays the home
+    and category pages and handles loading callbacks, while search and interaction-stutter issues remain documented
+    as unresolved at the time.
+  keywords:
+  - personal blog
+  - UIWebView
+  - hybrid apps
+  - page loading
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Published in 2015. The website wrapper uses UIWebView.
+  title: A technical blog can be more than a website
+  source_sha256: 33538c697725d414c3df4f4da8df4e74823f61fc918dd3eb3d8c724895ae9fc8
+lang: en
+source_path: _posts/2015-11-28-blog01.md
+source_url: /mac/blog01
+permalink: /en/journal/2015-11-28-a-technical-blog-can-be-more-than-a-website/
+translation_method: machine-assisted
+translation_source_sha256: 33538c697725d414c3df4f4da8df4e74823f61fc918dd3eb3d8c724895ae9fc8
+excerpt: Records an experiment in wrapping a personal technical blog as an iOS app. UIWebView displays the home
+  and category pages and handles loading callbacks, while search and interaction-stutter issues remain documented
+  as unresolved at the time.
+translation_date: '2026-10-23T02:34:10+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"iOS technical sharing, iOS development, iOS development tips, iOS development blog"
+<small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p>A technical blog can be more than a website. What else could it become? Let's see.
+Having recently left my job and been looking for work at home, I could put work aside, visit an internet café, play games, and clear my head.
+As an <code class="language-plaintext highlighter-rouge">iOS</code> developer, I often needed to show <code class="language-plaintext highlighter-rouge">app</code> s I had built during interviews.
+So why not turn my technical blog into an <code class="language-plaintext highlighter-rouge">app</code> too? The idea stayed with me, and I tend to act on my ideas.
+I did not know backend development or how to write the essential APIs ordinary users never see. All I had was my own technical blog...
+Then a simple implementation occurred to me. Some of you have probably guessed it: yes, the powerful <code class="language-plaintext highlighter-rouge">UIWebView</code>.
+First, here is the finished result.</p>
+<p><img alt="1" src="https://allluckly.cn/images/home.png"/></p>
+<p><br/>
+This is the home page. It looks all right, does it not?<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/class.png"/></p>
+<p><br/>
+This is the category page. It looks quite good and fits perfectly!<br/>
+Here is the core code.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">UIWebView</span> <span class="o">*</span><span class="nt">webView</span> <span class="o">=</span> <span class="o">[[</span><span class="nt">UIWebView</span> <span class="nt">alloc</span><span class="o">]</span><span class="nt">initWithFrame</span><span class="nd">:CGRectMake</span><span class="o">(</span><span class="err">0</span><span class="o">,</span> <span class="err">0</span><span class="o">,</span> <span class="nt">self</span><span class="nc">.view.frame.size.width</span><span class="o">,</span> <span class="nt">self</span><span class="nc">.view.frame.size.height</span><span class="o">)];</span>
+<span class="nt">webView</span><span class="nc">.delegate</span> <span class="o">=</span> <span class="nt">self</span><span class="o">;</span>
+<span class="o">[</span><span class="nt">self</span><span class="nc">.view</span> <span class="nt">addSubview</span><span class="nd">:webView</span><span class="o">];</span>
+
+<span class="nt">NSURL</span> <span class="o">*</span><span class="nt">url</span> <span class="o">=</span> <span class="o">[</span><span class="nt">NSURL</span> <span class="nt">URLWithString</span><span class="o">:@</span><span class="s1">"http://allluckly.cn"</span><span class="o">];</span>
+
+<span class="nt">NSString</span> <span class="o">*</span><span class="nt">str</span> <span class="o">=</span> <span class="o">[</span><span class="nt">NSString</span> <span class="nt">stringWithContentsOfURL</span><span class="nd">:url</span> <span class="nt">usedEncoding</span><span class="nd">:nil</span> <span class="nt">error</span><span class="nd">:nil</span><span class="o">];</span>
+<span class="o">[</span><span class="nt">webView</span> <span class="nt">loadHTMLString</span><span class="nd">:str</span> <span class="nt">baseURL</span><span class="nd">:url</span><span class="o">];</span>
+<span class="nt">webView</span><span class="nc">.opaque</span> <span class="o">=</span> <span class="nt">NO</span><span class="o">;</span>
+<span class="nt">webView</span><span class="nc">.backgroundColor</span> <span class="o">=</span> <span class="o">[</span><span class="nt">UIColor</span> <span class="nt">clearColor</span><span class="o">];</span></code></pre></figure>
+<p>Next come the <code class="language-plaintext highlighter-rouge">UIWebView</code> delegate methods.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span><span class="o">(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">webView</span><span class="o">:(</span><span class="nt">UIWebView</span><span class="o">*)</span><span class="nt">webView</span> <span class="nt">shouldStartLoadWithRequest</span><span class="o">:(</span><span class="nt">NSURLRequest</span><span class="o">*)</span><span class="nt">request</span> <span class="nt">navigationType</span><span class="o">:(</span><span class="nt">UIWebViewNavigationType</span><span class="o">)</span><span class="nt">navigationType</span><span class="p">{</span>
+
+    <span class="err">//判断是否是单击</span>
+    <span class="err">if</span> <span class="err">(navigationType</span> <span class="err">==</span> <span class="err">UIWebViewNavigationTypeLinkClicked)</span>
+    <span class="err">{</span>
+        <span class="err">NSURL</span> <span class="err">*url</span> <span class="err">=</span> <span class="err">[request</span> <span class="err">URL];</span>
+        <span class="err">NSString</span> <span class="err">*curUrl=</span> <span class="err">[url</span> <span class="err">absoluteString];</span>
+        <span class="err">LBArticle_VC</span> <span class="err">*vc</span> <span class="err">=</span> <span class="err">[[LBArticle_VC</span> <span class="err">alloc]init];</span>
+        <span class="err">vc.url</span> <span class="err">=</span> <span class="err">curUrl;</span>
+        <span class="err">[self.navigationController</span> <span class="py">pushViewController</span><span class="p">:</span><span class="n">vc</span> <span class="n">animated</span><span class="p">:</span><span class="n">YES</span><span class="p">];</span>
+        <span class="err">return</span> <span class="err">NO;</span>
+    <span class="p">}</span>
+
+    <span class="nt">return</span> <span class="nt">YES</span><span class="o">;</span>
+<span class="err">}</span></code></pre></figure>
+<p><br/></p>
+<p>However, tapping F and searching seem to lag a little. I have not resolved this yet; I will revisit it when I have time. If you know a good solution, please contact me!<br/></p>
+<p>The experience is slightly below that of a native <code class="language-plaintext highlighter-rouge">APP</code>, but it is simple, convenient, and saves time and effort!</p>
+<p>Recommended reading: <a href="/en/journal/2015-06-04-an-illustrated-guide-to-implementing-ios-in-app-purchases/">An illustrated guide to implementing iOS in-app purchases</a><br/></p>
+<p>Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.</p>
+
+{% endraw %}

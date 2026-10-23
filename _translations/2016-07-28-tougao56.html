@@ -1,0 +1,317 @@
+---
+layout: post
+title: Decoupling iOS Views from Concrete Model Types
+description: Uses several types of ticket data with different fields but similar presentation needs to explore a
+  dictionary-backed approach. A protocol exposes common display properties, reducing cells' and controllers' dependence
+  on specific models and clarifying where data conversion belongs.
+category: Development notes
+imagefeature: null
+date: 2016-07-28 00:00:00 +0800
+technical_translation:
+  topic: swift-runtime
+  summary: Uses several types of ticket data with different fields but similar presentation needs to explore a dictionary-backed
+    approach. A protocol exposes common display properties, reducing cells' and controllers' dependence on specific
+    models and clarifying where data conversion belongs.
+  keywords:
+  - protocols
+  - model decoupling
+  - MVC
+  - dictionaries
+  - view decoupling
+  provenance: contribution
+  author_name: Sindri
+  source_url: http://www.jianshu.com/p/2b2290fa0beb
+  credit: Originally credited to Sindri; edited and archived by Bison.
+  title: Decoupling iOS Views from Concrete Model Types
+  source_sha256: 809a289b5d23570592a78146a2f4b7d880b6ef6726d6c9de99a0e1b83ad847b0
+lang: en
+source_path: _posts/2016-07-28-tougao56.md
+source_url: /%E6%8A%95%E7%A8%BF/tougao56
+permalink: /en/journal/2016-07-28-decoupling-ios-views-from-concrete-model-types/
+translation_method: machine-assisted
+translation_source_sha256: 809a289b5d23570592a78146a2f4b7d880b6ef6726d6c9de99a0e1b83ad847b0
+excerpt: Uses several types of ticket data with different fields but similar presentation needs to explore a dictionary-backed
+  approach. A protocol exposes common display properties, reducing cells' and controllers' dependence on specific
+  models and clarifying where data conversion belongs.
+translation_date: '2026-10-23T02:52:08+00:00'
+---
+{% raw %}
+<p><code class="language-plaintext highlighter-rouge">去model化</code> is an approach to framework design. The <code class="language-plaintext highlighter-rouge">model</code> here does not mean the architectural <code class="language-plaintext highlighter-rouge">model</code> layer. To quote Casa's original blog post:</p>
+<blockquote>
+<p>Using models means using data objects; removing models means not using data objects.</p>
+</blockquote>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Source: <a href="http://www.jianshu.com/p/2b2290fa0beb">Sindri’s Notes</a><br/></p>
+<p>A common <code class="language-plaintext highlighter-rouge">去model化</code> approach stores data in dictionaries, then uses a <code class="language-plaintext highlighter-rouge">reformer</code> to convert it into information the <code class="language-plaintext highlighter-rouge">View</code> layer can display. The flow is:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao56/1.jpg"/><br/></p>
+<p>For more detailed theory, read Casa’s <a href="http://casatwy.com/OOP_nomodel.html">Removing models and data objects</a>. Building on Casa’s practice, this article uses another <code class="language-plaintext highlighter-rouge">去model化</code> implementation approach.</p>
+<h2 id="使用背景">Background</h2>
+<p>I read that article long ago but had not tried the approach. A recent project finally gave me the opportunity: three very similar <code class="language-plaintext highlighter-rouge">cell</code> s corresponding to different data <code class="language-plaintext highlighter-rouge">model</code> s:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao56/2.jpg"/><br/></p>
+<p>The display data needed by all three <code class="language-plaintext highlighter-rouge">cell</code> s includes:</p>
+<ul>
+<li>Product name</li>
+<li>When to use it</li>
+<li>Expiry date</li>
+<li>Background image</li>
+</ul>
+<p>In addition, <code class="language-plaintext highlighter-rouge">优惠信息</code> is specific to the first and second types. This requirement currently presents three main problems:</p>
+<blockquote>
+<p><strong>The server uses substantially different field names for the three data-object types.</strong>
+<em>Most apps face this problem, but these data objects have one important trait: their corresponding <code class="language-plaintext highlighter-rouge">cell</code> are highly similar and can become similar display data.</em></p>
+</blockquote>
+<blockquote>
+<p><strong>three kinds of <code class="language-plaintext highlighter-rouge">cell</code> can share one wrapper but correspond to different data objects.</strong>
+<em>This concerns <code class="language-plaintext highlighter-rouge">cell</code> and data-object integration. If <code class="language-plaintext highlighter-rouge">cell</code> changes later, will the original data object still apply?</em></p>
+</blockquote>
+<blockquote>
+<p><strong>The controller must coordinate different <code class="language-plaintext highlighter-rouge">cell</code> and <code class="language-plaintext highlighter-rouge">model</code>, creating excessive coupling.</strong>
+<em>This is common. A factory can usually separate coordination logic, but this article uses <code class="language-plaintext highlighter-rouge">去model</code> approach.</em></p>
+</blockquote>
+<p>These problems can make later maintenance difficult, with small requirement changes causing large code changes. My solution defines two corresponding protocols between <code class="language-plaintext highlighter-rouge">cell</code> and <code class="language-plaintext highlighter-rouge">model</code>, allowing the controller to ignore their concrete types.</p>
+<h2 id="实现">Implement</h2>
+<p>In my previous article,<a href="http://www.jianshu.com/p/4847c9a1e19b">Thoughts on MVC architecture </a>previously mentioned <code class="language-plaintext highlighter-rouge">M</code> layer’s business logic in <code class="language-plaintext highlighter-rouge">model</code>, although this article aims to <code class="language-plaintext highlighter-rouge">去model化</code>, removing property objects while retaining its own processing logic. Here is my <code class="language-plaintext highlighter-rouge">去model化</code> protocol diagram and declared properties:
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao56/3.jpg"/><br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@protocol LXDTicketModelProtocol &lt;NSObject&gt;
+
+@optional    
+@property (nonatomic, readonly) NSAttributedString * perferential;
+
+@required
+@property (nonatomic, readonly) NSString * backgroundImageName;
+@property (nonatomic, readonly) NSString * goodName;
+@property (nonatomic, readonly) NSString * effectCondition;
+@property (nonatomic, readonly) NSString * deadline;
+@property (nonatomic, readonly) LXDCellType type;
+
+- (instancetype)initWithDict: (NSDictionary *)dict;
+
+@end
+
+@protocol KMCTicketCellProtocol&lt;NSObject&gt;
+
+- (void)configurateCellWithModel: (id&lt;LXDTicketModelProtocol&gt;)model;
+
+@end
+</code></pre></div></div>
+<p>For <code class="language-plaintext highlighter-rouge">model</code> objects sharing display behavior as in this example, declare a protocol with several <code class="language-plaintext highlighter-rouge">readonly</code> properties. Within the protocol's <code class="language-plaintext highlighter-rouge">getter</code> methods, the objects perform the <code class="language-plaintext highlighter-rouge">数据-&gt;展示</code> business logic, while the <code class="language-plaintext highlighter-rouge">model</code> itself simply retains dictionary data:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao56/4.jpg"/><br/></p>
+<p>Taking <code class="language-plaintext highlighter-rouge">LXDCouponTicketModel</code> as an example, the protocol implementation is:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// h文件
+@interface LXDCouponTicketModel: NSObject&lt;LXDTicketModelProtocol&gt;
+
+@end
+
+// m实现
+@implementation LXDCouponTicketModel
+{
+    NSDictionary * _dict;
+}
+
+- (NSString *)backgroundImageName
+{
+    return ([_dict[@"overdue"] boolValue] ? @"coupon_overdue" : @"coupon_common");
+}
+
+- (NSAttributedString *)perferential
+{
+    NSAttributedString * result = objc_getAssociatedObject(self, KMCPerferentialKey);
+    if (result) { return result; }
+
+    NSMutableAttributedString * attributedString = [[NSMutableAttributedString alloc] initWithString: @"￥" attributes: @{ NSFontAttributeName: [UIFont systemFontOfSize: 16] }];
+    [attributedString appendAttributedString: [[NSAttributedString alloc] initWithString: [NSString stringWithFormat: @"%g", [_dict[@"ticketMoney"] doubleValue]] attributes: @{ NSFontAttributeName: [UIFont boldSystemFontOfSize: 32] }]];
+    [attributedString addAttributes: @{ NSForegroundColorAttributeName: KMCCommonColor } range: NSMakeRange(0, attributedString.length)];
+    result = attributedString.copy;
+    objc_setAssociatedObject(self, KMCPerferentialKey, result, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    return result;
+}
+
+- (NSString *)goodName
+{
+    return [_dict[@"goodName"] stringValue];
+}
+
+- (NSString *)effectCondition
+{
+    return [NSString stringWithFormat: @"· 满%lu元可用", [_dict[@"minLimitMoney"] unsignedIntegerValue]];;
+}
+
+- (NSString *)deadline
+{
+    return [NSString stringWithFormat: @"· 兑换截止日期：%@", _dict[@"deadline"]];
+}
+
+- (LXDCellType)type
+{
+    return LXDCellTypeCoupon;
+}
+
+- (instancetype)initWithDict: (NSDictionary *)dict
+{
+    if (self = [super init]) {
+        _dict = dict;
+    }
+    return self;
+}
+</code></pre></div></div>
+<p>Making all three data objects implement the protocol unifies their display output. A single encapsulated <code class="language-plaintext highlighter-rouge">cell</code> then need not know the concrete <code class="language-plaintext highlighter-rouge">model</code> type. It only implements the cell-configuration protocol method to obtain display data:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// h文件
+@interface LXDTicketCell: UITableViewCell&lt;LXDTicketCellProtocol&gt;
+
+@end
+
+// m实现
+#define LXDCommonColor [UIColor colorWithRed: 253/255. green: 99/255. blue: 99/255. alpha: 1]
+
+@implementation LXDTicketCell
+
+- (void)configurateWithModel: (id&lt;LXDTicketModelProtocol&gt;)model
+{
+    UIView * goodInfoView = _goodNameLabel.superview;
+    if ([model type] != KMCTicketTypeConvert) {
+        [goodInfoView mas_updateConstraints: ^(MASConstraintMaker *make) {
+            make.left.equalTo(_perferentialLabel.mas_right).offset(10); }];
+    } else {
+        [goodInfoView mas_updateConstraints: ^(MASConstraintMaker *make) {
+            make.left.equalTo(_backgroundImageView.mas_left).offset(18); }];
+    }
+    
+    [_use setTitleColor: LXDCommonColor forState: UIControlStateNormal];
+    _backgroundImageView.image = [UIImage imageNamed: [model backgroundImageName]];
+    _perferentialLabel.attributedText = [model perferential];
+    _effectConditionLabel.text = [model effectCondition];
+    _goodNameLabel.text = [model goodName];
+    _deadlineLabel.text = [model deadline];
+
+    [_effectConditionLabel sizeToFit];
+    [_goodNameLabel sizeToFit];
+    [_deadlineLabel sizeToFit];
+}
+
+@end
+</code></pre></div></div>
+<p>This resolves the first two problems: the protocol unifies display behavior, so the <code class="language-plaintext highlighter-rouge">model</code> need not store multiple property objects. It retrieves dictionary data when appropriate and converts it for presentation. The <code class="language-plaintext highlighter-rouge">cell</code> is no longer constrained by the passed parameter type; it calls protocol methods to obtain the required data. The final issue—controller coordination—then becomes simpler:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// m实现
+@interface LXDTicketViewController ()
+
+@property (nonatomic, strong) NSMutableArray&lt; id&lt;LXDTicketModelProtocol&gt; &gt; * couponTickets;
+@property (nonatomic, strong) NSMutableArray&lt; id&lt;LXDTicketModelProtocol&gt; &gt; * discountTickets;
+@property (nonatomic, strong) NSMutableArray&lt; id&lt;LXDTicketModelProtocol&gt; &gt; * convertTickets;    
+
+@end
+
+@implementation LXDTicketViewController
+
+#pragma mark - UITableViewDataSource
+- (UITableViewCell *)tableView: (UITableView *)tableView cellForRowAtIndexPath: (NSIndexPath *)indexPath
+{
+    UITableViewCell * cell = [tableView dequeueReusableCellWithIdentifier: KMCTicketCommonCellIdentifier];
+    if ([cell conformsToProtocol: @protocol(LXDTicketCellProtocol)]) {
+        [(id&lt;LXDTicketCellProtocol&gt;)cell configurateCellWithModel: [self modelWithIndexPath: indexPath]];
+    }
+    return cell;
+}
+
+#pragma mark - Data Generator
+- (id&lt;LXDTicketModelProtocol&gt;)modelWithIndexPath: (NSIndexPath *)indexPath
+{
+    return self.currentModelSet[indexPath.row];
+}
+
+- (NSMutableArray&lt; id&lt;LXDTicketModelProtocol&gt; &gt; *)currentModelSet
+{
+    switch (_ticketType) {
+        case KMCTicketTypeCoupon:
+            return _couponTickets;
+        
+        case KMCTicketTypeDiscount:
+            return _discountTickets;
+        
+        case KMCTicketTypeConvert:
+            return _convertTickets;
+    }
+}
+
+@end
+</code></pre></div></div>
+<p>When <code class="language-plaintext highlighter-rouge">cell</code> and <code class="language-plaintext highlighter-rouge">model</code> communicate through protocols, the controller's stored data sources can also ignore concrete types. Generic declarations allow multiple sources, leaving the controller only to select a source as the state machine changes. Although their types are unified, different data objects still need to be created from server <code class="language-plaintext highlighter-rouge">json</code> and placed into those sources. Keeping that business logic in the controller would not achieve loose coupling, so introduce a <code class="language-plaintext highlighter-rouge">Helper</code> intermediary:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// h文件
+@interface LXDTicketDataHelper: NSObject
+
++ (void)anaylseJSON: (NSString *)JSON complete: (void(^)(NSMutableArray&lt; id&lt;LXDTicketModelProtocol&gt; &gt; *)models); 
+
+@end
+
+// m实现
+#import "LXDCouponTicketModel.h"
+#import "LXDConvertTicketModel.h"
+#import "LXDDiscountTicketModel.h"
+
+@implementation LXDTicketDataHelper
+
++ (void)anaylseJSON: (NSString *)JSON complete: (void(^)(NSMutableArray&lt; id&lt;LXDTicketModelProtocol&gt; &gt; *)models)
+{
+    NSParameterAssert(JSON);
+    NSParameterAssert(complete);
+
+    [LXDQueue executeInGlobalQueue: ^{
+        Class ModelCls = NULL;
+        NSDictionary * jsonDict = [NSDictionary dictionaryWithJSON: JSON];
+        NSMutableArray&lt; id&lt;LXDTicketModelProtocol&gt; &gt; * results = @[].mutableCopy;
+
+        // 使用switch简单工厂，如果case太多时，使用继承关系的工厂会更好
+        switch ((LXDModelType)[jsonDict[@"modelType"] integerValue]) {
+            case LXDModelTypeCoupon:
+            ModelCls = [KXDCouponTicketModel class];
+            break;
+
+            case LXDModelTypeConvert:
+            ModelCls = [LXDConvertTicketModel class];
+            break;
+
+            case LXDModelTypeDiscount:
+            ModelCls = [LXDDiscountTicketModel class];
+            break;
+        }
+    
+        for (NSDictionary * dataDict in jsonDict[@"data"]) {
+            id item = [(id&lt;LXDTicketModelProtocol&gt;)[ModelCls alloc] initWithDict: dataDict];
+            [result addObject: item];
+        }
+        [LXDQueue executeInMainQueue: ^{
+            complete(result);
+        }];
+    }];
+} 
+
+@end
+
+// m实现
+#import "KMCNetworkHelper.h"    
+
+@implementation LXDTicketViewController
+
+- (void)requestTickets
+{
+    // get request parameters include 'url' and 'parameters'
+    [LXDNetworkManager POST: PATH(url) parameters: parameters 
+          complete: ^(NSString * JSON, NSError * error) {
+        // error check
+        [LXDTicketDataHelper analyseJSON: JSON complete: ^(NSMutableArray * models) {
+            [self.currentModelSet addObjectsFromArray: models];
+        }];
+    }];
+}
+
+@end
+</code></pre></div></div>
+<p>After <code class="language-plaintext highlighter-rouge">去model化</code>, the project's overall business flow is approximately:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao56/5.jpg"/><br/></p>
+<p>The main advantage is that controllers and views no longer depend on a concrete <code class="language-plaintext highlighter-rouge">model</code> type. If model fields change in server <code class="language-plaintext highlighter-rouge">json</code>, update the corresponding <code class="language-plaintext highlighter-rouge">ModelProtocol</code> implementation. Even if a later version adds <code class="language-plaintext highlighter-rouge">现金券</code> or other ticket types, the change only requires an appropriate factory at the <code class="language-plaintext highlighter-rouge">Helper</code> stage.</p>
+<h2 id="尾言">Closing notes</h2>
+<p><code class="language-plaintext highlighter-rouge">去model化</code> is an effective, quick way to loosen coupling, but it is no <code class="language-plaintext highlighter-rouge">万能药</code>. In this demo, its main motivation is that several <code class="language-plaintext highlighter-rouge">cell</code> s have much in common while the <code class="language-plaintext highlighter-rouge">model</code> property fields differ completely. The <code class="language-plaintext highlighter-rouge">Helper</code> can also become bloated as more models are added, so use the approach carefully.
+A good project architecture evolves with requirements; there is no universally best design. Trying different approaches broadens our understanding and develops our judgment about framework design.</p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

@@ -1,0 +1,112 @@
+---
+layout: post
+title: Adding iOS 10 Push Notification Extensions in Xcode 8
+description: Records the process of adding iOS 10 notification extensions to an existing app in Xcode 8. It covers
+  push capabilities, signing, Swift versions, architecture settings, and debugging and submission issues for Service
+  and Content extensions.
+category: Development notes
+imagefeature: null
+date: 2016-09-21 00:00:00 +0800
+technical_translation:
+  topic: tooling-release
+  summary: Records the process of adding iOS 10 notification extensions to an existing app in Xcode 8. It covers
+    push capabilities, signing, Swift versions, architecture settings, and debugging and submission issues for Service
+    and Content extensions.
+  keywords:
+  - iOS 10
+  - Xcode 8
+  - notification extensions
+  - code signing
+  - TestFlight
+  provenance: contribution
+  author_name: zhao0
+  source_url: http://www.jianshu.com/p/133b535a4e90
+  credit: Originally credited to zhao0; edited and archived by Bison.
+  version_note: The article explicitly uses Xcode 8 and iOS 10 and discusses the choice between Swift 2.3 and Swift
+    3.0.
+  title: Adding iOS 10 Push Notification Extensions in Xcode 8
+  source_sha256: f5d477741effb059eb53ecfc1944dcbbd5e7d56177f6dfbc90ca80ade8746097
+lang: en
+source_path: _posts/2016-09-21-tougao60.md
+source_url: /%E6%8A%95%E7%A8%BF/tougao60
+permalink: /en/journal/2016-09-21-adding-ios-10-push-notification-extensions-in-xcode-8/
+translation_method: machine-assisted
+translation_source_sha256: f5d477741effb059eb53ecfc1944dcbbd5e7d56177f6dfbc90ca80ade8746097
+excerpt: Records the process of adding iOS 10 notification extensions to an existing app in Xcode 8. It covers push
+  capabilities, signing, Swift versions, architecture settings, and debugging and submission issues for Service
+  and Content extensions.
+translation_date: '2026-10-23T02:34:15+00:00'
+---
+{% raw %}
+<p>After iOS10 was released, Jianshu prioritized support for its new notifications. This article shares the issues encountered while developing that feature.</p>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Source: <a href="http://www.jianshu.com/p/133b535a4e90">zhao0</a><br/></p>
+<h2 id="1工程配置">1. Project configuration</h2>
+<p>Xcode8 changed significantly. Simply opening, building, and running the old project no longer obtains a Push token. Printing the error in didFailToRegisterForRemoteNotificationsWithError shows the following </p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fail to register with error Error Domain=NSCocoaErrorDomain Code=3000 
+"no valid 'aps-environment' entitlement string found for application" 
+UserInfo={
+    NSLocalizedDescription=no valid 'aps-environment' 
+    entitlement string found for application
+}
+</code></pre></div></div>
+<p>A Google search revealed this Xcode8 change: entitlements come from the local entitlements file. Push Notification was off under the main Target's Capabilities and had to be enabled manually.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao60/1.png"/><br/></p>
+<h2 id="2code-sign">2, Code Sign</h2>
+<p>The project adds Notification Content and Notification Service extensions. Signing defaults to automatic mode.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao60/2.png"/><br/></p>
+<p>Online reports said Xcode8 managed signing more intelligently than Xcode7, so I tried it. Selecting a Team generated a provisioning profile automatically. However, Xcode8 also generated a new certificate, effectively adding a developer. My current certificate was therefore absent from the old profiles, so the manually configured profiles had to be regenerated.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao60/3.png"/><br/></p>
+<p>To return to manual signing, uncheck Automatically manage signing, delete the newly generated certificate from Key Chains, and generate the provisioning profile on the website. If using Automatically manage signing, it is best to use the same approach for every Target.</p>
+<h2 id="3swift版本">3. Swift version</h2>
+<p>Choosing Swift when creating a Target defaults to Swift3.0. Xcode8 supports both 3.0 and 2.3. If you have not yet learned the 3.0 API changes and want to keep using 2.3, set Use Legacy Swift Language Version to YES in that Target's Build Setting.</p>
+<h2 id="4architectures">4, Architectures</h2>
+<p>With the project configured and only template code present, I tried a Hello World run. Command+R produced a build error.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Check dependencies
+No architectures to compile for (ONLY_ACTIVE_ARCH=YES, active arch=x86_64, VALID_ARCHS=i386).
+</code></pre></div></div>
+<p>The corresponding active arch is missing from VALID_ARCHS.</p>
+<p>Add arm64 to Valid Architectures in the relevant Target's Build Setting.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao60/4.png"/><br/></p>
+<h2 id="5notification-service">5, Notification Service</h2>
+<p>Next came implementation, based mainly on 喵神's article and demo, “A Refactoring We Never Expected to See — An Analysis of the iOS 10 UserNotifications Framework,” plus WWDC 708 Advanced Notifications and its PDF.
+In the service, we download the image supplied in the back-end push payload to a local folder and use it as an attachment.
+Previously, our notifications displayed only a single alert. The JSON alert field can be a string or dictionary; a string corresponds to the dictionary's body. After iOS8.2, the dictionary can include title, subtitle, and other fields. We wanted to turn the old body into a title and put an article summary in the body. But changing aps.alert directly would make pre-8.2 devices display the summary. We found another solution: Notification Service can modify the content. Leave aps.alert unchanged and add separate title and body fields to the JSON. When the service receives the notification, read them and assign them to bestAttemptContent.title and bestAttemptContent.body.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+  "aps":{ 
+        "alert":"test test",
+        "mutable-content":1 
+  }, 
+  "title": "new title",
+  "body": "new body"
+}
+</code></pre></div></div>
+<h2 id="6notification-content">6, Notification Content</h2>
+<p>For a notification with attachments, a long press normally shows the image or video. We felt such a large image looked unattractive and also wanted action buttons, as shown below, so we needed Notification Content.
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao60/5.png"/><br/></p>
+<h2 id="效果">Result</h2>
+<p>We do not actually customize the notification UI here; we hide this view. In Info.plist, UNNotificationExtensionInitialContentSizeRatio specifies its initial height/width ratio; see WWDC for the other properties. Set it to 0.001, not 0, and set self.preferredContentSize = CGSizeZero; in viewDidload to hide the view.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao60/6.png"/><br/></p>
+<p>The extension can respond to multiple categories, each with its own action buttons. Action buttons and the customUI view are therefore independent, although buttons can update that view.
+Normally, an action button opens the APP and its delegate handles the response. With Notification Content, we can handle it directly inside the extension without opening the APP, or forward it to the APP's delegate.</p>
+<h2 id="5真机调试">5. Debugging on a physical device</h2>
+<p>Once most of the code was written, I began debugging. Extension debugging sometimes produced “Could not attach to process ID”. <id number="">error.</id></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao60/7.png"/><br/></p>
+<p>Restarting Xcode sometimes helps, but not always. Another method is to click OK when this window appears, then choose Debug &gt; Attach to Process &gt; your Extension. Breakpoints can then be caught.</p>
+<h2 id="6提交testflight">6. Submitting to TestFlight</h2>
+<p>After testing, we prepared to submit to TestFlight, but validation failed.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao60/8.png"/><br/></p>
+<p>The error is clear: Extension.appex contains a Frameworks folder. CocoaPods creates it when used by the extension, but it is not actually needed here. Add a final Build Phase that runs a shell script to delete that Frameworks folder.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd "${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/"
+if [[ -d "Frameworks" ]]; then
+rm -fr Frameworks
+fi
+</code></pre></div></div>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao60/9.png"/><br/>
+Every Jianshu release has a public beta. See the beta details if you would like to download and try it early.</p>
+<h2 id="7写在最后">7. Closing thoughts</h2>
+<p>Jianshu is a community for quality original content, offering a strong reading and writing experience that attracts writers and programmers. The technical team shares its experiences here in the hope of encouraging more developers to record, share, and discuss their own work. This collection will receive occasional articles from the team covering Android, iOS, front-end, back-end, and other topics. Please follow along.</p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

@@ -1,0 +1,381 @@
+---
+layout: post
+title: Bitwise Operations in iOS
+description: Introduces bitwise AND, OR, XOR, and NOT, using packed RGBA colors and state flags as examples. It
+  then explains how enumerations and masks can store and query several states together.
+category: Development notes
+imagefeature: null
+date: 2016-11-07 00:00:00 +0800
+technical_translation:
+  topic: swift-runtime
+  summary: Introduces bitwise AND, OR, XOR, and NOT, using packed RGBA colors and state flags as examples. It then
+    explains how enumerations and masks can store and query several states together.
+  keywords:
+  - bitwise operations
+  - bit masks
+  - RGBA
+  - enumerations
+  - state flags
+  provenance: contribution
+  author_name: Sindri
+  source_url: http://www.jianshu.com/p/36ba5d65804f
+  credit: Originally credited to Sindri; edited and archived by Bison.
+  title: Bitwise Operations in iOS
+  source_sha256: 4b51732a21ad70071823b8dda334df950233582e9377fae7c701ad7d16342915
+lang: en
+source_path: _posts/2016-11-07-tougao69.md
+source_url: /%E6%8A%95%E7%A8%BF/tougao69
+permalink: /en/journal/2016-11-07-bitwise-operations-in-ios/
+translation_method: machine-assisted
+translation_source_sha256: 4b51732a21ad70071823b8dda334df950233582e9377fae7c701ad7d16342915
+excerpt: Introduces bitwise AND, OR, XOR, and NOT, using packed RGBA colors and state flags as examples. It then
+  explains how enumerations and masks can store and query several states together.
+translation_date: '2026-10-23T02:52:09+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Source: <a href="http://www.jianshu.com/p/36ba5d65804f">Sindri’s Notes</a><br/></p>
+<h2 id="前言">Introduction</h2>
+<p>Modern computer circuits have only two states, <code class="language-plaintext highlighter-rouge">通电/没电</code>, represented as <code class="language-plaintext highlighter-rouge">0/1</code>. All data is stored in binary according to a specific encoding.</p>
+<p>Directly manipulating these binary digits is bitwise computation. In iOS, nearly all such operations hide their details through enum-based argument passing:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef NS_OPTIONS(NSUInteger, UIRectEdge) {
+    UIRectEdgeNone   = 0,
+    UIRectEdgeTop    = 1 &lt;&lt; 0,
+    UIRectEdgeLeft   = 1 &lt;&lt; 1,
+    UIRectEdgeBottom = 1 &lt;&lt; 2,
+    UIRectEdgeRight  = 1 &lt;&lt; 3,
+    UIRectEdgeAll    = UIRectEdgeTop | UIRectEdgeLeft | UIRectEdgeBottom | UIRectEdgeRight
+} NS_ENUM_AVAILABLE_IOS(7_0);
+</code></pre></div></div>
+<p>Bitwise operations are extremely efficient. Modern compilers already optimise extensively, but sensible bitwise use can improve readability and execution efficiency.</p>
+<h2 id="基础计算">Basic arithmetic</h2>
+<p>Before explaining bitwise operations, I will briefly discuss how the CPU performs calculations. If you already understand <code class="language-plaintext highlighter-rouge">CPU</code> computation, skip this section.</p>
+<p>When <code class="language-plaintext highlighter-rouge">int sum = 11 + 79</code> executes, the computer adds the binary digits of the two numbers and carries as needed:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>11:  0 0 0 0 1 0 1 1
+79:  0 1 0 0 1 1 1 1
+————————————————————
+90:  0 1 0 1 1 0 1 0
+</code></pre></div></div>
+<p>The time a CPU takes to add two numbers is commonly called one clock cycle. A 2.0GHz CPU can perform <code class="language-plaintext highlighter-rouge">2.0*1024*1024*1024</code> clock cycles per second. To compare multiplication with addition, consider the binary results of <code class="language-plaintext highlighter-rouge">11*2</code> and <code class="language-plaintext highlighter-rouge">11*4</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>11:  0 0 0 0 1 0 1 1  *  2
+————————————————————
+22:  0 0 0 1 0 1 1 0
+
+11:  0 0 0 0 1 0 1 1  *  4
+————————————————————
+44:  0 0 1 0 1 1 0 0
+</code></pre></div></div>
+<p>Multiplying a number by <code class="language-plaintext highlighter-rouge">2的N次幂</code> is equivalent to shifting its binary representation left by <code class="language-plaintext highlighter-rouge">N</code> bits. In code, <code class="language-plaintext highlighter-rouge">num &lt;&lt; N</code> shifts <code class="language-plaintext highlighter-rouge">num</code> left by <code class="language-plaintext highlighter-rouge">N</code> positions, equivalent to:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for (int idx = 0; idx &lt; N; idx++) {
+    num *= 2;
+}
+</code></pre></div></div>
+<p>If neither multiplier is a <code class="language-plaintext highlighter-rouge">2的N次幂</code>, the compiler decomposes one value into a sum of <code class="language-plaintext highlighter-rouge">2的N次幂</code> values. For example, for <code class="language-plaintext highlighter-rouge">37 * 69</code>, the CPU decomposes <code class="language-plaintext highlighter-rouge">37</code> into <code class="language-plaintext highlighter-rouge">32+4+1</code>, then calculates through <code class="language-plaintext highlighter-rouge">(69&lt;&lt;5) + (69&lt;&lt;2) + (69&lt;&lt;0)</code>. Multiplying two numbers therefore usually takes around ten clock cycles. Similarly, <code class="language-plaintext highlighter-rouge">num &gt;&gt; N</code> is equivalent to:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for (int idx = 0; idx &lt; N; idx++) {
+    num /= 2;
+}
+</code></pre></div></div>
+<p>Division takes far more clock cycles than multiplication, mostly spent decomposing values into <code class="language-plaintext highlighter-rouge">2的N次幂</code>. Floating-point calculations are more complex still, so here is a brief discussion of precision. A <code class="language-plaintext highlighter-rouge">float</code> occupies <code class="language-plaintext highlighter-rouge">32bit</code>: the first bit represents the sign, <code class="language-plaintext highlighter-rouge">2~13位</code> the integer portion, and <code class="language-plaintext highlighter-rouge">14~32位</code> the fractional part and scientific-notation indicator. This description may not be exact; it is intended only as a rough introduction. Binary fractional digits still have the <code class="language-plaintext highlighter-rouge">2的N次幂</code> property. Suppose the following binary digits belong to a fractional part:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1 0 1 1 1 0 0 1
+</code></pre></div></div>
+<p>That fractional part equals <code class="language-plaintext highlighter-rouge">1/2 + 1/4 + 1/8 + 1/16 + 1/128 = 0.9453125</code>. When an irregular decimal such as <code class="language-plaintext highlighter-rouge">3.1415926535898</code> is stored, its fractional portion is decomposed into many <code class="language-plaintext highlighter-rouge">2的N次幂</code> values. Since the available fractional bits are finite, a precision difference appears when the decomposed <code class="language-plaintext highlighter-rouge">N</code> exceeds what can be stored. This calculation also consumes clock cycles, which is why extensive floating-point work such as <code class="language-plaintext highlighter-rouge">(cell动态计算)</code> can cause stuttering. For a decimal with many digits, storing it as a string can therefore be a better choice.</p>
+<h2 id="位运算符">Bitwise operators</h2>
+<p>The operators include:</p>
+<table>
+<thead>
+<tr>
+<th>Meaning</th>
+<th style="text-align: center">Operator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Left shift</td>
+<td style="text-align: center">«</td>
+</tr>
+<tr>
+<td>Right shift</td>
+<td style="text-align: center">»</td>
+</tr>
+<tr>
+<td>Bitwise OR</td>
+<td style="text-align: center">︳</td>
+</tr>
+<tr>
+<td>Bitwise AND</td>
+<td style="text-align: center">&amp;</td>
+</tr>
+<tr>
+<td>Bitwise NOT</td>
+<td style="text-align: center">~</td>
+</tr>
+<tr>
+<td>Bitwise XOR</td>
+<td style="text-align: center">^</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>
+<p>&amp; operation</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  0 0 1 0 1 1 1 0    46
+  1 0 0 1 1 1 0 1    157
+  ———————————————
+  0 0 0 0 1 1 0 0    12
+</code></pre></div> </div>
+</li>
+<li>
+<table>
+<tbody>
+<tr>
+<td>Operation</td>
+</tr>
+</tbody>
+</table>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  0 0 1 0 1 1 1 0    46
+  1 0 0 1 1 1 0 1    157
+  ———————————————
+  1 0 1 1 1 1 1 1    191
+</code></pre></div> </div>
+</li>
+<li>
+<p>~ operation</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  0 0 1 0 1 1 1 0    46
+  ———————————————
+  1 1 0 1 0 0 0 1    225
+</code></pre></div> </div>
+</li>
+<li>
+<p>^ operation</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  0 0 1 0 1 1 1 0    46
+  1 0 0 1 1 1 0 1    157
+  ———————————————
+  1 0 1 1 0 0 1 1    179
+</code></pre></div> </div>
+</li>
+</ul>
+<h2 id="色彩存储">Colour storage</h2>
+<p>Reasons for bitwise operations include:
+1. More concise code
+2. Greater efficiency
+3. Less memory</p>
+<p>How might we store an image in the <code class="language-plaintext highlighter-rouge">RGB</code> color space directly? An image consists of pixels, each expressing its own color, so we need a class representing one pixel:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface Pixel
+
+@property (nonatomic, assign) CGFloat red;
+@property (nonatomic, assign) CGFloat green;
+@property (nonatomic, assign) CGFloat blue;
+@property (nonatomic, assign) CGFloat alpha;
+
+@end
+</code></pre></div></div>
+<p>On a 4.7-inch screen, a launch image needs <code class="language-plaintext highlighter-rouge">750*1334</code> such objects. Ignoring other data, the variables alone occupy <code class="language-plaintext highlighter-rouge">750*1334*4*8</code> = <code class="language-plaintext highlighter-rouge">32016000</code> bytes. In practice, however, images generally pack the four <code class="language-plaintext highlighter-rouge">RGBA</code> properties into one <code class="language-plaintext highlighter-rouge">int</code> or a similar variable using fewer bytes.</p>
+<p>Color values range from <code class="language-plaintext highlighter-rouge">0~255</code>, that is, <code class="language-plaintext highlighter-rouge">2^1 ~ 2^8-1</code>, fitting within one byte. Left shifts can therefore place one color value in each byte:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (int)rgbNumberWithRed: (int)red green: (int)green blue: (int)blue alpha: (float)alpha {
+    int bitPerByte = 8;
+    int maxNumber = 255;
+
+    int alphaInt = alpha * maxNumber;
+    int rgbNumber = (red &lt;&lt; (bitPerByte*3)) + (green &lt;&lt; (bitPerByte*2)) + (blue &lt;&lt; bitPerByte) + alphaInt;
+}
+</code></pre></div></div>
+<p>Likewise, shift right until the required data occupies the last byte, then extract it with <code class="language-plaintext highlighter-rouge">0xff</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)obtainRGBA: (int)rgbNumber {
+    int mask = 0xff;
+    int bitPerByte = 8;
+
+    double alphaInt = (rgbNumber &amp; mask) / 255.0;
+    int blue = ((rgbNumber &gt;&gt; bitPerByte) &amp; mask);
+    int green = ((rgbNumber &gt;&gt; (bitPerByte*2)) &amp; mask);
+    int red = ((rgbNumber &gt;&gt; (bitPerByte*3)) &amp; mask);
+}
+</code></pre></div></div>
+<p>Compared with class-based storage, bitwise storage wins decisively in efficiency and memory usage.</p>
+<h2 id="位运算应用">Applications of bitwise operations</h2>
+<p>Apple uses bitwise design in class-object structures: each object has an integer identifier,<code class="language-plaintext highlighter-rouge">flags</code>, whose different bits record weak references, initialisation and other flags. Extract this stored information using<code class="language-plaintext highlighter-rouge">&amp;</code>, <code class="language-plaintext highlighter-rouge">|</code>operators to extract it. These appear in <a href="http://opensource.apple.com">Runtime source</a>. Here is pseudocode; do not take the parameter names literally.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#define IS_TAGGED_POINTER (1 &lt;&lt; 12);
+#define HAS_WEAK_REFERENCE (1 &lt;&lt; 13);
+
+inline void objc_object::free() {
+    if (this-&gt;flags | HAS_WEAK_REFERENCE) {
+      ///  set all weak reference point to nil
+    }
+}
+
+inline int objc_object::retainCount() {
+    if (this.flags | IS_TAGGED_POINTER) {
+      return (int)INT_MAX;
+    } else {
+      return this-&gt;retainCount;
+    }
+}
+
+......
+</code></pre></div></div>
+<p>Following Apple’s approach, define an enum for common app permissions to obtain authorisation status:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef NS_ENUM(NSInteger, LXDAuthorizationType)
+{
+    LXDAuthorizationTypeNone = 0,
+    LXDAuthorizationTypePush = 1 &lt;&lt; 0,  ///&lt;    推送授权
+    LXDAuthorizationTypeLocation = 1 &lt;&lt; 1,  ///&lt;    定位授权
+    LXDAuthorizationTypeCamera = 1 &lt;&lt; 2,    ///&lt;    相机授权
+    LXDAuthorizationTypePhoto = 1 &lt;&lt; 3,     ///&lt;    相册授权
+    LXDAuthorizationTypeAudio = 1 &lt;&lt; 4,  ///&lt;    麦克风授权
+    LXDAuthorizationTypeContacts = 1 &lt;&lt; 5,  ///&lt;    通讯录授权
+};
+</code></pre></div></div>
+<p>Declare a global permissions variable to retain different authorization states. When the app has a permission, use <code class="language-plaintext highlighter-rouge">|</code> to set the corresponding bit to <code class="language-plaintext highlighter-rouge">1</code>. Otherwise, invert the relevant permission enum with <code class="language-plaintext highlighter-rouge">~</code>, then use <code class="language-plaintext highlighter-rouge">&amp;</code> to clear its bit. Create a helper class to retrieve and update these states:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/*!
+ *  @brief  获取应用授权信息工具，最低使用版本：iOS8.0
+ */
+NS_CLASS_AVAILABLE_IOS(8_0) @interface LXDAuthObtainTool : NSObject
+
+/// 获取当前应用权限
++ (LXDAuthorizationType)obtainAuthorization;
+/// 更新应用权限
++ (void)updateAuthorization;
+
+@end
+
+
+#pragma mark -  LXDAuthObtainTool.m
+static LXDAuthorizationType kAuthorization;
+
+@implementation LXDAuthObtainTool
+
++ (void)initialize
+{
+    kAuthorization = LXDAuthorizationTypeNone;
+    [self updateAuthorization];
+}
+
+/// 获取当前应用权限
++ (LXDAuthorizationType)obtainAuthorization
+{
+    return kAuthorization;
+}
+
+/// 更新应用权限
++ (void)updateAuthorization
+{
+    /// 推送
+    if ([UIApplication sharedApplication].currentUserNotificationSettings.types == UIUserNotificationTypeNone) {
+        kAuthorization &amp;= (~LXDAuthorizationTypePush);
+    } else {
+        kAuthorization |= LXDAuthorizationTypePush;
+    }
+    /// 定位
+    if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedAlways || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse) {
+        kAuthorization |= LXDAuthorizationTypeLocation;
+    } else {
+        kAuthorization &amp;= (~LXDAuthorizationTypeLocation);
+    }
+    /// 相机
+    if ([AVCaptureDevice authorizationStatusForMediaType: AVMediaTypeVideo] == AVAuthorizationStatusAuthorized) {
+        kAuthorization |= LXDAuthorizationTypeCamera;
+    } else {
+        kAuthorization &amp;= (~LXDAuthorizationTypeCamera);
+    }
+    /// 相册
+    if ([PHPhotoLibrary authorizationStatus] == PHAuthorizationStatusAuthorized) {
+        kAuthorization |= LXDAuthorizationTypePhoto;
+    } else {
+        kAuthorization &amp;= (~LXDAuthorizationTypePhoto);
+    }
+    /// 麦克风
+    [[AVAudioSession sharedInstance] requestRecordPermission: ^(BOOL granted) {
+        if (granted) {
+            kAuthorization |= LXDAuthorizationTypeAudio;
+        } else {
+            kAuthorization &amp;= (~LXDAuthorizationTypeAudio);
+        }
+    }];
+    /// 通讯录
+    if ([UIDevice currentDevice].systemVersion.doubleValue &gt;= 9) {
+        if ([CNContactStore authorizationStatusForEntityType: CNEntityTypeContacts] == CNAuthorizationStatusAuthorized) {
+            kAuthorization |= LXDAuthorizationTypeContacts;
+        } else {
+            kAuthorization &amp;= (~LXDAuthorizationTypeContacts);
+        }
+    } else {
+        if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized) {
+            kAuthorization |= LXDAuthorizationTypeContacts;
+        } else {
+            kAuthorization &amp;= (~LXDAuthorizationTypeContacts);
+        }
+    }
+}
+
+@end
+</code></pre></div></div>
+<p>When a permission is needed, such as opening Photos, check it directly with <code class="language-plaintext highlighter-rouge">&amp;</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)openCamera {
+    LXDAuthorizationType type = [LXDAuthObtainTool obtainAuthorization];
+    if (type &amp; LXDAuthorizationTypeCamera) {
+        ///  open camera
+    } else {
+        /// alert
+    }
+}
+</code></pre></div></div>
+<p>Bitwise operations offer compact storage and efficiency, but do more than that. My project needs to download all monetary data after login. The main problem is:</p>
+<blockquote>
+<p>The <code class="language-plaintext highlighter-rouge">AFN2.3+</code> request library does not support synchronous requests, making it cumbersome to determine when a group of request tasks has finished.</p>
+</blockquote>
+<p>Since an <code class="language-plaintext highlighter-rouge">NSInteger</code> contains 8 bytes, or 64 bits, I use each bit to represent the completion state of one request. With <code class="language-plaintext highlighter-rouge">N(&lt;64)</code> data-sync interfaces after login, we can declare a state value representing completion of all requests:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NSInteger complete = 0;
+for (int idx = 0; idx &lt; N; idx++) {
+    complete |= (1 &lt;&lt; idx);
+}
+</code></pre></div></div>
+<p>Then use a flag variable, <code class="language-plaintext highlighter-rouge">flags</code>, to track current request completion. Set the corresponding bit to <code class="language-plaintext highlighter-rouge">1</code> when each data-sync task finishes:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>__block NSInteger flags = 0;
+NSArray&lt;NSString *&gt; * urls = @[......];
+NSArray&lt;NSDictionary *&gt; * params = @[......];    
+
+for (NSInteger idx = 0; idx &lt; urls.count; idx++) {
+    NSString * url = urls[idx];
+    NSDictionary * param = params[idx];
+
+    [LXDDataSyncTool syncWithUrl: url params: param complete: ^{
+        flags |= (1 &lt;&lt; idx);
+        if ( (flags ^ complete) == 0 ) {
+            [self completeDataSync];
+        }
+    }];
+}
+</code></pre></div></div>
+<h2 id="位运算与算法">Bitwise operations and algorithms</h2>
+<p>With high-level languages widely used, bitwise operations are often hidden inside abstractions, so many developers may not use them directly in projects. In the <code class="language-plaintext highlighter-rouge">基础计算</code> section above, I said adding two numbers takes one clock cycle. Although <code class="language-plaintext highlighter-rouge">CPU</code> register reads and writes require additional cycles, their cost is usually constant and can be disregarded here.</p>
+<p>Since bitwise operations also generally finish in one clock cycle, algorithm developers favour them. For example, swapping two variables usually looks like:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int sum = a;
+a = b;
+b = sum;
+</code></pre></div></div>
+<p>Alternatively:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>a = a + b;
+b = a - b;
+a = a - b;
+</code></pre></div></div>
+<p>Bitwise operations require neither arithmetic nor temporary variables:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>a ^= b;
+b = a ^ b;
+a = a ^ b;
+</code></pre></div></div>
+<p>The code above is similar to the second approach: combine <code class="language-plaintext highlighter-rouge">a</code> and <code class="language-plaintext highlighter-rouge">b</code> into one variable, then eliminate <code class="language-plaintext highlighter-rouge">a</code> and <code class="language-plaintext highlighter-rouge">b</code> respectively. The <code class="language-plaintext highlighter-rouge">^</code> operation sets matching bits to 0, so <code class="language-plaintext highlighter-rouge">b^b</code> equals 0.</p>
+<blockquote>
+<p>Advanced exercise: find the only unpaired integer in an array where every other number appears twice.</p>
+</blockquote>
+<p>From swapping <code class="language-plaintext highlighter-rouge">a</code> and <code class="language-plaintext highlighter-rouge">b</code> without an intermediate variable above, we can derive this minimal code:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (int)singleDog(int * nums) {
+    int singleDog = 0;
+    for (int idx = 0; idx &lt; sizeof(nums)/sizeof(int); idx++) {
+        singleDog ^= nums[idx];
+    }
+    return singleDog;
+}
+</code></pre></div></div>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

@@ -1,0 +1,54 @@
+---
+layout: guide
+author: Bison
+app_id: nas_book
+title: 'Book Isle WebDAV sync: continue reading records across two devices'
+description: Use two devices and a test note to verify two-way updates, distinguish reading-data sync from original-book
+  downloads, and resolve conflicts using clear evidence.
+permalink: /en/guides/nasbook-webdav-sync/
+date: 2026-10-23 00:00:00 +0800
+modified: 2026-10-23 00:00:00 +0800
+category: Tutorials
+level: Beginner
+series_order: 16
+topic: Sync and maintenance
+reading_time: 8
+lang: en
+source_path: _posts/2026-10-23-nasbook-webdav-sync.md
+source_url: /guides/nasbook-webdav-sync/
+translation_method: machine-assisted
+translation_source_sha256: d3670e05aedf5be60ae8bc56381571ac954b49bebd68e8187f3de4fc75452a5c
+excerpt: Use two devices and a test note to verify two-way updates, distinguish reading-data sync from original-book
+  downloads, and resolve conflicts using clear evidence.
+translation_date: '2026-10-23T02:34:08+00:00'
+---
+{% raw %}
+<p>Book Isle's WebDAV synchronization stores reading information on your own server, including book metadata, progress, bookmarks, notes, highlights, tags, statistics, and related settings. It does not automatically transfer book files. This article verifies synchronization with two devices and one practice book rather than introducing conflicts across the whole library on the first attempt.</p>
+<h2 id="先准备两台设备与独立目录">Prepare two devices and a separate directory first</h2>
+<p>Call the device with more complete reading records A and the other B. On A, retain exports of important notes and original book files, then prepare a writable WebDAV directory dedicated to reading data. Do not mix synchronization files with your only original ebooks. A separate directory makes purpose and maintenance easier to verify.</p>
+<p>Both devices need Collector Pro entitlement for the relevant feature and access to the same target. Book Isle does not require registering a separate cloud account to store books; the remote location here is your chosen WebDAV server. Verify its address, account, directory, and write permissions first. A read-only account that downloads ebooks may not be able to write synchronization data.</p>
+<h2 id="先在甲设备配置目标">Configure the target on device A first</h2>
+<p>Go to Settings → Full Sync, enable the relevant synchronization switch, and choose a configured WebDAV connection from the target list. If none is available, first add WebDAV in NAS Connections. An enabled switch only completes configuration; you still need to run synchronization and inspect the result.</p>
+<p>Read the page's explanation before choosing a conflict strategy. On the first attempt, avoid global choices such as Overwrite Remote with Local or Keep All Remote without understanding their effects. They make explicit tradeoffs affecting other data. If remote records already exist, determine which copy is newer and more complete before deciding. Overwriting is not an ordinary refresh.</p>
+<h2 id="用一条笔记完成首次上传">Use one note for the first upload</h2>
+<p>On device A, open the practice book, read to chapter two, and save a note with clear text, such as 'Sync check: beginning of chapter two.' Return to synchronization settings and choose Full Sync Now or the current equivalent. Wait for completion and check the latest sync time, result, and errors. If logs are available, inspect whether this run actually finished.</p>
+<p>Do not immediately edit the same note on device B. Let A's data reach the remote target reliably before configuring B to reduce conflicts during the first test. Pressing Sync once does not establish success. Network interruptions, missing write permissions, and server storage problems can all end a task in failure. Use its result status.</p>
+<h2 id="在乙设备接收并打开同一本书">Receive and open the same book on device B</h2>
+<p>Configure the same WebDAV target on device B, synchronize, and check book information and the test note. Obtain the book file separately through local import, NAS, Calibre, or another source. A title and progress accompanied by a download prompt reflect the normal separation between synchronized data and file storage; they do not require deleting and recreating the record.</p>
+<p>After obtaining the same file version, open it and compare the chapter and original sentence. Screen dimensions and font sizes can change pagination across devices, so compare chapter-two content and the test note instead of demanding equal page numbers. Different translations or reformatted files cannot be aligned precisely by one progress number either.</p>
+<h2 id="再做一次反向更新">Perform one reverse update too</h2>
+<p>On device B, append 'Checked on the tablet' to the test note, save, and synchronize. Then synchronize device A and check for that sentence. A complete test covers both directions: A's data reaches B, and B's new edit returns to A. Matching cover lists alone do not prove that reading-record updates work.</p>
+<p>Then establish a simple habit: finish reading and confirm synchronization before switching devices, and retrieve the latest data before continuing on the other one. Do not let two offline devices edit the same note for a long time and expect any conflict strategy to infer your intent automatically. Save important rewrites separately before resolving synchronization conflicts.</p>
+<h2 id="遇到冲突时先确认内容">Inspect content first when conflicts occur</h2>
+<p>If unresolved conflicts appear, compare modification times and actual text rather than device names alone. Keep Remote adopts existing server content; Keep Local uses the current device's content. Neither label tells you which is correct. Be especially careful with batch choices for a whole synchronization run. Export important notes first to retain a readable copy.</p>
+<p>Sync logs help identify task times and failure types, but do not publish entire logs containing private addresses. For authentication or directory-write errors, repair the connection and retry. For content conflicts, repeatedly refreshing usually cannot make the decision for you. Separate network problems from choices about data to reduce repeated work.</p>
+<h2 id="常见问题">Frequently asked questions</h2>
+<p><strong>Why must a new device still download books after successful synchronization?</strong> Full refers to the scope of synchronized reading data, not a complete copy of every ebook file. Obtain original books separately and maintain your own backups of downloaded local files.</p>
+<p><strong>Do different page numbers on two devices mean synchronization failed?</strong> Reflowable-text page numbers depend on screen size and font size. Compare chapters, nearby text, and bookmarks first. If file versions differ, align the versions before judging. For PDFs, also distinguish file page numbers from printed page numbers.</p>
+<p><strong>Will local notes disappear when membership expires?</strong> The public description separates remote membership features from local reading. Private synchronization pauses after expiration, while local books and local reading remain usable. Export important information regularly rather than treating live synchronization as your only historical backup.</p>
+<h2 id="配套教程">Companion tutorials</h2>
+<p>If the server is not connected yet, start with <a href="/en/guides/nasbook-webdav-library/">WebDAV library setup</a>; to save information first, see <a href="/en/guides/nasbook-reading-data-export/">Export notes and statistics</a>. For relationships between multiple book formats, see <a href="/en/guides/nasbook-multiple-formats/">Organize formats of the same book</a>.</p>
+<h2 id="资料与版本">Sources and version</h2>
+<p>Information checked on October 23, 2026. The public release is Book Isle 1.1.3, requiring iOS / iPadOS 15.6 or later. This guide is based on public feature descriptions and their entry points. Interface labels may change with the version. See <a href="https://apps.apple.com/cn/app/id6766198898">Official App Store description</a> and <a href="https://itunes.apple.com/lookup?id=6766198898&amp;country=cn">Apple release information</a>.</p>
+
+{% endraw %}

@@ -1,0 +1,18 @@
+---
+layout: studio
+lang: en
+title: App tutorials and creative exercises
+description: Browse English tutorials for Aquarell, ManYue, VectorPaint, Book Isle, iCouldPlay and Yearn by app, learning
+  path or keyword.
+permalink: /en/guides/
+source_url: /guides/
+modified: '2026-10-23'
+section: guides
+---
+{% include language-context.html %}
+{% assign all_guides = localized_posts | where: 'layout', 'guide' %}
+<div class="wrap guide-directory" data-filter-group>
+<header class="guide-directory-header"><h1>Tutorials & exercises</h1><a class="text-link directory-jump" href="#guide-library">Find a tutorial <span aria-hidden="true">↓</span></a><p>{{ localized_apps.size }} apps, {{ all_guides.size }} tutorials. Follow a learning path or search for a specific task.</p></header>
+<section class="learning-paths" aria-label="Choose an app learning path">{% for app in localized_apps %}<a class="learning-path theme-{{ app.id }}" href="{{ app.guide_url | relative_url }}"><div class="learning-path-title"><img src="{{ app.icon | relative_url }}" alt="" width="48" height="48"><h2>{{ app.name }}</h2></div><p>{{ app.guide_intro }}</p>{% assign app_guides = all_guides | where: 'app_id', app.id %}<span class="learning-path-link">{{ app_guides.size }} tutorials · View learning path <span aria-hidden="true">→</span></span></a>{% endfor %}</section>
+<div class="guide-library-shell" id="guide-library" tabindex="-1"><aside class="library-controls" data-library-controls hidden aria-label="Find tutorials"><h2>Find a tutorial</h2><label for="guide-search">Keywords</label><input id="guide-search" type="search" data-guide-search placeholder="Try: transparent PNG, offline…" autocomplete="off" aria-controls="guide-results"><div class="filters" role="group" aria-label="Filter tutorials by app"><button type="button" data-filter="all" aria-pressed="true">All apps</button>{% for app in localized_apps %}<button type="button" data-filter="{{ app.id }}" aria-pressed="false">{{ app.name }}</button>{% endfor %}</div><button class="library-reset" type="button" data-guide-reset hidden>Clear filters</button></aside>
+<div class="guide-results" id="guide-results"><div class="library-toolbar"><p class="library-title">Tutorial library</p><p class="filter-status" role="status" aria-live="polite" aria-atomic="true">{{ all_guides.size }} tutorials</p></div><div class="library-empty" data-guide-empty hidden><h3>No matching tutorials</h3><p>Try a shorter keyword, such as “layers”, “import” or “export”, or choose another app.</p><button type="button" class="button" data-guide-reset>Show all tutorials <span aria-hidden="true">→</span></button></div><div class="guide-library">{% for app in localized_apps %}{% assign guides = all_guides | where: 'app_id', app.id | sort: 'series_order' %}<section class="library-section" data-library-section aria-labelledby="library-{{ app.id }}"><header class="library-heading"><h2 id="library-{{ app.id }}">{{ app.name }} <small>{{ guides.size }} tutorials</small></h2><a href="{{ app.guide_url | relative_url }}">Follow the learning path <span aria-hidden="true">→</span></a></header><ol class="lesson-list" role="list">{% for post in guides %}{% include lesson-row.html %}{% endfor %}</ol></section>{% endfor %}</div></div></div></div>

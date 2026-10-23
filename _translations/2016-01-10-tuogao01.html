@@ -1,0 +1,241 @@
+---
+layout: post
+title: 'Objective-C runtime fundamentals: properties and instance variables'
+description: Distinguishes Objective-C properties from instance variables, examining runtime structures, memory
+  offsets and synthesize to explain how properties are generated. Examples then show why dynamically inspecting
+  and manipulating an object's structure can be useful.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-01-10 00:00:00 +0800
+technical_translation:
+  topic: swift-runtime
+  summary: Distinguishes Objective-C properties from instance variables, examining runtime structures, memory offsets
+    and synthesize to explain how properties are generated. Examples then show why dynamically inspecting and manipulating
+    an object's structure can be useful.
+  keywords:
+  - Objective-C Runtime
+  - property
+  - ivar
+  - synthesize
+  - memory layout
+  provenance: contribution
+  author_name: SindriLin
+  source_url: http://sindrilin.com/runtime/2016/01/08/属性与变量.html
+  credit: Originally credited to SindriLin; edited and archived by Bison.
+  title: 'Objective-C runtime fundamentals: properties and instance variables'
+  source_sha256: 2572bd61415c725691b5d22c91c2ee35ab30f5c3c201497d52f1bba6058e99c5
+lang: en
+source_path: _posts/2016-01-10-tuogao01.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao01
+permalink: /en/journal/2016-01-10-objective-c-runtime-fundamentals-properties-and-instance-variables/
+translation_method: machine-assisted
+translation_source_sha256: 2572bd61415c725691b5d22c91c2ee35ab30f5c3c201497d52f1bba6058e99c5
+excerpt: Distinguishes Objective-C properties from instance variables, examining runtime structures, memory offsets
+  and synthesize to explain how properties are generated. Examples then show why dynamically inspecting and manipulating
+  an object's structure can be useful.
+translation_date: '2026-10-23T02:34:11+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://sindrilin.com/runtime/2016/01/08/属性与变量.html">SindriLin’s Notes</a><br/></p>
+<blockquote>
+<p>“The runtime refers to mechanisms that operate while a program is running. In iOS development, runtime features give oc its distinctive appeal.”</p>
+</blockquote>
+<p>The runtime refers to mechanisms that operate while a program is running. In iOS development, runtime features give oc its distinctive appeal.<br/>
+For C and C++, the methods a class object can call and the operations it can perform are determined when the program is compiled. The runtime mechanism allows<br/>
+oc can dynamically create classes, perform black-box testing, extend properties, and more at runtime, greatly increasing its flexibility. Today, using some runtime mechanisms,<br/>
+let's discuss properties and variables in oc. (This is the first article in my runtime series. If you disagree with any of the points raised, please join the<br/>
+comments to discuss them with me.)<br/></p>
+<h2 id="property和ivar">property and ivar<br/></h2>
+<p><br/>
+First, properties (property) and member variables (ivar) are different things. In oc, the distinction is as follows:<br/></p>
+<ul>
+<li><strong>Member variables</strong><br/>
+Member variables are usually declared in a class declaration's<code class="language-plaintext highlighter-rouge">@interface</code> or class implementation<code class="language-plaintext highlighter-rouge">@implementation</code> variables declared in the braces that follow,<br/>
+Their default visibility is<code class="language-plaintext highlighter-rouge">@protected</code> protected visibility (inaccessible outside the file), as well as<code class="language-plaintext highlighter-rouge">@public</code> public visibility,<code class="language-plaintext highlighter-rouge">@private</code><br/>
+private visibility and<code class="language-plaintext highlighter-rouge">@package</code> package visibility<br/></li>
+</ul>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="k">@interface</span> <span class="n">Person</span>
+<span class="p">{</span>
+    <span class="k">@public</span>       <span class="p">///</span><span class="err">&lt;</span> <span class="n">所有可视范围都能访问</span>
+    <span class="n">NSString</span> <span class="err">*</span> <span class="n">name</span><span class="p">;</span>
+    <span class="nt">NSString</span> <span class="o">*</span> <span class="nt">sex</span><span class="o">;</span>
+    <span class="k">@private</span>      <span class="p">///</span><span class="err">&lt;</span>  <span class="n">只有本类能够访问</span>
+    <span class="n">NSString</span> <span class="err">*</span> <span class="n">personalWealth</span><span class="p">;</span>
+    <span class="k">@protected</span>    <span class="p">///</span><span class="err">&lt;</span> <span class="n">本类和子类都能访问</span> 
+    <span class="n">NSString</span> <span class="err">*</span> <span class="n">housesNumber</span><span class="p">;</span>
+    <span class="k">@package</span>      <span class="p">///</span><span class="err">&lt;</span>  <span class="n">框架内视为public</span><span class="err">，</span><span class="n">框架外为private</span>
+    <span class="n">NSString</span> <span class="err">*</span> <span class="n">familyWealth</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+<p><br/></p>
+<ul>
+<li>Properties<br/></li>
+</ul>
+<p>Compared with a variable, a property involves several compiler operations: 1. Use <code class="language-plaintext highlighter-rouge">@synthesize</code> to generate its corresponding ivar, usually named <code class="language-plaintext highlighter-rouge">下划线+属性名</code>. 2. Generate a <code class="language-plaintext highlighter-rouge">setter</code> to set the ivar. 3. Generate a <code class="language-plaintext highlighter-rouge">getter</code> to retrieve it.</p>
+<p>In a sense, a property wraps a member variable, adding setter and getter methods to make it<br/>
+better suited to object-oriented programming. (If you do not understand why setters and getters are needed, see this article:<br/>
+<a href="http://www.zhihu.com/question/21401198">What getter and setter methods are for</a>)<br/>
+<br/></p>
+<h2 id="属性的内存结构与synthesize">Property memory structure and @synthesize<br/></h2>
+<p>In my earlier article,<a href="http://www.jianshu.com/users/0cf7d455eb9e/latest_articles">KVO implementation </a>article<br/>
+, I briefly discussed class memory structure. Here, we will look more closely at how memory changes after declaring properties and running the program. We will find that<br/>
+<code class="language-plaintext highlighter-rouge">@synthesize</code> actually does.<br/></p>
+<p>My <code class="language-plaintext highlighter-rouge">Person</code> class now looks like this:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="k">@interface</span> <span class="n">Person</span><span class="p">:</span> <span class="n">NSObject</span> <span class="p">{</span>
+    <span class="nt">NSString</span> <span class="o">*</span> <span class="nt">_name</span><span class="o">;</span>
+    <span class="nt">NSString</span> <span class="o">*</span> <span class="nt">_sex</span><span class="o">;</span>
+    <span class="nt">char</span> <span class="nt">_ch</span><span class="o">;</span>
+<span class="p">}</span>
+
+<span class="k">@property</span><span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span> <span class="n">copy</span><span class="p">)</span> <span class="n">NSString</span> <span class="err">*</span> <span class="n">abc</span><span class="p">;</span>
+<span class="k">@property</span><span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span> <span class="n">copy</span><span class="p">)</span> <span class="n">NSString</span> <span class="err">*</span> <span class="n">efg</span><span class="p">;</span>
+
+<span class="k">@end</span>    
+
+
+<span class="err">@</span><span class="n">implementation</span> <span class="n">Person</span>
+
+<span class="n">-</span> <span class="p">(</span><span class="n">instancetype</span><span class="p">)</span><span class="n">init</span> <span class="p">{</span>
+    <span class="nt">if</span> <span class="o">(</span><span class="nt">self</span> <span class="o">=</span> <span class="o">[</span><span class="nt">super</span> <span class="nt">init</span><span class="o">])</span> <span class="p">{</span>
+        <span class="err">NSLog(@"%p,</span> <span class="err">%p,</span> <span class="err">%p,</span> <span class="err">%p,</span> <span class="err">%p,</span> <span class="err">%p,</span> <span class="err">%p",</span> <span class="err">self,</span> <span class="err">&amp;_name,</span> <span class="err">&amp;_sex,</span> <span class="err">&amp;_ch,</span> <span class="err">_abc,</span> <span class="err">_efg);</span>
+    <span class="p">}</span>
+    <span class="nt">return</span> <span class="nt">self</span><span class="o">;</span>
+<span class="p">}</span>
+
+<span class="k">@end</span></code></pre></figure>
+<p><br/></p>
+<ul>
+<li><strong>Question one: Address offsets of member variables</strong><br/></li>
+</ul>
+<p>Although OC has its own characteristics as a dynamic language, its class structure does not differ greatly from that of other languages.<br/>
+In terms of class structure, member-variable addresses are offsets from the class object's own address, so these variables'<br/>
+addresses should increase by 0x8 each time, or 0x4 on a 32-bit system. The log output from the code above is as follows:<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="err">0</span><span class="nt">x7fb649c0c9b0</span><span class="o">,</span> <span class="err">0</span><span class="nt">x7fb649c0c9c0</span><span class="o">,</span> <span class="err">0</span><span class="nt">x7fb649c0c9c8</span><span class="o">,</span> 
+<span class="err">0</span><span class="nt">x7fb649c0c9d0</span><span class="o">,</span> <span class="err">0</span><span class="nt">x7fb649c0c9d8</span><span class="o">,</span> <span class="err">0</span><span class="nt">x7fb649c0c9e0</span></code></pre></figure>
+<p>As expected, the last three addresses differ by 0x8. However, the class object and its first member variable differ by 0x10. Why<br/>
+is that? In <a href="http://opensource.apple.com">Apple's open-source file</a>'s relevant code, we can find <code class="language-plaintext highlighter-rouge">Class</code><br/>
+type definition<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">typedef</span> <span class="nt">struct</span> <span class="nt">objc_class</span> <span class="o">*</span><span class="nt">Class</span><span class="o">;</span>
+<span class="nt">struct</span> <span class="nt">objc_class</span> <span class="p">{</span>
+    <span class="err">Class</span> <span class="err">isa;</span>
+    <span class="err">······</span>
+<span class="p">}</span></code></pre></figure>
+<p><code class="language-plaintext highlighter-rouge">Class</code> represents the Objective-C class structure. This code shows that it is a pointer to the <code class="language-plaintext highlighter-rouge">objc_class</code> struct, which contains an <code class="language-plaintext highlighter-rouge">isa</code> pointer. That extra pointer also explains the 0x10 offset in the output above: the two addresses differ by an <code class="language-plaintext highlighter-rouge">isa</code>. A later runtime article will discuss this in more detail.</p>
+<ul>
+<li><strong>Question two: How are address offsets calculated?</strong><br/></li>
+</ul>
+<p>A pointer occupies 8bit on a 64-bit system, but <code class="language-plaintext highlighter-rouge">char</code> uses only one bit, so why is the offset also 8 here? Is it calculated like a structure's address offset? This brings us to <code class="language-plaintext highlighter-rouge">class_addIvar(const char *, NSUInteger *, NSUInteger *)</code>, a function for adding a variable to a class. Its final parameter specifies the variable's memory alignment. Apple explains that parameter as follows:</p>
+<blockquote>
+<p>The instance variable’s minimum alignment in bytes is 1«align. The minimum alignment of an instance variable depends on the ivar’s type and the machine architecture. For variables of any pointer type, pass log2(sizeof(pointer_type)).</p>
+</blockquote>
+<p>This states that <code class="language-plaintext highlighter-rouge">alignment</code> is the variable's minimum alignment in bytes, but it does not explain exactly how the alignment works. In<br/>
+<a href="http://www.opensource.apple.com/source/objc4/objc4-647/runtime/objc-runtime-new.mm">objc-runtime-new.mm</a><br/>
+contains code that calculates address offsets. Looking at that code makes this clearer:<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css">    <span class="nt">uint32_t</span> <span class="nt">offset</span> <span class="o">=</span> <span class="nt">cls-</span><span class="o">&gt;</span><span class="nt">unalignedInstanceSize</span><span class="o">();</span>
+    <span class="nt">uint32_t</span> <span class="nt">alignMask</span> <span class="o">=</span> <span class="o">(</span><span class="err">1</span><span class="o">&lt;&lt;</span><span class="nt">alignment</span><span class="o">)</span><span class="nt">-1</span><span class="o">;</span>
+    <span class="nt">offset</span> <span class="o">=</span> <span class="o">(</span><span class="nt">offset</span> <span class="o">+</span> <span class="nt">alignMask</span><span class="o">)</span> <span class="o">&amp;</span> <span class="o">~</span><span class="nt">alignMask</span><span class="o">;</span></code></pre></figure>
+<p>In brief, Apple specifies a default variable offset of <code class="language-plaintext highlighter-rouge">1 &lt;&lt; alignment</code>, which in this context is the pointer length. Thus Objective-C class-structure offsets differ from ordinary struct offsets: anything shorter than 8bit is assigned an 8bit offset.</p>
+<ul>
+<li><strong>Question three: How are property backing variables stored?</strong><br/></li>
+</ul>
+<p>As discussed earlier, a property declared with <code class="language-plaintext highlighter-rouge">@property</code> automatically receives an underscore-prefixed ivar and associated setter and getter during compilation, allowing _property access within the class. The offset output shows that property-generated variables follow the member variables. How does that happen? In question two, I mentioned the runtime function <code class="language-plaintext highlighter-rouge">class_addIvar()</code>, described in Xcode as follows:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css">    <span class="o">*</span> <span class="k">@note</span> <span class="n">This</span> <span class="n">function</span> <span class="n">may</span> <span class="n">only</span> <span class="n">be</span> <span class="n">called</span> <span class="n">after</span> <span class="n">objc_allocateClassPair</span> <span class="n">and</span> <span class="n">before</span> <span class="n">objc_registerClassPair</span><span class="p">.</span> 
+    <span class="err">*</span>       <span class="n">Adding</span> <span class="n">an</span> <span class="n">instance</span> <span class="n">variable</span> <span class="n">to</span> <span class="n">an</span> <span class="n">existing</span> <span class="n">class</span> <span class="n">is</span> <span class="n">not</span> <span class="n">supported</span><span class="p">.</span>
+    <span class="err">*</span> <span class="err">@</span><span class="n">note</span> <span class="n">The</span> <span class="n">class</span> <span class="n">must</span> <span class="n">not</span> <span class="n">be</span> <span class="n">a</span> <span class="n">metaclass</span><span class="p">.</span> <span class="n">Adding</span> <span class="n">an</span> <span class="n">instance</span> <span class="n">variable</span> <span class="n">to</span> <span class="n">a</span> <span class="n">metaclass</span> <span class="n">is</span> <span class="n">not</span> <span class="n">supported</span><span class="p">.</span>
+    <span class="err">*</span> <span class="err">@</span><span class="n">note</span> <span class="n">The</span> <span class="n">instance</span> <span class="n">variable</span><span class="s2">'s minimum alignment in bytes is 1&lt;&lt;align. The minimum alignment of an instance 
+    *       variable depends on the ivar'</span><span class="n">s</span> <span class="n">type</span> <span class="n">and</span> <span class="n">the</span> <span class="n">machine</span> <span class="n">architecture</span><span class="p">.</span> 
+    <span class="err">*</span>       <span class="n">For</span> <span class="n">variables</span> <span class="n">of</span> <span class="n">any</span> <span class="nb">pointer</span> <span class="n">type</span><span class="p">,</span> <span class="n">pass</span> <span class="n">log2</span><span class="p">(</span><span class="n">sizeof</span><span class="p">(</span><span class="n">pointer_type</span><span class="p">)).</span></code></pre></figure>
+<p>During compilation, class operations include allocating class memory and adding variables, properties, and method lists. The class must then be registered before use. The <code class="language-plaintext highlighter-rouge">class_addIvar()</code> function is used before registration to add instance variables to the class and its variable list. From this, we infer that <code class="language-plaintext highlighter-rouge">@synthesize</code> uses it during compilation to add and store a property's instance variable. If this guess is correct, those variables should appear in the instance-variable list. The runtime provides a way to test that too: <code class="language-plaintext highlighter-rouge">Ivar * class_copyIvarList(Class, unsigned int *)</code> returns the class structure's variable list. The following code retrieves all variables of <code class="language-plaintext highlighter-rouge">Person</code> and prints their names:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">unsigned</span> <span class="nt">int</span> <span class="nt">ivarCount</span><span class="o">;</span>
+<span class="nt">Ivar</span> <span class="o">*</span> <span class="nt">ivars</span> <span class="o">=</span> <span class="nt">class_copyIvarList</span><span class="o">([</span><span class="nt">Person</span> <span class="nt">class</span><span class="o">],</span> <span class="o">&amp;</span><span class="nt">ivarCount</span><span class="o">);</span>
+
+<span class="nt">for</span> <span class="o">(</span><span class="nt">int</span> <span class="nt">idx</span> <span class="o">=</span> <span class="err">0</span><span class="o">;</span> <span class="nt">idx</span> <span class="o">&lt;</span> <span class="nt">ivarCount</span><span class="o">;</span> <span class="nt">idx</span><span class="o">++)</span> <span class="p">{</span>
+    <span class="err">Ivar</span> <span class="err">ivar</span> <span class="err">=</span> <span class="err">ivars[idx];</span>
+    <span class="err">NSLog(@"%s",</span> <span class="err">ivar_getName(ivar));</span>
+<span class="p">}</span>
+<span class="nt">free</span><span class="o">(</span><span class="nt">ivars</span><span class="o">);</span></code></pre></figure>
+<p>The instance-variable list for the Person class above is printed as follows:<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="err">2016</span><span class="nt">-01-07</span> <span class="err">21</span><span class="o">:</span><span class="err">59</span><span class="o">:</span><span class="err">49</span><span class="o">.</span><span class="err">580</span> <span class="nt">LXDCodingDemo</span><span class="o">[</span><span class="err">3036</span><span class="o">:</span><span class="err">255608</span><span class="o">]</span> <span class="nt">_omg</span>
+<span class="err">2016</span><span class="nt">-01-07</span> <span class="err">21</span><span class="o">:</span><span class="err">59</span><span class="o">:</span><span class="err">49</span><span class="o">.</span><span class="err">581</span> <span class="nt">LXDCodingDemo</span><span class="o">[</span><span class="err">3036</span><span class="o">:</span><span class="err">255608</span><span class="o">]</span> <span class="nt">_name</span>
+<span class="err">2016</span><span class="nt">-01-07</span> <span class="err">21</span><span class="o">:</span><span class="err">59</span><span class="o">:</span><span class="err">49</span><span class="o">.</span><span class="err">581</span> <span class="nt">LXDCodingDemo</span><span class="o">[</span><span class="err">3036</span><span class="o">:</span><span class="err">255608</span><span class="o">]</span> <span class="nt">_ch</span>
+<span class="err">2016</span><span class="nt">-01-07</span> <span class="err">21</span><span class="o">:</span><span class="err">59</span><span class="o">:</span><span class="err">49</span><span class="o">.</span><span class="err">581</span> <span class="nt">LXDCodingDemo</span><span class="o">[</span><span class="err">3036</span><span class="o">:</span><span class="err">255608</span><span class="o">]</span> <span class="nt">sct</span>
+<span class="err">2016</span><span class="nt">-01-07</span> <span class="err">21</span><span class="o">:</span><span class="err">59</span><span class="o">:</span><span class="err">49</span><span class="o">.</span><span class="err">581</span> <span class="nt">LXDCodingDemo</span><span class="o">[</span><span class="err">3036</span><span class="o">:</span><span class="err">255608</span><span class="o">]</span> <span class="nt">_sex</span>
+<span class="err">2016</span><span class="nt">-01-07</span> <span class="err">21</span><span class="o">:</span><span class="err">59</span><span class="o">:</span><span class="err">49</span><span class="o">.</span><span class="err">581</span> <span class="nt">LXDCodingDemo</span><span class="o">[</span><span class="err">3036</span><span class="o">:</span><span class="err">255608</span><span class="o">]</span> <span class="nt">_copying</span>
+<span class="err">2016</span><span class="nt">-01-07</span> <span class="err">21</span><span class="o">:</span><span class="err">59</span><span class="o">:</span><span class="err">49</span><span class="o">.</span><span class="err">581</span> <span class="nt">LXDCodingDemo</span><span class="o">[</span><span class="err">3036</span><span class="o">:</span><span class="err">255608</span><span class="o">]</span> <span class="nt">_egf</span>
+<span class="err">2016</span><span class="nt">-01-07</span> <span class="err">21</span><span class="o">:</span><span class="err">59</span><span class="o">:</span><span class="err">49</span><span class="o">.</span><span class="err">581</span> <span class="nt">LXDCodingDemo</span><span class="o">[</span><span class="err">3036</span><span class="o">:</span><span class="err">255608</span><span class="o">]</span> <span class="nt">_hij</span></code></pre></figure>
+<p>We can see that <code class="language-plaintext highlighter-rouge">@synthesize</code> does call this method, binding property and variable memory through <code class="language-plaintext highlighter-rouge">class_addIvar()</code>.</p>
+<ul>
+<li><strong>Question four: What exactly does @synthesize do?</strong><br/></li>
+</ul>
+<p>This question may seem surprising. From the preceding code and discussion, <code class="language-plaintext highlighter-rouge">@synthesize</code> clearly generates and binds variable memory. In the <code class="language-plaintext highlighter-rouge">Person</code> class, for example, declaring the <code class="language-plaintext highlighter-rouge">abc</code> property makes the compiler automatically generate <code class="language-plaintext highlighter-rouge">@synthesize abc = _abc;</code>, which means we can write it ourselves. What if we bind the property to an existing member variable instead, using <code class="language-plaintext highlighter-rouge">@synthesize abc = _name</code>? What addresses will be printed afterward?</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="k">@implementation</span> <span class="n">Person</span>
+<span class="err">@</span><span class="n">synthesize</span> <span class="n">abc</span> <span class="err">=</span> <span class="n">_name</span><span class="p">;</span>      <span class="o">///&lt;</span> <span class="nt">自定义绑定属性</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">instancetype</span><span class="o">)</span><span class="nt">init</span> <span class="p">{</span>
+    <span class="err">if</span> <span class="err">(self</span> <span class="err">=</span> <span class="err">[super</span> <span class="err">init])</span> <span class="err">{</span>
+        <span class="err">NSLog(@"%p,</span> <span class="err">%p,</span> <span class="err">%p,</span> <span class="err">%p",</span> <span class="err">&amp;_name,</span> <span class="err">&amp;_sex,</span> <span class="err">&amp;_ch,</span> <span class="err">&amp;_efg);</span>
+    <span class="p">}</span>
+    <span class="nt">return</span> <span class="nt">self</span><span class="o">;</span>
+<span class="err">}</span>
+
+<span class="k">@end</span></code></pre></figure>
+<p>Adding this custom binding causes an error in the original code. Binding the <code class="language-plaintext highlighter-rouge">abc</code> property to <code class="language-plaintext highlighter-rouge">_name</code> means the compiler no longer generates <code class="language-plaintext highlighter-rouge">_abc</code>, so that variable cannot be found in the class. After creating a <code class="language-plaintext highlighter-rouge">Person</code> instance, the console's address output remains unchanged, still differing by 0x8.</p>
+<p>0x7ff92b45a438, 0x7ff92b45a440, 0x7ff92b45a448, 0x7ff92b45a458<br/></p>
+<p>To test the relationship between <code class="language-plaintext highlighter-rouge">abc</code> and <code class="language-plaintext highlighter-rouge">_name</code>, I added this code to main:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">Person</span> <span class="o">*</span> <span class="nt">p</span> <span class="o">=</span> <span class="o">[</span><span class="nt">Person</span> <span class="nt">new</span><span class="o">];</span>
+<span class="nt">p</span><span class="nc">.abc</span> <span class="o">=</span> <span class="o">@</span><span class="s1">"123"</span><span class="o">;</span>
+<span class="nt">NSLog</span><span class="o">(@</span><span class="s1">"%@, %@"</span><span class="o">,</span> <span class="nt">p</span><span class="nc">.abc</span><span class="o">,</span> <span class="nt">p-</span><span class="o">&gt;</span><span class="nt">_name</span><span class="o">);</span></code></pre></figure>
+<p>The output for <code class="language-plaintext highlighter-rouge">abc</code> matches <code class="language-plaintext highlighter-rouge">_name</code>. This small example shows that when <code class="language-plaintext highlighter-rouge">@synthesize</code> supplies memory for a property, it first searches for an existing instance variable with the same name. If found, it generates a getter and setter to access that memory. Otherwise, it creates a new member variable and then binds the accessors. Thus <code class="language-plaintext highlighter-rouge">@synthesize</code> does more than simply call <code class="language-plaintext highlighter-rouge">class_addIvar()</code> when adding a variable; it also traverses the variable list.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tuogao01/tuogao01.jpg"/><br/></p>
+<p>Just as black has its opposite in white, <code class="language-plaintext highlighter-rouge">@synthesize</code> has a counterpart. In Objective-C, <code class="language-plaintext highlighter-rouge">@dynamic propertyName</code> prevents the compiler from binding variable storage and generating setters and getters for the property, leaving us to provide these methods at runtime. The runtime messaging article will explain this.</p>
+<ul>
+<li><strong>Question five: How does @synthesize determine a property's type?</strong><br/></li>
+</ul>
+<p>What if the custom binding changed from <code class="language-plaintext highlighter-rouge">_name</code> to <code class="language-plaintext highlighter-rouge">_ch</code>? The compiler reports an error because of type checking. But how does it determine a property's type when generating default storage? Properties also have attributes such as <code class="language-plaintext highlighter-rouge">copy</code>, <code class="language-plaintext highlighter-rouge">strong</code>, and <code class="language-plaintext highlighter-rouge">weak</code>, which affect setter implementation. How does <code class="language-plaintext highlighter-rouge">@synthesize</code> distinguish them? The less commonly used keyword <code class="language-plaintext highlighter-rouge">@encode</code> returns a type-encoding description. I added the following code to main and obtained this console output:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">NSLog</span><span class="o">(@</span><span class="s1">"%s, %s, %s"</span><span class="o">,</span> <span class="k">@encode</span><span class="p">(</span><span class="n">Person</span><span class="p">),</span> <span class="err">@</span><span class="n">encode</span><span class="p">(</span><span class="n">CGRect</span><span class="p">),</span> <span class="err">@</span><span class="n">encode</span><span class="p">(</span><span class="n">NSInteger</span><span class="p">));</span>
+
+<span class="o">///</span><span class="nt">输出</span>
+<span class="p">{</span><span class="err">Person=#@@c</span><span class="p">}</span><span class="o">,</span> <span class="p">{</span><span class="err">CGRect={CGPoint=dd</span><span class="p">}{</span><span class="err">CGSize=dd</span><span class="p">}</span><span class="err">}</span><span class="o">,</span> <span class="nt">q</span></code></pre></figure>
+<p>looks rather confusing. Apple's official documentation explains that the compiler uses C characters to represent every OC type, while using<code class="language-plaintext highlighter-rouge">@encode(type)</code><br/>
+returns the encoding for this type. The mappings between these encodings can be found in <a href="https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html">Type encoding</a><br/>.<br/></p>
+<p>The output shows that <code class="language-plaintext highlighter-rouge">Person</code> has encoding <code class="language-plaintext highlighter-rouge">#@@c</code>, where # denotes an object and the following elements represent <code class="language-plaintext highlighter-rouge">id</code>, <code class="language-plaintext highlighter-rouge">id</code>, and <code class="language-plaintext highlighter-rouge">char</code>. In the class file, these correspond to <code class="language-plaintext highlighter-rouge">_name</code>, <code class="language-plaintext highlighter-rouge">_sex</code>, and <code class="language-plaintext highlighter-rouge">_ch</code>. This shows how <code class="language-plaintext highlighter-rouge">@synthesize</code> identifies the type of a property's bound variable. The <code class="language-plaintext highlighter-rouge">class_addIvar()</code> function accepts a <code class="language-plaintext highlighter-rouge">const char *</code> argument describing attributes and variable types, allowing <code class="language-plaintext highlighter-rouge">@synthesize</code> to pass the obtained encoding and generate the corresponding variable.</p>
+<p>How is a property's type determined? Apple also provides the following in the runtime: <code class="language-plaintext highlighter-rouge">property_getAttributes()</code><br/>
+to obtain an object's type attributes. These attributes likewise use<code class="language-plaintext highlighter-rouge">@encode</code> a similar set of type encodings. These type encodings'<br/>
+standard table can also be found in <a href="https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtPropertyIntrospection.html">Property type encoding</a>.<br/>
+If you enjoy reading the code of open-source frameworks, the recently emerging <code class="language-plaintext highlighter-rouge">YYModel</code> you can see the author's extensive use of type encoding:<br/></p>
+<p><img alt="2" src="/images/blog/tuogao/tuogao01/tuogao02.jpg"/><br/></p>
+<h2 id="应用">Application<br/></h2>
+<blockquote>
+<p>Theory that cannot be put into practice is nonsense. — 沃德天·毫率<br/></p>
+</blockquote>
+<p>I have outlined many plausible theories, but they are of little use unless we can apply them. Data persistence is unavoidable in development. My company's projects are small and do not store much data, so I generally use the archiving provided by <code class="language-plaintext highlighter-rouge">NSCoding</code>. That often leads to code like this:</p>
+<p><img alt="3" src="/images/blog/tuogao/tuogao01/tuogao03.jpg"/><br/></p>
+<p>Writing it this way is not a problem while the model contains little data. As the amount of model data grows, this approach<br/>
+may cause:<br/></p>
+<p>1. With many fields, mismatched strings in archiving can cause saving or loading to fail. 2. The workload increases. As mentioned above, runtime's <code class="language-plaintext highlighter-rouge">class_copyIvarList()</code> retrieves every instance variable of a class; <code class="language-plaintext highlighter-rouge">class_copyPropertyList()</code> does the equivalent for properties. We can use it to enumerate properties and their names, then implement a one-step archiving macro similar to a singleton macro. The core code follows:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">unsigned</span> <span class="nt">int</span> <span class="nt">propertyCount</span><span class="o">;</span> 
+<span class="nt">objc_property_t</span> <span class="o">*</span> <span class="nt">properties</span> <span class="o">=</span> <span class="nt">class_copyPropertyList</span><span class="o">([</span><span class="nt">self</span> <span class="nt">class</span><span class="o">],</span> <span class="o">&amp;</span><span class="nt">propertyCount</span><span class="o">);</span>    
+
+<span class="nt">for</span> <span class="o">(</span><span class="nt">int</span> <span class="nt">idx</span> <span class="o">=</span> <span class="err">0</span><span class="o">;</span> <span class="nt">idx</span> <span class="o">&lt;</span> <span class="nt">propertyCount</span><span class="o">;</span> <span class="nt">idx</span><span class="o">++)</span> <span class="p">{</span>
+    <span class="err">objc_property_t</span> <span class="err">property</span> <span class="err">=</span> <span class="err">properties[idx];</span>
+    <span class="err">NSLog(@"\</span><span class="py">n--name</span><span class="p">:</span> <span class="err">%</span><span class="n">s</span><span class="err">\</span><span class="n">n--attributes</span><span class="p">:</span> <span class="err">%</span><span class="n">s</span><span class="err">"</span><span class="p">,</span> <span class="n">property_getName</span><span class="p">(</span><span class="n">property</span><span class="p">),</span> <span class="n">property_getAttributes</span><span class="p">(</span><span class="n">property</span><span class="p">));</span>  <span class="p">}</span>   
+<span class="err">}</span>   
+<span class="nt">free</span><span class="o">(</span><span class="nt">properties</span><span class="o">);</span></code></pre></figure>
+<p><br/></p>
+<p>Print the property's information in the console:<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">--name</span><span class="o">:</span> <span class="nt">abc</span>
+<span class="nt">--attributes</span><span class="o">:</span> <span class="nt">T</span><span class="o">@</span><span class="s1">"NSString"</span><span class="o">,</span><span class="nt">C</span><span class="o">,</span><span class="nt">N</span><span class="o">,</span><span class="nt">V_abc</span>
+
+<span class="nt">--name</span><span class="o">:</span> <span class="nt">efg</span>
+<span class="nt">--attributes</span><span class="o">:</span> <span class="nt">T</span><span class="o">@</span><span class="s1">"NSString"</span><span class="o">,</span><span class="nt">C</span><span class="o">,</span><span class="nt">N</span><span class="o">,</span><span class="nt">V_efg</span>
+
+<span class="nt">--name</span><span class="o">:</span> <span class="nt">hij</span>
+<span class="nt">--attributes</span><span class="o">:</span> <span class="nt">T</span><span class="o">@</span><span class="s1">"NSString"</span><span class="o">,</span><span class="nt">C</span><span class="o">,</span><span class="nt">N</span><span class="o">,</span><span class="nt">V_hij</span></code></pre></figure>
+<p>Both runtime-based archiving and unarchiving enumerate the class's properties. Define an <code class="language-plaintext highlighter-rouge">LXDCodingHandler</code> block to hold the processing for each <code class="language-plaintext highlighter-rouge">objc_property_t</code> property and pass it into this enumeration:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">typedef</span> <span class="nt">void</span><span class="o">(^</span><span class="nt">LXDCodingHandler</span><span class="o">)(</span><span class="nt">objc_property_t</span> <span class="nt">property</span><span class="o">,</span> <span class="nt">NSString</span> <span class="o">*</span> <span class="nt">propertyName</span><span class="o">);</span></code></pre></figure>
+<p>I have already wrapped the relevant code so that a model can be serialized in a single line.<br/>
+<a href="https://github.com/JustKeepRunning/LXDEncoding">Demo project</a><br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-01-04-a-windows-aliwangwang-style-login-screen-with-a-paper-feed-animation/">A Windows AliWangWang-style login screen with a paper-feed animation</a><br/></p>
+
+{% endraw %}

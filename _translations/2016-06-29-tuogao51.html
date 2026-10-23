@@ -1,0 +1,165 @@
+---
+layout: post
+title: 'Swift in practice: the template pattern'
+description: Uses product data and calculations to examine code that depends on a tuple's structure. Types and protocols
+  then organise reusable processing, showing how abstraction can reduce coupling between parameter formats and business
+  methods.
+category: Development notes
+imagefeature: null
+date: 2016-06-29 00:00:00 +0800
+technical_translation:
+  topic: swift-runtime
+  summary: Uses product data and calculations to examine code that depends on a tuple's structure. Types and protocols
+    then organise reusable processing, showing how abstraction can reduce coupling between parameter formats and
+    business methods.
+  keywords:
+  - Swift
+  - template pattern
+  - protocols
+  - tuples
+  - code reuse
+  provenance: contribution
+  author_name: Sindri
+  source_url: http://www.jianshu.com/p/76d38ceb1ad3
+  credit: Originally credited to Sindri; edited and archived by Bison.
+  title: 'Swift in practice: the template pattern'
+  source_sha256: affe3bc8cd2c9ee0a85e7dc02fb060c9eabb80637d23e24e582c2e6968b898b0
+lang: en
+source_path: _posts/2016-06-29-tuogao51.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao51
+permalink: /en/journal/2016-06-29-swift-in-practice-the-template-pattern/
+translation_method: machine-assisted
+translation_source_sha256: affe3bc8cd2c9ee0a85e7dc02fb060c9eabb80637d23e24e582c2e6968b898b0
+excerpt: Uses product data and calculations to examine code that depends on a tuple's structure. Types and protocols
+  then organise reusable processing, showing how abstraction can reduce coupling between parameter formats and business
+  methods.
+translation_date: '2026-10-23T02:52:08+00:00'
+---
+{% raw %}
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao51/1.png"/><br/></p>
+<blockquote>
+<p>Design patterns are classified, widely known, repeatedly used solutions distilled from code-design experience. The GoF proposed 23 patterns; this series implements them in Swift.</p>
+</blockquote>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/76d38ceb1ad3">Sindri’s Notes</a><br/></p>
+<h2 id="概述">Overview</h2>
+<p>The template design pattern is one of the most basic patterns. Online, it is commonly called the <code class="language-plaintext highlighter-rouge">模板方法模式</code>, but in practice its application is not limited to methods. My own definition is therefore:</p>
+<blockquote>
+<p>[Template design pattern] Encapsulate common methods and object members in a template providing abstract methods and members for concrete implementations.</p>
+</blockquote>
+<h2 id="坏味道的代码">Code smells</h2>
+<p>Swift has an interesting data structure, <code class="language-plaintext highlighter-rouge">元组Tuples</code>. In the following code, each tuple passed in represents the data for a product:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func calculateTax(product: (String, Double, Int)) -&gt; Double {
+    return product.1 * 0.17
+}
+
+func calculateStockValue(products: [(String, Double, Int)]) -&gt; Double {
+    return products.reduce(0.0){
+        $0 + $1.1 * Double($1.2)
+    }
+}
+
+override func viewDidLoad() {
+    super.viewDidLoad()
+    let products = [
+        ("Pizazz", 99.8, 10),
+        ("Hamburger", 25.6, 8),
+        ("Beef", 19.9, 30) ]
+
+    print("The tax of \(products[0].1) is \(calculateTax(product[0]))")
+    print("The stock value of all products is \(calculateStockValue(products))")
+} 上面的方法通过传入一个或者多个元组用来计算增值税（17%）以及商品存货总额。毫无疑问，对于稍有经验的开发者来说，都能说出这段代码有太大的`坏味道`了：两个方法过度的依赖于传入的元组结构，这意味着几乎无法复用这些方法
+</code></pre></div></div>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao51/2.jpg"/><br/></p>
+<h2 id="模板设计模式">Template design pattern</h2>
+<p>As languages evolved from procedural to object-oriented programming, high-level languages and frameworks encapsulated many design patterns. We often benefit from this without noticing. The <code class="language-plaintext highlighter-rouge">坏味道</code> in the code above comes mainly from restrictions on parameter types and values. To avoid this <code class="language-plaintext highlighter-rouge">坏味道</code>, a common approach is to use <code class="language-plaintext highlighter-rouge">模板设计模式</code> to reduce excessive coupling.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao51/3.jpg"/><br/></p>
+<p>In Swift, the template design pattern uses <code class="language-plaintext highlighter-rouge">class</code> and <code class="language-plaintext highlighter-rouge">struct</code> as structural templates for creating concrete objects with different contents. The revised code is:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func calculateTax(product: Product) -&gt; Double {
+    return product.price * 0.17
+}
+
+func calculateStockValue(products: [Product]) -&gt; Double {
+    return products.reduce(0){
+        return $0 + $1.price * Double($1.stock)
+    }
+}
+
+class Product {
+    var name: String
+    var price: Double
+    var stock: Int
+
+    init(name: String, price price: Double, stock stock: Int) {
+        self.name = name
+        self.price = price
+        self.stock = stock
+    }
+}
+</code></pre></div></div>
+<p>Using a <code class="language-plaintext highlighter-rouge">class</code> structure as the template, we can create products with different properties. Defining the <code class="language-plaintext highlighter-rouge">class</code> adds some work, but makes the code more consistent with <code class="language-plaintext highlighter-rouge">OOP</code> and removes the tight coupling between methods and tuples. Another coupling remains, however, between methods and classes. If the project later serves global markets with different tax types and rates, the code acquires another <code class="language-plaintext highlighter-rouge">坏味道</code>. We therefore also need to move these two methods into the <code class="language-plaintext highlighter-rouge">class</code> structure as method templates.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class Product {
+    var name: String
+    var price: Double
+    var stock: Int
+
+    init(name: String, price price: Double, stock stock: Int) {
+        self.name = name
+        self.price = price
+        self.stock = stock
+    }
+
+    private func calculateTax() -&gt; Double {
+        return price * 0.17
+    }
+
+    private func calculateStockValue() -&gt; Double {
+        return price * Double(stock)
+    }
+
+    func log() {
+        print("The tax of \(name) is \(calculateTax())")
+        print("The stock value of product is \(calculateStockValue())")
+    }
+}
+
+class Product_Japan: Product {
+    override private calculateTax() -&gt; Double {
+        return price * 0.05
+    }
+}
+</code></pre></div></div>
+<p>Abstracting methods into a superclass and overriding their concrete implementations in subclasses is a typical use of <code class="language-plaintext highlighter-rouge">模板方法模式</code>.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao51/4.jpg"/><br/></p>
+<p>Implementing multiple subclasses for regional tax rates creates substantial code. When the rate becomes a variable, change the method to accept it:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func calculateTax(ratio: Double) -&gt; Double {
+    return price * ratio
+}
+</code></pre></div></div>
+<h2 id="总结">Summary</h2>
+<blockquote>
+<p>Pattern advantages</p>
+</blockquote>
+<ul>
+<li>
+<p>Extract and encapsulate invariant behaviour, removing duplicated code.</p>
+</li>
+<li>
+<p>Subclasses override superclass implementations to add new behaviour.</p>
+</li>
+</ul>
+<blockquote>
+<p>Pattern disadvantages</p>
+</blockquote>
+<ul>
+<li>
+<p>Both <code class="language-plaintext highlighter-rouge">class</code> and <code class="language-plaintext highlighter-rouge">struct</code> can use the template pattern to reduce coupling, but their different passing semantics can cause errors.</p>
+</li>
+<li>
+<p>can cause an explosion of subclasses and make the design more abstract.</p>
+</li>
+</ul>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Adding a launch advertisement to an iOS app</a><br/></p>
+
+{% endraw %}

@@ -1,0 +1,77 @@
+---
+layout: post
+title: Custom iOS Transitions with a Two-Line API
+description: Introduces WTKTransitionAnimate, selecting transitions through a navigation delegate and factory methods.
+  It combines drag gestures with percentage-based progress to implement an interactive back transition and explains
+  the organization behind the wrapper.
+category: Development notes
+imagefeature: null
+date: 2016-11-14 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Introduces WTKTransitionAnimate, selecting transitions through a navigation delegate and factory methods.
+    It combines drag gestures with percentage-based progress to implement an interactive back transition and explains
+    the organization behind the wrapper.
+  keywords:
+  - WTKTransitionAnimate
+  - navigation transitions
+  - interactive animation
+  - Runtime
+  provenance: contribution
+  author_name: 逆流丶而上
+  source_url: http://www.jianshu.com/p/f99d72bf8452
+  credit: Originally credited to 逆流丶而上; edited and archived by Bison.
+  version_note: Published in 2016, the article uses the custom transition APIs introduced in iOS 7.
+  title: Custom iOS Transitions with a Two-Line API
+  source_sha256: f4e3009ca0a14b2131cb8a2f1f158d94d6164ad1f4c9a1189d37dd87335b5352
+lang: en
+source_path: _posts/2016-11-14-tougao70.md
+source_url: /%E6%8A%95%E7%A8%BF/tougao70
+permalink: /en/journal/2016-11-14-custom-ios-transitions-with-a-two-line-api/
+translation_method: machine-assisted
+translation_source_sha256: f4e3009ca0a14b2131cb8a2f1f158d94d6164ad1f4c9a1189d37dd87335b5352
+excerpt: Introduces WTKTransitionAnimate, selecting transitions through a navigation delegate and factory methods.
+  It combines drag gestures with percentage-based progress to implement an interactive back transition and explains
+  the organization behind the wrapper.
+translation_date: '2026-10-23T02:34:15+00:00'
+---
+{% raw %}
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao70/1.gif"/><br/></p>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Source: <a href="http://www.jianshu.com/p/f99d72bf8452">逆流丶而上</a><br/></p>
+<p>iOS7 introduced new transition APIs through protocols,<uiviewcontrollerinterativetransition>, id <uiviewanimatedtransitioning>interface for developers. Complex APIs and cumbersome implementation discourage many developers.</uiviewanimatedtransitioning></uiviewcontrollerinterativetransition></p>
+<p>I wrapped several common transitions for simpler use. Search CocoaPods for WTKTransitionAnimate and import it.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao70/2.png"/><br/></p>
+<h2 id="使用方法">Usage</h2>
+<p>Import #import <wtktransition.h></wtktransition.h></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>self.navigationController.delegate = [WTKTransition shareManager];
+[WTKTransition shareManager].animationType = WTKAnimateTypeKuGou;
+</code></pre></div></div>
+<p>Set navigationController’s delegate to the WTKTransition singleton; animationType specifies the transition:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef NS_ENUM(NSInteger,WTKAnimateType)
+{
+    WTKAnimateTypeDefault = 0,
+    /// 两个导航栏不一致
+    WTKAnimateTypeDiffNavi,
+    ///仿酷狗
+    WTKAnimateTypeKuGou,
+    ///圆形遮罩
+    WTKAnimateTypeRound,
+    ///椭圆遮罩
+    WTKAnimateTypeOval,
+    ///仿斗鱼
+    WTKAnimateTypeDouYu,
+};
+</code></pre></div></div>
+<h2 id="实现过程">Implementation</h2>
+<p>The singleton implements two transition delegate methods, using a factory to create subclasses for animateType and concrete animations. UIPercentDrivenInteractiveTransition provides interaction. A pan gesture on viewController.view updates its state. Normally the gesture belongs in a parent controller; for easier usage, a category uses runtime associations and intercepts viewDidLoad to add the back gesture.</p>
+<p>WTKAnimateTypeRound centres each animation on the tap coordinate. Obtain the tap location and use it as the next push animation’s centre. There are two ways to obtain it:</p>
+<p>1. Subclass Appdelegate, implement sendEvent and obtain coordinates from Event.</p>
+<p>2. Use a category to intercept sendEvent through runtime and obtain coordinates from Event.
+This simplifies WTKTransitionAnimation usage.
+Cancelling the swipe-back gesture also posts WTK_CANCEL_POP.</p>
+<p><a href="https://github.com/wangtongke/WTKTransitionAnimate">Download the demo</a></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

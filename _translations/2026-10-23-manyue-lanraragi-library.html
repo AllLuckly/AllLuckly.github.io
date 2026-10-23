@@ -1,0 +1,54 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Connect ManYue to LANraragi: archives, tags and a personal comic library'
+description: Use the native LANraragi connection, check the API key, archive-to-chapter mapping, tag search and
+  page indexes, and establish the scope of local progress and offline downloads.
+permalink: /en/guides/manyue-lanraragi-library/
+date: 2026-10-23 00:00:00 +0800
+modified: 2026-10-23 00:00:00 +0800
+category: Tutorials
+level: Intermediate
+series_order: 32
+topic: Server libraries
+reading_time: 8
+lang: en
+source_path: _posts/2026-10-23-manyue-lanraragi-library.md
+source_url: /guides/manyue-lanraragi-library/
+translation_method: machine-assisted
+translation_source_sha256: 05d9d5a4b92f6e0b55ca5644e6401293dba29aa92bca42820782cc973dba14bd
+excerpt: Use the native LANraragi connection, check the API key, archive-to-chapter mapping, tag search and page
+  indexes, and establish the scope of local progress and offline downloads.
+translation_date: '2026-10-23T02:34:08+00:00'
+---
+{% raw %}
+<p>LANraragi focuses on comic archives and tag management. ManYue can read your archive library through its native service entry, with each archive usually mapped to one work and one chapter. This guide connects a small archive first, focusing on the service root address, API key, and page index.</p>
+<h2 id="准备一个已完成索引的归档">Prepare an archive whose indexing is complete</h2>
+<p>In your LANraragi service, confirm that the practice archive opens with the correct page order and count. Use a short CBZ you made or are authorized to read, and give it a clear title and two or three accurate tags, such as its subject and author. Later, search by title and tag separately to confirm the metadata belongs to this archive. While an archive is still importing or indexing, page information may not be ready. Wait for server processing to settle before connecting the client.</p>
+<p>Record the server root address and access mode. Public read access differs from authenticated access; an API Key may be required when restrictions are enabled. Native server libraries in ManYue fall within Ultra, while server access control remains determined by your deployment. Do not use the web administration password directly as an API key.</p>
+<h2 id="添加-lanraragi-类型书库">Add a LANraragi library</h2>
+<p>In “Library” → “Manage Libraries,” add a library and choose LANraragi as the service type. Enter a name and the server root address, with a structure such as <code class="language-plaintext highlighter-rouge">http://192.168.1.20:3000/</code>. Use the actual address of your deployment, without appending a particular archive page or manually adding an API path.</p>
+<p>When a reverse proxy uses a subpath, keep the correct prefix. For a service requiring a key, put the original API Key in the dedicated field without extra manual encoding or placing it in the address. Whether a publicly readable service allows an empty key depends on its server settings. Seeing the home page does not prove that every API allows anonymous access.</p>
+<h2 id="连接后按标题和标签寻找样本">Find the sample by title and tag after connecting</h2>
+<p>Submit “Connect and Save,” then wait for access validation and library loading. Search the practice archive's title first, then try its existing tags or author information. Search relates to the currently loaded library, not the entire internet. If the catalog is still loading, wait or check progress before deciding that works are missing.</p>
+<p>A LANraragi archive differs from a serialized comic website's multi-chapter structure. One compressed archive may be a volume or short work, so one chapter in the client does not necessarily mean other chapters are missing. Compare the page count and images inside the archive rather than expecting it to split automatically into many chapters by story scene.</p>
+<h2 id="打开归档核对页面顺序">Open the archive and check page order</h2>
+<p>Open the archive details and start reading, checking the first, middle, and last pages. Page order comes from the server archive and index. If it is wrong, view the same archive in LANraragi's own reader first. If both are wrong, fix source archive naming or the server index rather than repeatedly changing reading direction in ManYue to disguise the issue.</p>
+<p>If the cover loads but pages fail, first confirm that indexing is complete, the archive file still exists, and the current account can read it. Covers and individual pages are separate requests; a visible cover does not prove the entire archive access path works. Refresh items whose indexing is unfinished later instead of immediately deleting the server's only original file.</p>
+<h2 id="下载与阅读记录的范围">The scope of downloads and reading records</h2>
+<p>For offline reading, explicitly download the target archive or relevant chapter in ManYue, wait for completion, then open it with networking disabled. The server retaining an archive, the phone displaying its catalog, and the phone saving its pages are three different states. Especially when NAS storage is ample but phone space is limited, download for near-term reading instead of copying the entire library.</p>
+<p>With the current native LANraragi connection, reading progress and favorites are mainly managed locally in ManYue. Do not assume Suwayomi's server-side progress capabilities apply. Reading to page ten in ManYue does not mean the LANraragi web interface will show the same position. Synchronizing reading information across devices also requires the relevant functions actually provided by ManYue.</p>
+<h2 id="密钥变更与服务器迁移">Key changes and server migration</h2>
+<p>After changing the server's API Key, update credentials through the current connection interface and verify the original practice archive again. Do not change the address, account, and key simultaneously and conclude that every relationship is correct from one successful result. If the address now points to an entirely different service, create a separate connection and retain the original source relationships for downloads and history, rather than merging same-named archives into one record.</p>
+<p>Credentials may not transfer to a new device with an ordinary data backup. If the new device shows a connection name but cannot access it, restore valid authentication before checking directories. Keep keys out of public screenshots and tutorial examples. When asking for help, describe only the authentication mode, error type, and necessary redacted address structure.</p>
+<h2 id="常见问题">Frequently asked questions</h2>
+<p><strong>Are the API Key and administrator password interchangeable?</strong> No. They serve different authentication purposes. Obtain an API Key according to the server settings and enter it in the dedicated field. Trying the administration password will not make the native interface accept it automatically.</p>
+<p><strong>Why does an archive have only one chapter?</strong> This integration maps archives to works and chapters; the images inside are the actual pages. Judge completeness by page count and content rather than chapter-button count alone.</p>
+<p><strong>Why does search not change immediately after tags are updated?</strong> The client needs to refresh the relevant library data, and search may operate on a loaded snapshot. First confirm that the server saved the tags, then refresh the current connection instead of repeatedly adding same-named connections to obtain the change.</p>
+<h2 id="继续管理私人归档">Continue managing your private archives</h2>
+<p>When multiple libraries become mixed together, see <a href="/en/guides/manyue-server-library-scope/">Sources and personal display scope</a>; for questions about archive page order, see <a href="/en/guides/manyue-formats-and-page-order/">Formats and page order</a>. To take downloaded content with you, continue with <a href="/en/guides/manyue-batch-export/">Batch export</a>.</p>
+<h2 id="资料与版本">Sources and version</h2>
+<p>Information checked on October 23, 2026. The public release is ManYue 2.0.2, requiring iOS / iPadOS 15.0 or later. This guide is based on public feature descriptions and their entry points; available options depend on the installed version. See <a href="https://apps.apple.com/cn/app/id6753895889">Official App Store description</a> and <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn">Apple release information</a>.</p>
+
+{% endraw %}

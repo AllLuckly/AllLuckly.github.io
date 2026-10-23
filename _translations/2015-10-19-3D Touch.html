@@ -1,0 +1,140 @@
+---
+layout: post
+title: iOS 9 3D Touch quick actions, with a Swift update
+description: 'Explains iOS 9 Home Screen quick actions: defining icons, titles and types in Info.plist, then dispatching
+  selections through AppDelegate. Both Objective-C and Swift implementations illustrate the configuration and callback
+  flow.'
+category: Development notes
+imagefeature: BG.jpg
+date: 2015-10-19 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: 'Explains iOS 9 Home Screen quick actions: defining icons, titles and types in Info.plist, then dispatching
+    selections through AppDelegate. Both Objective-C and Swift implementations illustrate the configuration and
+    callback flow.'
+  keywords:
+  - 3D Touch
+  - UIApplicationShortcutItem
+  - AppDelegate
+  - quick actions
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Targets Home Screen 3D Touch quick actions from the iOS 9 and iPhone 6s era.
+  title: iOS 9 3D Touch quick actions, with a Swift update
+  source_sha256: 3fdf02d5ec3ed45f7d0581befc761336d5707c64294319f5e03937964bc09f9e
+lang: en
+source_path: _posts/2015-10-19-3D Touch.md
+source_url: /3d%20touch/3D-Touch
+permalink: /en/journal/2015-10-19-ios-9-3d-touch-quick-actions-with-a-swift-update/
+translation_method: machine-assisted
+translation_source_sha256: 3fdf02d5ec3ed45f7d0581befc761336d5707c64294319f5e03937964bc09f9e
+excerpt: 'Explains iOS 9 Home Screen quick actions: defining icons, titles and types in Info.plist, then dispatching
+  selections through AppDelegate. Both Objective-C and Swift implementations illustrate the configuration and callback
+  flow.'
+translation_date: '2026-10-23T02:34:10+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"Work hard, keep working hard, and work harder still. Today’s effort becomes tomorrow’s reward."
+<small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p><br/></p>
+<p>On October 19, a weekend day, I got up for breakfast and then went to Walmart to pick up ingredients for dinner. I wandered over to the iPhone counter—an occupational habit, perhaps. 😄 I tried the newly released <code class="language-plaintext highlighter-rouge">iPhone6s</code> and its new <code class="language-plaintext highlighter-rouge">3D Touch</code> feature. It was rather hard to trigger at first 😓; apparently you need to get a feel for it. Mainstream <code class="language-plaintext highlighter-rouge">app</code> s already supported it, and I could not stop thinking about implementing it myself. The biggest drawback was that it worked only on <code class="language-plaintext highlighter-rouge">iPhone6s</code> and later models, although apparently other phones could get this interesting feature through jailbreaking. Enough digression...
+Now to the point:
+I searched online and found very little information, just one brief introduction:
+http://www.jianshu.com/p/74fe6cbc542b</p>
+<p>Of course, that article alone made this feature difficult to implement—at least in my view.
+So I put my supposedly unbeatable searching skills to work and finally found a way forward.
+First, add an entry to the <code class="language-plaintext highlighter-rouge">Info.plist</code> file.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">&lt;</span><span class="nt">key</span><span class="o">&gt;</span><span class="nt">UIApplicationShortcutItems</span><span class="o">&lt;/</span><span class="nt">key</span><span class="o">&gt;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="o">&lt;</span><span class="nt">array</span><span class="o">&gt;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="o">&lt;</span><span class="nt">dict</span><span class="o">&gt;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="o">&lt;</span><span class="nt">key</span><span class="o">&gt;</span><span class="nt">UIApplicationShortcutItemIconType</span><span class="o">&lt;/</span><span class="nt">key</span><span class="o">&gt;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="o">&lt;</span><span class="nt">string</span><span class="o">&gt;</span><span class="nt">UIApplicationShortcutIconTypeShare</span><span class="o">&lt;/</span><span class="nt">string</span><span class="o">&gt;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="o">&lt;</span><span class="nt">key</span><span class="o">&gt;</span><span class="nt">UIApplicationShortcutItemTitle</span><span class="o">&lt;/</span><span class="nt">key</span><span class="o">&gt;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="o">&lt;</span><span class="nt">string</span><span class="o">&gt;</span><span class="nt">Share</span><span class="o">&lt;/</span><span class="nt">string</span><span class="o">&gt;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="o">&lt;</span><span class="nt">key</span><span class="o">&gt;</span><span class="nt">UIApplicationShortcutItemType</span><span class="o">&lt;/</span><span class="nt">key</span><span class="o">&gt;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="o">&lt;</span><span class="nt">string</span><span class="o">&gt;</span><span class="nt">-11</span><span class="nc">.UITouchText.share</span><span class="o">&lt;/</span><span class="nt">string</span><span class="o">&gt;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="o">&lt;/</span><span class="nt">dict</span><span class="o">&gt;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="o">&lt;/</span><span class="nt">array</span><span class="o">&gt;</span></code></pre></figure>
+<p>Here is what the entries mean.
+<code class="language-plaintext highlighter-rouge">UIApplicationShortcutItemIconType</code> specifies the icon type shown when <code class="language-plaintext highlighter-rouge">3D Touch</code> is triggered.
+<code class="language-plaintext highlighter-rouge">UIApplicationShortcutIconTypeShare</code> shows the share icon.
+Other icons are available too, but I will not list them all: I am also just getting started, so please bear with me. 😄
+<code class="language-plaintext highlighter-rouge">UIApplicationShortcutItemTitle</code> supplies the displayed name.
+<code class="language-plaintext highlighter-rouge">UIApplicationShortcutItemType</code> is unique, like the project's <code class="language-plaintext highlighter-rouge">Bundle Identifier</code>.
+Use this identifier to determine which item was tapped and trigger its action.
+You can configure several items.
+That finishes the <code class="language-plaintext highlighter-rouge">Info.plist</code> setup. What next?
+What—you do not know either?
+All right, I will continue with the next step...
+First, add the following method to <code class="language-plaintext highlighter-rouge">AppDelegate.m</code>.</p>
+<h3 id="oc版">Objective-C version<br/></h3>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">application</span><span class="o">:(</span><span class="nt">UIApplication</span> <span class="o">*)</span><span class="nt">application</span> 
+<span class="nt">performActionForShortcutItem</span><span class="o">:(</span><span class="nt">UIApplicationShortcutItem</span> <span class="o">*)</span><span class="nt">shortcutItem</span>
+<span class="nt">completionHandler</span><span class="o">:(</span><span class="nt">void</span><span class="o">(^)(</span><span class="nt">BOOL</span> <span class="nt">succeeded</span><span class="o">))</span><span class="nt">completionHandler</span><span class="p">{</span>
+
+<span class="p">}</span></code></pre></figure>
+<h3 id="swift版">Swift version<br/></h3>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">func</span> <span class="nt">application</span><span class="o">(</span><span class="nt">application</span><span class="o">:</span> <span class="nt">UIApplication</span><span class="o">,</span> <span class="nt">performActionForShortcutItem</span> <span class="nt">shortcutItem</span><span class="o">:</span> <span class="nt">UIApplicationShortcutItem</span><span class="o">,</span> <span class="nt">completionHandler</span><span class="o">:</span> <span class="o">(</span><span class="nt">Bool</span><span class="o">)</span> <span class="nt">-</span><span class="o">&gt;</span> <span class="nt">Void</span><span class="o">)</span> <span class="p">{</span>
+
+<span class="p">}</span></code></pre></figure>
+<p>What does this method do? You probably already know.
+Yes: it handles the event triggered by <code class="language-plaintext highlighter-rouge">3D Touch</code>.
+Here is how I wrote my <code class="language-plaintext highlighter-rouge">Demo</code>:</p>
+<h3 id="oc版-">Objective-C version <br/></h3>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">application</span><span class="o">:(</span><span class="nt">UIApplication</span> <span class="o">*)</span><span class="nt">application</span> <span class="nt">performActionForShortcutItem</span><span class="o">:(</span><span class="nt">UIApplicationShortcutItem</span> <span class="o">*)</span><span class="nt">shortcutItem</span> <span class="nt">completionHandler</span><span class="o">:(</span><span class="nt">void</span><span class="o">(^)(</span><span class="nt">BOOL</span> <span class="nt">succeeded</span><span class="o">))</span><span class="nt">completionHandler</span><span class="p">{</span>
+<span class="err">  </span> <span class="err"> //判断先前我们设置的唯一标识</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">if([shortcutItem.type</span> <span class="py">isEqualToString</span><span class="p">:</span><span class="err">@</span><span class="s1">"-11.UITouchText.share"</span><span class="p">])</span><span class="err">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="n">NSArray</span> <span class="err">*</span><span class="n">arr</span> <span class="err">=</span> <span class="err">@</span><span class="p">[</span><span class="err">@</span><span class="s1">"hello 3D Touch"</span><span class="p">];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">UIActivityViewController</span> <span class="err">*vc</span> <span class="err">=</span> <span class="err">[[UIActivityViewController</span> <span class="err">alloc]</span><span class="py">initWithActivityItems</span><span class="p">:</span><span class="n">arr</span> <span class="n">applicationActivities</span><span class="p">:</span><span class="n">nil</span><span class="p">];</span>
+<span class="err">//设置当前的VC</span> <span class="err">为rootVC</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">[self.window.rootViewController</span> <span class="py">presentViewController</span><span class="p">:</span><span class="n">vc</span> <span class="n">animated</span><span class="p">:</span><span class="n">YES</span> <span class="n">completion</span><span class="p">:</span><span class="err">^{</span>
+<span class="err">  </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="p">}</span><span class="o">];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">}</span>
+<span class="err">}</span></code></pre></figure>
+<p><br/></p>
+<h3 id="swift版-1">Swift version<br/></h3>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">func</span> <span class="nt">application</span><span class="o">(</span><span class="nt">application</span><span class="o">:</span> <span class="nt">UIApplication</span><span class="o">,</span> <span class="nt">performActionForShortcutItem</span> <span class="nt">shortcutItem</span><span class="o">:</span> <span class="nt">UIApplicationShortcutItem</span><span class="o">,</span> <span class="nt">completionHandler</span><span class="o">:</span> <span class="o">(</span><span class="nt">Bool</span><span class="o">)</span> <span class="nt">-</span><span class="o">&gt;</span> <span class="nt">Void</span><span class="o">)</span> <span class="p">{</span>
+<span class="err">  </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">switch</span> <span class="err">shortcutItem.type</span> <span class="err">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">case</span> <span class="err">"-11.UITouchText.share":</span>
+<span class="err">let</span> <span class="err">items</span> <span class="err">=</span> <span class="err">["hello</span> <span class="err">3D</span> <span class="err">Touch"]</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span>     <span class="err">let</span> <span class="err">activityVC</span> <span class="err">=</span> <span class="err">UIActivityViewController(</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="py">activityItems</span><span class="p">:</span> <span class="n">items</span><span class="p">,</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="n">applicationActivities</span><span class="p">:</span> <span class="n">nil</span><span class="p">)</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span>     <span class="n">self</span><span class="p">.</span><span class="n">window</span><span class="err">?</span><span class="p">.</span><span class="n">rootViewController</span><span class="err">?</span><span class="p">.</span><span class="n">presentViewController</span><span class="p">(</span><span class="n">activityVC</span><span class="p">,</span> <span class="n">animated</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span> <span class="n">completion</span><span class="p">:</span> <span class="err">{</span> <span class="p">()</span> <span class="n">-</span><span class="err">&gt;</span> <span class="n">Void</span> <span class="n">in</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> 
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="p">}</span><span class="o">)</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="nt">default</span><span class="o">:</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="nt">break</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">}</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">}</span></code></pre></figure>
+<p>I suspect many fellow developers are like me and have not yet bought an <code class="language-plaintext highlighter-rouge">iPhone6s</code>, which prevents us from testing the result directly. Here is a way around that limitation. It will not show the running effect, but it can still help determine whether the setup succeeded.</p>
+<h3 id="oc版-1">Objective-C version<br/></h3>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">if</span> <span class="o">(</span><span class="nt">self</span><span class="nc">.traitCollection.forceTouchCapability</span> <span class="o">==</span> <span class="nt">UIForceTouchCapabilityAvailable</span><span class="o">)</span> <span class="p">{</span>
+        <span class="err">NSLog(@"你的手机支持3D</span> <span class="err">Touch!");</span>
+<span class="err"> </span> <span class="err"> </span> <span class="p">}</span>
+<span class="err"> </span> <span class="err"> </span> <span class="nt">else</span> <span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">NSLog(@"你的手机暂不支持3D</span> <span class="err">Touch!");</span>
+<span class="err"> </span> <span class="err"> </span> <span class="p">}</span></code></pre></figure>
+<p><br/></p>
+<h3 id="swift版-2">Swift version<br/></h3>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">if</span> <span class="nt">traitCollection</span><span class="nc">.forceTouchCapability</span> <span class="o">==</span> <span class="nt">UIForceTouchCapability</span><span class="nc">.Available</span> <span class="p">{</span>
+
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> NSLog(@"你的手机支持3D</span> <span class="err">Touch!");</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="p">}</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="nt">else</span> <span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">NSLog(@"你的手机暂不支持3D</span> <span class="err">Touch!");</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="p">}</span></code></pre></figure>
+<p><br/>
+Here is a screenshot for you to enjoy! 😄<br/>
+<img alt="2" src="/images/blog/3dtouch.jpg"/><br/></p>
+<p>Recommended reading: <a href="http://www.jianshu.com/p/05a3087cd796">Integrating Alipay friend sharing in three minutes</a><br/>
+Technical discussion group: 511040024<br/></p>
+<p>Copyright ©Bison. Reproduction without permission is prohibited.<br/></p>
+
+{% endraw %}

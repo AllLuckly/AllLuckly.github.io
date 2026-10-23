@@ -1,0 +1,125 @@
+---
+layout: post
+title: Bison's guide to iOS multithreading, part 2
+description: Examines shared data accessed by several threads, introducing synchronized blocks and NSLock locking
+  and unlocking. NSCondition examples then use waiting, signalling and broadcasting to explain coordination between
+  threads.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-01-18 00:00:00 +0800
+technical_translation:
+  topic: concurrency-performance
+  summary: Examines shared data accessed by several threads, introducing synchronized blocks and NSLock locking
+    and unlocking. NSCondition examples then use waiting, signalling and broadcasting to explain coordination between
+    threads.
+  keywords:
+  - thread safety
+  - synchronized
+  - NSLock
+  - NSCondition
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  title: Bison's guide to iOS multithreading, part 2
+  source_sha256: 3b884a102f6928a11eb53ad3999f0e4070a29b55309b08409b75e054236c27de
+lang: en
+source_path: _posts/2016-01-18-duoxiancheng02.md
+source_url: /%E5%A4%9A%E7%BA%BF%E7%A8%8B/duoxiancheng02
+permalink: /en/journal/2016-01-18-bison-s-guide-to-ios-multithreading-part-2/
+translation_method: machine-assisted
+translation_source_sha256: 3b884a102f6928a11eb53ad3999f0e4070a29b55309b08409b75e054236c27de
+excerpt: Examines shared data accessed by several threads, introducing synchronized blocks and NSLock locking and
+  unlocking. NSCondition examples then use waiting, signalling and broadcasting to explain coordination between
+  threads.
+translation_date: '2026-10-23T02:45:01+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"Multithreading can suddenly produce unexpected errors because system scheduling is partly random. Yet even an occasional problem results from incorrect programming. When multiple threads access the same data, seemingly occasional thread-safety problems can easily arise."</p>
+</blockquote>
+<p>Earlier, in “<a href="/en/journal/2016-01-13-bison-s-guide-to-ios-multithreading-part-1/">Bison's guide to iOS multithreading, part 1</a>”, we discussed thread priorities. Next, let’s examine thread synchronisation and communication.<br/>
+Multithreading can suddenly produce unexpected errors because scheduling has a degree of randomness. However, even when a problem occurs only occasionally,<br/>
+it still results from incorrect programming. Accessing the same data from multiple threads can easily produce seemingly occasional thread-safety problems.<br/></p>
+<p>Objective-C's multithreading support introduces synchronization to address thread safety. A common approach is to mark a code block with <code class="language-plaintext highlighter-rouge">@synchronized</code>. A block marked with <code class="language-plaintext highlighter-rouge">@synchronized</code> is referred to here as a synchronized block. Its syntax is:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="k">@synchronized</span><span class="p">(</span><span class="n">obj</span><span class="p">){</span>
+    <span class="o">...</span>
+    <span class="o">//</span><span class="nt">此处的代码即为同步代码块</span>
+<span class="p">}</span></code></pre></figure>
+<p>In this syntax, the object in parentheses after <code class="language-plaintext highlighter-rouge">@synchronized</code>, namely <code class="language-plaintext highlighter-rouge">obj</code>, is the synchronization monitor. Before a thread executes the synchronized block, it must acquire the monitor's lock. Only one thread can hold that lock at any moment. Once the block finishes, the thread releases it. Although Objective-C allows any object to serve as the monitor, consider its purpose: preventing two threads from accessing the same shared resource concurrently. The shared resource that may be accessed concurrently is therefore usually recommended as the synchronization monitor.</p>
+<p>A thread-safe class has these characteristics:<br/></p>
+<blockquote>
+<p>Objects of the class can be accessed safely by multiple threads.<br/></p>
+</blockquote>
+<blockquote>
+<p>Every thread gets correct results after calling any method on the object.<br/></p>
+</blockquote>
+<blockquote>
+<p>After any thread calls any method on the object, the object remains in a valid state.<br/></p>
+</blockquote>
+<p>Many <code class="language-plaintext highlighter-rouge">Foundation</code> classes have mutable and immutable versions. Immutable classes are always thread-safe because their object state cannot change, while mutable objects require additional measures. Marking the critical section where multiple threads modify a shared resource with <code class="language-plaintext highlighter-rouge">@synchronized</code> ensures that at most one thread enters it to change the data at a time, enabling a thread-safe class.
+Thread safety for mutable classes comes at a cost in execution efficiency. To reduce that impact, a program can use the following strategies:</p>
+<blockquote>
+<p>Do not synchronise every method of a thread-safe class; synchronise only the methods that modify a contested shared resource.<br/></p>
+</blockquote>
+<blockquote>
+<p>If a mutable class is used in both single-threaded and multithreaded environments, provide two versions: thread-unsafe and thread-safe. Use the thread-unsafe version in the single-threaded environment for performance, and the thread-safe version in the multithreaded environment.<br/></p>
+</blockquote>
+<p>Before entering a synchronised block, any thread must acquire the synchronisation monitor’s lock. When is that lock released? The program cannot release it explicitly; the thread releases it in the following situations.</p>
+<blockquote>
+<p>When a thread finishes executing its synchronised block, it releases the synchronisation monitor.<br/></p>
+</blockquote>
+<blockquote>
+<p>goto or return ends a synchronised block or its method, the current thread releases the synchronisation monitor.<br/></p>
+</blockquote>
+<blockquote>
+<p>If an error causes a synchronized block to exit exceptionally, its synchronization monitor is released. A related distinction is that pausing a thread with an <code class="language-plaintext highlighter-rouge">NSThread</code> <code class="language-plaintext highlighter-rouge">sleepXxx</code> method does not release the synchronization monitor.</p>
+</blockquote>
+<p><code class="language-plaintext highlighter-rouge">Foundation</code> also provides <code class="language-plaintext highlighter-rouge">NSLock</code> for synchronization through explicitly defined lock objects. This mechanism uses an <code class="language-plaintext highlighter-rouge">NSLock</code> object as the lock.</p>
+<p><code class="language-plaintext highlighter-rouge">NSLock</code> controls access to shared resources by multiple threads. A lock normally provides exclusive access: only one thread can lock an <code class="language-plaintext highlighter-rouge">NSLock</code> object at a time. A thread should first acquire the <code class="language-plaintext highlighter-rouge">NSLock</code> lock before accessing the shared resource.</p>
+<p>For thread-safety control, this <code class="language-plaintext highlighter-rouge">NSLock</code> object allows explicit locking and unlocking. Here is a simple example.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NSLock* lock;
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        lock = [[NSLock alloc] init];
+    }
+    return self;
+}
+
+//定义需要保证线程安全的方法
+- (void)Safety{
+    
+    [lock lock];
+
+    //需要保证线程安全的方法
+    
+    [lock unlock];
+}
+
+</code></pre></div></div>
+<p><br/>
+System thread scheduling is partly hidden from a running program. We generally cannot control exactly how threads alternate, but mechanisms can coordinate their execution by handling communication between threads.<br/></p>
+<p>For communication between threads, <code class="language-plaintext highlighter-rouge">Foundation</code> provides the <code class="language-plaintext highlighter-rouge">NSCondition</code> class. <code class="language-plaintext highlighter-rouge">NSCondition</code> implements the <code class="language-plaintext highlighter-rouge">NSLock</code> protocol, so its <code class="language-plaintext highlighter-rouge">lock</code> and <code class="language-plaintext highlighter-rouge">unlock</code> methods can provide thread synchronization. In addition, <code class="language-plaintext highlighter-rouge">NSCondition</code> allows a thread that has locked an <code class="language-plaintext highlighter-rouge">NSCondition</code> object but cannot proceed to release that <code class="language-plaintext highlighter-rouge">NSCondition</code> object. An <code class="language-plaintext highlighter-rouge">NSCondition</code> object can also wake other waiting threads.</p>
+<p><code class="language-plaintext highlighter-rouge">NSCondition</code> provides the following methods.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//改方法导致当前线程一直等待，直到其他线程调用该NSCondition的signal方法或者broadcast方法 
+- (void)wait;
+//用于控制等待到指定时间点，如果到了该时间点，该线程将会被自动唤醒
+- (BOOL)waitUntilDate:(NSDate *)limit;
+//唤醒等待的单个线程，如果有多个，则随机唤醒一个。只有当前线程放弃对该NSCondition对象的锁定后（wait方法），才可执行
+- (void)signal;
+//唤醒等待的所有线程
+- (void)broadcast;
+
+</code></pre></div></div>
+<p>That is all for today!<br/>
+Coming next: Part 3 focuses on GCD multithreading!<br/></p>
+<hr/>
+<blockquote>
+<p>Original article: <a href="/en/">https://allluckly.cn/</a><br/></p>
+</blockquote>
+<p>Recommended reading: <a href="/en/journal/2016-01-10-understanding-and-using-core-data-for-persistence/">Understanding and using Core Data for persistence</a><br/></p>
+<p>Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.</p>
+
+{% endraw %}

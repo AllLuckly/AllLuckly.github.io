@@ -1,0 +1,167 @@
+---
+layout: post
+title: Building a WeChat-style iOS app, part 1
+description: The opening instalment organises the project and its MVC folders, introduces shared view controllers,
+  and creates the feature pages and UITabBarController. It establishes the common navigation structure that later
+  screens will use.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-01-29 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: The opening instalment organises the project and its MVC folders, introduces shared view controllers,
+    and creates the feature pages and UITabBarController. It establishes the common navigation structure that later
+    screens will use.
+  keywords:
+  - WeChat-style app
+  - MVC
+  - UITabBarController
+  - project structure
+  provenance: contribution
+  author_name: WzxJiang
+  source_url: http://www.jianshu.com/users/389c20d5a244/latest_articles
+  author_url: http://www.jianshu.com/users/389c20d5a244/latest_articles
+  credit: Originally credited to WzxJiang; edited and archived by Bison.
+  title: Building a WeChat-style iOS app, part 1
+  source_sha256: 396fea23778464f6b3adc1dd76d915b916f0b7eee65c518497ceaf6b9359b28c
+lang: en
+source_path: _posts/2016-01-29-tuogao12.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao12
+permalink: /en/journal/2016-01-29-building-a-wechat-style-ios-app-part-1/
+translation_method: machine-assisted
+translation_source_sha256: 396fea23778464f6b3adc1dd76d915b916f0b7eee65c518497ceaf6b9359b28c
+excerpt: The opening instalment organises the project and its MVC folders, introduces shared view controllers, and
+  creates the feature pages and UITabBarController. It establishes the common navigation structure that later screens
+  will use.
+translation_date: '2026-10-23T02:34:12+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/users/389c20d5a244/latest_articles">WzxJiang</a><br/></p>
+<blockquote>
+<p>"Starting today (2016.1.28), I will build a WeChat-style app. I can only work on personal projects in the evenings, so progress may be slow. Thank you for understanding!:"</p>
+</blockquote>
+<p><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao12/1.png"/><br/></p>
+<p>Today's tasks:<br/></p>
+<ul>
+<li>Create the project.<br/></li>
+<li>Set up the structure.<br/></li>
+</ul>
+<p>1. Create the project<br/></p>
+<p>I will skip the basic creation steps and discuss only what to do after creating a project.<br/></p>
+<ul>
+<li>First, drag the things you do not need into Supporting Files.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao12/2.png"/>/<center><br/></center></p>
+<ul>
+<li>Next, create folders through <code class="language-plaintext highlighter-rouge">Show In Finder</code>. Make one project folder for each feature, then create <code class="language-plaintext highlighter-rouge">Model</code>, <code class="language-plaintext highlighter-rouge">View</code><code class="language-plaintext highlighter-rouge">、ViewController</code> folders inside each.</li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao12/3.png"/><br/></p>
+<ul>
+<li>Add the folders to the project.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao12/4.png"/><br/></p>
+<p>Drag the images into <code class="language-plaintext highlighter-rouge">Assets.xcassets</code>. I took these screenshots myself... If anyone has the originals and can send them to me, I would be very grateful!</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao12/5.png"/><br/></p>
+<p>That completes project creation for now. Suggestions are welcome in the comments!<br/></p>
+<p>2. Set up the structure<br/></p>
+<p>Create a BaseViewController superclass to make changes across all VCs easier.<br/>
+For today, this superclass only needs to change the status-bar text color.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="c">/**
+*  修改状态栏字体颜色成白色
+*/</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">UIStatusBarStyle</span><span class="o">)</span><span class="nt">preferredStatusBarStyle</span>
+<span class="p">{</span>
+    <span class="err">return</span> <span class="err">UIStatusBarStyleLightContent;</span>
+<span class="p">}</span></code></pre></figure>
+<ul>
+<li>In each feature's ViewController folder, create a VC that inherits from BaseViewController.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao12/6.png"/><br/></p>
+<ul>
+<li>Create a UITabBarController.<br/></li>
+</ul>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="nt">导入VC头文件</span>
+<span class="nf">#import</span> <span class="s1">"AddressBookViewController.h"</span>
+<span class="nf">#import</span> <span class="s1">"FoundViewController.h"</span>
+<span class="nf">#import</span> <span class="s1">"ChatViewController.h"</span>
+<span class="nf">#import</span> <span class="s1">"MeViewController.h"</span></code></pre></figure>
+<p><br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">viewDidLoad</span> <span class="p">{</span>
+    <span class="err">[super</span> <span class="err">viewDidLoad];</span>
+
+    <span class="err">ChatViewController</span> <span class="err">*</span> <span class="err">chatVC</span> <span class="err">=</span> <span class="err">[[ChatViewController</span> <span class="err">alloc]init];</span>
+    <span class="err">chatVC.title</span> <span class="err">=</span> <span class="err">@"微信";</span>
+
+    <span class="err">AddressBookViewController</span> <span class="err">*</span> <span class="err">addbkVC</span> <span class="err">=</span> <span class="err">[[AddressBookViewController</span> <span class="err">alloc]init];</span>
+    <span class="err">addbkVC.title</span> <span class="err">=</span> <span class="err">@"通讯录";</span>
+
+    <span class="err">FoundViewController</span> <span class="err">*</span> <span class="err">foundVC</span> <span class="err">=</span> <span class="err">[[FoundViewController</span> <span class="err">alloc]init];</span>
+    <span class="err">foundVC.title</span> <span class="err">=</span> <span class="err">@"发现";</span>
+
+    <span class="err">MeViewController</span> <span class="err">*</span> <span class="err">meVC</span> <span class="err">=</span> <span class="err">[[MeViewController</span> <span class="err">alloc]init];</span>
+    <span class="err">meVC.title</span> <span class="err">=</span> <span class="err">@"我";</span>
+
+    <span class="err">self.viewControllers</span> <span class="err">=</span> <span class="err">@[[self</span> <span class="py">giveMeNavWithVC</span><span class="p">:</span><span class="n">chatVC</span> <span class="n">andImgName</span><span class="p">:</span><span class="err">@</span><span class="s1">"tabbar_chat_no"</span> <span class="n">andSelectImgName</span><span class="p">:</span><span class="err">@</span><span class="s1">"tabbar_chat_yes"</span><span class="p">],[</span><span class="n">self</span> <span class="n">giveMeNavWithVC</span><span class="p">:</span><span class="n">addbkVC</span> <span class="n">andImgName</span><span class="p">:</span><span class="err">@</span><span class="s1">"tabbar_book_no"</span> <span class="n">andSelectImgName</span><span class="p">:</span><span class="err">@</span><span class="s1">"tabbar_book_yes"</span><span class="p">],[</span><span class="n">self</span> <span class="n">giveMeNavWithVC</span><span class="p">:</span><span class="n">foundVC</span> <span class="n">andImgName</span><span class="p">:</span><span class="err">@</span><span class="s1">"tabbar_found_no"</span><span class="n">andSelectImgName</span><span class="p">:</span><span class="err">@</span><span class="s1">"tabbar_found_yes"</span><span class="p">],[</span><span class="n">self</span> <span class="n">giveMeNavWithVC</span><span class="p">:</span><span class="n">meVC</span> <span class="n">andImgName</span><span class="p">:</span><span class="err">@</span><span class="s1">"tabbar_me_no"</span><span class="n">andSelectImgName</span><span class="p">:</span><span class="err">@</span><span class="s1">"tabbar_me_yes"</span><span class="p">]];</span>
+
+    <span class="err">self.tabBar.tintColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="py">colorWithRed</span><span class="p">:</span><span class="m">9</span><span class="p">/</span><span class="m">255.0</span> <span class="no">green</span><span class="p">:</span><span class="m">187</span><span class="p">/</span><span class="m">255.0</span> <span class="no">blue</span><span class="p">:</span><span class="m">7</span><span class="p">/</span><span class="m">255.0</span> <span class="n">alpha</span><span class="p">:</span><span class="m">1</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="c">/**
+*  返回取消渲染的image
+*/</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">UIImage</span> <span class="o">*)</span><span class="nt">removeRendering</span><span class="o">:(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">imageName</span>
+<span class="p">{</span>
+    <span class="err">UIImage</span> <span class="err">*</span> <span class="err">image</span> <span class="err">=</span> <span class="err">[UIImage</span> <span class="py">imageNamed</span><span class="p">:</span><span class="n">imageName</span><span class="p">];</span>
+    <span class="err">return</span> <span class="err">[image</span> <span class="py">imageWithRenderingMode</span><span class="p">:</span><span class="n">UIImageRenderingModeAlwaysOriginal</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="c">/**
+*  快速创建Nav
+*/</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">UINavigationController</span> <span class="o">*)</span><span class="nt">giveMeNavWithVC</span><span class="o">:(</span><span class="nt">UIViewController</span> <span class="o">*)</span><span class="nt">VC</span> <span class="nt">andImgName</span><span class="o">:(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">imgName</span> <span class="nt">andSelectImgName</span><span class="o">:(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">selectImgName</span>
+<span class="p">{</span>
+    <span class="err">UINavigationController</span> <span class="err">*</span> <span class="err">nav</span> <span class="err">=</span> <span class="err">[[UINavigationController</span> <span class="err">alloc]</span><span class="py">initWithRootViewController</span><span class="p">:</span><span class="n">VC</span><span class="p">];</span>
+    <span class="err">nav.tabBarItem</span> <span class="err">=</span> <span class="err">[[UITabBarItem</span> <span class="err">alloc]</span><span class="py">initWithTitle</span><span class="p">:</span><span class="n">VC</span><span class="p">.</span><span class="n">title</span> <span class="n">image</span><span class="p">:[</span><span class="n">self</span> <span class="n">removeRendering</span><span class="p">:</span><span class="n">imgName</span><span class="p">]</span> <span class="n">selectedImage</span><span class="p">:[</span><span class="n">self</span> <span class="n">removeRendering</span><span class="p">:</span><span class="n">selectImgName</span><span class="p">]];</span>
+    <span class="err">return</span> <span class="err">nav;</span>
+<span class="p">}</span></code></pre></figure>
+<p>Creating suitable helper methods can save a lot of code.</p>
+<p>Add some code to AppDelegate.m.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">application</span><span class="o">:(</span><span class="nt">UIApplication</span> <span class="o">*)</span><span class="nt">application</span> <span class="nt">didFinishLaunchingWithOptions</span><span class="o">:(</span><span class="nt">NSDictionary</span> <span class="o">*)</span><span class="nt">launchOptions</span> <span class="p">{</span>
+
+    <span class="err">self.window.bounds</span> <span class="err">=</span> <span class="err">[UIScreen</span> <span class="err">mainScreen].bounds;</span>
+
+    <span class="err">self.window.backgroundColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="err">whiteColor];</span>
+
+    <span class="err">[self.window</span> <span class="err">makeKeyAndVisible];</span>
+
+    <span class="err">self.window.rootViewController</span> <span class="err">=</span> <span class="err">[[TabBarViewController</span> <span class="err">alloc]init];</span>
+
+    <span class="err">[self</span> <span class="err">changeNav];</span>
+
+    <span class="err">return</span> <span class="err">YES;</span>
+<span class="p">}</span>
+
+<span class="c">/**
+*  全局改变Nav
+*/</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">changeNav</span>
+<span class="p">{</span>
+    <span class="err">//设置NavigationBar背景颜色</span>
+    <span class="err">[[UINavigationBar</span> <span class="err">appearance]</span> <span class="py">setBarTintColor</span><span class="p">:[</span><span class="n">UIColor</span> <span class="n">colorWithRed</span><span class="p">:</span><span class="m">54</span><span class="p">/</span><span class="m">255.0</span> <span class="no">green</span><span class="p">:</span><span class="m">53</span><span class="p">/</span><span class="m">255.0</span> <span class="no">blue</span><span class="p">:</span><span class="m">58</span><span class="p">/</span><span class="m">255.0</span> <span class="n">alpha</span><span class="p">:</span><span class="m">1</span><span class="p">]];</span>
+    <span class="err">//@{</span><span class="p">}</span><span class="nt">代表Dictionary</span>
+    <span class="o">[[</span><span class="nt">UINavigationBar</span> <span class="nt">appearance</span><span class="o">]</span> <span class="nt">setTitleTextAttributes</span><span class="o">:@</span><span class="p">{</span><span class="py">NSForegroundColorAttributeName</span><span class="p">:[</span><span class="n">UIColor</span> <span class="n">whiteColor</span><span class="p">]}</span><span class="o">];</span>
+    <span class="o">//</span><span class="nt">不设置这个无法修改状态栏字体颜色</span>
+    <span class="o">[[</span><span class="nt">UINavigationBar</span> <span class="nt">appearance</span><span class="o">]</span> <span class="nt">setBarStyle</span><span class="nd">:UIBarStyleBlack</span><span class="o">];</span>
+<span class="err">}</span></code></pre></figure>
+<p>Run it now.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao12/1.gif"/><br/></p>
+<p>That is all for today! Tomorrow, I will create the basic UI.<br/>
+Current code, to be updated until the project is complete<br/>
+<a href="https://github.com/Wzxhaha/WWeChat">GitHub:WzxJiang</a><br/></p>
+<p>If you have suggestions or questions, please leave a comment!<br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-01-20-integrating-lianlian-pay-into-an-ios-app/">Integrating LianLian Pay into an iOS app</a><br/></p>
+
+{% endraw %}

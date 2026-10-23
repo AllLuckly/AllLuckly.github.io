@@ -1,0 +1,285 @@
+---
+layout: post
+title: 'iOS animation: a fragment-based reveal'
+description: Explains how UIView's maskView affects which content is visible, then divides the mask into regions
+  and animates them separately. These steps build a fragmented reveal and an image-carousel transition.
+category: Development notes
+imagefeature: null
+date: 2016-05-12 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Explains how UIView's maskView affects which content is visible, then divides the mask into regions and
+    animates them separately. These steps build a fragmented reveal and an image-carousel transition.
+  keywords:
+  - maskView
+  - fragment animation
+  - UIView
+  - masking
+  - image carousel
+  provenance: contribution
+  author_name: Sindri
+  source_url: http://www.jianshu.com/p/e189696dd535
+  credit: Originally credited to Sindri; edited and archived by Bison.
+  version_note: The implementation is based on UIView's maskView property, available from iOS 8.
+  title: 'iOS animation: a fragment-based reveal'
+  source_sha256: 0ab7d8b1fb7daad492bf06f38ecd81ff2045d149e4523820335fd636e3dcc4ba
+lang: en
+source_path: _posts/2016-05-12-tuogao45.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao45
+permalink: /en/journal/2016-05-12-ios-animation-a-fragment-based-reveal/
+translation_method: machine-assisted
+translation_source_sha256: 0ab7d8b1fb7daad492bf06f38ecd81ff2045d149e4523820335fd636e3dcc4ba
+excerpt: Explains how UIView's maskView affects which content is visible, then divides the mask into regions and
+  animates them separately. These steps build a fragmented reveal and an image-carousel transition.
+translation_date: '2026-10-23T02:45:03+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/e189696dd535">Sindri’s Notes</a><br/></p>
+<p>More than four months have passed since I began the animation series. Originally, this post was to introduce <code class="language-plaintext highlighter-rouge">CoreAnimation</code>. Looking back, though, the examples in my earlier posts were not especially attractive—in plain terms, the animations were rather ugly. I wanted to make something appealing using the basics, but could not think of an approach. Eventually I saw a striking fragmentation animation online, implemented it myself, and decided to explain it here:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao45/1.gif"/><br/></p>
+<h2 id="遮罩视图">Mask view<br/></h2>
+<p>UIView has a <code class="language-plaintext highlighter-rouge">maskView</code> property, the most important variable for today's animation. Available since iOS8, it represents a view's mask. I struggled to find a useful analogy. Put simply, a <code class="language-plaintext highlighter-rouge">UIView</code> object's opacity can be changed through <code class="language-plaintext highlighter-rouge">alpha</code>, and masking affects visibility similarly. The difference is that the former changes a value from 0 to 1, whereas a mask view's <code class="language-plaintext highlighter-rouge">backgroundColor</code>, <code class="language-plaintext highlighter-rouge">alpha</code>, <code class="language-plaintext highlighter-rouge">transform</code>, and other properties all affect the masked view's transparency. For example:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>UIView * viewContainer = [[UIView alloc] initWithFrame: CGRectMake(0, 0, 200, 200)];
+viewContainer.backgroundColor = [UIColor blueColor];
+
+UIView * contentView = [[UIView alloc] initWithFrame: CGRectMake(0, 0, 200, 200)];
+contentView.backgroundColor = [UIColor redColor];
+[viewContainer addSubview: contentView];
+
+UIView * maskView = [[UIView alloc] initWithFrame: CGRectMake(50, 50, 75, 75)];
+maskView.backgroundColor = [UIColor yellowColor];
+contentView.maskView = maskView;
+</code></pre></div></div>
+<p><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao45/2.jpeg"/><br/></p>
+<p>Make a small change to the code above, adjusting the opacity of <code class="language-plaintext highlighter-rouge">maskView</code> and <code class="language-plaintext highlighter-rouge">contentView</code> separately, and see what happens to the red view when the mask opacity changes:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao45/3.jpeg"/><br/></p>
+<p>The experiment shows that changing the view's own opacity and changing <code class="language-plaintext highlighter-rouge">maskView</code> opacity produce the same effect. In other words, the mask's influence on the view is determined directly by two visible properties: <code class="language-plaintext highlighter-rouge">透明度</code> and <code class="language-plaintext highlighter-rouge">显示尺寸</code>.</p>
+<p>Besides <code class="language-plaintext highlighter-rouge">alpha</code>, which mask-view properties affect the view's appearance?</p>
+<ul>
+<li>
+<p>Color<br/>
+These opacity experiments lead to a conclusion: the view’s appearance depends on <code class="language-plaintext highlighter-rouge">maskView</code>opacity. With no transparent colour components, there is no transparency effect. But if the mask colour has transparency:
+    maskView.backgroundColor = [UIColor colorWithWhite: 1 alpha: 0.5];  //任意颜色
+the result matches directly setting<code class="language-plaintext highlighter-rouge">alpha = 0.5</code> has the same effect. In <a href="http://objccn.io/issue-3-1/">Draw pixels to the screen </a>reveals colour rendering and <code class="language-plaintext highlighter-rouge">alpha</code> property association.<br/></p>
+</li>
+<li>
+<p>Subviews of <code class="language-plaintext highlighter-rouge">maskView</code></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>maskView.backgroundColor = [UIColor clearColor];
+UIView * sub1 = [[UIView alloc] initWithFrame: CGRectMake(0, 0, 20, 34)];
+sub1.backgroundColor = [UIColor blackColor];
+UIView * sub2 = [[UIView alloc] initWithFrame: CGRectMake(15, 18, 33, 40)];
+sub2.backgroundColor = [UIColor blackColor];
+[maskView addSubview: sub1];
+[maskView addSubview: sub2];
+</code></pre></div> </div>
+</li>
+</ul>
+<p>To understand how <code class="language-plaintext highlighter-rouge">maskView</code> subviews affect masking, we need to remove the mask view's own influence. Set the background of <code class="language-plaintext highlighter-rouge">maskView</code> to transparent.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao45/4.jpeg"/><br/></p>
+<p>Even when the mask itself is transparent, its subviews can provide part of the mask effect. Changing their opacity therefore changes the mask too.<br/></p>
+<h2 id="动画实现">Animation implementation<br/></h2>
+<p>Returning to the animation shown above, the image divides into rectangular pieces that gradually disappear. There are two rows vertically and roughly 15 columns horizontally. Add 2*15 evenly distributed subviews to <code class="language-plaintext highlighter-rouge">maskView</code>. Give each subview an identifier so that they can be hidden in sequence during the animation:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>UIView * maskView = [[UIView alloc] initWithFrame: contentView.bounds];
+const NSInteger horizontalCount = 15;
+const NSInteger verticalCount = 2;
+const CGFloat fadeWidth = CGRectGetWidth(maskView.frame) / horizontalCount;
+const CGFloat fadeHeight = CGRectGetHeight(maskView.frame) / verticalCount;
+
+for (NSInteger line = 0; line &lt; horizontalCount; line ++) {
+    for (NSInteger row = 0; row &lt; verticalCount; row++) {
+        CGRect frame = CGRectMake(line*fadeWidth, row*fadeHeight, fadeWidth, fadeHeight);
+        UIView * fadeView = [[UIView alloc] initWithFrame: frame];
+        fadeView.tag = [self viewTag: line*verticalCount+row];
+        fadeView.backgroundColor = [UIColor whiteColor];
+        [maskView addSubview: fadeView];
+    }
+}
+contentView.maskView = maskView;
+</code></pre></div></div>
+<p><br/></p>
+<p>When the animation starts, iterate over every subview of <code class="language-plaintext highlighter-rouge">maskView</code> and animate them in order:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for (NSInteger line = 0; line &lt; horizontalCount; line ++) {
+    for (NSInteger row = 0; row &lt; verticalCount; row++) {
+        NSInteger idx = line*verticalCount+row;
+        UIView * fadeView = [contentView.maskView viewWithTag: [self viewWithTag: idx];
+        [UIView animateWithDuration: fadeDuration delay: interval*idx options: UIViewAnimationOptionCurveLinear animations: ^{
+            fadeView.alpha = 0;
+        } completion: nil];
+    }
+}
+</code></pre></div></div>
+<p>While implementing an animation, consider how to package it for reuse. This fragmentation animation can be encapsulated on <code class="language-plaintext highlighter-rouge">UIView</code> as a <code class="language-plaintext highlighter-rouge">category</code> to reduce intrusion and coupling:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#define LXDMAXDURATION 1.2
+#define LXDMINDURATION .2
+#define LXDMULTIPLED .25
+
+@interface UIView (LXDFadeAnimation)
+
+/*!
+ *  @brief 视图是否隐藏
+ */
+@property (nonatomic, assign, readonly) BOOL isFade;
+/*!
+ *  @brief 是否处在动画中
+ */
+@property (nonatomic, assign, readonly) BOOL isFading;
+/*!
+ *  @brief 垂直方块个数。默认为3
+ */
+@property (nonatomic, assign) NSInteger verticalCount;
+/*!
+ *  @brief 水平方块个数。默认为18
+ */
+@property (nonatomic, assign) NSInteger horizontalCount;
+/*!
+ *  @brief 方块动画之间的间隔0.2~1.2。默认0.7
+ */
+@property (nonatomic, assign) NSTimeInterval intervalDuration;
+/*!
+ *  @brief 每个方块隐藏的动画时间0.05~0.3，最多为动画时长的25%。默认为0.175
+ */
+@property (nonatomic, assign) NSTimeInterval fadeAnimationDuration;
+
+- (void)configurateWithVerticalCount: (NSInteger)verticalCount horizontalCount: (NSInteger)horizontalCount interval: (NSTimeInterval)interval duration: (NSTimeInterval)duration;
+
+- (void)reverseWithComplete: (void(^)(void))complete;
+- (void)animateFadeWithComplete: (void(^)(void))complete;
+- (void)reverseWithoutAnimate;
+
+@end
+</code></pre></div></div>
+<p>In iOS, properties declared in a <code class="language-plaintext highlighter-rouge">category</code> do not automatically receive compiler-provided <code class="language-plaintext highlighter-rouge">getter</code> and <code class="language-plaintext highlighter-rouge">setter</code> methods. We therefore need to implement both methods, and cannot access the variable directly using <code class="language-plaintext highlighter-rouge">下划线+变量名</code>. Import <code class="language-plaintext highlighter-rouge">objc/runtime.h</code> and use the runtime's <code class="language-plaintext highlighter-rouge">objc_associateObject</code> mechanism to add properties to the view dynamically:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (BOOL)isFade
+{
+    return [objc_getAssociatedObject(self, kIsFadeKey) boolValue];
+}    
+// other getAssociatedObject method
+
+- (void)setIsFade: (BOOL)isFade
+{
+    objc_setAssociatedObject(self, kIsFadeKey, @(isFade), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+// other setAssociatedObject method
+</code></pre></div></div>
+<p><br/>
+The fragmentation hide animation also needs a restoring animation:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NSInteger fadeCount = self.verticalCount * self.horizontalCount;
+for (NSInteger idx = fadeCount - 1; idx &gt;= 0; idx--) {
+    UIView * subview = [self.maskView viewWithTag: [self subViewTag: idx]];
+    [UIView animateWithDuration: self.fadeAnimationDuration delay: self.intervalDuration * (fadeCount - 1 - idx) options: UIViewAnimationOptionCurveLinear animations: ^{
+        subview.alpha = 1;
+    } completion: nil];
+}
+</code></pre></div></div>
+<p>There is another issue: suppose tapping an image starts a show or hide animation based on the view's current visibility. On repeated taps, check whether an animation is already running and, if so, do not run the animation code again. Before starting, set the animation-state flag <code class="language-plaintext highlighter-rouge">isFading</code> to YES. But since each square has its own hide animation, how do we determine when everything ends? With <code class="language-plaintext highlighter-rouge">fadeView</code> objects numbering <code class="language-plaintext highlighter-rouge">count</code>, the whole fragmentation animation finishes when the last square disappears, that is, when animation number <code class="language-plaintext highlighter-rouge">count</code> completes. Use a temporary variable to track this:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>__block NSInteger timeCount = 0;
+//......
+[UIView animateWithDuration: self.fadeAnimationDuration delay: self.intervalDuration * (fadeCount - 1 - idx) options: UIViewAnimationOptionCurveLinear animations: ^{
+    subview.alpha = 1;
+} completion: ^(BOOL finished) {
+    if (++timeCount == fadeCount) {
+        self.isFade = NO;
+        self.isFading = NO;
+        if (complete) { complete(); }
+    }
+}];
+//......
+</code></pre></div></div>
+<p>Once we know when the animation ends, add a <code class="language-plaintext highlighter-rouge">block</code> so the caller can perform other work on completion.</p>
+<h2 id="轮播碎片动画">Carousel fragmentation animation<br/></h2>
+<p>With fragmentation understood, I want to make an advertising carousel, again using <code class="language-plaintext highlighter-rouge">category</code> approach. The demo carousel uses only local images. Here is the effect:<br/>
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao45/5.gif"/><br/>
+What steps are needed for an advertising carousel?<br/>
+1. Insert a <code class="language-plaintext highlighter-rouge">UIImageView</code> to display the next image. Reuse this whenever possible: <code class="language-plaintext highlighter-rouge">imageView</code><br/>
+2. Add <code class="language-plaintext highlighter-rouge">UIPageControl</code> as the image index.<br/></p>
+<p>I therefore provide an interface accepting an image array to run the animation:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 获取动态绑定临时展示的UIImageView
+- (UIImageView *)associateTempBannerWithImage: (UIImage *)image
+{
+    UIImageView * tempBanner = objc_getAssociatedObject(self, kTempImageKey);
+    if (!tempBanner) {
+        tempBanner = [[UIImageView alloc] initWithFrame: self.frame];
+        objc_setAssociatedObject(self, kTempImageKey, tempBanner, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [self.superview insertSubview: tempBanner belowSubview: self];
+    }
+    tempBanner.image = image;
+    return tempBanner;
+}
+</code></pre></div></div>
+<p>Initially, I added <code class="language-plaintext highlighter-rouge">pageControl</code> to the animated <code class="language-plaintext highlighter-rouge">imageView</code>, but halfway through, the <code class="language-plaintext highlighter-rouge">pageControl</code> disappeared along with the partial hiding animation. Instead, recalculate an appropriate size and position using the current coordinates of <code class="language-plaintext highlighter-rouge">imageView</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)associatePageControlWithCurrentIdx: (NSInteger)idx
+{
+    UIPageControl * pageControl = objc_getAssociatedObject(self, kPageControlKey);
+    if (!pageControl) {
+        pageControl = [[UIPageControl alloc] initWithFrame: CGRectMake(self.frame.origin.x, CGRectGetHeight(self.frame) - 37 + self.frame.origin.y, CGRectGetWidth(self.frame), 37)];
+        [self.superview addSubview: pageControl];
+        pageControl.numberOfPages = self.bannerImages.count;
+        objc_setAssociatedObject(self, kPageControlKey, pageControl, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    pageControl.currentPage = idx;
+}
+</code></pre></div></div>
+<p>After each fragmentation animation completes, the same animation code needs to run again. Completion is handled by a <code class="language-plaintext highlighter-rouge">block</code>, so we need to nest a call to the same <code class="language-plaintext highlighter-rouge">block</code> within it. First declare the animation code as a <code class="language-plaintext highlighter-rouge">block</code> variable. Also declare an <code class="language-plaintext highlighter-rouge">idx</code> variable to update the image after each fragmentation, using <code class="language-plaintext highlighter-rouge">__block</code> so its value can change in the callback:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)fadeBanner
+    NSParameterAssert(self.superview);
+    UIImageView * tempBanner = [self associateTempBannerWithImage: [UIImage imageNamed: self.bannerImages[1]]];
+    self.stop = NO;
+    __block NSInteger idx = 0;
+    __weak typeof(self) weakSelf = self;
+    [self associatePageControlWithCurrentIdx: idx];
+
+    void (^complete)() = ^{
+        NSInteger updateIndex = [weakSelf updateImageWithCurrentIndex: ++idx tempBanner: tempBanner];
+        idx = updateIndex;
+        [weakSelf associatePageControlWithCurrentIdx: idx];
+    };
+    // 保存block并执行动画
+    objc_setAssociatedObject(self, kCompleteBlockKey, complete, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    [self animateFadeWithComplete: ^{
+        if (!self.stop) {
+            complete();
+        }
+    }];
+}
+
+// 更新展示的图片，并且返回下一次要展示的图片下标
+- (NSInteger)updateImageWithCurrentIndex: (NSInteger)idx tempBanner: (UIImageView *)tempBanner
+{
+    if (idx &gt;= self.bannerImages.count) { idx = 0; }
+    self.image = [UIImage imageNamed: self.bannerImages[idx]];
+    [self reverseWithoutAnimate];
+    NSInteger nextIdx = idx + 1;
+    if (nextIdx &gt;= self.bannerImages.count) { nextIdx = 0; }
+    tempBanner.image = [UIImage imageNamed: self.bannerImages[nextIdx]];
+    [self animateFadeWithComplete: ^{
+        if (!self.stop) {
+            void (^complete)() = objc_getAssociatedObject(self, kCompleteBlockKey);
+            complete();
+        }
+    }];
+    return idx;
+}
+</code></pre></div></div>
+<p>Note that I used <code class="language-plaintext highlighter-rouge">objc_Associate</code> above to retain the completion <code class="language-plaintext highlighter-rouge">block</code>, which is necessary. Even if you prefer not to encapsulate the image-update code and instead put it directly in the <code class="language-plaintext highlighter-rouge">complete</code> declaration above, it must still be stored dynamically. Otherwise, the <code class="language-plaintext highlighter-rouge">block</code> is released during the third image fragmentation, causing a crash.</p>
+<p>Remember to restore all mask subviews after each image transition and update the displayed image.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)reverseWithoutAnimate
+{
+    if (self.isFading) {
+        NSLog(@"It's animating!");
+        return;
+    }
+    for (UIView * subview in self.maskView.subviews) {
+        subview.alpha = 1;
+    }
+}
+</code></pre></div></div>
+<p><br/></p>
+<h2 id="最后">Finally<br/></h2>
+<p>Time for a closing digression. I have been practising for the road test and feel rather talented—another experienced driver in the making! Unfortunately, time off to practise has also cost me money. /(ㄒoㄒ)/~~<br/></p>
+<p>More than four months since the series began—time has flown. Starting next time, we will officially enter <code class="language-plaintext highlighter-rouge">CoreAnimation</code> phase. This is an exceptionally powerful animation framework; even the impressive <code class="language-plaintext highlighter-rouge">maskView</code> is actually based on the layer’s <code class="language-plaintext highlighter-rouge">mask</code> property. Finally, here is the demo: <a href="https://github.com/JustKeepRunning/Animations">LXDMaskViewAnimation</a><br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-04-29-rich-text-with-hyperlinks-on-ios/">Rich text with hyperlinks on iOS</a><br/></p>
+
+{% endraw %}

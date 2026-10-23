@@ -1,0 +1,235 @@
+---
+layout: post
+title: DNS Hijacking and Request Handling in iOS
+description: Introduces DNS hijacking through unexpected name-resolution results, then describes using NSURLProtocol
+  to adjust requests and resolution. It discusses compatibility boundaries involving IPv6, WebKit, and NSURLSession
+  and retains the implementation examples and references.
+category: Development notes
+imagefeature: null
+date: 2017-05-03 00:00:00 +0800
+technical_translation:
+  topic: data-network
+  summary: Introduces DNS hijacking through unexpected name-resolution results, then describes using NSURLProtocol
+    to adjust requests and resolution. It discusses compatibility boundaries involving IPv6, WebKit, and NSURLSession
+    and retains the implementation examples and references.
+  keywords:
+  - DNS
+  - NSURLProtocol
+  - IPv6
+  - WebKit
+  - NSURLSession
+  provenance: contribution
+  author_name: SindriLin
+  source_url: http://sindrilin.com/apm/2017/03/31/DNS劫持
+  credit: Originally credited to SindriLin; edited and archived by Bison.
+  version_note: Published in 2017, the request-interception and resolution approaches should be read in light of
+    the framework limitations of that period.
+  title: DNS Hijacking and Request Handling in iOS
+  source_sha256: d5f640dab9687d55fae1c1489359f15d7728b1bba332c02a60203314f1e808f8
+lang: en
+source_path: _posts/2017-05-03-tougao75.md
+source_url: /%E6%8A%95%E7%A8%BF/tougao75
+permalink: /en/journal/2017-05-03-dns-hijacking-and-request-handling-in-ios/
+translation_method: machine-assisted
+translation_source_sha256: d5f640dab9687d55fae1c1489359f15d7728b1bba332c02a60203314f1e808f8
+excerpt: Introduces DNS hijacking through unexpected name-resolution results, then describes using NSURLProtocol
+  to adjust requests and resolution. It discusses compatibility boundaries involving IPv6, WebKit, and NSURLSession
+  and retains the implementation examples and references.
+translation_date: '2026-10-23T02:34:16+00:00'
+---
+{% raw %}
+<h2 id="前言">Introduction</h2>
+<p>DNS hijacking, <code class="language-plaintext highlighter-rouge">DNS劫持</code>, intercepts name-resolution requests within the controlled network, examines the requested domain, and allows requests outside its inspection scope. For the rest, it returns a false IP address or does nothing, leaving the request unanswered.</p>
+<p>Editor: <a href="/en/">Bison</a><br/></p>
+<p>Source: <a href="http://sindrilin.com/apm/2017/03/31/DNS劫持">SindriLin's Nest</a><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao75/1.jpg"/><br/></p>
+<p>A common sign of DNS hijacking, <code class="language-plaintext highlighter-rouge">DNS劫持</code>, is tapping a video and unexpectedly reaching an advertising site. Normally, tapping a link sends a request to a <code class="language-plaintext highlighter-rouge">DNS服务器</code>, or DNS server, to convert the link into a machine-readable <code class="language-plaintext highlighter-rouge">ip</code> address. The process is:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao75/2.jpg"/><br/></p>
+<p>Converting a domain to an <code class="language-plaintext highlighter-rouge">ip</code> address is called DNS resolution, <code class="language-plaintext highlighter-rouge">DNS解析</code>. Because <code class="language-plaintext highlighter-rouge">DNS</code> request packets are plaintext, they may be observed in transit. An attacker can impersonate a <code class="language-plaintext highlighter-rouge">DNS</code> server and return a false <code class="language-plaintext highlighter-rouge">ip</code> address, sending the host to a fake server.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao75/3.jpg"/><br/></p>
+<h2 id="nsurlprotocol">NSURLProtocol</h2>
+<p><code class="language-plaintext highlighter-rouge">NSURLProtocol</code> is one of Apple's powerful low-level tools for developers. It can intercept and alter most network requests to change URL-loading behavior, letting us adjust request details without changing networking business code. As an abstract class, <code class="language-plaintext highlighter-rouge">NSURLProtocol</code> must be subclassed to implement this interception.</p>
+<ul>
+<li>
+<p>Determine whether to handle the request. Webpages may contain dynamic links, so simply returning <code class="language-plaintext highlighter-rouge">YES</code> can create many <code class="language-plaintext highlighter-rouge">NSURLProtocol</code> objects. Ensure that each request receives <code class="language-plaintext highlighter-rouge">YES</code> only once.</p>
+<ul>
+<li>(BOOL)canInitWithRequest: (NSURLRequest *)request;</li>
+<li>(BOOL)canInitWithTask: (NSURLSessionTask *)task;</li>
+</ul>
+</li>
+<li>
+<p>Determine whether to redirect or change important details such as headers or domain. Return a new <code class="language-plaintext highlighter-rouge">NSURLRequest</code> to customize the behavior.</p>
+<ul>
+<li>(NSURLRequest *)canonicalRequestForRequest: (NSURLRequest *)request;</li>
+</ul>
+</li>
+<li>
+<p>If request handling returns <code class="language-plaintext highlighter-rouge">YES</code>, the following callbacks correspond to the request's start and end. This is where we can mark it as already handled.</p>
+<ul>
+<li>(void)startLoading;</li>
+<li>(void)stopLoading;</li>
+</ul>
+</li>
+</ul>
+<p>When a network request starts, the system consults registered <code class="language-plaintext highlighter-rouge">NSURLProtocol</code> classes to decide whether to handle or alter it. Register your subclass with this code:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[NSURLProtocol registerClass: [CustomURLProtocol class]];
+</code></pre></div></div>
+<h2 id="dns解析">DNS resolution</h2>
+<p>We usually consider <code class="language-plaintext highlighter-rouge">DNS劫持</code>, or DNS hijacking, when using a <code class="language-plaintext highlighter-rouge">webView</code>. Compared with webpages, ordinary requests may simply return wrong data or a <code class="language-plaintext highlighter-rouge">404</code> if hijacked, and they have other defensive options. This article therefore focuses on hijacked webpage loading.</p>
+<h5 id="localdns">LocalDNS</h5>
+<p><code class="language-plaintext highlighter-rouge">LocalDNS</code> is a common anti-hijacking approach. In brief, obtain the requested domain, resolve it locally to an <code class="language-plaintext highlighter-rouge">ip</code>, and return a request that accesses the page's <code class="language-plaintext highlighter-rouge">ip</code> address directly. Address information is represented by <code class="language-plaintext highlighter-rouge">struct hostent</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct hostent {
+    char *h_name;                     // official name of host
+    char **h_aliases;                 // alias list
+    int h_addrtype;                   // host address type——AF_INET || AF_INET6
+    int h_length;                     // length of address
+    char **h_addr_list;               // list of addresses
+};
+</code></pre></div></div>
+<p>The C function <code class="language-plaintext highlighter-rouge">gethostbyname</code> recursively resolves a supplied domain into a <code class="language-plaintext highlighter-rouge">struct hostent</code>. This has a drawback: recursive lookup often times out, yet <code class="language-plaintext highlighter-rouge">gethostbyname</code> has no timeout handling itself. Run it on an operation queue and use a semaphore to wait <code class="language-plaintext highlighter-rouge">1.5</code> seconds for the lookup:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (struct hostent *)getHostByName: (const char *)hostName {
+    __block struct hostent * phost = NULL;
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    NSOperationQueue * queue = [NSOperationQueue new];
+    queue.maxConcurrentOperationCount = 1;
+    [queue addOperationWithBlock: ^{
+        phost = gethostbyname(hostName);
+        dispatch_semaphore_signal(semaphore);
+    }];
+    dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC));
+    [queue cancelAllOperations];
+    return phost;
+}
+</code></pre></div></div>
+<p>Then use <code class="language-plaintext highlighter-rouge">inet_ntop</code> to convert the structure's address information into a C string. Expose <code class="language-plaintext highlighter-rouge">getIpAddressFromHostName</code> to hide the details of handling <code class="language-plaintext highlighter-rouge">ipv4</code> and <code class="language-plaintext highlighter-rouge">ipv6</code> addresses:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (NSString *)getIpv4AddressFromHost: (NSString *)host {
+    const char * hostName = host.UTF8String;
+    struct hostent * phost = [self getHostByName: hostName];
+    if ( phost == NULL ) { return nil; }
+
+    struct in_addr ip_addr;
+    memcpy(&amp;ip_addr, phost-&gt;h_addr_list[0], 4);
+
+    char ip[20] = { 0 };
+    inet_ntop(AF_INET, &amp;ip_addr, ip, sizeof(ip));
+    return [NSString stringWithUTF8String: ip];
+}
+
++ (NSString *)getIpv6AddressFromHost: (NSString *)host {
+    const char * hostName = host.UTF8String;
+    struct hostent * phost = [self getHostByName: hostName];
+    if ( phost == NULL ) { return nil; }
+
+    char ip[32] = { 0 };
+    char ** aliases;
+    switch (phost-&gt;h_addrtype) {
+        case AF_INET:
+        case AF_INET6: {
+            for (aliases = phost-&gt;h_addr_list; *aliases != NULL; aliases++) {
+                NSString * ipAddress = [NSString stringWithUTF8String: inet_ntop(phost-&gt;h_addrtype, *aliases, ip, sizeof(ip))];
+                    if (ipAddress) { return ipAddress; }
+            }
+        } break;
+        
+        default:
+            break;
+    }
+    return nil;
+}
+  
++ (NSString *)getIpAddressFromHostName: (NSString *)host {
+    NSString * ipAddress = [self getIpv4AddressFromHost: host];
+    if (ipAddress == nil) {
+        ipAddress = [self getIpv6AddressFromHost: host];
+    }
+    return ipAddress;
+}
+</code></pre></div></div>
+<h2 id="适配ipv6">Supporting IPv6</h2>
+<p>Apple explicitly requires current apps to support <code class="language-plaintext highlighter-rouge">IPv6</code> addresses. For developers, this is not a large change: replace <code class="language-plaintext highlighter-rouge">gethostbyname</code> with another function:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>phost = gethostbyname2(host, AF_INET6);
+</code></pre></div></div>
+<p>Also, prefer <code class="language-plaintext highlighter-rouge">IPv6</code> addresses over <code class="language-plaintext highlighter-rouge">IPv4</code> during resolution:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (NSString *)getIpAddressFromHostName: (NSString *)host {
+    NSString * ipAddress = [self getIpv6AddressFromHost: host];
+    if (ipAddress == nil) {
+        ipAddress = [self getIpv4AddressFromHost: host];
+    }
+    return ipAddress;
+}
+</code></pre></div></div>
+<h2 id="扩展">extension</h2>
+<p>Direct resolution through <code class="language-plaintext highlighter-rouge">localDNS</code> may produce an <code class="language-plaintext highlighter-rouge">ip</code> address that is not optimal. Another approach downloads a <code class="language-plaintext highlighter-rouge">DNS</code> mapping list from the server after each app launch and uses its <code class="language-plaintext highlighter-rouge">ip</code> addresses directly. This is more efficient than recursive lookup. Take care to prevent a man-in-the-middle from altering the mapping list while it is downloaded.</p>
+<p>Since a request address may be invalid, keep an <code class="language-plaintext highlighter-rouge">ip</code>-to-<code class="language-plaintext highlighter-rouge">host</code> mapping so a failed address can fall back to the original domain. Once an <code class="language-plaintext highlighter-rouge">ip</code> is confirmed invalid, maintain an invalid-address table to decide whether to use it after future resolution. The overall process is approximately:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao75/4.jpg"/><br/></p>
+<p>If your app also lacks a server-provided <code class="language-plaintext highlighter-rouge">DNS</code> resolution-list service, directly use <code class="language-plaintext highlighter-rouge">Local DNS</code> resolution may produce an invalid <code class="language-plaintext highlighter-rouge">ip</code> invalid-address issue. Currently, the code above handles it by checking whether <code class="language-plaintext highlighter-rouge">ip</code> is invalid, invoke a callback to make <code class="language-plaintext highlighter-rouge">webView</code> reload. Another approach is to store a local table of required domains and resolve them asynchronously after startup. Refer to <a href="http://nszzy.me/2016/09/07/dns-resolving/">Handling DNS Resolution Failure, with IPv6 Support </a>to prepare for failed resolutions in advance.</p>
+<h2 id="webkit">WebKit</h2>
+<p><code class="language-plaintext highlighter-rouge">WKWebView</code> is Apple's <code class="language-plaintext highlighter-rouge">UIWebView</code> replacement. However, the former is not yet good enough to eliminate widespread use of the latter. Also, using <code class="language-plaintext highlighter-rouge">NSURLProtocol</code> to protect against <code class="language-plaintext highlighter-rouge">DNS劫持</code> functionality, when invoking <code class="language-plaintext highlighter-rouge">canInitWithRequest:</code> there was no further progress. Research showed that implementing <code class="language-plaintext highlighter-rouge">WebKit</code> request interception requires calling some private methods, <a href="https://blog.yeatse.com/2016/10/26/support-nsurlprotocol-in-wkwebview/">Adding NSURLProtocol Support to WKWebView </a>article already handles this well. Building on it, I added another layer to protocol registration, since Apple can be unforgiving with its surprises:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>static inline NSString * lxd_scheme_selector_suffix() {
+    return @"SchemeForCustomProtocol:";
+}
+
+static inline SEL lxd_register_scheme_selector() {
+    const NSString * const registerPrefix = @"register";
+    return NSSelectorFromString([registerPrefix stringByAppendingString: lxd_scheme_selector_suffix()]);
+}
+
+static inline SEL lxd_unregister_scheme_selector() {
+    const NSString * const unregisterPrefix = @"unregister";
+    return NSSelectorFromString([unregisterPrefix stringByAppendingString: lxd_scheme_selector_suffix()]);
+}
+</code></pre></div></div>
+<h2 id="nsurlsession">NSURLSession</h2>
+<p>After <code class="language-plaintext highlighter-rouge">AFNetworking</code> switched to <code class="language-plaintext highlighter-rouge">NSURLSession</code>, conventional <code class="language-plaintext highlighter-rouge">NSURLProtocol</code> interception no longer worked. Enable support for the intercepting class in <code class="language-plaintext highlighter-rouge">NSURLSessionConfiguration</code> to continue intercepting:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NSURLSessionConfiguration * configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+configuration.protocolClasses = @[LXDDNSInterceptor class];
+</code></pre></div></div>
+<p>Both <code class="language-plaintext highlighter-rouge">AFNetworking</code> and <code class="language-plaintext highlighter-rouge">SDWebImage</code> initialize sessions with the default <code class="language-plaintext highlighter-rouge">defaultSessionConfiguration</code>, so a <code class="language-plaintext highlighter-rouge">hook</code> of that method can adapt interception:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (NSURLSessionConfiguration *)lxd_defaultSessionConfiguration {
+    NSURLSessionConfiguration * configuration = [self lxd_defaultSessionConfiguration];
+    configuration.protocolClasses = @[LXDDNSInterceptor class];
+    return configuration;
+}
+</code></pre></div></div>
+<p>However, code may use the shorter <code class="language-plaintext highlighter-rouge">[NSURLSessionConfiguration new]</code> construction form. A <code class="language-plaintext highlighter-rouge">hook</code> of the previous method therefore cannot guarantee interception. I shifted the <code class="language-plaintext highlighter-rouge">hook</code> target to <code class="language-plaintext highlighter-rouge">NSURLSession</code> and found a class factory method that creates instances:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (NSURLSession *)sessionWithConfiguration: (NSURLSessionConfiguration *)configuration delegate: (id&lt;NSURLSessionDelegate&gt;)delegate delegateQueue: (NSOperationQueue *)queue;
+</code></pre></div></div>
+<p>5. <code class="language-plaintext highlighter-rouge">hook</code> this class method. But after outputting the method list with <code class="language-plaintext highlighter-rouge">class_getClassMethod</code>, I found that the class method was absent; an <code class="language-plaintext highlighter-rouge">init</code> constructor appeared instead:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao75/5.jpg"/><br/></p>
+<p>I wonder whether Apple deliberately made this misleading for developers. (<em>Apple: I make the rules</em>.) Code completion did not expose this function directly either, so I used <code class="language-plaintext highlighter-rouge">category</code> to expose the method name, and <code class="language-plaintext highlighter-rouge">hook</code> removed:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// h文件
+@interface NSURLSession (LXDIntercept)
+
+- (instancetype)initWithConfiguration: (NSURLSessionConfiguration *)configuration delegate: (id&lt;NSURLSessionDelegate&gt;)delegate delegateQueue: (NSOperationQueue *)queue;
+
+@end
+
+/// m文件
+@implementation NSURLSession (LXDIntercept)
+
++ (void)load {
+    Method origin = class_getClassMethod([NSURLSession class], @selector(initWithConfiguration:delegate:delegateQueue:));
+    Method custom = class_getClassMethod([NSURLSession class], @selector(lxd_initWithConfiguration:delegate:delegateQueue:));
+    method_exchangeImplementations(origin, custom);
+}
+
+- (NSURLSession *)lxd_initWithConfiguration: (NSURLSessionConfiguration *)configuration delegate: (id&lt;NSURLSessionDelegate&gt;)delegate delegateQueue: (NSOperationQueue *)queue {
+    if (lxd_url_session_configure) {
+        lxd_url_session_configure(configuration);
+    }
+    return [self lxd_initWithConfiguration: configuration delegate: delegate delegateQueue: queue];
+}
+
+@end
+</code></pre></div></div>
+<p>We can now happily use network interception in the project again.</p>
+<p>Article demo: <a href="https://github.com/JustKeepRunning/LXDAppMonitor">LXDAppMonitor</a></p>
+<h2 id="参考资料">References</h2>
+<p><a href="http://nshipster.cn/nsurlprotocol/">NSURLProtocol</a>
+<a href="https://segmentfault.com/a/1190000004369289">Optimizing iOS Network Requests with DNS Mapping</a>
+<a href="http://blog.csdn.net/kaitiren/article/details/51503269">Supporting IPV6 in an iOS App: The Essentials</a>
+<a href="https://blog.yeatse.com/2016/10/26/support-nsurlprotocol-in-wkwebview/">Adding NSURLProtocol Support to WKWebView</a></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

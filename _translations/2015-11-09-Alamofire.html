@@ -1,0 +1,129 @@
+---
+layout: post
+title: Using Alamofire with Swift 2.0
+description: Shows how to import Alamofire manually, configure project dependencies and make network requests in
+  a Swift 2.0 environment. Screenshots identify the project-linking settings, preserving an early framework integration
+  and usage workflow.
+category: Development notes
+imagefeature: BG.jpg
+date: 2015-11-09 00:00:00 +0800
+technical_translation:
+  topic: data-network
+  summary: Shows how to import Alamofire manually, configure project dependencies and make network requests in a
+    Swift 2.0 environment. Screenshots identify the project-linking settings, preserving an early framework integration
+    and usage workflow.
+  keywords:
+  - Swift 2.0
+  - Alamofire
+  - network requests
+  - framework integration
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Targets Swift 2.0 and the Alamofire APIs available at the time.
+  title: Using Alamofire with Swift 2.0
+  source_sha256: 316ba4ac245cf09ac10d8c6eaea3ee95a0c5e67d95f44ab50e267eb95ce6bece
+technical_update_translation:
+  updated: '2026-10-23'
+  note: This article uses Alamofire APIs from the Swift 2.0 era. It remains useful for examining how requests, parameters
+    and response handling are organised. When adding the library to a new project, check the system, Swift and installation
+    requirements for the specific release in the official repository, and use examples for that release. The old
+    syntax in this article has not been migrated or recompiled.
+  references:
+  - title: Alamofire official repository and documentation
+    url: https://github.com/Alamofire/Alamofire
+lang: en
+source_path: _posts/2015-11-09-Alamofire.md
+source_url: /swift/Alamofire
+permalink: /en/journal/2015-11-09-using-alamofire-with-swift-2-0/
+translation_method: machine-assisted
+translation_source_sha256: 316ba4ac245cf09ac10d8c6eaea3ee95a0c5e67d95f44ab50e267eb95ce6bece
+excerpt: Shows how to import Alamofire manually, configure project dependencies and make network requests in a Swift
+  2.0 environment. Screenshots identify the project-linking settings, preserving an early framework integration
+  and usage workflow.
+translation_date: '2026-10-23T02:44:59+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"iOS technical sharing, iOS development, iOS development tips, iOS development blog"
+<small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p><br/></p>
+<h2 id="第一部分配置项目">Part 1: configure the project</h2>
+<p>Here I only describe adding third-party frameworks manually.<code class="language-plaintext highlighter-rouge">Pods</code> can look it up on Baidu. If you do not understand <code class="language-plaintext highlighter-rouge">Pods</code> can click the link.
+<a href="/en/journal/2015-05-20-installing-and-using-cocoapods-for-ios-development/">Link</a>
+First, create a project as shown below.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/Alamofire/1.png"/><br/></p>
+<p>Then put all extracted <code class="language-plaintext highlighter-rouge">Alamofire</code> files into the project folder you created, as shown below.</p>
+<p><img alt="2" src="/images/blog/Alamofire/2.png"/><br/></p>
+<p>This is the crucial moment: concentrate and pay attention!</p>
+<p><img alt="3" src="/images/blog/Alamofire/3.png"/><br/></p>
+<p>After this screen comes the most important step. Watch the red boxes carefully and do not choose the wrong option!</p>
+<p><img alt="4" src="/images/blog/Alamofire/4.jpg"/><br/></p>
+<p>Next, add the <code class="language-plaintext highlighter-rouge">Alamofire</code> static library to the project, as shown below.</p>
+<p><img alt="5" src="/images/blog/Alamofire/5.png"/><br/></p>
+<p>Then import the <code class="language-plaintext highlighter-rouge">Alamofire</code> header and run the project. If there are no errors, the imported files and project configuration are correct.</p>
+<h4 id="ps">PS</h4>
+<p>A small tip from Bison: many third-party frameworks can be imported in a similar way, such as <code class="language-plaintext highlighter-rouge">HanekeSwift</code>.</p>
+<h2 id="第二部分bison教你怎么使用alamofire">Part two: Bison shows you how to use <code class="language-plaintext highlighter-rouge">Alamofire</code>.</h2>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">import</span> <span class="nt">UIKit</span>
+
+<span class="nt">import</span> <span class="nt">Alamofire</span>
+
+<span class="nt">class</span> <span class="nt">ViewController</span><span class="o">:</span> <span class="nt">UIViewController</span> <span class="p">{</span>
+
+    <span class="err">let</span> <span class="err">BaiduURL</span> <span class="err">=</span> <span class="err">"</span><span class="py">http</span><span class="p">://</span><span class="n">apis</span><span class="p">.</span><span class="n">haoservice</span><span class="p">.</span><span class="n">com</span><span class="p">/</span><span class="n">lifeservice</span><span class="p">/</span><span class="n">cook</span><span class="p">/</span><span class="n">query</span><span class="err">?</span><span class="s1">"
+
+override func viewDidLoad() {
+    super.viewDidLoad()
+    //网络请求
+    self .reloadData()
+}
+
+func reloadData(){
+
+
+    let parameters = [
+    "</span><span class="n">menu</span><span class="s1">": "</span><span class="n">土豆</span><span class="s1">",
+    "</span><span class="n">pn</span><span class="s1">":  1,
+    "</span><span class="n">rn</span><span class="s1">": "</span><span class="m">10</span><span class="s1">",
+    "</span><span class="n">key</span><span class="s1">": "</span><span class="m">2</span><span class="n">ba215a3f83b4b898d0f6fdca4e16c7c</span><span class="s1">",
+    ]
+
+
+    Alamofire.request(.POST, BaiduURL, parameters:parameters ).responseJSON {response in
+
+    //            debugPrint(response)
+    switch response.result {
+        case .Success:
+            //把得到的JSON数据转为字典
+            if let j = response.result.value as? NSDictionary{
+                //获取字典里面的key为数组
+                let Items = j.valueForKey("</span><span class="n">result</span><span class="err">"</span><span class="p">)</span><span class="n">as</span><span class="err">!</span> <span class="n">NSArray</span>
+            <span class="p">//</span><span class="n">便利数组得到每一个字典模型</span>
+            <span class="n">for</span> <span class="n">dict</span> <span class="n">in</span> <span class="n">Items</span><span class="err">{</span>
+
+                <span class="n">print</span><span class="p">(</span><span class="n">dict</span><span class="p">)</span>
+            <span class="p">}</span>
+
+        <span class="err">}</span>
+        <span class="nt">case</span> <span class="nc">.Failure</span><span class="o">(</span><span class="nt">let</span> <span class="nt">error</span><span class="o">):</span>
+
+            <span class="nt">print</span><span class="o">(</span><span class="nt">error</span><span class="o">)</span>
+        <span class="err">}</span>
+
+
+        <span class="err">}</span>
+
+    <span class="err">}</span>
+
+<span class="err">}</span></code></pre></figure>
+<p><br/></p>
+<p>That concludes this tutorial. Leave a comment if you have questions; I will answer when I have time.<br/></p>
+<p>Recommended reading: <a href="http://www.jianshu.com/p/05a3087cd796">An illustrated guide to implementing iOS in-app purchases</a><br/></p>
+<p>Original article: https://allluckly.cn/</p>
+<p><br/>
+Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.</p>
+
+{% endraw %}

@@ -4,7 +4,8 @@ sitemap: false
 ---
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-  {% assign video_works = site.posts | where: 'layout', 'work' %}
+  {% assign all_video_documents = site.posts | concat: site.translations %}
+  {% assign video_works = all_video_documents | where: 'layout', 'work' %}
   {% for entry in video_works %}
     {% unless entry.sitemap == false or entry.noindex or entry.published == false %}
       {% if entry.video.src and entry.video.poster and entry.video.name and entry.video.description and entry.video.upload_date and entry.video.duration %}

@@ -1,0 +1,208 @@
+---
+layout: post
+title: RunLoop and Keeping iOS Threads Alive
+description: Uses the networking thread in AFNetworking 2.x to examine RunLoop-based thread lifetimes. It explains
+  how copied run-loop code can retain objects or prevent threads from exiting, then explores more controlled lifecycle
+  handling through examples.
+category: Development notes
+imagefeature: null
+date: 2016-07-26 00:00:00 +0800
+technical_translation:
+  topic: concurrency-performance
+  summary: Uses the networking thread in AFNetworking 2.x to examine RunLoop-based thread lifetimes. It explains
+    how copied run-loop code can retain objects or prevent threads from exiting, then explores more controlled lifecycle
+    handling through examples.
+  keywords:
+  - RunLoop
+  - NSThread
+  - AFNetworking
+  - thread lifetime
+  - memory leaks
+  provenance: contribution
+  author_name: bestswifter
+  source_url: http://www.jianshu.com/p/10121d699c32
+  credit: Originally credited to bestswifter; edited and archived by Bison.
+  version_note: The article specifically examines the NSURLConnection networking thread implementation in AFNetworking
+    2.x.
+  title: RunLoop and Keeping iOS Threads Alive
+  source_sha256: 1f26197603478533ff3b9ab50d427a4138201dd0f52f97cc80ad5f4d2e4057e0
+lang: en
+source_path: _posts/2016-07-26-tuogao55.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao55
+permalink: /en/journal/2016-07-26-runloop-and-keeping-ios-threads-alive/
+translation_method: machine-assisted
+translation_source_sha256: 1f26197603478533ff3b9ab50d427a4138201dd0f52f97cc80ad5f4d2e4057e0
+excerpt: Uses the networking thread in AFNetworking 2.x to examine RunLoop-based thread lifetimes. It explains how
+  copied run-loop code can retain objects or prevent threads from exiting, then explores more controlled lifecycle
+  handling through examples.
+translation_date: '2026-10-23T02:34:15+00:00'
+---
+{% raw %}
+<p>Articles about runloop and AFNetworking(2.x) often explain keeping a thread alive with a runloop. Without examining the details, however, it is easy to learn an incorrect usage pattern. This article analyzes common misunderstandings.</p>
+<p>I provide a Demo that can be downloaded from my <a href="https://github.com/bestswifter/MySampleCode/tree/master/RunloopAndThread">Github</a> and run it yourself. This article includes only part of the code.</p>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Source: <a href="http://www.jianshu.com/p/10121d699c32">bestswifter</a><br/></p>
+<h2 id="afn-中的实现">AFN's implementation</h2>
+<p>First, we know that <a href="https://github.com/AFNetworking/AFNetworking/tree/2.x">Older versions of AFN</a> uses NSURLConnection to initiate and handle network connections. AFN starts requests and parses responses on the same background thread. Background threads do not start a runloop by default and exit after their code finishes, like a C program. Since network requests are asynchronous, the thread may have exited before the response arrives, leaving delegate methods unable to run. AFN therefore keeps the thread alive with a runloop—the familiar code below:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (void)networkRequestThreadEntryPoint:(id)__unused object {
+    @autoreleasepool {
+        [[NSThread currentThread] setName:@"AFNetworking"];
+
+        NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
+        [runLoop addPort:[NSMachPort port] forMode:NSDefaultRunLoopMode];
+        [runLoop run];
+    }
+}
+</code></pre></div></div>
+<p>This method alone tells us little. Let's examine where it is called in context:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (NSThread *)networkRequestThread {
+    static NSThread *_networkRequestThread = nil;
+    static dispatch_once_t oncePredicate;
+    dispatch_once(&amp;oncePredicate, ^{
+        _networkRequestThread = [[NSThread alloc] initWithTarget:self selector:@selector(networkRequestThreadEntryPoint:) object:nil];
+        [_networkRequestThread start];
+    });
+
+    return _networkRequestThread;
+}
+</code></pre></div></div>
+<p>This suggests that a runloop can keep a background thread alive for asynchronous work. More precisely, however, AFN's implementation does not meet our general requirements; it works in AFN's specific context.</p>
+<p>Read the second code sample and compare it with normal NSThread usage. If you do not see the difference yet, keep it in mind; we will analyze it shortly.</p>
+<h2 id="nsthread-与内存泄漏">NSThread and memory leaks</h2>
+<p>The first problem with this approach is a memory leak. The following example simply puts AFN's thread-creation code inside a loop:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)memoryTest {
+    for (int i = 0; i &lt; 100000; ++i) {
+        NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(run) object:nil];
+        [thread start];
+    }
+}
+
+- (void)run {
+    @autoreleasepool {
+        NSLog(@"current thread = %@", [NSThread currentThread]);
+        NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
+        if (!self.emptyPort) {
+            self.emptyPort = [NSMachPort port];
+        }
+        [runLoop addPort:self.emptyPort forMode:NSDefaultRunLoopMode];
+        [runLoop run];
+    }
+}
+</code></pre></div></div>
+<p>Something strange happens: memory usage keeps growing even under ARC. Removing the runloop-related code from run eliminates the issue. Starting the runloop is therefore causing a memory leak: the thread object cannot be released.</p>
+<blockquote>
+<p>emptyPort keeps the runloop running. According to the documentation, a runloop without any modeItem exits immediately rather than starting. I use a property instead of a temporary variable because each call to [NSMachPort port] appeared to consume memory, for reasons I have not yet determined.</p>
+</blockquote>
+<p>We can try manually stopping the runloop and closing the thread:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)memoryTest {
+    for (int i = 0; i &lt; 100000; ++i) {
+        NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(run) object:nil];
+        [thread start];
+        [self performSelector:@selector(stopThread) onThread:thread withObject:nil waitUntilDone:YES];
+    }
+}
+
+- (void)stopThread {
+    CFRunLoopStop(CFRunLoopGetCurrent());
+    NSThread *thread = [NSThread currentThread];
+    [thread cancel];
+}
+</code></pre></div></div>
+<p>Unfortunately, this still has no effect. It appears we have not stopped the runloop correctly.</p>
+<h2 id="runloop-的启动与退出">Starting and exiting a Runloop</h2>
+<p>Time to test our English. First, the official documentation describes three ways to start a runloop:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Unconditionally
+
+With a set time limit
+
+In a particular mode
+</code></pre></div></div>
+<p>These three entry modes correspond to three methods. The first is the one we currently use:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>run
+runUntilDate
+runMode:beforeDate:
+</code></pre></div></div>
+<p>The documentation explains each mode at length. Here is a brief summary; interested readers can consult the original.</p>
+<p>Entering unconditionally is simplest but least recommended. It puts the thread into an endless loop, making the runloop difficult to control; the only way to end it is to kill it. With a timeout, the runloop ends after handling an event or timing out, and we can choose to start it again. That is better than the first approach. The third approach is preferable because it also lets us specify the runloop mode. The run documentation reveals that it repeatedly calls runMode:beforeDate: indefinitely. runUntilDate: also repeats that call, but stops doing so after its timeout.</p>
+<p>In summary, runMode:beforeDate: represents one runloop invocation; the other two methods invoke it repeatedly.</p>
+<p>Exiting a runloop is simpler than starting it. There are only two approaches:</p>
+<p>1. Set a timeout</p>
+<p>2. Stop manually</p>
+<p>The second and third startup methods let you specify a timeout. However, when using a runloop to keep a thread alive, we want precise control—for example, stopping immediately when work finishes instead of relying on a timeout.</p>
+<p>Fortunately, the documentation says CFRunLoopStop() can stop a runloop manually. Note this statement in its discussion of manual exit:</p>
+<blockquote>
+<p>The difference is that you can use this technique on run loops you started unconditionally.</p>
+</blockquote>
+<p>This explanation is easy to misread. Missing the distinction between exit and terminate can lead to confusion, because the run method's documentation also says:</p>
+<blockquote>
+<p>If you want the run loop to terminate, you shouldn’t use this method</p>
+</blockquote>
+<p>In general, do not use run if you want to return from the runloop. According to the experiments and documentation, the other two startup methods also cannot be stopped manually.</p>
+<h2 id="正确的做法">The correct approach</h2>
+<p>Does starting a runloop on a background thread make the thread impossible to stop and release? That would clearly be unreasonable. After searching, I found an article explaining why CFRunLoopStop() has no effect here:</p>
+<p>CFRunLoopStop() ends only the current runMode:beforeDate: invocation, not later invocations. This explains why the Runloop documentation says it can exit a runloop, while documentation for run and related methods says the runloop cannot terminate this way.</p>
+<p>The article recommends starting with CFRunLoopRun(), allowing CFRunLoopStop() to stop it. The documentation recommends another approach:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>BOOL shouldKeepRunning = YES;        // global
+NSRunLoop *theRL = [NSRunLoop currentRunLoop];
+while (shouldKeepRunning &amp;&amp; [theRL runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]);
+</code></pre></div></div>
+<p>I tried the documented approach, and it avoids the memory leak. However, it is inconvenient for verifying that the runloop starts and then stops. I therefore used the first approach:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)memoryTest {
+    for (int i = 0; i &lt; 100000; ++i) {
+        NSThread *thread = [[NSThread alloc] initWithTarget:self selector:@selector(run) object:nil];
+        [thread start];
+        [self performSelector:@selector(stopThread) onThread:thread withObject:nil waitUntilDone:YES];
+    }
+}
+
+- (void)stopThread {
+    CFRunLoopStop(CFRunLoopGetCurrent());
+    NSThread *thread = [NSThread currentThread];
+    [thread cancel];
+}
+
+- (void)run {
+    @autoreleasepool {
+        NSLog(@"current thread = %@", [NSThread currentThread]);
+        NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
+        if (!self.emptyPort) {
+            self.emptyPort = [NSMachPort port];
+        }
+        [runLoop addPort:self.emptyPort forMode:NSDefaultRunLoopMode];
+        [runLoop runMode:NSRunLoopCommonModes beforeDate:[NSDate distantFuture]];
+    }
+}
+</code></pre></div></div>
+<h2 id="验证">Verification</h2>
+<p>With that approach, the memory leak disappears. But we still need to verify that the runloop actually starts and later stops.</p>
+<p>To verify that the runloop actually starts, I designed the following method:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)printSomething {
+    NSLog(@"current thread = %@", [NSThread currentThread]);
+    [self performSelector:@selector(printSomething) withObject:nil afterDelay:1];
+}
+</code></pre></div></div>
+<p>performSelector:withObject:afterDelay depends on the thread's runloop because a timer schedules its execution there. If the method runs successfully, the current thread's runloop has started; otherwise, it has not.</p>
+<p>To show that a runloop can be stopped, I created a button that executes this method when tapped:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)stopButtonDidClicked:(id)sender {
+    [self performSelector:@selector(stopRunloop) onThread:self.thread withObject:nil waitUntilDone:YES];
+}
+
+- (void)stopRunloop {
+    CFRunLoopStop(CFRunLoopGetCurrent());
+}
+</code></pre></div></div>
+<p>After tapping the button, console logging stops, verifying that the runloop has stopped.</p>
+<h2 id="总结">Summary</h2>
+<p>This investigation is really about keeping a thread alive with a runloop. The main points to understand are:</p>
+<p>1. Understand how a runloop keeps a thread alive, including the empty port added to it.</p>
+<p>2. Understand the thread-object memory leak caused by a runloop.</p>
+<p>3. Understand the runloop startup methods and how they relate.</p>
+<p>4. Understand how runloops are released and why.</p>
+<p>Relevant information is scarce and my understanding is limited. Although I have investigated carefully, I cannot guarantee absolute correctness. Corrections and discussion are welcome.</p>
+<p>Finally, here is a small question based on the AFN analysis at the start: why does AFN's usage avoid this problem?</p>
+<h2 id="参考资料">References</h2>
+<p><a href="https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/Multithreading/RunLoopManagement/RunLoopManagement.html">Official Run Loops documentation</a></p>
+<p><a href="http://www.cocoabuilder.com/archive/cocoa/305204-runloop-not-being-stopped-by-cfrunloopstop.html">Runloop not being …</a></p>
+<p><a href="http://blog.ibireme.com/2015/05/18/runloop/">Understanding RunLoop in depth</a></p>
+
+{% endraw %}

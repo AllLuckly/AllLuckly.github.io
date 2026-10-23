@@ -1,25 +1,27 @@
 ---
 layout: studio
 ---
-{% assign app = site.data.apps | where: 'id', page.app_id | first %}
-{% assign series = site.posts | where: 'layout', 'guide' | where: 'app_id', page.app_id | sort: 'series_order' %}
+{% include language-context.html %}
+{% assign app = ui_app %}
+{% assign series = localized_posts | where: 'layout', 'guide' | where: 'app_id', page.app_id | sort: 'series_order' %}
 {% assign previous_lesson = nil %}{% assign next_lesson = nil %}
 {% for lesson in series %}{% if lesson.url == page.url %}{% assign previous_index = forloop.index0 | minus: 1 %}{% assign next_index = forloop.index0 | plus: 1 %}{% if previous_index >= 0 %}{% assign previous_lesson = series[previous_index] %}{% endif %}{% assign next_lesson = series[next_index] %}{% endif %}{% endfor %}
 <div class="wrap guide-article">
-  <nav class="breadcrumbs" aria-label="面包屑"><a href="{{ '/' | relative_url }}">首页</a><span aria-hidden="true">/</span><a href="{{ '/guides/' | relative_url }}">教程</a><span aria-hidden="true">/</span><a href="{{ app.guide_url | relative_url }}">{{ app.name }}</a><span aria-hidden="true">/</span><span class="breadcrumb-current" aria-current="page" title="{{ page.title | escape }}">{{ page.title }}</span></nav>
+  <nav class="breadcrumbs" aria-label="{% if content_lang == 'en' %}Breadcrumbs{% else %}面包屑{% endif %}"><a href="{{ locale_home | relative_url }}">{% if content_lang == 'en' %}Home{% else %}首页{% endif %}</a><span aria-hidden="true">/</span><a href="{{ locale_prefix | append: '/guides/' | relative_url }}">{% if content_lang == 'en' %}Tutorials{% else %}教程{% endif %}</a><span aria-hidden="true">/</span><a href="{{ app.guide_url | relative_url }}">{{ app.name }}</a><span aria-hidden="true">/</span><span class="breadcrumb-current" aria-current="page" title="{{ page.title | escape }}">{{ page.title | escape }}</span></nav>
   <div class="guide-reading-layout">
     <article class="guide-reading-main">
-      <header class="article-header"><p class="article-topic">{{ page.topic | default: page.level | default: '使用指南' }}</p><h1>{{ page.title }}</h1><p class="article-lede">{{ page.description }}</p><div class="article-meta"><span>Bison</span><time datetime="{{ page.modified | default: page.date | date_to_xmlschema }}">{{ page.modified | default: page.date | date: '%Y-%m-%d' }} 更新</time><span>约 {{ page.reading_time | default: 6 }} 分钟</span></div></header>
-      <div class="prose"><details class="mobile-toc" data-toc hidden><summary>本文目录</summary><ol></ol></details><div data-article-body>{{ content }}</div></div>
-      <footer class="guide-reading-footer"><p class="author-note">Bison 撰写。界面有变化时，可以结合文中的版本说明查看。</p>
-        <nav class="lesson-navigation" aria-label="继续学习">{% if previous_lesson %}<a href="{{ previous_lesson.url | relative_url }}"><small>← 上一篇</small><span>{{ previous_lesson.title }}</span></a>{% endif %}{% if next_lesson %}<a class="next-lesson" href="{{ next_lesson.url | relative_url }}"><small>下一篇 →</small><span>{{ next_lesson.title }}</span></a>{% endif %}</nav>
-        <a class="text-link" href="{{ app.guide_url | relative_url }}">返回 {{ app.name }} 学习路线 <span aria-hidden="true">→</span></a>
+      <header class="article-header"><p class="article-topic">{{ page.topic | default: page.level | escape }}</p><h1>{{ page.title | escape }}</h1><p class="article-lede">{{ page.description | escape }}</p><div class="article-meta"><span>Bison</span><time datetime="{{ page.modified | default: page.date | date_to_xmlschema }}">{{ page.modified | default: page.date | date: '%Y-%m-%d' }} {% if content_lang == 'en' %}updated{% else %}更新{% endif %}</time><span>{% if content_lang == 'en' %}{{ page.reading_time | default: 6 }} min read{% else %}约 {{ page.reading_time | default: 6 }} 分钟{% endif %}</span></div></header>
+      {% include translation-note.html %}
+      <div class="prose"><details class="mobile-toc" data-toc hidden><summary>{% if content_lang == 'en' %}On this page{% else %}本文目录{% endif %}</summary><ol></ol></details><div data-article-body>{{ content }}</div></div>
+      <footer class="guide-reading-footer"><p class="author-note">{% if content_lang == 'en' %}Written by Bison. Check the version notes if your app’s interface differs.{% else %}Bison 撰写。界面有变化时，可以结合文中的版本说明查看。{% endif %}</p>
+        <nav class="lesson-navigation" aria-label="{% if content_lang == 'en' %}Continue learning{% else %}继续学习{% endif %}">{% if previous_lesson %}<a href="{{ previous_lesson.url | relative_url }}"><small>{% if content_lang == 'en' %}← Previous{% else %}← 上一篇{% endif %}</small><span>{{ previous_lesson.title | escape }}</span></a>{% endif %}{% if next_lesson %}<a class="next-lesson" href="{{ next_lesson.url | relative_url }}"><small>{% if content_lang == 'en' %}Next →{% else %}下一篇 →{% endif %}</small><span>{{ next_lesson.title | escape }}</span></a>{% endif %}</nav>
+        <a class="text-link" href="{{ app.guide_url | relative_url }}">{% if content_lang == 'en' %}Back to the {{ app.name | escape }} learning path{% else %}返回 {{ app.name | escape }} 学习路线{% endif %} <span aria-hidden="true">→</span></a>
       </footer>
     </article>
-    <aside class="guide-sidebar" aria-label="教程导航">
-      <a class="guide-context" href="{{ app.guide_url | relative_url }}"><img src="{{ app.icon | relative_url }}" alt="" width="36" height="36"><span><strong>{{ app.name }}</strong><small>学习路线 · 第 {{ page.series_order }} / {{ series.size }} 篇</small></span></a>
-      <nav class="toc" aria-label="本文目录" data-toc hidden><h2>本文目录</h2><ol role="list"></ol></nav>
-      <a class="guide-app-link" href="{{ app.url | relative_url }}">应用介绍与下载 <span aria-hidden="true">↗</span></a>
+    <aside class="guide-sidebar" aria-label="{% if content_lang == 'en' %}Tutorial navigation{% else %}教程导航{% endif %}">
+      <a class="guide-context" href="{{ app.guide_url | relative_url }}"><img src="{{ app.icon | relative_url }}" alt="" width="36" height="36"><span><strong>{{ app.name }}</strong><small>{% if content_lang == 'en' %}Learning path · Lesson {{ page.series_order }} of {{ series.size }}{% else %}学习路线 · 第 {{ page.series_order }} / {{ series.size }} 篇{% endif %}</small></span></a>
+      <nav class="toc" aria-label="{% if content_lang == 'en' %}On this page{% else %}本文目录{% endif %}" data-toc hidden><h2>{% if content_lang == 'en' %}On this page{% else %}本文目录{% endif %}</h2><ol role="list"></ol></nav>
+      <a class="guide-app-link" href="{{ app.url | relative_url }}">{% if content_lang == 'en' %}About the app and download{% else %}应用介绍与下载{% endif %} <span aria-hidden="true">↗</span></a>
     </aside>
   </div>
 </div>

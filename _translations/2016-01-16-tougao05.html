@@ -1,0 +1,190 @@
+---
+layout: post
+title: Inside KVO on iOS
+description: Starts with observing a list's scroll offset, then examines the dynamic subclass and isa-pointer changes
+  caused by registering an observer. Runtime functions are used to attempt a similar mechanism, connecting practical
+  KVO usage with its underlying behaviour.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-01-16 00:00:00 +0800
+technical_translation:
+  topic: swift-runtime
+  summary: Starts with observing a list's scroll offset, then examines the dynamic subclass and isa-pointer changes
+    caused by registering an observer. Runtime functions are used to attempt a similar mechanism, connecting practical
+    KVO usage with its underlying behaviour.
+  keywords:
+  - KVO
+  - isa
+  - dynamic subclasses
+  - Objective-C Runtime
+  - property observation
+  provenance: contribution
+  author_name: SindriLin
+  source_url: http://sindrilin.com/ios-dev/2015/12/12/KVO的奥秘.html
+  credit: Originally credited to SindriLin; edited and archived by Bison.
+  title: Inside KVO on iOS
+  source_sha256: e3db0322fbcf0443b1f211fe73767a8f24c3f49423da4bd11a89571e03ddd5fb
+lang: en
+source_path: _posts/2016-01-16-tougao05.md
+source_url: /%E6%8A%95%E7%A8%BF/tougao05
+permalink: /en/journal/2016-01-16-inside-kvo-on-ios/
+translation_method: machine-assisted
+translation_source_sha256: e3db0322fbcf0443b1f211fe73767a8f24c3f49423da4bd11a89571e03ddd5fb
+excerpt: Starts with observing a list's scroll offset, then examines the dynamic subclass and isa-pointer changes
+  caused by registering an observer. Runtime functions are used to attempt a similar mechanism, connecting practical
+  KVO usage with its underlying behaviour.
+translation_date: '2026-10-23T02:52:06+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://sindrilin.com/ios-dev/2015/12/12/KVO的奥秘.html">SindriLin’s Notes</a><br/></p>
+<blockquote>
+<p>“KVO is simple to use. The object must support kvc, which all NSObject subclasses do. For the gradient navigation-bar example above, we add controller as an observer of tableView. As the list scrolls, its scroll offset is calculated and used to change the navigation bar's background opacity.”</p>
+</blockquote>
+<p>Apple provides many callback mechanisms in iOS. <code class="language-plaintext highlighter-rouge">KVO(key-value-observing)</code> is particularly interesting: once an observer is registered, changes to the observed object cause it to notify the observer so a callback can run. A common use is observing a <code class="language-plaintext highlighter-rouge">scrollView</code>'s <code class="language-plaintext highlighter-rouge">contentOffset</code> property to change controls dynamically during scrolling, enabling effects such as fading navigation bars and pull-to-refresh controls.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao05/1.gif"/><br/></p>
+<h2 id="使用">Use <br/></h2>
+<p>KVO is simple to use. The object must support kvc, which all NSObject subclasses do. For the gradient navigation-bar example above, we add controller as an observer of tableView. As the list scrolls, its scroll offset is calculated and used to change the navigation bar's background opacity.<br/></p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="sr">//</span><span class="err">添加监听者</span>
+<span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="nf">tableView</span> <span class="ss">addObserver: </span><span class="nb">self</span> <span class="ss">forKeyPath: </span><span class="err">@</span><span class="s2">"contentOffset"</span> <span class="ss">options: </span><span class="no">NSKeyValueObservingOptionNew</span> <span class="ss">context: </span><span class="kp">nil</span><span class="p">];</span>
+
+<span class="sr">/**
+*  监听属性值发生改变时回调
+*/</span>
+<span class="o">-</span> <span class="p">(</span><span class="n">void</span><span class="p">)</span><span class="n">observeValueForKeyPath</span><span class="p">:(</span><span class="no">NSString</span> <span class="o">*</span><span class="p">)</span><span class="n">keyPath</span> <span class="n">ofObject</span><span class="p">:(</span><span class="nb">id</span><span class="p">)</span><span class="n">object</span> <span class="n">change</span><span class="p">:(</span><span class="no">NSDictionary</span><span class="o">&lt;</span><span class="no">NSString</span> <span class="o">*</span><span class="p">,</span><span class="nb">id</span><span class="o">&gt;</span> <span class="o">*</span><span class="p">)</span><span class="n">change</span> <span class="n">context</span><span class="p">:(</span><span class="n">void</span> <span class="o">*</span><span class="p">)</span><span class="n">context</span> <span class="p">{</span>
+    <span class="no">CGFloat</span> <span class="n">offset</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="nf">tableView</span><span class="p">.</span><span class="nf">contentOffset</span><span class="p">.</span><span class="nf">y</span><span class="p">;</span>
+    <span class="no">CGFloat</span> <span class="n">delta</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">/</span> <span class="mi">64</span><span class="p">.</span><span class="nf">f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">.</span><span class="nf">f</span><span class="p">;</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="no">MAX</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">delta</span><span class="p">);</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="n">alphaNavController</span><span class="p">].</span><span class="nf">barAlpha</span> <span class="o">=</span> <span class="no">MIN</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">delta</span><span class="p">);</span>
+<span class="p">}</span></code></pre></figure>
+<p>KVO is undoubtedly a convenient callback mechanism, but how does the compiler implement observation? First, look at Apple's documentation describing the KVO implementation.<br/></p>
+<blockquote>
+<p>Automatic key-value observing is implemented using a technique called isa-swizzling… When an observer is registered for an attribute of an object the isa pointer of the observed object is modified, pointing to an intermediate class rather than at the true class ..</p>
+</blockquote>
+<p>Briefly, after observation is registered, the compiler changes the observed object's isa pointer—the tableView above—to point to a newly generated intermediate class. In a sense, this is a deception.<br/></p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">typedef</span> <span class="n">struct</span> <span class="n">objc_class</span> <span class="o">*</span><span class="no">Class</span><span class="p">;</span>
+<span class="n">typedef</span> <span class="n">struct</span> <span class="n">objc_object</span>  <span class="p">{</span>
+    <span class="no">Class</span> <span class="n">isa</span><span class="p">;</span>
+<span class="p">}</span> <span class="o">*</span><span class="nb">id</span><span class="p">;</span></code></pre></figure>
+<p>The isa pointer needs explanation here. isa is a pointer of type Class that points to the class type. We can obtain its value with object_getClass (<em>Normally, the class method obtains this isa pointer, but Apple overrides that method on observed objects in kvo. My earlier description incorrectly said that it pointed to the superclass. Many thanks to <a href="http://www.jianshu.com/users/1498e495a4b1/timeline">夏都 </a>for correcting me.</em>).<br/></p>
+<p>In oc, anything with an isa pointer is considered an object. The objc_object above is the structure representation of NSObject, so oc does not allow objects that are not subclasses of NSObject.<em>(block is a special exception)</em><br/></p>
+<p>Apple does not explain many more implementation details, but we can use runtime mechanisms for some interesting debugging.<br/></p>
+<h2 id="苹果的黑魔法">Apple's black magic<br/></h2>
+<p>According to Apple, registering observation changes certain properties of the observed object and its isa pointer. We can therefore print its properties before and after registration to investigate how kvo works. To obtain the true object type, I used object_getClass, which is what the class method essentially calls. This function is declared in runtime.h.<br/></p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">"address: %p"</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="nf">tableView</span><span class="p">);</span>
+<span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">"class method: %@"</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="nf">tableView</span><span class="p">.</span><span class="nf">class</span><span class="p">);</span>
+<span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">"description method: %@"</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="nf">tableView</span><span class="p">);</span>
+<span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">"use runtime to get class: %@"</span><span class="p">,</span> <span class="n">object_getClass</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="nf">tableView</span><span class="p">));</span>
+<span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="nf">tableView</span> <span class="ss">addObserver: </span><span class="nb">self</span> <span class="ss">forKeyPath: </span><span class="err">@</span><span class="s2">"contentOffset"</span> <span class="ss">options: </span><span class="no">NSKeyValueObservingOptionNew</span> <span class="ss">context: </span><span class="kp">nil</span><span class="p">];</span>
+<span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">"==================================================="</span><span class="p">);</span>
+<span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">"address: %p"</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="nf">tableView</span><span class="p">);</span>
+<span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">"class method: %@"</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="nf">tableView</span><span class="p">.</span><span class="nf">class</span><span class="p">);</span>
+<span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">"description method: %@"</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="nf">tableView</span><span class="p">);</span>
+<span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">"use runtime to get class %@"</span><span class="p">,</span> <span class="n">object_getClass</span><span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="nf">tableView</span><span class="p">));</span></code></pre></figure>
+<p>Before running this code, consider what its output will be.<br/></p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="ss">address: </span><span class="mh">0x7f927a81d200</span>
+<span class="k">class</span> <span class="ss">method: </span><span class="no">UITableView</span>
+<span class="n">description</span> <span class="ss">method: </span><span class="o">&lt;</span><span class="no">UITableView</span><span class="p">:</span> <span class="mh">0x7f927a81d200</span><span class="p">;</span> <span class="n">frame</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span> <span class="mi">0</span><span class="p">;</span> <span class="mi">320</span> <span class="mi">568</span><span class="p">);</span> <span class="n">clipsToBounds</span> <span class="o">=</span> <span class="no">YES</span><span class="p">;</span> <span class="n">autoresize</span> <span class="o">=</span> <span class="no">W</span><span class="o">+</span><span class="no">H</span><span class="p">;</span> <span class="n">gestureRecognizers</span> <span class="o">=</span> <span class="o">&lt;</span><span class="no">NSArray</span><span class="p">:</span> <span class="mh">0x7f927971f9a0</span><span class="o">&gt;</span><span class="p">;</span> <span class="n">layer</span> <span class="o">=</span> <span class="o">&lt;</span><span class="no">CALayer</span><span class="p">:</span> <span class="mh">0x7f9279706f50</span><span class="o">&gt;</span><span class="p">;</span> <span class="ss">contentOffset: </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">};</span> <span class="ss">contentSize: </span><span class="p">{</span><span class="mi">600</span><span class="p">,</span> <span class="mi">0</span><span class="p">}</span><span class="o">&gt;</span>
+<span class="n">use</span> <span class="n">runtime</span> <span class="n">to</span> <span class="n">get</span> <span class="ss">class: </span><span class="no">UITableView</span>
+<span class="o">===================================================</span>
+<span class="ss">address: </span><span class="mh">0x7f927a81d200</span>
+<span class="k">class</span> <span class="ss">method: </span><span class="no">UITableView</span>
+<span class="n">description</span> <span class="ss">method: </span><span class="o">&lt;</span><span class="no">UITableView</span><span class="p">:</span> <span class="mh">0x7f927a81d200</span><span class="p">;</span> <span class="n">frame</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span> <span class="mi">0</span><span class="p">;</span> <span class="mi">320</span> <span class="mi">568</span><span class="p">);</span> <span class="n">clipsToBounds</span> <span class="o">=</span> <span class="no">YES</span><span class="p">;</span> <span class="n">autoresize</span> <span class="o">=</span> <span class="no">W</span><span class="o">+</span><span class="no">H</span><span class="p">;</span> <span class="n">gestureRecognizers</span> <span class="o">=</span> <span class="o">&lt;</span><span class="no">NSArray</span><span class="p">:</span> <span class="mh">0x7f927971f9a0</span><span class="o">&gt;</span><span class="p">;</span> <span class="n">layer</span> <span class="o">=</span> <span class="o">&lt;</span><span class="no">CALayer</span><span class="p">:</span> <span class="mh">0x7f9279706f50</span><span class="o">&gt;</span><span class="p">;</span> <span class="ss">contentOffset: </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">};</span> <span class="ss">contentSize: </span><span class="p">{</span><span class="mi">600</span><span class="p">,</span> <span class="mi">0</span><span class="p">}</span><span class="o">&gt;</span>
+<span class="n">use</span> <span class="n">runtime</span> <span class="n">to</span> <span class="n">get</span> <span class="k">class</span> <span class="nc">NSKVONotifying_UITableView</span></code></pre></figure>
+<p>Apart from the type obtained through object_getClass, none of the output changes. Overriding <code class="language-plaintext highlighter-rouge">class</code> and <code class="language-plaintext highlighter-rouge">description</code> could explain those results, but why is even the address identical?</p>
+<p>A short piece of code illustrates this:<br/></p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">"%@, %@"</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="nf">class</span><span class="p">,</span> <span class="k">super</span><span class="p">.</span><span class="nf">class</span><span class="p">);</span></code></pre></figure>
+<p>No matter how you print the code above, the two results are identical. This is because super essentially points to the superclass's memory. That is a mouthful, but an object-memory diagram can illustrate it:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao05/1.jpg"/><br/></p>
+<p>Part of every object's memory is occupied by its superclass's properties; part of that region belongs to the superclass's own superclass. As stated earlier, the isa pointer points to the superclass. In this diagram, Son therefore begins at Father, and Father at NSObject, leaving all three object addresses identical. This suggests that the intermediate class mentioned in Apple's documentation is a subclass of the observed object's class. To conceal the implementation, Apple also overrides its class and description methods. The new class adds an <code class="language-plaintext highlighter-rouge">NSKVONotifying_</code> prefix to avoid creating observation subclasses repeatedly and save resources.</p>
+<h2 id="怎么实现类似效果">How to achieve a similar effect<br/></h2>
+<p>Now that we understand Apple's approach, we can implement KVO ourselves using runtime mechanisms. The runtime lets us dynamically create classes, extend methods, perform method-swizzling, bind properties, and do other interesting things while the program runs.<br/></p>
+<p>Before creating a new class, follow Apple's approach: check whether it already exists, and create it only if it does not. Reimplement the new class's class method to conceal the implementation. Based on these principles, we use the following method to obtain the new class.<br/></p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="o">-</span> <span class="p">(</span><span class="no">Class</span><span class="p">)</span><span class="ss">createKVOClassWithOriginalClassName: </span><span class="p">(</span><span class="no">NSString</span> <span class="o">*</span><span class="p">)</span><span class="n">className</span> <span class="p">{</span>
+    <span class="no">NSString</span> <span class="o">*</span> <span class="n">kvoClassName</span> <span class="o">=</span> <span class="p">[</span><span class="n">kLXDkvoClassPrefix</span> <span class="ss">stringByAppendingString: </span><span class="n">className</span><span class="p">];</span>
+    <span class="no">Class</span> <span class="n">observedClass</span> <span class="o">=</span> <span class="no">NSClassFromString</span><span class="p">(</span><span class="n">kvoClassName</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">observedClass</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">observedClass</span><span class="p">;</span> <span class="p">}</span>
+
+    <span class="sr">//</span><span class="err">创建新类，并且添加</span><span class="no">LXDObserver_</span><span class="err">为类名新前缀</span>
+    <span class="no">Class</span> <span class="n">originalClass</span> <span class="o">=</span> <span class="n">object_getClass</span><span class="p">(</span><span class="nb">self</span><span class="p">);</span>
+    <span class="no">Class</span> <span class="n">kvoClass</span> <span class="o">=</span> <span class="n">objc_allocateClassPair</span><span class="p">(</span><span class="n">originalClass</span><span class="p">,</span> <span class="n">kvoClassName</span><span class="o">.</span><span class="no">UTF8String</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+
+    <span class="sr">//</span><span class="err">获取监听对象的</span><span class="n">class</span><span class="err">方法实现代码，然后替换新建类的</span><span class="n">class</span><span class="err">实现</span>
+    <span class="no">Method</span> <span class="n">classMethod</span> <span class="o">=</span> <span class="n">class_getInstanceMethod</span><span class="p">(</span><span class="n">originalClass</span><span class="p">,</span> <span class="vi">@selector</span><span class="p">(</span><span class="k">class</span><span class="p">));</span>
+    <span class="n">const</span> <span class="n">char</span> <span class="o">*</span> <span class="n">types</span> <span class="o">=</span> <span class="n">method_getTypeEncoding</span><span class="p">(</span><span class="n">classMethod</span><span class="p">);</span>
+    <span class="n">class_addMethod</span><span class="p">(</span><span class="n">kvoClass</span><span class="p">,</span> <span class="vi">@selector</span><span class="p">(</span><span class="k">class</span><span class="p">),</span> <span class="p">(</span><span class="no">IMP</span><span class="p">)</span><span class="n">kvo_Class</span><span class="p">,</span> <span class="n">types</span><span class="p">);</span>
+    <span class="n">objc_registerClassPair</span><span class="p">(</span><span class="n">kvoClass</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">kvoClass</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+<p>Before deciding whether an intermediate class is needed to register observation, we must also validate the property. Derive its setter name by capitalizing the first letter and adding the set prefix, then look up the setter implementation. If no implementation exists, throw an exception that terminates the program.<br/></p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">SEL</span> <span class="n">setterSelector</span> <span class="o">=</span> <span class="no">NSSelectorFromString</span><span class="p">(</span><span class="n">setterForGetter</span><span class="p">(</span><span class="n">key</span><span class="p">));</span>
+<span class="no">Method</span> <span class="n">setterMethod</span> <span class="o">=</span> <span class="n">class_getInstanceMethod</span><span class="p">([</span><span class="nb">self</span> <span class="k">class</span><span class="p">],</span> <span class="n">setterSelector</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">setterMethod</span><span class="p">)</span> <span class="p">{</span>
+    <span class="vi">@throw</span> <span class="p">[</span><span class="no">NSException</span> <span class="ss">exceptionWithName: </span><span class="no">NSInvalidArgumentException</span> <span class="ss">reason: </span><span class="p">[</span><span class="no">NSString</span> <span class="ss">stringWithFormat: </span><span class="err">@</span><span class="s2">"unrecognized selector sent to instance %p"</span><span class="p">,</span> <span class="nb">self</span><span class="p">]</span> <span class="ss">userInfo: </span><span class="kp">nil</span><span class="p">];</span>
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="no">Class</span> <span class="n">observedClass</span> <span class="o">=</span> <span class="n">object_getClass</span><span class="p">(</span><span class="nb">self</span><span class="p">);</span>
+<span class="no">NSString</span> <span class="o">*</span> <span class="n">className</span> <span class="o">=</span> <span class="no">NSStringFromClass</span><span class="p">(</span><span class="n">observedClass</span><span class="p">);</span>
+
+<span class="sr">//</span><span class="err">如果被监听者没有</span><span class="no">LXDObserver_</span><span class="err">，那么判断是否需要创建新类</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="n">className</span> <span class="ss">hasPrefix: </span><span class="n">kLXDkvoClassPrefix</span><span class="p">])</span> <span class="p">{</span>
+    <span class="n">observedClass</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="ss">createKVOClassWithOriginalClassName: </span><span class="n">className</span><span class="p">];</span>
+    <span class="n">object_setClass</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">observedClass</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="sr">//</span><span class="err">重新实现</span><span class="n">setter</span><span class="err">方法，使其完成</span>
+<span class="n">const</span> <span class="n">char</span> <span class="o">*</span> <span class="n">types</span> <span class="o">=</span> <span class="n">method_getTypeEncoding</span><span class="p">(</span><span class="n">setterMethod</span><span class="p">);</span>
+<span class="n">class_addMethod</span><span class="p">(</span><span class="n">observedClass</span><span class="p">,</span> <span class="n">setterSelector</span><span class="p">,</span> <span class="p">(</span><span class="no">IMP</span><span class="p">)</span><span class="no">KVO_setter</span><span class="p">,</span> <span class="n">types</span><span class="p">);</span></code></pre></figure>
+<p>Two important methods in the overridden setter are <code class="language-plaintext highlighter-rouge">willChangeValueForKey</code> and <code class="language-plaintext highlighter-rouge">didChangeValueForKey</code>, called before and after assignment respectively. It must also iterate through all registered observers and notify them:</p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">static</span> <span class="n">void</span> <span class="no">KVO_setter</span><span class="p">(</span><span class="nb">id</span> <span class="nb">self</span><span class="p">,</span> <span class="no">SEL</span> <span class="n">_cmd</span><span class="p">,</span> <span class="nb">id</span> <span class="n">newValue</span><span class="p">)</span> <span class="p">{</span>
+    <span class="no">NSString</span> <span class="o">*</span> <span class="n">setterName</span> <span class="o">=</span> <span class="no">NSStringFromSelector</span><span class="p">(</span><span class="n">_cmd</span><span class="p">);</span>
+    <span class="no">NSString</span> <span class="o">*</span> <span class="n">getterName</span> <span class="o">=</span> <span class="n">getterForSetter</span><span class="p">(</span><span class="n">setterName</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">getterName</span><span class="p">)</span> <span class="p">{</span>
+        <span class="vi">@throw</span> <span class="p">[</span><span class="no">NSException</span> <span class="ss">exceptionWithName: </span><span class="no">NSInvalidArgumentException</span> <span class="ss">reason: </span><span class="p">[</span><span class="no">NSString</span> <span class="ss">stringWithFormat: </span><span class="err">@</span><span class="s2">"unrecognized selector sent to instance %p"</span><span class="p">,</span> <span class="nb">self</span><span class="p">]</span> <span class="ss">userInfo: </span><span class="kp">nil</span><span class="p">];</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nb">id</span> <span class="n">oldValue</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="ss">valueForKey: </span><span class="n">getterName</span><span class="p">];</span>
+    <span class="n">struct</span> <span class="n">objc_super</span> <span class="n">superClass</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="p">.</span><span class="nf">receiver</span> <span class="o">=</span> <span class="nb">self</span><span class="p">,</span>
+        <span class="p">.</span><span class="nf">super_class</span> <span class="o">=</span> <span class="n">class_getSuperclass</span><span class="p">(</span><span class="n">object_getClass</span><span class="p">(</span><span class="nb">self</span><span class="p">))</span>
+    <span class="p">};</span>
+
+    <span class="p">[</span><span class="nb">self</span> <span class="ss">willChangeValueForKey: </span><span class="n">getterName</span><span class="p">];</span>
+    <span class="n">void</span> <span class="p">(</span><span class="o">*</span><span class="n">objc_msgSendSuperKVO</span><span class="p">)(</span><span class="n">void</span> <span class="o">*</span><span class="p">,</span> <span class="no">SEL</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">void</span> <span class="o">*</span><span class="p">)</span><span class="n">objc_msgSendSuper</span><span class="p">;</span>
+    <span class="n">objc_msgSendSuperKVO</span><span class="p">(</span><span class="o">&amp;</span><span class="n">superClass</span><span class="p">,</span> <span class="n">_cmd</span><span class="p">,</span> <span class="n">newValue</span><span class="p">);</span>
+    <span class="p">[</span><span class="nb">self</span> <span class="ss">didChangeValueForKey: </span><span class="n">getterName</span><span class="p">];</span>
+
+    <span class="sr">//</span><span class="err">获取所有监听回调对象进行回调</span>
+    <span class="no">NSMutableArray</span> <span class="o">*</span> <span class="n">observers</span> <span class="o">=</span> <span class="n">objc_getAssociatedObject</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="p">(</span><span class="n">__bridge</span> <span class="n">const</span> <span class="n">void</span> <span class="o">*</span><span class="p">)</span><span class="n">kLXDkvoAssiociateObserver</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="no">LXD_ObserverInfo</span> <span class="o">*</span> <span class="n">info</span> <span class="k">in</span> <span class="n">observers</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">([</span><span class="n">info</span><span class="p">.</span><span class="nf">key</span> <span class="ss">isEqualToString: </span><span class="n">getterName</span><span class="p">])</span> <span class="p">{</span>        
+            <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_queue_create</span><span class="p">(</span><span class="no">DISPATCH_QUEUE_PRIORITY_DEFAULT</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="o">^</span><span class="p">{</span>
+            <span class="n">info</span><span class="p">.</span><span class="nf">handler</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">getterName</span><span class="p">,</span> <span class="n">oldValue</span><span class="p">,</span> <span class="n">newValue</span><span class="p">);</span> <span class="p">});</span>
+    <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+<p>We store all observers through dynamic association, but this creates strong references, so we also need a way to release them:<br/></p>
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="o">-</span> <span class="p">(</span><span class="n">void</span><span class="p">)</span><span class="no">LXD_removeObserver</span><span class="p">:(</span><span class="no">NSObject</span> <span class="o">*</span><span class="p">)</span><span class="n">object</span> <span class="n">forKey</span><span class="p">:(</span><span class="no">NSString</span> <span class="o">*</span><span class="p">)</span><span class="n">key</span> <span class="p">{</span>
+    <span class="no">NSMutableArray</span> <span class="o">*</span> <span class="n">observers</span> <span class="o">=</span> <span class="n">objc_getAssociatedObject</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="p">(</span><span class="n">__bridge</span> <span class="n">void</span> <span class="o">*</span><span class="p">)</span><span class="n">kLXDkvoAssiociateObserver</span><span class="p">);</span>
+
+    <span class="no">LXD_ObserverInfo</span> <span class="o">*</span> <span class="n">observerRemoved</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="no">LXD_ObserverInfo</span> <span class="o">*</span> <span class="n">observerInfo</span> <span class="k">in</span> <span class="n">observers</span><span class="p">)</span> <span class="p">{</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">observerInfo</span><span class="p">.</span><span class="nf">observer</span> <span class="o">==</span> <span class="n">object</span> <span class="o">&amp;&amp;</span> <span class="p">[</span><span class="n">observerInfo</span><span class="p">.</span><span class="nf">key</span> <span class="ss">isEqualToString: </span><span class="n">key</span><span class="p">])</span> <span class="p">{</span>
+            <span class="n">observerRemoved</span> <span class="o">=</span> <span class="n">observerInfo</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="p">[</span><span class="n">observers</span> <span class="ss">removeObject: </span><span class="n">observerRemoved</span><span class="p">];</span>
+<span class="p">}</span></code></pre></figure>
+<p>Although the code above provides a rough kvo implementation and lets us customize callbacks, it is far from the complete mechanism. target-action or block callbacks offer more options than the single system callback. However, the code currently observes only object types, not primitive types. It also lacks stronger features such as keyPath observation of properties on an object's member objects.</p>
+<h2 id="尾言">Closing notes</h2>
+<p>For observing primitive types, Apple may bridge through <code class="language-plaintext highlighter-rouge">void *</code> and access memory directly. Type encoding lets us determine each setter's specific type. Although more involved, this could produce a similar effect.</p>
+<p>Studying kvo gives us a deeper understanding of Apple's implementation. These topics involve lower-level techniques, and exploring them broadens our development perspective. Compared with other callback mechanisms, however, KVO's subclass creation and method overriding consume considerable memory. I therefore prefer callbacks such as delegate and block. It is even possible to use method-swizzling directly instead of overriding the setter this way.<br/></p>
+<p><em>P.S. Yesterday someone asked why kvo creates an intermediate class instead of simply overriding the setter to invoke callbacks. method_swizzling is an excellent mechanism and can certainly satisfy observation requirements. But what if the observed object is a tableView? An app normally has more than one list, and method_swizzling would add observation callbacks to every list. Even setting aside the possible crash risk, the setters of all tableView-derived views, including tableView itself, would be affected. An intermediate class avoids this problem.</em><br/></p>
+<p>Article code: <a href="https://github.com/JustKeepRunning/LXD_KeyValueObserveDemo">Implementing KVO ourselves</a><br/></p>
+<p><br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-01-04-a-windows-aliwangwang-style-login-screen-with-a-paper-feed-animation/">A Windows AliWangWang-style login screen with a paper-feed animation</a><br/></p>
+
+{% endraw %}

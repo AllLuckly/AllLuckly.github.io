@@ -1,0 +1,172 @@
+---
+layout: post
+title: WeChat Mini Programs from Scratch, Part 3
+description: Connects an article list to a network request, reads the response, updates the page with setData, and
+  adjusts WXML field bindings. It also records the limitations encountered at the time with image URLs and HTML5
+  detail pages.
+category: Development notes
+imagefeature: null
+date: 2016-10-19 00:00:00 +0800
+technical_translation:
+  topic: web-notes
+  summary: Connects an article list to a network request, reads the response, updates the page with setData, and
+    adjusts WXML field bindings. It also records the limitations encountered at the time with image URLs and HTML5
+    detail pages.
+  keywords:
+  - WeChat Mini Programs
+  - wx.request
+  - setData
+  - data binding
+  - network requests
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  version_note: This implementation was recorded during the 2016 closed beta. Its image and HTML5 display issues
+    describe only the author's attempts at that time.
+  author_url: https://allluckly.cn/about/
+  title: WeChat Mini Programs from Scratch, Part 3
+  source_sha256: dc8f7a7134f8aa88ce483ad1b2cdb36cee1d5328f600112a1e4fafa3efef0e7a
+lang: en
+source_path: _posts/2016-10-19-weixinxiaochengxu02.md
+source_url: /%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/weixinxiaochengxu02
+permalink: /en/journal/2016-10-19-wechat-mini-programs-from-scratch-part-3/
+translation_method: machine-assisted
+translation_source_sha256: dc8f7a7134f8aa88ce483ad1b2cdb36cee1d5328f600112a1e4fafa3efef0e7a
+excerpt: Connects an article list to a network request, reads the response, updates the page with setData, and adjusts
+  WXML field bindings. It also records the limitations encountered at the time with image URLs and HTML5 detail
+  pages.
+translation_date: '2026-10-23T02:34:15+00:00'
+---
+{% raw %}
+<p><img alt="1" src="https://allluckly.cn/images/blog/weixinxiaochengxu/20161017/1.png"/><br/></p>
+<p><a href="http://www.jianshu.com/p/ccf40205300f">WeChat Mini Programs from Scratch, Part 1</a></p>
+<p><a href="http://www.jianshu.com/p/bfd8c8d91c7d">WeChat Mini Programs from Scratch, Part 2</a></p>
+<p>The first two chapters built a mini program structure and displayed an article list. This article covers network requests for that list and connecting the returned data.</p>
+<p>First, find index.js, then consult <a href="https://mp.weixin.qq.com/debug/wxadoc/dev/api/network-request.html?t=1476197482156">WeChat mini program network-request documentation </a>The sample code is easy to find:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wx.request({
+  url: 'test.php',
+  data: {
+     x: '' ,
+     y: ''
+  },
+  header: {
+      'Content-Type': 'application/json'
+  },
+  success: function(res) {
+    console.log(res.data)
+  }
+})
+
+</code></pre></div></div>
+<blockquote>
+<p>url is the interface to request.</p>
+</blockquote>
+<blockquote>
+<p>data contains our request parameters.</p>
+</blockquote>
+<blockquote>
+<p>header sets the request headers; Referer cannot be set there.</p>
+</blockquote>
+<blockquote>
+<p>success is the callback invoked after a successful response from the developer's server, with res = {data: ‘content returned by the developer server’}.</p>
+</blockquote>
+<blockquote>
+<p>console.log( res.data ) prints the response data.</p>
+</blockquote>
+<p>The default request method is get. We will use that here. The code is:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>onLoad: function () {
+    console.log('onLoad')
+    var that = this
+    wx.request( {
+      url: 'http://sep9.cn/qt5wix',
+      data: {},
+      header: {
+        'Content-Type': 'application/json'
+      },
+      success: function( res ) {
+        console.log( res.data )
+      }
+    })
+  }
+</code></pre></div></div>
+<p>Run it to check whether the request returns data. The result is shown below:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/weixinxiaochengxu/20161019/1.png"/><br/></p>
+<p>The request succeeded. Simple, right? 😄 Now let us populate the corresponding UI.</p>
+<p>First, add this code in the successful-response handler:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>success: function( res ) {
+        console.log( res.data )
+          that.setData( {
+            
+          })
+      }
+</code></pre></div></div>
+<p>The <code class="language-plaintext highlighter-rouge">that.setData( { })</code> method mainly assigns the data.</p>
+<p>The returned data is <code class="language-plaintext highlighter-rouge">res.data</code>. Printing it shows the same structure as our hard-coded data, but with different field names. Assign the fetched values to the existing data source, then change its fields to match the network response. The final code follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//index.js
+//获取应用实例
+var app = getApp()
+Page({
+  data: {
+    newList:[  
+    ]
+  },
+  //事件处理函数
+  bindViewTap: function() {
+    wx.navigateTo({
+      url: '../logs/logs'
+    })
+  },
+  onLoad: function () {
+    console.log('onLoad')
+    var that = this
+    wx.request( {
+      url: 'http://sep9.cn/qt5wix',
+      data: {},
+      header: {
+        'Content-Type': 'application/json'
+      },
+      success: function( res ) {
+        console.log( res.data )
+          that.setData( {
+            newList: res.data
+          })
+      }
+    })
+  }
+
+})
+</code></pre></div></div>
+<p>Change the field bindings in index.wxml to match the server response, then run it. The result follows:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/weixinxiaochengxu/20161019/2.gif"/><br/></p>
+<p>For some reason, the image URLs returned by this interface do not display in the mini program. To bring the result closer to the intended design, I added some web images locally to the data source:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+data: {
+    newList:[{fistImg:"http://img0.imgtn.bdimg.com/it/u=1640246403,1832676351&amp;fm=21&amp;gp=0.jpg"} ,
+             {fistImg:"http://a.hiphotos.baidu.com/image/pic/item/c8ea15ce36d3d539be4d77b83f87e950352ab05c.jpg"} , 
+             {fistImg:"http://h.hiphotos.baidu.com/image/pic/item/8d5494eef01f3a2922e765c99b25bc315c607c8d.jpg"} ,
+             {fistImg:"http://c.hiphotos.baidu.com/image/pic/item/3b292df5e0fe9925ae23d95736a85edf8db1718d.jpg"} ,
+             {fistImg:"http://g.hiphotos.baidu.com/image/pic/item/faedab64034f78f099a529f47b310a55b3191c0e.jpg"} ,
+             {fistImg:"http://g.hiphotos.baidu.com/image/pic/item/bd315c6034a85edf9ba34e244b540923dd54758d.jpg"} ,
+             {fistImg:"http://f.hiphotos.baidu.com/image/pic/item/00e93901213fb80e0ee553d034d12f2eb9389484.jpg"} ,
+             {fistImg:"http://img1.imgtn.bdimg.com/it/u=2955244448,132069077&amp;fm=21&amp;gp=0.jpg"} ,
+             {fistImg:"http://image.tianjimedia.com/uploadImages/2014/127/32/VP974HZ0AXL2.jpg"} ,
+             {fistImg:"http://img0.imgtn.bdimg.com/it/u=1640246403,1832676351&amp;fm=21&amp;gp=0.jpg"} ,
+             {fistImg:"http://img0.imgtn.bdimg.com/it/u=1640246403,1832676351&amp;fm=21&amp;gp=0.jpg"} ,
+             {fistImg:"http://img0.imgtn.bdimg.com/it/u=1640246403,1832676351&amp;fm=21&amp;gp=0.jpg"} ,
+             {fistImg:"http://img0.imgtn.bdimg.com/it/u=1640246403,1832676351&amp;fm=21&amp;gp=0.jpg"} ,
+             {fistImg:"http://img0.imgtn.bdimg.com/it/u=1640246403,1832676351&amp;fm=21&amp;gp=0.jpg"} ,
+             {fistImg:"http://img0.imgtn.bdimg.com/it/u=1640246403,1832676351&amp;fm=21&amp;gp=0.jpg"} ,
+             {fistImg:"http://img0.imgtn.bdimg.com/it/u=1640246403,1832676351&amp;fm=21&amp;gp=0.jpg"} 
+    ]
+  }
+
+</code></pre></div></div>
+<p>I picked a few images to see how it looks. 😄</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/weixinxiaochengxu/20161019/3.gif"/><br/></p>
+<p>I wanted to build the detail page too, but the interface returns H5 content, and mini programs apparently cannot load H5 directly. If you know how, please leave a comment. I know nothing about H5 myself. 😄</p>
+<p><a href="https://github.com/AllLuckly/IT-Blog_Wechat">Demo download</a></p>
+<p>This article is an original work by <a href="/en/">Bison</a>. Credit the source when reproducing it; otherwise, legal responsibility will be pursued.</p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

@@ -1,0 +1,73 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint mask exercise: keep a pattern inside a circular window'
+description: Use three colour shapes and a circle to practise clipping, masks, stacking and raster boundaries without
+  mistaking a crop for vectorisation.
+permalink: /en/guides/vectorpaint-masks/
+date: 2026-10-22 00:00:00 +0800
+modified: '2026-10-22 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 13
+topic: Paths and design
+reading_time: 7
+lang: en
+source_path: _posts/2026-10-22-vectorpaint-masks.md
+source_url: /guides/vectorpaint-masks/
+translation_method: machine-assisted
+translation_source_sha256: 1a4d9534bb0d0d6fd4c1ec2c97ee58a4c8f22109e28fdd5edb148faedc4a26fa
+excerpt: Use three colour shapes and a circle to practise clipping, masks, stacking and raster boundaries without
+  mistaking a crop for vectorisation.
+translation_date: '2026-10-23T02:34:07+00:00'
+---
+{% raw %}
+<p>Use three colour shapes and a circle to practise clipping, masks, stacking and raster boundaries without mistaking a crop for vectorisation.</p>
+<h2 id="先区分裁剪和删除">Distinguish clipping from deletion first</h2>
+<p>A mask uses a shape to control visible content, useful for stripes, illustrations or images inside an outline. Use three coloured rectangles and a circular window, retaining content copies first. This concerns basic clipping masks, not verified support for every opacity mask or other software’s rules.</p>
+<h2 id="建立超过窗口的内容">Build content larger than the window</h2>
+<p>On a 600×600 px canvas, stack three horizontal rectangles about 400 wide and 100 high. Make content wider than the later circle so clipping is obvious. Verify visible fills and distinct colours first; an already transparent or hidden stripe disappearing does not prove a mask failure.</p>
+<h2 id="把窗口形状放到合适位置">Position the window shape</h2>
+<p>Place a circle about 300 in diameter above the stripes. Check that it covers the wanted area. Masks commonly depend on selection and stacking; a centred circle alone does not make a correct clipping boundary. Temporarily recolour it if needed to identify selection.</p>
+<h2 id="选择适用对象并建立蒙版">Select suitable objects and create the mask</h2>
+<p>Select the window and content and use the available Create Mask action. Stripes should show only inside the circle. If reversed or reduced to one block, undo and inspect selection, stacking and locks. Make the simple case work before complex photos or multilayer groups.</p>
+<h2 id="调整内容与边界时先辨认选区">Identify the selected part before changing content or boundary</h2>
+<p>Moving the result may move both boundary and content; local editing requires the correct target. Whole-result movement does not prove the window cannot be adjusted. Learn the structure through available selection, grouping or release-mask controls, testing copies. Keep important unmasked content because other apps may organise it differently.</p>
+<h2 id="图片放进蒙版仍然是图片">A masked image remains an image</h2>
+<p>Replacing stripes with a photo changes only visibility, not the photo into editable Bézier paths. SVG/PDF may still include raster images. Use separate vectorisation and inspect actual paths; cropping and extensions are not proof. This matters when describing deliverables to clients.</p>
+<h2 id="用遮挡实验分辨蒙版与普通叠放">Use an overlap experiment to distinguish masks from ordinary stacking</h2>
+<p>Before masking, place a solid circle above the stripes: its own colour blocks them. Compare with the mask, where stripes appear within the circle. Both look circular but have different object relationships. Understanding this prevents mistaking ordinary occlusion for successful clipping in complex work.</p>
+<p>For an unwanted coloured rim, check the window’s stroke or another test circle above it. Do not enlarge the mask blindly, exposing content meant to stay hidden. Identify which object contributes the edge, then edit its properties.</p>
+<p>Leave spare content beyond the boundary. Stripes fitting exactly may reveal gaps after a small window move. Extra coverage helps composition and avoids repainting; it does not mean final previews must show hidden regions.</p>
+<h2 id="完成检查与边缘排查">Final checks and edge troubleshooting</h2>
+<p>Test the circular badge on light and dark backgrounds for extra lines, residual colour or clipped details. Check stripes at normal size and remove test circles lying above the result. Save the original and preview, then inspect boundaries in the receiving app, especially for complex paths or nested masks.</p>
+<h2 id="延伸练习比较圆形与矩形窗口">Further exercise: circular versus rectangular windows</h2>
+<ol>
+<li>
+<p>Keep the same three stripes and compare circular and rectangular mask-window copies to see how boundaries affect composition.</p>
+</li>
+<li>
+<p>Shift the window slightly and check stripe coverage to understand why content must extend beyond it.</p>
+</li>
+<li>
+<p>Export a PNG preview and inspect SVG edges in the target software. Record differences; an appearance preview is not structural validation.</p>
+</li>
+</ol>
+<h2 id="常见问题">Frequently asked questions</h2>
+<h3 id="蒙版和布尔相减有什么不同">How do masks differ from Boolean subtraction?</h3>
+<p>Masks control visibility; Boolean operations change path geometry. Similar appearances do not mean the same structure or purpose, so do not judge only by thumbnails.</p>
+<h3 id="蒙版后看不到所有内容怎么办">What if all content disappears after masking?</h3>
+<p>Undo and inspect window position, selection, visibility and order. Reproduce with one circle and one large colour block to distinguish operation mistakes from complex compatibility issues.</p>
+<h3 id="裁剪照片后导出-svg-就是纯矢量吗">Is a cropped photo exported as SVG fully vector?</h3>
+<p>No. A photo may remain an embedded raster; the circle is only a clipping boundary. Editable photo outlines require a separate vectorisation process and its detail trade-offs.</p>
+<h2 id="接着读">Read next</h2>
+<ul>
+<li><a href="/en/guides/vectorpaint-layers-groups/">VectorPaint layers and groups: make complex work easier to select and edit</a></li>
+<li><a href="/en/guides/vectorpaint-image-vectorization/">VectorPaint image tracing: turn clear line art into editable paths</a></li>
+<li><a href="/en/guides/vectorpaint-svg-import-edit/">Import SVG into VectorPaint: inspect structure before editing paths and colours</a></li>
+</ul>
+<h2 id="来源与适用范围">Sources and scope</h2>
+<p>This article is based on  <a href="https://apps.apple.com/cn/app/id1587272880">VectorPaint App Store description</a>  and the available feature entry points; <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn">Apple’s public release information </a>Checked on  <strong>October 22, 2026</strong>, for version  <strong>1.0.7</strong>, requiring iOS / iPadOS 17.0 or later. The interface may vary by device and version. Dimensions, colours and wording are exercise suggestions; confirm the requirements for your actual use.</p>
+
+{% endraw %}

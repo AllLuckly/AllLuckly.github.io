@@ -1,0 +1,136 @@
+---
+layout: post
+title: Getting started with XMPP, step by step
+description: 'Records the initial integration of XMPP chat: importing dependencies, connecting to Openfire with
+  user information, handling registration and sign-in authentication, and processing message callbacks. Client-side
+  code accompanies the connection and messaging workflow.'
+category: Development notes
+imagefeature: default_bg.jpg
+date: 2015-09-23 00:00:00 +0800
+technical_translation:
+  topic: data-network
+  summary: 'Records the initial integration of XMPP chat: importing dependencies, connecting to Openfire with user
+    information, handling registration and sign-in authentication, and processing message callbacks. Client-side
+    code accompanies the connection and messaging workflow.'
+  keywords:
+  - XMPP
+  - Openfire
+  - instant messaging
+  - user authentication
+  - sending and receiving messages
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  title: Getting started with XMPP, step by step
+  source_sha256: 7036f8da62e1eb22835844c9cb565c8cabffc1d97e6b1b12443888c7cc1f1cd7
+lang: en
+source_path: _posts/2015-09-23-一点一滴慢慢的揭开XMPP的神秘面纱.md
+source_url: /ios%E4%B9%8Bxmpp/%E4%B8%80%E7%82%B9%E4%B8%80%E6%BB%B4%E6%85%A2%E6%85%A2%E7%9A%84%E6%8F%AD%E5%BC%80XMPP%E7%9A%84%E7%A5%9E%E7%A7%98%E9%9D%A2%E7%BA%B1
+permalink: /en/journal/2015-09-23-getting-started-with-xmpp-step-by-step/
+translation_method: machine-assisted
+translation_source_sha256: 7036f8da62e1eb22835844c9cb565c8cabffc1d97e6b1b12443888c7cc1f1cd7
+excerpt: 'Records the initial integration of XMPP chat: importing dependencies, connecting to Openfire with user
+  information, handling registration and sign-in authentication, and processing message callbacks. Client-side code
+  accompanies the connection and messaging workflow.'
+translation_date: '2026-10-23T02:44:59+00:00'
+---
+{% raw %}
+<blockquote>
+<p>“Enrich yourself and increase your value by continuing to learn.”
+<small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p><br/></p>
+<p>I will not go into what <code class="language-plaintext highlighter-rouge">XMPP</code> does here; I am only beginning to learn it myself.
+First, drag <code class="language-plaintext highlighter-rouge">XMPP</code> into the project, then add the required frameworks:
+<code class="language-plaintext highlighter-rouge">CFNetwork.framework</code>
+<code class="language-plaintext highlighter-rouge">Security.framework</code>
+<code class="language-plaintext highlighter-rouge">libxml2.dylib</code>
+<code class="language-plaintext highlighter-rouge">libresolv.dylib</code>
+<code class="language-plaintext highlighter-rouge">SystemConfiguration.framework</code>
+<code class="language-plaintext highlighter-rouge">CoreLocation.framework</code>
+<code class="language-plaintext highlighter-rouge">AudioToolbox.framework</code>
+<code class="language-plaintext highlighter-rouge">AVFoundation.framework</code>
+Run the project; if there are no errors, the setup is correct.
+For chat in our app, we first need to log in and obtain the user's information. Once we have it, check whether the user already exists in <code class="language-plaintext highlighter-rouge">Openfire</code>. If not, register the user; otherwise, assign the values automatically and log in to <code class="language-plaintext highlighter-rouge">Openfire</code>.
+<code class="language-plaintext highlighter-rouge">[self XmppLogin:dic];</code></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nf">#pragma</span> <span class="nt">mark</span> <span class="nt">登陆xmpp</span>
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">XmppLogin</span><span class="o">:(</span><span class="nt">NSDictionary</span><span class="o">*)</span><span class="nt">userdic</span><span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">App.IM_Account</span> <span class="err">= </span> <span class="err">[NSString</span> <span class="py">stringWithFormat</span><span class="p">:</span><span class="err">@</span><span class="s1">"Bison%@"</span><span class="p">,</span><span class="n">App</span><span class="p">.</span><span class="n">UserId</span><span class="p">];</span><span class="err">//拼上前缀</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">App.IM_Password</span> <span class="err">= </span> <span class="err">@"**************";</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[[JEXMPP</span> <span class="err">Shared]</span> <span class="err">XmppLogin];</span>
+<span class="p">}</span></code></pre></figure>
+<p><br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nf">#pragma</span> <span class="nt">mark</span> <span class="nt">-</span><span class="err"> </span> <span class="nt">登录</span> <span class="nt">退出</span>
+<span class="nt">-</span><span class="o">(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">XmppLogin</span><span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">if</span> <span class="err">(![XMPP_Stream</span> <span class="err">isDisconnected])</span> <span class="err">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">return</span> <span class="err">YES;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="p">}</span>
+<span class="err"> </span> <span class="err"> </span> <span class="o">[</span><span class="nt">XMPP_Stream</span> <span class="nt">setHostName</span><span class="nd">:kIM_Host</span><span class="o">];//</span><span class="nt">设置服务器</span>
+<span class="err"> </span> <span class="err"> </span> <span class="o">[</span><span class="nt">XMPP_Stream</span> <span class="nt">setHostPort</span><span class="o">:[</span><span class="nt">kIM_Port</span> <span class="nt">intValue</span><span class="o">]];//</span><span class="nt">设置端口</span>
+
+<span class="err"> </span> <span class="err"> </span> <span class="nt">NSLog</span><span class="o">(@</span><span class="s1">"jid:%@ ps:%@"</span><span class="o">,</span><span class="nt">App</span><span class="nc">.IM_Account</span><span class="o">,</span><span class="nt">App</span><span class="nc">.IM_Password</span><span class="o">);</span>
+<span class="err"> </span> <span class="err"> </span> <span class="nt">if</span> <span class="o">(</span><span class="nt">App</span><span class="nc">.IM_Account</span> <span class="o">==</span> <span class="nt">nil</span> <span class="o">||</span> <span class="nt">App</span><span class="nc">.IM_Password</span> <span class="o">==</span> <span class="nt">nil</span><span class="o">)</span> <span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">return</span> <span class="err">NO;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="p">}</span>
+
+<span class="err"> </span><span class="nt">XMPPJID</span> <span class="o">*</span><span class="nt">myjid</span> <span class="o">=</span> <span class="o">[</span><span class="nt">XMPPJID</span> <span class="nt">jidWithString</span><span class="o">:[</span><span class="nt">NSString</span> <span class="nt">stringWithFormat</span><span class="o">:@</span><span class="s1">"%@@%@"</span><span class="o">,</span><span class="nt">App</span><span class="nc">.IM_Account</span><span class="o">,</span><span class="nt">kIM_Domain</span><span class="o">]</span> <span class="nt">resource</span><span class="o">:@</span><span class="s1">"jp"</span><span class="o">];//</span><span class="nt">设置了</span> <span class="nt">jid</span> <span class="nt">的</span> <span class="nt">resource</span> <span class="nt">即限制了多点登陆</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="nt">NSError</span> <span class="o">*</span><span class="nt">error</span> <span class="o">;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="o">[</span><span class="nt">XMPP_Stream</span> <span class="nt">setMyJID</span><span class="nd">:myjid</span><span class="o">];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="nt">if</span> <span class="o">(![</span><span class="nt">XMPP_Stream</span> <span class="nt">connectWithTimeout</span><span class="nd">:XMPPStreamTimeoutNone</span> <span class="nt">error</span><span class="o">:&amp;</span><span class="nt">error</span><span class="o">])</span> <span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">NSLog(@"my</span> <span class="err">connected</span> <span class="py">error</span> <span class="p">:</span> <span class="err">%@"</span><span class="p">,</span><span class="n">error</span><span class="p">.</span><span class="n">description</span><span class="p">);</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">return</span> <span class="err">NO;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="p">}</span>
+<span class="err"> </span> <span class="err"> </span> <span class="nt">return</span> <span class="nt">YES</span><span class="o">;</span>
+<span class="err">}</span></code></pre></figure>
+<p>Next, verify whether the user has logged in to <code class="language-plaintext highlighter-rouge">Openfire</code>.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="nt">将要连上</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">xmppStreamWillConnect</span><span class="o">:(</span><span class="nt">XMPPStream</span> <span class="o">*)</span><span class="nt">sender</span><span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">NSLog(@"==xmppStreamWillConnect");</span>
+<span class="p">}</span>
+<span class="o">//</span><span class="nt">连上了</span> <span class="nt">还要验证密码</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">xmppStreamDidConnect</span><span class="o">:(</span><span class="nt">XMPPStream</span> <span class="o">*)</span><span class="nt">sender</span><span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">NSLog(@"xmppStreamDidConnect");</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">if</span> <span class="err">(App.IM_Password)</span> <span class="err">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">NSError</span> <span class="err">*error</span> <span class="err">;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">if</span> <span class="err">(![XMPP_Stream</span> <span class="py">authenticateWithPassword</span><span class="p">:</span><span class="n">App</span><span class="p">.</span><span class="n">IM_Password</span> <span class="n">error</span><span class="p">:</span><span class="err">&amp;</span><span class="n">error</span><span class="p">])</span> <span class="err">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="n">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s1">"error authenticate : %@"</span><span class="p">,</span><span class="n">error</span><span class="p">.</span><span class="n">description</span><span class="p">);</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="p">}</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">}</span>
+<span class="err">}</span>
+
+<span class="o">//</span><span class="nt">突然掉线了</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">xmppReconnect</span><span class="o">:(</span><span class="nt">XMPPReconnect</span> <span class="o">*)</span><span class="nt">sender</span> <span class="nt">didDetectAccidentalDisconnect</span><span class="o">:(</span><span class="nt">SCNetworkReachabilityFlags</span><span class="o">)</span><span class="nt">reachabilityFlags</span> <span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">NSLog(@"</span><span class="py">didDetectAccidentalDisconnect</span> <span class="p">:</span> <span class="err">\</span><span class="n">n</span> <span class="err">%</span><span class="n">u</span> <span class="s1">", reachabilityFlags);
+}
+//YES 重连 
+- (BOOL)xmppReconnect:(XMPPReconnect *)sender shouldAttemptAutoReconnect:(SCNetworkReachabilityFlags)reachabilityFlags{
+    NSLog(@"</span><span class="n">shouldAttemptAutoReconnect</span> <span class="p">:</span> <span class="err">\</span><span class="n">n</span> <span class="err">%</span><span class="n">u</span> <span class="s1">", reachabilityFlags);
+    return YES;
+}
+
+#pragma mark 发送 成功  失败
+- (void)xmppStream:(XMPPStream *)sender didSendMessage:(XMPPMessage *)message{
+
+}
+//发送失败
+- (void)xmppStream:(XMPPStream *)sender didFailToSendMessage:(XMPPMessage *)message error:(NSError *)error{
+
+}
+//发送 成功或失败的 反馈给聊天页面
+-(void)XmppSend_Status:(NSInteger)status Msg:(JEChatMessage *)msg{
+    NSLog(@"</span><span class="n">XmppSend_Status</span> <span class="n">消息发送</span><span class="p">:</span><span class="err">%@</span> <span class="err">\</span><span class="n">n内容</span><span class="p">:</span><span class="err">%@</span><span class="s1">", status == 1 ? @"</span><span class="n">成功</span><span class="s1">" : @"</span><span class="n">失败</span><span class="s1">",msg.TextContent);
+   
+   
+}
+
+#pragma mark 接收消息
+- (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message{
+    NSLog(@"</span><span class="err">%@\</span><span class="n">n</span> <span class="n">来新消息了</span><span class="err">\</span><span class="n">n</span> <span class="n">from</span><span class="p">:</span><span class="err">%@\</span><span class="n">n</span> <span class="n">to</span><span class="p">:</span><span class="err">%@\</span><span class="n">n</span> <span class="n">type</span><span class="p">:</span><span class="err">%@\</span><span class="n">n</span> <span class="n">message</span><span class="p">:</span><span class="err">%@\</span><span class="n">n</span> <span class="n">body</span><span class="p">:</span><span class="err">%@</span><span class="s1">",message,[[message attributeForName:@"</span><span class="n">from</span><span class="s1">"] stringValue],[[message attributeForName:@"</span><span class="n">to</span><span class="s1">"] stringValue],[[message attributeForName:@"</span><span class="n">type</span><span class="s1">"] stringValue],[[message attributeForName:@"</span><span class="n">message</span><span class="s1">"] stringValue],[[message elementForName:@"</span><span class="n">body</span><span class="err">"</span><span class="p">]</span> <span class="n">stringValue</span><span class="p">]);</span>
+<span class="p">}</span></code></pre></figure>
+<p>That is all for today.<br/>
+Please point out any shortcomings; I have only recently started working with XMPP too.<br/>
+Copyright © Bison. Please credit the source when reproducing this article!<br/></p>
+
+{% endraw %}

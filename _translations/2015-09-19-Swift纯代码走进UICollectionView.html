@@ -1,0 +1,187 @@
+---
+layout: post
+title: Building a UICollectionView programmatically in Swift
+description: Starts with data-source and delegate setup, then builds UICollectionView cells, loads network data
+  and adds reusable headers. These steps bring together the structure of a collection-view interface implemented
+  entirely in Swift code.
+category: Development notes
+imagefeature: default_bg.jpg
+date: 2015-09-19 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Starts with data-source and delegate setup, then builds UICollectionView cells, loads network data and
+    adds reusable headers. These steps bring together the structure of a collection-view interface implemented entirely
+    in Swift code.
+  keywords:
+  - UICollectionView
+  - Swift
+  - Alamofire
+  - UICollectionReusableView
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Published in 2015, using the Swift and Alamofire syntax current at the time.
+  title: Building a UICollectionView programmatically in Swift
+  source_sha256: 46c930a773432ffb19daf02afc761aabae175d0894c1991a0c5adfcd8fa3c10a
+lang: en
+source_path: _posts/2015-09-19-Swift纯代码走进UICollectionView.md
+source_url: /ios%E4%B9%8Bswift%E5%88%9D%E6%8E%A2/Swift%E7%BA%AF%E4%BB%A3%E7%A0%81%E8%B5%B0%E8%BF%9BUICollectionView
+permalink: /en/journal/2015-09-19-building-a-uicollectionview-programmatically-in-swift/
+translation_method: machine-assisted
+translation_source_sha256: 46c930a773432ffb19daf02afc761aabae175d0894c1991a0c5adfcd8fa3c10a
+excerpt: Starts with data-source and delegate setup, then builds UICollectionView cells, loads network data and
+  adds reusable headers. These steps bring together the structure of a collection-view interface implemented entirely
+  in Swift code.
+translation_date: '2026-10-23T02:34:10+00:00'
+---
+{% raw %}
+<blockquote>
+<p>“Enrich yourself and increase your value by continuing to learn.”
+<small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p>As a new iOS programming language, <code class="language-plaintext highlighter-rouge">Swift</code> was bound to rise in prominence.</p>
+<p>We experienced programmers must inevitably learn new skills too.<br/></p>
+<p>Anyone who refuses to learn new skills will be left behind by this community.<br/></p>
+<p>So I am happy to embrace this seemingly immature language.<br/></p>
+<p>Next, let's discuss a commonly used control in <code class="language-plaintext highlighter-rouge">Swift</code>: <code class="language-plaintext highlighter-rouge">UICollectionView</code>.</p>
+<p>First define a global <code class="language-plaintext highlighter-rouge">UICollectionView</code> and a data source.</p>
+<p><code class="language-plaintext highlighter-rouge">var colltionView : UICollectionView?</code><br/>
+<code class="language-plaintext highlighter-rouge">var dataArr = NSMutableArray()</code><br/></p>
+<p>Then set up the 3 protocols for <code class="language-plaintext highlighter-rouge">UICollectionView</code>: <code class="language-plaintext highlighter-rouge">UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout</code>. Next initialize the necessary objects in <code class="language-plaintext highlighter-rouge">override func viewDidLoad()</code>.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">override</span> <span class="nt">func</span> <span class="nt">viewDidLoad</span><span class="o">()</span> <span class="p">{</span>
+    <span class="err">super.viewDidLoad()</span>
+    <span class="err">var</span> <span class="err">layout</span> <span class="err">=</span> <span class="err">UICollectionViewFlowLayout()</span>
+    <span class="err">colltionView</span> <span class="err">=</span> <span class="err">UICollectionView(</span><span class="py">frame</span><span class="p">:</span> <span class="n">CGRectMake</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">),</span> <span class="n">collectionViewLayout</span><span class="p">:</span> <span class="n">layout</span><span class="p">)</span>
+    <span class="p">//</span><span class="n">注册一个cell</span>
+    <span class="n">colltionView</span><span class="err">!</span> <span class="p">.</span><span class="n">registerClass</span><span class="p">(</span><span class="n">Home_Cell</span><span class="p">.</span><span class="n">self</span><span class="p">,</span> <span class="n">forCellWithReuseIdentifier</span><span class="p">:</span><span class="s1">"cell"</span><span class="p">)</span>
+    <span class="p">//</span><span class="n">注册一个headView</span>
+    <span class="n">colltionView</span><span class="err">!</span> <span class="p">.</span><span class="n">registerClass</span><span class="p">(</span><span class="n">Home_HeadView</span><span class="p">.</span><span class="n">self</span><span class="p">,</span> <span class="n">forSupplementaryViewOfKind</span><span class="p">:</span><span class="n">UICollectionElementKindSectionHeader</span><span class="p">,</span> <span class="n">withReuseIdentifier</span><span class="p">:</span> <span class="s1">"headView"</span><span class="p">)</span>
+    <span class="n">colltionView</span><span class="err">?</span><span class="p">.</span><span class="n">delegate</span> <span class="err">=</span> <span class="n">self</span><span class="p">;</span>
+    <span class="err">colltionView?.dataSource</span> <span class="err">=</span> <span class="err">self;</span>
+
+    <span class="err">colltionView?.backgroundColor</span> <span class="err">=</span> <span class="err">UIColor.whiteColor()</span>
+    <span class="err">//设置每一个cell的宽高</span>
+    <span class="err">layout.itemSize</span> <span class="err">=</span> <span class="err">CGSizeMake((width-30)/2,</span> <span class="err">250)</span>
+    <span class="err">self.view</span> <span class="err">.addSubview(colltionView!)</span>
+    <span class="err">self</span> <span class="err">.getData()</span>
+<span class="p">}</span></code></pre></figure>
+<p>Then implement the delegate methods for <code class="language-plaintext highlighter-rouge">UICollectionView</code>.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="nt">返回多少个组</span>
+<span class="nt">func</span> <span class="nt">numberOfSectionsInCollectionView</span><span class="o">(</span><span class="nt">collectionView</span><span class="o">:</span> <span class="nt">UICollectionView</span><span class="o">)</span> <span class="nt">-</span><span class="o">&gt;</span> <span class="nt">Int</span> <span class="p">{</span>
+
+    <span class="err">return</span> <span class="err">1</span>
+<span class="p">}</span>
+<span class="o">//</span><span class="nt">返回多少个cell</span>
+<span class="nt">func</span> <span class="nt">collectionView</span><span class="o">(</span><span class="nt">collectionView</span><span class="o">:</span> <span class="nt">UICollectionView</span><span class="o">,</span> <span class="nt">numberOfItemsInSection</span> <span class="nt">section</span><span class="o">:</span> <span class="nt">Int</span><span class="o">)</span> <span class="nt">-</span><span class="o">&gt;</span> <span class="nt">Int</span> <span class="p">{</span>
+    <span class="err">return</span> <span class="err">dataArr.count</span>
+<span class="p">}</span>
+<span class="o">//</span><span class="nt">返回自定义的cell</span>
+<span class="nt">func</span> <span class="nt">collectionView</span><span class="o">(</span><span class="nt">collectionView</span><span class="o">:</span> <span class="nt">UICollectionView</span><span class="o">,</span> <span class="nt">cellForItemAtIndexPath</span> <span class="nt">indexPath</span><span class="o">:</span> <span class="nt">NSIndexPath</span><span class="o">)</span> <span class="nt">-</span><span class="o">&gt;</span> <span class="nt">UICollectionViewCell</span> <span class="p">{</span>
+
+
+    <span class="err">let</span> <span class="err">cell</span> <span class="err">=</span> <span class="err">collectionView.dequeueReusableCellWithReuseIdentifier("cell",</span> <span class="py">forIndexPath</span><span class="p">:</span> <span class="n">indexPath</span><span class="p">)</span> <span class="n">as</span><span class="err">!</span> <span class="n">Home_Cell</span>
+    <span class="n">var</span> <span class="n">model</span> <span class="err">=</span> <span class="n">GoodsModel</span><span class="p">()</span>
+    <span class="n">model</span> <span class="err">=</span> <span class="n">dataArr</span><span class="p">[</span><span class="n">indexPath</span><span class="p">.</span><span class="n">row</span><span class="p">]</span> <span class="n">as</span><span class="err">!</span> <span class="n">GoodsModel</span>
+    <span class="n">let</span> <span class="nb">url</span> <span class="p">:</span> <span class="n">NSURL</span> <span class="err">=</span> <span class="n">NSURL</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="n">model</span><span class="p">.</span><span class="n">image_url</span> <span class="n">as</span> <span class="n">String</span><span class="p">)</span><span class="err">!</span>
+    <span class="n">cell</span><span class="p">.</span><span class="n">imgView</span><span class="err">!</span><span class="p">.</span><span class="n">hnk_setImageFromURL</span><span class="p">(</span><span class="nb">url</span><span class="p">)</span>
+    <span class="n">cell</span><span class="p">.</span><span class="n">layer</span><span class="p">.</span><span class="n">borderWidth</span> <span class="err">=</span> <span class="m">0.3</span><span class="p">;</span>
+    <span class="err">cell.layer.borderColor</span> <span class="err">=</span> <span class="err">UIColor.lightGrayColor().CGColor</span>
+    <span class="err">cell.titleLabel!.text</span> <span class="err">=</span> <span class="err">model.short_name</span>
+    <span class="err">cell.priceLabel!.text</span> <span class="err">=</span> <span class="err">"￥"+model.p_price</span>
+    <span class="err">cell.readLabel!.text</span> <span class="err">=</span> <span class="err">"💗"+model.like_count</span>
+    <span class="err">return</span> <span class="err">cell</span>
+<span class="p">}</span>
+<span class="o">//</span><span class="nt">返回HeadView的宽高</span>
+<span class="nt">func</span> <span class="nt">collectionView</span><span class="o">(</span><span class="nt">collectionView</span><span class="o">:</span> <span class="nt">UICollectionView</span><span class="o">,</span> <span class="nt">layout</span> <span class="nt">collectionViewLayout</span><span class="o">:</span> <span class="nt">UICollectionViewLayout</span><span class="o">,</span> <span class="nt">referenceSizeForHeaderInSection</span> <span class="nt">section</span><span class="o">:</span> <span class="nt">Int</span><span class="o">)</span> <span class="nt">-</span><span class="o">&gt;</span> <span class="nt">CGSize</span><span class="p">{</span>
+
+    <span class="err">return</span> <span class="err">CGSize(</span><span class="nl">width</span><span class="p">:</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="n">height</span><span class="p">/</span><span class="m">1.6</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="o">//</span><span class="nt">返回自定义HeadView或者FootView</span><span class="err">，</span><span class="nt">我这里以headview为例</span>
+<span class="nt">func</span> <span class="nt">collectionView</span><span class="o">(</span><span class="nt">collectionView</span><span class="o">:</span> <span class="nt">UICollectionView</span><span class="o">,</span> <span class="nt">viewForSupplementaryElementOfKind</span> <span class="nt">kind</span><span class="o">:</span> <span class="nt">String</span><span class="o">,</span> <span class="nt">atIndexPath</span> <span class="nt">indexPath</span><span class="o">:</span> <span class="nt">NSIndexPath</span><span class="o">)</span> <span class="nt">-</span><span class="o">&gt;</span> <span class="nt">UICollectionReusableView</span><span class="p">{</span>
+    <span class="err">var</span> <span class="err">v</span> <span class="err">=</span> <span class="err">Home_HeadView()</span>
+    <span class="err">if</span> <span class="err">kind</span> <span class="err">==</span> <span class="err">UICollectionElementKindSectionHeader{</span>
+
+    <span class="err">v</span> <span class="err">=</span> <span class="err">colltionView!.dequeueReusableSupplementaryViewOfKind(kind,</span> <span class="py">withReuseIdentifier</span><span class="p">:</span> <span class="s1">"headView"</span><span class="p">,</span> <span class="n">forIndexPath</span><span class="p">:</span> <span class="n">indexPath</span><span class="p">)</span> <span class="n">as</span><span class="err">!</span> <span class="n">Home_HeadView</span>
+    <span class="p">}</span>
+    <span class="nt">return</span> <span class="nt">v</span>
+<span class="err">}</span>
+<span class="o">//</span><span class="nt">返回cell</span> <span class="nt">上下左右的间距</span>
+<span class="nt">func</span> <span class="nt">collectionView</span><span class="o">(</span><span class="nt">collectionView</span><span class="o">:</span> <span class="nt">UICollectionView</span><span class="o">,</span> <span class="nt">layout</span> <span class="nt">collectionViewLayout</span><span class="o">:</span> <span class="nt">UICollectionViewLayout</span><span class="o">,</span> <span class="nt">insetForSectionAtIndex</span> <span class="nt">section</span><span class="o">:</span> <span class="nt">Int</span><span class="o">)</span> <span class="nt">-</span><span class="o">&gt;</span> <span class="nt">UIEdgeInsets</span><span class="p">{</span>
+    <span class="err">return</span> <span class="err">UIEdgeInsetsMake(5,</span> <span class="err">10,</span> <span class="err">5,</span> <span class="err">10)</span>
+<span class="p">}</span></code></pre></figure>
+<p>Next retrieve the data. I use <code class="language-plaintext highlighter-rouge">Alamofire</code> for the network request here; I cannot disclose the URL.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="nt">获取数据</span>
+<span class="nt">func</span> <span class="nt">getData</span><span class="o">()</span><span class="p">{</span>
+    <span class="err">Alamofire.request(.GET,</span> <span class="err">GoodsUrl).responseJSON()</span> <span class="err">{</span> <span class="err">(req,</span> <span class="err">_,</span> <span class="err">JSON,</span> <span class="err">_)</span> <span class="err">-&gt;</span> <span class="err">Void</span> <span class="err">in</span>
+
+        <span class="err">if</span> <span class="err">let</span> <span class="err">j</span> <span class="err">=</span> <span class="err">JSON</span> <span class="err">as?</span> <span class="err">NSDictionary{</span>
+            <span class="err">var</span> <span class="err">data</span> <span class="err">=</span> <span class="err">j.valueForKey("data")as!</span> <span class="err">NSArray</span>
+
+            <span class="err">for</span> <span class="err">dict</span> <span class="err">in</span> <span class="err">data{</span>
+                <span class="err">var</span> <span class="err">model</span> <span class="err">=</span> <span class="err">GoodsModel()</span>
+                <span class="err">model.Analytical(dict</span> <span class="err">as!</span> <span class="err">NSDictionary)</span>
+                <span class="err">self.dataArr.addObject(model)</span>
+            <span class="p">}</span>
+
+            <span class="nt">self</span><span class="nc">.colltionView</span><span class="o">!</span><span class="nc">.reloadData</span><span class="o">()</span>
+        <span class="err">}</span>
+    <span class="err">}</span>
+<span class="err">}</span></code></pre></figure>
+<p>Next, let's see what is actually inside the cell.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">class</span> <span class="nt">Home_Cell</span><span class="o">:</span> <span class="nt">UICollectionViewCell</span> <span class="p">{</span>
+
+    <span class="err">let</span> <span class="err">width</span> <span class="err">=</span> <span class="err">UIScreen.mainScreen().bounds.size.width//获取屏幕宽</span>
+    <span class="err">var</span> <span class="py">imgView</span> <span class="p">:</span> <span class="n">UIImageView</span><span class="err">?</span><span class="p">//</span><span class="n">cell上的图片</span>
+    <span class="n">var</span> <span class="n">titleLabel</span><span class="p">:</span><span class="n">UILabel</span><span class="err">?</span><span class="p">//</span><span class="n">cell上title</span>
+    <span class="n">var</span> <span class="n">priceLabel</span><span class="p">:</span><span class="n">UILabel</span><span class="err">?</span><span class="p">//</span><span class="n">cell上价格</span>
+    <span class="n">var</span> <span class="n">readLabel</span><span class="p">:</span><span class="n">UILabel</span><span class="err">?</span><span class="p">//</span><span class="n">cell上的阅读量</span>
+
+
+<span class="n">override</span> <span class="n">init</span><span class="p">(</span><span class="n">frame</span><span class="p">:</span> <span class="n">CGRect</span><span class="p">)</span> <span class="err">{</span>
+
+    <span class="nb">super</span><span class="p">.</span><span class="n">init</span><span class="p">(</span><span class="n">frame</span><span class="p">:</span> <span class="n">frame</span><span class="p">)</span>
+    <span class="p">//</span><span class="n">初始化各种控件</span>
+    <span class="n">imgView</span> <span class="err">=</span> <span class="n">UIImageView</span><span class="p">(</span><span class="n">frame</span><span class="p">:</span> <span class="n">CGRectMake</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">-10</span><span class="p">,</span> <span class="p">(</span><span class="n">width-30</span><span class="p">)/</span><span class="m">2</span><span class="p">,</span> <span class="m">200</span><span class="p">))</span>
+    <span class="n">self</span> <span class="p">.</span><span class="n">addSubview</span><span class="p">(</span><span class="n">imgView</span><span class="err">!</span><span class="p">)</span>
+    <span class="n">titleLabel</span> <span class="err">=</span> <span class="n">UILabel</span><span class="p">(</span><span class="n">frame</span><span class="p">:</span> <span class="n">CGRectMake</span><span class="p">(</span><span class="m">5</span><span class="p">,</span> <span class="n">CGRectGetMaxY</span><span class="p">(</span><span class="n">imgView</span><span class="err">!</span><span class="p">.</span><span class="n">frame</span><span class="p">)</span><span class="m">-12</span><span class="p">,</span> <span class="p">(</span><span class="n">width-40</span><span class="p">)/</span><span class="m">2</span><span class="p">,</span> <span class="m">50</span><span class="p">))</span>
+    <span class="n">titleLabel</span><span class="err">?</span><span class="p">.</span><span class="n">numberOfLines</span> <span class="err">=</span> <span class="m">0</span>
+    <span class="n">titleLabel</span><span class="err">?</span><span class="p">.</span><span class="n">font</span> <span class="err">=</span> <span class="n">UIFont</span><span class="p">.</span><span class="n">boldSystemFontOfSize</span><span class="p">(</span><span class="m">14.0</span><span class="p">)</span>
+    <span class="n">titleLabel</span><span class="err">?</span><span class="p">.</span><span class="n">textColor</span> <span class="err">=</span> <span class="n">UIColor</span><span class="p">.</span><span class="n">lightGrayColor</span><span class="p">()</span>
+    <span class="n">self</span> <span class="p">.</span><span class="n">addSubview</span><span class="p">(</span><span class="n">titleLabel</span><span class="err">!</span><span class="p">)</span>
+
+    <span class="n">priceLabel</span> <span class="err">=</span> <span class="n">UILabel</span><span class="p">(</span><span class="n">frame</span><span class="p">:</span> <span class="n">CGRectMake</span><span class="p">(</span><span class="m">5</span><span class="p">,</span> <span class="n">CGRectGetMaxY</span><span class="p">(</span><span class="n">titleLabel</span><span class="err">!</span><span class="p">.</span><span class="n">frame</span><span class="p">),</span> <span class="p">(</span><span class="n">width-40</span><span class="p">)/</span><span class="m">2</span><span class="p">/</span><span class="m">2</span><span class="p">,</span> <span class="m">20</span><span class="p">))</span>
+    <span class="n">priceLabel</span><span class="err">?</span><span class="p">.</span><span class="n">numberOfLines</span> <span class="err">=</span> <span class="m">0</span>
+    <span class="n">priceLabel</span><span class="err">?</span><span class="p">.</span><span class="n">font</span> <span class="err">=</span> <span class="n">UIFont</span><span class="p">.</span><span class="n">boldSystemFontOfSize</span><span class="p">(</span><span class="m">14.0</span><span class="p">)</span>
+    <span class="n">priceLabel</span><span class="err">?</span><span class="p">.</span><span class="n">textColor</span> <span class="err">=</span> <span class="n">UIColor</span><span class="p">.</span><span class="n">lightGrayColor</span><span class="p">()</span>
+    <span class="n">self</span> <span class="p">.</span><span class="n">addSubview</span><span class="p">(</span><span class="n">priceLabel</span><span class="err">!</span><span class="p">)</span>
+
+    <span class="n">readLabel</span> <span class="err">=</span> <span class="n">UILabel</span><span class="p">(</span><span class="n">frame</span><span class="p">:</span> <span class="n">CGRectMake</span><span class="p">((</span><span class="n">width-30</span><span class="p">)/</span><span class="m">2</span><span class="p">/</span><span class="m">2</span><span class="p">,</span> <span class="n">CGRectGetMaxY</span><span class="p">(</span><span class="n">titleLabel</span><span class="err">!</span><span class="p">.</span><span class="n">frame</span><span class="p">),</span> <span class="p">(</span><span class="n">width-40</span><span class="p">)/</span><span class="m">2</span><span class="p">/</span><span class="m">2</span><span class="p">,</span> <span class="m">20</span><span class="p">))</span>
+    <span class="n">readLabel</span><span class="err">?</span><span class="p">.</span><span class="n">numberOfLines</span> <span class="err">=</span> <span class="m">0</span>
+    <span class="n">readLabel</span><span class="err">?</span><span class="p">.</span><span class="n">textAlignment</span> <span class="err">=</span> <span class="n">NSTextAlignment</span><span class="p">.</span><span class="n">Right</span>
+    <span class="n">readLabel</span><span class="err">?</span><span class="p">.</span><span class="n">font</span> <span class="err">=</span> <span class="n">UIFont</span><span class="p">.</span><span class="n">boldSystemFontOfSize</span><span class="p">(</span><span class="m">14.0</span><span class="p">)</span>
+    <span class="n">readLabel</span><span class="err">?</span><span class="p">.</span><span class="n">textColor</span> <span class="err">=</span> <span class="n">UIColor</span><span class="p">.</span><span class="n">lightGrayColor</span><span class="p">()</span>
+    <span class="n">self</span> <span class="p">.</span><span class="n">addSubview</span><span class="p">(</span><span class="n">readLabel</span><span class="err">!</span><span class="p">)</span>
+
+
+<span class="p">}</span>
+
+<span class="nt">required</span> <span class="nt">init</span><span class="o">(</span><span class="nt">coder</span> <span class="nt">aDecoder</span><span class="o">:</span> <span class="nt">NSCoder</span><span class="o">)</span> <span class="p">{</span>
+    <span class="err">fatalError("init(</span><span class="py">coder</span><span class="p">:)</span> <span class="n">has</span> <span class="n">not</span> <span class="n">been</span> <span class="n">implemented</span><span class="err">"</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="err">}</span></code></pre></figure>
+<p>Does something still seem missing? Yes, we have not created the header view yet. Let's see how to set up the header for <code class="language-plaintext highlighter-rouge">UICollectionView</code>. The key is that it must inherit from <code class="language-plaintext highlighter-rouge">UICollectionReusableView</code>. However, this .m file has no method like <code class="language-plaintext highlighter-rouge">override func viewDidLoad()</code>, so what should we do? Let's inspect the methods in our superclass, <code class="language-plaintext highlighter-rouge">UICollectionReusableView</code>. After some searching, I finally found one we can use. 😄</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">override</span> <span class="nt">func</span> <span class="nt">applyLayoutAttributes</span><span class="o">(</span><span class="nt">layoutAttributes</span><span class="o">:</span> <span class="nt">UICollectionViewLayoutAttributes</span><span class="o">!)</span><span class="p">{</span>
+
+<span class="p">}</span></code></pre></figure>
+<p>Put custom UI setup, data requests, and similar work in this method. It serves a role like <code class="language-plaintext highlighter-rouge">override func viewDidLoad()</code> in our view controller. That concludes the tutorial. Leave a comment with any questions; I will set aside time to reply periodically.</p>
+<p>Copyright © Bison. Please credit the source when reproducing this article!</p>
+<p><br/></p>
+<blockquote>
+<p>The final result is shown below.<br/>
+<img alt="UICollectionView example result" src="/images/blog/Swift_CollTionView.gif"/><br/><br/><br/></p>
+</blockquote>
+
+{% endraw %}

@@ -1,0 +1,304 @@
+---
+layout: post
+title: Prompting users to review an iOS app
+description: Introduces the LBToAppStore review-prompt wrapper, using the app version, elapsed days and the user's
+  previous choice to decide when to show a dialog. The response either opens the store or postpones the reminder,
+  illustrating an early review-request workflow.
+category: Development notes
+imagefeature: null
+date: 2016-05-03 00:00:00 +0800
+technical_translation:
+  topic: tooling-release
+  summary: Introduces the LBToAppStore review-prompt wrapper, using the app version, elapsed days and the user's
+    previous choice to decide when to show a dialog. The response either opens the store or postpones the reminder,
+    illustrating an early review-request workflow.
+  keywords:
+  - LBToAppStore
+  - App Store
+  - UIAlertController
+  - review prompts
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Published in 2016. The older reminder workflow uses UIAlertView, UIAlertController and a link to
+    the store.
+  title: Prompting users to review an iOS app
+  source_sha256: e6a0e49c0cc895d458368c91a4adb1a0003dbf884031acd671b75bdf94bfccb4
+lang: en
+source_path: _posts/2016-05-3-GoToAppStore.md
+source_url: /aso/GoToAppStore
+permalink: /en/journal/2016-05-03-prompting-users-to-review-an-ios-app/
+translation_method: machine-assisted
+translation_source_sha256: e6a0e49c0cc895d458368c91a4adb1a0003dbf884031acd671b75bdf94bfccb4
+excerpt: Introduces the LBToAppStore review-prompt wrapper, using the app version, elapsed days and the user's previous
+  choice to decide when to show a dialog. The response either opens the store or postpones the reminder, illustrating
+  an early review-request workflow.
+translation_date: '2026-10-23T02:34:14+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"My app has few downloads and reviews, so I have been looking for ways to improve its aso. Reviews are an important part of aso. Earlier versions had no feature encouraging users to leave a review, leaving me in a rather passive position."</p>
+</blockquote>
+<p>I put together a simple wrapper for the feature. First, let us look at the result:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/LBAppStoreReview/1.png"/><br/></p>
+<p>The popup requires no special handling: use the system <code class="language-plaintext highlighter-rouge">UIAlertView</code> before 8.0 and <code class="language-plaintext highlighter-rouge">UIAlertController</code> from 8.0 onward.</p>
+<p>The code contains the detailed algorithms. Without further discussion, here it is. 😄<br/></p>
+<p>Create an NSObject subclass named <code class="language-plaintext highlighter-rouge">LBToAppStore</code>. Its code follows:</p>
+<h2 id="h文件">.h file<br/></h2>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import &lt;Foundation/Foundation.h&gt;
+
+#import &lt;UIKit/UIKit.h&gt;
+
+
+
+@interface LBToAppStore : NSObject&lt;UIAlertViewDelegate&gt;
+{
+    #if __IPHONE_OS_VERSION_MAX_ALLOWED &lt; __IPHONE_8_0
+
+    UIAlertView *alertViewTest;
+
+    #else
+
+    UIAlertController *alertController;
+
+    #endif
+
+}
+
+@property (nonatomic,strong) NSString * myAppID;//appID
+
+
+
+- (void)showGotoAppStore:(UIViewController *)VC;
+
+@end
+</code></pre></div></div>
+<p><br/></p>
+<h2 id="m文件">.m file<br/></h2>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import "LBToAppStore.h"
+
+@implementation LBToAppStore
+
+
+- (void)showGotoAppStore:(UIViewController *)VC{
+    //当前版本号
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    float appVersion = [[infoDictionary objectForKey:@"CFBundleShortVersionString"] floatValue];
+    //userDefaults里的天数
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    int udtheDays = [[userDefaults objectForKey:@"theDays"] intValue];
+    //userDefaults里的版本号
+    float udAppVersion = [[userDefaults objectForKey:@"appVersion"] intValue];
+    //userDefaults里用户上次的选项
+    int udUserChoose = [[userDefaults objectForKey:@"userOptChoose"] intValue];
+    //时间戳的天数
+    NSTimeInterval interval = [[NSDate date] timeIntervalSince1970];
+    int daySeconds = 24 * 60 * 60;
+    NSInteger theDays = interval / daySeconds;
+
+    //版本升级之后的处理,全部规则清空,开始弹窗
+    if (udAppVersion &amp;&amp; appVersion&gt;udAppVersion) {
+        [userDefaults removeObjectForKey:@"theDays"];
+        [userDefaults removeObjectForKey:@"appVersion"];
+        [userDefaults removeObjectForKey:@"userOptChoose"];
+        [self alertUserCommentView:VC];
+    }
+    //1,从来没弹出过的
+    //2,用户选择😓我要吐槽，7天之后再弹出
+    //3,用户选择😭残忍拒绝后，7天内，每过1天会弹一次
+    //4,用户选择😭残忍拒绝的30天后，才会弹出
+    else if (!udUserChoose ||
+    (udUserChoose==2 &amp;&amp; theDays-udtheDays&gt;7) ||
+    (udUserChoose&gt;=3 &amp;&amp; theDays-udtheDays&lt;=7 &amp;&amp; theDays-udtheDays&gt;udUserChoose-3) ||
+    (udUserChoose&gt;=3 &amp;&amp; theDays-udtheDays&gt;30))
+    {
+        [self alertUserCommentView:VC];
+
+    }
+
+}
+
+-(void)alertUserCommentView:(UIViewController *)VC{
+
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] &gt;= 8.0) {
+
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    //当前时间戳的天数
+    NSTimeInterval interval = [[NSDate date] timeIntervalSince1970];
+    int daySeconds = 24 * 60 * 60;
+    NSInteger theDays = interval / daySeconds;
+    //当前版本号
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    float appVersion = [[infoDictionary objectForKey:@"CFBundleShortVersionString"] floatValue];
+    //userDefaults里版本号
+    float udAppVersion = [[userDefaults objectForKey:@"appVersion"] intValue];
+    //userDefaults里用户选择项目
+    int udUserChoose = [[userDefaults objectForKey:@"userOptChoose"] intValue];
+    //userDefaults里用户天数
+    int udtheDays = [[userDefaults objectForKey:@"theDays"] intValue];
+
+    //当前版本比userDefaults里版本号高
+    if (appVersion&gt;udAppVersion) {
+        [userDefaults setObject:[NSString stringWithFormat:@"%f",appVersion] forKey:@"appVersion"];
+    }
+
+    alertController = [UIAlertController alertControllerWithTitle:@"致开发者的一封信" message:@"有了您的支持才能更好的为您服务，提供更加优质的，更加适合您的App，当然您也可以直接反馈问题给到我们" preferredStyle:(UIAlertControllerStyleAlert)];
+
+    UIAlertAction *refuseAction = [UIAlertAction actionWithTitle:@"😭残忍拒绝" style:(UIAlertActionStyleDefault) handler:^(UIAlertAction *action) {
+
+    [userDefaults setObject:@"1" forKey:@"userOptChoose"];
+    [userDefaults setObject:[NSString stringWithFormat:@"%d",(int)theDays] forKey:@"theDays"];
+    }];
+
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"😄好评赞赏" style:(UIAlertActionStyleDefault) handler:^(UIAlertAction *action) {
+
+    [userDefaults setObject:@"2" forKey:@"userOptChoose"];
+    [userDefaults setObject:[NSString stringWithFormat:@"%d",(int)theDays] forKey:@"theDays"];
+
+    NSString *str = [NSString stringWithFormat:
+    @"https://itunes.apple.com/cn/app/id%@?mt=8",
+    self.myAppID ];
+
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
+
+    }];
+
+    UIAlertAction *showAction = [UIAlertAction actionWithTitle:@"😓我要吐槽" style:(UIAlertActionStyleDefault) handler:^(UIAlertAction *action) {
+
+    if (udUserChoose&lt;=3 || theDays-[[userDefaults objectForKey:@"theDays"] intValue]&gt;30) {
+    [userDefaults setObject:@"3" forKey:@"userOptChoose"];
+    [userDefaults setObject:[NSString stringWithFormat:@"%d",(int)theDays] forKey:@"theDays"];
+    }else{
+    [userDefaults setObject:[NSString stringWithFormat:@"%d",(int)(theDays-udtheDays+3)] forKey:@"userOptChoose"];
+    }
+    NSString *str = [NSString stringWithFormat:
+    @"https://itunes.apple.com/cn/app/id%@?mt=8",
+    self.myAppID ];
+
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
+    }];
+
+
+    [alertController addAction:refuseAction];
+    [alertController addAction:okAction];
+    [alertController addAction:showAction];
+
+    //        NSLog(@"%@",[userDefaults objectForKey:@"appVersion"]);
+    //        NSLog(@"%@",[userDefaults objectForKey:@"userOptChoose"]);
+    //        NSLog(@"%@",[userDefaults objectForKey:@"theDays"]);
+
+    [VC presentViewController:alertController animated:YES completion:nil];
+
+    }else{
+        #if __IPHONE_OS_VERSION_MAX_ALLOWED &lt; __IPHONE_8_0
+        alertViewTest = [[UIAlertView alloc] initWithTitle:@"致开发者的一封信" message:@"有了您的支持才能更好的为您服务，提供更加优质的，更加适合您的App，当然您也可以直接反馈问题给到我们" delegate:self cancelButtonTitle:@"😭残忍拒绝" otherButtonTitles:@"😄好评赞赏",@"😓我要吐槽", nil];
+        [alertViewTest show];
+        #endif
+    }
+
+}
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED &lt; __IPHONE_8_0
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    //当前时间戳的天数
+    NSTimeInterval interval = [[NSDate date] timeIntervalSince1970];
+    int daySeconds = 24 * 60 * 60;
+    NSInteger theDays = interval / daySeconds;
+    //当前版本号
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    float appVersion = [[infoDictionary objectForKey:@"CFBundleShortVersionString"] floatValue];
+    //userDefaults里版本号
+    float udAppVersion = [[userDefaults objectForKey:@"appVersion"] intValue];
+    //userDefaults里用户选择项目
+    int udUserChoose = [[userDefaults objectForKey:@"userOptChoose"] intValue];
+    //userDefaults里用户天数
+    int udtheDays = [[userDefaults objectForKey:@"theDays"] intValue];
+
+    //当前版本比userDefaults里版本号高
+    if (appVersion&gt;udAppVersion) {
+        [userDefaults setObject:[NSString stringWithFormat:@"%f",appVersion] forKey:@"appVersion"];
+    }
+
+    switch (buttonIndex) {
+        case 0: //残忍的拒绝
+        if (udUserChoose&lt;=3 || theDays-[[userDefaults objectForKey:@"theDays"] intValue]&gt;30) {
+            [userDefaults setObject:@"3" forKey:@"userOptChoose"];
+            [userDefaults setObject:[NSString stringWithFormat:@"%d",(int)theDays] forKey:@"theDays"];
+        }else{
+            [userDefaults setObject:[NSString stringWithFormat:@"%d",(int)(theDays-udtheDays+3)] forKey:@"userOptChoose"];
+        }
+        break;
+        case 1:{ //好评
+            [userDefaults setObject:@"1" forKey:@"userOptChoose"];
+            [userDefaults setObject:[NSString stringWithFormat:@"%d",(int)theDays] forKey:@"theDays"];
+            NSString *str = [NSString stringWithFormat:
+            @"https://itunes.apple.com/cn/app/id%@?mt=8",
+            self.myAppID ];
+
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
+        }
+        break;
+        case 2:{ //不好用，我要提意见
+            [userDefaults setObject:@"2" forKey:@"userOptChoose"];
+            [userDefaults setObject:[NSString stringWithFormat:@"%d",(int)theDays] forKey:@"theDays"];
+            NSString *str = [NSString stringWithFormat:
+            @"https://itunes.apple.com/cn/app/id%@?mt=8",
+            self.myAppID ];
+
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
+        }
+        break;
+
+        default:
+        break;
+        }
+    //    NSLog(@"%@",[userDefaults objectForKey:@"appVersion"]);
+    //    NSLog(@"%@",[userDefaults objectForKey:@"userOptChoose"]);
+    //    NSLog(@"%@",[userDefaults objectForKey:@"theDays"]);
+
+}
+
+#endif
+
+
+@end
+</code></pre></div></div>
+<p><br/></p>
+<p>Here is how to use it:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import "ViewController.h"
+#import "LBToAppStore.h"
+@interface ViewController ()
+
+@end
+
+@implementation ViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view, typically from a nib.
+}
+
+-(void)viewDidAppear:(BOOL)animated{
+
+    //用户好评系统
+    LBToAppStore *toAppStore = [[LBToAppStore alloc]init];
+    toAppStore.myAppID = @"1067787090";
+    [toAppStore showGotoAppStore:self];
+
+}
+
+
+@end
+</code></pre></div></div>
+<p><br/></p>
+<p><a href="https://github.com/AllLuckly/LBAppStoreReview">Click here to download the demo.</a><br/></p>
+<p>If this helps, please give it a star!<br/></p>
+<p>Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.</p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-04-29-rich-text-with-hyperlinks-on-ios/">Rich text with hyperlinks on iOS</a><br/></p>
+
+{% endraw %}

@@ -1,0 +1,106 @@
+_posts/2015-05-20-CocoaPods安装及使用.md:
+  updated: '2026-10-23'
+  note: >-
+    The original article records the installation process in 2015, including the Ruby mirror,
+    Podfile and Xcode settings used at the time. When setting up an environment now, start with
+    the official CocoaPods installation guide rather than copying the old mirror address.
+    This article is retained to explain the relationship between the Podfile, Pods, Podfile.lock
+    and workspace. The old steps have not been rerun with the current toolchain.
+  references:
+    - title: CocoaPods official installation guide
+      url: https://guides.cocoapods.org/using/getting-started.html
+_posts/2015-06-10-iOS开发打包静态库.a文件.md:
+  updated: '2026-10-23'
+  note: >-
+    The original article uses the Xcode interface from 2015 to build separate static libraries
+    for physical devices and the simulator, then combines them with lipo. For binary distribution
+    across platforms today, consult Apple's XCFramework documentation and prepare the platform
+    and simulator variants separately. Do not treat the old merging command as a current
+    distribution workflow. The original project has not been recompiled here.
+  references:
+    - title: 'Apple: Creating a multi-platform XCFramework'
+      url: https://developer.apple.com/documentation/xcode/creating-a-multi-platform-binary-framework-bundle
+_posts/2015-07-17-webView的使用与总结.md:
+  updated: '2026-10-23'
+  note: >-
+    Apple has deprecated UIWebView. For a current project, start with the migration guidance for
+    WKWebView. This article preserves UIWebView loading methods, delegate callbacks and synchronous
+    JavaScript calls. Migration requires checking the delegate interfaces and asynchronous calls
+    again; replacing the class name alone is insufficient. The old examples have not been
+    revalidated on current iOS versions.
+  references:
+    - title: 'Apple: Replacing UIWebView in your app'
+      url: https://developer.apple.com/documentation/webkit/replacing-uiwebview-in-your-app
+_posts/2015-11-09-Alamofire.md:
+  updated: '2026-10-23'
+  note: >-
+    This article uses Alamofire APIs from the Swift 2.0 era. It remains useful for examining how
+    requests, parameters and response handling are organised. When adding the library to a new
+    project, check the system, Swift and installation requirements for the specific release in
+    the official repository, and use examples for that release. The old syntax in this article
+    has not been migrated or recompiled.
+  references:
+    - title: Alamofire official repository and documentation
+      url: https://github.com/Alamofire/Alamofire
+_posts/2016-02-29-duoxiancheng03.md:
+  updated: '2026-10-23'
+  note: >-
+    Correction: the section on submitting a task synchronously names dispatch_async, but the
+    correct function is dispatch_sync. It returns after the task has completed and may execute
+    the task on the current thread. dispatch_once does not take a queue argument and does not
+    switch execution to the main thread. For a given static or global token, its block executes
+    once during the process's lifetime; concurrent calls wait for that first execution to finish.
+    The comment describing the dispatch_apply example as asynchronous is also inaccurate:
+    dispatch_apply returns only after all iterations have completed. The original code is
+    retained for comparison and has not been rerun.
+  references:
+    - title: 'Apple: Submitting a task synchronously'
+      url: https://developer.apple.com/documentation/dispatch/dispatchqueue/sync%28execute%3A%29-3segw?language=objc
+    - title: 'Apple: dispatch_once'
+      url: https://developer.apple.com/documentation/dispatch/dispatch_once-c.func
+    - title: 'Apple: Dispatch Queues and dispatch_apply'
+      url: https://developer.apple.com/library/archive/documentation/General/Conceptual/ConcurrencyProgrammingGuide/OperationQueues/OperationQueues.html
+_posts/2017-07-11-ffmpeg1.md:
+  updated: '2026-10-23'
+  note: >-
+    This article records a 2017 build of FFmpeg-iOS using a third-party script. Its terminal output
+    reflects the macOS toolchain used at the time. Recheck the script, assembly tools and target
+    architectures against your actual environment. The broad permission settings in the original
+    article should not be treated as default installation steps either. Only reading references
+    have been added here; the build has not been rerun with current Xcode.
+  references:
+    - title: 'FFmpeg: Build notes for Darwin platforms'
+      url: https://ffmpeg.org/platform.html
+_posts/2017-07-11-ffmpeg2.md:
+  updated: '2026-10-23'
+  note: >-
+    Calls such as av_register_all and avcodec_decode_video2 belong to the older APIs used in the
+    original article. First follow the sequence of demuxing, finding the video stream, decoding
+    and releasing resources. To implement decoding with current FFmpeg, consult the send/receive
+    API and handle submitting input and repeatedly receiving frames as separate steps. The old
+    project has not been recompiled.
+  references:
+    - title: 'FFmpeg: send/receive encoding and decoding API'
+      url: https://ffmpeg.org/doxygen/trunk/group__lavc__encdec.html
+_posts/2017-07-12-ffmpeg3.md:
+  updated: '2026-10-23'
+  note: >-
+    This account of muxing dates from 2017. Focus on how encoded data, the output context and the
+    streaming workflow fit together. For a current project, check the muxing interfaces, stream
+    parameters, time bases and error handling against the FFmpeg version you use, with the official
+    muxing documentation as a reference. Neither today's streaming services nor the original
+    project have been tested again for this article.
+  references:
+    - title: 'FFmpeg: Muxing and output streams'
+      url: https://ffmpeg.org/doxygen/trunk/group__lavf__encoding.html
+_posts/2017-07-20-ffmpeg4.md:
+  updated: '2026-10-23'
+  note: >-
+    The original article presents FFmpeg device input alongside iOS capture code using
+    AVCaptureSession. When repeating the experiment, check device selection, input formats and
+    application permissions separately. Do not apply desktop device indices directly to a phone.
+    Consult the official device documentation for avfoundation options. These examples have not
+    been revalidated on current devices.
+  references:
+    - title: 'FFmpeg: avfoundation input device'
+      url: https://ffmpeg.org/ffmpeg-devices.html#avfoundation

@@ -1,0 +1,73 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'Import SVG into VectorPaint: inspect structure before editing paths and colours'
+description: Check a simple SVG import, distinguishing paths, text, raster images and masks rather than treating
+  the extension as a guarantee of complete editability.
+permalink: /en/guides/vectorpaint-svg-import-edit/
+date: 2026-10-22 00:00:00 +0800
+modified: '2026-10-22 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 14
+topic: Export and troubleshooting
+reading_time: 7
+lang: en
+source_path: _posts/2026-10-22-vectorpaint-svg-import-edit.md
+source_url: /guides/vectorpaint-svg-import-edit/
+translation_method: machine-assisted
+translation_source_sha256: a01290e26c28cad2cc2bbdbcc5efc2e7517cf82bf46e206ff7d4a87d68f0483a
+excerpt: Check a simple SVG import, distinguishing paths, text, raster images and masks rather than treating the
+  extension as a guarantee of complete editability.
+translation_date: '2026-10-23T02:34:07+00:00'
+---
+{% raw %}
+<p>Check a simple SVG import, distinguishing paths, text, raster images and masks rather than treating the extension as a guarantee of complete editability.</p>
+<h2 id="先准备来源清楚的简单文件">Prepare a simple file with a clear source</h2>
+<p>Start with a file you made or are explicitly allowed to use, preferably an SVG containing only a few paths, solid colors, and ordinary text. Keep the original separately and create an editing copy. Do not test every capability on your first attempt with a finished file full of complex filters, external resources, and deep nesting. This article establishes a repeatable checking order so you know what remains editable and what requires a different delivery method.</p>
+<h2 id="导入后先比较整体外观">Compare the overall appearance after importing</h2>
+<p>Use the portfolio's import entry point to select an SVG. After opening it, inspect the canvas proportions, subject position, colors, and text first. You can prepare a reference preview from the source application, but that preview is not the editable structure itself. If only some content is missing, record which part rather than immediately scaling the whole file arbitrarily. Categorize differences as position, appearance, fonts, or missing objects to make later diagnosis easier.</p>
+<h2 id="通过选择判断对象类型">Identify object types through selection</h2>
+<p>Select the main graphic, title, and image region in turn. Observe whether you can change a fill, see nodes, or edit a text object. SVG can contain paths, text, and bitmaps together, so opening successfully does not mean every part is a Bézier curve. If a region can be handled only as one image, saving it as SVG again will not restore original paths. Identify the object type before choosing a tool.</p>
+<h2 id="先做一种低风险修改">Begin with one low-risk change</h2>
+<p>Choose an identifiable solid-color path and change its fill from dark blue to orange, then check whether other objects stay the same. This verifies basic object editing, not every feature in the file. Next, move the object a short distance and undo the move to confirm control over the correct scope. If recoloring affects an entire group, inspect the selection level and shared appearance before deciding whether to select a more specific object.</p>
+<h2 id="文字与图片要分开处理">Handle text and images separately</h2>
+<p>Text appearance may depend on the receiving device having the relevant font. Check missing characters, line breaks, and character-width changes separately. Images retain their original pixel limits; enlarging a vector canvas does not add photographic detail. If the source file uses externally linked images, confirm that those resources are included. Before delivery, clarify with the provider whether you need editable text, outlines with fixed appearance, or merely a visual preview.</p>
+<h2 id="复杂效果先做最小比较">Make a minimal comparison for complex effects</h2>
+<p>For gradient, mask, or opacity differences, isolate one problematic object in a copy and compare it in the two environments. Working basic solid paths do not guarantee support for complex filters. Do not delete the original just to make a preview look similar. Ask the provider for a simpler SVG, an outlined version, or a PDF reference. Explain which editing capabilities each alternative sacrifices.</p>
+<h2 id="用逐项记录代替一句兼容或不兼容">Record individual findings instead of simply saying compatible or incompatible</h2>
+<p>Make a brief record for the imported file: which paths allow node editing, which text remains editable, which regions are images, and which special effects differ from the reference. Basic shapes may work perfectly while a font is unavailable on the device; alternatively, text may work while complex clipping differs. Reducing all of this to 'the entire file is broken' gives the next conversation no direction.</p>
+<p>Give specific requirements if you ask the provider to export again. 'Please provide an outlined text copy and retain an original with editable text' is clearer than 'change the format.' 'Please include the external image resources' is easier to act on than 'why is the photo missing?' The provider needs to know what you intend to edit, not merely that you want to see the same picture.</p>
+<p>When a revised file arrives, recheck it with the same sample rather than overwriting the old file simply because the thumbnail looks right. Begin formal editing only after verification. This separates exchange-format problems from design changes and prevents discovering missing imported content after you have already changed many colors and paths.</p>
+<h2 id="完成检查与回传">Final checks and return delivery</h2>
+<p>After editing, export the SVG and open it in the intended receiving environment. Check colors, positions, text, and images individually. Include a PNG preview to help the recipient compare appearance, but do not substitute it for the source file. Put a version in the filename, such as Emblem_Recolored_v02, so overwriting the original does not prevent comparison. Keep the VectorPaint original and start future edits from a verified editable document.</p>
+<h2 id="延伸练习建立一份自己的-svg-交换样本">Further exercise: create your own SVG exchange sample</h2>
+<ol>
+<li>
+<p>Create a circle, a stroked rectangle, a text element, and a small image. Export and reopen the file, then check each object's type.</p>
+</li>
+<li>
+<p>Change only the circle's color and return the file to your usual receiving environment. Confirm that the intended object changed and that other elements remained intact.</p>
+</li>
+<li>
+<p>Record the results in four categories: graphics, text, images, and special effects. Reuse the same sample when changing software or versions.</p>
+</li>
+</ol>
+<h2 id="常见问题">Frequently asked questions</h2>
+<h3 id="svg-文件为什么会包含照片">Why can an SVG file contain a photo?</h3>
+<p>SVG is a document format that can reference or contain bitmap content. Placing a photo in SVG does not automatically turn it into paths, so its original pixel limitations may remain when enlarged.</p>
+<h3 id="导入后文字变样了是文件坏了吗">Text changed after import. Is the file damaged?</h3>
+<p>Not necessarily. Font availability, text layout, and supported features can all affect appearance. Compare against the reference preview to identify the specific difference. If stable letter shapes are required, ask the source provider for an outlined copy while retaining the editable original.</p>
+<h3 id="能保证所有设计软件的-svg-都一样吗">Can SVG files from every design application be guaranteed to behave identically?</h3>
+<p>No. Basic shapes are easier to exchange, while complex effects and software-specific extensions require individual checks. A small test file is more effective for verifying the capabilities you actually need than importing a complex finished design all at once.</p>
+<h2 id="接着读">Read next</h2>
+<ul>
+<li><a href="/en/guides/vectorpaint-bezier-nodes/">Edit Bézier nodes in VectorPaint: smooth curves without adding anchors</a></li>
+<li><a href="/en/guides/vectorpaint-image-vectorization/">VectorPaint image tracing: turn clear line art into editable paths</a></li>
+<li><a href="/en/guides/vectorpaint-export-formats/">Choose VectorPaint export formats: SVG, PDF, PNG and editable originals</a></li>
+</ul>
+<h2 id="来源与适用范围">Sources and scope</h2>
+<p>This article is based on  <a href="https://apps.apple.com/cn/app/id1587272880">VectorPaint App Store description</a>  and the available feature entry points; <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn">Apple’s public release information </a>Checked on  <strong>October 22, 2026</strong>, for version  <strong>1.0.7</strong>, requiring iOS / iPadOS 17.0 or later. The interface may vary by device and version. Dimensions, colours and wording are exercise suggestions; confirm the requirements for your actual use.</p>
+
+{% endraw %}

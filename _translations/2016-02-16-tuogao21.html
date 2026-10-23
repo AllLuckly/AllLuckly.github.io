@@ -1,0 +1,357 @@
+---
+layout: post
+title: Seven Swift pitfalls and how to avoid them
+description: Uses code examples to investigate surprising behaviour in protocol extensions, optional-chain assignment
+  and functional processing. It compares dispatch for value and reference types and explains how code can compile
+  successfully while producing an unexpected result.
+category: Development notes
+imagefeature: null
+date: 2016-02-16 00:00:00 +0800
+technical_translation:
+  topic: swift-runtime
+  summary: Uses code examples to investigate surprising behaviour in protocol extensions, optional-chain assignment
+    and functional processing. It compares dispatch for value and reference types and explains how code can compile
+    successfully while producing an unexpected result.
+  keywords:
+  - Swift
+  - protocol extensions
+  - optional chaining
+  - value types
+  - functional programming
+  provenance: contribution
+  author_name: bestswifter
+  source_url: http://www.jianshu.com/p/c467809bedb3
+  credit: Originally credited to bestswifter; edited and archived by Bison.
+  version_note: Published in 2016. Interpret the language behaviour and examples in the context of the Swift version
+    used then.
+  title: Seven Swift pitfalls and how to avoid them
+  source_sha256: bc356052645aff39080c8e08970936a12a2a4fb8780f999fb646dcdc141e7893
+lang: en
+source_path: _posts/2016-02-16-tuogao21.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao21
+permalink: /en/journal/2016-02-16-seven-swift-pitfalls-and-how-to-avoid-them/
+translation_method: machine-assisted
+translation_source_sha256: bc356052645aff39080c8e08970936a12a2a4fb8780f999fb646dcdc141e7893
+excerpt: Uses code examples to investigate surprising behaviour in protocol extensions, optional-chain assignment
+  and functional processing. It compares dispatch for value and reference types and explains how code can compile
+  successfully while producing an unexpected result.
+translation_date: '2026-10-23T02:34:13+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/c467809bedb3">bestswifter</a><br/></p>
+<blockquote>
+<p>"Swift is accomplishing something remarkable: changing how we program Apple devices by introducing modern paradigms such as functional programming and richer type checking than a purely object-oriented language like Objective-C."</p>
+</blockquote>
+<p>Swift aims to prevent bugs through safe programming patterns, but this inevitably creates artificial traps that introduce bugs without compiler errors. Some are mentioned in the Swift book and others are not. Here are seven I encountered last year, involving protocol extensions, optional chaining and functional programming.<br/></p>
+<h3 id="协议扩展强大但是需要谨慎使用">Protocol extensions: powerful, but use them carefully</h3>
+<p><br/>
+A Swift class can inherit from another class, clarifying relationships and enabling fine-grained code sharing. Non-reference types, such as structures and enumerations, cannot inherit from classes. A value type can conform to a protocol, and protocols can inherit from protocols. Protocols contain type information rather than implementation code, but protocol extensions can contain code. This enables a code-sharing inheritance tree with value types at the leaves and protocols and their extensions at the roots and internal nodes.<br/></p>
+<p>Swift protocol extensions are still relatively new territory with unresolved problems. Code does not always behave as expected. Because these problems occur when value types—structures and enumerations—are combined with protocols, we first use classes and protocols to show a case without the trap. Switching back to value types then produces a surprise.<br/></p>
+<p>Introducing the example: classy pizza<br/></p>
+<p>Suppose we have three pizzas made from two different grains:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>enum Grain  { case Wheat, Corn }
+
+class  NewYorkPizza  { let crustGrain: Grain = .Wheat }
+class  ChicagoPizza  { let crustGrain: Grain = .Wheat }
+class CornmealPizza  { let crustGrain: Grain = .Corn  }
+</code></pre></div></div>
+<p>We can obtain the pizza’s ingredient through crustGrain.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NewYorkPizza().crustGrain     // returns Wheat
+ChicagoPizza().crustGrain     // returns Wheat
+CornmealPizza().crustGrain     // returns Corn
+</code></pre></div></div>
+<p><br/>
+Because most pizzas use wheat, the common code can live in a superclass as the default implementation.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>enum Grain { case Wheat, Corn }
+
+class Pizza {
+    var crustGrain: Grain { return .Wheat }
+    // other common pizza behavior
+}
+class NewYorkPizza: Pizza {}
+class ChicagoPizza: Pizza {}
+</code></pre></div></div>
+<p><br/>
+The default implementation can be overridden for other cases, such as using corn.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class CornmealPizza: Pizza {
+    override var crustGain: Grain { return .Corn }
+}
+</code></pre></div></div>
+<p><br/>
+Oops! This code is wrong, and fortunately the compiler detects it. Can you spot the mistake? The second crustGain omits r. Swift’s explicit override marker helps prevent this: the misspelled crustGain does not actually override any property. Here is the corrected code:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class CornmealPizza: Pizza {
+    override var crustGrain: Grain { return .Corn }
+} &lt;br&gt; 现在它可以通过编译并成功运行：&lt;br&gt;
+
+NewYorkPizza().crustGrain         // returns Wheat
+ChicagoPizza().crustGrain         // returns Wheat
+CornmealPizza().crustGrain         // returns Corn
+</code></pre></div></div>
+<p><br/>
+The Pizza superclass also lets code work with pizzas without knowing their concrete types. We can declare a variable of type Pizza.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var pie: Pizza &lt;br&gt;
+</code></pre></div></div>
+<p>Yet the general Pizza type can still obtain concrete-type information.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pie =  NewYorkPizza();        pie.crustGrain     // returns Wheat
+pie =  ChicagoPizza();      pie.crustGrain     // returns Wheat
+pie = CornmealPizza();      pie.crustGrain     // returns Corn
+</code></pre></div></div>
+<p><br/>
+Swift reference types work well in this demo. If concurrency and race conditions are involved, value types may help avoid them. Let’s try value-type pizzas!<br/></p>
+<p>This is as simple as before: change class to struct.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>enum Grain { case Wheat, Corn }
+
+struct  NewYorkPizza     { let crustGrain: Grain = .Wheat }
+struct  ChicagoPizza     { let crustGrain: Grain = .Wheat }
+struct CornmealPizza     { let crustGrain: Grain = .Corn  }
+</code></pre></div></div>
+<p><br/>
+Execute<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NewYorkPizza()    .crustGrain     // returns Wheat
+ChicagoPizza()    .crustGrain     // returns Wheat
+CornmealPizza()    .crustGrain     // returns Corn &lt;br&gt; 当我们使用引用类型的时候，我们通过一个超类Pizza来达到目的。但是对于值类型将要求一个协议和一个协议扩展来合作完成。&lt;br&gt;
+
+protocol Pizza {}
+
+extension Pizza {  var crustGrain: Grain { return .Wheat }  }
+
+struct  NewYorkPizza: Pizza { }
+struct  ChicagoPizza: Pizza { }
+struct CornmealPizza: Pizza {  let crustGain: Grain = .Corn } &lt;br&gt;
+</code></pre></div></div>
+<p>This compiles. Let’s test it:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NewYorkPizza().crustGrain         // returns Wheat
+ChicagoPizza().crustGrain         // returns Wheat
+CornmealPizza().crustGrain         // returns Wheat  What?! &lt;br&gt; 对于执行结果，我们想说cornmeal pizza并不是Wheat制作的，返回结果出现错误！哎呀！我把&lt;br&gt;
+
+struct CornmealPizza: Pizza {  let crustGain: Grain = .Corn } &lt;br&gt;
+</code></pre></div></div>
+<p>has crustGrain misspelled as crustGain, again omitting r. For a value type, however, no override keyword helps the compiler detect the mistake. Without that help, we must write the code more carefully.<br/></p>
+<blockquote>
+<p>⚠️ Check carefully when overriding protocol properties in a protocol extension.<br/></p>
+</blockquote>
+<p>Now correct the spelling:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct CornmealPizza: Pizza {  let crustGrain: Grain = .Corn } &lt;br&gt; 重新执行&lt;br&gt;
+
+NewYorkPizza().crustGrain         // returns Wheat
+ChicagoPizza().crustGrain         // returns Wheat
+CornmealPizza().crustGrain     // returns Corn  Hooray! &lt;br&gt;
+</code></pre></div></div>
+<p>To discuss Pizza without worrying about New York, Chicago or cornmeal varieties, use the Pizza protocol as the variable’s type.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var pie: Pizza &lt;br&gt;
+</code></pre></div></div>
+<p>This variable can be used with different kinds of Pizza.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pie =  NewYorkPizza(); pie.crustGrain  // returns Wheat
+pie =  ChicagoPizza(); pie.crustGrain  // returns Wheat
+pie = CornmealPizza(); pie.crustGrain  // returns Wheat    Not again?! &lt;br&gt;
+</code></pre></div></div>
+<p>Why does the program say a cornmeal pizza contains wheat? During compilation, Swift ignores the variable’s actual runtime value and uses only compile-time information. It knows pie has the Pizza protocol type and its extension returns wheat, so the override in CornmealPizza has no effect. The compiler could warn about this potential error when static dispatch replaces dynamic dispatch, but does not. Carelessness here creates a serious pitfall.<br/></p>
+<p>Swift offers a solution here: declare crustGrain in the protocol as well as defining it in the protocol extension.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>protocol  Pizza {  var crustGrain: Grain { get }  }
+extension Pizza {  var crustGrain: Grain { return .Wheat }  }
+</code></pre></div></div>
+<p><br/>
+Declaring the variable in the protocol and defining it in the extension tells the compiler to consider pie’s runtime value.<br/></p>
+<p>Declaring a property in a protocol has two different consequences—static or dynamic dispatch—depending on whether the property is defined in a protocol extension.<br/></p>
+<p>After declaring the variable in the protocol, the code works correctly:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pie =  NewYorkPizza();  pie.crustGrain     // returns Wheat
+pie =  ChicagoPizza();  pie.crustGrain     // returns Wheat
+pie = CornmealPizza();  pie.crustGrain     // returns Corn    Whew!
+</code></pre></div></div>
+<p><br/></p>
+<blockquote>
+<p>⚠️ Declare every property defined in a protocol extension in the protocol itself.<br/></p>
+</blockquote>
+<p>However, this attempt to avoid the trap does not always work.<br/></p>
+<p>Imported protocols cannot be extended completely.<br/></p>
+<p>Frameworks let programs import interfaces without including implementation details. Apple’s frameworks provide user-interface, system and other facilities. Swift extensions let programs add their own non-stored properties to imported classes, structures, enumerations and protocols. Properties added through protocol extensions look like original protocol members, but are not first-class citizens because an extension cannot add their declarations to the protocol.<br/></p>
+<p>First, implement a framework defining the Pizza protocol and concrete types.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// PizzaFramework:
+
+public protocol Pizza { }
+
+public struct  NewYorkPizza: Pizza  { public init() {} }
+public struct  ChicagoPizza: Pizza  { public init() {} }
+public struct CornmealPizza: Pizza  { public init() {} }
+</code></pre></div></div>
+<p><br/>
+Import the framework and extend Pizza.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import PizzaFramework
+
+public enum Grain { case Wheat, Corn }
+
+extension Pizza         { var crustGrain: Grain { return .Wheat    } }
+extension CornmealPizza { var crustGrain: Grain { return .Corn    } } &lt;br&gt;
+</code></pre></div></div>
+<p>As before, static dispatch produces the wrong answer.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var pie: Pizza = CornmealPizza()
+pie.crustGrain                            // returns Wheat   Wrong! &lt;br&gt;
+</code></pre></div></div>
+<p>As explained above, crustGrain is defined only in the extension, not declared in the protocol. We cannot modify the framework’s code to fix this. Thus adding properties to another framework’s protocol through extensions is unsafe.<br/></p>
+<blockquote>
+<p>⚠️ Do not extend imported protocols with new properties that may require dynamic dispatch.<br/></p>
+</blockquote>
+<p>As just described, interactions between frameworks and protocol extensions limit extensions’ usefulness. Frameworks are not the only limitation; type constraints also affect them.<br/></p>
+<h4 id="attributes-in-restricted-protocol-extensions-declaration-is-no-longer-enough">Attributes in restricted protocol extensions: declaration is no longer enough<br/></h4>
+<p>Recall the earlier Pizza example:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>enum Grain { case Wheat, Corn }
+
+protocol  Pizza { var crustGrain: Grain { get }  }
+extension Pizza { var crustGrain: Grain { return .Wheat }  }
+
+struct  NewYorkPizza: Pizza  { }
+struct  ChicagoPizza: Pizza  { }
+struct CornmealPizza: Pizza  { let crustGrain: Grain = .Corn } &lt;br&gt; 让我们用Pizza做一顿饭。不幸的是，并不是每顿饭都会吃pizza，所以我们使用一个通用的Meal结构体来适应各种情况。我们只需要传入一个参数就可以确定进餐的具体类型。&lt;br&gt;
+
+struct Meal: MealProtocol {
+    let mainDish: MainDishOfMeal
+} &lt;br&gt;
+</code></pre></div></div>
+<p>The Meal structure conforms to MealProtocol, which tests whether a meal contains gluten.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>protocol MealProtocol {
+    typealias MainDish_OfMealProtocol
+    var mainDish: MainDish_OfMealProtocol {get}
+    var isGlutenFree: Bool {get}
+}
+</code></pre></div></div>
+<p><br/>
+To avoid a reaction, the code defaults to gluten-free.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension MealProtocol {
+    var isGlutenFree: Bool  { return false }
+} &lt;br&gt; Swift中的 Where提供了一种方式去表达约束性协议扩展。当主菜是pizza的时候，我们知道pizza有scrustGrain属性，我们就可以访问这个属性。如果没where这里的限制，我们在不是Pizza的情况下访问scrustGrain是不安全的。&lt;br&gt;
+
+extension MealProtocol  where  MainDish_OfMealProtocol: Pizza {
+    var isGlutenFree: Bool  { return mainDish.crustGrain == .Corn }
+} &lt;br&gt; 一个带有Where的扩展叫做约束性扩展。&lt;br&gt;
+</code></pre></div></div>
+<p>Let’s make a delicious cornmeal Pizza.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let meal: Meal = Meal(mainDish: CornmealPizza())
+</code></pre></div></div>
+<p><br/>
+Result:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>meal.isGlutenFree    // returns false
+// 根据协议拓展，理论上应该返回true &lt;br&gt;
+</code></pre></div></div>
+<p>As shown earlier, dynamic dispatch requires a declaration in the protocol and a definition in its extension. But definitions in constrained extensions are always statically dispatched. To prevent bugs caused by unintended static dispatch:<br/></p>
+<blockquote>
+<p>⚠️ Avoid constrained protocol extensions when a new property needs dynamic dispatch.<br/></p>
+</blockquote>
+<h3 id="使用可选链赋值和副作用">Optional-chained assignment and side effects<br/></h3>
+<p>Swift helps avoid errors by checking whether a variable is nil and provides convenient optional-chaining shorthand to skip nil references. This is also Objective-C’s default behaviour.</p>
+<p>Unfortunately, an optional-chained assignment can go wrong when its reference is nil. Consider this example, where Holder stores an integer:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class Holder  {
+    var x = 0
+}
+
+var n = 1
+var h: Holder? = nil
+h?.x = n++ &lt;br&gt;
+</code></pre></div></div>
+<p>In the final line, we assign n++ to a property of h. Besides producing a value, n increments; we call that a side effect.<br/></p>
+<p>The final value of n depends on whether h is nil. If h is non-nil, assignment occurs and n++ executes. If h is nil, neither assignment nor n++ occurs. To avoid surprises caused by a missing side effect:<br/></p>
+<blockquote>
+<p>⚠️ Avoid assigning expressions with side effects through optional chaining.<br/></p>
+</blockquote>
+<h3 id="函数编程陷阱">Functional-programming pitfalls<br/></h3>
+<p>Swift brings functional-programming advantages to Apple’s ecosystem. Functions and closures are first-class citizens, both convenient and powerful. Unfortunately, there are pitfalls to avoid.<br/></p>
+<p>For example, an inout parameter may silently stop working in a closure.<br/></p>
+<p>Swift inout parameters allow a function to accept and assign directly to an argument. Closures can refer to captured values during execution. Both features help write elegant, readable code, so combining them may seem natural, but that combination can cause problems.<br/></p>
+<p>Override crustGrain to demonstrate inout parameters. For simplicity, begin without closures:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>enum Grain {
+    case Wheat, Corn
+}
+
+struct CornmealPizza {
+    func setCrustGrain(inout grain: Grain)  {
+        grain = .Corn
+    }
+} &lt;br&gt;
+</code></pre></div></div>
+<p>To test the function, pass a variable whose value should change from Wheat to Corn when the function returns:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let pizza = CornmealPizza()
+var grain: Grain = .Wheat
+pizza.setCrustGrain(&amp;grain)
+grain        // returns Corn &lt;br&gt; 现在我们尝试在函数中返回闭包，然后在闭包中设置参数的值：&lt;br&gt;
+
+struct CornmealPizza {
+    func getCrustGrainSetter() -&gt; (inout grain: Grain) -&gt; Void {
+        return { (inout grain: Grain) in
+            grain = .Corn
+        }
+    }
+} &lt;br&gt; 使用这个闭包只需要多一次调用：&lt;br&gt;
+
+var grain: Grain = .Wheat
+let pizza = CornmealPizza()
+let aClosure = pizza.getCrustGrainSetter()
+grain            // returns Wheat (We have not run the closure yet)
+aClosure(grain: &amp;grain)
+grain            // returns Corn &lt;br&gt; 到目前为止一切正常，但如果我们直接把参数传进getCrustGrainSetter函数而不是闭包呢？&lt;br&gt;
+
+struct CornmealPizza {
+    func getCrustGrainSetter(inout grain: Grain)  -&gt;  () -&gt; Void {
+        return { grain = .Corn }
+    }
+} 然后再试一次：&lt;br&gt;
+
+var grain: Grain = .Wheat
+let pizza = CornmealPizza()
+let aClosure = pizza.getCrustGrainSetter(&amp;grain)
+print(grain)                // returns Wheat (We have not run the closure yet)
+aClosure()
+print(grain)                // returns Wheat  What?!? &lt;br&gt;
+</code></pre></div></div>
+<p>inout parameters stop working outside the scope passed into the closure, so:<br/></p>
+<blockquote>
+<p>⚠️ Avoid inout parameters in closures.<br/></p>
+</blockquote>
+<p>The Swift documentation mentions this issue, but a related issue also deserves attention: currying, an equivalent way of constructing closures.<br/></p>
+<p>inout parameters behave inconsistently when currying is involved.<br/></p>
+<p>Swift offers concise syntax for functions that create and return closures, shortening both their type and body. Although currying looks like shorthand, combining it with inout parameters can be surprising. To demonstrate, rewrite the example using currying: rather than declaring a closure return type, add a second parameter list after the first and omit explicit closure creation from the body:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct CornmealPizza {
+    func getCrustGrainSetterWithCurry(inout grain: Grain)() -&gt; Void {
+        grain = .Corn
+    }
+} 和显式创建闭包时一样，我们调用这个函数然后返回一个闭包：&lt;br&gt;
+
+var grain: Grain = .Wheat
+let pizza = CornmealPizza()
+let aClosure = pizza.getCrustGrainSetterWithCurry(&amp;grain) &lt;br&gt;
+</code></pre></div></div>
+<p>The preceding explicitly created closure failed to assign through the inout parameter, but this version succeeds:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aClosure()
+grain                // returns Corn &lt;br&gt;
+</code></pre></div></div>
+<p>This shows that inout works in the curried function but not with explicitly created closures.<br/></p>
+<blockquote>
+<p>⚠️ Avoid inout parameters in curried functions; later rewriting them as explicit closures would introduce an error.<br/></p>
+</blockquote>
+<h3 id="总结七个避免">Summary: seven things to avoid</h3>
+<ul>
+<li>
+<p>Check carefully when overriding protocol properties in a protocol extension.<br/></p>
+</li>
+<li>
+<p>Declare every property defined in a protocol extension in the protocol itself.<br/></p>
+</li>
+<li>
+<p>Do not extend imported third-party protocols with properties that may require dynamic dispatch.<br/></p>
+</li>
+<li>
+<p>Avoid constrained protocol extensions when a new property needs dynamic dispatch.<br/></p>
+</li>
+<li>
+<p>Avoid assigning an expression with side effects through optional chaining.<br/></p>
+</li>
+<li>
+<p>Avoid inout parameters in closures.<br/></p>
+</li>
+<li>
+<p>Avoid inout parameters in curried functions; rewriting them later as explicit closures would introduce an error.<br/></p>
+</li>
+</ul>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-01-20-integrating-lianlian-pay-into-an-ios-app/">Integrating LianLian Pay into an iOS app</a><br/></p>
+
+{% endraw %}

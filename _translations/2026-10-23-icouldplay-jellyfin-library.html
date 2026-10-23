@@ -1,0 +1,51 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'Connect iCouldPlay to Jellyfin: find films and series from your server'
+description: Connect an existing Jellyfin service, check the actual port, user-library scope, seasons and episodes,
+  and distinguish empty lists, missing metadata and playback failures.
+permalink: /en/guides/icouldplay-jellyfin-library/
+date: 2026-10-23 00:00:00 +0800
+category: Tutorials
+level: Beginner
+series_order: 7
+topic: Servers and library setup
+reading_time: 11
+lang: en
+source_path: _posts/2026-10-23-icouldplay-jellyfin-library.md
+source_url: /guides/icouldplay-jellyfin-library/
+translation_method: machine-assisted
+translation_source_sha256: f2b36579a8347db674e47ec9b93c1089148ad754bf871628cc7a15ce74396b02
+excerpt: Connect an existing Jellyfin service, check the actual port, user-library scope, seasons and episodes,
+  and distinguish empty lists, missing metadata and playback failures.
+translation_date: '2026-10-23T02:34:08+00:00'
+---
+{% raw %}
+<p>Jellyfin organizes movies, series, and viewing state on its server; iCouldPlay mainly browses and plays them after connecting. Using one movie library and one series library, first confirm the service address, then navigate through libraries, seasons, and episodes. A series entry, a season, and a specific video file are different levels of content.</p>
+<h2 id="在同一网络里建立连接基线">Establish a connection baseline on the same network</h2>
+<p>Confirm server operation through Jellyfin's own web interface first. Record the address and port currently reachable from the phone, especially with containers where the external port may differ from the internal default. Jellyfin's official default HTTP port is 8096; HTTPS availability depends on configuration. Use your actual service settings.<a href="https://jellyfin.org/docs/general/post-install/networking/">Networking guidance</a></p>
+<p>Prepare one playable movie and a series with at least two episodes. Sign in through the original interface with the ordinary user account intended for iCouldPlay and confirm access to both libraries. Testing as administrator and then adding iCouldPlay with an account lacking library permissions would obscure the reason for an empty list.</p>
+<h2 id="在云映选择-jellyfin-类型">Choose Jellyfin as the source type in iCouldPlay</h2>
+<p>In Sources, add a media server and choose Jellyfin. Enter an identifiable name, server host, port, username, and password, matching HTTPS to the service. For example, host <code class="language-plaintext highlighter-rouge">192.168.1.40</code> and port <code class="language-plaintext highlighter-rouge">8096</code> is only a LAN example, not an address to copy into your environment. If the service uses a domain, confirm that the phone's current network can resolve it.</p>
+<p>The address should point to the service entry, not a film's browser detail page. Some installations put Jellyfin under a reverse-proxy subpath, which differs from a direct host-and-port setup. If the form cannot handle it correctly, ask the administrator for a compatible client address. Do not arbitrarily remove the path and claim the original service is connected. After saving successfully, continue checking the list.</p>
+<h2 id="先从媒体库名称确认范围">Confirm the scope through library names first</h2>
+<p>Open the added Jellyfin source and check for separate movie and series libraries. Names come from server administration and may be “Movies,” “TV Shows,” or custom names. They need not match this tutorial exactly; content and permissions matter. If only one library appears, check the same account in the original interface before creating a duplicate source.</p>
+<p>Open the movie library, find the sample, and check title, year, and duration. Missing covers and an entirely empty list are different problems: the former may still allow details and playback, while the latter calls for checking library requests or permissions first. Describe the behavior precisely to avoid mistaking an image-loading issue for an offline server.</p>
+<h2 id="剧集按系列季度单集逐层检查">Check series, seasons, and episodes one level at a time</h2>
+<p>In the series library, open the series, then a season, then a particular episode. Record the title or duration of season one, episode two to confirm the intended content opens. A series poster alone does not prove every season and episode is organized correctly; server naming, scanning, and matching affect the hierarchy.</p>
+<p>If a season lacks episodes, inspect that same season in Jellyfin's original interface, then server files and scan results. Renaming a client card cannot create episodes the server has not recognized. For file naming, see <a href="/en/guides/icouldplay-episode-naming/">Series naming and episode checks</a>, but make server-side changes only where you have administrative permission.</p>
+<h2 id="播放样本并观察返回位置">Play samples and observe where you return</h2>
+<p>Play the movie sample and then one episode, checking the beginning and a seek to the middle for each. On return, notice whether you land on the season or series page, avoiding confusion with a same-named entry from another source later. Viewing state involves client-server data exchange. Use one sample to check whether other devices receive the update and how long it takes.</p>
+<p>If subtitles or audio tracks differ, confirm both clients opened the same media version. A server may retain several files for one film; identical covers do not imply identical containers, tracks, or subtitles. Continue with <a href="/en/guides/icouldplay-external-subtitles/">Checking external subtitles</a>, keeping subtitle matching separate from server connection troubleshooting.</p>
+<h2 id="把元数据问题与网络问题分开">Separate metadata issues from network issues</h2>
+<p>Jellyfin can run independently on a LAN, but posters and metadata may rely on external providers. If playback works and metadata is incomplete, check the server's metadata state before changing the iCouldPlay account again. Conversely, with complete metadata but failed playback, check file readability, reachability of the actual playback path, and client compatibility with the source.</p>
+<p>Remote access also depends on service and user permissions. After LAN access works, test the same file through an administrator-configured remote address. Do not change network, user, and film together. Changing one condition makes it easier to identify address scope, permissions, or file-reading differences.</p>
+<h2 id="常见问题与最终核对">Common questions and final checks</h2>
+<p><strong>Why does the default port still fail?</strong> Defaults do not prove how a service is deployed. Container mappings, reverse proxies, and custom settings may change the port the phone must reach. Use the service address accessible in that phone's browser as a clue, then confirm client suitability instead of guessing among common ports repeatedly.</p>
+<p><strong>Movies work, but a series shows only one poster. What now?</strong> Check whether you opened the top-level series entry, then look for seasons and episodes. If Jellyfin's original interface also lacks proper episodes, fix server organization first. If that interface works but iCouldPlay lacks the hierarchy, record the series, season, and version as a compatibility issue instead of copying the video repeatedly to manufacture entries.</p>
+<p>Completion means the movie and series library scopes are correct, one movie and one episode open details, play, and seek, and the same entries remain easy to find after returning. Record the library names, user, and working address, then expand gradually rather than connecting every household account at once.</p>
+<h2 id="资料来源与版本">Sources and version</h2>
+<p>Based on <a href="https://apps.apple.com/cn/app/id6755653178">iCouldPlay official App Store description</a>, the existing Jellyfin entry point, and official Jellyfin networking documentation. iCouldPlay's public version checked on October 23, 2026 was 1.1.0. Server configuration affects library hierarchy and permissions, and the interface may change by version.</p>
+
+{% endraw %}

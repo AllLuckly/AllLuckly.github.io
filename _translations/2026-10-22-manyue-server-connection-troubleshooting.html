@@ -1,0 +1,60 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Troubleshoot ManYue servers: separate network, login, catalogue and page access'
+description: Use a known sample to locate the failing stage in WebDAV, SMB, Komga, Kavita or OPDS, and keep error
+  information that can be checked again.
+permalink: /en/guides/manyue-server-connection-troubleshooting/
+date: 2026-10-22 00:00:00 +0800
+modified: 2026-10-22 00:00:00 +0800
+category: Tutorials
+level: Intermediate
+series_order: 15
+topic: Sync and troubleshooting
+reading_time: 6
+lang: en
+source_path: _posts/2026-10-22-manyue-server-connection-troubleshooting.md
+source_url: /guides/manyue-server-connection-troubleshooting/
+translation_method: machine-assisted
+translation_source_sha256: a94c2385d0281f5bab655e99d1faeff8d30793858b0b07a7f6328440d6656e68
+excerpt: Use a known sample to locate the failing stage in WebDAV, SMB, Komga, Kavita or OPDS, and keep error information
+  that can be checked again.
+translation_date: '2026-10-23T02:34:07+00:00'
+---
+{% raw %}
+<p>“Cannot connect” can mean an unreachable address, rejected login, empty list, working covers with failed pages, or successful reading but failed downloads. Combining them encourages changes to stages already working. This tutorial narrows problems by layer for private libraries you manage or are authorised to access.</p>
+<h2 id="先记住最后一个正常环节">Remember the last successful stage</h2>
+<p>Record service type, app version, network, time and exact error. Describe the last successful action, such as “share opens but comic folder is absent” or “series list loads, chapter opening fails”. Hide private address portions, usernames, passwords, tokens and personal-library contents in screenshots.</p>
+<p>Prepare a small sample and a working comparison. For one failing book, try another small file on the same service. If everything fails, verify the service webpage or administrator-provided access method. Do not change password, path, protocol and connection simultaneously; even success would not identify the cause.</p>
+<h2 id="第一层确认地址和网络可达">Layer one: address and network reachability</h2>
+<p>Check the intended network, whether local addresses work only at home and whether the NAS is running. Verify scheme, port and subpath for WebDAV, Komga, Kavita and OPDS; distinguish SMB host, share and directory. An administration webpage is not necessarily a file-protocol address, nor a book-detail URL the server base.</p>
+<p>If using your own remote-access or proxy setup, verify it works on this device. Do not expose private shares temporarily or disable all certificate checking as a permanent workaround. If networking fails, renaming shelves or clearing caches rarely fixes reachability.</p>
+<h2 id="第二层检查登录与账号权限">Layer two: login and account permissions</h2>
+<p>Check allowed actions with the current account. Changed passwords, incomplete account setup or unshared libraries can produce different failures. A browser’s old session may still load pages without proving the newly entered password works; explicitly verify the current account.</p>
+<p>For authentication failures, revisit address, service type and credentials; for permission denial, inspect account scope. HTTP 401 and 403 offer clues, but proxies and server implementations affect responses. Administrators checking records at the matching time are more effective than repeated failed logins.</p>
+<h2 id="第三层目录为空和页面失败分开处理">Layer three: distinguish empty catalogues from failed pages</h2>
+<p>If login works but books are missing, check sharing scope, selected folder, server file recognition and filters. SMB shares, WebDAV folders and comic-server series are different hierarchy levels; one identical directory path will not suit every entry point.</p>
+<p>If catalogues and covers work but pages fail, test another small item on the same service. One failing file suggests format, integrity or server processing; all pages failing suggests read permissions or paths. OPDS also needs a compatible page stream. An ordinary whole-file entry lacking page streaming is not a password error.</p>
+<h2 id="第四层只在下载时失败">Layer four: failure only during download</h2>
+<p>If reading works but downloading fails, check whether the source offers downloads and the account has permission. Then inspect storage, task status and failure stage. Transfer failures and post-transfer import failures need different handling; not every error means slow networking.</p>
+<p>Keep successful results and retry only failed tasks. Reduce concurrency and test one sample if many fail. Duplicate tasks or clearing all download records destroys clues. Aim for a repeatable success or failure, not more items labelled retrying.</p>
+<h2 id="实例封面正常但正文不能读取">Example: covers load but chapter pages do not</h2>
+<p>Suppose Komga covers appear but every chapter fails. Use the same account on the server to verify page-reading permission, then test a known-good small chapter. If another account works, have the administrator check the original permissions rather than adopting administrator credentials permanently.</p>
+<p>If OPDS lists titles but reports no page stream, inspect protocol capabilities instead of changing passwords. Distinguishing these cases helps developers or administrators identify permissions versus content support, rather than receiving an unreproducible “the app does not work”.</p>
+<h2 id="整理一份有帮助的反馈">Prepare useful feedback</h2>
+<p>Report reproduction steps, expected and actual outcomes, time, service/version and comparison results. Keep exact error text. Logs may contain addresses and accounts, so inspect and redact before public sharing. Complete comic files or account passwords are unnecessary to prove a problem.</p>
+<h3 id="删除连接重新添加是不是最快">Is deleting and re-adding the connection fastest?</h3>
+<p>Reconfiguration may be necessary, but record address structure, account and last successful stage first. Deleting a connection loses evidence and may create a different identity from existing records. Fix known problems and test a sample before rebuilding blindly.</p>
+<h3 id="我换了网络就好了可以认定-app-没问题吗">Does success on another network prove the app is fine?</h3>
+<p>It only shows that network conditions affected this attempt, not that every stage is correct. Retain the differences and same-sample results on both networks, separating observations from guesses for further diagnosis.</p>
+<h2 id="接下来读什么">What to read next</h2>
+<ul>
+<li><a href="/en/guides/manyue-webdav-library/">Check WebDAV addresses and folders</a>.</li>
+<li><a href="/en/guides/manyue-smb-library/">Check SMB host and share</a>.</li>
+<li><a href="/en/guides/manyue-opds-pse-library/">Identify OPDS page-stream limitations</a>.</li>
+</ul>
+<h2 id="资料来源与版本">Sources and version</h2>
+<p>Checked on October 22, 2026: ManYue 2.0.2 for iPhone / iPad. Based on <a href="https://apps.apple.com/cn/app/id6753895889">the public description on the China App Store</a>, <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn">Apple release lookup</a> and the corresponding feature entry points. Interface labels may change with the version. Feature access is determined by the app’s current purchase screen.</p>
+
+{% endraw %}

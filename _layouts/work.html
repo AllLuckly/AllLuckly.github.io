@@ -1,29 +1,33 @@
 ---
 layout: studio
 ---
-{% assign app = site.data.apps | where: 'id', page.app_id | first %}
+{% include language-context.html %}
+{% assign app = ui_app %}
+{% assign caption_language = page.video.captions_lang | default: 'zh-CN' %}
 <div class="wrap work-page">
-  <nav class="breadcrumbs" aria-label="面包屑"><a href="{{ '/' | relative_url }}">首页</a><span>/</span><a href="{{ '/works/' | relative_url }}">作品视频</a><span>/</span><span aria-current="page">{{ page.title }}</span></nav>
+  <nav class="breadcrumbs" aria-label="{% if content_lang == 'en' %}Breadcrumbs{% else %}面包屑{% endif %}"><a href="{{ locale_home | relative_url }}">{% if content_lang == 'en' %}Home{% else %}首页{% endif %}</a><span>/</span><a href="{{ locale_prefix | append: '/works/' | relative_url }}">{% if content_lang == 'en' %}Creative videos{% else %}作品视频{% endif %}</a><span>/</span><span aria-current="page">{{ page.title | escape }}</span></nav>
   <header class="article-header work-header">
-    <p class="eyebrow">{{ app.name }} / 创作过程</p>
-    <h1>{{ page.title }}</h1>
-    <p class="article-lede">{{ page.description }}</p>
-    <div class="article-meta"><span>作者 {{ page.author.name | default: page.author | default: site.owner.name }}</span><time datetime="{{ page.date | date_to_xmlschema }}">发布于 {{ page.date | date: '%Y-%m-%d' }}</time>{% if page.modified %}<time datetime="{{ page.modified | date_to_xmlschema }}">更新于 {{ page.modified | date: '%Y-%m-%d' }}</time>{% endif %}</div>
+    <p class="eyebrow">{{ app.name | escape }} / {% if content_lang == 'en' %}Creative process{% else %}创作过程{% endif %}</p>
+    <h1>{{ page.title | escape }}</h1>
+    <p class="article-lede">{{ page.description | escape }}</p>
+    <div class="article-meta"><span>{% if content_lang == 'en' %}By{% else %}作者{% endif %} {{ page.author.name | default: page.author | default: site.owner.name }}</span><time datetime="{{ page.date | date_to_xmlschema }}">{% if content_lang == 'en' %}Published{% else %}发布于{% endif %} {{ page.date | date: '%Y-%m-%d' }}</time>{% if page.modified %}<time datetime="{{ page.modified | date_to_xmlschema }}">{% if content_lang == 'en' %}Updated{% else %}更新于{% endif %} {{ page.modified | date: '%Y-%m-%d' }}</time>{% endif %}</div>
   </header>
+  {% include translation-note.html %}
   {% if page.video.src %}
   <figure class="work-player">
     <video id="work-video" controls playsinline preload="metadata"{% if page.video.width and page.video.height %} width="{{ page.video.width | escape }}" height="{{ page.video.height | escape }}"{% endif %} poster="{{ page.video.poster | relative_url | escape }}" aria-label="{{ page.video.name | escape }}" aria-describedby="video-description">
       <source src="{{ page.video.src | relative_url | escape }}" type="video/mp4">
-      {% if page.video.captions %}<track kind="subtitles" src="{{ page.video.captions | relative_url | escape }}" srclang="zh-CN" label="中文步骤" default>{% endif %}
-      你的浏览器暂时无法播放此视频，请使用下方链接直接打开。
+      {% if page.video.captions %}<track kind="subtitles" src="{{ page.video.captions | relative_url | escape }}" srclang="{{ caption_language | escape }}" label="{% if caption_language == 'en' %}English steps{% else %}中文步骤{% endif %}" default>{% endif %}
+      {% if page.video.captions_zh and page.video.captions_zh != page.video.captions %}<track kind="subtitles" src="{{ page.video.captions_zh | relative_url | escape }}" srclang="zh-CN" label="中文步骤">{% endif %}
+      {% if content_lang == 'en' %}Your browser cannot play this video. Use the direct video link below.{% else %}你的浏览器暂时无法播放此视频，请使用下方链接直接打开。{% endif %}
     </video>
     <figcaption>
-      <p id="video-description">{{ page.video.description }}</p>
-      {% if page.recording_note %}<p class="recording-note">{{ page.recording_note }}</p>{% endif %}
-      <div class="video-links"><a href="{{ page.video.src | relative_url | escape }}">直接打开视频 ↗</a>{% if page.video.captions %}<a href="{{ page.video.captions | relative_url | escape }}" download>下载中文步骤字幕</a>{% endif %}<a href="#creation-notes">阅读文字过程 ↓</a></div>
+      <p id="video-description">{{ page.video.description | escape }}</p>
+      {% if page.recording_note %}<p class="recording-note">{{ page.recording_note | escape }}</p>{% endif %}
+      <div class="video-links"><a href="{{ page.video.src | relative_url | escape }}">{% if content_lang == 'en' %}Open video ↗{% else %}直接打开视频 ↗{% endif %}</a>{% if page.video.captions %}<a href="{{ page.video.captions | relative_url | escape }}" download>{% if content_lang == 'en' %}Download step subtitles{% else %}下载中文步骤字幕{% endif %}</a>{% endif %}<a href="#creation-notes">{% if content_lang == 'en' %}Read the process notes ↓{% else %}阅读文字过程 ↓{% endif %}</a></div>
       {% if page.video.chapters.size > 0 %}
-      <nav class="video-chapters" aria-label="视频章节" data-video-chapters>
-        <p class="video-chapters-heading">按章节观看</p>
+      <nav class="video-chapters" aria-label="{% if content_lang == 'en' %}Video chapters{% else %}视频章节{% endif %}" data-video-chapters>
+        <p class="video-chapters-heading">{% if content_lang == 'en' %}Watch by chapter{% else %}按章节观看{% endif %}</p>
         <ol>
           {% for chapter in page.video.chapters %}
           {% assign chapter_minutes = chapter.start | divided_by: 60 | floor %}
@@ -32,14 +36,14 @@ layout: studio
           {% endfor %}
         </ol>
         <p class="video-chapter-status" role="status" data-video-chapter-status hidden></p>
-        <noscript><p>章节跳转需要 JavaScript，也可以按标注时间拖动播放器进度条。</p></noscript>
+        <noscript><p>{% if content_lang == 'en' %}Chapter links need JavaScript. You can also use the listed times to seek with the player controls.{% else %}章节跳转需要 JavaScript，也可以按标注时间拖动播放器进度条。{% endif %}</p></noscript>
       </nav>
       {% endif %}
     </figcaption>
   </figure>
   {% endif %}
   <div class="article-layout work-notes" id="creation-notes">
-    <article class="prose"><div data-article-body>{{ content }}</div><a class="text-link" href="{{ '/works/' | relative_url }}">← 查看全部作品视频</a></article>
-    <aside class="article-aside"><div class="aside-box"><img class="aside-icon" src="{{ app.icon | relative_url }}" alt="" width="56" height="56"><h2>{{ app.name }}</h2><p>{{ app.tagline }}</p><a class="button" href="{{ app.store_url }}">在 App Store 查看 ↗</a><a class="aside-guide" href="{{ app.guide_url | relative_url }}">从基础开始，阅读使用教程 →</a><a class="aside-guide" href="{{ app.url | relative_url }}">应用介绍与常见问题 →</a></div></aside>
+    <article class="prose"><div data-article-body>{{ content }}</div><a class="text-link" href="{{ locale_prefix | append: '/works/' | relative_url }}">{% if content_lang == 'en' %}← All creative videos{% else %}← 查看全部作品视频{% endif %}</a></article>
+    <aside class="article-aside"><div class="aside-box"><img class="aside-icon" src="{{ app.icon | relative_url }}" alt="" width="56" height="56"><h2>{{ app.name | escape }}</h2><p>{{ app.tagline | escape }}</p><a class="button" href="{{ app.store_url }}">{% if content_lang == 'en' %}View on the App Store ↗{% else %}在 App Store 查看 ↗{% endif %}</a><a class="aside-guide" href="{{ app.guide_url | relative_url }}">{% if content_lang == 'en' %}Start with the tutorials →{% else %}从基础开始，阅读使用教程 →{% endif %}</a><a class="aside-guide" href="{{ app.url | relative_url }}">{% if content_lang == 'en' %}About the app and FAQ →{% else %}应用介绍与常见问题 →{% endif %}</a></div></aside>
   </div>
 </div>

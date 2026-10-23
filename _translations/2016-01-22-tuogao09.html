@@ -1,0 +1,241 @@
+---
+layout: post
+title: 'iOS animation: starting with UIView animations'
+description: Uses a login screen's arriving text fields and appearing button to introduce animatable UIView properties,
+  duration and options. Adding spring animations shows how position, opacity and transforms can be combined into
+  a continuous sequence.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-01-22 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Uses a login screen's arriving text fields and appearing button to introduce animatable UIView properties,
+    duration and options. Adding spring animations shows how position, opacity and transforms can be combined into
+    a continuous sequence.
+  keywords:
+  - UIView animation
+  - animatable properties
+  - spring animation
+  - alpha
+  - login screen
+  provenance: contribution
+  author_name: SindriLin
+  source_url: http://sindrilin.com/animate/2016/01/22/%E4%BB%8EUIView%E5%8A%A8%E7%94%BB%E8%AF%B4%E8%B5%B7.html
+  credit: Originally credited to SindriLin; edited and archived by Bison.
+  title: 'iOS animation: starting with UIView animations'
+  source_sha256: a05d67835caa1926e50d897a3c8c2a777cb96278db532930be052150df4337c5
+lang: en
+source_path: _posts/2016-01-22-tuogao09.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao09
+permalink: /en/journal/2016-01-22-ios-animation-starting-with-uiview-animations/
+translation_method: machine-assisted
+translation_source_sha256: a05d67835caa1926e50d897a3c8c2a777cb96278db532930be052150df4337c5
+excerpt: Uses a login screen's arriving text fields and appearing button to introduce animatable UIView properties,
+  duration and options. Adding spring animations shows how position, opacity and transforms can be combined into
+  a continuous sequence.
+translation_date: '2026-10-23T02:45:01+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://sindrilin.com/animate/2016/01/22/%E4%BB%8EUIView%E5%8A%A8%E7%94%BB%E8%AF%B4%E8%B5%B7.html">SindriLin’s Notes</a><br/></p>
+<blockquote>
+<p>"As the first article in this animation series, I originally planned to explain the water-drop effect in QQ pull-to-refresh. But after studying iOS Animations by Tutorials over the past few days, I gained a deeper understanding and decided to start with UIView animation, with Layer and Transitioning animations to follow. I hope this offers a useful starting point and another perspective. Here is an effect from a demo in the book."</p>
+</blockquote>
+<p><br/>
+Without doubt, making animations is one of the most enjoyable parts of iOS development. A carefully designed, polished animation can feel fresh and catch users’ attention, which matters greatly to an app.<br/></p>
+<p>As the first article in this animation series, I originally planned to explain the water-drop effect in QQ pull-to-refresh. But after studying iOS Animations by Tutorials over the past few days, I gained a deeper understanding and decided to start with UIView animation, with Layer and Transitioning animations to follow. I hope this offers a useful starting point and another perspective. Here is an effect from a demo in the book.<a href="http://www.raywenderlich.com/store">Buy the book</a><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao09/1.gif"/><br/></p>
+<p><em>P.S. This article mainly introduces animation for iOS development.</em><br/></p>
+<h2 id="从登录动画说起">Start with a login animation<br/></h2>
+<p>For a long time I implemented animation with CALayer and overlooked UIKit’s animation APIs. These functions are powerful and flexible enough for most animation needs in development.<br/></p>
+<p>Before exploring these powerful APIs, look at the first effect: when a user opens the login screen, the account and password fields enter from the left, followed by the login button.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao09/2.gif"/><br/></p>
+<p>The clearest change is the positions of the two text fields. Before the animation, both should be to the left of the screen, while the button below is hidden by setting alpha.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao09/3.jpg"/><br/></p>
+<p>Therefore, the changes in this animation can be summarised by the following code:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>self.userName.center.x += offset;    //userName进入
+self.password.center.x += offset;    //password进入
+self.login.alpha = 1;                //显示登录按钮
+既然已经知道了我们的动画发生了什么，接着就可以使用`UIKit`的动画API让我们的动画活起来了
+
+//设置文本框初始位置为屏幕左侧
+CGPoint accountCenter = self.userName.center;
+CGPoint psdCenter = self.password.center;
+accountCenter.x -= 200;
+pasCenter.x -= 200;
+self.userName.center = accountCenter;
+self.password.center = psdCenter;
+
+//还原中心坐标
+accountCenter.x += 200;
+psdCenter.x += 200;        
+[UIView animateWithDuration: 0.5 animations: ^{
+    self.userName.center = accountCenter;
+    self.password.center = passwordCenter;
+    self.login.alpha = 1;
+} completion: nil];
+</code></pre></div></div>
+<p>In UIKit, methods whose names begin with <code class="language-plaintext highlighter-rouge">animate</code> are class methods of <code class="language-plaintext highlighter-rouge">UIView</code> that make animations easy to create. Each provides a parameter named <code class="language-plaintext highlighter-rouge">animations</code>, an animation <code class="language-plaintext highlighter-rouge">block</code>, whose changes are animated immediately or after a delay following the method call. The first parameter of all these APIs sets the animation duration.</p>
+<p>Run this code in <code class="language-plaintext highlighter-rouge">viewDidAppear:</code>. The text fields slide in from the left and the button fades in, but the result is not quite what we want: the three animations are not staggered, so the effect is less appealing. We want the password field to appear a little after the account field slides in, and the button later still. Use the following method:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[UIView animateWithDuration: 0.5 delay: 0.35 options: UIViewAnimationOptionCurveEaseInOut animations: ^{
+    self.password.center = passwordCenter;
+} completion: ^(BOOL finished) {
+    [UIView animateWithDuration: 0.2 animations: ^{
+        self.login.alpha = 1;
+    }];
+}];
+</code></pre></div></div>
+<p><br/>
+This method looks familiar, but adds several parameters for greater customisation:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- duration：  动画时长
+- delay：  决定了动画在延迟多久之后执行
+- options：用来决定动画的展示方式，接下来会进行讲解
+- animations：转化成动画表示的代码
+- completion：动画结束后执行的代码块
+</code></pre></div></div>
+<p><br/>
+In the code above, the password field starts entering from the left after a 0.35-second delay. After its 0.5-second animation, the button fades in, completing the sequence.<br/></p>
+<h2 id="可实现动画的属性">Animatable properties<br/></h2>
+<p>You can now create simple animations, but remember that not every property change inside an <code class="language-plaintext highlighter-rouge">animations</code> block becomes animated. Changing a view's <code class="language-plaintext highlighter-rouge">tag</code> or <code class="language-plaintext highlighter-rouge">delegate</code>, for example, does not. Animatable properties cause the view to be rendered again. They can broadly be divided into three groups: <code class="language-plaintext highlighter-rouge">坐标尺寸</code>, <code class="language-plaintext highlighter-rouge">视图显示</code>, and <code class="language-plaintext highlighter-rouge">形态变化</code>.</p>
+<h4 id="坐标尺寸类">Position and dimensions<br/></h4>
+<ul>
+<li>bounds: Changing this property uses <code class="language-plaintext highlighter-rouge">center</code> to recalculate <code class="language-plaintext highlighter-rouge">frame</code>. Use this property to change size.</li>
+<li>frame: Changing this property generally changes both the view's shape and position, then resets <code class="language-plaintext highlighter-rouge">center</code> and <code class="language-plaintext highlighter-rouge">bounds</code>.</li>
+<li>center: Setting it moves the view to a new position, then uses <code class="language-plaintext highlighter-rouge">bounds</code> to recalculate <code class="language-plaintext highlighter-rouge">frame</code>.</li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao09/4.jpg"/><br/></p>
+<h4 id="视图显示类">Display properties<br/></h4>
+<ul>
+<li>backgroundColor: changing this property produces a colour transition, essentially through the system continually changing tintColor.<br/></li>
+<li>alpha: changing this property creates a fade-in or fade-out.<br/></li>
+<li>hidden: changing this property can create an effect that hides the view during a page flip.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao09/5.jpg"/><br/></p>
+<h4 id="形态变化类">Changes of form<br/></h4>
+<ul>
+<li>transform: changing this property can rotate, distort, translate or flip a view. It uses matrix operations and is therefore more powerful.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao09/6.jpg"/><br/></p>
+<h2 id="动画参数">Animation options<br/></h2>
+<p>An important parameter in the animation methods above is <code class="language-plaintext highlighter-rouge">options</code>, which allows extensive customization. The following is a set of values for its type. Combine different options to create your own animation:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-  Repeating
+
+UIViewAnimationOptionRepeat       //动画循环执行
+UIViewAnimationOptionAutoreverse  //动画在执行完毕后会反方向再执行一次
+我们将这两个参数传入到上面密码框出现动画中，看看会有什么效果（不同的参数使用`|`操作符一起传入）
+
+[UIView animateWithDuration: 0.5 delay: 0.35 options: UIViewAnimationOptionAutoreverse | UIViewAnimationOptionRepeat animations: ^{
+    self.password.center = passwordCenter;
+} completion: ^(BOOL finished) {
+    [UIView animateWithDuration: 0.2 animations: ^{
+        self.login.alpha = 1;
+    }];
+}];
+</code></pre></div></div>
+<p><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao09/7.gif"/><br/></p>
+<p>The password field repeatedly enters the screen and leaves in the reverse direction, while the login button never fades in. This shows that <code class="language-plaintext highlighter-rouge">UIViewAnimationOptionRepeat </code> not only repeats the animation, but also prevents the <code class="language-plaintext highlighter-rouge">completion</code> callback from ever executing.</p>
+<ul>
+<li>Easing<br/></li>
+</ul>
+<p>A good animation should follow the rules we expect. Nothing starts or stops moving instantaneously; a vehicle, for instance, accelerates and decelerates.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao09/8.jpg"/><br/></p>
+<p>To make animation better match our expectations, the system provides similar effect options:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+UIViewAnimationOptionCurveEaseInOut   //先加速后减速，默认
+UIViewAnimationOptionCurveEaseIn      //由慢到快
+UIViewAnimationOptionCurveEaseOut     //由快到慢
+UIViewAnimationOptionCurveLinear      //匀速
+我在demo上创建了四个橙色的UIView，分别传入这四个不同的参数，然后让这四个view在同一时间y轴上向上移动。
+
+[self animatedView: _view1];
+[self animatedView: _view2];
+[self animatedView: _view3];
+[self animatedView: _view4];
+
+//y轴上移动视图上升250
+- (void)animatedView: (UIView *)view
+{
+    [UIView animateWithDuration: 0.5 delay: 0 options: UIViewAnimationOptionCurveLinear animations: ^{
+    CGPoint center = view.center;
+    center.y -= 250;
+    view.center = center;
+    } completion: nil];
+}
+
+</code></pre></div></div>
+<p><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao09/9.gif"/><br/></p>
+<p>While the simulator is running, choose <code class="language-plaintext highlighter-rouge">DEBUG -&gt; Slow Animation</code> from the menu bar or use <code class="language-plaintext highlighter-rouge">command + T</code> to slow the app's animations. This demo runs in the 6p simulator. At reduced speed, the four views change speed as follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1、逐渐加速。`EaseIn`
+2、先加速，后减速。`EaseInOut`
+3、速度领先，然后减速。`EaseOut`
+4、匀速运动。`Linear`
+</code></pre></div></div>
+<p><br/></p>
+<p>Run the initial login animation with simulator animations slowed. The default <code class="language-plaintext highlighter-rouge">EaseInOut</code> option makes the password field visibly decelerate near its destination.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- Transitioning
+除了上面提到的这些效果，在视图、图片切换的时候，我们还能通过传入下面的这些参数来实现一些特殊的动画效果。
+UIViewAnimationOptionTransitionNone            //没有效果，默认
+UIViewAnimationOptionTransitionFlipFromLeft    //从左翻转效果
+UIViewAnimationOptionTransitionFlipFromRight   //从右翻转效果
+UIViewAnimationOptionTransitionCurlUp          //从上往下翻页
+UIViewAnimationOptionTransitionCurlDown        //从下往上翻页
+UIViewAnimationOptionTransitionCrossDissolve   //旧视图溶解过渡到下一个视图
+UIViewAnimationOptionTransitionFlipFromTop     //从上翻转效果
+UIViewAnimationOptionTransitionFlipFromBottom  //从上翻转效果
+那么这些参数使用的时机是什么时候呢？我们来看看这么一段代码：
+[UIView transitionWithView: firstPV duration: 0.5 options: UIViewAnimationOptionTransitionFlipFromLeft animations: ^{
+    [firstPV flipCard];
+} completion: ^(BOOL finished) {
+    isAnimating = NO;
+}];
+
+- (void)flipCard
+{
+    if (isfliped) {
+        self.image = [UIImage imageNamed: @"flipPicBG.png"];
+        isfliped = NO;
+    } else {
+        self.image = [UIImage imageNamed: [NSString stringWithFormat: @"flipPic%d.png", type]];
+        isfliped = YES; 
+    }
+}
+</code></pre></div></div>
+<p>In this code, I change the image displayed by an <code class="language-plaintext highlighter-rouge">UIImageView</code>, again using animation. A new animation API appears here: <code class="language-plaintext highlighter-rouge">transitionWithView: duration: options: animations: completion:</code>. Compared with the <code class="language-plaintext highlighter-rouge">animateWithDuration</code> methods above, it adds a parameter of type <code class="language-plaintext highlighter-rouge">UIView</code>, whose object is the animation target. This code comes from a card-matching game I made earlier. Tapping produces the following effect:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao09/10.gif"/><br/></p>
+<p>After slowing the simulator animation with <code class="language-plaintext highlighter-rouge">command+T</code>, I captured four frames of the flip:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao09/11.jpg"/><br/></p>
+<p>When changing images, the original flips around the view’s centre on the x-axis. The system also adds shadows during the transition for greater realism.<em>(P.S. Again, transition animations should be used only when switching views; moving a view does not itself produce a transition.)</em><br/></p>
+<h2 id="弹簧动画">Spring animations<br/></h2>
+<p>You can now create polished animations with the <code class="language-plaintext highlighter-rouge">UIKit</code> animation APIs, combining <code class="language-plaintext highlighter-rouge">options</code> values for realistic effects. But there is always more to explore. Imagine a tightly compressed spring bouncing repeatedly after release. The approaches above could produce it, but the code would be complicated and barely reusable. We therefore need another animation technique, and the system provides one:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (void)animateWithDuration:(NSTimeInterval)duration delay:(NSTimeInterval)delay usingSpringWithDamping:(CGFloat)dampingRatio initialSpringVelocity:(CGFloat)velocity options:(UIViewAnimationOptions)options animations:(void (^)(void))animations completion:(void (^ __nullable)(BOOL finished))completion
+</code></pre></div></div>
+<p><br/>
+As usual, here is some additional parameter information:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- dampingRatio：速度衰减比例。取值范围0 ~ 1，值越低震动越强
+- velocity：初始化速度，值越高则物品的速度越快
+
+</code></pre></div></div>
+<p>A rounded button that shoots into the interface and then shakes strongly will certainly catch the eye. For example, I tried springing a <code class="language-plaintext highlighter-rouge">UICollectionView</code> category button into view from below, or bouncing this ball toward the lower-right corner to suggest an action:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao09/12.gif"/><br/></p>
+<p>The effect is excellent: the little circles instinctively invite a tap, yet their entrance animation needs only the following few lines of code.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CGPoint center = cell.center;
+CGPoint startCenter = center;
+startCenter.y += LXD_SCREEN_HEIGHT;
+cell.center = startCenter;
+
+[UIView animateWithDuration: 0.5 delay: 0.35 * indexPath.item usingSpringWithDamping: 0.6 initialSpringVelocity: 0 options: UIViewAnimationOptionCurveLinear animations: ^{
+    cell.center = center;
+} completion: nil];
+</code></pre></div></div>
+<p><br/>
+Besides the pop-up code, tapping a ball animates it towards the lower right, then opens a list from the left. This is useful because, without extra hints, users naturally know how to return to the category screen: tap the round button at the lower right. Animation should make an interface attractive while also reducing the effort of learning an app.<br/></p>
+<h3 id="最后">Finally<br/></h3>
+<p>Compared with rougher desktop interfaces, mobile apps call for greater polish. Elaborate animations are combinations of simple ones. As the first post in this animation series, this article starts with basic <code class="language-plaintext highlighter-rouge">UIView</code> animations and gradually expands into other types, hopefully offering ideas to build on. If you are beginning with iOS animation, combine the concepts above and add code to the initial login demo so the button fades and springs up from below:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao09/13.gif"/><br/></p>
+<p><a href="https://github.com/JustKeepRunning/LXDUIViewAnimation">Demo for this article</a><br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-01-20-integrating-lianlian-pay-into-an-ios-app/">Integrating LianLian Pay into an iOS app</a><br/></p>
+
+{% endraw %}

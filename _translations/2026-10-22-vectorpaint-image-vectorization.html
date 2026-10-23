@@ -1,0 +1,73 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint image tracing: turn clear line art into editable paths'
+description: Trace a black-and-white leaf silhouette, compare threshold, colour count and previews, and understand
+  the trade-off between photo quantisation and path complexity.
+permalink: /en/guides/vectorpaint-image-vectorization/
+date: 2026-10-22 00:00:00 +0800
+modified: '2026-10-22 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 15
+topic: Paths and design
+reading_time: 7
+lang: en
+source_path: _posts/2026-10-22-vectorpaint-image-vectorization.md
+source_url: /guides/vectorpaint-image-vectorization/
+translation_method: machine-assisted
+translation_source_sha256: e415561c2fc0168300ab10802c32f65c4b633b1fce49f4e12ae8b135f29d95b9
+excerpt: Trace a black-and-white leaf silhouette, compare threshold, colour count and previews, and understand the
+  trade-off between photo quantisation and path complexity.
+translation_date: '2026-10-23T02:34:07+00:00'
+---
+{% raw %}
+<p>Trace a black-and-white leaf silhouette, compare threshold, colour count and previews, and understand the trade-off between photo quantisation and path complexity.</p>
+<h2 id="先选对图片比调参数更重要">Choosing the right image matters more than tuning parameters</h2>
+<p>Prepare a black-and-white silhouette or flat-color image you have permission to use, such as a black leaf on white. Choose a clear outline and simple background rather than starting with a portrait under complex lighting. Image vectorization extracts contours from pixels; it does not know which line you want to keep or which blemish to ignore. A clearer original makes an editable result easier to obtain. Cropping irrelevant edges first also reduces unnecessary processing.</p>
+<h2 id="导入图片并保留原始文件">Import the image and retain the original file</h2>
+<p>Import the image into VectorPaint, place it on the canvas, and check its clarity and orientation. Keep the original image file and the unprocessed work, then duplicate the editable work for practice and open image vectorization. Select one image for processing rather than an entire group of images, text, and shapes. Perform the replacement described below only in the practice copy, retaining the original for comparison.</p>
+<h2 id="用黑白模式理解阈值">Understand the threshold in black-and-white mode</h2>
+<p>For a black-and-white silhouette, start with monochrome processing. The threshold determines which light and dark regions enter the generated contour, so inspect the preview after every adjustment. Try 0.50 as a starting point, then compare 0.40 and 0.60. These are practice settings; the best choice depends on the original. Watch for broken thin lines, disappearing holes, and background specks mistaken for content. The threshold is not a 'higher means clearer' slider; it changes what is retained and discarded.</p>
+<h2 id="平涂图再尝试多色处理">Try multicolor processing on a flat-color image</h2>
+<p>If the original has only two or three distinct color regions, try a similar color count and inspect the boundaries. Photos contain many continuous tones; reducing the color count combines them into blocks, producing the visual change caused by quantization. More colors may retain more tonal levels but may also create more fragments and paths. Decide whether you want a simplified illustration or as much detail as possible before choosing an acceptable level of complexity.</p>
+<h2 id="在预览中比较整体结果">Compare the overall result in the preview</h2>
+<p>The preview lets you compare the overall outline, color distribution, and recognizability; it has no separate zoom control. Record the actual processing dimensions and path count shown in the interface. Inspect fine-line intersections, contour turns, and edge details by returning to the canvas and zooming after generating the paths. Start with a longest side of 512 px, then compare 256 px and 1024 px. More processing pixels do not guarantee a better-looking result and may preserve more noise. For line art, a clean main contour is often easier to edit than many tiny paths.</p>
+<h2 id="确认后做必要的人工修正">Make necessary manual corrections after confirmation</h2>
+<p>In the practice copy, enable Replace Original Image on Confirmation. Once satisfied with the preview, choose Confirm and Generate Editable Paths. Return to the canvas and zoom in to inspect major contour turns, internal holes, fine-line intersections, and background edges. Try selecting the relevant paths and editing their nodes. Remove clearly useless fragments first, correct important contours next, and address details afterward. Image vectorization is not a final step that replaces judgment; it is a starting point for turning pixel information into an editable structure. If the result is poor, adjusting the original background and contrast is usually more effective than blindly repairing thousands of nodes.</p>
+<h2 id="线稿断裂时先回到原图判断原因">When line art breaks apart, inspect the original first</h2>
+<p>If lines in the original are faint, broken, or accompanied by paper texture, generated paths may contain both gaps and specks. Zoom into the original first to confirm whether those marks are actually present, then adjust the processing settings. Moving the threshold one way may connect thin lines while also bringing background blemishes into the result; moving it the other way may clean the background but remove details. Make these tradeoffs according to the graphic's purpose.</p>
+<p>For a monochrome logo, clear contours and correct internal holes usually matter more than paper texture. Prepare an image with a cleaner background before processing it. For handwritten line art whose varying stroke width is part of its character, check whether the converted outline retains those important variations, not merely whether its overall shape looks similar.</p>
+<p>Use a different set of criteria for a multicolor photo: the result is a graphic representation with colors consolidated. Decide which color regions must remain distinct, then compare color counts rather than expecting every increase to move automatically closer to the original photo. If your goal is faithful preservation of photographic detail, a high-quality bitmap is often more suitable than forcing it into complex paths.</p>
+<h2 id="完成检查与合理交付">Final checks and sensible delivery</h2>
+<p>Inspect the practice copy in which the original image has been replaced, and confirm that the generated paths themselves represent the intended shape. Do not hide the layer to exclude the original image: when the original is retained, it shares a layer with the generated result, so hiding the layer hides both. Export an SVG and check it in its target environment, then include a PNG preview to show the final appearance. Keep the original image, editable document, and processing settings for regeneration later. Do not describe the color-block version of a photo as a lossless reconstruction or use the file extension alone as proof that everything is vectorized.</p>
+<h2 id="延伸练习用一张剪影做三组预览">Further exercise: make three previews from one silhouette</h2>
+<ol>
+<li>
+<p>Keep the image and color count fixed and change only the threshold. Record the settings and compare the overall silhouette, holes, and recognizability in the preview.</p>
+</li>
+<li>
+<p>For the same three-color flat image, compare results with fewer and slightly more colors. Observe whether the added regions actually help describe the shape.</p>
+</li>
+<li>
+<p>Keep the unprocessed work and original image. In the practice copy, enable Replace Original Image on Confirmation and generate the result. Return to the canvas, zoom in, and find a node that needs manual correction. Edit it and compare again to understand the division between automatic processing and manual refinement.</p>
+</li>
+</ol>
+<h2 id="常见问题">Frequently asked questions</h2>
+<h3 id="为什么照片变成了一块块颜色">Why has my photo turned into blocks of color?</h3>
+<p>Photos contain continuous changes in color and brightness. Vectorization consolidates that information according to the chosen number of colors. The resulting color blocks are inherent to the process, not something that any arbitrary parameter setting can eliminate.</p>
+<h3 id="导入-png-后直接导出-svg-行不行">Can I simply import a PNG and export an SVG?</h3>
+<p>Being able to export a document does not mean it contains paths. Run image vectorization and confirm the result, then inspect it with selection and node editing. Simply changing the outer file format may leave the bitmap intact.</p>
+<h3 id="路径数量越多质量越高吗">Does a higher path count mean better quality?</h3>
+<p>Not necessarily. Noise and fine texture also increase the path count. What matters is whether the contour expresses the intended shape, remains easy to edit, and reads clearly at the final size.</p>
+<h2 id="接着读">Read next</h2>
+<ul>
+<li><a href="/en/guides/vectorpaint-pen-curves/">VectorPaint pen tutorial: draw a leaf with a few anchors</a></li>
+<li><a href="/en/guides/vectorpaint-bezier-nodes/">Edit Bézier nodes in VectorPaint: smooth curves without adding anchors</a></li>
+<li><a href="/en/guides/vectorpaint-svg-import-edit/">Import SVG into VectorPaint: inspect structure before editing paths and colours</a></li>
+</ul>
+<h2 id="来源与适用范围">Sources and scope</h2>
+<p>This article is based on  <a href="https://apps.apple.com/cn/app/id1587272880">VectorPaint App Store description</a>  and the available feature entry points; <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn">Apple’s public release information </a>Checked on  <strong>October 22, 2026</strong>, for version  <strong>1.0.7</strong>, requiring iOS / iPadOS 17.0 or later. The interface may vary by device and version. Dimensions, colours and wording are exercise suggestions; confirm the requirements for your actual use.</p>
+
+{% endraw %}

@@ -1,0 +1,77 @@
+---
+layout: post
+title: A first look at PhotoKit in Swift
+description: Uses a multi-photo picker to introduce PhotoKit, including the maximum selection count, returning an
+  array of PHAsset objects and invoking a closure. The album project and learning resources document an attempt
+  to move from AssetsLibrary to PhotoKit.
+category: Development notes
+imagefeature: null
+date: 2016-05-09 00:00:00 +0800
+technical_translation:
+  topic: data-network
+  summary: Uses a multi-photo picker to introduce PhotoKit, including the maximum selection count, returning an
+    array of PHAsset objects and invoking a closure. The album project and learning resources document an attempt
+    to move from AssetsLibrary to PhotoKit.
+  keywords:
+  - PhotoKit
+  - PHAsset
+  - multiple-photo selection
+  - closures
+  - photo albums
+  provenance: contribution
+  author_name: 大石头布
+  source_url: http://www.jianshu.com/p/673e68fa60e3
+  credit: Originally credited to 大石头布; edited and archived by Bison.
+  version_note: Published in 2016. It introduces PhotoKit, added in iOS 8, through Swift examples from that period.
+  title: A first look at PhotoKit in Swift
+  source_sha256: 1783dc7f94541657783f8f6f590a6d6c4da97200715ee6f3c7921cf5e7fa5098
+lang: en
+source_path: _posts/2016-05-9-tuogao44.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao44
+permalink: /en/journal/2016-05-09-a-first-look-at-photokit-in-swift/
+translation_method: machine-assisted
+translation_source_sha256: 1783dc7f94541657783f8f6f590a6d6c4da97200715ee6f3c7921cf5e7fa5098
+excerpt: Uses a multi-photo picker to introduce PhotoKit, including the maximum selection count, returning an array
+  of PHAsset objects and invoking a closure. The album project and learning resources document an attempt to move
+  from AssetsLibrary to PhotoKit.
+translation_date: '2026-10-23T02:34:14+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/673e68fa60e3">大石头布</a><br/></p>
+<h2 id="1photokit是什么">1. What is PhotoKit?<br/></h2>
+<p>PhotoKit is Apple's library for working with photo-library resources. Previously, we used <a href="https://developer.apple.com/library/ios/documentation/AssetsLibrary/Reference/ALAssetsLibrary_Class/#//apple_ref/doc/uid/TP40009722-CH1-SW57">The AssetsLibrary framework</a> , the Camera and Photos apps changed significantly, adding features such as organizing photos by moments. Meanwhile, AssetsLibrary fell behind, and Apple introduced PhotoKit starting in iOS 8.</p>
+<h2 id="2本文示例">2. This article's example<br/></h2>
+<p>This article introduces basic PhotoKit usage. Here is the result:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao44/1.gif"/><br/></p>
+<p>I previously wrote a Jianshu article about the photo library using AssetsLibrary, which had some problems too: <a href="http://www.jianshu.com/p/8c89cac09387">Selecting multiple photos in Swift</a> that is the article. I recommend using PhotoKit for photo-library management where possible.</p>
+<p>Tapping Done in the image above returns the photos through a closure, passing a [PHAsset] array for use. You must also supply the maximum number of selectable photos; I use 4 here.</p>
+<p>Using it in a vc takes just one line.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>self.zz_presentPhotoVC(4){ (assets) in
+              print(assets.count)
+}
+</code></pre></div></div>
+<p><br/>
+I originally planned to explain PhotoKit, but I do not yet have much original insight into it. Most of my understanding comes from official documentation and good blogs, which already explain what I wanted to discuss. Instead, here are those links and the source of my practice project for you to study.<br/></p>
+<h2 id="3学习资源和代码">3. Learning resources and code<br/></h2>
+<p><a href="http://objccn.io/issue-21-4/">obc China</a><br/>
+<a href="http://www.jianshu.com/p/42e5d2f75452">A good article by a fellow Jianshu author</a><br/>
+<a href="https://developer.apple.com/library/ios/samplecode/UsingPhotosFramework/Introduction/Intro.html#//apple_ref/doc/uid/TP40014575">Official Objective-C sample code</a><br/>
+<a href="https://developer.apple.com/videos/play/wwdc2014/511/">WWDC PhotoKit video</a><br/>
+<a href="https://github.com/smalldu/ZZImagePicker">Code for the gif above, in Swift</a><br/></p>
+<h2 id="2016年4月29更新">Updated 2016/4/29<br/></h2>
+<p>Following WeChat's approach, remove empty smart-album cells, combine all groups into one section and sort them, improve the presentation, change the selection mode, and add preview, which is not implemented yet.
+As shown:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao44/2.gif"/><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao44/3.jpg"/><br/></p>
+<p>Exceeding the selection limit produces a left-right shake as feedback.
+I will update this again after implementing preview.
+Suggestions are welcome.
+There are still many rough edges, which I will improve gradually.</p>
+<h2 id="2016年5月3日更新1">Updated 2016/5/3 <br/>1</h2>
+<p>Preview is now implemented, and the component is basically usable. Let me know if you need anything else.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao44/4.gif"/><br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-05-04-objective-c-runtime-in-practice-changing-fonts-throughout-an-interface/">Rich text with hyperlinks on iOS</a><br/></p>
+
+{% endraw %}

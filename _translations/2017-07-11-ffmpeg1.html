@@ -1,0 +1,84 @@
+---
+layout: post
+title: Building FFmpeg-iOS on a Mac
+description: Records preparing gas-preprocessor and yasm on a Mac, then running the FFmpeg-iOS build script. It
+  explains script locations, dependency installation, and output directories to prepare libraries for the later
+  decoding examples.
+category: Development notes
+imagefeature: null
+date: 2017-07-11 00:00:00 +0800
+technical_translation:
+  topic: audio-video
+  summary: Records preparing gas-preprocessor and yasm on a Mac, then running the FFmpeg-iOS build script. It explains
+    script locations, dependency installation, and output directories to prepare libraries for the later decoding
+    examples.
+  keywords:
+  - FFmpeg
+  - gas-preprocessor
+  - yasm
+  - building for iOS
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Published in 2017, the build output includes Homebrew installation logs from El Capitan. Script
+    and permission settings are retained as historical examples.
+  title: Building FFmpeg-iOS on a Mac
+  source_sha256: e0016cb2e8467671b41f03c6fe2f71bd3cccebda56a0679b588d1c97c2dae61a
+technical_update_translation:
+  updated: '2026-10-23'
+  note: This article records a 2017 build of FFmpeg-iOS using a third-party script. Its terminal output reflects
+    the macOS toolchain used at the time. Recheck the script, assembly tools and target architectures against your
+    actual environment. The broad permission settings in the original article should not be treated as default installation
+    steps either. Only reading references have been added here; the build has not been rerun with current Xcode.
+  references:
+  - title: 'FFmpeg: Build notes for Darwin platforms'
+    url: https://ffmpeg.org/platform.html
+lang: en
+source_path: _posts/2017-07-11-ffmpeg1.md
+source_url: /ffmpeg/ffmpeg1
+permalink: /en/journal/2017-07-11-building-ffmpeg-ios-on-a-mac/
+translation_method: machine-assisted
+translation_source_sha256: e0016cb2e8467671b41f03c6fe2f71bd3cccebda56a0679b588d1c97c2dae61a
+excerpt: Records preparing gas-preprocessor and yasm on a Mac, then running the FFmpeg-iOS build script. It explains
+  script locations, dependency installation, and output directories to prepare libraries for the later decoding
+  examples.
+translation_date: '2026-10-23T02:34:16+00:00'
+---
+{% raw %}
+<p><span class="technical-missing-image">This historical illustration is currently unavailable. <a href="http://upload-images.jianshu.io/upload_images/671504-ada1e50c34918b9b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">The original image URL is retained</a> for reference.</span></p>
+<p>I will not explain FFmpeg's uses in detail here. Interested readers can look them up.</p>
+<p>Now for the main instructions:</p>
+<ol>
+<li>
+<p>Download <a href="https://github.com/libav/gas-preprocessor">gas-preprocessor</a></p>
+</li>
+<li>
+<p>From <code class="language-plaintext highlighter-rouge">gas-preprocessor</code>, copy <code class="language-plaintext highlighter-rouge">gas-preprocessor.pl</code> into <code class="language-plaintext highlighter-rouge">/usr/local/bin/</code>.</p>
+</li>
+<li>
+<p>Enable permissions.</p>
+</li>
+</ol>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>chmod 777 /usr/local/bin/gas-preprocessor.pl
+</code></pre></div></div>
+<p>4. Install yasm.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew install yasm
+</code></pre></div></div>
+<p>After installation, the result looks like this:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>==&gt; Downloading https://homebrew.bintray.com/bottles/yasm-1.3.0.el_capitan.bottl
+######################################################################## 100.0%
+==&gt; Pouring yasm-1.3.0.el_capitan.bottle.1.tar.gz
+🍺  /usr/local/Cellar/yasm/1.3.0: 44 files, 3.1M
+
+</code></pre></div></div>
+<p>5. Download the Mac <a href="https://github.com/kewlbear/FFmpeg-iOS-build-script">FFmpeg build script</a></p>
+<p>6. In Terminal, use cd followed by the folder path to enter the downloaded folder, then run the build script.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./build-ffmpeg.sh
+</code></pre></div></div>
+<p>You can now take a drink and wait for compilation. If FFmpeg is not installed, this command installs it automatically, which may take a while.
+When all compilation completes, it produces the <code class="language-plaintext highlighter-rouge">FFmpeg-iOS</code> file.</p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-02-01-a-beginner-developer-s-review-of-2015/">A beginner developer's review of 2015</a><br/></p>
+
+{% endraw %}

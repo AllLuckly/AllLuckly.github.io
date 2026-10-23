@@ -1,24 +1,24 @@
 ---
 layout: studio
 ---
-{% assign app = site.data.apps | where: 'id', page.app_id | first %}
-{% assign guides = site.posts | where: 'layout', 'guide' | where: 'app_id', page.app_id | sort: 'series_order' %}
+{% include language-context.html %}{% assign app = ui_app %}{% assign stages = page.stages | default: site.data.guide_stages_en[page.app_id] %}
+{% assign guides = localized_posts | where: 'layout', 'guide' | where: 'app_id', page.app_id | sort: 'series_order' %}
 <div class="wrap guide-series">
-  <nav class="breadcrumbs" aria-label="面包屑"><a href="{{ '/' | relative_url }}">首页</a><span aria-hidden="true">/</span><a href="{{ '/guides/' | relative_url }}">教程</a><span aria-hidden="true">/</span><span class="breadcrumb-current" aria-current="page" title="{{ page.title | escape }}">{{ page.title }}</span></nav>
+  <nav class="breadcrumbs" aria-label="{% if content_lang == 'en' %}Breadcrumb{% else %}面包屑{% endif %}"><a href="{{ locale_home | relative_url }}">{% if content_lang == 'en' %}Home{% else %}首页{% endif %}</a><span aria-hidden="true">/</span><a href="{{ locale_prefix | append: '/guides/' | relative_url }}">{% if content_lang == 'en' %}Tutorials{% else %}教程{% endif %}</a><span aria-hidden="true">/</span><span class="breadcrumb-current" aria-current="page" title="{{ page.title | escape }}">{{ page.title }}</span></nav>
   <header class="series-header">
-    <div class="series-brand"><img src="{{ app.icon | relative_url }}" alt="" width="56" height="56"><div><p>学习路线 · {{ guides.size }} 篇</p><h1>{{ page.title }}</h1></div></div>
+    <div class="series-brand"><img src="{{ app.icon | relative_url }}" alt="" width="56" height="56"><div><p>{% if content_lang == 'en' %}Learning path · {{ guides.size }} tutorials{% else %}学习路线 · {{ guides.size }} 篇{% endif %}</p><h1>{{ page.title }}</h1></div></div>
     <p class="series-description">{{ page.description }}</p>
-    <div class="series-actions"><a class="button" href="{{ guides.first.url | relative_url }}">从第一篇开始 <span aria-hidden="true">→</span></a><a class="text-link" href="{{ app.url | relative_url }}">了解 {{ app.name }} <span aria-hidden="true">↗</span></a></div>
+    <div class="series-actions"><a class="button" href="{{ guides.first.url | relative_url }}">{% if content_lang == 'en' %}Start with the first tutorial{% else %}从第一篇开始{% endif %} <span aria-hidden="true">→</span></a><a class="text-link" href="{{ app.url | relative_url }}">{% if content_lang == 'en' %}About {{ app.name }}{% else %}了解 {{ app.name }}{% endif %} <span aria-hidden="true">↗</span></a></div>
   </header>
   <div class="series-layout">
     <aside class="series-sidebar">
-      <nav class="series-stage-nav" aria-label="学习阶段"><h2>学习阶段</h2><ol role="list">{% for stage in page.stages %}<li><a href="#{{ stage.id }}"><span aria-hidden="true">0{{ forloop.index }}</span><span>{{ stage.title }}<small>第 {{ stage.start }}–{{ stage.end }} 篇</small></span></a></li>{% endfor %}</ol></nav>
-      <a class="series-all-guides" href="{{ '/guides/' | relative_url }}">查看其他应用教程 <span aria-hidden="true">→</span></a>
+      <nav class="series-stage-nav" aria-label="{% if content_lang == 'en' %}Learning stages{% else %}学习阶段{% endif %}"><h2>{% if content_lang == 'en' %}Learning stages{% else %}学习阶段{% endif %}</h2><ol role="list">{% for stage in stages %}<li><a href="#{{ stage.id }}"><span aria-hidden="true">0{{ forloop.index }}</span><span>{{ stage.title }}<small>{% if content_lang == 'en' %}Tutorials {{ stage.start }}–{{ stage.end }}{% else %}第 {{ stage.start }}–{{ stage.end }} 篇{% endif %}</small></span></a></li>{% endfor %}</ol></nav>
+      <a class="series-all-guides" href="{{ locale_prefix | append: '/guides/' | relative_url }}">{% if content_lang == 'en' %}Explore other apps{% else %}查看其他应用教程{% endif %} <span aria-hidden="true">→</span></a>
     </aside>
     <div class="series-main">
       <div class="series-intro">{{ content }}</div>
-      <div class="series-lessons" aria-label="{{ app.name }} 教程目录">
-        {% for stage in page.stages %}
+      <div class="series-lessons" aria-label="{{ app.name }} {% if content_lang == 'en' %}tutorials{% else %}教程目录{% endif %}">
+        {% for stage in stages %}
         <section class="series-stage" id="{{ stage.id }}" tabindex="-1" aria-labelledby="{{ stage.id }}-title">
           <header class="stage-heading"><h2 id="{{ stage.id }}-title">{{ stage.title }}</h2><p>{{ stage.description }}</p></header>
           <ol class="lesson-list" role="list" start="{{ stage.start }}">{% for post in guides %}{% if post.series_order >= stage.start and post.series_order <= stage.end %}{% include lesson-row.html hide_topic=true %}{% endif %}{% endfor %}</ol>

@@ -1,0 +1,55 @@
+---
+layout: guide
+author: Bison
+app_id: yearn
+title: 'Yearn in-game saves and save states: verify that saved progress loads'
+description: Distinguish the game’s own save menu from emulator states, test save, exit, reopen and load, and understand
+  why autosave settings do not replace a restore check.
+permalink: /en/guides/yearn-autosave-battery/
+date: 2026-10-23 00:00:00 +0800
+modified: 2026-10-23 00:00:00 +0800
+category: Tutorials
+level: Intermediate
+series_order: 12
+topic: Saved games and offline use
+reading_time: 8
+lang: en
+source_path: _posts/2026-10-23-yearn-autosave-battery.md
+source_url: /guides/yearn-autosave-battery/
+translation_method: machine-assisted
+translation_source_sha256: 8d5559432bb2f88a6fd5e0ecbe9c411ee297bfb70d31f1f4254c01304f916068
+excerpt: Distinguish the game’s own save menu from emulator states, test save, exit, reopen and load, and understand
+  why autosave settings do not replace a restore check.
+translation_date: '2026-10-23T02:49:32+00:00'
+---
+{% raw %}
+<p>Selecting ‘Save’ inside a game and selecting Save in Yearn’s menu save different layers of information. The game itself decides what the first method stores; the second records the emulated running state. This tutorial uses the same game with in-game saving support for two independent checks, so you know exactly which record you will rely on when continuing next time.</p>
+<h2 id="先找到游戏自己的保存入口">First find the game’s own save function</h2>
+<p>After entering the game, inspect its own menus, save points, or save prompts. Some games allow saving only at specific locations, some have a save option in a menu, and some have no long-term saving system at all. First find a reliable saving method according to the game’s own rules. Do not assume that pausing, returning to the title screen, or finishing a level automatically means your progress has been saved.</p>
+<p>After saving within the game, note the character’s location, level, time, or save name. If a ‘Saving’ message appears, wait until it ends before doing anything else. Success at this layer is reported by the game itself. You still need to exit and reopen it afterward to determine whether the app retained the corresponding data.</p>
+<h2 id="即时存档保留的是另一份检查点">A save state keeps a separate checkpoint</h2>
+<p>Open Yearn’s game menu, create a save state in an empty slot, then move to a slightly different location. You now have two records at different layers: the game’s own save location and the current state stored in the slot. Label them clearly and separately instead of calling two different scenes ‘the latest save.’</p>
+<p>Deliberately creating this difference makes it easier to tell which path you used when loading later. Selecting Load directly should restore the save state; choosing Continue from the game’s title screen checks the in-game save. If both methods lead to the same screen, it is actually harder to distinguish what was loaded.</p>
+<h2 id="安全退出比强制结束更适合检查">Use a normal exit for checking saves</h2>
+<p>After saving, use the game menu to end the current session, giving the app a chance to stop emulation and process save data. Swiping the app away in the system app switcher, a depleted battery, and an unexpected app interruption do not follow this normal exit path. Verify the normal procedure during your first check before considering how to reduce losses from unexpected interruptions.</p>
+<p>After exiting to the game library, reopen the same original file and first check Continue or the save records from the game’s own title menu. Do not immediately use the save-state Load command to bypass the title screen. That would only establish that the save state loads, without proving the in-game save works independently.</p>
+<h2 id="再检查即时槽位是否仍存在">Check that the save-state slot still exists</h2>
+<p>After checking the in-game save, open Yearn’s save list, find the slot and time you noted, load it, and compare the scene. Record the results separately: ‘In-game save loads’ and ‘Save-state slot loads,’ or state clearly which check failed. Success with one does not guarantee the other.</p>
+<p>After reopening the game, check the same slot and scene again to confirm that the app can still find the record. If an association has been lost, preserve the files and data first. Do not try to guess at a fix by deleting, reinstalling, or importing again; those actions may make troubleshooting harder.</p>
+<h2 id="自动存档选项怎样理解">Understand the automatic-save options</h2>
+<p>The store description mentions automatic saving, and Settings also provides automatic-save and interval options. Before relying on it, check that a new record exists and that you can load it. Merely waiting for a while without observing a specific record is not enough to confirm that saving succeeded.</p>
+<p>To evaluate automatic saving, start with practice content, note the starting time and manual slot, then check whether a recognizable new record appears and actually load it. If you cannot find a clear record or verify the loading result, continue using your tested manual and in-game saving procedures, keeping the checkpoints you have already confirmed work.</p>
+<h2 id="保持游戏文件与记录的对应">Keep game files matched to their saves</h2>
+<p>Regional editions, patched versions, and copies from different sources of a game with the same name may not share the same data structure. Once you have made progress, keep the original ROM, its original name, and information about the app version wherever possible. Importing another file with the same name may replace an existing copy, so create an independent backup before updating the content.</p>
+<p>When organizing your files, you can keep a small table with the filename, platform, in-game save location, save-state slot, and most recent successful load date. These notes cannot restore a game by themselves, but they help identify which backup belongs to which file and prevent blind loading among several similar copies.</p>
+<h2 id="常见问题">Frequently asked questions</h2>
+<p><strong>The game reported a successful save. Why is Continue missing when I reopen it?</strong> First confirm that you reopened the same file and version, then check whether you exited normally. If the problem persists, preserve the app data and save files and record the steps in detail. An in-game message does not establish that the app’s entire saving and recognition process has been verified.</p>
+<p><strong>Is keeping save states alone enough?</strong> Do not treat different types of saves as interchangeable. Keep in-game saves whenever they are available and also verify save states. Add independent file backups to reduce dependence on a single recovery path.</p>
+<p>By the end, you should know where each loading method takes you and be able to identify any automatic behavior you have not yet confirmed. These records describe the actual condition of your progress more clearly than ‘all the switches are on.’</p>
+<h2 id="用两个不同场景避免读错记录">Use two different scenes to distinguish the saves</h2>
+<p>For example, save within the game in a village, then move to a nearby road and create a save state. After reopening the game, choosing Continue from the title screen should take you to the game’s own save location, while loading the save-state slot should return you to the road. This is only an example of the checking method; choose actual save locations according to the game’s rules. Making the two records visibly different prevents one successful load from being mistaken for confirmation that both saving methods work.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p>Continue reading <a href="/en/guides/yearn-save-slots/">Working with save-state slots</a> and <a href="/en/guides/yearn-icloud-saves/">Check cloud status</a>.</p>
+<p>Information dated October 23, 2026. Public release information comes from  <a href="https://apps.apple.com/cn/app/id6756637059">Yearn App Store description</a> and  <a href="https://itunes.apple.com/lookup?id=6756637059&amp;country=cn">Apple release lookup</a>, and lists version 1.0.2. Check compatibility with your game and saved state using the save, exit and load steps in this guide.</p>
+
+{% endraw %}

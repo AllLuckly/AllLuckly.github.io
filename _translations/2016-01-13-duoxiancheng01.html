@@ -1,0 +1,278 @@
+---
+layout: post
+title: Bison's guide to iOS multithreading, part 1
+description: Introduces multithreading by distinguishing processes from threads and comparing NSThread, NSOperationQueue
+  and GCD. It then demonstrates thread creation, execution, termination and priorities, using logs to observe scheduling
+  behaviour.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-01-13 00:00:00 +0800
+technical_translation:
+  topic: concurrency-performance
+  summary: Introduces multithreading by distinguishing processes from threads and comparing NSThread, NSOperationQueue
+    and GCD. It then demonstrates thread creation, execution, termination and priorities, using logs to observe
+    scheduling behaviour.
+  keywords:
+  - NSThread
+  - multithreading
+  - thread scheduling
+  - thread priority
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  title: Bison's guide to iOS multithreading, part 1
+  source_sha256: 36d5d3a0c2205033d1267b7afa59aeb23ccfe267490f6b8119c14b619b69d4b2
+lang: en
+source_path: _posts/2016-01-13-duoxiancheng01.md
+source_url: /%E5%A4%9A%E7%BA%BF%E7%A8%8B/duoxiancheng01
+permalink: /en/journal/2016-01-13-bison-s-guide-to-ios-multithreading-part-1/
+translation_method: machine-assisted
+translation_source_sha256: 36d5d3a0c2205033d1267b7afa59aeb23ccfe267490f6b8119c14b619b69d4b2
+excerpt: Introduces multithreading by distinguishing processes from threads and comparing NSThread, NSOperationQueue
+  and GCD. It then demonstrates thread creation, execution, termination and priorities, using logs to observe scheduling
+  behaviour.
+translation_date: '2026-10-23T02:45:01+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"A single-threaded app has just one sequential execution flow. A time-consuming operation blocks its main thread, leaving the app unable to continue and making it feel unresponsive, like a blocked river that cannot carry water onward until cleared. Multithreading is more like a river with many branches: if one is blocked, the others can keep flowing without stopping everything."</p>
+</blockquote>
+<p>Have you been asked about multithreading in an iOS software-engineer interview? I have encountered it quite often. Here is a rather embarrassing scene from one of my interviews 🙈. No laughing!<br/></p>
+<p>Interviewer: Do you use multithreading in development?<br/></p>
+<p>Me: Yes!<br/></p>
+<p>Interviewer: In which development situations have you used multithreading?<br/></p>
+<p>Me: In lots of situations… (The atmosphere suddenly became awkward 😓.)<br/></p>
+<p>Interviewer: Which multithreading frameworks are available?<br/></p>
+<p>Me: <code class="language-plaintext highlighter-rouge">NSThread</code>, <code class="language-plaintext highlighter-rouge">NSOperationQueue</code>, and <code class="language-plaintext highlighter-rouge">GCD</code>—saying their English names with a little flourish. 😄</p>
+<p>Interviewer: Explain the advantages and disadvantages of the three approaches. (The atmosphere relaxed a little.)<br/></p>
+<p>Me: (I had memorised something I saw online and, feeling rather pleased, confidently recited the following.)<br/>
+1.NSThread:<br/></p>
+<blockquote>
+<p>Creating a thread with an NSThread object is very convenient;</p>
+</blockquote>
+<p><br/></p>
+<blockquote>
+<p>However, managing multiple threads with NSThread is difficult and not recommended;</p>
+</blockquote>
+<p><br/></p>
+<blockquote>
+<p>Tip! Use [NSThread currentThread] to trace the thread executing a task; this works with all three technologies.</p>
+</blockquote>
+<p><br/></p>
+<p>2.NSOperation/NSOperationQueue:<br/></p>
+<blockquote>
+<p>is a set of Objective-C APIs implemented using GCD;<br/></p>
+</blockquote>
+<p><br/></p>
+<blockquote>
+<p>is an object-oriented multithreading technology;</p>
+</blockquote>
+<p><br/></p>
+<blockquote>
+<p>provides features that are less easy to implement with GCD, such as maximum concurrency limits and dependencies between operations.</p>
+</blockquote>
+<p>3.GCD—Grand Central Dispatch:</p>
+<blockquote>
+<p>is a low-level API based on C;<br/></p>
+</blockquote>
+<p><br/></p>
+<blockquote>
+<p>Tasks are defined with blocks, making them flexible and convenient to use;<br/></p>
+</blockquote>
+<p><br/></p>
+<blockquote>
+<p>provides greater control and low-level functions unavailable in operation queues.<br/></p>
+</blockquote>
+<p>Interviewer: With no expression, “Go home and wait to hear from us.” (You can guess the result 😂.)<br/>
+That was Bison’s understanding of multithreading when first starting out 😄.<br/>
+Ultimately, that situation arose because I only knew how to use these tools without understanding their underlying implementation. Now let’s look more seriously at what multithreading actually involves.</p>
+<p>A single-threaded app has one sequential execution flow. A time-consuming operation blocks the main thread, leaving the app unable to proceed and making it feel unresponsive. Think of a blocked river: water cannot flow downstream until the blockage clears. Multithreading is like a river with many branches; if one is blocked, other branches still run without stopping everything. I hope the analogy is reasonable 😄.
+iOS provides excellent multithreading support. Programs can start multiple threads easily to handle the situations mentioned above. This reduces the complexity of building multithreaded apps.
+Almost every operating system can run several tasks at once. A task is usually a program, and each running program is a process. A running program can contain several sequential execution flows, each called a thread. This brings us to the difference between processes and threads, which I used to confuse too 😂. Here is my understanding.
+For reference only.</p>
+<blockquote>
+<p>When a program is loaded into memory and runs, it becomes a process. A process is a running program with independent functionality, and an independent unit for system resource allocation and scheduling.</p>
+</blockquote>
+<p><br/></p>
+<blockquote>
+<p>Threads are parts of a process. A process can contain multiple threads, while every thread must have a parent process. Each thread can have its own stack, program counter and local variables, but does not own separate system resources; it shares all resources owned by the process with the other threads. This makes multithreaded programming convenient, but each thread must avoid interfering with the others.</p>
+</blockquote>
+<p>After that lengthy explanation, you should have a basic understanding of multithreading. Here are several advantages of multithreaded programming; please add any I missed in the comments:</p>
+<ul>
+<li>
+<p>Processes cannot share memory, whereas threads can share it easily. (This is incorrect: shared memory is one of the most efficient forms of interprocess communication. Processes can read and write it directly without copying data. Thanks to @皮皮彭 for the correction.)</p>
+</li>
+<li>Creating a process requires the system to allocate resources anew, whereas creating a thread costs much less. Thus multithreading is more efficient than multiple processes for concurrent tasks.</li>
+<li>iOS provides several multithreading implementations, simplifying multithreaded programming.</li>
+</ul>
+<p>Next, Bison will explain how each is used for multithreading in iOS development.</p>
+<h2 id="nsthread">NSThread</h2>
+<p>iOS represents a thread with the <code class="language-plaintext highlighter-rouge">NSThread </code> class, so creating a new thread means creating an <code class="language-plaintext highlighter-rouge">NSThread </code> object. There are two ways to create an <code class="language-plaintext highlighter-rouge">NSThread </code>.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="nt">创建一个新线程对象</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">instancetype</span><span class="o">)</span><span class="nt">initWithTarget</span><span class="o">:(</span><span class="nt">id</span><span class="o">)</span><span class="nt">target</span> <span class="nt">selector</span><span class="o">:(</span><span class="nt">SEL</span><span class="o">)</span><span class="nt">selector</span> <span class="nt">object</span><span class="o">:(</span><span class="nt">nullable</span> <span class="nt">id</span><span class="o">)</span><span class="nt">argument</span> <span class="nt">NS_AVAILABLE</span><span class="o">(</span><span class="err">10</span><span class="nt">_5</span><span class="o">,</span> <span class="err">2</span><span class="nt">_0</span><span class="o">);</span>
+<span class="o">//</span><span class="nt">创建并启动新线程</span>
+<span class="o">+</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">detachNewThreadSelector</span><span class="o">:(</span><span class="nt">SEL</span><span class="o">)</span><span class="nt">selector</span> <span class="nt">toTarget</span><span class="o">:(</span><span class="nt">id</span><span class="o">)</span><span class="nt">target</span> <span class="nt">withObject</span><span class="o">:(</span><span class="nt">nullable</span> <span class="nt">id</span><span class="o">)</span><span class="nt">argument</span><span class="o">;</span></code></pre></figure>
+<p>Both approaches essentially turn the <code class="language-plaintext highlighter-rouge">target</code> object's <code class="language-plaintext highlighter-rouge">selector</code> method into the thread's execution body. The <code class="language-plaintext highlighter-rouge">selector</code> method accepts at most one parameter, and <code class="language-plaintext highlighter-rouge">argument</code> is the argument passed to <code class="language-plaintext highlighter-rouge">selector</code>.
+There is no substantial difference between these two ways of creating threads. The first is an instance-initialization method that returns an <code class="language-plaintext highlighter-rouge">NSThread </code> object, whose <code class="language-plaintext highlighter-rouge">start</code> method must be called to start the thread. The other does not return an <code class="language-plaintext highlighter-rouge">NSThread </code> object; it creates and starts the new thread directly.
+Here is a simple example:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">viewDidLoad</span>
+<span class="p">{</span>
+    <span class="err">[super</span> <span class="err">viewDidLoad];</span>
+    <span class="err">for(int</span> <span class="err">i</span> <span class="err">=</span> <span class="err">0</span> <span class="err">;</span> <span class="err">i</span> <span class="err">&lt;</span> <span class="err">100</span> <span class="err">;</span> <span class="err">i++)</span>
+    <span class="err">{</span>
+        <span class="err">NSLog(@"===%@===%d"</span> <span class="err">,</span> <span class="err">[NSThread</span> <span class="err">currentThread].name</span> <span class="err">,</span> <span class="err">i);</span>
+    <span class="err">if(i</span> <span class="err">==</span> <span class="err">7)</span>
+    <span class="err">{</span>
+        <span class="err">//</span> <span class="err">创建线程对象</span>
+        <span class="err">NSThread</span> <span class="err">*thread</span> <span class="err">=</span> <span class="err">[[NSThread</span> <span class="err">alloc]</span><span class="py">initWithTarget</span><span class="p">:</span><span class="n">self</span>
+        <span class="n">selector</span><span class="p">:</span><span class="err">@</span><span class="n">selector</span><span class="p">(</span><span class="n">run</span><span class="p">)</span> <span class="n">object</span><span class="p">:</span><span class="n">nil</span><span class="p">];</span>
+        <span class="err">//</span> <span class="err">启动新线程</span>
+        <span class="err">[thread</span> <span class="err">start];</span>
+        <span class="err">//</span> <span class="err">创建并启动新线程</span>
+        <span class="err">//</span>			<span class="err">[NSThread</span> <span class="py">detachNewThreadSelector</span><span class="p">:</span><span class="err">@</span><span class="n">selector</span><span class="p">(</span><span class="n">run</span><span class="p">)</span> <span class="n">toTarget</span><span class="p">:</span><span class="n">self</span>
+        <span class="p">//</span>				<span class="n">withObject</span><span class="p">:</span><span class="n">nil</span><span class="p">];</span>
+        <span class="p">}</span>
+    <span class="err">}</span>
+<span class="err">}</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">run</span>
+<span class="p">{</span>
+    <span class="err">for(int</span> <span class="err">i</span> <span class="err">=</span> <span class="err">0</span> <span class="err">;</span> <span class="err">i</span> <span class="err">&lt;</span> <span class="err">100</span> <span class="err">;</span> <span class="err">i++)</span>
+    <span class="err">{</span>
+        <span class="err">NSLog(@"-----%@----%d"</span> <span class="err">,</span> <span class="err">[NSThread</span> <span class="err">currentThread].name,</span> <span class="err">i);</span>
+    <span class="p">}</span>
+<span class="err">}</span></code></pre></figure>
+<p>Run it; the log output is:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="nt">主线程正在运行</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">400</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104912</span><span class="o">]</span> <span class="o">======</span><span class="err">0</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">401</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104912</span><span class="o">]</span> <span class="o">======</span><span class="err">1</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">401</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104912</span><span class="o">]</span> <span class="o">======</span><span class="err">2</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">401</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104912</span><span class="o">]</span> <span class="o">======</span><span class="err">3</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">401</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104912</span><span class="o">]</span> <span class="o">======</span><span class="err">4</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">401</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104912</span><span class="o">]</span> <span class="o">======</span><span class="err">5</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">401</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104912</span><span class="o">]</span> <span class="o">======</span><span class="err">6</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">402</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104912</span><span class="o">]</span> <span class="o">======</span><span class="err">7</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">402</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104912</span><span class="o">]</span> <span class="o">======</span><span class="err">8</span>
+<span class="o">//</span><span class="nt">新线程开始运行</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">402</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104956</span><span class="o">]</span> <span class="nt">---------0</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">402</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104912</span><span class="o">]</span> <span class="o">======</span><span class="err">9</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">402</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104956</span><span class="o">]</span> <span class="nt">---------1</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">402</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104912</span><span class="o">]</span> <span class="o">======</span><span class="err">10</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">402</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104956</span><span class="o">]</span> <span class="nt">---------2</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">402</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104912</span><span class="o">]</span> <span class="o">======</span><span class="err">11</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">402</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104912</span><span class="o">]</span> <span class="o">======</span><span class="err">12</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">14</span><span class="o">:</span><span class="err">30</span><span class="o">:</span><span class="err">46</span><span class="o">.</span><span class="err">402</span> <span class="nt">NSThreadTest</span><span class="o">[</span><span class="err">7498</span><span class="o">:</span><span class="err">104956</span><span class="o">]</span> <span class="nt">---------3</span>
+<span class="o">................</span></code></pre></figure>
+<p>The result clearly shows two threads executing concurrently. The example also uses <code class="language-plaintext highlighter-rouge">+ (NSThread *)currentThread;</code>, which always returns the currently executing thread object.</p>
+<p>A newly created and started thread does not necessarily begin executing immediately, nor does it remain executing continuously. Even once running, it cannot monopolize the CPU indefinitely. The CPU switches among threads, so their states repeatedly alternate between running and ready.
+After the program creates a thread, it is in the new state. Like other Objective-C objects, it has only had memory allocated and member variables initialized. It does not yet exhibit dynamic thread behavior, and its execution body does not run.
+After the thread object's <code class="language-plaintext highlighter-rouge">start</code> method is called, it enters the ready state. The system creates a method-call stack and program counter for it. It is not yet running; it is eligible to run, with the timing determined by system scheduling.</p>
+<h4 id="终止子线程">Terminate a child thread</h4>
+<p>A thread ends in one of the following 3 ways, after which it is in the dead state.</p>
+<blockquote>
+<p>The thread’s execution method completes, and the thread ends normally.</p>
+</blockquote>
+<p><br/></p>
+<blockquote>
+<p>An error occurs during thread execution.</p>
+</blockquote>
+<p><br/></p>
+<blockquote>
+<p>Call the <code class="language-plaintext highlighter-rouge">NSThread </code> class's exit method directly to terminate the currently executing thread.</p>
+</blockquote>
+<p>To test whether a thread is running, call its <code class="language-plaintext highlighter-rouge">isExecuting</code> and <code class="language-plaintext highlighter-rouge">isFinished</code> methods. During execution, <code class="language-plaintext highlighter-rouge">isExecuting</code> returns YES; after completion, <code class="language-plaintext highlighter-rouge">isFinished</code> returns YES as well.
+To terminate a child thread from the UI thread, note that <code class="language-plaintext highlighter-rouge">NSThread </code> provides no method that directly terminates a particular child thread. Its <code class="language-plaintext highlighter-rouge">cancel</code> method only changes the thread's state, causing isCancelled to return NO, rather than actually terminating it.
+Instead, send a signal to the child thread and check for it within the thread's execution-body method. If the termination signal has been received, the program should call <code class="language-plaintext highlighter-rouge">exit</code> to stop the current execution loop. Here is an example:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">NSThread</span><span class="o">*</span> <span class="nt">thread</span><span class="o">;</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">viewDidLoad</span>
+<span class="p">{</span>
+    <span class="err">[super</span> <span class="err">viewDidLoad];</span>
+    <span class="err">//</span> <span class="err">创建新线程对象</span>
+    <span class="err">thread</span> <span class="err">=</span> <span class="err">[[NSThread</span> <span class="err">alloc]</span> <span class="py">initWithTarget</span><span class="p">:</span><span class="n">self</span> <span class="n">selector</span><span class="p">:</span><span class="err">@</span><span class="n">selector</span><span class="p">(</span><span class="n">run</span><span class="p">)</span>
+    <span class="n">object</span><span class="p">:</span><span class="n">nil</span><span class="p">];</span>
+    <span class="err">//</span> <span class="err">启动新线程</span>
+    <span class="err">[thread</span> <span class="err">start];</span>
+<span class="p">}</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">run</span>
+<span class="p">{</span>
+    <span class="err">for(int</span> <span class="err">i</span> <span class="err">=</span> <span class="err">0</span> <span class="err">;</span> <span class="err">i</span> <span class="err">&lt;</span> <span class="err">100</span> <span class="err">;</span> <span class="err">i++)</span>
+    <span class="err">{</span>
+        <span class="err">if([NSThread</span> <span class="err">currentThread].isCancelled)</span>
+    <span class="err">{</span>
+        <span class="err">//</span> <span class="err">终止当前正在执行的线程</span>
+        <span class="err">[NSThread</span> <span class="err">exit];</span>
+    <span class="p">}</span>
+    <span class="nt">NSLog</span><span class="o">(@</span><span class="s1">"-----%@----%d"</span> <span class="o">,</span> <span class="o">[</span><span class="nt">NSThread</span> <span class="nt">currentThread</span><span class="o">]</span><span class="nc">.name</span><span class="o">,</span> <span class="nt">i</span><span class="o">);</span>
+    <span class="o">//</span> <span class="nt">每执行一次</span><span class="err">，</span><span class="nt">线程暂停0</span><span class="o">.</span><span class="err">5</span><span class="nt">秒</span>
+    <span class="o">[</span><span class="nt">NSThread</span> <span class="nt">sleepForTimeInterval</span><span class="o">:</span><span class="err">0</span><span class="o">.</span><span class="err">5</span><span class="o">];</span>
+<span class="err">}</span>
+<span class="err">}</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">IBAction</span><span class="o">)</span><span class="nt">cancelThread</span><span class="o">:(</span><span class="nt">id</span><span class="o">)</span><span class="nt">sender</span>
+<span class="p">{</span>
+    <span class="err">//</span> <span class="err">取消thread线程，调用该方法后，thread的isCancelled方法将会返回NO</span>
+    <span class="err">[thread</span> <span class="err">cancel];</span> 
+<span class="p">}</span></code></pre></figure>
+<p>To pause the currently executing thread for a while and put it into a blocked state, call the following method.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span>  <span class="nt">让当前正在执行的线程暂停到date代表的时间</span><span class="err">，</span><span class="nt">并进入阻塞状态</span><span class="err">。</span>
+<span class="o">+</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">sleepUntilDate</span><span class="o">:(</span><span class="nt">NSDate</span> <span class="o">*)</span><span class="nt">date</span><span class="o">;</span>
+<span class="o">//</span>  <span class="nt">让当前正在执行的线程暂停到ti秒</span><span class="err">，</span><span class="nt">并进入阻塞状态</span><span class="err">。</span>
+<span class="o">+</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">sleepForTimeInterval</span><span class="o">:(</span><span class="nt">NSTimeInterval</span><span class="o">)</span><span class="nt">ti</span><span class="o">;</span></code></pre></figure>
+<p>Each executing thread has a priority. Higher-priority threads receive more opportunities to execute, while lower-priority threads receive fewer. The default priority of a child thread is 0.5.
+The following code demonstrates <code class="language-plaintext highlighter-rouge">NSThread </code> priorities.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">viewDidLoad</span>
+<span class="p">{</span>
+    <span class="err">[super</span> <span class="err">viewDidLoad];</span>
+    <span class="err">NSLog(@"UI线程的优先级为：%g"</span> <span class="err">,</span> <span class="err">[NSThread</span> <span class="err">threadPriority]);</span>
+    <span class="err">//</span> <span class="err">创建第一个线程对象</span>
+    <span class="err">NSThread*</span> <span class="err">thread1</span> <span class="err">=</span> <span class="err">[[NSThread</span> <span class="err">alloc]</span>
+    <span class="py">initWithTarget</span><span class="p">:</span><span class="n">self</span> <span class="n">selector</span><span class="p">:</span><span class="err">@</span><span class="n">selector</span><span class="p">(</span><span class="n">run</span><span class="p">)</span> <span class="n">object</span><span class="p">:</span><span class="n">nil</span><span class="p">];</span>
+    <span class="err">//</span> <span class="err">设置第一个线程对象的名字</span>
+    <span class="err">thread1.name</span> <span class="err">=</span> <span class="err">@"线程A";</span>
+    <span class="err">NSLog(@"线程A的优先级为：%g"</span> <span class="err">,</span> <span class="err">thread1.threadPriority);</span>
+    <span class="err">//</span> <span class="err">设置使用最低优先级</span>
+    <span class="err">thread1.threadPriority</span> <span class="err">=</span> <span class="err">0.0;</span>
+    <span class="err">//</span> <span class="err">创建第二个线程对象</span>
+    <span class="err">NSThread*</span> <span class="err">thread2</span> <span class="err">=</span> <span class="err">[[NSThread</span> <span class="err">alloc]</span>
+    <span class="py">initWithTarget</span><span class="p">:</span><span class="n">self</span> <span class="n">selector</span><span class="p">:</span><span class="err">@</span><span class="n">selector</span><span class="p">(</span><span class="n">run</span><span class="p">)</span> <span class="n">object</span><span class="p">:</span><span class="n">nil</span><span class="p">];</span>
+    <span class="err">//</span> <span class="err">设置第二个线程对象的名字</span>
+    <span class="err">thread2.name</span> <span class="err">=</span> <span class="err">@"线程B";</span>
+    <span class="err">NSLog(@"线程B的优先级为：%g"</span> <span class="err">,</span> <span class="err">thread2.threadPriority);</span>
+    <span class="err">//</span> <span class="err">设置使用最高优先级</span>
+    <span class="err">thread2.threadPriority</span> <span class="err">=</span> <span class="err">1.0;</span>
+    <span class="err">//</span> <span class="err">启动2个线程</span>
+    <span class="err">[thread1</span> <span class="err">start];</span>
+    <span class="err">[thread2</span> <span class="err">start];</span>
+<span class="p">}</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">run</span>
+<span class="p">{</span>
+    <span class="err">for(int</span> <span class="err">i</span> <span class="err">=</span> <span class="err">0</span> <span class="err">;</span> <span class="err">i</span> <span class="err">&lt;</span> <span class="err">100</span> <span class="err">;</span> <span class="err">i++)</span>
+    <span class="err">{</span>
+        <span class="err">NSLog(@"-----%@----%d"</span> <span class="err">,</span> <span class="err">[NSThread</span> <span class="err">currentThread].name,</span> <span class="err">i);</span>
+    <span class="p">}</span>
+<span class="err">}</span></code></pre></figure>
+<p>The resulting log is shown below.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="err">2016</span><span class="nt">-01-12</span> <span class="err">16</span><span class="o">:</span><span class="err">26</span><span class="o">:</span><span class="err">26</span><span class="o">.</span><span class="err">451</span> <span class="nt">PriorityTest</span><span class="o">[</span><span class="err">10135</span><span class="o">:</span><span class="err">150983</span><span class="o">]</span> <span class="nt">UI线程的优先级为</span><span class="err">：0</span><span class="o">.</span><span class="err">5</span>
+<span class="o">//</span><span class="nt">新线程默认优先级</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">16</span><span class="o">:</span><span class="err">26</span><span class="o">:</span><span class="err">26</span><span class="o">.</span><span class="err">452</span> <span class="nt">PriorityTest</span><span class="o">[</span><span class="err">10135</span><span class="o">:</span><span class="err">150983</span><span class="o">]</span> <span class="nt">线程A的优先级为</span><span class="err">：0</span><span class="o">.</span><span class="err">5</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">16</span><span class="o">:</span><span class="err">26</span><span class="o">:</span><span class="err">26</span><span class="o">.</span><span class="err">452</span> <span class="nt">PriorityTest</span><span class="o">[</span><span class="err">10135</span><span class="o">:</span><span class="err">150983</span><span class="o">]</span> <span class="nt">线程B的优先级为</span><span class="err">：0</span><span class="o">.</span><span class="err">5</span>
+<span class="o">//</span><span class="nt">改变优先级后</span><span class="err">，</span><span class="nt">优先级高的线程</span><span class="err">，</span><span class="nt">获取更多的执行机会</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">16</span><span class="o">:</span><span class="err">26</span><span class="o">:</span><span class="err">26</span><span class="o">.</span><span class="err">453</span> <span class="nt">PriorityTest</span><span class="o">[</span><span class="err">10135</span><span class="o">:</span><span class="err">151058</span><span class="o">]</span> <span class="nt">-----线程B----0</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">16</span><span class="o">:</span><span class="err">26</span><span class="o">:</span><span class="err">26</span><span class="o">.</span><span class="err">453</span> <span class="nt">PriorityTest</span><span class="o">[</span><span class="err">10135</span><span class="o">:</span><span class="err">151058</span><span class="o">]</span> <span class="nt">-----线程B----1</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">16</span><span class="o">:</span><span class="err">26</span><span class="o">:</span><span class="err">26</span><span class="o">.</span><span class="err">453</span> <span class="nt">PriorityTest</span><span class="o">[</span><span class="err">10135</span><span class="o">:</span><span class="err">151058</span><span class="o">]</span> <span class="nt">-----线程B----2</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">16</span><span class="o">:</span><span class="err">26</span><span class="o">:</span><span class="err">26</span><span class="o">.</span><span class="err">454</span> <span class="nt">PriorityTest</span><span class="o">[</span><span class="err">10135</span><span class="o">:</span><span class="err">151058</span><span class="o">]</span> <span class="nt">-----线程B----3</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">16</span><span class="o">:</span><span class="err">26</span><span class="o">:</span><span class="err">26</span><span class="o">.</span><span class="err">454</span> <span class="nt">PriorityTest</span><span class="o">[</span><span class="err">10135</span><span class="o">:</span><span class="err">151058</span><span class="o">]</span> <span class="nt">-----线程B----4</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">16</span><span class="o">:</span><span class="err">26</span><span class="o">:</span><span class="err">26</span><span class="o">.</span><span class="err">454</span> <span class="nt">PriorityTest</span><span class="o">[</span><span class="err">10135</span><span class="o">:</span><span class="err">151058</span><span class="o">]</span> <span class="nt">-----线程B----5</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">16</span><span class="o">:</span><span class="err">26</span><span class="o">:</span><span class="err">26</span><span class="o">.</span><span class="err">454</span> <span class="nt">PriorityTest</span><span class="o">[</span><span class="err">10135</span><span class="o">:</span><span class="err">151058</span><span class="o">]</span> <span class="nt">-----线程B----6</span>
+<span class="err">2016</span><span class="nt">-01-12</span> <span class="err">16</span><span class="o">:</span><span class="err">26</span><span class="o">:</span><span class="err">26</span><span class="o">.</span><span class="err">465</span> <span class="nt">PriorityTest</span><span class="o">[</span><span class="err">10135</span><span class="o">:</span><span class="err">151056</span><span class="o">]</span> <span class="nt">-----线程A----0</span></code></pre></figure>
+<p>That is enough for today; this has become rather long 😄.</p>
+<blockquote>
+<p><a href="/en/journal/2016-01-18-bison-s-guide-to-ios-multithreading-part-2/">Bison's guide to iOS multithreading, part 2</a></p>
+</blockquote>
+<hr/>
+<blockquote>
+<p>Original article: <a href="/en/">https://allluckly.cn/</a><br/></p>
+</blockquote>
+<p>Recommended reading: <a href="/en/journal/2016-01-10-understanding-and-using-core-data-for-persistence/">Understanding and using Core Data for persistence</a><br/></p>
+<p>Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.</p>
+
+{% endraw %}

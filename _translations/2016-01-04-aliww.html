@@ -1,0 +1,114 @@
+---
+layout: post
+title: A Windows AliWangWang-style login screen with a paper-feed animation
+description: Recreates the printer-paper login animation from Windows AliWangWang. Keeping the view's horizontal
+  position and width fixed while gradually adjusting its height creates the unfolding effect; the LBPrinterPaper
+  project supplies the example.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-01-04 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Recreates the printer-paper login animation from Windows AliWangWang. Keeping the view's horizontal position
+    and width fixed while gradually adjusting its height creates the unfolding effect; the LBPrinterPaper project
+    supplies the example.
+  keywords:
+  - UIView animation
+  - frame
+  - login screen
+  - LBPrinterPaper
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  title: A Windows AliWangWang-style login screen with a paper-feed animation
+  source_sha256: 268e4026e79e63db4bf511b8a7e68a93284df7d60a659e926432d2d2e1ea57e1
+lang: en
+source_path: _posts/2016-01-04-aliww.md
+source_url: /sdk/aliww
+permalink: /en/journal/2016-01-04-a-windows-aliwangwang-style-login-screen-with-a-paper-feed-animation/
+translation_method: machine-assisted
+translation_source_sha256: 268e4026e79e63db4bf511b8a7e68a93284df7d60a659e926432d2d2e1ea57e1
+excerpt: Recreates the printer-paper login animation from Windows AliWangWang. Keeping the view's horizontal position
+  and width fixed while gradually adjusting its height creates the unfolding effect; the LBPrinterPaper project
+  supplies the example.
+translation_date: '2026-10-23T02:34:11+00:00'
+---
+{% raw %}
+<blockquote>
+<p>“I happened to notice the interesting login effect in AliWangWang for Windows, so I imitated it with an animation resembling paper coming out of a printer.”</p>
+</blockquote>
+<p><br/>
+I happened to notice the interesting login effect in AliWangWang for Windows, so I imitated it with an animation resembling paper coming out of a printer.<br/>
+Something that looks impressive is not necessarily hard to implement. Here is the main source code.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">createUI</span><span class="p">{</span>
+    <span class="err">UIImageView</span> <span class="err">*backimageView=[[UIImageView</span> <span class="err">alloc]init];</span>
+    <span class="err">backimageView.image</span> <span class="err">=[UIImage</span> <span class="py">imageNamed</span><span class="p">:</span><span class="err">@</span><span class="s1">"1.png"</span><span class="p">];</span>
+    <span class="err">backimageView.frame</span> <span class="err">=</span> <span class="err">CGRectMake(50,</span> <span class="err">100,</span> <span class="err">LBSCREEN_WIDTH-100,</span> <span class="err">30);</span>
+    <span class="err">[self.view</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">backimageView</span><span class="p">];</span>
+    <span class="err">backView</span> <span class="err">=</span> <span class="err">[[UIView</span> <span class="err">alloc]</span><span class="py">initWithFrame</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="m">60</span><span class="p">,</span> <span class="m">115</span><span class="p">,</span> <span class="n">LBSCREEN_WIDTH-120</span><span class="p">,</span> <span class="m">0</span><span class="p">)];</span>
+    <span class="err">backView.layer.cornerRadius</span> <span class="err">=</span> <span class="err">5;</span>
+    <span class="err">backView.backgroundColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="err">whiteColor];</span>
+    <span class="err">backView.layer.borderWidth</span> <span class="err">=</span> <span class="err">1;</span>
+    <span class="err">backView.layer.borderColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="err">blackColor].CGColor;</span>
+    <span class="err">backView.clipsToBounds</span> <span class="err">=</span> <span class="err">YES;</span>
+    <span class="err">[self.view</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">backView</span><span class="p">];</span>
+    <span class="err">login_btn</span> <span class="err">=</span> <span class="err">[UIButton</span> <span class="py">buttonWithType</span><span class="p">:</span><span class="n">UIButtonTypeCustom</span><span class="p">];</span>
+    <span class="err">login_btn.frame</span> <span class="err">=</span> <span class="err">CGRectMake(10,</span> <span class="err">120,</span> <span class="err">LBSCREEN_WIDTH-140,</span> <span class="err">35);</span>
+    <span class="err">[login_btn</span> <span class="py">setTitle</span><span class="p">:</span><span class="err">@</span><span class="s1">"登陆"</span> <span class="n">forState</span><span class="p">:</span><span class="n">UIControlStateNormal</span><span class="p">];</span>
+    <span class="err">login_btn.backgroundColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="err">lightGrayColor];</span>
+    <span class="err">login_btn.layer.cornerRadius</span> <span class="err">=</span> <span class="err">5;</span>
+    <span class="err">login_btn.layer.borderWidth</span> <span class="err">=</span> <span class="err">1;</span>
+    <span class="err">login_btn.layer.borderColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="err">lightGrayColor].CGColor;</span>
+    <span class="err">[login_btn</span> <span class="py">addTarget</span><span class="p">:</span><span class="n">self</span> <span class="n">action</span><span class="p">:</span><span class="err">@</span><span class="n">selector</span><span class="p">(</span><span class="n">passwordClick</span><span class="p">:)</span> <span class="n">forControlEvents</span><span class="p">:</span><span class="n">UIControlEventTouchUpInside</span><span class="p">];</span>
+    <span class="err">login_btn.clipsToBounds</span> <span class="err">=</span> <span class="err">YES;</span>
+    <span class="err">pass_btn</span> <span class="err">=</span> <span class="err">[UIButton</span> <span class="py">buttonWithType</span><span class="p">:</span><span class="n">UIButtonTypeCustom</span><span class="p">];</span>
+    <span class="err">pass_btn.frame</span> <span class="err">=</span> <span class="err">CGRectMake(10,</span> <span class="err">165,</span> <span class="err">LBSCREEN_WIDTH-140,</span> <span class="err">35);</span>
+    <span class="err">[pass_btn</span> <span class="py">setTitle</span><span class="p">:</span><span class="err">@</span><span class="s1">"注册"</span> <span class="n">forState</span><span class="p">:</span><span class="n">UIControlStateNormal</span><span class="p">];</span>
+    <span class="err">pass_btn.backgroundColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="err">redColor];</span>
+    <span class="err">[pass_btn</span> <span class="py">addTarget</span><span class="p">:</span><span class="n">self</span> <span class="n">action</span><span class="p">:</span><span class="err">@</span><span class="n">selector</span><span class="p">(</span><span class="n">passwordClick</span><span class="p">:)</span> <span class="n">forControlEvents</span><span class="p">:</span><span class="n">UIControlEventTouchUpInside</span><span class="p">];</span>
+    <span class="err">pass_btn.layer.cornerRadius</span> <span class="err">=</span> <span class="err">5;</span>
+    <span class="err">pass_btn.layer.borderWidth</span> <span class="err">=</span> <span class="err">1;</span>
+    <span class="err">pass_btn.layer.borderColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="err">lightGrayColor].CGColor;</span>
+    <span class="err">pass_btn.clipsToBounds</span> <span class="err">=</span> <span class="err">YES;</span>
+    <span class="err">Name_textfield</span> <span class="err">=</span> <span class="err">[[UITextField</span> <span class="err">alloc]</span><span class="py">initWithFrame</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="m">10</span><span class="p">,</span> <span class="m">20</span><span class="p">,</span> <span class="n">LBSCREEN_WIDTH-140</span><span class="p">,</span> <span class="m">40</span><span class="p">)];</span>
+    <span class="err">Name_textfield.placeholder</span> <span class="err">=</span> <span class="err">@"帐号";</span>
+    <span class="err">Name_textfield.borderStyle</span> <span class="err">=</span> <span class="err">UITextBorderStyleRoundedRect;</span>
+    <span class="err">Pass_textfield</span> <span class="err">=</span> <span class="err">[[UITextField</span> <span class="err">alloc]</span><span class="py">initWithFrame</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="m">10</span><span class="p">,</span> <span class="m">70</span><span class="p">,</span> <span class="n">LBSCREEN_WIDTH-140</span><span class="p">,</span> <span class="m">40</span><span class="p">)];</span>
+    <span class="err">Pass_textfield.borderStyle</span> <span class="err">=</span> <span class="err">UITextBorderStyleRoundedRect;</span>
+    <span class="err">Pass_textfield.placeholder</span> <span class="err">=</span> <span class="err">@"密码";</span>
+    <span class="err">//2秒后开始一个持续一分钟的动画</span>
+    <span class="err">[UIView</span> <span class="py">animateWithDuration</span><span class="p">:</span><span class="m">1</span> <span class="n">delay</span><span class="p">:</span><span class="m">2</span> <span class="n">options</span><span class="p">:</span><span class="n">UIViewAnimationOptionBeginFromCurrentState</span> <span class="n">animations</span><span class="p">:</span><span class="err">^{</span>
+        <span class="n">backView</span><span class="p">.</span><span class="n">frame</span><span class="err">=</span><span class="n">CGRectMake</span><span class="p">(</span><span class="m">60</span><span class="p">,</span> <span class="m">115</span><span class="p">,</span> <span class="n">LBSCREEN_WIDTH-120</span><span class="p">,</span> <span class="m">210</span><span class="p">);</span>
+    <span class="p">}</span> <span class="nt">completion</span><span class="o">:^(</span><span class="nt">BOOL</span> <span class="nt">finished</span><span class="o">)</span> <span class="p">{</span>
+    
+        <span class="err">[backView</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">Name_textfield</span><span class="p">];</span>
+        <span class="err">dispatch_after(dispatch_time(DISPATCH_TIME_NOW,</span> <span class="err">(int64_t)(0.3</span> <span class="err">*</span> <span class="err">NSEC_PER_SEC)),</span> <span class="err">dispatch_get_main_queue(),</span> <span class="err">^{</span>
+            <span class="err">[backView</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">Pass_textfield</span><span class="p">];</span>
+            <span class="err">dispatch_after(dispatch_time(DISPATCH_TIME_NOW,</span> <span class="err">(int64_t)(0.3</span> <span class="err">*</span> <span class="err">NSEC_PER_SEC)),</span> <span class="err">dispatch_get_main_queue(),</span> <span class="err">^{</span>
+                <span class="err">[backView</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">login_btn</span><span class="p">];</span>
+                <span class="err">dispatch_after(dispatch_time(DISPATCH_TIME_NOW,</span> <span class="err">(int64_t)(0.3</span> <span class="err">*</span> <span class="err">NSEC_PER_SEC)),</span> <span class="err">dispatch_get_main_queue(),</span> <span class="err">^{</span>
+                    <span class="err">[backView</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">pass_btn</span><span class="p">];</span>
+                <span class="p">}</span><span class="o">);</span>
+            <span class="err">}</span><span class="o">);</span>
+        <span class="err">}</span><span class="o">);</span>
+
+    <span class="err">}</span><span class="o">];</span>
+
+<span class="err">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">passwordClick</span><span class="o">:(</span><span class="nt">UIButton</span> <span class="o">*)</span><span class="nt">sender</span><span class="p">{</span>
+    <span class="err">NSLog(@"hhhhh....");</span>
+<span class="p">}</span></code></pre></figure>
+<p><br/>
+It is not hard to understand, is it? The main technique is an animation that changes the frame: keep x, y, and width unchanged, and change the height.<br/>
+Here is the result.<br/></p>
+<p><img alt="(https://allluckly.cn/)" src="https://github.com/AllLuckly/LBPrinterPaper/blob/master/LBPrinterPaper.gif?raw=true"/><br/></p>
+<blockquote>
+<p>Oh, I almost forgot the source-code download link. Here it is.<br/></p>
+</blockquote>
+<p><a href="https://github.com/AllLuckly/LBPrinterPaper">Download link—click here</a><br/></p>
+<p>Recommended reading: <a href="/en/journal/2015-12-28-bison-s-collection-of-solutions-to-common-git-errors/">Bison's collection of solutions to common Git errors</a><br/></p>
+<p>Original article: <a href="/en/">https://allluckly.cn/</a></p>
+
+{% endraw %}

@@ -1,0 +1,562 @@
+---
+layout: post
+title: Optimising UITableViewCell height calculation in Swift
+description: Addresses repeated cell-height calculation by drawing on FDTemplateLayoutCell's template measurement
+  and height-caching approach. A Swift wrapper reduces repeated work during table-view scrolling.
+category: Development notes
+imagefeature: null
+date: 2016-04-25 00:00:00 +0800
+technical_translation:
+  topic: concurrency-performance
+  summary: Addresses repeated cell-height calculation by drawing on FDTemplateLayoutCell's template measurement
+    and height-caching approach. A Swift wrapper reduces repeated work during table-view scrolling.
+  keywords:
+  - UITableViewCell
+  - row-height caching
+  - FDTemplateLayoutCell
+  - Swift
+  - scrolling performance
+  provenance: contribution
+  author_name: 大石头布
+  source_url: http://www.jianshu.com/p/c4a5fc3a4cd3
+  credit: Originally credited to 大石头布; edited and archived by Bison.
+  version_note: Published in 2016. The Swift implementation uses the list-layout and caching interfaces available
+    then.
+  title: Optimising UITableViewCell height calculation in Swift
+  source_sha256: 60067cbd16f1f5c6522dea6deaf91ec4e6449016d524d6cd739c906dda4d9c06
+lang: en
+source_path: _posts/2016-04-25-tuogao40.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao40
+permalink: /en/journal/2016-04-25-optimising-uitableviewcell-height-calculation-in-swift/
+translation_method: machine-assisted
+translation_source_sha256: 60067cbd16f1f5c6522dea6deaf91ec4e6449016d524d6cd739c906dda4d9c06
+excerpt: Addresses repeated cell-height calculation by drawing on FDTemplateLayoutCell's template measurement and
+  height-caching approach. A Swift wrapper reduces repeated work during table-view scrolling.
+translation_date: '2026-10-23T02:34:14+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"Recently I have been trying to improve my iOS skills by reading other developers’ blogs. Without practice I soon forget them, but I do not know where to start practising. So I decided to inspect library implementations. Large libraries are hard to read and discouraging; I will start with smaller ones."</p>
+</blockquote>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/c4a5fc3a4cd3">大石头布</a><br/></p>
+<p>UITableView is a very common iOS component. Anyone learning iOS can use it, but using it well is less easy. Improper use often drops frames and causes stuttering.</p>
+<p>For image-display principles and causes of stuttering, read this article: <a href="http://blog.ibireme.com/2015/11/12/smooth_user_interfaces_for_ios/">iOS techniques for a smooth interface</a> . YY uses asynchronous rendering for a smooth interface, which I do not fully understand yet 😂. The principles of rendering and stuttering are still well worth studying.</p>
+<p>For problems caused by excessive rounded corners or shadows, read <a href="http://www.jianshu.com/p/f970872fdc22">Practical iOS techniques for efficient rounded corners</a> .</p>
+<p>Those details are not the main point. The key is that the system repeatedly calculates TableViewCell heights.</p>
+<p>For detailed explanations of setting UITableViewCell heights and their performance impact, click here: <a href="http://blog.sunnyxx.com/2015/05/17/cell-height-calculation/">Optimising UITableViewCell height calculations</a></p>
+<p>Read the article above: it is by sunnyxx, formerly at Baidu. It details UITableViewCell height-calculation approaches and performance issues, and provides an open-source library to improve UITableView scrolling. The library is here: <a href="https://github.com/forkingdog/UITableView-FDTemplateLayoutCell">UITableView+FDTemplateLayoutCell</a>. The library was version 1.2 when the article was written; it is now 1.5.</p>
+<p>This article explores the corresponding library, version 1.2, and builds a Swift version. I chose it because it is short; I also tried reading YY’s library but found much of it difficult and set it aside.</p>
+<blockquote>
+<p>Why reimplement a library when Objective-C and Swift can bridge? My purpose is to understand every line, the author’s reasoning and its Swift equivalent; the languages differ considerably. Understanding the library also makes it safer to use. Owning a Swift version lets me adapt it to other requirements and apply the ideas to other useful libraries. Many benefits from reading the source!<br/></p>
+</blockquote>
+<p>The library improves scrolling by caching tableViewCell heights. I tested my Swift implementation with sunnyxx’s data and many added emoji. With short text and few emoji, both cached and uncached versions stay near 60 frames per second.</p>
+<p>The cached version runs at over 50 frames per second, while the uncached version drops into the twenties or even teens. (YY’s asynchronous rendering could probably maintain 60.)</p>
+<p>Here are two screenshots. Test on a physical device: the simulator uses the CPU to emulate GPU work and drops frames, obscuring the effect.</p>
+<p>Screenshot while scrolling without caching<br/>
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao40/1.jpg"/><br/></p>
+<p>Screenshot while scrolling with caching<br/>
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao40/2.jpg"/><br/></p>
+<p>The FPS display is a custom view implemented with CADisplayLink, modelled on a class in YY’s library. Inspect the source if interested.</p>
+<p>Displaying many emoji often causes stuttering, especially with repeated Auto Layout calculations. Caching cell heights can alleviate this.</p>
+<p>Now to the main implementation. If you read this article, you already know the approach: <a href="http://blog.sunnyxx.com/2015/05/17/cell-height-calculation/">Optimising UITableViewCell height calculations</a></p>
+<p>It mainly uses RunLoop idle time to calculate tableViewCell heights and cache them. At use time, heights come directly from an in-memory array cache.</p>
+<p>If RunLoop and its modes are unclear, watch the video on sunnyxx’s blog. <a href="http://yun.baidu.com/share/link?shareid=2268593032&amp;uk=2885973690">Watch the video here</a> . For an article, see <a href="http://blog.ibireme.com/2015/05/18/runloop/">Understanding RunLoop in depth</a> ,  <a href="http://www.jianshu.com/p/37ab0397fec7">[iOS program startup and operation] Personal RunLoop notes</a></p>
+<p>If you patiently read the links above, sunnyxx’s explanation should make sense. Calculations run in kCFRunLoopDefaultMode at the BeforeWaiting stage.</p>
+<p>Let’s inspect the source. First, in <a href="https://github.com/forkingdog/UITableView-FDTemplateLayoutCell">UITableView+FDTemplateLayoutCell</a> Download the source, choosing version 1.2. Version 1.5 does not use RunLoop.</p>
+<p>The resulting library has only two files, or one in Swift.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao40/3.png"/><br/></p>
+<p>At a glance, the .m file has only 500 lines.<br/></p>
+<p>P.S. Follow along and you will understand it; there is much more useful detail ahead.<br/></p>
+<p>Look at the author’s implementation, from top to bottom:<br/>
+1. Create _FDTemplateLayoutCellHeightCache to manage the cache, with two properties and four methods.<br/></p>
+<h3 id="属性">Properties:<br/></h3>
+<p>sections is a two-dimensional array storing cached heights, because tableView has both sections and rows.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>_FDTemplateLayoutCellHeightCacheAbsentValue 这个是一个静态常量，就是用来标记没有缓存高度row 。 &lt;br&gt;
+</code></pre></div></div>
+<h3 id="方法">Methods:<br/></h3>
+<p><br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>buildHeightCachesAtIndexPathsIfNeeded:indexPaths
+</code></pre></div></div>
+<p><br/>
+This method takes an indexPaths array to initialise uninitialised elements in sections.
+hasCachedHeightAtIndexPath:indexPath checks whether a cached height exists at the index, essentially comparing it with the static constant above.
+cacheHeight:height:byIndexPath assigns a height in sections by indexPath.
+cachedHeightAtIndexPath:indexPath retrieves it by indexPath.
+This class stores and manages cached values. Here is the Swift implementation.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class ZZTemplateLayoutCellHeightCache:NSObject,NSCopying{
+
+    var sections:[[CGFloat]] = []
+
+    func copyWithZone(zone: NSZone) -&gt; AnyObject {
+        let theCopy = ZZTemplateLayoutCellHeightCache()
+        theCopy.sections = self.sections
+        return theCopy
+    }
+
+    // 标记没有被cache的值
+    static let ZZTemplateLayoutCellHeightCacheAbsentValue:CGFloat = -1
+
+    /**
+     初始化Height缓存数组 对每个元素做标记
+
+     - parameter indexPaths: indexPaths数组
+     */
+    func buildHeightCachesAtIndexPathsIfNeeded(indexPaths:[NSIndexPath]){
+        guard indexPaths.count &gt; 0 else { return }
+        indexPaths.forEach { (indexPath) -&gt; () in
+            //如果section 数组里面还没有 创建一个对象的空数组
+            if indexPath.section &gt;= self.sections.count{
+                self.sections.insert([], atIndex: indexPath.section)
+            }
+
+            var rows = self.sections[indexPath.section]
+            //如果对应的row不存在 创建一个并标记为没有被cache
+            if indexPath.row &gt;= rows.count {
+                rows.insert(ZZTemplateLayoutCellHeightCache.ZZTemplateLayoutCellHeightCacheAbsentValue, atIndex: indexPath.row)
+            }
+            self.sections[indexPath.section] = rows
+        }
+
+    }
+
+    /**
+     indexPath是否已经被缓存
+
+     - parameter indexPath: indexPath
+
+     - returns: Bool
+     */
+    func hasCachedHeightAtIndexPath(indexPath:NSIndexPath)-&gt;Bool{
+
+        self.buildHeightCachesAtIndexPathsIfNeeded([indexPath])
+        return self.sections[indexPath.section][indexPath.row] != ZZTemplateLayoutCellHeightCache.ZZTemplateLayoutCellHeightCacheAbsentValue
+
+    }
+
+    /**
+     缓存高度
+
+     - parameter height:    高度
+     - parameter indexPath: indexPath索引
+     */
+    func cacheHeight(height:CGFloat,byIndexPath indexPath:NSIndexPath){
+
+        self.buildHeightCachesAtIndexPathsIfNeeded([indexPath])
+        self.sections[indexPath.section][indexPath.row] = height
+
+    }
+
+    /**
+     获取已经缓存的height
+
+     - parameter indexPath: indexPath索引
+
+     - returns: height
+     */
+    func cachedHeightAtIndexPath(indexPath:NSIndexPath)-&gt;CGFloat{
+        self.buildHeightCachesAtIndexPathsIfNeeded([indexPath])
+        return self.sections[indexPath.section][indexPath.row]
+    }
+}
+</code></pre></div></div>
+<p><br/>
+I added copyWithZone:, because copying requires NSCopying conformance.<br/></p>
+<p>Continuing, the author adds a UITableView extension.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao40/4.png"/><br/></p>
+<p>Look at the first method.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao40/5.png"/><br/></p>
+<p>This mainly retrieves a cell using the supplied identifier, the reuse ID.</p>
+<p>The first line is:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NSMutableDictionary *templateCellsByIdentifiers = objc_getAssociatedObject(self, _cmd);
+</code></pre></div></div>
+<p><br/>
+Objective-C’s _cmd represents the current method. objc_getAssociatedObject retrieves an associated-object property. In Swift, we can add properties directly to existing system classes.<br/></p>
+<p>For example, this method’s cell has an fd_isTemplateLayoutCell property. Let’s implement a Swift version.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension UITableViewCell{
+    //在私有嵌套 struct 中使用 static var，这样会生成我们所需的关联对象键，但不会污染整个命名空间。
+    private struct AssociatedKeys{
+        static var zz_isTemplateLayoutCell = "zz_isTemplateLayoutCell"
+    }
+
+    ///扩展 添加属性 是否为临时布局的cell
+    var zz_isTemplateLayoutCell:Bool? {
+        set{
+            objc_setAssociatedObject(self, &amp;AssociatedKeys.zz_isTemplateLayoutCell,newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_COPY_NONATOMIC)
+        }
+        get{
+            return objc_getAssociatedObject(self, &amp;AssociatedKeys.zz_isTemplateLayoutCell) as? Bool
+        }
+    }
+}
+</code></pre></div></div>
+<p>Refer to this article. <a href="http://nshipster.cn/swift-objc-runtime/">Swift &amp; the Objective-C Runtime</a><br/>
+Further reading about Runtime: <a href="http://yulingtianxia.com/blog/2014/11/05/objective-c-runtime/">Objective-C Runtime</a><br/>
+<a href="http://yulingtianxia.com/blog/2014/11/05/objective-c-runtime/">Objective-C Runtime: a one-hour introduction</a><br/></p>
+<p>With this understanding, we can add the properties handled through _cmd and the less elegant Objective-C approach using our cleaner Swift implementation.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extension UITableView{
+
+    private struct AssociatedKeys{
+        static var zz_debugLogEnabled = "zz_debugLogEnabled"
+        static var zz_chc = "zz_chc"
+        static var zz_tmpCellForReuseId = "zz_tmpCellForReuseId"
+        static var zz_autoCacheInvalidationEnabled = "zz_autoCacheInvalidationEnabled"
+        static var zz_precacheEnabled = "zz_precacheEnabled"
+    }
+
+    /// 扩展 添加属性 是否在debug的情况下打印
+    var zz_debugLogEnabled:Bool? {
+        set{
+            objc_setAssociatedObject(self, &amp;AssociatedKeys.zz_debugLogEnabled,newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_COPY_NONATOMIC)
+        }
+        get{
+            return objc_getAssociatedObject(self, &amp;AssociatedKeys.zz_debugLogEnabled) as? Bool
+        }
+    }
+
+
+    private var zz_chc:ZZTemplateLayoutCellHeightCache?{
+        set{
+            objc_setAssociatedObject(self, &amp;AssociatedKeys.zz_chc,newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_COPY_NONATOMIC)
+        }
+        get{
+            return objc_getAssociatedObject(self, &amp;AssociatedKeys.zz_chc) as? ZZTemplateLayoutCellHeightCache
+        }
+    }
+
+    private var zz_tmpCellForReuseId:[String:UITableViewCell]?{
+        set{
+            objc_setAssociatedObject(self, &amp;AssociatedKeys.zz_tmpCellForReuseId,newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_COPY_NONATOMIC)
+        }
+        get{
+            return objc_getAssociatedObject(self, &amp;AssociatedKeys.zz_tmpCellForReuseId) as? [String:UITableViewCell]
+        }
+    }
+
+    var zz_autoCacheInvalidationEnabled:Bool?{
+        set{
+            objc_setAssociatedObject(self, &amp;AssociatedKeys.zz_autoCacheInvalidationEnabled,newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_COPY_NONATOMIC)
+        }
+        get{
+            return objc_getAssociatedObject(self, &amp;AssociatedKeys.zz_autoCacheInvalidationEnabled) as? Bool
+        }
+    }
+
+    var zz_precacheEnabled:Bool?{
+        set{
+            objc_setAssociatedObject(self, &amp;AssociatedKeys.zz_precacheEnabled,newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_COPY_NONATOMIC)
+        }
+        get{
+            return objc_getAssociatedObject(self, &amp;AssociatedKeys.zz_precacheEnabled) as? Bool
+        }
+    }
+}
+</code></pre></div></div>
+<p><br/>
+The Swift version of retrieving a cell by its identifier is much shorter.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> /**
+     根据identifier获取UITableViewCell
+
+     - parameter identifier: identifier
+
+     - returns: UITableViewCell
+     */
+    func zz_templateCellForReuseIdentifier(identifier:String)-&gt;UITableViewCell{
+        assert(identifier.characters.count&gt;0, "需要一个正确的identifier - \(identifier)")
+
+        if zz_tmpCellForReuseId == nil {
+            zz_tmpCellForReuseId = [:]
+        }
+        var templateCell = zz_tmpCellForReuseId![identifier]
+        if templateCell == nil{
+
+            templateCell = self.dequeueReusableCellWithIdentifier(identifier)
+            assert(templateCell != nil, "cell必须已经用identifier注册过: - \(identifier)")
+            templateCell!.zz_isTemplateLayoutCell = true
+            zz_tmpCellForReuseId![identifier] = templateCell
+            self.zz_debugLog("cell布局已经创建: - \(identifier)")
+        }
+
+        return templateCell!
+    }
+</code></pre></div></div>
+<p><br/>
+Callers pass an identifier, and the library retrieves the cell through this method.<br/></p>
+<p>A method then retrieves the _FDTemplateLayoutCellHeightCache object managing the cache:
+fd_cellHeightCache</p>
+<p>Because we added properties too, this method is particularly simple.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/**
+     返回ZZTemplateLayoutCellHeightCache的一个实例对象 如果已经存在直接获取
+
+     - returns: ZZTemplateLayoutCellHeightCache对象
+     */
+    func zz_cellHeightCache()-&gt;ZZTemplateLayoutCellHeightCache{
+        if zz_chc == nil{
+            zz_chc = ZZTemplateLayoutCellHeightCache()
+        }
+        return self.zz_chc!
+    }
+</code></pre></div></div>
+<p><br/>
+Next are several properties; we already implemented them more elegantly above, so skip these.<br/></p>
+<p>Next is another category, the important one that calculates heights and calls the cache manager.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao40/6.png"/><br/></p>
+<p>As mentioned in the author’s blog, calculations are divided into RunLoop Source tasks, Source 0, in NSDefaultRunLoopMode just before sleeping.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)performSelector:(SEL)aSelector onThread:(NSThread *)thr withObject:(id)arg waitUntilDone:(BOOL)wait modes:(NSArray *)array;
+</code></pre></div></div>
+<p><br/>
+This creates a Source 0 task, dispatches it to the specified thread’s RunLoop in the given Mode and wakes the RunLoop if it is asleep so it can handle the event.<br/></p>
+<p>Now inspect the Swift implementation:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// MARK: - cell的预缓存
+extension UITableView{
+
+    private func zz_precacheIfNeeded(){
+
+        if let pe = self.zz_precacheEnabled where !pe {
+            return
+        }
+        guard let delegate = self.delegate else { return }
+
+        if !delegate.respondsToSelector(Selector("tableView:heightForRowAtIndexPath:")){
+            return
+        }
+
+        let runLoop = CFRunLoopGetCurrent()
+        //一个空闲的Runloop ，当页面滚动时会切换到"UITrackingRunLoopMode"
+        let runLoopMode = kCFRunLoopDefaultMode
+
+        // 收集所有被缓存过的index paths
+        var mutableIndexPathsToBePrecached = self.zz_allIndexPathsToBePrecached()
+
+        let observer = CFRunLoopObserverCreateWithHandler(kCFAllocatorDefault, CFRunLoopActivity.BeforeWaiting.rawValue, true, 0) { (observer, _) -&gt; Void in
+            // 所有预缓存任务完成的时候 移除Observer
+            if mutableIndexPathsToBePrecached.count == 0{
+                CFRunLoopRemoveObserver(runLoop, observer, runLoopMode)
+                return
+            }
+
+            // 取出第一个indexPath作为此Runloop迭代的任务
+            let indexPath = mutableIndexPathsToBePrecached.first
+            mutableIndexPathsToBePrecached.removeFirst()
+//            这个方法将创建一个 Source 0 任务，分发到指定线程的 RunLoop 中，在给定的 Mode 下执行，若指定的 RunLoop 处于休眠状态，则唤醒它处理事件
+            self.performSelector("zz_precacheIndexPathIfNeeded:", onThread: NSThread.mainThread(), withObject: indexPath, waitUntilDone: false, modes: [NSDefaultRunLoopMode])
+        }
+
+        CFRunLoopAddObserver(runLoop, observer, runLoopMode)
+
+    }
+
+
+    /**
+     如果没有缓存的话 就缓存高度
+
+     - parameter indexPath: indexpath
+     */
+    func zz_precacheIndexPathIfNeeded(indexPath:NSIndexPath){
+        guard let delegate = self.delegate else { return }
+        if !self.zz_cellHeightCache().hasCachedHeightAtIndexPath(indexPath){
+            let height = delegate.tableView!(self, heightForRowAtIndexPath: indexPath)
+            self.zz_cellHeightCache().cacheHeight(height, byIndexPath: indexPath)
+            self.zz_debugLog("Precached - \(indexPath.section) , \(indexPath.row) , \(height)")
+        }
+    }
+
+    /**
+     获取所有需要被缓存的indexPath
+
+     - returns: [indexpath]
+     */
+    func zz_allIndexPathsToBePrecached()-&gt;[NSIndexPath]{
+
+        var allIndexPaths:[NSIndexPath] = []
+        for section in 0..&lt;self.numberOfSections{
+            for row in 0..&lt;self.numberOfRowsInSection(section){
+
+                print("section is :\(section) , row is :\(row) ")
+                let indexPath = NSIndexPath(forRow: row, inSection: section)
+                if !self.zz_cellHeightCache().hasCachedHeightAtIndexPath(indexPath){
+                    allIndexPaths.append(indexPath)
+                }
+
+            }
+        }
+        return allIndexPaths
+    }
+
+}
+</code></pre></div></div>
+<p><br/>
+The comments explain the logic: traverse every section and row, find rows without cached heights and add them to a pending array. Observe RunLoop; when idle, create a Source 0 task to calculate and cache heights. Once precaching completes, remove the observer. Questions are welcome.</p>
+<p>Next is another extension.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao40/7.png"/><br/></p>
+<p>This category looks long but is less intimidating than it appears; most methods follow the same pattern.</p>
+<p>Some operations change cells, so the author must update sections whenever a cell changes and recalculate heights for additions or modifications. This uses method swizzling; fortunately, the earlier blog also demonstrates it in Swift.</p>
+<p>The author puts swizzling in UITableView’s load class method. In Swift we need to override initialize.</p>
+<p>Therefore, the implementation is:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    /**
+      相当于 oc中的load类方法 在方法加载的第一时间执行
+     */
+    public override class func initialize() {
+
+        // 所有有可能要修改height缓存的方法
+        let selectors = [
+                            Selector("reloadData"),
+                            Selector("insertSections:withRowAnimation:"),
+                            Selector("deleteSections:withRowAnimation:"),
+                            Selector("reloadSections:withRowAnimation:"),
+                            Selector("moveSection:toSection:"),
+                            Selector("insertRowsAtIndexPaths:withRowAnimation:"),
+                            Selector("deleteRowsAtIndexPaths:withRowAnimation:"),
+                            Selector("reloadRowsAtIndexPaths:withRowAnimation:"),
+                            Selector("moveRowAtIndexPath:toIndexPath:")
+                        ]
+
+        // 对所有method转换成我们自己写的method
+        for index in 0..&lt;selectors.count{
+
+            let originalSelector = selectors[index]
+            let swizzledSelector = NSSelectorFromString("zz_\(NSStringFromSelector(originalSelector))")
+
+            let originalMethod = class_getInstanceMethod(self, originalSelector)
+            let swizzledMethod = class_getInstanceMethod(self, swizzledSelector)
+
+            let didAddMethod = class_addMethod(self, originalSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))
+
+            if didAddMethod {
+                class_replaceMethod(self, swizzledSelector, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod))
+            } else {
+                method_exchangeImplementations(originalMethod, swizzledMethod);
+            }
+
+        }
+
+    }
+</code></pre></div></div>
+<p><br/>
+Find every method that may change indexPath, then iterate through and replace it. Next, implement our methods.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    func zz_reloadData(){
+        if let zz_auto = self.zz_autoCacheInvalidationEnabled where zz_auto{
+            self.zz_cellHeightCache().sections.removeAll()
+        }
+        self.zz_reloadData()
+        self.zz_precacheIfNeeded()
+    }
+
+    func zz_insertSections(sections: NSIndexSet, withRowAnimation animation: UITableViewRowAnimation){
+        if let zz_auto = self.zz_autoCacheInvalidationEnabled where zz_auto {
+            sections.forEach({ (index) -&gt; () in
+                self.zz_cellHeightCache().sections.insert([], atIndex: index)
+            })
+        }
+
+        self.zz_insertSections(sections, withRowAnimation: animation)
+        self.zz_precacheIfNeeded()
+    }
+
+    func zz_deleteSections(sections: NSIndexSet, withRowAnimation animation: UITableViewRowAnimation){
+
+        if let zz_auto = self.zz_autoCacheInvalidationEnabled where zz_auto {
+            sections.forEach({ (index) -&gt; () in
+                self.zz_cellHeightCache().sections.removeAtIndex(index)
+            })
+        }
+        self.zz_deleteSections(sections, withRowAnimation: animation)
+    }
+</code></pre></div></div>
+<p><br/>
+Only three example methods are shown here. See the source linked at the end for the rest.<br/></p>
+<p>Everything appears ready. Here are the methods exposed to callers.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// MARK: - [Public] 提供给外部的方法
+extension UITableView{
+    /**
+     计算获得height
+
+     - parameter identifier:    id
+     - parameter configuration: configuration
+
+     - returns: height
+     */
+    func zz_heightForCellWithIdentifier(identifier:String,configuration:((cell:UITableViewCell)-&gt;())?)-&gt;CGFloat{
+        // 通过id获取一个cell
+        let cell = self.zz_templateCellForReuseIdentifier(identifier)
+        //手动调用已确保和屏幕上显示的保持一致
+        cell.prepareForReuse()
+        configuration?(cell: cell)
+
+        //手动添加一个约束 确保动态内容 如label
+        let tempWidthConstraint = NSLayoutConstraint(item: cell.contentView,
+            attribute: NSLayoutAttribute.Width,
+            relatedBy: NSLayoutRelation.Equal,
+            toItem: nil,
+            attribute: NSLayoutAttribute.NotAnAttribute,
+            multiplier: 1.0,
+            constant: CGRectGetWidth(self.frame))
+
+        cell.contentView.addConstraint(tempWidthConstraint)
+
+        // 算出size
+        let fittingSize = cell.contentView.systemLayoutSizeFittingSize(UILayoutFittingCompressedSize)
+        // 移除约束
+        cell.contentView.removeConstraint(tempWidthConstraint)
+
+        return fittingSize.height
+    }
+
+    /**
+     供外界使用的方法 提供了高度的缓存
+
+     - parameter identifier:    identifier
+     - parameter indexPath:     indexPath
+     - parameter configuration: 供外部使用的闭包
+     - returns: Height
+     */
+    func zz_heightForCellWithIdentifier(identifier:String,cacheByIndexPath indexPath:NSIndexPath,configuration:((cell:UITableViewCell)-&gt;())?)-&gt;CGFloat{
+
+        if self.zz_autoCacheInvalidationEnabled == nil{
+            self.zz_autoCacheInvalidationEnabled = true
+        }
+
+        if self.zz_precacheEnabled == nil{
+            self.zz_precacheEnabled = true
+        }
+        print("cache : \(indexPath.section) , \(indexPath.row)")
+        // 如果存在缓存 从缓存中返回
+        if self.zz_cellHeightCache().hasCachedHeightAtIndexPath(indexPath){
+            self.zz_debugLog("cache : \(indexPath.section) , \(indexPath.row) , \(self.zz_cellHeightCache().cachedHeightAtIndexPath(indexPath))")
+            return self.zz_cellHeightCache().cachedHeightAtIndexPath(indexPath)
+        }
+
+        //计算 
+        let height = self.zz_heightForCellWithIdentifier(identifier, configuration: configuration)
+
+        self.zz_debugLog("计算出的cache cache : \(indexPath.section) , \(indexPath.row) , \(height)")
+
+        //缓存
+        self.zz_cellHeightCache().cacheHeight(height, byIndexPath: indexPath)
+
+        return height
+    }
+
+}
+</code></pre></div></div>
+<p><br/>
+The first method calculates manually and caches the result; the second reads the cache first, calculating only when no cached value exists.<br/></p>
+<p>Callers only need this to add caching to tableView height calculations.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -&gt; CGFloat {
+
+        return tableView.zz_heightForCellWithIdentifier(String(ZZFeedCell), cacheByIndexPath: indexPath, configuration: { (cell) -&gt; () in
+            guard let cell = cell as? ZZFeedCell else { return }
+            cell.entity = self.feedEntitySections[indexPath.section][indexPath.row]
+        })
+
+    }
+</code></pre></div></div>
+<p><br/>
+I finally finished reading a library. Although small, it is a good start.<br/></p>
+<p>Read the source. URL: <a href="https://github.com/smalldu/ZZTableViewTemplateLayoutCell-Swift">GitHub URL</a><br/></p>
+<p>Discuss questions below. The result is shown above. Download the GitHub source and run it on a physical device. To use it in a Swift project, copy the files shown below into your project.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao40/8.png"/><br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-03-30-combining-aes-encryption-with-base64-encoding-on-ios/">Combining AES encryption with Base64 encoding on iOS</a><br/></p>
+
+{% endraw %}

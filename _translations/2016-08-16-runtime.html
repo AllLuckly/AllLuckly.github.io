@@ -1,0 +1,160 @@
+---
+layout: post
+title: 'Objective-C Runtime in Practice: Mapping Dictionaries to Models'
+description: Moves from manual assignment, KVC, and third-party model libraries to an NSObject category that traverses
+  runtime information and maps dictionaries to models. It also defines the example's support for two levels of nested
+  data.
+category: Development notes
+imagefeature: null
+date: 2016-08-16 00:00:00 +0800
+technical_translation:
+  topic: swift-runtime
+  summary: Moves from manual assignment, KVC, and third-party model libraries to an NSObject category that traverses
+    runtime information and maps dictionaries to models. It also defines the example's support for two levels of
+    nested data.
+  keywords:
+  - Objective-C Runtime
+  - dictionary-to-model mapping
+  - KVC
+  - NSObject categories
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  title: 'Objective-C Runtime in Practice: Mapping Dictionaries to Models'
+  source_sha256: 39049268a4c141e02aeafbffff87561833dfa95044ba8cd053ed56dc5c180671
+lang: en
+source_path: _posts/2016-08-16-runtime.md
+source_url: /runtime/runtime
+permalink: /en/journal/2016-08-16-objective-c-runtime-in-practice-mapping-dictionaries-to-models/
+translation_method: machine-assisted
+translation_source_sha256: 39049268a4c141e02aeafbffff87561833dfa95044ba8cd053ed56dc5c180671
+excerpt: Moves from manual assignment, KVC, and third-party model libraries to an NSObject category that traverses
+  runtime information and maps dictionaries to models. It also defines the example's support for two levels of nested
+  data.
+translation_date: '2026-10-23T02:52:08+00:00'
+---
+{% raw %}
+<p><img alt="1" src="https://allluckly.cn/images/blog/runtime/1.jpg"/><br/></p>
+<p>It has been a while since my last article because our company project has been busy.
+Here is a beginner’s evolution—come and see 😄. When I was starting out, I dutifully wrote the following code in models to convert dictionaries:</p>
+<p>1. Manual parsing</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//手动解析
+ - (instancetype)initWithDic
+{
+    self = [super init];
+    if (self) {
+        xxx = dic[@"xxx"];
+        ...
+    }
+    return self;
+}
+</code></pre></div></div>
+<p>2. KVC parsing</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//kvc解析
+ - (instancetype)initWithDic
+{
+    self = [super init];
+    if (self) {
+        [self setValuesForKeysWithDictionary:dict];
+    }
+    return self;
+}
+
+</code></pre></div></div>
+<p>3. Third-party frameworks</p>
+<hr/>
+<p>Does this look familiar? Everyone evolves when learning iOS. I wrote this way until leaving that company and being thoroughly challenged in interviews elsewhere by sophisticated low-level questions. Interviews can help us grow: seeing gaps forces us to improve. I hope that reflection helps. Now to the subject.</p>
+<p>I generally use KVC for parsing, sometimes with third-party frameworks such as MJ's <code class="language-plaintext highlighter-rouge">MJExtension</code> or <code class="language-plaintext highlighter-rouge">JsonModel</code>. I hear <code class="language-plaintext highlighter-rouge">RunTime</code> has become a popular interview topic. To be honest, my low-level knowledge is weak because I rarely use it in actual projects and forget it after a while. Plenty of material is already online, but I will join in too. 😄 Here is some practical work from studying <code class="language-plaintext highlighter-rouge">RunTime</code>.</p>
+<p>1. First, create an NSObject category named <code class="language-plaintext highlighter-rouge">DicToModel</code>.</p>
+<p>2. Add a dictionary-to-model method named:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
++ (instancetype)createModelWithDict:(NSDictionary *)dict;
+
+</code></pre></div></div>
+<p>3. Import the runtime header: <code class="language-plaintext highlighter-rouge">#import &lt;objc/message.h&gt;</code>.</p>
+<p>4. Implement the methods declared in the .h file.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (instancetype)createModelWithDict:(NSDictionary *)dict{
+    
+    // 1.创建对应类的对象
+    id model = [[self alloc] init];
+    
+    // runtime:遍历模型中所有成员属性,去字典中查找
+    // 属性定义在哪,定义在类,类里面有个属性列表(数组)
+    
+    // 遍历模型所有成员属性
+    // ivar:成员属性
+    // class_copyIvarList:把成员属性列表复制一份给你
+    // Ivar *:指向Ivar指针
+    // Ivar *:指向一个成员变量数组
+    // class:获取哪个类的成员属性列表
+    // count:成员属性总数
+    unsigned int count = 0;
+    Ivar *ivarList = class_copyIvarList([self class], &amp;count);
+    for (int i = 0 ; i &lt; count; i++) {
+        // 获取成员属性
+        Ivar ivar = ivarList[i];
+        
+        // 获取成员名
+        NSString *propertyName = [NSString stringWithUTF8String:ivar_getName(ivar)];
+        // 获取key
+        NSString *key = [propertyName substringFromIndex:1];
+        
+        // user value:字典
+        // 获取字典的value
+        id value = dict[key];
+        // 给模型的属性赋值
+        // value:字典的值
+        // key:属性名
+        
+        // 成员属性类型
+        NSString *propertyType = [NSString stringWithUTF8String:ivar_getTypeEncoding(ivar)];
+        // 二级转换
+        // 值是字典,成员属性的类型不是字典,才需要转换成模型
+        if ([value isKindOfClass:[NSDictionary class]] &amp;&amp; ![propertyType containsString:@"NSDictionary"]) { // 需要字典转换成模型
+            // @"@\"xxxx\"" 截取类名字符串
+            NSRange range = [propertyType rangeOfString:@"\""];
+            propertyType = [propertyType substringFromIndex:range.location + range.length];
+            // xxxx\"";
+            range = [propertyType rangeOfString:@"\""];
+            propertyType = [propertyType substringToIndex:range.location];
+            // 获取需要转换类的类对象
+            Class modelClass =  NSClassFromString(propertyType);
+            
+            if (modelClass) {
+                value =  [modelClass createModelWithDict:value];
+            }
+        }
+        if (value) {// KVC赋值:不能传空
+            [model setValue:value forKey:key];
+            
+        }
+        
+    }
+    
+    
+    return model;
+}
+
+</code></pre></div></div>
+<p>The code above implements two-level dictionary-to-model conversion and generally works for ordinary cases. To support other cases, add <code class="language-plaintext highlighter-rouge">value isKindOfClass</code> checks and the corresponding handling. See the comments for details. Next, here is how to call it:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)viewDidLoad {
+    [super viewDidLoad];
+    // 解析Plist
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"status.plist" ofType:nil];
+    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:filePath];
+    NSArray *dictArr = dict[@"statuses"];
+    NSMutableArray *statusesData = [NSMutableArray array];
+    // 遍历字典数组
+    for (NSDictionary *dict in dictArr) {
+        //传字典给我们写的分类返回一个status的模型
+        Status *status = [Status createModelWithDict:dict];
+        [statusesData addObject:status];
+    }
+    NSLog(@"%@",statusesData);
+}
+</code></pre></div></div>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

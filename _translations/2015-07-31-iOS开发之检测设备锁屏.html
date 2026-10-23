@@ -1,0 +1,89 @@
+---
+layout: post
+title: Detecting device locking in an iOS app
+description: Records SpringBoard lock-notification handling used to investigate a failure in an embedded game when
+  the device locked. It preserves the troubleshooting approach and callback code; the conditions under which those
+  interfaces may be used need separate verification.
+category: Development notes
+imagefeature: picture-37.jpg
+date: 2015-07-31 00:00:00 +0800
+technical_translation:
+  topic: tooling-release
+  summary: Records SpringBoard lock-notification handling used to investigate a failure in an embedded game when
+    the device locked. It preserves the troubleshooting approach and callback code; the conditions under which those
+    interfaces may be used need separate verification.
+  keywords:
+  - lock notifications
+  - SpringBoard
+  - CFNotificationCenter
+  - troubleshooting
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Published in 2015. The example listens for com.apple.springboard lock-screen notifications.
+  title: Detecting device locking in an iOS app
+  source_sha256: 4c32bdc2ee1c3061b17fdce25683a750bb9232c30071473f7336d9a4745bef80
+lang: en
+source_path: _posts/2015-07-31-iOS开发之检测设备锁屏.md
+source_url: /iOS%E5%BC%80%E5%8F%91%E4%B9%8B%E6%A3%80%E6%B5%8B%E8%AE%BE%E5%A4%87%E9%94%81%E5%B1%8F
+permalink: /en/journal/2015-07-31-detecting-device-locking-in-an-ios-app/
+translation_method: machine-assisted
+translation_source_sha256: 4c32bdc2ee1c3061b17fdce25683a750bb9232c30071473f7336d9a4745bef80
+excerpt: Records SpringBoard lock-notification handling used to investigate a failure in an embedded game when the
+  device locked. It preserves the troubleshooting approach and callback code; the conditions under which those interfaces
+  may be used need separate verification.
+translation_date: '2026-10-23T02:34:09+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"Health is the foundation of everything. Getting more exercise is the way to go."
+<small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p>A recent project contains an embedded game, and the app crashes as soon as the screen locks.
+I spent a long time looking for a solution.</p>
+<p>The code is as follows<br/></p>
+<p>Core code</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nf">#define</span> <span class="nt">NotificationLock</span> <span class="nt">CFSTR</span><span class="o">(</span><span class="s1">"com.apple.springboard.lockcomplete"</span><span class="o">)</span>
+
+<span class="nf">#define</span> <span class="nt">NotificationChange</span> <span class="nt">CFSTR</span><span class="o">(</span><span class="s1">"com.apple.springboard.lockstate"</span><span class="o">)</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">application</span><span class="o">:(</span><span class="nt">UIApplication</span> <span class="o">*)</span><span class="nt">application</span> <span class="nt">didFinishLaunchingWithOptions</span><span class="o">:(</span><span class="nt">NSDictionary</span> <span class="o">*)</span><span class="nt">launchOptions</span> <span class="p">{</span>
+
+    
+    <span class="err">[self</span> <span class="err">lookLockScreen];</span>
+
+    <span class="err">return</span> <span class="err">YES;</span>
+    
+<span class="p">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">lookLockScreen</span>
+<span class="p">{</span>
+    <span class="err">CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),</span> <span class="err">NULL,</span> <span class="err">screenLockStateChanged,</span> <span class="err">NotificationLock,</span> <span class="err">NULL,</span> <span class="err">CFNotificationSuspensionBehaviorDeliverImmediately);</span>
+
+    <span class="err">CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),</span> <span class="err">NULL,</span> <span class="err">screenLockStateChanged,</span> <span class="err">NotificationChange,</span> <span class="err">NULL,</span> <span class="err">CFNotificationSuspensionBehaviorDeliverImmediately);</span>
+
+
+<span class="p">}</span>
+
+<span class="nt">static</span> <span class="nt">void</span> <span class="nt">screenLockStateChanged</span><span class="o">(</span><span class="nt">CFNotificationCenterRef</span> <span class="nt">center</span><span class="o">,</span><span class="nt">void</span><span class="o">*</span> <span class="nt">observer</span><span class="o">,</span><span class="nt">CFStringRef</span> <span class="nt">name</span><span class="o">,</span><span class="nt">const</span> <span class="nt">void</span><span class="o">*</span> <span class="nt">object</span><span class="o">,</span><span class="nt">CFDictionaryRef</span> <span class="nt">userInfo</span><span class="o">)</span>
+
+<span class="p">{</span>
+
+    <span class="err">NSString*</span> <span class="err">lockstate</span> <span class="err">=</span> <span class="err">(__bridge</span> <span class="err">NSString*)name;</span>
+
+    <span class="err">if</span> <span class="err">([lockstate</span> <span class="py">isEqualToString</span><span class="p">:(</span><span class="n">__bridge</span>  <span class="n">NSString</span><span class="err">*</span><span class="p">)</span><span class="n">NotificationLock</span><span class="p">])</span> <span class="err">{</span>
+
+        <span class="p">//</span><span class="n">锁屏</span>
+        <span class="n">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s1">"locked."</span><span class="p">);</span>
+
+    <span class="p">}</span> <span class="nt">else</span> <span class="p">{</span>
+        <span class="err">//锁屏状态改变</span>
+        <span class="err">NSLog(@"lock</span> <span class="err">state</span> <span class="err">changed.");</span>
+
+    <span class="p">}</span>
+
+<span class="err">}</span></code></pre></figure>
+<p><br/></p>
+
+{% endraw %}

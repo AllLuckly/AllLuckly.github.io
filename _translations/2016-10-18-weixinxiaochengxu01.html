@@ -1,0 +1,123 @@
+---
+layout: post
+title: WeChat Mini Programs from Scratch, Part 2
+description: Adds an article detail page to the existing list, using navigator for navigation and parameters. It
+  then adjusts spacing, image placement, and text layout in WXSS to refine the list into the intended page design.
+category: Development notes
+imagefeature: null
+date: 2016-10-18 00:00:00 +0800
+technical_translation:
+  topic: web-notes
+  summary: Adds an article detail page to the existing list, using navigator for navigation and parameters. It then
+    adjusts spacing, image placement, and text layout in WXSS to refine the list into the intended page design.
+  keywords:
+  - WeChat Mini Programs
+  - navigator
+  - WXSS
+  - page navigation
+  - list layout
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  version_note: This installment was written during the WeChat Mini Programs closed beta in 2016.
+  author_url: https://allluckly.cn/about/
+  title: WeChat Mini Programs from Scratch, Part 2
+  source_sha256: 590340ac9b1949bc331c15fe1070861fd75dc95caf47e71008e1a32e2b73967f
+lang: en
+source_path: _posts/2016-10-18-weixinxiaochengxu01.md
+source_url: /%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/weixinxiaochengxu01
+permalink: /en/journal/2016-10-18-wechat-mini-programs-from-scratch-part-2/
+translation_method: machine-assisted
+translation_source_sha256: 590340ac9b1949bc331c15fe1070861fd75dc95caf47e71008e1a32e2b73967f
+excerpt: Adds an article detail page to the existing list, using navigator for navigation and parameters. It then
+  adjusts spacing, image placement, and text layout in WXSS to refine the list into the intended page design.
+translation_date: '2026-10-23T02:45:04+00:00'
+---
+{% raw %}
+<p><img alt="1" src="https://allluckly.cn/images/blog/weixinxiaochengxu/20161017/1.png"/><br/></p>
+<p>From <a href="http://www.jianshu.com/p/ccf40205300f">WeChat Mini Programs from Scratch, Part 1</a></p>
+<p>, we learned to set up a WeChat Mini Program and display an article list. This article covers tapping list items and refining the UI to achieve the intended result.</p>
+<p>First, create the files required by the detail screen, as shown:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/weixinxiaochengxu/20161018/1.png"/><br/></p>
+<p>For now, create a simple detail page; the main goal is learning navigation.</p>
+<p>First, put some arbitrary content on the detail page:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!--detail.wxml--&gt;
+&lt;view class="container"&gt;
+666666
+&lt;/view&gt;
+
+</code></pre></div></div>
+<p>The detail page will display 666666. Then write the navigation code in index.wxml; the main code follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;navigator url="navigate?title=navigate" hover-class="navigator-hover"&gt;
+跳转到新页面
+&lt;/navigator&gt;
+</code></pre></div></div>
+<p>Here, <code class="language-plaintext highlighter-rouge">url</code> is the in-app navigation link, <code class="language-plaintext highlighter-rouge">title=navigate</code> is the field passed to the destination, and <code class="language-plaintext highlighter-rouge">hover-class</code> specifies the class used while pressed. With hover-class="none", there is no pressed-state effect. The complete code is in the outlined area of the image below.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/weixinxiaochengxu/20161018/2.png"/><br/></p>
+<p>Run it to see the following result.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/weixinxiaochengxu/20161018/3.gif"/><br/></p>
+<p>The image shows that navigation is working. Next, improve the homepage UI, mainly in <code class="language-plaintext highlighter-rouge">index.wxss</code>, defining settings for each control's class name. Start with the whole page, using the following code:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/**index.wxss**/
+.list {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20rpx;
+}
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">padding</code> specifies inner spacing. The homepage's class is list, so use .list{} to style it. Next style the navigator block and each list item, which I named cell to feel familiar to iOS developers. The full code follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>navigator{ overflow: hidden;}
+
+.cell{
+  margin-bottom:  20rpx;
+  height: 200rpx;
+  position: relative;
+}
+</code></pre></div></div>
+<p>Next, set the image's position in the cell:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.imgs{
+  float: right;
+}
+.imgs image { 
+  display: block;
+  width: 200rpx;
+  height: 200rpx;
+}
+</code></pre></div></div>
+<p>The code right-aligns the image and sets both width and height to 200rpx. Run it to check whether the image changes.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/weixinxiaochengxu/20161018/4.png"/><br/></p>
+<p>The image should now roughly match our target. Next, adjust the title and remaining UI. Place those elements in class=”infos”; first, configure that whole area's layout:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.infos {
+  float: left; 
+  width: 480rpx;
+  height: 200rpx;
+  padding: 20rpx 0 0 20rpx;
+}
+</code></pre></div></div>
+<p>Then configure each component as follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.title {font-size: 20px;}
+
+.date {
+  padding-top: 50rpx;
+  float: right;
+  font-size: 16px;
+  color: #aaa;
+  position: relative;
+
+}
+.classification{
+  padding-top: 50rpx;
+  font-size: 16px;
+  color: #aaa;
+  position: relative;
+}
+
+</code></pre></div></div>
+<p>Finally, run it and inspect the result:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/weixinxiaochengxu/20161018/5.gif"/><br/></p>
+<p>When I have time, I will cover network requests and combine them with this <a href="https://github.com/AllLuckly/IT-Blog_Wechat">demo </a>write</p>
+<p>This article is an original work by <a href="/en/">Bison</a>. Credit the source when reproducing it; otherwise, legal responsibility will be pursued.</p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

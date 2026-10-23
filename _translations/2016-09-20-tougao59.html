@@ -1,0 +1,298 @@
+---
+layout: post
+title: Animating iOS Buttons with Core Animation
+description: Builds on Core Animation fundamentals to animate button gradients and shapes with CALayer, CABasicAnimation,
+  and animation groups. It explains layer properties, timing, and the organization of cooperating animations.
+category: Development notes
+imagefeature: null
+date: 2016-09-20 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Builds on Core Animation fundamentals to animate button gradients and shapes with CALayer, CABasicAnimation,
+    and animation groups. It explains layer properties, timing, and the organization of cooperating animations.
+  keywords:
+  - Core Animation
+  - CABasicAnimation
+  - CAAnimationGroup
+  - button animation
+  provenance: contribution
+  author_name: Sindri
+  source_url: http://www.jianshu.com/p/2b73dd95b125
+  credit: Originally credited to Sindri; edited and archived by Bison.
+  title: Animating iOS Buttons with Core Animation
+  source_sha256: 10e332179bb5f3dedc2564a17c3c96ad0aa85a800f20e7e118f32badf055976e
+lang: en
+source_path: _posts/2016-09-20-tougao59.md
+source_url: /%E6%8A%95%E7%A8%BF/tougao59
+permalink: /en/journal/2016-09-20-animating-ios-buttons-with-core-animation/
+translation_method: machine-assisted
+translation_source_sha256: 10e332179bb5f3dedc2564a17c3c96ad0aa85a800f20e7e118f32badf055976e
+excerpt: Builds on Core Animation fundamentals to animate button gradients and shapes with CALayer, CABasicAnimation,
+  and animation groups. It explains layer properties, timing, and the organization of cooperating animations.
+translation_date: '2026-10-23T02:45:04+00:00'
+---
+{% raw %}
+<p>In the previous article,<a href="http://sindrilin.com/animate/2016/06/07/认识CoreAnimation">Understanding CoreAnimation</a>, I introduced the system animation library,<code class="language-plaintext highlighter-rouge">CoreAnimation</code>. Animation libraries offer many benefits, which I will not repeat. This article continues the previous discussion by implementing effects with the basic animation classes introduced there.</p>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Source: <a href="http://www.jianshu.com/p/2b73dd95b125">Sindri’s Notes</a><br/></p>
+<p>Here is the effect:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao59/1.gif"/><br/></p>
+<p>The demo mainly uses fades and transformations. An earlier article created the same effects with the <code class="language-plaintext highlighter-rouge">UIView</code> animation API; this time we will use <code class="language-plaintext highlighter-rouge">CoreAnimation</code>.</p>
+<h2 id="关于图层">About layers</h2>
+<p>On iOS, every <code class="language-plaintext highlighter-rouge">UIView</code> has an associated <code class="language-plaintext highlighter-rouge">CALayer</code> responsible for drawing and displaying its contents. Like a view, <code class="language-plaintext highlighter-rouge">CALayer</code> has a tree of sublayers and similar interfaces. <code class="language-plaintext highlighter-rouge">CALayer</code> is the base layer class, primarily providing display bounds and hierarchy interfaces, and we use its subclasses. The following adds a purple circular layer at the center of the view controller's view:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>override func viewDidLoad() {
+    super.viewDidLoad()
+    
+    let layer = CAShapeLayer()
+    layer.fillColor = UIColor.purpleColor().CGColor
+    layer.path = UIBezierPath(arcCenter: CGPoint(x: UIScreen.mainScreen().bounds.width / 2, y: UIScreen.mainScreen().bounds.height / 2), radius: 100, startAngle: 0, endAngle: 2.0*CGFloat(M_PI), clockwise: false).CGPath
+    self.view.layer.addSublayer(layer)
+}
+</code></pre></div></div>
+<p>Likewise, every <code class="language-plaintext highlighter-rouge">CALayer</code> has a <code class="language-plaintext highlighter-rouge">sublayers</code> array that we can enumerate for operations such as removing child layers:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for sublayer in self.view.layer.sublayers! {
+    print("\(sublayer)")
+    sublayer.removeFromSuperlayer()
+}
+</code></pre></div></div>
+<p>Since Core Animation effects are added to <code class="language-plaintext highlighter-rouge">CALayer</code> layers, adding and removing layers are among the most common operations. The <code class="language-plaintext highlighter-rouge">addAnimation(anim:forKey:)</code> interface adds an animation to a layer.</p>
+<p>## Basic animation</p>
+<p>The basic-animation class <code class="language-plaintext highlighter-rouge">CABasicAnimation</code> is the most frequently used for effects. It inherits from the animation base <code class="language-plaintext highlighter-rouge">CAAnimation</code> and provides a <code class="language-plaintext highlighter-rouge">keyPath</code> property to animate the corresponding <code class="language-plaintext highlighter-rouge">keyPath</code> property value. Its <code class="language-plaintext highlighter-rouge">fromValue</code> and <code class="language-plaintext highlighter-rouge">toValue</code> specify start and end values. The following makes the purple layer added to the view transparent:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@IBAction func actionToAnimatedLayer(sender: AnyObject) {
+    let animation = CABasicAnimation(keyPath: "opacity")
+    animation.fromValue = NSNumber(double: 1)
+    animation.toValue = NSNumber(double: 0)
+    animation.duration = 1
+    layer.addAnimation(animation, forKey: nil)
+}
+</code></pre></div></div>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao59/2.gif"/><br/></p>
+<p>The code animates the layer's <code class="language-plaintext highlighter-rouge">opacity</code> from <code class="language-plaintext highlighter-rouge">1</code> to <code class="language-plaintext highlighter-rouge">0</code> within 1 second. Yet afterward, the purple layer does not retain <code class="language-plaintext highlighter-rouge">opacity</code> equal to <code class="language-plaintext highlighter-rouge">0</code>; it returns to its initial state. Why?</p>
+<p>The previous article described three trees in every <code class="language-plaintext highlighter-rouge">CALayer</code>: <code class="language-plaintext highlighter-rouge">模型</code>, <code class="language-plaintext highlighter-rouge">呈现</code>, and <code class="language-plaintext highlighter-rouge">渲染</code>, which work together for implicit animation. With Core Animation, <code class="language-plaintext highlighter-rouge">CABasicAnimation</code> calculates each frame's property value from the duration and submits it to <code class="language-plaintext highlighter-rouge">呈现树</code> to display the corresponding instant. When the animation ends, <code class="language-plaintext highlighter-rouge">CAAnimation</code> is automatically removed from the layer. Since <code class="language-plaintext highlighter-rouge">模型树</code> never changed during the animation, <code class="language-plaintext highlighter-rouge">呈现树</code> obtains the layer properties again from <code class="language-plaintext highlighter-rouge">模型树</code> and redraws. There are several solutions:</p>
+<ul>
+<li>
+<p>Update <code class="language-plaintext highlighter-rouge">opacity</code> while implementing the animation so the model-tree data stays synchronized.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@IBAction func actionToAnimatedLayer(sender: AnyObject) {
+    let animation = CABasicAnimation(keyPath: "opacity")
+    animation.fromValue = NSNumber(double: 1)
+    animation.toValue = NSNumber(double: 0)
+    animation.fillMode = kCAFillModeForwards
+    animation.removedOnCompletion = false
+    animation.duration = 1
+    
+    layer.addAnimation(animation, forKey: nil)
+}
+</code></pre></div> </div>
+</li>
+<li>
+<p>Disable automatic removal of <code class="language-plaintext highlighter-rouge">CAAnimation</code> and configure it to retain its final state after completion.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  @IBAction func actionToAnimatedLayer(sender: AnyObject) {
+      let animation = CABasicAnimation(keyPath: "opacity")
+      animation.fromValue = NSNumber(double: 1)
+      animation.toValue = NSNumber(double: 0)
+      animation.fillMode = kCAFillModeForwards
+      animation.removedOnCompletion = false
+      animation.duration = 1
+      layer.addAnimation(animation, forKey: nil)
+  }
+</code></pre></div> </div>
+</li>
+<li>
+<p>Implement the animation delegate method, combining the operations from the two approaches above.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  @IBAction func actionToAnimatedLayer(sender: AnyObject) {
+      let animation = CABasicAnimation(keyPath: "opacity")
+      animation.fromValue = NSNumber(double: 1)
+      animation.toValue = NSNumber(double: 0)
+      animation.fillMode = kCAFillModeForwards
+      animation.removedOnCompletion = false
+      animation.duration = 1
+			
+      animation.setValue(layer, forKey: "animatedLayer")
+      animation.delegate = self
+      layer.addAnimation(animation, forKey: nil)
+  }
+
+  override func animationDidStop(anim: CAAnimation, finished flag: Bool) {
+      if anim is CABasicAnimation {
+          let animation = anim as! CABasicAnimation
+          if let layer = animation.valueForKey("animatedLayer") as? CALayer {
+              layer.setValue(animation.toValue, forKey: animation.keyPath!)
+              layer.removeAllAnimations()
+          }
+      }
+  }
+</code></pre></div> </div>
+</li>
+</ul>
+<p>Compared with the first two approaches, implementing a delegate and updating properties seems cumbersome. But when a layer must be removed or other work performed after animation, a delegate is the best approach. Other commonly used <code class="language-plaintext highlighter-rouge">keyPath</code> animation values can be found in <a href="http://www.cnblogs.com/bucengyongyou/archive/2012/12/20/2826590.html">Here,</a>see</p>
+<h2 id="动画组">Animation groups</h2>
+<p>To add a transformation to the fade above, I need two <code class="language-plaintext highlighter-rouge">CABasicAnimation</code> objects:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@IBAction func actionToAnimatedLayer(sender: AnyObject) {
+    let opacity = CABasicAnimation(keyPath: "opacity")
+    opacity.fromValue = NSNumber(double: 1)
+    opacity.toValue = NSNumber(double: 0)
+    opacity.duration = 1
+    
+    layer.addAnimation(opacity, forKey: "opacity")
+    
+    let scale = CABasicAnimation(keyPath: "transform")
+    scale.fromValue = NSValue(CATransform3D: CATransform3DIdentity)
+    scale.toValue = NSValue(CATransform3D: CATransform3DMakeScale(2, 2, 2))
+    scale.duration = 1
+    
+    layer.addAnimation(scale, forKey: "scale")
+}
+</code></pre></div></div>
+<p>Alternatively, <code class="language-plaintext highlighter-rouge">CoreAnimation</code> provides <code class="language-plaintext highlighter-rouge">CAAnimationGroup</code> to combine several animations into one object added to the layer. The resulting behavior does not differ from the preceding code, but the logic can be clearer:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@IBAction func actionToAnimatedLayer(sender: AnyObject) {
+    // create animations
+
+    let group = CAAnimationGroup()
+    group.animations = [opacity, scale]
+    group.duration = 1
+    layer.addAnimation(group, forKey: "group")
+}
+</code></pre></div></div>
+<h2 id="按钮动画">Button animation</h2>
+<p>The transformation and fade correspond respectively to <code class="language-plaintext highlighter-rouge">transform</code> and <code class="language-plaintext highlighter-rouge">opacity</code>, the two <code class="language-plaintext highlighter-rouge">keyPath</code> values. The animated layer is not the button's own layer, so an additional layer is needed. We also need an enumeration to distinguish outward and inward expansion effects:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>enum LXDAnimationType {
+    case Inner
+    case Outer
+}
+</code></pre></div></div>
+<p>Swift <code class="language-plaintext highlighter-rouge">extension</code> does not support adding stored properties, so use dynamic association through <code class="language-plaintext highlighter-rouge">runtime</code> to extend the button with animation-type and animation-color properties:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>private var kAnimationTypeKey: UInt = 0
+private var kAnimationColorKey: UInt = 1
+extension UIButton {
+
+    enum LXDAnimationType {
+        case Inner
+        case Outer
+    }
+
+    //MARK: - Expand property
+    var animationType: LXDAnimationType? {
+        get {
+            if let type = (objc_getAssociatedObject(self, &amp;kAnimationTypeKey) as? String) {
+                return LXDAnimationType(rawValue: type)
+            }
+            return nil
+        }
+        set {
+            guard newValue != nil else { return }
+            self.clipsToBounds = (newValue == .Inner)
+            objc_setAssociatedObject(self, &amp;kAnimationTypeKey, newValue!.rawValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+
+    var animationColor: UIColor {
+        get {
+            if let color = objc_getAssociatedObject(self, &amp;kAnimationColorKey) {
+                return color as! UIColor
+            }
+            return UIColor.whiteColor()
+        }
+        set {
+            objc_setAssociatedObject(self, &amp;kAnimationColorKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+}
+</code></pre></div></div>
+<p>How do we ensure our animation runs on a button tap? Override <code class="language-plaintext highlighter-rouge">sendAction(action:to:forEvent:)</code>, which is called whenever the button sends an event, including when the user taps it:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//MARK: - Override
+public override func sendAction(action: Selector, to target: AnyObject?, forEvent event: UIEvent?) {
+    super.sendAction(action, to: target, forEvent: event)
+    
+    if let type = animationType {
+        var rect: CGRect?
+        var radius = self.layer.cornerRadius
+        
+        var pos = touchPoint(event)
+        let smallerSize = min(self.frame.width, self.frame.height)
+        let longgerSize = max(self.frame.width, self.frame.height)
+        var scale = longgerSize / smallerSize + 0.5
+        
+        switch type {
+        case .Inner:
+            radius = smallerSize / 2
+            rect = CGRect(x: 0, y: 0, width: radius*2, height: radius*2)
+            break
+            
+        case .Outer:
+            scale = 2.5
+            pos = CGPoint(x: self.bounds.width/2, y: self.bounds.height/2)
+            rect = CGRect(x: pos.x - self.bounds.width, y: pos.y - self.bounds.height, width: self.bounds.width, height: self.bounds.height)
+            break
+        }
+        
+        let layer = animateLayer(rect!, radius: radius, position: pos)
+        let group = animateGroup(scale)
+        self.layer.addSublayer(layer)
+        group.setValue(layer, forKey: "animatedLayer")
+        layer.addAnimation(group, forKey: "buttonAnimation")
+    }
+}
+
+public override func animationDidStop(anim: CAAnimation, finished flag: Bool) {
+    if let layer = anim.valueForKey("animatedLayer") as? CALayer {
+        layer .removeFromSuperlayer()
+    }
+}
+
+
+//MARK: - Private
+private func touchPoint(event: UIEvent?) -&gt; CGPoint {
+    if let touch = event?.allTouches()?.first {
+        return touch.locationInView(self)
+    } else {
+        return CGPoint(x: self.frame.width/2, y: self.frame.height/2)
+    }
+}
+
+private func animateLayer(rect: CGRect, radius: CGFloat, position: CGPoint) -&gt; CALayer {
+    let layer = CAShapeLayer()
+    layer.lineWidth = 1
+    layer.position = position
+    layer.path = UIBezierPath(roundedRect: rect, cornerRadius: radius).CGPath
+    
+    switch animationType! {
+    case .Inner:
+        layer.fillColor = animationColor.CGColor
+        layer.bounds = CGRect(x: 0, y: 0, width: radius*2, height: radius*2)
+        break
+        
+    case .Outer:
+        layer.strokeColor = animationColor.CGColor
+        layer.fillColor = UIColor.clearColor().CGColor
+        break
+    }
+    return layer
+}
+
+private func animateGroup(scale: CGFloat) -&gt; CAAnimationGroup {
+    let opacityAnim = CABasicAnimation(keyPath: "opacity")
+    opacityAnim.fromValue = NSNumber(double: 1)
+    opacityAnim.toValue = NSNumber(double: 0)
+    
+    let scaleAnim = CABasicAnimation(keyPath: "transform")
+    scaleAnim.fromValue = NSValue(CATransform3D: CATransform3DIdentity)
+    scaleAnim.toValue = NSValue(CATransform3D: CATransform3DMakeScale(scale, scale, scale))
+    
+    let group = CAAnimationGroup()
+    group.animations = [opacityAnim, scaleAnim]
+    group.duration = 0.5
+    group.delegate = self
+    group.fillMode = kCAFillModeBoth
+    group.removedOnCompletion = false
+    return group
+}
+</code></pre></div></div>
+<p>Once the extended button's <code class="language-plaintext highlighter-rouge">animationType</code> property is set, it animates when tapped.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>animateButton.animationType = .Outer
+</code></pre></div></div>
+<h2 id="尾话">Closing remarks</h2>
+<p>Animations in Chinese apps tend to be more restrained than in overseas apps, and many apps give them little consideration. Yet in today's highly competitive mobile market, good animation can still improve retention—provided the app itself is useful; effects alone do not retain users. Animation is therefore an important fundamental skill.<a href="https://github.com/JustKeepRunning/Animations">Demo for this article</a></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

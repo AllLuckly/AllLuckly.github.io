@@ -1,0 +1,279 @@
+---
+layout: post
+title: 'Objective-C runtime in practice: changing fonts throughout an interface'
+description: Starts with registering a custom font and finding its name, then uses Objective-C runtime techniques
+  to replace interface fonts. It discusses the differences between controls created in code and those loaded from
+  a storyboard when applying a common setting.
+category: Development notes
+imagefeature: null
+date: 2016-05-04 00:00:00 +0800
+technical_translation:
+  topic: swift-runtime
+  summary: Starts with registering a custom font and finding its name, then uses Objective-C runtime techniques
+    to replace interface fonts. It discusses the differences between controls created in code and those loaded from
+    a storyboard when applying a common setting.
+  keywords:
+  - Objective-C Runtime
+  - custom fonts
+  - UIFont
+  - method swizzling
+  - storyboard
+  provenance: contribution
+  author_name: HenryCheng
+  source_url: http://www.jianshu.com/p/b9fdd17c525e
+  credit: Originally credited to HenryCheng; edited and archived by Bison.
+  title: 'Objective-C runtime in practice: changing fonts throughout an interface'
+  source_sha256: cfbcea6b0ed9ba7130b5c72038ba18d495bce646b3f7e27bec3915cfdc93875b
+lang: en
+source_path: _posts/2016-05-4-tuogao43.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao43
+permalink: /en/journal/2016-05-04-objective-c-runtime-in-practice-changing-fonts-throughout-an-interface/
+translation_method: machine-assisted
+translation_source_sha256: cfbcea6b0ed9ba7130b5c72038ba18d495bce646b3f7e27bec3915cfdc93875b
+excerpt: Starts with registering a custom font and finding its name, then uses Objective-C runtime techniques to
+  replace interface fonts. It discusses the differences between controls created in code and those loaded from a
+  storyboard when applying a common setting.
+translation_date: '2026-10-23T02:34:14+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/b9fdd17c525e">HenryCheng</a><br/></p>
+<p>Busy, busy, busy! It has been a long time since I last blogged. My days have been packed, and when I get home I am too tired to write, so I just read a little in bed. Our company has a major launch event in May, and we need to stabilize the release and improve the interface beforehand. There is plenty of detailed work to do.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/1.jpg"/><br/></p>
+<p>The latest version was submitted a couple of days ago, leaving me a little spare time, so I am sharing the runtime-based method for changing fonts in one step that I mentioned earlier. You might ask: is changing a font not simply a matter of replacing its name? Take a seat, grab a snack, and let me explain.</p>
+<h2 id="1准备">1. Preparation</h2>
+<p>Create a project named ChangeFont. I picked a font file called loveway.ttf and dragged it in. The project structure looks roughly like this:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/2.png"/><br/></p>
+<p>For now, drag a label and a button onto the storyboard and add constraints, like this:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/3.png"/><br/></p>
+<p>Yes, it is that simple. Run it.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/4.png"/><br/></p>
+<p>It displays normally. Next, change the font.</p>
+<h2 id="2改变字体">2. Change the font</h2>
+<p>We already added loveway.ttf. Now configure the plist: add a row named Fonts provided by application, then put the font filename in an item.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/5.png"/><br/></p>
+<p>Finally, verify that we really have added it.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/6.png"/><br/></p>
+<p>You may be impatient to change the font now. Here is how:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//
+//  ViewController.m
+//  ChangeFont
+//
+//  Created by HenryCheng on 16/4/27.
+//  Copyright © 2016年 HenryCheng. All rights reserved.
+//
+
+#import "ViewController.h"
+
+@interface ViewController ()
+@property (weak, nonatomic) IBOutlet UILabel *myLabel;
+@property (weak, nonatomic) IBOutlet UIButton *myButton;
+
+@end
+
+@implementation ViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    _myLabel.font = [UIFont fontWithName:@"loveway.ttf" size:17.0f];
+    _myButton.titleLabel.font = [UIFont fontWithName:@"loveway" size:17.0f];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+@end
+</code></pre></div></div>
+<p><br/>
+Run it… oh no! Nothing changed; it still looks the same.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/7.gif"/><br/></p>
+<p>I must be doing something wrong, so I searched Baidu, although I usually use Google. Indeed, this approach was incorrect.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/8.jpg"/><br/></p>
+<p>I changed approach: first find the font's actual name. Like this—change the code to:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    for(NSString *familyName in [UIFont familyNames]){
+        NSLog(@"Font FamilyName = %@",familyName); //*输出字体族科名字
+
+        for(NSString *fontName in [UIFont fontNamesForFamilyName:familyName]) {
+            NSLog(@"\t%@",fontName);         //*输出字体族科下字样名字
+        }
+    }
+    _myLabel.font = [UIFont fontWithName:@"loveway.ttf" size:17.0f];
+    _myButton.titleLabel.font = [UIFont fontWithName:@"loveway" size:17.0f];
+}
+</code></pre></div></div>
+<p><br/>
+Run it and inspect the console.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/9.png"/><br/></p>
+<p>What is this? I do not know the name of the font I just added. How am I supposed to find it?</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/10.jpg"/><br/></p>
+<p>Then I thought of a solution: create another project without loveway.ttf, print the font list, and compare the entries. The extra entry must be the font! Bingo—after a little work, I found FZLBJW–GB1-0. Time to try it.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)viewDidLoad {
+    [super viewDidLoad];
+    /*
+    for(NSString *familyName in [UIFont familyNames]){
+        NSLog(@"Font FamilyName = %@",familyName); //输出字体族科名字
+
+        for(NSString *fontName in [UIFont fontNamesForFamilyName:familyName]) {
+            NSLog(@"\t%@",fontName);         //输出字体族科下字样名字
+        }
+    }
+     */
+    _myLabel.font = [UIFont fontWithName:@"FZLBJW--GB1-0" size:17.0f];
+    _myButton.titleLabel.font = [UIFont fontWithName:@"FZLBJW--GB1-0" size:17.0f];
+}
+</code></pre></div></div>
+<p><br/>
+Run it; the result follows.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/11.png"/><br/></p>
+<p>Result after changing the font<br/></p>
+<p>OK! It works. The result is a little awkward, but we achieved the effect—not bad.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/12.gif"/><br/></p>
+<p>At this point, the basic font change is complete.<br/></p>
+<h2 id="3查找字体的一种简单的方法">3. A simple way to find a font name<br/></h2>
+<p>We found FZLBJW–GB1-0 by comparing font lists above, but there is an easier way.
+Find the ttf in Finder and double-click it. Double-clicking it in Xcode does not have this effect. The system opens it in Apple's Font Book, as shown below.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/13.png"/><br/></p>
+<p>We can now see the font-family name, FZLiBian-S02S. Search for that family in the console output listing all fonts to find the specific font name.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/14.png"/><br/></p>
+<p>This is much simpler than the earlier approach.<br/></p>
+<h2 id="4进一步的思考">4. Further considerations<br/></h2>
+<p>The example above changes fonts successfully, but it raises a question. There are only two simple controls here; what if there are many? You could apply the same method one by one, which is manageable for controls created in code. But with xibs, must you create outlets for every otherwise unneeded display-only label or button just to change the font? That would be inefficient, especially in a large, partly completed project. This approach clearly will not scale.<br/>
+This uses the runtime methods class_addMethod, class_replaceMethod, and method_exchangeImplementations together with the behavior of + (void)load. I will discuss + (void)load later; if it is unfamiliar, you can also look it up first. Here is the code:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//
+//  UILabel+FontChange.m
+//  LiquoriceDoctorProject
+//
+//  Created by HenryCheng on 15/12/7.
+//  Copyright © 2015年 iMac. All rights reserved.
+//
+
+#import "UILabel+FontChange.h"
+#import &lt;objc/runtime.h&gt;
+
+#define CustomFontName @"FZLBJW--GB1-0"
+
+@implementation UILabel (FontChange)
+
++ (void)load {
+    //方法交换应该被保证，在程序中只会执行一次
+    static dispatch_once_t onceToken;
+    dispatch_once(&amp;onceToken, ^{
+        //获得viewController的生命周期方法的selector
+        SEL systemSel = @selector(willMoveToSuperview:);
+        //自己实现的将要被交换的方法的selector
+        SEL swizzSel = @selector(myWillMoveToSuperview:);
+        //两个方法的Method
+        Method systemMethod = class_getInstanceMethod([self class], systemSel);
+        Method swizzMethod = class_getInstanceMethod([self class], swizzSel);
+
+        //首先动态添加方法，实现是被交换的方法，返回值表示添加成功还是失败
+        BOOL isAdd = class_addMethod(self, systemSel, method_getImplementation(swizzMethod), method_getTypeEncoding(swizzMethod));
+        if (isAdd) {
+            //如果成功，说明类中不存在这个方法的实现
+            //将被交换方法的实现替换到这个并不存在的实现
+            class_replaceMethod(self, swizzSel, method_getImplementation(systemMethod), method_getTypeEncoding(systemMethod));
+        } else {
+            //否则，交换两个方法的实现
+            method_exchangeImplementations(systemMethod, swizzMethod);
+        }
+
+    });
+}
+
+- (void)myWillMoveToSuperview:(UIView *)newSuperview {
+
+    [self myWillMoveToSuperview:newSuperview];
+//    if ([self isKindOfClass:NSClassFromString(@"UIButtonLabel")]) {
+//        return;
+//    }
+    if (self) {
+        if (self.tag == 10086) {
+            self.font = [UIFont systemFontOfSize:self.font.pointSize];
+        } else {
+            if ([UIFont fontNamesForFamilyName:CustomFontName])
+                self.font  = [UIFont fontWithName:CustomFontName size:self.font.pointSize];
+        }
+    }
+}
+
+@end
+</code></pre></div></div>
+<p><br/>
+Without adding any code, it looks like this:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//
+//  ViewController.m
+//  ChangeFont
+//
+//  Created by HenryCheng on 16/4/27.
+//  Copyright © 2016年 HenryCheng. All rights reserved.
+//
+
+#import "ViewController.h"
+
+@interface ViewController ()
+@property (weak, nonatomic) IBOutlet UILabel *myLabel;
+@property (weak, nonatomic) IBOutlet UIButton *myButton;
+
+@end
+
+@implementation ViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+//    for(NSString *familyName in [UIFont familyNames]){
+//        NSLog(@"Font FamilyName = %@",familyName); //输出字体族科名字
+//
+//        for(NSString *fontName in [UIFont fontNamesForFamilyName:familyName]) {
+//            NSLog(@"\t%@",fontName);         //输出字体族科下字样名字
+//        }
+//    }
+
+//    _myLabel.font = [UIFont fontWithName:@"FZLBJW--GB1-0" size:17.0f];
+//    _myButton.titleLabel.font = [UIFont fontWithName:@"FZLBJW--GB1-0" size:17.0f];
+//    _myLabel.tag = 10086;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+@end
+</code></pre></div></div>
+<p><br/>
+Run</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/15.png"/><br/></p>
+<p>We can see that the font has changed.<br/>
+What if some views should change font and others should not? A simple approach is to use a tag. For example, I assign a label the arbitrary tag 10086 to exempt it from the font change.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/16.png"/><br/></p>
+<p>Result when run<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao43/17.png"/><br/></p>
+<h3 id="注意">Note:<br/></h3>
+<p>1. For a control created in code whose font should remain unchanged, set its tag to 10086 when creating it.<br/>
+2. One line in the code above is commented out: <br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//    if ([self isKindOfClass:NSClassFromString(@"UIButtonLabel")]) {
+//        return;
+//    }
+</code></pre></div></div>
+<p><br/>
+This line was originally used to leave button-title fonts unchanged. Decide which control types should change and which should not. To preserve button fonts, uncomment this line.<br/>
+3. For a control created in a xib whose font should remain unchanged, set its tag to 10086 in the xib. Do not wait until - (void)viewDidLoad after loading. This is again due to the behavior of + (void)load.<br/></p>
+<p>Before a program's main function runs, after its libraries load into the runtime, the runtime invokes +load on the classes and categories added to it. You can easily verify this with log statements.<br/>
+If both a superclass and subclass have +load methods invoked, the superclass always runs first. The system handles this automatically; the subclass does not need to call [super load] explicitly.
+This is only a brief explanation. Consult the official documentation for more detail.<br/></p>
+<h2 id="5最后">5. Finally<br/></h2>
+<p>The project's comments explain the code clearly, so I will not repeat them here. Leave a comment if something is unclear. Usage is simple: drag UILabel+FontChange.h and UILabel+FontChange.m into your project.
+For more fonts, visit  <a href="http://www.webpagepublicity.com/free-fonts.html">Download fonts</a>. All the code is available at  <a href="https://github.com/Loveway/HWChangeFont">Here,</a>Download.<br/>
+I have been studying Swift and taking notes lately. I will share some Swift tips later.<br/>
+Finally, please leave any suggestions or corrections in the comments. If you like this or find it useful, give it a star. Thank you!<br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-04-29-rich-text-with-hyperlinks-on-ios/">Rich text with hyperlinks on iOS</a><br/></p>
+
+{% endraw %}

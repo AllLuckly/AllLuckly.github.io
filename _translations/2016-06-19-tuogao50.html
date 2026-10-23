@@ -1,0 +1,251 @@
+---
+layout: post
+title: 'What''s new in iOS 10: SiriKit'
+description: Introduces SiriKit integration following WWDC 2016, from creating an Intents Extension to implementing
+  intent handling and its interface. It explains how a spoken request is interpreted and passed to an app extension
+  for the relevant response.
+category: Development notes
+imagefeature: null
+date: 2016-06-19 00:00:00 +0800
+technical_translation:
+  topic: tooling-release
+  summary: Introduces SiriKit integration following WWDC 2016, from creating an Intents Extension to implementing
+    intent handling and its interface. It explains how a spoken request is interpreted and passed to an app extension
+    for the relevant response.
+  keywords:
+  - SiriKit
+  - Intents Extension
+  - INExtension
+  - voice interaction
+  provenance: contribution
+  author_name: Sindri
+  source_url: http://www.jianshu.com/p/0881bb0ff538
+  credit: Originally credited to Sindri; edited and archived by Bison.
+  version_note: Explicitly targets iOS 10 and Xcode 8, preserving SiriKit's service categories and extension configuration
+    from that period.
+  title: 'What''s new in iOS 10: SiriKit'
+  source_sha256: 1261541cb616de15c2e599610b6ecbca405724ccac5d4e32c2f36d8762e7e613
+lang: en
+source_path: _posts/2016-06-19-tuogao50.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao50
+permalink: /en/journal/2016-06-19-what-s-new-in-ios-10-sirikit/
+translation_method: machine-assisted
+translation_source_sha256: 1261541cb616de15c2e599610b6ecbca405724ccac5d4e32c2f36d8762e7e613
+excerpt: Introduces SiriKit integration following WWDC 2016, from creating an Intents Extension to implementing
+  intent handling and its interface. It explains how a spoken request is interpreted and passed to an app extension
+  for the relevant response.
+translation_date: '2026-10-23T02:45:03+00:00'
+---
+{% raw %}
+<p>At the conference in the early hours of June 14,<code class="language-plaintext highlighter-rouge">WWDC2016</code> conference, Apple described <code class="language-plaintext highlighter-rouge">iOS10</code> a milestone and introduced ten new features, most based on <code class="language-plaintext highlighter-rouge">iPhone</code> updates to Apple’s own apps. I will not repeat all the features; please see <a href="https://developer.apple.com/ios/download/">Download WWDC2016 </a>to watch it yourself. Calling it a milestone seems exaggerated to me, but the new Notification Centre integration with <code class="language-plaintext highlighter-rouge">3D Touch</code> does advance human–computer interaction. Another major highlight is <code class="language-plaintext highlighter-rouge">Siri</code> interface is exposed. In <code class="language-plaintext highlighter-rouge">iOS10</code> provides <code class="language-plaintext highlighter-rouge">SiriKit</code> framework when a user uses <code class="language-plaintext highlighter-rouge">Siri</code> generates an <code class="language-plaintext highlighter-rouge">INExtension</code> object informs our app. Implementing the methods lets <code class="language-plaintext highlighter-rouge">Siri</code> Obtain the content the app wants to show the user.</p>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/0881bb0ff538">Sindri’s Notes</a><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao50/1.jpg"/><br/></p>
+<p>After <code class="language-plaintext highlighter-rouge">iOS10</code>, Apple wanted <code class="language-plaintext highlighter-rouge">Siri</code> to provide richer user experiences, leading to the new <code class="language-plaintext highlighter-rouge">SiriKit</code> framework. <code class="language-plaintext highlighter-rouge">Siri</code> parses a user's conversational request through language processing and creates an <code class="language-plaintext highlighter-rouge">Intents</code> event describing it. The <code class="language-plaintext highlighter-rouge">SiriKit</code> framework then delivers it to an integrated app to obtain app content, enabling tasks such as <code class="language-plaintext highlighter-rouge">通过文字匹配查找应用聊天记录、聊天对象</code>. It also supports features such as <code class="language-plaintext highlighter-rouge">为用户使用苹果地图时提供应用内置服务</code>. The official documentation lists six service categories supported by <code class="language-plaintext highlighter-rouge">SiriKit</code>:</p>
+<ul>
+<li>Voice and video calls</li>
+<li>Send a message</li>
+<li>Payments or payment requests</li>
+<li>Image search</li>
+<li>Workout management</li>
+<li>Ride booking</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">Siri</code> and <code class="language-plaintext highlighter-rouge">Maps</code> interact with our app through an <code class="language-plaintext highlighter-rouge">Intents extension</code>. An <code class="language-plaintext highlighter-rouge">INExtension</code> object plays a central role in the <code class="language-plaintext highlighter-rouge">Intents extension</code>, working directly with <code class="language-plaintext highlighter-rouge">Siri</code> to respond to user requests. After implementing an <code class="language-plaintext highlighter-rouge">Intents extension</code>, a <code class="language-plaintext highlighter-rouge">Siri</code> request typically results in an <code class="language-plaintext highlighter-rouge">Intent</code> processing sequence with three steps: <code class="language-plaintext highlighter-rouge">Resolve</code>, <code class="language-plaintext highlighter-rouge">Confirm</code>, and <code class="language-plaintext highlighter-rouge">Handle</code>.</p>
+<ul>
+<li>The <code class="language-plaintext highlighter-rouge">Resolve</code> stage: after <code class="language-plaintext highlighter-rouge">Siri</code> receives the user's speech, it creates an <code class="language-plaintext highlighter-rouge">INIntent</code>, extracts key information, and fills the corresponding properties. That object is later passed to our configured <code class="language-plaintext highlighter-rouge">INExtension</code> subclass for handling, with the approach selected according to the service <code class="language-plaintext highlighter-rouge">protocol</code> the subclass adopts.</li>
+<li>The <code class="language-plaintext highlighter-rouge">Confirm</code> stage: the previous stage used <code class="language-plaintext highlighter-rouge">handler(for intent:)</code> to return an object handling the <code class="language-plaintext highlighter-rouge">intent</code>. At this stage, instance methods beginning with <code class="language-plaintext highlighter-rouge">confirm</code> are called in sequence to check whether information populated by <code class="language-plaintext highlighter-rouge">Siri</code> is complete. Matching can produce <code class="language-plaintext highlighter-rouge">Exactly one match</code>, <code class="language-plaintext highlighter-rouge">Two or more matches</code>, or <code class="language-plaintext highlighter-rouge">No match</code>. During this process, <code class="language-plaintext highlighter-rouge">Siri</code> can ask the user for more specific parameters.</li>
+<li>After <code class="language-plaintext highlighter-rouge">confirm</code> finishes, <code class="language-plaintext highlighter-rouge">Siri</code> enters the final handling stage, creates a response object, confirms the result for this <code class="language-plaintext highlighter-rouge">intent</code>, and displays it to the user.</li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao50/2.jpg"/><br/></p>
+<p>For the execution sequence, refer to <a href="https://developer.apple.com/library/prerelease/content/documentation/Intents/Conceptual/SiriIntegrationGuide/ResolvingandHandlingIntents.html#//apple_ref/doc/uid/TP40016875-CH5-SW1">Documentation</a> and <a href="https://developer.apple.com/videos/play/wwdc2016/225/">Presentation video</a></p>
+<h2 id="创建intents-extension">Create an Intents Extension</h2>
+<p><code class="language-plaintext highlighter-rouge">SiriKit</code> integrates through an <code class="language-plaintext highlighter-rouge">App Extension</code>, a code structure that runs independently of the app. As an app extension, the system wakes its <code class="language-plaintext highlighter-rouge">Extension</code> code only when needed, then terminates it after the task. These <code class="language-plaintext highlighter-rouge">Extension</code> s also have limited memory available. Restrictions on invocation timing prevent us from doing certain <code class="language-plaintext highlighter-rouge">坏事</code> while running.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao50/3.jpg"/><br/></p>
+<p>At this stage, integrating <code class="language-plaintext highlighter-rouge">SiriKit</code> requires upgrading the tools to <code class="language-plaintext highlighter-rouge">Xcode8</code>, downloading <code class="language-plaintext highlighter-rouge">Xcode8_beta</code> from Apple's developer site with a developer account, and upgrading a test device to <code class="language-plaintext highlighter-rouge">iOS10</code>. Select the app, open the project overview, and add a <code class="language-plaintext highlighter-rouge">TARGET</code>.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao50/4.jpg"/><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao50/5.jpg"/><br/></p>
+<p>As shown above, I named the <code class="language-plaintext highlighter-rouge">Intents Extension</code> <code class="language-plaintext highlighter-rouge">LXDSiriExtension</code>. When creating an <code class="language-plaintext highlighter-rouge">Extension</code>, accept the prompt asking whether to activate it. Also accept creation of the <code class="language-plaintext highlighter-rouge">Intents UI Extension</code>. This gives the project <code class="language-plaintext highlighter-rouge">LXDSiriExtension</code> and <code class="language-plaintext highlighter-rouge">LXDSiriExtensionUI</code> as two <code class="language-plaintext highlighter-rouge">TARGET</code> s. Each directory contains a new <code class="language-plaintext highlighter-rouge">info.plist</code>, used to configure the handling class for <code class="language-plaintext highlighter-rouge">intent</code> events. The following slide from <code class="language-plaintext highlighter-rouge">WWDC</code>, presented as a <code class="language-plaintext highlighter-rouge">ppt</code>, helps explain it:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao50/6.jpg"/><br/></p>
+<p>Expand the hierarchy as shown. <code class="language-plaintext highlighter-rouge">IntentsSupported</code> and <code class="language-plaintext highlighter-rouge">IntentsRestrictedWhileLocked</code> are string arrays; each string is the class name of an <code class="language-plaintext highlighter-rouge">intent</code> event handled by the extension. The former lists supported events, while the latter lists events restricted when locked. The default file uses <code class="language-plaintext highlighter-rouge">workout</code> events; here I changed it to the send-message event <code class="language-plaintext highlighter-rouge">INSendMessageIntent</code>. In addition, <code class="language-plaintext highlighter-rouge">NSExtensionPrincipalClass</code> names an <code class="language-plaintext highlighter-rouge">INExtension</code> subclass, which obtains the class handling the <code class="language-plaintext highlighter-rouge">intent</code> event.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao50/7.jpg"/><br/></p>
+<p>The official explanation also mentions <code class="language-plaintext highlighter-rouge">Embedded frameworks</code>. In the <code class="language-plaintext highlighter-rouge">session</code>, Apple demonstrates <code class="language-plaintext highlighter-rouge">SiriKit</code> integration with a messaging app. The extension and app run differently and cannot directly use classes created in one another. Packaging shared classes as <code class="language-plaintext highlighter-rouge">frameworks</code> and importing them into the app allows both to use them. This article does not use <code class="language-plaintext highlighter-rouge">frameworks</code> imports; instead, it simulates a class to manage some event-handling logic. Still, remember the <code class="language-plaintext highlighter-rouge">Embedded frameworks</code> guideline. The simulated class is:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import Intents
+
+class LXDMatch {
+    var handle: String?
+    var displayName: String?
+    var contactIdentifier: String?
+
+    convenience init(handle: String, _ displayName: String, _ contactIdentifier: String) {
+        self.init()
+        self.handle = handle
+        self.displayName = displayName
+        self.contactIdentifier = contactIdentifier
+    }
+
+    func inPerson() -&gt; INPerson {
+        return INPerson(handle: handle!, displayName: displayName, contactIdentifier: contactIdentifier)
+    }
+}
+
+class LXDAccount {
+    private static let instance = LXDAccount()
+
+    private init() {
+        print("only call share() to get an instance of LXDAccount")
+    }
+
+    class func share() -&gt; LXDAccount {
+        return LXDAccount.instance
+    }
+
+    func contact(matchingName: String) -&gt; [LXDMatch] {
+        return [LXDMatch(handle: NSStringFromClass(LXDSendMessageIntentHandler.classForCoder()), matchingName, matchingName)]
+    }
+
+    func send(message: String, to recipients: [INPerson]) -&gt; INSendMessageIntentResponseCode {
+        print("Send a message: \"\(message)\" to \(recipients)")
+        return .success
+    }
+}
+</code></pre></div></div>
+<p>After this setup, configure the app's own <code class="language-plaintext highlighter-rouge">Info.plist</code>. Add a string key named <code class="language-plaintext highlighter-rouge">NSSiriUsageDescription</code> whose value is shown when asking the user for <code class="language-plaintext highlighter-rouge">Siri</code> permission, such as <code class="language-plaintext highlighter-rouge">Siri想要访问您的应用信息</code>. Then call the <code class="language-plaintext highlighter-rouge">INPreferences</code> class method to request <code class="language-plaintext highlighter-rouge">Siri</code> access.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import Intents
+
+INPreferences.requestSiriAuthorization {
+    switch $0 {
+    case .authorized:
+        print("用户已授权")
+        break
+
+    case .notDetermined:
+        print("未决定")
+        break
+
+    case .restricted:
+        print("权限受限制")
+        break
+
+    case .denied:
+        print("拒绝授权")
+        break
+    }
+}
+</code></pre></div></div>
+<h2 id="代码实现">Code implementation</h2>
+<p>First, we need an <code class="language-plaintext highlighter-rouge">INExtension</code> subclass, or we can add code to the subclass created by default. In its method, inspect the <code class="language-plaintext highlighter-rouge">intent</code> type, create the appropriate handler instance, and return it. In this example, suppose we say to <code class="language-plaintext highlighter-rouge">Siri</code>: <code class="language-plaintext highlighter-rouge">Siri，在微信上告诉我的家人们今天我不回去吃饭了</code>.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class LXDIntentHandler: INExtension {
+    override func handler(for intent: INIntent) -&gt; AnyObject? {
+
+        if intent is INSendMessageIntent {
+            return LXDSendMessageIntentHandler()
+        }
+        //  这里可以判断更多类型来返回
+        return nil
+    }
+}
+</code></pre></div></div>
+<p>After identifying the <code class="language-plaintext highlighter-rouge">intent</code> as a send-message chat event, I create and return an <code class="language-plaintext highlighter-rouge">LXDSendMessageIntentHandler</code> handler. It must then complete <code class="language-plaintext highlighter-rouge">Resolve</code>, <code class="language-plaintext highlighter-rouge">Confirm</code>, and <code class="language-plaintext highlighter-rouge">Handle</code>, implemented by adopting the <code class="language-plaintext highlighter-rouge">INSendMessageIntentHandling</code> protocol:</p>
+<ul>
+<li>
+<p>Resolve stage</p>
+<p>At this stage, identify the message recipients. Three outcomes are possible: <code class="language-plaintext highlighter-rouge">Exactly one match</code>, <code class="language-plaintext highlighter-rouge">Two or more matches</code>, and <code class="language-plaintext highlighter-rouge">No matches</code>. Handle them as follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func resolveRecipients(forSendMessage intent: INSendMessageIntent, with completion: ([INPersonResolutionResult]) -&gt; Void) {
+      if let recipients = intent.recipients {
+          var resolutionResults = [INPersonResolutionResult]()
+          for  recipient in recipients {
+              let matches = LXDAccount.share().contact(matchingName: recipient.displayName)
+              switch matches.count {
+              case 2...Int.max:    //两个或更多匹配结果
+                  let disambiguations = matches.map { $0.inPerson() }
+                  resolutionResults.append(INPersonResolutionResult.disambiguation(with: disambiguations))
+              break
+  
+              case 1:  //一个匹配结果
+                  let recipient = matches[0].inPerson()
+              resolutionResults.append(INPersonResolutionResult.success(with: recipient))
+                  break
+  
+              case 0:  //无匹配结果
+                  resolutionResults.append(INPersonResolutionResult.unsupported(with: .none))
+                  break
+  
+              default:
+                  break
+              }
+          }
+          completion(resolutionResults)
+      } else {
+          //未从用户语音中提取到信息，需要向用户征询更多关键信息
+          completion([INPersonResolutionResult.needsValue()])
+      }
+  }
+</code></pre></div> </div>
+<p>The code identifies who <code class="language-plaintext highlighter-rouge">我的家人们</code> refers to in the message, representing each contact as an <code class="language-plaintext highlighter-rouge">INPerson</code>. Next, match the message content:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func resolveContent(forSendMessage intent: INSendMessageIntent, with completion: (INStringResolutionResult) -&gt; Void) {
+    if let text = intent.content where !text.isEmpty {
+        completion(INStringResolutionResult.success(with: text))
+    } else {
+        //向用户征询发送的消息内容
+        completion(INStringResolutionResult.needsValue())
+    }
+}
+</code></pre></div> </div>
+<p>After matching recipients and message content, handling of the <code class="language-plaintext highlighter-rouge">intent</code> enters its second stage, <code class="language-plaintext highlighter-rouge">Confirm</code>, to verify the values.</p>
+</li>
+<li>
+<p>Confirm stage</p>
+<p>At this stage, the <code class="language-plaintext highlighter-rouge">intent</code> information is expected to be populated. Inspect its values against our requirements. Meanwhile, <code class="language-plaintext highlighter-rouge">Siri</code> tries to wake the app to prepare the final handling step. As noted earlier, using <code class="language-plaintext highlighter-rouge">frameworks</code> to track whether the app has started helps communication between app and extension before the appropriate operation.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func confirm(sendMessage intent: INSendMessageIntent, completion: (INSendMessageIntentResponse) -&gt; Void) {
+      /// let content = intent.content
+      /// let recipients = intent.recipients
+      /// do or judge in content &amp; recipients
+      completion(INSendMessageIntentResponse(code: .success, userActivity: nil))
+      /// Launch your app to do something like store message record
+      /// Use a singleton in frameworks to remark if the app has launched
+      /// if not launched, use the code following
+      /// completion(INSendMessageIntentResponse(code: .failureRequiringAppLaunch, userActivity: nil))
+  }
+</code></pre></div> </div>
+<p>The <code class="language-plaintext highlighter-rouge">Confirm</code> stage is the last chance to adjust values passed in the <code class="language-plaintext highlighter-rouge">intent</code>. Exact information is ideal, but making <code class="language-plaintext highlighter-rouge">Siri</code> ask too many detailed questions about parameters can frustrate users.</p>
+</li>
+<li>
+<p>Handle stage</p>
+<p>The <code class="language-plaintext highlighter-rouge">Handle</code> stage needs little additional work. Check whether recipients and message content exist; if so, perform an action such as <code class="language-plaintext highlighter-rouge">保存/发送</code> and finish. Otherwise, tell <code class="language-plaintext highlighter-rouge">Siri</code> that this <code class="language-plaintext highlighter-rouge">intent</code> failed. Configure an <code class="language-plaintext highlighter-rouge">NSUserActivity </code> object to explain the failure to <code class="language-plaintext highlighter-rouge">Siri</code>.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func handle(sendMessage intent: INSendMessageIntent, completion: (INSendMessageIntentResponse) -&gt; Void) {
+    if intent.recipients != nil &amp;&amp; intent.content != nil {
+        /// do some thing success send message
+        let success = LXDAccount.share().send(message: intent.content!, to: intent.recipients!)
+        completion(INSendMessageIntentResponse(code: success, userActivity: nil))
+    } else {
+        let userActivity = NSUserActivity(activityType: String(INSendMessageIntent))
+        userActivity.userInfo = [NSString(string: "error") : String("AppDidNotLaunch")]
+        completion(INSendMessageIntentResponse(code: .failure, userActivity: userActivity))
+    }
+}
+</code></pre></div> </div>
+</li>
+</ul>
+<h2 id="事件ui">Intent UI</h2>
+<p>The code above focuses on handling logic. During interaction with <code class="language-plaintext highlighter-rouge">Siri</code>, we can also have <code class="language-plaintext highlighter-rouge">Siri</code> show a corresponding custom interface:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao50/8.jpg"/><br/></p>
+<p>When creating the <code class="language-plaintext highlighter-rouge">Intents Extension</code>, <code class="language-plaintext highlighter-rouge">Xcode</code> also asked whether to create an <code class="language-plaintext highlighter-rouge">Intents UI Extension</code>. Its directory likewise has an <code class="language-plaintext highlighter-rouge">Info.plist</code> with similar key-value pairs, except it contains only one state setting.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao50/9.jpg"/><br/></p>
+<p>This directory contains a storyboard named <code class="language-plaintext highlighter-rouge">MainInterface</code>, which defines the interface shown during interaction between <code class="language-plaintext highlighter-rouge">Siri</code> and the app. Modifying its elements produces the effect shown above. Before presentation, we can also change the class code to populate interface information:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func configure(with interaction: INInteraction!, context: INUIHostedViewContext, completion: ((CGSize) -&gt; Void)!) {
+    //这里执行界面设置的代码，完成之后执行completion代码就会让界面展示出来
+    if let completion = completion {
+        completion(self.desiredSize)
+    }
+}
+
+var desiredSize: CGSize {
+    return self.extensionContext!.hostedViewMaximumAllowedSize
+}
+</code></pre></div></div>
+<h2 id="尾言">Closing notes</h2>
+<p>When watching the new features at <code class="language-plaintext highlighter-rouge">WWDC2016</code>, I was initially impressed by the interaction between <code class="language-plaintext highlighter-rouge">Siri</code> and apps. Reading the documentation later revealed many restrictions, so overall it did not substantially improve the use of <code class="language-plaintext highlighter-rouge">Siri</code>. Still, if Apple continues developing this interaction, it could bring new possibilities to our apps.</p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-04-29-rich-text-with-hyperlinks-on-ios/">Rich text with hyperlinks on iOS</a><br/></p>
+
+{% endraw %}
