@@ -23,7 +23,7 @@ General notes and suggestions for customizing **HMFAYSAL OMEGA Theme**.
 
 ## Basic Setup for a new Jekyll site
 
-1. [Install Jekyll](http://jekyllrb.com) and read through [this installation instructions]({{ site.url }}/theme-setup/installing-jekyll-on-windows/) if you haven't already.
+1. [Install Jekyll](https://jekyllrb.com/) and read through [this installation instructions](https://jekyllrb.com/docs/installation/windows/) if you haven't already.
 2. Fork the [HMFAYSAL OMEGA Theme repo](https://github.com/hmfaysal/hmfaysal-omega-theme/fork)
 3. Clone the repo you just forked.
 4. Edit `_config.yml` to personalize your site.
