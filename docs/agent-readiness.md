@@ -126,3 +126,11 @@ Cloudflare Worker `allluckly-agent-access` 已部署版本 `5c8b5829`，仅关�
 OAuth discovery/protected resource、MCP/A2A 卡、Web Bot Auth 与 DNS-AID 需要对应的真实服务。仅提供内容的博客没有这些服务时，保留实际状态。Cloudflare 原文也说明仅提供内容、没有向其他站点发请求的网站无需 Web Bot Auth。商务协议用于实际付款与交易，本博客公开阅读不收款。
 
 新增数据接口与公开访问说明的规范依据：[API Catalog / RFC 9727](https://www.rfc-editor.org/rfc/rfc9727.html)、[auth.md](https://workos.com/auth-md/docs/auth-md)。后台与公开扫描的完整原始证据保存在本机忽略目录 `output/agent-readiness/diagnostics-*.json` 及其配套事件响应和时间元数据。
+
+
+本轮标准 API 目录与匿名访问说明通过 [PR #13](https://github.com/AllLuckly/AllLuckly.github.io/pull/13) 发布，Pages 提交 `7063039927d2f6ac6650ec7f838d53fcda816ac8` 的[部署成功](https://github.com/AllLuckly/AllLuckly.github.io/actions/runs/39909534928)。Worker 更新为 `ef2b8612`，路由和安全设置不变。线上 624 条索引记录符合规范，新增四个入口均实际返回 200；主 11 项读取检查通过。后台重新扫描确认 API Catalog 通过，技术基础从 1/3 提升到 2/3。
+
+首次复扫指出 `/auth.md` 缺少规范预期的 `# Auth.md` 标题，因此将文件标题与该格式对齐。公开匿名读取、无注册协议的边界说明保持真实。后续核验使用 `diagnostics-final-all.json` 与后台显式重扫的结果，不能仅凭文件存在声称协议已经实现。
+
+
+14:13:45–52（上海时间），新资源的线上 HTTP 验收 43/43 通过：Catalog 的 RFC 9727 媒体类型/profile、OpenAPI 类型、四入口的 Link/Vary、五个 JSON 资源的 HEAD 与 ETag 304、Auth.md 的 HEAD/304 及压缩和未压缩客户端的完整读取。原始结果在 `output/agent-readiness/diagnostics-after-api-http.json`。此记录验证访问和数据契约，不验证注册或登录协议。
