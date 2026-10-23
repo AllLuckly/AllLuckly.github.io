@@ -1,3 +1,4 @@
+const studioEnglish = document.documentElement.lang.toLowerCase().startsWith('en');
 document.querySelectorAll('[data-filter-group]').forEach(group => {
   const controls = group.querySelector('.filters');
   if (!controls) return;
@@ -28,7 +29,7 @@ document.querySelectorAll('[data-filter-group]').forEach(group => {
     controls.querySelectorAll('button[data-filter]').forEach(button => {
       button.setAttribute('aria-pressed', String(button.dataset.filter === selectedApp));
     });
-    if (status) status.textContent = count ? `显示 ${count} 篇教程` : '没有匹配的教程';
+    if (status) status.textContent = studioEnglish ? (count ? `${count} tutorial${count === 1 ? '' : 's'} shown` : 'No matching tutorials') : (count ? `显示 ${count} 篇教程` : '没有匹配的教程');
     if (empty) empty.hidden = count !== 0;
     resetButtons.forEach(button => {
       if (!empty?.contains(button)) button.hidden = selectedApp === 'all' && terms.length === 0;
@@ -106,7 +107,7 @@ if (search) {
   search.querySelector('input').addEventListener('input', event => {
     const query = event.target.value.trim().toLocaleLowerCase(); let count = 0;
     items.forEach(item => { item.hidden = !item.textContent.toLocaleLowerCase().includes(query); if (!item.hidden) count++; });
-    search.querySelector('[data-search-status]').textContent = count ? `找到 ${count} 篇文章` : '没有找到匹配文章，试试其他关键词。';
+    search.querySelector('[data-search-status]').textContent = studioEnglish ? (count ? `${count} article${count === 1 ? '' : 's'} found` : 'No matching articles. Try another keyword.') : (count ? `找到 ${count} 篇文章` : '没有找到匹配文章，试试其他关键词。');
   });
 }
 
@@ -149,7 +150,7 @@ if (workVideo && videoChapters) {
       pendingSeek = null;
       updateChapter();
     } catch {
-      showStatus('暂时无法定位章节，请使用播放器进度条。');
+      showStatus(studioEnglish ? 'This chapter could not be loaded. Use the player timeline.' : '暂时无法定位章节，请使用播放器进度条。');
     }
   };
   const seekTo = (seconds, play) => {
@@ -161,7 +162,7 @@ if (workVideo && videoChapters) {
     if (play) {
       const playback = workVideo.play();
       if (playback && typeof playback.catch === 'function') {
-        playback.catch(() => showStatus('请点击播放器的播放按钮，继续观看所选章节。'));
+        playback.catch(() => showStatus(studioEnglish ? 'Press Play in the player to watch the selected chapter.' : '请点击播放器的播放按钮，继续观看所选章节。'));
       }
     }
   };

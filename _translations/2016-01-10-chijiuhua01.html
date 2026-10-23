@@ -1,0 +1,286 @@
+---
+layout: post
+title: Understanding and using Core Data for persistence
+description: Explains the relationship between managed objects, contexts and the persistent store coordinator, then
+  sets up Core Data and an entity model manually. Examples of creating, fetching, updating and deleting objects
+  illustrate the main persistence workflow.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-01-10 00:00:00 +0800
+technical_translation:
+  topic: data-network
+  summary: Explains the relationship between managed objects, contexts and the persistent store coordinator, then
+    sets up Core Data and an entity model manually. Examples of creating, fetching, updating and deleting objects
+    illustrate the main persistence workflow.
+  keywords:
+  - Core Data
+  - NSManagedObjectContext
+  - entity models
+  - data persistence
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  title: Understanding and using Core Data for persistence
+  source_sha256: a7704db28f87b6ed9fab24f41743e0c18ae70c8c5e2755d83dcdbf576e51c9c3
+lang: en
+source_path: _posts/2016-01-10-chijiuhua01.md
+source_url: /%E6%8C%81%E4%B9%85%E5%8C%96/chijiuhua01
+permalink: /en/journal/2016-01-10-understanding-and-using-core-data-for-persistence/
+translation_method: machine-assisted
+translation_source_sha256: a7704db28f87b6ed9fab24f41743e0c18ae70c8c5e2755d83dcdbf576e51c9c3
+excerpt: Explains the relationship between managed objects, contexts and the persistent store coordinator, then
+  sets up Core Data and an entity model manually. Examples of creating, fetching, updating and deleting objects
+  illustrate the main persistence workflow.
+translation_date: '2026-10-23T02:34:11+00:00'
+---
+{% raw %}
+<blockquote>
+<p>“<code class="language-plaintext highlighter-rouge">Care Data</code> is a purely object-oriented framework for persisting entities and the relationships between them—what we usually call data persistence.”</p>
+</blockquote>
+<h2 id="1原理部分">1. Principles<br/></h2>
+<p><code class="language-plaintext highlighter-rouge">Care Data</code> is a purely object-oriented framework for persisting entities and their relationships. <code class="language-plaintext highlighter-rouge">Care Data</code> can use a <code class="language-plaintext highlighter-rouge">SQLite</code> database, an <code class="language-plaintext highlighter-rouge">XML</code> document, or even memory as its underlying store. The central concept in <code class="language-plaintext highlighter-rouge">Care Data</code> is an entity: a model object managed by <code class="language-plaintext highlighter-rouge">Care Data</code>, which must be an instance of <code class="language-plaintext highlighter-rouge">NSManagedObject</code> or one of its subclasses. Entities can have 1-1, 1-N and N-N relationships. All the entities and their relationships together form the managed object model, <code class="language-plaintext highlighter-rouge">NSManagedObiectModel</code>. The core object in <code class="language-plaintext highlighter-rouge">Care Data</code> is the managed object context, <code class="language-plaintext highlighter-rouge">NSManagedObjectContext</code>, which manages all entities. Every create, delete, fetch or update operation in a <code class="language-plaintext highlighter-rouge">Care Data</code> application must go through this context. Applications use <code class="language-plaintext highlighter-rouge">NSMannagedObjectContext</code> to perform these operations; <code class="language-plaintext highlighter-rouge">NSMannagedObjectContext</code> connects to the persistent store coordinator, which manages the underlying storage format, such as <code class="language-plaintext highlighter-rouge">SQLite</code>. The main <code class="language-plaintext highlighter-rouge">Care Data</code> objects and <code class="language-plaintext highlighter-rouge">API</code> are described below.</p>
+<blockquote>
+<p>Managed object model, <code class="language-plaintext highlighter-rouge">NSManagedObiectModel</code>: manages every entity and the relationships between them. After designing those relationships in the <code class="language-plaintext highlighter-rouge">Xcode</code> graphical interface, use this object to load and manage the application's model.</p>
+</blockquote>
+<p><br/></p>
+<blockquote>
+<p>Persistent store coordinator, <code class="language-plaintext highlighter-rouge">NSPeristentStoreCoordinator</code>: manages the underlying storage files, such as <code class="language-plaintext highlighter-rouge">SQLite</code> databases.</p>
+</blockquote>
+<p><br/></p>
+<blockquote>
+<p>Managed object context, <code class="language-plaintext highlighter-rouge">NSManagedObjectContext</code>: the core object in <code class="language-plaintext highlighter-rouge">Care Data</code>. Every operation that creates, deletes, fetches or updates an entity must go through this object.</p>
+</blockquote>
+<p><br/></p>
+<blockquote>
+<p>Entity description, <code class="language-plaintext highlighter-rouge">NSEntityDescription</code>: describes an entity and can be viewed as an abstraction of it. The description defines its name and implementation class, and uses a collection to define all its attributes.</p>
+</blockquote>
+<p><br/></p>
+<blockquote>
+<p>Fetch request, <code class="language-plaintext highlighter-rouge">NSFetchRequest</code>: encapsulates which entities to query, the conditions and the sort rules. It specifies an entity name and expresses the query conditions using <code class="language-plaintext highlighter-rouge">NSPredicate来表示</code>. An <code class="language-plaintext highlighter-rouge">NSArray</code> collection defines the sort rules.</p>
+</blockquote>
+<p><br/></p>
+<h4 id="熟悉以上几点之后使用core-data持久化操作的步骤大致如下">With these concepts in place, the basic <code class="language-plaintext highlighter-rouge">Core Data</code> persistence workflow is as follows.</h4>
+<ul>
+<li>Create an <code class="language-plaintext highlighter-rouge">NSManagedObiectModel</code> object to load and manage the application's model.</li>
+<li>Using <code class="language-plaintext highlighter-rouge">NSManagedObiectModel</code> as the basis, create an <code class="language-plaintext highlighter-rouge">NSPeristentStoreCoordinator</code> object as required. It determines the underlying storage format used by <code class="language-plaintext highlighter-rouge">Core Data</code>.</li>
+<li>Using <code class="language-plaintext highlighter-rouge">NSManagedObiectModel</code> as the basis, create <code class="language-plaintext highlighter-rouge">NSMannagedObjectContext</code>, the core object through which <code class="language-plaintext highlighter-rouge">Core Data</code> performs persistent access.</li>
+<li>For ordinary create, delete, fetch and update operations, first create, delete or modify the relevant entity. Then call the <code class="language-plaintext highlighter-rouge">NSMannagedObjectContext</code> object's <code class="language-plaintext highlighter-rouge">save:</code> method to save the changes to the underlying store.</li>
+<li>To query entities, first create an <code class="language-plaintext highlighter-rouge">NSFetchRequest </code> object. Then call the <code class="language-plaintext highlighter-rouge">NSMannagedObjectContext</code> object's <code class="language-plaintext highlighter-rouge">executeFetchRequest:error</code> method. The result is an <code class="language-plaintext highlighter-rouge">NSArray</code> containing all matching entities.</li>
+</ul>
+<h2 id="2手动配置环境">2. Configure the environment manually<br/></h2>
+<p>When creating an iOS project, selecting “Use Core Data” initializes all the resources that <code class="language-plaintext highlighter-rouge">Core Data</code> requires. Here, however, we will initialize a <code class="language-plaintext highlighter-rouge">Core Data</code> project ourselves. Starting with an <code class="language-plaintext highlighter-rouge">Empty Application</code>, we will configure <code class="language-plaintext highlighter-rouge">Core Data</code> manually so that it is clear which resources a <code class="language-plaintext highlighter-rouge">Care Data</code> project needs. Next, we will turn this <code class="language-plaintext highlighter-rouge">Empty Application</code> into a <code class="language-plaintext highlighter-rouge">Core Data</code> project step by step, as follows.</p>
+<ul>
+<li>Add the <code class="language-plaintext highlighter-rouge">CoreData.framework</code> framework to the project.</li>
+<li>Add an entity model file to the project. In Xcode's main menu, choose “File” → “New” → “File”, as shown below:<br/></li>
+</ul>
+<p><img alt="1" src="/images/blog/coredata/coredata01.png"/><br/></p>
+<p><br/></p>
+<ul>
+<li>In <code class="language-plaintext highlighter-rouge">AppDelegate</code>, initialize the core objects required by the <code class="language-plaintext highlighter-rouge">Core Data</code> application. These <code class="language-plaintext highlighter-rouge">API </code> objects are <code class="language-plaintext highlighter-rouge">NSManagedObiectModel</code>, <code class="language-plaintext highlighter-rouge">NSPeristentStoreCoordinator</code> and <code class="language-plaintext highlighter-rouge">NSManagedObjectContext</code>. In the application delegate's interface, define properties for these 3 core <code class="language-plaintext highlighter-rouge">API</code> objects. Add a method for saving through the <code class="language-plaintext highlighter-rouge">NSManagedObjectContext </code> object and another for obtaining the application's <code class="language-plaintext highlighter-rouge">Docouments</code> directory. The revised interface code follows.</li>
+</ul>
+<p><br/>
+<code class="language-plaintext highlighter-rouge">AppDelegate.h</code>
+<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nf">#import</span> <span class="o">&lt;</span><span class="nt">UIKit</span><span class="o">/</span><span class="nt">UIKit</span><span class="nc">.h</span><span class="o">&gt;</span>
+<span class="nf">#import</span> <span class="o">&lt;</span><span class="nt">CoreData</span><span class="o">/</span><span class="nt">CoreData</span><span class="nc">.h</span><span class="o">&gt;</span>
+<span class="k">@interface</span> <span class="n">AppDelegate</span> <span class="p">:</span> <span class="n">UIResponder</span> <span class="err">&lt;</span><span class="n">UIApplicationDelegate</span><span class="err">&gt;</span>
+<span class="err">@</span><span class="n">property</span> <span class="p">(</span><span class="n">strong</span><span class="p">,</span> <span class="n">nonatomic</span><span class="p">)</span> <span class="n">UIWindow</span> <span class="err">*</span><span class="n">window</span><span class="p">;</span>
+<span class="o">//</span> <span class="nt">定义Core</span> <span class="nt">Data的3个核心API的属性</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">readonly</span><span class="p">,</span> <span class="n">strong</span><span class="p">,</span> <span class="n">nonatomic</span><span class="p">)</span> <span class="n">NSManagedObjectContext</span><span class="err">*</span>
+<span class="n">managedObjectContext</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">readonly</span><span class="p">,</span> <span class="n">strong</span><span class="p">,</span> <span class="n">nonatomic</span><span class="p">)</span> <span class="n">NSManagedObjectModel</span> <span class="err">*</span><span class="n">managedObjectModel</span><span class="p">;</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">readonly</span><span class="p">,</span> <span class="n">strong</span><span class="p">,</span> <span class="n">nonatomic</span><span class="p">)</span> <span class="n">NSPersistentStoreCoordinator</span><span class="err">*</span>
+<span class="n">persistentStoreCoordinator</span><span class="p">;</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">saveContext</span><span class="o">;</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">NSURL</span> <span class="o">*)</span><span class="nt">applicationDocumentsDirectory</span><span class="o">;</span>
+<span class="k">@end</span></code></pre></figure>
+<p>Next, modify the implementation in <code class="language-plaintext highlighter-rouge">AppDelegate.m</code> to initialize the objects and implement <code class="language-plaintext highlighter-rouge">saveContext </code>. The <code class="language-plaintext highlighter-rouge">applicationDocumentsDirectory </code> method simply obtains the application's <code class="language-plaintext highlighter-rouge">Docouments</code> directory. The implementation is shown in <code class="language-plaintext highlighter-rouge">AppDelegate.m</code> below.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="k">@synthesize</span> <span class="n">managedObjectContext</span> <span class="err">=</span> <span class="n">_managedObjectContext</span><span class="p">;</span>
+<span class="k">@synthesize</span> <span class="n">managedObjectModel</span> <span class="err">=</span> <span class="n">_managedObjectModel</span><span class="p">;</span>
+<span class="k">@synthesize</span> <span class="n">persistentStoreCoordinator</span> <span class="err">=</span> <span class="n">_persistentStoreCoordinator</span><span class="p">;</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">application</span><span class="o">:(</span><span class="nt">UIApplication</span> <span class="o">*)</span><span class="nt">application</span>
+<span class="nt">didFinishLaunchingWithOptions</span><span class="o">:(</span><span class="nt">NSDictionary</span> <span class="o">*)</span><span class="nt">launchOptions</span>
+<span class="p">{</span>
+    <span class="err">return</span> <span class="err">YES;</span>
+<span class="p">}</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">applicationWillTerminate</span><span class="o">:(</span><span class="nt">UIApplication</span> <span class="o">*)</span><span class="nt">application</span>
+<span class="p">{</span>
+    <span class="err">//</span> <span class="err">当应用被中断时候，将所有托管上下文中数据保存起来</span>
+    <span class="err">[self</span> <span class="err">saveContext];</span>
+<span class="p">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">saveContext</span>
+<span class="p">{</span>
+    <span class="err">NSError</span> <span class="err">*error</span> <span class="err">=</span> <span class="err">nil;</span>
+    <span class="err">//</span> <span class="err">获取应用的托管对象上下文</span>
+    <span class="err">NSManagedObjectContext</span> <span class="err">*managedObjectContext</span> <span class="err">=</span> <span class="err">self.managedObjectContext;</span>
+    <span class="err">if</span> <span class="err">(managedObjectContext</span> <span class="err">!=</span> <span class="err">nil)</span>
+    <span class="err">{</span>
+        <span class="err">//</span> <span class="err">如果托管对象上下文中包含了未保存的修改，执行保存，如果保存失败记录错误信息</span>
+        <span class="err">if</span> <span class="err">([managedObjectContext</span> <span class="err">hasChanges]</span> <span class="err">&amp;&amp;</span>
+        <span class="err">![managedObjectContext</span> <span class="py">save</span><span class="p">:</span><span class="err">&amp;</span><span class="n">error</span><span class="p">])</span>
+        <span class="err">{</span>
+            <span class="n">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s1">"保存出现错误：%@, %@"</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="p">[</span><span class="n">error</span> <span class="n">userInfo</span><span class="p">]);</span>
+            <span class="err">abort();</span>
+        <span class="p">}</span>
+    <span class="err">}</span>
+<span class="err">}</span>
+<span class="o">//</span> <span class="nt">初始化应用的托管对象上下文</span><span class="err">。</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">NSManagedObjectContext</span> <span class="o">*)</span><span class="nt">managedObjectContext</span>
+<span class="p">{</span>
+    <span class="err">//</span> <span class="err">如果_managedObjectContext已经被初始化过，直接返回该对象</span>	
+    <span class="err">if</span> <span class="err">(_managedObjectContext</span> <span class="err">!=</span> <span class="err">nil)</span> <span class="err">{</span>
+        <span class="err">return</span> <span class="err">_managedObjectContext;</span>
+    <span class="p">}</span>
+    <span class="o">//</span> <span class="nt">获取持久化存储协调器</span>
+    <span class="nt">NSPersistentStoreCoordinator</span> <span class="o">*</span><span class="nt">coordinator</span> <span class="o">=</span> <span class="o">[</span><span class="nt">self</span> <span class="nt">persistentStoreCoordinator</span><span class="o">];</span>
+    <span class="o">//</span> <span class="nt">如果持久化存储协调器不为nil</span>
+    <span class="nt">if</span> <span class="o">(</span><span class="nt">coordinator</span> <span class="o">!=</span> <span class="nt">nil</span><span class="o">)</span>
+    <span class="p">{</span>
+        <span class="err">//</span> <span class="err">创建NSManagedObjectContext对象</span>
+        <span class="err">_managedObjectContext</span> <span class="err">=</span> <span class="err">[[NSManagedObjectContext</span> <span class="err">alloc]</span> <span class="err">init];</span>
+        <span class="err">//</span> <span class="err">为NSManagedObjectContext对象设置持久化存储协调器</span>
+        <span class="err">[_managedObjectContext</span> <span class="py">setPersistentStoreCoordinator</span><span class="p">:</span><span class="n">coordinator</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="nt">return</span> <span class="nt">_managedObjectContext</span><span class="o">;</span>
+<span class="err">}</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">NSManagedObjectModel</span> <span class="o">*)</span><span class="nt">managedObjectModel</span>
+<span class="p">{</span>
+    <span class="err">//</span> <span class="err">如果_managedObjectModel已经被初始化过，直接返回该对象</span>
+    <span class="err">if</span> <span class="err">(_managedObjectModel</span> <span class="err">!=</span> <span class="err">nil)</span> <span class="err">{</span>
+        <span class="err">return</span> <span class="err">_managedObjectModel;</span>
+    <span class="p">}</span>
+    <span class="o">//</span> <span class="nt">获取实体模型文件对应的NSURL</span>
+    <span class="nt">NSURL</span> <span class="o">*</span><span class="nt">modelURL</span> <span class="o">=</span> <span class="o">[[</span><span class="nt">NSBundle</span> <span class="nt">mainBundle</span><span class="o">]</span> <span class="nt">URLForResource</span><span class="o">:@</span><span class="s1">"FKModel"</span>
+    <span class="nt">withExtension</span><span class="o">:@</span><span class="s1">"momd"</span><span class="o">];</span>
+    <span class="o">//</span> <span class="nt">加载应用的实体模型文件</span><span class="err">，</span><span class="nt">并初始化NSManagedObjectModel对象</span>
+    <span class="nt">_managedObjectModel</span> <span class="o">=</span> <span class="o">[[</span><span class="nt">NSManagedObjectModel</span> <span class="nt">alloc</span><span class="o">]</span>
+    <span class="nt">initWithContentsOfURL</span><span class="nd">:modelURL</span><span class="o">];</span>
+    <span class="nt">return</span> <span class="nt">_managedObjectModel</span><span class="o">;</span>
+<span class="err">}</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">NSPersistentStoreCoordinator</span> <span class="o">*)</span><span class="nt">persistentStoreCoordinator</span>
+<span class="p">{</span>
+    <span class="err">//</span> <span class="err">如果_persistentStoreCoordinator已经被初始化过，直接返回该对象</span>
+    <span class="err">if</span> <span class="err">(_persistentStoreCoordinator</span> <span class="err">!=</span> <span class="err">nil)</span> <span class="err">{</span>
+        <span class="err">return</span> <span class="err">_persistentStoreCoordinator;</span>
+    <span class="p">}</span>
+    <span class="o">//</span> <span class="nt">获取SQLite数据库文件的存储目录</span>
+    <span class="nt">NSURL</span> <span class="o">*</span><span class="nt">storeURL</span> <span class="o">=</span> <span class="o">[[</span><span class="nt">self</span> <span class="nt">applicationDocumentsDirectory</span><span class="o">]</span>
+    <span class="nt">URLByAppendingPathComponent</span><span class="o">:@</span><span class="s1">"Books.sqlite"</span><span class="o">];</span>
+    <span class="nt">NSError</span> <span class="o">*</span><span class="nt">error</span> <span class="o">=</span> <span class="nt">nil</span><span class="o">;</span>
+    <span class="o">//</span> <span class="nt">以持久化对象模型为基础</span><span class="err">，</span><span class="nt">创建NSPersistentStoreCoordinator对象</span>
+    <span class="nt">_persistentStoreCoordinator</span> <span class="o">=</span> <span class="o">[[</span><span class="nt">NSPersistentStoreCoordinator</span> <span class="nt">alloc</span><span class="o">]</span>
+    <span class="nt">initWithManagedObjectModel</span><span class="o">:[</span><span class="nt">self</span> <span class="nt">managedObjectModel</span><span class="o">]];</span>
+    <span class="o">//</span> <span class="nt">设置持久化存储协调器底层采用SQLite存储机制</span><span class="err">，</span><span class="nt">如果设置失败记录错误信息</span>
+    <span class="nt">if</span> <span class="o">(![</span><span class="nt">_persistentStoreCoordinator</span> <span class="nt">addPersistentStoreWithType</span><span class="nd">:NSSQLiteStoreType</span>
+    <span class="nt">configuration</span><span class="nd">:nil</span> <span class="nt">URL</span><span class="nd">:storeURL</span> <span class="nt">options</span><span class="nd">:nil</span> <span class="nt">error</span><span class="o">:&amp;</span><span class="nt">error</span><span class="o">])</span>
+    <span class="p">{</span>
+        <span class="err">NSLog(@"设置持久化存储失败：%@,</span> <span class="err">%@",</span> <span class="err">error,</span> <span class="err">[error</span> <span class="err">userInfo]);</span>
+        <span class="err">abort();</span>
+    <span class="p">}</span>
+    <span class="nt">return</span> <span class="nt">_persistentStoreCoordinator</span><span class="o">;</span>
+<span class="err">}</span>
+<span class="o">//</span> <span class="nt">获取应用的Documents目录</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">NSURL</span> <span class="o">*)</span><span class="nt">applicationDocumentsDirectory</span>
+<span class="p">{</span>
+    <span class="err">return</span> <span class="err">[[[NSFileManager</span> <span class="err">defaultManager]</span> <span class="py">URLsForDirectory</span><span class="p">:</span><span class="n">NSDocumentDirectory</span>
+    <span class="n">inDomains</span><span class="p">:</span><span class="n">NSUserDomainMask</span><span class="p">]</span> <span class="n">lastObject</span><span class="p">];</span>
+<span class="p">}</span></code></pre></figure>
+<p>The environment required by <code class="language-plaintext highlighter-rouge">Core Data</code> is now essentially ready. The application can call <code class="language-plaintext highlighter-rouge">managedObjectContext </code> to perform create, delete, fetch and update operations.</p>
+<h2 id="3设计实体模型">3. Design the entity model<br/></h2>
+<p>In Xcode, find the <code class="language-plaintext highlighter-rouge">Core Data</code> file we created and open its entity model for editing, as shown below.</p>
+<p><br/></p>
+<p><img alt="2" src="/images/blog/coredata/coredata02.png"/></p>
+<p><br/></p>
+<p>Add a simple entity by clicking <code class="language-plaintext highlighter-rouge">Add Entity</code> in the lower-left corner of the view above. The system adds an entity under <code class="language-plaintext highlighter-rouge">ENTITIES</code>. Rename it as required by the project; here, we use <code class="language-plaintext highlighter-rouge">Bison</code>.</p>
+<p><br/></p>
+<h4 id="ps长按add-entity将会显示add-entityadd-fetch-requestadd-configuration列表可供选择添加实体抓取请求配置">Tip: press and hold <code class="language-plaintext highlighter-rouge">Add Entity</code> to choose from <code class="language-plaintext highlighter-rouge">Add Entity</code>, <code class="language-plaintext highlighter-rouge">Add Fetch Request</code> and <code class="language-plaintext highlighter-rouge">Add Configuration</code>, allowing you to add an entity, fetch request or configuration.</h4>
+<p>Select the <code class="language-plaintext highlighter-rouge">Bison</code> entity and click <code class="language-plaintext highlighter-rouge">Add Attribute</code> in the lower-right corner to add a property to <code class="language-plaintext highlighter-rouge">Bison</code>. Rename the property to <code class="language-plaintext highlighter-rouge">name</code> and choose its type; here, select <code class="language-plaintext highlighter-rouge">String</code>. The property's name must not begin with an uppercase letter.</p>
+<h4 id="ps长按add-attribute将会显示add-attributeadd-relationshipadd-configurationadd-fetch-property列表可供选择添加属性关联关系抓取属性也可以通过----来添加与删除">Tip: press and hold <code class="language-plaintext highlighter-rouge">Add Attribute</code> to display <code class="language-plaintext highlighter-rouge">Add Attribute</code>, <code class="language-plaintext highlighter-rouge">Add Relationship</code>, <code class="language-plaintext highlighter-rouge">Add Configuration</code> and Add Fetch Property. These add attributes, relationships or fetched properties. You can also use <code class="language-plaintext highlighter-rouge">+ </code> and <code class="language-plaintext highlighter-rouge">— </code> to add and remove items.</h4>
+<p><br/>
+Repeat the steps above to add a <code class="language-plaintext highlighter-rouge">birthDay</code> attribute, whose type is <code class="language-plaintext highlighter-rouge">date</code> type. After designing the entity, it looks as follows:<br/>
+<img alt="3" src="/images/blog/coredata/coredata03.jpg"/>
+<br/>
+Then click the following in Xcode's main menu: <code class="language-plaintext highlighter-rouge">Editor</code>–&gt;<code class="language-plaintext highlighter-rouge">Create NSManagedObject Subclass</code> menu item,<br/>
+If the system contains more than two entities, Xcode displays a dialog asking which entities to generate these for: <code class="language-plaintext highlighter-rouge">NSManagedObject</code><br/>
+subclasses, then displays a dialog asking where to save the <code class="language-plaintext highlighter-rouge">NSManagedObject</code> subclasses. After making the selection,<code class="language-plaintext highlighter-rouge">Create</code> button.<br/>
+After these steps, we have added a simple <code class="language-plaintext highlighter-rouge">Bison</code> entity. It contains two attributes but no relationships.<br/>
+<br/></p>
+<h2 id="4core-data数据的增删查改">4.<code class="language-plaintext highlighter-rouge">Core Data</code> Creating, deleting, fetching, and updating data<br/></h2>
+<p>After obtaining the managed object context, <code class="language-plaintext highlighter-rouge">NSManagedObjectContext</code>, use it to create, delete, fetch and update entities.</p>
+<ul>
+<li>Adding an entity: call the <code class="language-plaintext highlighter-rouge">NSEntityDescription</code> class's <code class="language-plaintext highlighter-rouge">insertNewObjectForEntityForName:inManagedObjectContext:</code> static method to create a new entity. Its first argument is the entity name, and its second is an <code class="language-plaintext highlighter-rouge">NSManagedObjectContext</code> object. Set the new entity's properties, then call the <code class="language-plaintext highlighter-rouge">NSManagedObjectContext </code> object's <code class="language-plaintext highlighter-rouge">save:</code> method to save. The code follows.</li>
+</ul>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span> <span class="nt">控制Core</span> <span class="nt">Data在托管对象上下文中创建一个新实体</span>
+<span class="nt">Bison</span><span class="o">*</span> <span class="nt">bison</span> <span class="o">=</span> <span class="o">[</span><span class="nt">NSEntityDescription</span>
+<span class="nt">insertNewObjectForEntityForName</span><span class="o">:@</span><span class="s1">"Bison"</span>
+<span class="nt">inManagedObjectContext</span><span class="nd">:self</span><span class="nc">.appDelegate.managedObjectContext</span><span class="o">];</span>
+<span class="o">//</span> <span class="nt">为新实体设置属性</span>
+<span class="nt">bison</span><span class="nc">.name</span> <span class="o">=</span> <span class="o">@</span><span class="s1">"linbin"</span><span class="o">;</span>
+<span class="nt">bison</span><span class="nc">.birth_Day</span> <span class="o">=</span> <span class="o">[</span><span class="nt">NSDate</span> <span class="nt">date</span><span class="o">];</span>
+<span class="o">//</span> <span class="nt">定义一个NSError对象</span><span class="err">，</span><span class="nt">用于接受错误信息</span>
+<span class="nt">NSError</span> <span class="o">*</span><span class="nt">error</span><span class="o">;</span>
+<span class="o">//</span> <span class="nt">设置完实体属性之后</span><span class="err">，</span><span class="nt">调用托管对象上下文的</span><span class="err">`</span><span class="nt">save</span><span class="o">:</span><span class="err">`</span><span class="nt">方法将实体写入数据库</span><span class="err">，</span><span class="nt">如果保存成功</span>
+<span class="nt">if</span> <span class="o">([</span><span class="nt">self</span><span class="nc">.appDelegate.managedObjectContext</span> <span class="nt">save</span><span class="o">:&amp;</span><span class="nt">error</span><span class="o">])</span>
+<span class="p">{</span>
+    <span class="err">[[[UIActionSheet</span> <span class="err">alloc]</span> <span class="py">initWithTitle</span><span class="p">:</span><span class="err">@</span><span class="s1">"保存成功"</span> <span class="n">delegate</span><span class="p">:</span><span class="n">nil</span>
+    <span class="n">cancelButtonTitle</span><span class="p">:</span><span class="err">@</span><span class="s1">"确定"</span> <span class="n">destructiveButtonTitle</span><span class="p">:</span><span class="n">nil</span>
+    <span class="n">otherButtonTitles</span><span class="p">:</span> <span class="n">nil</span><span class="p">]</span> <span class="n">showInView</span><span class="p">:</span><span class="n">self</span><span class="p">.</span><span class="n">view</span><span class="p">];</span>
+<span class="p">}</span><span class="nt">else</span><span class="p">{</span>
+    <span class="err">NSLog(@"</span><span class="py">保存FKEvent实体出错</span><span class="p">:</span> <span class="err">%@</span><span class="p">,</span><span class="err">%@"</span> <span class="p">,</span> <span class="n">error</span> <span class="p">,[</span><span class="n">error</span> <span class="n">userInfo</span><span class="p">]);</span>
+<span class="p">}</span></code></pre></figure>
+<p><br/></p>
+<ul>
+<li>Deleting an entity: first obtain the entity to delete. Call the <code class="language-plaintext highlighter-rouge">NSManagedObjectContext</code> object's <code class="language-plaintext highlighter-rouge">deleteObject:</code> method to delete it, then call the <code class="language-plaintext highlighter-rouge">NSManagedObjectContext </code> object's <code class="language-plaintext highlighter-rouge">save:</code> method to save. The code follows.</li>
+</ul>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span> <span class="nt">获取将要删除的实体</span>
+<span class="nt">Bison</span><span class="o">*</span> <span class="nt">deleteEvent</span> <span class="o">=</span> <span class="o">.....;</span>
+<span class="o">//</span> <span class="nt">从托管对象上下文中删除指定对象</span>
+<span class="o">[</span><span class="nt">self</span><span class="nc">.appDelegate.managedObjectContext</span> <span class="nt">deleteObject</span><span class="nd">:deleteEvent</span><span class="o">];</span>
+<span class="nt">NSError</span> <span class="o">*</span><span class="nt">error</span><span class="o">;</span>
+<span class="o">//</span> <span class="nt">保存删除操作</span><span class="err">，</span><span class="nt">如果出现错误</span><span class="err">，</span><span class="nt">显示错误信息</span>
+<span class="nt">if</span> <span class="o">(![</span><span class="nt">self</span><span class="nc">.appDelegate.managedObjectContext</span> <span class="nt">save</span><span class="o">:&amp;</span><span class="nt">error</span><span class="o">])</span>
+<span class="p">{</span>
+    <span class="err">NSLog(@"</span><span class="py">删除FKEvent实体出错</span><span class="p">:</span><span class="err">%@</span><span class="p">,</span><span class="err">%@"</span><span class="p">,</span><span class="n">error</span><span class="p">,[</span><span class="n">error</span> <span class="n">userInfo</span><span class="p">]);</span>
+<span class="p">}</span></code></pre></figure>
+<ul>
+<li>Updating an entity: obtain the entity to change, which must be managed by <code class="language-plaintext highlighter-rouge">NSManagedObjectContext</code>. Modify its properties, then call the <code class="language-plaintext highlighter-rouge">NSManagedObjectContext </code> object's <code class="language-plaintext highlighter-rouge">save:</code> method to save. The code follows.</li>
+</ul>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span> <span class="nt">获取将要修改的实体</span>
+<span class="nt">Bison</span><span class="o">*</span> <span class="nt">updateEvent</span> <span class="o">=</span> <span class="o">.....;</span>
+<span class="o">//</span><span class="nt">修改实体的属性</span>
+<span class="o">.....</span>
+<span class="o">//</span><span class="nt">定义一个NSError对象</span><span class="err">，</span><span class="nt">用于接收错误信息</span>
+<span class="nt">NSError</span> <span class="o">*</span><span class="nt">error</span><span class="o">;</span>
+<span class="o">//</span> <span class="nt">保存修改操作</span><span class="err">，</span><span class="nt">如果出现错误</span><span class="err">，</span><span class="nt">显示错误信息</span>
+<span class="nt">if</span> <span class="o">(![</span><span class="nt">self</span><span class="nc">.appDelegate.managedObjectContext</span> <span class="nt">save</span><span class="o">:&amp;</span><span class="nt">error</span><span class="o">])</span>
+<span class="p">{</span>
+    <span class="err">NSLog(@"</span><span class="py">删除FKEvent实体出错</span><span class="p">:</span><span class="err">%@</span><span class="p">,</span><span class="err">%@"</span><span class="p">,</span><span class="n">error</span><span class="p">,[</span><span class="n">error</span> <span class="n">userInfo</span><span class="p">]);</span>
+<span class="p">}</span></code></pre></figure>
+<p><br/></p>
+<ul>
+<li>Querying entities: create an <code class="language-plaintext highlighter-rouge">NSFetchRequest</code> object. Use <code class="language-plaintext highlighter-rouge">NSEntityDescription</code> to specify which entities the <code class="language-plaintext highlighter-rouge">NSFetchRequest </code> should fetch. If filtering is needed, set the conditions through <code class="language-plaintext highlighter-rouge">NSPredicate</code>. To sort the results, configure <code class="language-plaintext highlighter-rouge">NSFetchRequest</code> with one or more <code class="language-plaintext highlighter-rouge">NSSortDescriptor</code> objects. Then call the <code class="language-plaintext highlighter-rouge">NSManagedObjectContext</code> object’s <code class="language-plaintext highlighter-rouge">executeFetchRequest:error:</code> method. It returns an <code class="language-plaintext highlighter-rouge">NSArray</code> containing all matching entities. The code follows.</li>
+</ul>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span> <span class="nt">创建抓取数据的请求对象</span>
+<span class="nt">NSFetchRequest</span> <span class="o">*</span><span class="nt">request</span> <span class="o">=</span> <span class="o">[[</span><span class="nt">NSFetchRequest</span> <span class="nt">alloc</span><span class="o">]</span> <span class="nt">init</span><span class="o">];</span>
+<span class="o">//</span> <span class="nt">设置要抓取哪种类型的实体</span>
+<span class="nt">NSEntityDescription</span> <span class="o">*</span><span class="nt">entity</span> <span class="o">=</span> <span class="o">[</span><span class="nt">NSEntityDescription</span> <span class="nt">entityForName</span><span class="o">:@</span><span class="s1">"Bison"</span>
+<span class="nt">inManagedObjectContext</span><span class="nd">:self</span><span class="nc">.appDelegate.managedObjectContext</span><span class="o">];</span>
+<span class="o">//</span> <span class="nt">设置抓取实体</span>
+<span class="o">[</span><span class="nt">request</span> <span class="nt">setEntity</span><span class="nd">:entity</span><span class="o">];</span>
+<span class="nt">NSError</span> <span class="o">*</span><span class="nt">error</span> <span class="o">=</span> <span class="nt">nil</span><span class="o">;</span>
+<span class="o">//</span> <span class="nt">执行抓取数据的请求</span><span class="err">，</span><span class="nt">返回符合条件的数据</span>
+<span class="nt">eventArray</span> <span class="o">=</span> <span class="o">[[</span><span class="nt">self</span><span class="nc">.appDelegate.managedObjectContext</span>
+<span class="nt">executeFetchRequest</span><span class="nd">:request</span> <span class="nt">error</span><span class="o">:&amp;</span><span class="nt">error</span><span class="o">]</span> <span class="nt">mutableCopy</span><span class="o">];</span></code></pre></figure>
+<p><br/>
+That covers the basic methods. Download the Demo for further details.<br/></p>
+<blockquote>
+<p><a href="https://github.com/AllLuckly/CoreDataTest/tree/master">Download URL</a><br/></p>
+</blockquote>
+<p>Recommended reading: <a href="/en/journal/2016-01-04-a-windows-aliwangwang-style-login-screen-with-a-paper-feed-animation/">A Windows AliWangWang-style login screen with a paper-feed animation</a><br/></p>
+<p>Original article: <a href="/en/">https://allluckly.cn/</a></p>
+<p>Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.</p>
+
+{% endraw %}

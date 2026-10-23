@@ -1,0 +1,237 @@
+---
+layout: null
+permalink: /en/journal/2016-01-16-inside-kvo-on-ios/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Inside KVO on iOS
+agent_source_url: https://allluckly.cn/en/journal/2016-01-16-inside-kvo-on-ios/
+agent_source_sha256: e153ffafc2f75a30c9330a0a720287a562e75dcff3b14a02fd66b118a4e72536
+agent_generator_version: 1
+---
+{% raw %}# Inside KVO on iOS
+
+Language: en
+Canonical: [Inside KVO on iOS](<https://allluckly.cn/en/journal/2016-01-16-inside-kvo-on-ios/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao05>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-01-16-inside-kvo-on-ios/>)
+Published: 2016-01-16T00:00:00+08:00
+Modified: 2026-10-23T10:52:06+08:00
+Author: SindriLin
+
+Starts with observing a list's scroll offset, then examines the dynamic subclass and isa-pointer changes caused by registering an observer. Runtime functions are used to attempt a similar mechanism, connecting practical KVO usage with its underlying behaviour.
+
+Originally credited to SindriLin; edited and archived by Bison.
+
+[Source listed in the original](<http://sindrilin.com/ios-dev/2015/12/12/KVO%E7%9A%84%E5%A5%A5%E7%A7%98.html>)
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao05>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Read API, dependency and tool details in the context of the original publication date.
+
+Editor: [Bison](<https://allluckly.cn/en/>)  
+ Contributor: [SindriLin’s Notes](<http://sindrilin.com/ios-dev/2015/12/12/KVO%E7%9A%84%E5%A5%A5%E7%A7%98.html>)
+
+> “KVO is simple to use. The object must support kvc, which all NSObject subclasses do. For the gradient navigation-bar example above, we add controller as an observer of tableView. As the list scrolls, its scroll offset is calculated and used to change the navigation bar's background opacity.”
+
+Apple provides many callback mechanisms in iOS. `KVO(key-value-observing)` is particularly interesting: once an observer is registered, changes to the observed object cause it to notify the observer so a callback can run. A common use is observing a `scrollView`'s `contentOffset` property to change controls dynamically during scrolling, enabling effects such as fading navigation bars and pull-to-refresh controls.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao05/1.gif>)
+
+## Use
+
+KVO is simple to use. The object must support kvc, which all NSObject subclasses do. For the gradient navigation-bar example above, we add controller as an observer of tableView. As the list scrolls, its scroll offset is calculated and used to change the navigation bar's background opacity.
+
+```ruby
+//添加监听者
+[self.tableView addObserver: self forKeyPath: @"contentOffset" options: NSKeyValueObservingOptionNew context: nil];
+
+/**
+*  监听属性值发生改变时回调
+*/
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
+    CGFloat offset = self.tableView.contentOffset.y;
+    CGFloat delta = offset / 64.f + 1.f;
+    delta = MAX(0, delta);
+    [self alphaNavController].barAlpha = MIN(1, delta);
+}
+```
+
+KVO is undoubtedly a convenient callback mechanism, but how does the compiler implement observation? First, look at Apple's documentation describing the KVO implementation.
+
+> Automatic key-value observing is implemented using a technique called isa-swizzling… When an observer is registered for an attribute of an object the isa pointer of the observed object is modified, pointing to an intermediate class rather than at the true class ..
+
+Briefly, after observation is registered, the compiler changes the observed object's isa pointer—the tableView above—to point to a newly generated intermediate class. In a sense, this is a deception.
+
+```ruby
+typedef struct objc_class *Class;
+typedef struct objc_object  {
+    Class isa;
+} *id;
+```
+
+The isa pointer needs explanation here. isa is a pointer of type Class that points to the class type. We can obtain its value with object\_getClass (*Normally, the class method obtains this isa pointer, but Apple overrides that method on observed objects in kvo. My earlier description incorrectly said that it pointed to the superclass. Many thanks to [夏都](<http://www.jianshu.com/users/1498e495a4b1/timeline>)for correcting me.*).
+
+In oc, anything with an isa pointer is considered an object. The objc\_object above is the structure representation of NSObject, so oc does not allow objects that are not subclasses of NSObject.*(block is a special exception)*
+
+Apple does not explain many more implementation details, but we can use runtime mechanisms for some interesting debugging.
+
+## Apple's black magic
+
+According to Apple, registering observation changes certain properties of the observed object and its isa pointer. We can therefore print its properties before and after registration to investigate how kvo works. To obtain the true object type, I used object\_getClass, which is what the class method essentially calls. This function is declared in runtime.h.
+
+```ruby
+NSLog(@"address: %p", self.tableView);
+NSLog(@"class method: %@", self.tableView.class);
+NSLog(@"description method: %@", self.tableView);
+NSLog(@"use runtime to get class: %@", object_getClass(self.tableView));
+[self.tableView addObserver: self forKeyPath: @"contentOffset" options: NSKeyValueObservingOptionNew context: nil];
+NSLog(@"===================================================");
+NSLog(@"address: %p", self.tableView);
+NSLog(@"class method: %@", self.tableView.class);
+NSLog(@"description method: %@", self.tableView);
+NSLog(@"use runtime to get class %@", object_getClass(self.tableView));
+```
+
+Before running this code, consider what its output will be.
+
+```ruby
+address: 0x7f927a81d200
+class method: UITableView
+description method: <UITableView: 0x7f927a81d200; frame = (0 0; 320 568); clipsToBounds = YES; autoresize = W+H; gestureRecognizers = <NSArray: 0x7f927971f9a0>; layer = <CALayer: 0x7f9279706f50>; contentOffset: {0, 0}; contentSize: {600, 0}>
+use runtime to get class: UITableView
+===================================================
+address: 0x7f927a81d200
+class method: UITableView
+description method: <UITableView: 0x7f927a81d200; frame = (0 0; 320 568); clipsToBounds = YES; autoresize = W+H; gestureRecognizers = <NSArray: 0x7f927971f9a0>; layer = <CALayer: 0x7f9279706f50>; contentOffset: {0, 0}; contentSize: {600, 0}>
+use runtime to get class NSKVONotifying_UITableView
+```
+
+Apart from the type obtained through object\_getClass, none of the output changes. Overriding `class` and `description` could explain those results, but why is even the address identical?
+
+A short piece of code illustrates this:
+
+```ruby
+NSLog(@"%@, %@", self.class, super.class);
+```
+
+No matter how you print the code above, the two results are identical. This is because super essentially points to the superclass's memory. That is a mouthful, but an object-memory diagram can illustrate it:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao05/1.jpg>)
+
+Part of every object's memory is occupied by its superclass's properties; part of that region belongs to the superclass's own superclass. As stated earlier, the isa pointer points to the superclass. In this diagram, Son therefore begins at Father, and Father at NSObject, leaving all three object addresses identical. This suggests that the intermediate class mentioned in Apple's documentation is a subclass of the observed object's class. To conceal the implementation, Apple also overrides its class and description methods. The new class adds an `NSKVONotifying_` prefix to avoid creating observation subclasses repeatedly and save resources.
+
+## How to achieve a similar effect
+
+Now that we understand Apple's approach, we can implement KVO ourselves using runtime mechanisms. The runtime lets us dynamically create classes, extend methods, perform method-swizzling, bind properties, and do other interesting things while the program runs.
+
+Before creating a new class, follow Apple's approach: check whether it already exists, and create it only if it does not. Reimplement the new class's class method to conceal the implementation. Based on these principles, we use the following method to obtain the new class.
+
+```ruby
+- (Class)createKVOClassWithOriginalClassName: (NSString *)className {
+    NSString * kvoClassName = [kLXDkvoClassPrefix stringByAppendingString: className];
+    Class observedClass = NSClassFromString(kvoClassName);
+    if (observedClass) { return observedClass; }
+
+    //创建新类，并且添加LXDObserver_为类名新前缀
+    Class originalClass = object_getClass(self);
+    Class kvoClass = objc_allocateClassPair(originalClass, kvoClassName.UTF8String, 0);
+
+    //获取监听对象的class方法实现代码，然后替换新建类的class实现
+    Method classMethod = class_getInstanceMethod(originalClass, @selector(class));
+    const char * types = method_getTypeEncoding(classMethod);
+    class_addMethod(kvoClass, @selector(class), (IMP)kvo_Class, types);
+    objc_registerClassPair(kvoClass);
+    return kvoClass;
+}
+```
+
+Before deciding whether an intermediate class is needed to register observation, we must also validate the property. Derive its setter name by capitalizing the first letter and adding the set prefix, then look up the setter implementation. If no implementation exists, throw an exception that terminates the program.
+
+```ruby
+SEL setterSelector = NSSelectorFromString(setterForGetter(key));
+Method setterMethod = class_getInstanceMethod([self class], setterSelector);
+if (!setterMethod) {
+    @throw [NSException exceptionWithName: NSInvalidArgumentException reason: [NSString stringWithFormat: @"unrecognized selector sent to instance %p", self] userInfo: nil];
+    return;
+}
+Class observedClass = object_getClass(self);
+NSString * className = NSStringFromClass(observedClass);
+
+//如果被监听者没有LXDObserver_，那么判断是否需要创建新类
+if (![className hasPrefix: kLXDkvoClassPrefix]) {
+    observedClass = [self createKVOClassWithOriginalClassName: className];
+    object_setClass(self, observedClass);
+}
+//重新实现setter方法，使其完成
+const char * types = method_getTypeEncoding(setterMethod);
+class_addMethod(observedClass, setterSelector, (IMP)KVO_setter, types);
+```
+
+Two important methods in the overridden setter are `willChangeValueForKey` and `didChangeValueForKey`, called before and after assignment respectively. It must also iterate through all registered observers and notify them:
+
+```ruby
+static void KVO_setter(id self, SEL _cmd, id newValue) {
+    NSString * setterName = NSStringFromSelector(_cmd);
+    NSString * getterName = getterForSetter(setterName);
+    if (!getterName) {
+        @throw [NSException exceptionWithName: NSInvalidArgumentException reason: [NSString stringWithFormat: @"unrecognized selector sent to instance %p", self] userInfo: nil];
+        return;
+    }
+
+    id oldValue = [self valueForKey: getterName];
+    struct objc_super superClass = {
+        .receiver = self,
+        .super_class = class_getSuperclass(object_getClass(self))
+    };
+
+    [self willChangeValueForKey: getterName];
+    void (*objc_msgSendSuperKVO)(void *, SEL, id) = (void *)objc_msgSendSuper;
+    objc_msgSendSuperKVO(&superClass, _cmd, newValue);
+    [self didChangeValueForKey: getterName];
+
+    //获取所有监听回调对象进行回调
+    NSMutableArray * observers = objc_getAssociatedObject(self, (__bridge const void *)kLXDkvoAssiociateObserver);
+    for (LXD_ObserverInfo * info in observers) {
+        if ([info.key isEqualToString: getterName]) {        
+            dispatch_async(dispatch_queue_create(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            info.handler(self, getterName, oldValue, newValue); });
+    }
+    }
+}
+```
+
+We store all observers through dynamic association, but this creates strong references, so we also need a way to release them:
+
+```ruby
+- (void)LXD_removeObserver:(NSObject *)object forKey:(NSString *)key {
+    NSMutableArray * observers = objc_getAssociatedObject(self, (__bridge void *)kLXDkvoAssiociateObserver);
+
+    LXD_ObserverInfo * observerRemoved = nil;
+    for (LXD_ObserverInfo * observerInfo in observers) {
+
+        if (observerInfo.observer == object && [observerInfo.key isEqualToString: key]) {
+            observerRemoved = observerInfo;
+            break;
+        }
+    }
+    [observers removeObject: observerRemoved];
+}
+```
+
+Although the code above provides a rough kvo implementation and lets us customize callbacks, it is far from the complete mechanism. target-action or block callbacks offer more options than the single system callback. However, the code currently observes only object types, not primitive types. It also lacks stronger features such as keyPath observation of properties on an object's member objects.
+
+## Closing notes
+
+For observing primitive types, Apple may bridge through `void *` and access memory directly. Type encoding lets us determine each setter's specific type. Although more involved, this could produce a similar effect.
+
+Studying kvo gives us a deeper understanding of Apple's implementation. These topics involve lower-level techniques, and exploring them broadens our development perspective. Compared with other callback mechanisms, however, KVO's subclass creation and method overriding consume considerable memory. I therefore prefer callbacks such as delegate and block. It is even possible to use method-swizzling directly instead of overriding the setter this way.
+
+*P.S. Yesterday someone asked why kvo creates an intermediate class instead of simply overriding the setter to invoke callbacks. method\_swizzling is an excellent mechanism and can certainly satisfy observation requirements. But what if the observed object is a tableView? An app normally has more than one list, and method\_swizzling would add observation callbacks to every list. Even setting aside the possible crash risk, the setters of all tableView-derived views, including tableView itself, would be affected. An intermediate class avoids this problem.*
+
+Article code: [Implementing KVO ourselves](<https://github.com/JustKeepRunning/LXD_KeyValueObserveDemo>)
+
+---
+
+Recommended reading: [A Windows AliWangWang-style login screen with a paper-feed animation](<https://allluckly.cn/en/journal/2016-01-04-a-windows-aliwangwang-style-login-screen-with-a-paper-feed-animation/>)
+{% endraw %}

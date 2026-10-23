@@ -1,0 +1,218 @@
+---
+layout: null
+permalink: /en/journal/2016-01-13-event-delivery-and-the-responder-chain-in-ios/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Event delivery and the responder chain in iOS
+agent_source_url: https://allluckly.cn/en/journal/2016-01-13-event-delivery-and-the-responder-chain-in-ios/
+agent_source_sha256: 1910aad6b359daa068ad724ad71c3b89a0c42dfd875786f69976c88633f40ac1
+agent_generator_version: 1
+---
+{% raw %}# Event delivery and the responder chain in iOS
+
+Language: en
+Canonical: [Event delivery and the responder chain in iOS](<https://allluckly.cn/en/journal/2016-01-13-event-delivery-and-the-responder-chain-in-ios/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao02>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-01-13-event-delivery-and-the-responder-chain-in-ios/>)
+Published: 2016-01-13T00:00:00+08:00
+Modified: 2026-10-23T10:34:12+08:00
+Author: SindriLin
+
+Uses UIResponder, UIEvent and UITouch to explain how touch events reach views. Custom views reveal the relationship between the responder chain and gestures, followed by discussion of how event-delivery behaviour can be used in an interface.
+
+Originally credited to SindriLin; edited and archived by Bison.
+
+[Source listed in the original](<http://sindrilin.com/ios-dev/2015/12/27/%E4%BA%8B%E4%BB%B6%E4%BC%A0%E9%80%92%E5%93%8D%E5%BA%94%E9%93%BE.html>)
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao02>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Read API, dependency and tool details in the context of the original publication date.
+
+Editor: [Bison](<https://allluckly.cn/en/>)  
+ Contributor: [SindriLin’s Notes](<http://sindrilin.com/ios-dev/2015/12/27/%E4%BA%8B%E4%BB%B6%E4%BC%A0%E9%80%92%E5%93%8D%E5%BA%94%E9%93%BE.html>)
+
+> "When using a tool such as WeChat, tapping Scan opens a QR-code scanning view. When we tap the screen, iphone OS detects the tap, packages the information into UITouch and UIEvent instances, finds the currently running application, and searches level by level for objects capable of responding, until no responder handles it. This search is called the event responder chain."
+
+When using a tool such as WeChat, tapping Scan opens a QR-code scanning view. When we tap the screen, iphone OS detects the tap, packages information about it into UITouch and UIEvent instances, finds the currently running application, and searches level by level for objects capable of responding, until no responder handles it. This search is called the event responder chain. As illustrated below, different responders are searched in a chain.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao02/1.jpg>)
+
+## Responder
+
+In iOS, objects that can respond to events are instances of subclasses of `UIResponder`. `UIResponder` provides four touch callbacks, corresponding to touch begin, movement, end, and cancellation. The cancellation callback is invoked only when the application is forcibly terminated or a call arrives.
+
+![2](<https://allluckly.cn/images/blog/tuogao/tougao02/2.jpg>)
+
+When making custom controls based on UIView, we can override these methods for touch callbacks. Each receives two arguments: a set of `UITouch` objects and a `UIEvent` object. These represent the touches and the event, respectively.
+
+- Event object
+
+iOS represents user-interaction events with `UIEvent`. In `UIEvent.h`, a property of type `UIEventType` indicates the current event type: multitouch, motion such as shaking, or remote control. A 3DTouch event type was added in a later iOS version. Throughout one user-touch event's handling, the `UIEvent` object is unique.
+
+- Tapped object
+
+`UITouch` represents an individual touch. Its declaration contains a property of enum type `UITouchPhase`, describing one of five states: began, moved, stationary, ended, or canceled. When touches occur, their objects are passed as a set to `UIResponder` callbacks. We obtain touch positions from these objects: `- (CGPoint)locationInView:(nullable UIView *)view` gives the current coordinates, and `- (CGPoint)previousLocationInView:(nullable UIView *)view` gives the previous coordinates.
+
+To confirm that UIView responds through the touch methods of `UIResponder`, I created a UIView category, overrode `+ (void)load`, and used method\_swizzling to exchange the touch-event implementations.
+
+```css
++ (void)load
+{   
+    Method origin = class_getInstanceMethod([UIView class], @selector(touchesBegan:withEvent:));
+    Method custom = class_getInstanceMethod([UIView class], @selector(lxd_touchesBegan:withEvent:));
+    method_exchangeImplementations(origin, custom);
+
+    origin = class_getInstanceMethod([UIView class], @selector(touchesMoved:withEvent:));
+    custom = class_getInstanceMethod([UIView class], @selector(lxd_touchesMoved:withEvent:));
+    method_exchangeImplementations(origin, custom);
+
+    origin = class_getInstanceMethod([UIView class], @selector(touchesEnded:withEvent:));
+    custom = class_getInstanceMethod([UIView class], @selector(lxd_touchesEnded:withEvent:));
+    method_exchangeImplementations(origin, custom);
+}
+
+- (void)lxd_touchesBegan: (NSSet<UITouch *> *)touches withEvent: (UIEvent *)event
+{
+    NSLog(@"%@ --- begin", self.class);
+    [self lxd_touchesBegan: touches withEvent: event];
+}
+
+- (void)lxd_touchesMoved: (NSSet<UITouch *> *)touches withEvent: (UIEvent *)event
+{
+    NSLog(@"%@ --- move", self.class);
+    [self lxd_touchesMoved: touches withEvent: event];
+}
+
+- (void)lxd_touchesEnded: (NSSet<UITouch *> *)touches withEvent: (UIEvent *)event
+{
+    NSLog(@"%@ --- end", self.class);
+    [self lxd_touchesEnded: touches withEvent: event];
+}
+```
+
+In a new project, I created four UIView subclasses—AView, BView, CView, and DView—and then tapped an arbitrary position:
+
+![3](<https://allluckly.cn/images/blog/tuogao/tougao02/3.jpg>)
+
+When I tapped the green view above, the console printed the following log, with the date portion removed:
+
+```css
+CView --- begin
+CView --- end
+```
+
+This shows that tapping a UIView is handled through the callbacks associated with touches events.
+
+Besides the touches callbacks, a `UIGestureRecognizer` can be attached to a view to support richer gestures. After adding a tap recognizer, the original touchesEnded no longer worked. I initially thought all touches methods became ineffective, but the test demo still called touchesBegan while moved and ended were not called. Therefore, I suspected that system touch handling contains a method after touchesBegan that schedules subsequent events, a nextHandler. My guess at that scheduling process is shown below:
+
+![4](<https://allluckly.cn/images/blog/tuogao/tougao02/4.jpg>)
+
+## Responder-chain delivery
+
+We have described how a control handles a tap it receives. But how does the system find the view that should handle a tap at the user's chosen position?
+
+As discussed above, the system responds to touches by repeatedly finding the next responder, and all interactive controls directly or indirectly subclass `UIResponder`. Can we find the key property in its header?
+
+There is indeed a method, `- (nullable UIResponder *)nextResponder`. Its name suggests it retrieves the current view's next responder. Let's override touchesBegan and obtain successive responders until there is no next one. The relevant code follows:
+
+```css
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    UIResponder * next = [self nextResponder];
+    NSMutableString * prefix = @"".mutableCopy;
+
+    while (next != nil) {
+        NSLog(@"%@%@", prefix, [next class]);
+        [prefix appendString: @"--"];
+        next = [next nextResponder];
+    }    
+}
+```
+
+The console lists all the subsequent event responders as follows:
+
+```css
+AView
+--UIView
+----ViewController
+------UIWindow
+--------UIApplication
+----------AppDelegate
+```
+
+The output has a clear hierarchy, but its order is exactly the reverse of the system's step-by-step responder search. Why? The output includes a ViewController, showing that `UIViewController` also subclasses `UIResponder`. However, a controller manages a view. Even as a member of the responder chain, logically it should not be among the system's search targets. Following nextResponder is therefore not the correct approach to that search.
+
+I later found two methods in the `UIView` header, returning `UIView` and `BOOL`, respectively:
+
+```css
+- (nullable UIView *)hitTest:(CGPoint)point withEvent:(nullable UIEvent *)event;   // recursively calls -pointInside:withEvent:. point is in the receiver's coordinate system
+- (BOOL)pointInside:(CGPoint)point withEvent:(nullable UIEvent *)event;   // default returns YES if point is in bounds
+```
+
+Judging by their names, one method uses the tap coordinates to report whether the event occurred inside this view, while the other returns the object that responds to the tap. We can infer that, on receiving a tap, the system repeatedly invokes these methods on the current view's subviews to find the next responding view. I therefore used method\_swizzling to replace the implementations of both methods and obtained the following test output:
+
+```css
+UIStatusBarWindow can answer 1
+UIStatusBar can answer 0
+UIStatusBarForegroundView can answer 0
+UIStatusBarServiceItemView can answer 0
+UIStatusBarDataNetworkItemView can answer 0
+UIStatusBarBatteryItemView can answer 0
+UIStatusBarTimeItemView can answer 0
+hit view: UIStatusBar
+hit view: UIStatusBarWindow
+UIWindow can answer 1
+UIView can answer 1
+hit view: _UILayoutGuide
+hit view: _UILayoutGuide
+AView can answer 1
+DView can answer 0
+hit view: DView
+BView can answer 0
+hit view: BView
+hit view: AView
+hit view: UIView
+hit view: UIWindow
+......  //下面是touches方法的输出
+```
+
+You may not recognize the types beginning with UIStatusBar at the top, but they are evidently status-bar-related views. You can look them up in Apple's documentation center, opened in Xcode with shift+command+0. The output suggests that the system first calls ` pointInSide: WithEvent:  ` to determine whether a view and its subviews can receive this touch, then calls ` hitTest: withEvent:  ` to obtain the views that can handle it. Once those objects have been found, their touches callbacks begin.
+
+The method-call output shows the search order: `UIStatusBar`-related views → `UIWindow` → `UIView` → `AView` → `DView` → `BView`. The system traverses every subview while passing along the event chain to determine whether it can respond to the touch. For this article's demo, the search can be diagrammed as follows:
+
+![5](<https://allluckly.cn/images/blog/tuogao/tougao02/5.jpg>)
+
+After this responder search finishes, the system converts the event's touches into `UITouch` objects and passes them, together with an event object of type `UIEvent`, to touchesBegan, you
+
+Furthermore, the nextResponder output above shows responders returned as touch-responsive views during the search. We can therefore infer that `UIApplication` maintains a responder stack of its own: when ` pointInSide: withEvent:  ` returns yes, the responder is pushed onto it.
+
+![2](<https://allluckly.cn/images/blog/tuogao/tougao02/6.jpg>)
+
+The responder at the top has first priority. If AView does not handle the event, it is popped and the event passes to UIView, continuing until handled or discarded after reaching AppDelegate without a response. This also makes the controller an exception in the stack: even without a ` pointInSide: withEvent:  ` result declaring it responsive, the controller can still be pushed as the next responder after `UIView`.
+
+## Applying the responder chain
+
+Now that we know how the system finds the responding view, we can override the event-handler lookup method to support tapping irregular shapes. A circle is the most common example. In the demo, I set both the view's width and height to 200, then override the method as follows:
+
+```css
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
+{
+    const CGFloat halfWidth = 100;
+    CGFloat xOffset = point.x - 100;
+    CGFloat yOffset = point.y - 100;
+    CGFloat radius = sqrt(xOffset * xOffset + yOffset * yOffset);
+    return radius <= halfWidth;
+}
+```
+
+The final result is shown below:
+
+![2](<https://allluckly.cn/images/blog/tuogao/tougao02/1.gif>)
+
+> [Demo project](<https://github.com/JustKeepRunning/LXDEventChain>)
+
+---
+
+Recommended reading: [Bison's guide to iOS multithreading, part 1](<https://allluckly.cn/en/journal/2016-01-13-bison-s-guide-to-ios-multithreading-part-1/>)
+{% endraw %}

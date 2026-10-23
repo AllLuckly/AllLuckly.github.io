@@ -1,4 +1,5 @@
 (() => {
+  const english = document.documentElement.lang.toLowerCase().startsWith('en');
   const normalize = value => String(value).normalize('NFKC').toLocaleLowerCase();
 
   document.querySelectorAll('[data-technical-library]').forEach(library => {
@@ -25,7 +26,7 @@
       sections.forEach(section => {
         section.hidden = !Array.from(section.querySelectorAll('[data-technical-item]')).some(row => !row.hidden);
       });
-      if (status) status.textContent = terms.length ? `找到 ${count} 篇文章，共 ${rows.length} 篇` : `显示全部 ${rows.length} 篇文章`;
+      if (status) status.textContent = english ? (terms.length ? `${count} of ${rows.length} articles found` : `All ${rows.length} articles shown`) : (terms.length ? `找到 ${count} 篇文章，共 ${rows.length} 篇` : `显示全部 ${rows.length} 篇文章`);
       if (empty) empty.hidden = count !== 0;
       resets.forEach(button => {
         if (form.contains(button)) button.hidden = input.value.length === 0;

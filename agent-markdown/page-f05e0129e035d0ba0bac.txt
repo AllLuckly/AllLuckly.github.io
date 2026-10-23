@@ -1,0 +1,80 @@
+---
+layout: null
+permalink: /cocoapods/CocoaPods安装及使用/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发CocoaPods安装及使用
+agent_source_url: https://allluckly.cn/cocoapods/CocoaPods%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8
+agent_source_sha256: dee36e560e0ba2f50e1a128287bb9ecd817d375b6e7a429642df80049072ccb5
+agent_generator_version: 1
+---
+{% raw %}# iOS开发CocoaPods安装及使用
+
+语言：zh-CN
+原文：[iOS开发CocoaPods安装及使用](<https://allluckly.cn/cocoapods/CocoaPods%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8>)
+中文：[中文 HTML](<https://allluckly.cn/cocoapods/CocoaPods%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-05-20-installing-and-using-cocoapods-for-ios-development/>)
+发布于: 2015-05-20T00:00:00+08:00
+内容更新于: 2026-10-23T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+从安装 Ruby 与 CocoaPods 开始，说明如何搜索依赖、编写 Podfile、执行安装并使用生成的工作区，还记录头文件补全的处理方法，适合理解早期 iOS 依赖管理流程。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文发表于 2015 年，示例使用 iOS 7.0、SDWebImage 2.0 与当时的 Ruby 镜像地址。
+
+原文记录了 2015 年的安装过程，包括当时使用的 Ruby 镜像、Podfile 与 Xcode 设置。现在重新搭建环境，请从 CocoaPods 官方安装指南开始，不要照搬旧镜像地址。本文保留用于理解 Podfile、Pods、Podfile.lock 与 workspace 的关系；旧步骤没有在当前工具链重新执行。
+
+- [CocoaPods 官方安装指南](<https://guides.cocoapods.org/using/getting-started.html>)
+
+阅读说明补充于 2026-10-23
+
+> "The beginning is the most important part of the work." Plato 1.安装Brew
+
+`ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"` 2.更新Ruby
+
+`brew install ruby`
+
+3.安装CocoaPods
+
+首先： `sudo gem install cocoapods`   
+ 如果没反应 `gem sources --remove https://rubygems.org/`   
+ //等有反应之后再敲入以下命令 `gem sources -a http://ruby.taobao.org/` 为了验证你的Ruby镜像是并且仅是taobao，可以用以下命令查看：
+
+`gem sources -l`
+
+只有在终端中出现下面文字才表明你上面的命令是成功的： *\*\* CURRENT SOURCES \*\**
+
+http://ruby.taobao.org/ 这时候，你再次在终端中运行：`sudo gem install cocoapods`
+
+等待十几秒 然后：`pod setup`
+
+4.使用Search命令来看看你需要的第三方库是否存在!
+
+`pod search SDWebImage `
+
+5.创建Podfile
+
+`cd` +项目的路径 然后再创建
+
+`touch Podfile`
+
+1. 然后在Podfile文件中输入以下文字： ` platform :ios, '7.0'
+pod "SDWebImage", "~> 2.0"   `
+
+7.最后 `esc  :wq`
+
+1. 运行 ` pod install  `
+
+如果需要再加第三方框架到CocoaPods中时 需要`pod search` 第三方框架名 选择最新的版本加到 Podfile 文件中！然后 `pod install`。
+
+注意最后一句话，意思是：以后打开项目就用 .xcworkspace 打开，而不是之前的.xcodeproj文件。
+
+使用`CocoaPods` 导入第三方库头文件不自动补齐时解决方法
+
+选择`Target -> Build Settings` 菜单，找到`\”User Header Search Paths\”`设置项 新增一个值`"${SRCROOT}"`，并且选择`\”Recursive\”`，这样xcode就会在项目目录中递归搜索文件 自动补齐功能马上就好使了。
+
+你也许会郁闷，为什么会出现.xcworkspace文件呢。这正是你刚刚运行`$ pod install`命令产生的新文件。除了这个文件，你会发现还多了另外一个文件“Podfile.lock”和一个文件夹“Pods”。
+{% endraw %}

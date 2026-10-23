@@ -1,0 +1,77 @@
+---
+layout: null
+permalink: /ffmpeg/ffmpeg1/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: Mac编译ffmpeg获取FFmpeg-iOS
+agent_source_url: https://allluckly.cn/ffmpeg/ffmpeg1
+agent_source_sha256: acdb20b8f25452561fd758e18c08c8c8dd89955ac46266d722c0d12ce12ca8dc
+agent_generator_version: 1
+---
+{% raw %}# Mac编译ffmpeg获取FFmpeg-iOS
+
+语言：zh-CN
+原文：[Mac编译ffmpeg获取FFmpeg-iOS](<https://allluckly.cn/ffmpeg/ffmpeg1>)
+中文：[中文 HTML](<https://allluckly.cn/ffmpeg/ffmpeg1>)
+English: [English HTML](<https://allluckly.cn/en/journal/2017-07-11-building-ffmpeg-ios-on-a-mac/>)
+发布于: 2017-07-11T00:00:00+08:00
+内容更新于: 2026-10-23T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+记录在 Mac 上准备 gas-preprocessor 与 yasm，再运行 FFmpeg-iOS 构建脚本的流程，说明脚本位置、依赖安装和最终生成目录，为后续解码示例准备库文件。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文发表于 2017 年，构建输出包含 El Capitan 的 Homebrew 安装记录，脚本与权限设置保留为历史示例。
+
+这是 2017 年通过第三方脚本构建 FFmpeg-iOS 的过程，终端输出对应当时的 macOS 工具链。脚本、汇编工具和目标架构都需要按实际环境重新核对；原文的宽泛权限设置也不应作为默认安装步骤。这里只补充阅读入口，未在当前 Xcode 重跑构建。
+
+- [FFmpeg：Darwin 平台构建说明](<https://ffmpeg.org/platform.html>)
+
+阅读说明补充于 2026-10-23
+
+历史配图暂不可用，[保留原图地址](<http://upload-images.jianshu.io/upload_images/671504-ada1e50c34918b9b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240>)供查阅。
+
+ffmpeg 的用处在此就不做太多的阐述，感兴趣的朋友可以自行百度。
+
+下面开始正文：
+
+1. 下载 [gas-preprocessor](<https://github.com/libav/gas-preprocessor>)
+2. 复制`gas-preprocessor` 文件中的`gas-preprocessor.pl`文件 到`/usr/local/bin/`文件夹下
+3. 打开权限
+
+```
+chmod 777 /usr/local/bin/gas-preprocessor.pl
+```
+
+4.安装 yasm
+
+```
+brew install yasm
+```
+
+安装完成时如下：
+
+```
+==> Downloading https://homebrew.bintray.com/bottles/yasm-1.3.0.el_capitan.bottl
+######################################################################## 100.0%
+==> Pouring yasm-1.3.0.el_capitan.bottle.1.tar.gz
+🍺  /usr/local/Cellar/yasm/1.3.0: 44 files, 3.1M
+
+```
+
+5.下载MAC上[ffmpeg能编译的脚本](<https://github.com/kewlbear/FFmpeg-iOS-build-script>)
+
+6.终端cd + 文件夹目录，进入下载的文件夹中，然后编译脚本
+
+```
+./build-ffmpeg.sh
+```
+
+这时你可以喝杯水压压惊了，坐等编译完成。如果没安装FFmpeg，这个命令会自动安装FFmpeg，时间可能有点久。 全部编译完成可以得到 `FFmpeg-iOS`文件
+
+---
+
+好文推荐：[菜鸟程序员2015年年终总结](<https://allluckly.cn/%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/zongjie2015>)
+{% endraw %}

@@ -1,0 +1,210 @@
+---
+layout: post
+title: Xcode development tips from a SwiftGG discussion
+description: 'Collects Xcode techniques from a SwiftGG discussion: exception, symbolic and test-failure breakpoints;
+  inspecting and changing variables during debugging; Quick Look; and reusable code snippets.'
+category: Development notes
+imagefeature: null
+date: 2016-02-26 00:00:00 +0800
+technical_translation:
+  topic: tooling-release
+  summary: 'Collects Xcode techniques from a SwiftGG discussion: exception, symbolic and test-failure breakpoints;
+    inspecting and changing variables during debugging; Quick Look; and reusable code snippets.'
+  keywords:
+  - Xcode
+  - breakpoints
+  - Quick Look
+  - code snippets
+  - SwiftGG
+  provenance: contribution
+  author_name: bestswifter
+  source_url: http://www.jianshu.com/p/cda4b0fe07e0
+  credit: Originally credited to bestswifter; edited and archived by Bison.
+  version_note: A record of a 2016 discussion. Debugger and language support are described as they existed at the
+    time.
+  title: Xcode development tips from a SwiftGG discussion
+  source_sha256: b01bdf6163de667fe551b1b72214789c4234636739ea58a20404a394a7086806
+lang: en
+source_path: _posts/2016-02-26-tuogao24.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao24
+permalink: /en/journal/2016-02-26-xcode-development-tips-from-a-swiftgg-discussion/
+translation_method: machine-assisted
+translation_source_sha256: b01bdf6163de667fe551b1b72214789c4234636739ea58a20404a394a7086806
+excerpt: 'Collects Xcode techniques from a SwiftGG discussion: exception, symbolic and test-failure breakpoints;
+  inspecting and changing variables during debugging; Quick Look; and reusable code snippets.'
+translation_date: '2026-10-23T02:52:07+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/cda4b0fe07e0">bestswifter</a><br/></p>
+<blockquote>
+<p>"Thanks to<a href="http://www.jianshu.com/users/ef1058d2d851/latest_articles">@星夜暮晨 (Weibo) </a>gave this presentation. 星星 also wrote Xcode Jianghu Lu, with more Xcode tips."</p>
+</blockquote>
+<p><br/></p>
+<p>I recorded most of this presentation and uploaded the video to <a href="https://speakerdeck.com/cee/swiftgg-show-di-qi-xcode-tips-and-tricks-xing-ye-mu-chen">Youku</a>. Below are written notes for quick future reference. Please correct any misunderstandings.<br/></p>
+<h3 id="断点">Breakpoints<br/></h3>
+<p>Besides ordinary breakpoints, there are five special kinds:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Exception Breakpoint：代码出现问题，抛出异常时触发。
+Symbolic Breakpoint：当执行某个符号时触发。
+OpenGL ES Error Breakpoint：在 OpenGL ES 错误发生时触发
+Test Failure Breakpoint：测试断言失败的时候触发
+Swift Error Breakpoint：在 Swift 错误发生时触发
+</code></pre></div></div>
+<p><br/>
+Ordinary breakpoint:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao24/1.png"/><br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Condition: 返回一个布尔值，只有在布尔值为真时断点才会触发
+
+Ignore：忽略前n次断点，直到第n+1次遇到断点才触发。
+
+Action：断点触发时，Xcode执行的操作，如脚本等。
+</code></pre></div></div>
+<p><br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>AppleScript：用于执行脚本，如display dialog "SwiftGG"弹出对话框。
+Capture GPU Frame：捕获在断点处 GPU 当前绘制的帧图，用于 OpenGL ES应用的调试。
+Debugger Command：相当于在控制台中输入的 lldb 调试命令。
+Log Message：将自定义格式、内容的信息输出到控制台，常用的占位符有：%H(断点第几次触发)，%B(断点所在的方法的名字)和 @expr@(输出expr的值)。
+Shell Command：接收命令文件以及相应的参数列表。Xcode会异步执行 Shell Command。勾选 "Wait until done"表示等待 Shell 命令执行结束后再执行调试工作。
+Sound：触发断点的同时播放声音
+Automatically continue after evaluating actions：勾选这个选项后，断点不会中断程序运行。
+</code></pre></div></div>
+<p><br/></p>
+<h3 id="swift-error-breakpoint">Swift Error Breakpoint: <br/></h3>
+<p>This breakpoint triggers when an error conforming to ErrorType is thrown.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>enum ThisPersonError: ErrorType {
+    case IsDead
+}
+
+func findSomeone(name: String) throws {
+    if name == "xx" {
+        throw ThisPersonError.IsDead    // 这里将触发断点
+    }
+}
+
+do {
+    try findSomeone("xx")
+}
+</code></pre></div></div>
+<p><br/></p>
+<p>Edit a Swift Error Breakpoint to specify the error types it should respond to.<br/></p>
+<h3 id="exception-breakpoint">Exception Breakpoint: <br/></h3>
+<p>This only works in Objective-C or C++. For example:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        @try {
+            // 打断点后，程序在下一行代码处中断
+            @throw [NSException exceptionWithName:@"名字" reason:@"原因" userInfo:nil];
+        }
+        @catch (NSException *exception) {
+            NSLog(@"catch断点");
+        }
+    }
+    return 0;
+}
+</code></pre></div></div>
+<p><br/></p>
+<p>Without an Exception Breakpoint, execution reaches @catch. The breakpoint editor differs slightly from earlier versions:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao24/2.png"/><br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Exception： 表示响应哪种语言的异常，可以是 Objective-C 或 C++
+
+Break：是在 throw 还是在 catch 中触发这个异常
+</code></pre></div></div>
+<p><br/></p>
+<h3 id="symbolic-breakpoint">Symbolic Breakpoint: <br/></h3>
+<p>A symbolic breakpoint triggers when a particular method is called:<br/></p>
+<p>For example, define these two functions:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func burnAllCouples() {
+    print("FFF Couples")
+}
+
+func burnAllSingleDogs() {
+    print("FFF Single Dogs")
+}
+</code></pre></div></div>
+<p><br/></p>
+<p>Then set Symbol to a function name, such as burnAllSingleDogs. The breakpoint triggers each time burnAllSingleDogs is called:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao24/3.png"/><br/></p>
+<p>A significant limitation of Symbolic Breakpoint in Swift is that it does not support method names with parameters.<br/></p>
+<h3 id="test-failure-breakpoint">Test Failure Breakpoint<br/></h3>
+<p>This triggers when a test assertion fails:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func testExample() {
+    XCTAssert(1 == 0)
+    // This is an example of a functional test case.
+    // Use XCTAssert and related functions to verify your tests produce the correct results.
+}
+</code></pre></div></div>
+<p><br/></p>
+<p>This assertion must fail, for example. With a Test Failure Breakpoint, execution stops at XCTAssert(1 == 0).<br/></p>
+<h3 id="内存变量设置">Setting variables in memory<br/></h3>
+<p>A simple example:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NSString *string = @"SwiftGG";
+NSLog(@"%@", string); // 这一行前面打断点
+</code></pre></div></div>
+<p><br/></p>
+<p>After running, right-click the variable:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao24/4.png"/><br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Print Description of "string"：把 string 的信息输出到控制台。
+Copy：复制 string 的信息，包含变量名，类名和值。
+View Value As：以什么类型的格式来查看变量，默认情况下会自动推断类型。
+Edit Value：可以直接修改变量的值。在 Swift中无法修改
+Edit Summary Format：修改输出信息的格式，这里的修改会直接影响 Copy 出来的东西。在 Swift 中无效。
+Add expression：和断点类似，可以输入新的变量表达式。
+Watch：相当于一种新的断点，它观察变量的值。如果发生变化，就像断点一样中断运行。观察点在程序运行结束后会失效。
+</code></pre></div></div>
+<p><br/></p>
+<h3 id="quick-look">Quick Look<br/></h3>
+<p>It displays source code in a more intuitive way.<br/></p>
+<p>Using the earlier code, hover briefly over string. A window appears; click its small eye button to open Quick Look:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao24/5.png"/><br/>
+This is especially useful for variables that are difficult to inspect directly, for example:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>UIColor *color = [UIColor colorWithRed:222/255.0 green:242/255.0 blue:255/255.0 alpha:1];
+NSLog(@"%@", color);    // 这一行前面打断点
+</code></pre></div></div>
+<p><br/>
+The same approach quickly reveals detailed colour information:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao24/6.png"/><br/></p>
+<p>P.S. I could not open it correctly in Swift. 星星 later explained that Swift does not support UIView and UIColor here.<br/></p>
+<p>Quick Look supports many types, including images, colours, NSBezierPath, strings, URLs and SpriteKit classes.<br/></p>
+<p>Normally Quick Look supports only built-in types. For a custom type, implement debugQuickLookObject:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class WebContent: NSObject {
+var URL = ""
+
+init(URL: String) {
+self.URL = URL
+}
+
+func debugQuickLookObject() -&gt; AnyObject? {
+guard let url = NSURL(string: URL) else { return URL }
+return url
+}
+}
+
+let web = WebContent(URL: "http://swift.gg")
+print(web)    // 这里加断点
+</code></pre></div></div>
+<p><br/></p>
+<p>Clicking the eye now opens a webpage, somewhat like a firm 3D Touch press.<br/></p>
+<h3 id="代码片段">Code snippets<br/></h3>
+<p>The debugQuickLookObject method has no completion suggestion, making it inconvenient and error-prone to type. Create a code snippet for it.<br/></p>
+<p>First, use a placeholder in place of the actual function implementation:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class WebContent: NSObject {    
+    func debugQuickLookObject() -&gt; AnyObject? {
+        &lt;#Statement#&gt;
+    }
+} &lt;br&gt;
+</code></pre></div></div>
+<p>After typing the final “&gt;”, Xcode automatically displays the code in this form:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao24/7.png"/><br/></p>
+<p>Select the code and drag it into the code-snippet collection on Xcode’s right-hand side:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao24/8.png"/><br/></p>
+<p>Then double-click the custom snippet to edit it:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao24/9.png"/><br/></p>
+<p>Mainly change Title and Completion ShortCut. Afterwards, typing produces completion suggestions:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao24/10.png"/><br/></p>
+<h2 id="总结">Summary<br/></h2>
+<p>That concludes this presentation, covering four areas: breakpoints, setting memory variables, Quick Look and code snippets. Applause goes here 👏👏👏.<br/></p>
+<p>Thanks again to<a href="http://www.jianshu.com/users/ef1058d2d851/latest_articles">@星夜暮晨 </a>for the presentation.<br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-02-18-preparing-an-ios-app-for-apple-pay/">Preparing an iOS app for Apple Pay</a><br/></p>
+
+{% endraw %}

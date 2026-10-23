@@ -1,0 +1,28 @@
+{%- comment -%}Shared language context. URLs identify translations; product IDs stay language-independent.{%- endcomment -%}
+{%- assign content_lang = page.lang | default: site.lang | default: 'zh-CN' -%}
+{%- assign locale_prefix = '' -%}
+{%- assign localized_posts = site.posts -%}
+{%- assign localized_apps = site.data.apps -%}
+{%- assign localized_topics = site.data.technical_topics -%}
+{%- assign locale_title = site.title -%}
+{%- assign locale_description = site.description -%}
+{%- if content_lang == 'en' -%}
+  {%- assign locale_prefix = '/en' -%}
+  {%- assign localized_posts = site.translations | where: 'lang', 'en' | sort: 'date' | reverse -%}
+  {%- assign localized_apps = site.data.apps_en -%}
+  {%- assign localized_topics = site.data.technical_topics_en -%}
+  {%- assign locale_title = 'Bison’s Creative & Development Notes' -%}
+  {%- assign locale_description = 'App tutorials, creative projects and historical iOS development notes by Bison.' -%}
+{%- endif -%}
+{%- assign locale_home = locale_prefix | append: '/' -%}
+{%- assign locale_route = page.url | replace: '/index.html', '/' -%}
+{%- if content_lang == 'en' -%}{%- assign locale_route = locale_route | remove_first: '/en' -%}{%- endif -%}
+{%- assign source_key = page.source_path | default: page.path -%}
+{%- assign source_url = page.source_url | default: page.url | remove: site.url | replace: '/index.html', '/' -%}
+{%- assign translation_pair = site.data.translations[source_url] -%}
+{%- unless translation_pair.status == 'complete' -%}{%- assign translation_pair = nil -%}{%- endunless -%}
+{%- assign canonical_app = nil -%}{%- assign ui_app = nil -%}
+{%- if page.app_id -%}
+  {%- assign canonical_app = site.data.apps | where: 'id', page.app_id | first -%}
+  {%- assign ui_app = localized_apps | where: 'id', page.app_id | first -%}
+{%- endif -%}

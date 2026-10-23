@@ -1,0 +1,53 @@
+---
+layout: post
+title: Animating a view around another view on iOS
+description: Explains how to move a view around the centre of an image. Trigonometric functions calculate points
+  on a circle, and updating the view coordinates produces an orbiting animation without a complex animation framework.
+category: Development notes
+imagefeature: picture-35.jpg
+date: 2015-07-29 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Explains how to move a view around the centre of an image. Trigonometric functions calculate points on
+    a circle, and updating the view coordinates produces an orbiting animation without a complex animation framework.
+  keywords:
+  - UIView
+  - circular motion
+  - trigonometry
+  - animation
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  title: Animating a view around another view on iOS
+  source_sha256: eda9eedb726f930fc5aa6eb8d213f9d5e304ee42df876c3ed947404825e2b270
+lang: en
+source_path: _posts/2015-07-29-iOS开发动画之绕View旋转的View.md
+source_url: /ios%E5%8A%A8%E7%94%BB/iOS%E5%BC%80%E5%8F%91%E5%8A%A8%E7%94%BB%E4%B9%8B%E7%BB%95View%E6%97%8B%E8%BD%AC%E7%9A%84View
+permalink: /en/journal/2015-07-29-animating-a-view-around-another-view-on-ios/
+translation_method: machine-assisted
+translation_source_sha256: eda9eedb726f930fc5aa6eb8d213f9d5e304ee42df876c3ed947404825e2b270
+excerpt: Explains how to move a view around the centre of an image. Trigonometric functions calculate points on
+  a circle, and updating the view coordinates produces an orbiting animation without a complex animation framework.
+translation_date: '2026-10-23T02:34:09+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"Health is the foundation of everything. Getting more exercise is the way to go."
+<small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p>A recent project needed an animation, so I looked through a lot of related material.<br/>
+I found nothing suitable, so I made a custom implementation.<br/>
+The main principle uses the sine rule for triangles  <br/>
+and the cosine rule to animate a view moving around an image's center.<br/></p>
+<p>See the code below.<br/></p>
+<p>Core code</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">self</span><span class="nc">.center</span> <span class="o">=</span> <span class="nt">CGPointMake</span><span class="o">(</span><span class="nt">_radius</span> <span class="o">*</span> <span class="nt">cosf</span><span class="o">(</span><span class="nt">_angle</span><span class="o">)</span> <span class="o">+</span> <span class="nt">imgView</span><span class="nc">.center.x</span><span class="o">,</span> <span class="nt">_radius</span> <span class="o">*</span> <span class="nt">sinf</span><span class="o">(</span><span class="nt">_angle</span><span class="o">)</span> <span class="o">+</span> <span class="nt">imgView</span><span class="nc">.center.y</span><span class="o">);</span>
+
+<span class="nt">_timer</span> <span class="o">=</span> <span class="o">[</span><span class="nt">NSTimer</span> <span class="nt">scheduledTimerWithTimeInterval</span><span class="nd">:_time</span> <span class="nt">target</span><span class="nd">:self</span> <span class="nt">selector</span><span class="o">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">moveView</span><span class="p">)</span> <span class="n">userInfo</span><span class="p">:</span><span class="n">nil</span> <span class="n">repeats</span><span class="p">:</span><span class="n">YES</span><span class="p">];</span></code></pre></figure>
+<blockquote>
+<p><a href="https://github.com/AllLuckly/RadiusOperation">Click to download the demo</a> <br/></p>
+</blockquote>
+<p><img alt="(RadiusOperation)" src="https://github.com/AllLuckly/RadiusOperation/blob/master/123.gif?raw=true"/></p>
+
+{% endraw %}

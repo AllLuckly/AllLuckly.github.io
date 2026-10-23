@@ -1,0 +1,1430 @@
+---
+layout: null
+permalink: /en/journal/2017-03-09-reading-cocoaasyncsocket-completing-the-connection/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Reading CocoaAsyncSocket: Completing the Connection'
+agent_source_url: https://allluckly.cn/en/journal/2017-03-09-reading-cocoaasyncsocket-completing-the-connection/
+agent_source_sha256: b2f0009aa3cdcaa30a47602d345b2517c58338b48f7683e81ef11571ce037fc0
+agent_generator_version: 1
+---
+{% raw %}# Reading CocoaAsyncSocket: Completing the Connection
+
+Language: en
+Canonical: [Reading CocoaAsyncSocket: Completing the Connection](<https://allluckly.cn/en/journal/2017-03-09-reading-cocoaasyncsocket-completing-the-connection/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao72>)
+English: [English HTML](<https://allluckly.cn/en/journal/2017-03-09-reading-cocoaasyncsocket-completing-the-connection/>)
+Published: 2017-03-09T00:00:00+08:00
+Modified: 2026-10-23T10:34:15+08:00
+Author: 涂耀辉
+
+Continues tracing the CocoaAsyncSocket connection process from local-address binding to connection establishment and callbacks. Low-level socket operations explain the order of asynchronous execution and the purpose of the relevant configuration.
+
+Originally credited to 涂耀辉; edited and archived by Bison.
+
+[Source listed in the original](<http://www.jianshu.com/p/22c984eac9b9>)
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao72>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Published in 2017, this installment follows the source version used in the preceding article. Both originals list the same source link.
+
+## Introduction:
+
+This article continues from: [Reading CocoaAsyncSocket: Connection Setup](<https://allluckly.cn/en/journal/2017-02-17-reading-cocoaasyncsocket-connection-setup/>)
+
+Note: this article contains substantial code, so reading the source alongside it helps. My annotated source is available as “CocoaAsyncSocket source annotations”. For basic usage, see my earlier “iOS instant messaging: from getting started to giving up?” or consult other material.
+
+The previous article covered GCDAsyncSocket initialisation and preparation before connect: error checks, local address and socket creation, server address creation and local socket options such as preventing network errors from signalling process termination.
+
+Editor: [Bison](<https://allluckly.cn/en/>)  
+ Source: [涂耀辉](<http://www.jianshu.com/p/22c984eac9b9>)
+
+## Back to the main subject, continuing from the previous article.
+
+Earlier, method 8—Create Socket—included this line:
+
+```
+//和connectInterface绑定
+if (![self bindSocket:socketFD toInterface:connectInterface error:errPtr])
+{
+    //绑定失败，直接关闭返回
+    [self closeSocket:socketFD];
+
+    return SOCKET_NULL;
+}
+```
+
+Bind the socket using the local address created earlier, leading to this method:
+
+Method 9: bind a local address to the Socket
+
+```
+//绑定一个Socket的本地地址
+- (BOOL)bindSocket:(int)socketFD toInterface:(NSData *)connectInterface error:(NSError **)errPtr
+{
+    // Bind the socket to the desired interface (if needed)
+    //无接口就不绑定，connect会自动绑定到一个不冲突的端口上去。
+    if (connectInterface)
+    {
+        LogVerbose(@"Binding socket...");
+
+        //判断当前地址的Port是不是大于0
+        if ([[self class] portFromAddress:connectInterface] > 0)
+        {
+            // Since we're going to be binding to a specific port,
+            // we should turn on reuseaddr to allow us to override sockets in time_wait.
+
+            int reuseOn = 1;
+
+
+            //设置调用close(socket)后,仍可继续重用该socket。调用close(socket)一般不会立即关闭socket，而经历TIME_WAIT的过程。
+            setsockopt(socketFD, SOL_SOCKET, SO_REUSEADDR, &reuseOn, sizeof(reuseOn));
+        }
+
+        //拿到地址
+        const struct sockaddr *interfaceAddr = (const struct sockaddr *)[connectInterface bytes];
+        //绑定这个地址
+        int result = bind(socketFD, interfaceAddr, (socklen_t)[connectInterface length]);
+
+        //绑定出错，返回NO
+        if (result != 0)
+        {
+            if (errPtr)
+                *errPtr = [self errnoErrorWithReason:@"Error in bind() function"];
+
+            return NO;
+        }
+    }
+
+    //成功
+    return YES;
+}
+```
+
+If connectInterface is absent, return YES; connecting automatically binds a port. If present, bind the initially specified address. Two socket functions are involved. The first configures socket parameters as previously discussed:
+
+```
+setsockopt(socketFD, SOL_SOCKET, SO_REUSEADDR, &reuseOn, sizeof(reuseOn));
+```
+
+The main purpose is to avoid closing the socket immediately on close, instead passing through TIME\_WAIT, during which the socket can be reused. The earlier connect sequence showed no reuse code because it was the client sequence. Reuse becomes visible when we discuss server-side accept.
+
+The second function is bind.
+
+```
+int result = bind(socketFD, interfaceAddr, (socklen_t)[connectInterface length]);
+```
+
+This function takes only 3 parameters: socket, address and address size, binding the socket to that address—in effect, the port.
+
+All preparation is now complete: we have the local socket and server address. Begin the final connection:
+
+Method 10: the final connection method
+
+```
+//连接最终方法 3 finnal。。。
+- (void)connectSocket:(int)socketFD address:(NSData *)address stateIndex:(int)aStateIndex
+{
+    // If there already is a socket connected, we close socketFD and return
+    //已连接，关闭连接返回
+    if (self.isConnected)
+    {
+        [self closeSocket:socketFD];
+        return;
+    }
+
+    // Start the connection process in a background queue
+    //开始连接过程，在后台queue中
+    __weak GCDAsyncSocket *weakSelf = self;
+
+    //获取到全局Queue
+    dispatch_queue_t globalConcurrentQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    //新线程
+    dispatch_async(globalConcurrentQueue, ^{
+#pragma clang diagnostic push
+#pragma clang diagnostic warning "-Wimplicit-retain-self"
+        //调用connect方法，该函数阻塞线程，所以要异步新线程
+        //客户端向特定网络地址的服务器发送连接请求，连接成功返回0，失败返回 -1。
+        int result = connect(socketFD, (const struct sockaddr *)[address bytes], (socklen_t)[address length]);
+
+        //老样子，安全判断
+        __strong GCDAsyncSocket *strongSelf = weakSelf;
+        if (strongSelf == nil) return_from_block;
+
+        //在socketQueue中，开辟线程
+        dispatch_async(strongSelf->socketQueue, ^{ @autoreleasepool {
+            //如果状态为已经连接，关闭连接返回
+            if (strongSelf.isConnected)
+            {
+                [strongSelf closeSocket:socketFD];
+                return_from_block;
+            }
+
+            //说明连接成功
+            if (result == 0)
+            {
+                //关闭掉另一个没用的socket
+                [self closeUnusedSocket:socketFD];
+                //调用didConnect，生成stream，改变状态等等！
+                [strongSelf didConnect:aStateIndex];
+            }
+            //连接失败
+            else
+            {
+                //关闭当前socket
+                [strongSelf closeSocket:socketFD];
+
+                // If there are no more sockets trying to connect, we inform the error to the delegate
+                //返回连接错误的error
+                if (strongSelf.socket4FD == SOCKET_NULL && strongSelf.socket6FD == SOCKET_NULL)
+                {
+                    NSError *error = [strongSelf errnoErrorWithReason:@"Error in connect() function"];
+                    [strongSelf didNotConnect:aStateIndex error:error];
+                }
+            }
+        }});
+
+#pragma clang diagnostic pop
+    });
+    //输出正在连接中
+    LogVerbose(@"Connecting...");
+}
+```
+
+This method mainly calls the following connection function:
+
+```
+int result = connect(socketFD, (const struct sockaddr *)[address bytes], (socklen_t)[address length]);
+```
+
+This function blocks: the thread stays on that line until a result returns. A global concurrent queue therefore performs the connection on another thread, then dispatches back to socketQueue for subsequent work.
+
+A result of 0 means success. Close the other unused socket, if present, then call another method for post-connection initialisation. Otherwise close the socket, populate the error and return.
+
+Now inspect post-connection initialisation:
+
+Method 11: initialisation after a successful connection
+
+```
+//连接成功后调用，设置一些连接成功的状态
+- (void)didConnect:(int)aStateIndex
+{
+    LogTrace();
+
+    NSAssert(dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey), @"Must be dispatched on socketQueue");
+
+    //状态不同
+    if (aStateIndex != stateIndex)
+    {
+        LogInfo(@"Ignoring didConnect, already disconnected");
+
+        // The connect operation has been cancelled.
+        // That is, socket was disconnected, or connection has already timed out.
+        return;
+    }
+
+    //kConnected合并到当前flag中
+    flags |= kConnected;
+    //停止连接超时
+    [self endConnectTimeout];
+
+    #if TARGET_OS_IPHONE
+    // The endConnectTimeout method executed above incremented the stateIndex.
+    //上面的endConnectTimeout,会导致stateIndex增加，所以需要重新赋值
+    aStateIndex = stateIndex;
+    #endif
+
+    // Setup read/write streams (as workaround for specific shortcomings in the iOS platform)
+    // 
+    // Note:
+    // There may be configuration options that must be set by the delegate before opening the streams.
+    //打开stream之前必须用相关配置设置代理
+    // The primary example is the kCFStreamNetworkServiceTypeVoIP flag, which only works on an unopened stream.
+    //主要的例子是kCFStreamNetworkServiceTypeVoIP标记，只能工作在未打开的stream中？
+    // 
+    // Thus we wait until after the socket:didConnectToHost:port: delegate method has completed.
+    //所以我们要等待，连接完成的代理调用完
+    // This gives the delegate time to properly configure the streams if needed.
+    //这些给了代理时间，去正确的配置Stream，如果是必要的话
+
+    //创建个Block来初始化Stream
+    dispatch_block_t SetupStreamsPart1 = ^{
+
+        NSLog(@"hello~");
+        #if TARGET_OS_IPHONE
+        //创建读写stream失败，则关闭并报对应错误
+        if (![self createReadAndWriteStream])
+        {
+            [self closeWithError:[self otherError:@"Error creating CFStreams"]];
+            return;
+        }
+
+        //参数是给NO的，就是有可读bytes的时候，不会调用回调函数
+        if (![self registerForStreamCallbacksIncludingReadWrite:NO])
+        {
+            [self closeWithError:[self otherError:@"Error in CFStreamSetClient"]];
+            return;
+        }
+
+        #endif
+    };
+    //part2设置stream
+    dispatch_block_t SetupStreamsPart2 = ^{
+        #if TARGET_OS_IPHONE
+        //状态不一样直接返回
+        if (aStateIndex != stateIndex)
+        {
+            // The socket has been disconnected.
+            return;
+        }
+        //如果加到runloop上失败
+        if (![self addStreamsToRunLoop])
+        {
+            //错误返回
+            [self closeWithError:[self otherError:@"Error in CFStreamScheduleWithRunLoop"]];
+            return;
+        }
+
+        //读写stream open
+        if (![self openStreams])
+        {
+            //开启错误返回
+            [self closeWithError:[self otherError:@"Error creating CFStreams"]];
+            return;
+        }
+
+        #endif
+    };
+
+    // Notify delegate
+    //通知代理
+    //拿到server端的host port
+    NSString *host = [self connectedHost];
+    uint16_t port = [self connectedPort];
+    //拿到unix域的 url
+    NSURL *url = [self connectedUrl];
+    //拿到代理
+    __strong id theDelegate = delegate;
+
+    //代理队列 和 Host不为nil 且响应didConnectToHost代理方法
+    if (delegateQueue && host != nil && [theDelegate respondsToSelector:@selector(socket:didConnectToHost:port:)])
+    {
+        //调用初始化stream1
+        SetupStreamsPart1();
+
+        dispatch_async(delegateQueue, ^{ @autoreleasepool {
+
+            //到代理队列调用连接成功的代理方法
+            [theDelegate socket:self didConnectToHost:host port:port];
+
+            //然后回到socketQueue中去执行初始化stream2
+            dispatch_async(socketQueue, ^{ @autoreleasepool {
+
+                SetupStreamsPart2();
+            }});
+        }});
+    }
+    //这个是unix domain 请求回调
+    else if (delegateQueue && url != nil && [theDelegate respondsToSelector:@selector(socket:didConnectToUrl:)])
+    {
+        SetupStreamsPart1();
+
+        dispatch_async(delegateQueue, ^{ @autoreleasepool {
+
+            [theDelegate socket:self didConnectToUrl:url];
+
+            dispatch_async(socketQueue, ^{ @autoreleasepool {
+
+                SetupStreamsPart2();
+            }});
+        }});
+    }
+    //否则只初始化stream
+    else
+    {
+        SetupStreamsPart1();
+        SetupStreamsPart2();
+    }
+
+    // Get the connected socket
+
+    int socketFD = (socket4FD != SOCKET_NULL) ? socket4FD : (socket6FD != SOCKET_NULL) ? socket6FD : socketUN;
+
+    //fcntl,功能描述：根据文件描述词来操作文件的特性。http://blog.csdn.net/pbymw8iwm/article/details/7974789
+    // Enable non-blocking IO on the socket
+    //使socket支持非阻塞IO
+    int result = fcntl(socketFD, F_SETFL, O_NONBLOCK);
+    if (result == -1)
+    {
+        //失败 ，报错
+        NSString *errMsg = @"Error enabling non-blocking IO on socket (fcntl)";
+        [self closeWithError:[self otherError:errMsg]];
+
+        return;
+    }
+
+    // Setup our read/write sources
+    //初始化读写source
+    [self setupReadAndWriteSourcesForNewlyConnectedSocket:socketFD];
+
+    // Dequeue any pending read/write requests
+    //开始下一个任务
+    [self maybeDequeueRead];
+    [self maybeDequeueWrite];
+}
+```
+
+The method is long but mainly performs a few straightforward tasks:
+
+Add connected to the current flags and stop the connection-timeout timer started earlier.
+
+Initialise SetupStreamsPart1 and SetupStreamsPart2. The first creates read/write streams and registers callbacks. The second adds them to the current thread’s RunLoop and opens them.
+
+Check the delegate queue and whether host or URL is present, then whether the delegate implements didConnectToHost or didConnectToUrl, corresponding to ordinary sockets and Unix domain sockets. Invoke the appropriate success callback if implemented.
+
+Alongside the delegate call, invoke the two previously initialised stream blocks. Their order relative to the delegate matters:
+
+- Execute SetupStreamsPart1 before SetupStreamsPart2. The important issue is callback timing: placing the success delegate after SetupStreamsPart2 might allow incoming data before the connection-success callback, which is unreasonable. Thus use SetupStreamsPart1 → delegate → SetupStreamsPart2.
+
+Hence this code:
+
+```
+//调用初始化stream1
+   SetupStreamsPart1();
+
+   dispatch_async(delegateQueue, ^{ @autoreleasepool {
+
+       //到代理队列调用连接成功的代理方法
+       [theDelegate socket:self didConnectToHost:host port:port];
+
+       //然后回到socketQueue中去执行初始化stream2
+       dispatch_async(socketQueue, ^{ @autoreleasepool {
+
+           SetupStreamsPart2();
+       }});
+   }});
+```
+
+For thread safety, socket operations must run on socketQueue. Delegate callbacks must run on the configured delegate queue.
+
+Obtain the current local socket and call:
+
+```
+int result = fcntl(socketFD, F_SETFL, O_NONBLOCK);
+```
+
+Like setsockopt(), fcntl configures socket parameters for specific functionality, but supports more operations. See “fcntl explained” for reference.
+
+Here the socket’s I/O mode is set to nonblocking. If that term is unclear, do not worry; it is discussed below.
+
+Initialise read/write sources. This is important: every message is triggered through a source. The method will be examined later.
+
+After initialising streams and sources, begin one read and one write task. These methods are left for the later Read and Write articles.
+
+Continue through the method calls in order, starting with step 2: stream handling in the two blocks. Six functions concern streams:
+
+Stream method 1: create read/write streams
+
+```
+//创建读写stream
+- (BOOL)createReadAndWriteStream
+{
+    LogTrace();
+
+    NSAssert(dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey), @"Must be dispatched on socketQueue");
+
+    //如果有一个有值，就返回
+    if (readStream || writeStream)
+    {
+        // Streams already created
+        return YES;
+    }
+    //拿到socket，首选是socket4FD，其次socket6FD，都没有才是socketUN，socketUN应该是Unix的socket结构体
+    int socketFD = (socket4FD != SOCKET_NULL) ? socket4FD : (socket6FD != SOCKET_NULL) ? socket6FD : socketUN;
+
+    //如果都为空，返回NO
+    if (socketFD == SOCKET_NULL)
+    {
+        // Cannot create streams without a file descriptor
+        return NO;
+    }
+
+    //如果非连接，返回NO
+    if (![self isConnected])
+    {
+        // Cannot create streams until file descriptor is connected
+        return NO;
+    }
+
+    LogVerbose(@"Creating read and write stream...");
+
+#pragma mark - 绑定Socket和CFStream
+    //下面的接口用于创建一对 socket stream，一个用于读取，一个用于写入：
+    CFStreamCreatePairWithSocket(NULL, (CFSocketNativeHandle)socketFD, &readStream, &writeStream);
+
+    // The kCFStreamPropertyShouldCloseNativeSocket property should be false by default (for our case).
+    // But let's not take any chances.
+
+
+
+    //读写stream都设置成不会随着绑定的socket一起close,release。 kCFBooleanFalse不一起，kCFBooleanTrue一起
+    if (readStream)
+        CFReadStreamSetProperty(readStream, kCFStreamPropertyShouldCloseNativeSocket, kCFBooleanFalse);
+    if (writeStream)
+        CFWriteStreamSetProperty(writeStream, kCFStreamPropertyShouldCloseNativeSocket, kCFBooleanFalse);
+
+    //如果有一个为空
+    if ((readStream == NULL) || (writeStream == NULL))
+    {
+        LogWarn(@"Unable to create read and write stream...");
+
+        //关闭对应的stream
+        if (readStream)
+        {
+            CFReadStreamClose(readStream);
+            CFRelease(readStream);
+            readStream = NULL;
+        }
+        if (writeStream)
+        {
+            CFWriteStreamClose(writeStream);
+            CFRelease(writeStream);
+            writeStream = NULL;
+        }
+        //返回创建失败
+        return NO;
+    }
+    //创建成功
+    return YES;
+}
+```
+
+This simply calls two stream functions:
+
+The stream-creation function:
+
+```
+CFStreamCreatePairWithSocket(NULL, (CFSocketNativeHandle)socketFD, &readStream, &writeStream);
+```
+
+This function creates a read/write stream pair and associates the streams with the socket.
+
+Set stream properties:
+
+```
+CFReadStreamSetProperty(readStream, kCFStreamPropertyShouldCloseNativeSocket, kCFBooleanFalse);
+CFWriteStreamSetProperty(writeStream, kCFStreamPropertyShouldCloseNativeSocket, kCFBooleanFalse);
+```
+
+This configures a stream property so its lifecycle does not close or release the socket.
+
+Next, registerForStreamCallbacksIncludingReadWrite registers stream callbacks.
+
+Stream method 2: register read/write callbacks
+
+```
+//注册Stream的回调
+- (BOOL)registerForStreamCallbacksIncludingReadWrite:(BOOL)includeReadWrite
+{
+    LogVerbose(@"%@ %@", THIS_METHOD, (includeReadWrite ? @"YES" : @"NO"));
+
+    NSAssert(dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey), @"Must be dispatched on socketQueue");
+    //判断读写stream是不是都为空
+    NSAssert((readStream != NULL && writeStream != NULL), @"Read/Write stream is null");
+
+    //客户端stream上下文对象
+    streamContext.version = 0;
+    streamContext.info = (__bridge void *)(self);
+    streamContext.retain = nil;
+    streamContext.release = nil;
+    streamContext.copyDescription = nil;
+
+//    The open has completed successfully.
+//    The stream has bytes to be read.
+//    The stream can accept bytes for writing.
+//        An error has occurred on the stream.
+//        The end of the stream has been reached.
+
+    //设置一个CF的flag  两种，一种是错误发生的时候，一种是stream事件结束
+    CFOptionFlags readStreamEvents = kCFStreamEventErrorOccurred | kCFStreamEventEndEncountered ;
+    //如果包含读写
+    if (includeReadWrite)
+        //仍然有Bytes要读的时候     The stream has bytes to be read.
+        readStreamEvents |= kCFStreamEventHasBytesAvailable;
+
+    //给读stream设置客户端，会在之前设置的那些标记下回调函数 CFReadStreamCallback。设置失败的话直接返回NO
+    if (!CFReadStreamSetClient(readStream, readStreamEvents, &CFReadStreamCallback, &streamContext))
+    {
+        return NO;
+    }
+
+    //写的flag,也一样
+    CFOptionFlags writeStreamEvents = kCFStreamEventErrorOccurred | kCFStreamEventEndEncountered;
+    if (includeReadWrite)
+        writeStreamEvents |= kCFStreamEventCanAcceptBytes;
+
+    if (!CFWriteStreamSetClient(writeStream, writeStreamEvents, &CFWriteStreamCallback, &streamContext))
+    {
+        return NO;
+    }
+    //走到最后说明读写都设置回调成功，返回YES
+    return YES;
+}
+```
+
+If you have used CFStream, this is straightforward. The method calls CFStream functions, primarily this one registering read/write callbacks:
+
+```
+Boolean CFReadStreamSetClient(CFReadStreamRef stream, CFOptionFlags streamEvents, CFReadStreamClientCallBack clientCB, CFStreamClientContext *clientContext);
+Boolean CFWriteStreamSetClient(CFWriteStreamRef stream, CFOptionFlags streamEvents, CFWriteStreamClientCallBack clientCB, CFStreamClientContext *clientContext);
+```
+
+This function has 4 parameters: The first is the stream to configure. The second selects observed events, including:
+
+```
+typedef CF_OPTIONS(CFOptionFlags, CFStreamEventType) {
+    kCFStreamEventNone = 0,  //没有事件发生
+    kCFStreamEventOpenCompleted = 1,  //成功打开流
+    kCFStreamEventHasBytesAvailable = 2, //流中有数据可读
+    kCFStreamEventCanAcceptBytes = 4,  //流中可以接受数据去写
+    kCFStreamEventErrorOccurred = 8,  //流发生错误
+    kCFStreamEventEndEncountered = 16  //到达流的结尾
+};
+```
+
+Try the details yourself. The author observes kCFStreamEventErrorOccurred and kCFStreamEventEndEncountered, then uses the argument to decide whether to observe kCFStreamEventCanAcceptBytes:
+
+```
+//如果包含读写
+if (includeReadWrite)
+   //仍然有Bytes要读的时候     The stream has bytes to be read.
+     readStreamEvents |= kCFStreamEventHasBytesAvailable;
+```
+
+The argument here is NO, so readable data is not observed. Incoming messages on an ordinary connection are therefore not triggered by stream callbacks. In this framework, TLS sockets use streams for this, as a later article will explain.
+
+What triggers reading and writing when data arrives? The read/write sources, which we will create and initialise next.
+
+Two functions are bound for the read and write callbacks:
+
+```
+//读的回调
+static void CFReadStreamCallback (CFReadStreamRef stream, CFStreamEventType type, void *pInfo)
+//写的回调
+static void CFWriteStreamCallback (CFWriteStreamRef stream, CFStreamEventType type, void *pInfo)
+```
+
+These two functions are also deferred to a later article.
+
+streamContext is also worth noting. It is a structure containing stream-context information:
+
+```
+typedef struct {
+    CFIndex version;
+    void *info;
+    void *(*retain)(void *info);
+    void (*release)(void *info);
+    CFStringRef (*copyDescription)(void *info);
+} CFStreamClientContext;
+```
+
+The context’s info pointer is the pInfo argument passed to the read/write callbacks every time. version identifies the stream context version. The other three fields are function pointers for retaining, releasing and describing pInfo; here all are nil.
+
+Next comes stream step three: addStreamsToRunLoop.
+
+Stream method 3: add to the current thread’s RunLoop
+
+```
+//把stream添加到runloop上
+- (BOOL)addStreamsToRunLoop
+{
+    LogTrace();
+
+    NSAssert(dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey), @"Must be dispatched on socketQueue");
+    NSAssert((readStream != NULL && writeStream != NULL), @"Read/Write stream is null");
+
+    //判断flag里是否包含kAddedStreamsToRunLoop，没添加过则添加。
+    if (!(flags & kAddedStreamsToRunLoop))
+    {
+        LogVerbose(@"Adding streams to runloop...");
+
+
+        [[self class] startCFStreamThreadIfNeeded];
+        //在开启的线程中去执行，阻塞式的
+        [[self class] performSelector:@selector(scheduleCFStreams:)
+                             onThread:cfstreamThread
+                           withObject:self
+                        waitUntilDone:YES];
+
+        //添加标识
+        flags |= kAddedStreamsToRunLoop;
+    }
+
+    return YES;
+}
+```
+
+This method does two things:
+
+A persistent thread handles CFStream read/write callbacks, invoking several functions:
+
+```
++ (void)startCFStreamThreadIfNeeded；
++ (void)cfstreamThread；
+```
+
+These functions create a RunLoop and attach a timer, keeping the thread alive. Read the GitHub demo’s comments for details. For questions, see “Keeping a thread alive, destruction and communication with RunLoop” or comment below; I will answer.
+
+Call the registration method on this persistent thread:
+
+```
+//注册CFStream
++ (void)scheduleCFStreams:(GCDAsyncSocket *)asyncSocket
+{
+ LogTrace();
+
+ //断言当前线程是cfstreamThread，不是则报错
+ NSAssert([NSThread currentThread] == cfstreamThread, @"Invoked on wrong thread");
+
+ //获取到runloop
+ CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+ //如果有readStream
+ if (asyncSocket->readStream)
+     //注册readStream在runloop的kCFRunLoopDefaultMode上
+     CFReadStreamScheduleWithRunLoop(asyncSocket->readStream, runLoop, kCFRunLoopDefaultMode);
+
+ //一样
+ if (asyncSocket->writeStream)
+     CFWriteStreamScheduleWithRunLoop(asyncSocket->writeStream, runLoop, kCFRunLoopDefaultMode);
+}
+```
+
+Stream callbacks run on this persistent stream thread. Readers of my AFNetworking series may understand why; later articles will discuss threading in this framework in detail. CFReadStreamScheduleWithRunLoop mainly registers the stream with RunLoop:
+
+```
+CFReadStreamScheduleWithRunLoop(asyncSocket->readStream, runLoop, kCFRunLoopDefaultMode);
+CFWriteStreamScheduleWithRunLoop(asyncSocket->writeStream, runLoop, kCFRunLoopDefaultMode);
+```
+
+Then an observed stream event triggers our registered read/write callbacks on this RunLoop.
+
+After registering callbacks, open the stream:
+
+Stream method 4: open the stream
+
+```
+//打开stream
+- (BOOL)openStreams
+{
+    LogTrace();
+
+    NSAssert(dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey), @"Must be dispatched on socketQueue");
+    //断言读写stream都不会空
+    NSAssert((readStream != NULL && writeStream != NULL), @"Read/Write stream is null");
+
+    //返回stream的状态
+
+    CFStreamStatus readStatus = CFReadStreamGetStatus(readStream);
+    CFStreamStatus writeStatus = CFWriteStreamGetStatus(writeStream);
+
+    //如果有任意一个没有开启
+    if ((readStatus == kCFStreamStatusNotOpen) || (writeStatus == kCFStreamStatusNotOpen))
+    {
+        LogVerbose(@"Opening read and write stream...");
+
+        //开启
+        BOOL r1 = CFReadStreamOpen(readStream);
+        BOOL r2 = CFWriteStreamOpen(writeStream);
+
+        //有一个开启失败
+        if (!r1 || !r2)
+        {
+            LogError(@"Error in CFStreamOpen");
+            return NO;
+        }
+    }
+
+    return YES;
+}
+```
+
+Use CFReadStreamGetStatus to inspect the stream. If unopened, call CFReadStreamOpen; return an error if opening fails.
+
+Stream initialisation is complete. Return to method 11, post-connection initialisation:
+
+Step 5 sets socket I/O to nonblocking. Many readers confuse synchronous, asynchronous, blocking and nonblocking. Simply put, synchronous/asynchronous concerns the caller: calling a function directly is synchronous; starting a new thread to perform it is asynchronous relative to the current thread. Blocking/nonblocking concerns the called side. Returning immediately, whether processing has finished or not, is nonblocking; waiting for data and processing before returning is blocking.
+
+With that distinction established, examine Linux’s 5 I/O models:
+
+1) Blocking I/O
+
+2) Nonblocking I/O
+
+3) I/O multiplexing (select and poll)
+
+4) Signal-driven I/O (SIGIO)
+
+5) Asynchronous I/O (the POSIX aio\_functions)
+
+Let’s briefly discuss these 5 models:
+
+1) Blocking I/O: For example, read() waits until a message arrives. Why not create a thread and leave it waiting? That seems reasonable from a client perspective. But if a server does the same, every socket connection needs its own blocking-I/O thread. 2) Nonblocking I/O: read() returns immediately. Often no message is available, so it returns -1 and sets errno to EWOULDBLOCK, indicating that no data is ready. We need a mechanism to know when data arrives before calling read(). One crude approach continually polls the function, reading as soon as data appears. 3) I/O multiplexing: This improves on blocking I/O. Before read(), select examines all sockets for messages, blocking until one becomes ready. Then a blocking read copies the message from the kernel into the process. 4) Signal-driven I/O: This partly asynchronous model first calls a signal-related system function to associate a socket with a signal, then returns without waiting. The kernel checks for data and signals the process when it is available. The process then calls blocking read() to copy data from the kernel. Registration is nonblocking; the read blocks. 5) Asynchronous I/O: You may already see an improvement. Like the preceding model, associate the socket with a signal, also providing a data buffer, then return immediately. The kernel checks for data, fills the supplied buffer and triggers the signal. The process responds and reads directly from the buffer, with no blocking throughout. Our CocoaAsyncSocket framework clearly uses this fifth model.
+
+If the I/O models remain confusing, read: [Sockets: blocking, nonblocking, synchronous, asynchronous and I/O models](<http://blog.csdn.net/hguisu/article/details/7453390>)
+
+Return to step 6 in method 11, post-connection initialisation: initialising read/write sources.
+
+Method 12: initialise read/write sources
+
+```
+//初始化读写source
+- (void)setupReadAndWriteSourcesForNewlyConnectedSocket:(int)socketFD
+{
+    //GCD source DISPATCH_SOURCE_TYPE_READ 会一直监视着 socketFD，直到有数据可读
+    readSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, socketFD, 0, socketQueue);
+    //_dispatch_source_type_write ：监视着 socketFD，直到写数据了
+    writeSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_WRITE, socketFD, 0, socketQueue);
+
+    // Setup event handlers
+
+    __weak GCDAsyncSocket *weakSelf = self;
+
+#pragma mark readSource的回调
+
+    //GCD事件句柄  读，当socket中有数据流出现，就会触发这个句柄，全自动，不需要手动触发
+    dispatch_source_set_event_handler(readSource, ^{ @autoreleasepool {
+    #pragma clang diagnostic push
+    #pragma clang diagnostic warning "-Wimplicit-retain-self"
+
+        __strong GCDAsyncSocket *strongSelf = weakSelf;
+        if (strongSelf == nil) return_from_block;
+
+        LogVerbose(@"readEventBlock");
+        //从readSource中，获取到数据长度，
+        strongSelf->socketFDBytesAvailable = dispatch_source_get_data(strongSelf->readSource);
+        LogVerbose(@"socketFDBytesAvailable: %lu", strongSelf->socketFDBytesAvailable);
+
+        //如果长度大于0，开始读数据
+        if (strongSelf->socketFDBytesAvailable > 0)
+            [strongSelf doReadData];
+        else
+            //因为触发了，但是却没有可读数据，说明读到当前包边界了。做边界处理
+            [strongSelf doReadEOF];
+
+    #pragma clang diagnostic pop
+    }});
+
+    //写事件句柄
+    dispatch_source_set_event_handler(writeSource, ^{ @autoreleasepool {
+    #pragma clang diagnostic push
+    #pragma clang diagnostic warning "-Wimplicit-retain-self"
+
+        __strong GCDAsyncSocket *strongSelf = weakSelf;
+        if (strongSelf == nil) return_from_block;
+
+        LogVerbose(@"writeEventBlock");
+        //标记为接受数据
+        strongSelf->flags |= kSocketCanAcceptBytes;
+        //开始写
+        [strongSelf doWriteData];
+
+    #pragma clang diagnostic pop
+    }});
+
+    // Setup cancel handlers
+
+    __block int socketFDRefCount = 2;
+
+    #if !OS_OBJECT_USE_OBJC
+    dispatch_source_t theReadSource = readSource;
+    dispatch_source_t theWriteSource = writeSource;
+    #endif
+
+    //读写取消的句柄
+    dispatch_source_set_cancel_handler(readSource, ^{
+    #pragma clang diagnostic push
+    #pragma clang diagnostic warning "-Wimplicit-retain-self"
+
+        LogVerbose(@"readCancelBlock");
+
+        #if !OS_OBJECT_USE_OBJC
+        LogVerbose(@"dispatch_release(readSource)");
+        dispatch_release(theReadSource);
+        #endif
+
+        if (--socketFDRefCount == 0)
+        {
+            LogVerbose(@"close(socketFD)");
+            //关闭socket
+            close(socketFD);
+        }
+
+    #pragma clang diagnostic pop
+    });
+
+    dispatch_source_set_cancel_handler(writeSource, ^{
+    #pragma clang diagnostic push
+    #pragma clang diagnostic warning "-Wimplicit-retain-self"
+
+        LogVerbose(@"writeCancelBlock");
+
+        #if !OS_OBJECT_USE_OBJC
+        LogVerbose(@"dispatch_release(writeSource)");
+        dispatch_release(theWriteSource);
+        #endif
+
+        if (--socketFDRefCount == 0)
+        {
+            LogVerbose(@"close(socketFD)");
+            //关闭socket
+            close(socketFD);
+        }
+
+    #pragma clang diagnostic pop
+    });
+
+    // We will not be able to read until data arrives.
+    // But we should be able to write immediately.
+
+    //设置未读数量为0
+    socketFDBytesAvailable = 0;
+    //把读挂起的状态移除
+    flags &= ~kReadSourceSuspended;
+
+    LogVerbose(@"dispatch_resume(readSource)");
+    //开启读source
+    dispatch_resume(readSource);
+
+    //标记为当前可接受数据
+    flags |= kSocketCanAcceptBytes;
+    //先把写source标记为挂起
+    flags |= kWriteSourceSuspended;
+}
+这个方法初始化了读写source，这个方法主要是GCD source运用，如果有对这部分知识有所疑问，可以看看宜龙大神这篇:GCD高级用法。
+这里GCD Source相关的主要是下面这3个函数：
+
+//创建source
+dispatch_source_create(dispatch_source_type_t type,
+    uintptr_t handle,
+    unsigned long mask,
+    dispatch_queue_t _Nullable queue);
+//为source设置事件句柄
+dispatch_source_set_event_handler(dispatch_source_t source,
+    dispatch_block_t _Nullable handler);
+//为source设置取消句柄
+dispatch_source_set_cancel_handler(dispatch_source_t source,
+    dispatch_block_t _Nullable handler);
+```
+
+Anyone who has used a GCD timer has likely encountered these three functions. The source-creation function handles different events according to type:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao72/1.png>)
+
+DISPATCH\_SOURCE\_TYPE\_READ and DISPATCH\_SOURCE\_TYPE\_WRITE indicate that readable or writable data on the handle triggers the corresponding handler.
+
+- The initialised read/write event handlers simply read and write data.
+- The cancellation handler simply closes the socket.
+- After initialisation, readSource starts. Incoming data triggers its handler to read the socket’s allocated buffer. writeSource, however, remains suspended after initialisation.
+- Also initialise the current source’s state for later operations.
+
+The client Connect sequence is complete. Here is a summary diagram:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao72/2.png>)
+
+The diagram summarises the client connection sequence, but details include IPv4 and IPv6 address handling, protection against socket-network errors terminating the process, and scheduling socketQueue, the delegate queue, global concurrent queues and the persistent stream thread.
+
+Most operations run on socketQueue, using dispatch\_sync or dispatch\_async. Because it is serial, keeping all operations there ensures thread safety. Operations that must block subsequent work use sync. That can easily deadlock, so the author makes this check before every synchronous call:
+
+```
+if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
+```
+
+Check whether execution is already on socketQueue. If so, call directly; otherwise submit synchronously to it. This avoids deadlock—another useful technique.
+
+Next, the server Accept sequence:
+
+Compared with Connect, this sequence is simple. Because the method is long and repeats earlier material, I omitted some code and kept the important parts. Follow along with the source.
+
+```
+//监听端口起点
+- (BOOL)acceptOnPort:(uint16_t)port error:(NSError **)errPtr
+{
+     return [self acceptOnInterface:nil port:port error:errPtr];
+}
+
+- (BOOL)acceptOnInterface:(NSString *)inInterface port:(uint16_t)port error:(NSError **)errPtr
+{
+     LogTrace();
+
+     // Just in-case interface parameter is immutable.
+    //防止参数被修改
+     NSString *interface = [inInterface copy];
+
+     __block BOOL result = NO;
+     __block NSError *err = nil;
+
+     // CreateSocket Block
+     // This block will be invoked within the dispatch block below.
+     //创建socket的Block
+     int(^createSocket)(int, NSData*) = ^int (int domain, NSData *interfaceAddr) {
+
+        //创建TCP的socket
+          int socketFD = socket(domain, SOCK_STREAM, 0);
+
+          //一系列错误判断
+          ...
+          // Bind socket
+        //用本地地址去绑定
+          status = bind(socketFD, (const struct sockaddr *)[interfaceAddr bytes], (socklen_t)[interfaceAddr length]);
+
+          //监听这个socket
+        //第二个参数是这个端口下维护的socket请求队列，最多容纳的用户请求数。
+          status = listen(socketFD, 1024);
+          return socketFD;
+     };
+
+     // Create dispatch block and run on socketQueue
+
+     dispatch_block_t block = ^{ @autoreleasepool {
+
+         //一系列错误判断
+          ...
+
+        //判断ipv4 ipv6是否支持
+          ...
+
+        //得到本机的IPV4 IPV6的地址
+          [self getInterfaceAddress4:&interface4 address6:&interface6 fromDescription:interface port:port];
+          ...
+
+        //判断可以用IPV4还是6进行请求
+          ...
+
+          // Create accept sources
+          //创建接受连接被触发的source
+          if (enableIPv4)
+          {
+            //接受连接的source
+               accept4Source = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, socket4FD, 0, socketQueue);
+
+
+
+            //事件句柄
+               dispatch_source_set_event_handler(accept4Source, ^{ @autoreleasepool {
+
+                //拿到数据，连接数
+                    unsigned long numPendingConnections = dispatch_source_get_data(acceptSource);
+
+                    LogVerbose(@"numPendingConnections: %lu", numPendingConnections);
+
+                //循环去接受这些socket的事件(一次触发可能有多个连接)
+                    while ([strongSelf doAccept:socketFD] && (++i < numPendingConnections));
+
+               }});
+
+               //取消句柄
+               dispatch_source_set_cancel_handler(accept4Source, ^{
+                //...
+                //关闭socket
+                    close(socketFD);
+
+               });
+
+            //开启source
+               dispatch_resume(accept4Source);
+          }
+
+        //ipv6一样
+          ...
+
+    //在scoketQueue中同步做这些初始化。
+     if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
+          block();
+     else
+          dispatch_sync(socketQueue, block);
+
+     //...错误判断
+     //返回结果
+     return result;
+}
+```
+
+Even after omissions, the method remains long. It mainly performs two tasks, simplified here for space:
+
+- Create a local address and socket, bind the port and listen.
+- A GCD Source watches this socket’s read source. A connection event triggers its handler, which calls doAccept: repeatedly to accept every pending connection.
+
+Now inspect the connection-accepting method, again omitting some less important code:
+
+```
+//连接接受的方法
+- (BOOL)doAccept:(int)parentSocketFD
+{
+     LogTrace();
+
+     int socketType;
+     int childSocketFD;
+     NSData *childSocketAddress;
+
+    //IPV4
+     if (parentSocketFD == socket4FD)
+     {
+          socketType = 0;
+
+          struct sockaddr_in addr;
+          socklen_t addrLen = sizeof(addr);
+          //调用接受，得到接受的子socket
+          childSocketFD = accept(parentSocketFD, (struct sockaddr *)&addr, &addrLen);
+          //NO说明没有连接
+          if (childSocketFD == -1)
+          {
+               LogWarn(@"Accept failed with error: %@", [self errnoError]);
+               return NO;
+          }
+          //子socket的地址数据
+          childSocketAddress = [NSData dataWithBytes:&addr length:addrLen];
+     }
+    //一样
+     else if (parentSocketFD == socket6FD)
+     {
+          ...
+     }
+    //unix domin socket 一样
+     else // if (parentSocketFD == socketUN)
+     {
+          ...
+     }
+
+     //socket 配置项的设置... 和connect一样
+
+    //响应代理
+     if (delegateQueue)
+     {
+          __strong id theDelegate = delegate;
+          //代理队列中调用
+          dispatch_async(delegateQueue, ^{ @autoreleasepool {
+
+               // Query delegate for custom socket queue
+
+               dispatch_queue_t childSocketQueue = NULL;
+
+            //判断是否实现了为socket 生成一个新的SocketQueue，是的话拿到新queue
+               if ([theDelegate respondsToSelector:@selector(newSocketQueueForConnectionFromAddress:onSocket:)])
+               {
+                    childSocketQueue = [theDelegate newSocketQueueForConnectionFromAddress:childSocketAddress
+                                                                                  onSocket:self];
+               }
+
+               // Create GCDAsyncSocket instance for accepted socket
+               //新创建一个本类实例，给接受的socket
+               GCDAsyncSocket *acceptedSocket = [[[self class] alloc] initWithDelegate:theDelegate
+                                                                                       delegateQueue:delegateQueue
+                                                                                          socketQueue:childSocketQueue];
+               //IPV4 6 un
+               if (socketType == 0)
+                    acceptedSocket->socket4FD = childSocketFD;
+               else if (socketType == 1)
+                    acceptedSocket->socket6FD = childSocketFD;
+               else
+                    acceptedSocket->socketUN = childSocketFD;
+               //标记开始 并且已经连接
+               acceptedSocket->flags = (kSocketStarted | kConnected);
+
+               // Setup read and write sources for accepted socket
+               //初始化读写source
+               dispatch_async(acceptedSocket->socketQueue, ^{ @autoreleasepool {
+
+                    [acceptedSocket setupReadAndWriteSourcesForNewlyConnectedSocket:childSocketFD];
+               }});
+
+            //判断代理是否实现了didAcceptNewSocket方法，把我们新创建的socket返回出去
+               if ([theDelegate respondsToSelector:@selector(socket:didAcceptNewSocket:)])
+               {
+                    [theDelegate socket:self didAcceptNewSocket:acceptedSocket];
+               }
+
+          }});
+     }
+     return YES;
+}
+```
+
+The core simply calls the function below to accept a connection and obtain a new socket.
+
+```
+childSocketFD = accept(parentSocketFD, (struct sockaddr *)&addr, &addrLen);
+```
+
+Call newSocketQueueForConnectionFromAddress:onSocket: so the delegate can configure a socketQueue for the new socket. Create a GCDAsyncSocket around that socket and pass it out through didAcceptNewSocket. The receiving code must retain this instance; otherwise it is released and the client connection closes. Initialise its read/write sources through the same method used for connect, so data triggers the new socket’s sources. Each newly connected socket is independent, with the same read, write and disconnection logic as a client socket. Only one original socket listens on the local port; it handles incoming connections and creates these new socket instances.
+
+That completes server-side Accept. Space required omitting some details, but they repeat Connect handling and do not change the main explanation. If anything is unclear, download the annotated GitHub source and compare it; that should help.
+
+Next, establishing local interprocess communication with Unix domain sockets:
+
+This is simpler than every preceding sequence, even without omitting code, because the client Connect implementation already supplies many shared methods.
+
+Now to the main subject: the method initiating a connection.
+
+```
+//连接本机的url上，IPC，进程间通信
+- (BOOL)connectToUrl:(NSURL *)url withTimeout:(NSTimeInterval)timeout error:(NSError **)errPtr;
+{
+    LogTrace();
+
+    __block BOOL result = NO;
+    __block NSError *err = nil;
+
+    dispatch_block_t block = ^{ @autoreleasepool {
+
+        //判断长度
+        if ([url.path length] == 0)
+        {
+            NSString *msg = @"Invalid unix domain socket url.";
+            err = [self badParamError:msg];
+
+            return_from_block;
+        }
+
+        // Run through standard pre-connect checks
+        //前置的检查
+        if (![self preConnectWithUrl:url error:&err])
+        {
+            return_from_block;
+        }
+
+        // We've made it past all the checks.
+        // It's time to start the connection process.
+
+        flags |= kSocketStarted;
+
+        // Start the normal connection process
+
+        NSError *connectError = nil;
+        //调用另一个方法去连接
+        if (![self connectWithAddressUN:connectInterfaceUN error:&connectError])
+        {
+            [self closeWithError:connectError];
+
+            return_from_block;
+        }
+
+        [self startConnectTimeout:timeout];
+
+        result = YES;
+    }};
+
+    //在socketQueue中同步执行
+    if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
+        block();
+    else
+        dispatch_sync(socketQueue, block);
+
+    if (result == NO)
+    {
+        if (errPtr)
+            *errPtr = err;
+    }
+
+    return result;
+}
+```
+
+The connection method performs error handling and calls other methods, including a preflight checking parameters. Valid inputs return YES and convert the URL into a Unix domain socket address structure stored in connectInterfaceUN. Then connectWithAddressUN initiates the connection.
+
+Now inspect this method:
+
+```
+//连接Unix域服务器
+- (BOOL)connectWithAddressUN:(NSData *)address error:(NSError **)errPtr
+{
+     LogTrace();
+
+     NSAssert(dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey), @"Must be dispatched on socketQueue");
+
+     // Create the socket
+
+     int socketFD;
+
+     LogVerbose(@"Creating unix domain socket");
+
+    //创建本机socket
+     socketUN = socket(AF_UNIX, SOCK_STREAM, 0);
+
+     socketFD = socketUN;
+
+     if (socketFD == SOCKET_NULL)
+     {
+          if (errPtr)
+               *errPtr = [self errnoErrorWithReason:@"Error in socket() function"];
+
+          return NO;
+     }
+
+     // Bind the socket to the desired interface (if needed)
+
+     LogVerbose(@"Binding socket...");
+
+     int reuseOn = 1;
+    //设置可复用
+     setsockopt(socketFD, SOL_SOCKET, SO_REUSEADDR, &reuseOn, sizeof(reuseOn));
+
+     // Prevent SIGPIPE signals
+
+     int nosigpipe = 1;
+    //进程终止错误信号禁止
+     setsockopt(socketFD, SOL_SOCKET, SO_NOSIGPIPE, &nosigpipe, sizeof(nosigpipe));
+
+     // Start the connection process in a background queue
+
+     int aStateIndex = stateIndex;
+
+     dispatch_queue_t globalConcurrentQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+     dispatch_async(globalConcurrentQueue, ^{
+
+          const struct sockaddr *addr = (const struct sockaddr *)[address bytes];
+        //并行队列调用连接
+          int result = connect(socketFD, addr, addr->sa_len);
+          if (result == 0)
+          {
+               dispatch_async(socketQueue, ^{ @autoreleasepool {
+                    //连接成功的一些状态初始化
+                    [self didConnect:aStateIndex];
+               }});
+          }
+          else
+          {
+               // 失败的处理
+               perror("connect");
+               NSError *error = [self errnoErrorWithReason:@"Error in connect() function"];
+
+               dispatch_async(socketQueue, ^{ @autoreleasepool {
+
+                    [self didNotConnect:aStateIndex error:error];
+               }});
+          }
+     });
+
+     LogVerbose(@"Connecting...");
+
+     return YES;
+}
+```
+
+The main part matches client connection but is much simpler. This line completes it:
+
+```
+int result = connect(socketFD, addr, addr->sa_len);
+```
+
+As on the client, call this method after connection succeeds to initialise resources:
+
+```
+ [self didConnect:aStateIndex];
+```
+
+Connection essentially involves these two methods, with some details omitted. After understanding client connection, this becomes straightforward.
+
+Next, inspect Accept for a Unix domain socket server.
+
+This Accept is essentially the same as ordinary server-side Socket Accept.
+
+```
+//接受一个Url，uniex domin socket 做为服务端
+- (BOOL)acceptOnUrl:(NSURL *)url error:(NSError **)errPtr;
+{
+     LogTrace();
+
+     __block BOOL result = NO;
+     __block NSError *err = nil;
+
+    //基本和正常的socket accept一模一样
+     // CreateSocket Block
+     // This block will be invoked within the dispatch block below.
+     //生成一个创建socket的block，创建、绑定、监听
+     int(^createSocket)(int, NSData*) = ^int (int domain, NSData *interfaceAddr) {
+
+          //creat  socket 
+          ...
+          // Set socket options
+
+          ...
+          // Bind socket
+
+          ...
+
+          // Listen
+          ...
+     };
+
+     // Create dispatch block and run on socketQueue
+     //错误判断
+     dispatch_block_t block = ^{ @autoreleasepool {
+
+          //错误判断
+          ...
+
+
+          //判断是否有这个url路径是否正确
+          ...
+
+          //调用上面的Block创建socket，并且绑定监听。
+          ...
+
+          //创建接受连接的source
+          acceptUNSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, socketUN, 0, socketQueue);
+
+          int socketFD = socketUN;
+          dispatch_source_t acceptSource = acceptUNSource;
+          //事件句柄，和accpept一样
+          dispatch_source_set_event_handler(acceptUNSource, ^{ @autoreleasepool {
+               //循环去接受所有的每一个连接
+               ...
+          }});
+
+          //取消句柄
+          dispatch_source_set_cancel_handler(acceptUNSource, ^{
+
+               //关闭socket
+               close(socketFD);
+          });
+
+          LogVerbose(@"dispatch_resume(accept4Source)");
+          dispatch_resume(acceptUNSource);
+
+          flags |= kSocketStarted;
+
+          result = YES;
+     }};
+
+     if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
+          block();
+     else
+          dispatch_sync(socketQueue, block);
+     //填充错误
+     if (result == NO)
+     {
+          LogInfo(@"Error in accept: %@", err);
+
+          if (errPtr)
+               *errPtr = err;
+     }
+
+     return result; 
+}
+```
+
+Most code matches the earlier server example, so it is omitted. The only difference is binding a Unix domain address structure containing a local file path, the link for interprocess communication. The server binds that path. When readable data appears—an incoming client connection—the initialised source handler triggers, accepts all pending connections and creates a new socket instance for each, just like ordinary sockets.
+
+That covers every connection approach. The last two were explained briefly to save space, but their core steps are included. Understanding the client Connect sequence should make them straightforward; both are much simpler.
+
+## Closing notes
+
+That concludes Connect. I wanted one article per topic, but there is too much code; excessive brevity would hide useful details. I also wanted to avoid an unreadably long, fragmented explanation, so I am glad it fits in two articles. After the New Year, I will continue with read, write and other sections. I hope the series deepens your understanding of Socket programming and helps you use sockets in projects.
+
+The New Year is here already. Looking back, several things were only satisfactory; I hope for a better 2017. Reading alone is shallow; real understanding requires practice.
+
+---
+
+Recommended reading: [Implement an iOS launch-screen advertisement in minutes](<https://allluckly.cn/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/>)
+{% endraw %}

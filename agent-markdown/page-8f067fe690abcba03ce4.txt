@@ -1,0 +1,280 @@
+---
+layout: null
+permalink: /en/journal/2016-01-13-bison-s-guide-to-ios-multithreading-part-1/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Bison's guide to iOS multithreading, part 1
+agent_source_url: https://allluckly.cn/en/journal/2016-01-13-bison-s-guide-to-ios-multithreading-part-1/
+agent_source_sha256: 76ed9e6467cc48ff657bf5effbff936ff90032f0c613ca7a73f49f42dfac58a4
+agent_generator_version: 1
+---
+{% raw %}# Bison's guide to iOS multithreading, part 1
+
+Language: en
+Canonical: [Bison's guide to iOS multithreading, part 1](<https://allluckly.cn/en/journal/2016-01-13-bison-s-guide-to-ios-multithreading-part-1/>)
+中文：[中文 HTML](<https://allluckly.cn/%E5%A4%9A%E7%BA%BF%E7%A8%8B/duoxiancheng01>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-01-13-bison-s-guide-to-ios-multithreading-part-1/>)
+Published: 2016-01-13T00:00:00+08:00
+Modified: 2026-10-23T10:45:01+08:00
+Author: [Bison](<https://allluckly.cn/about/>)
+
+Introduces multithreading by distinguishing processes from threads and comparing NSThread, NSOperationQueue and GCD. It then demonstrates thread creation, execution, termination and priorities, using logs to observe scheduling behaviour.
+
+Originally credited to Bison. Content is retained as published.
+
+English translation of the [Chinese original](<https://allluckly.cn/%E5%A4%9A%E7%BA%BF%E7%A8%8B/duoxiancheng01>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Read API, dependency and tool details in the context of the original publication date.
+
+> "A single-threaded app has just one sequential execution flow. A time-consuming operation blocks its main thread, leaving the app unable to continue and making it feel unresponsive, like a blocked river that cannot carry water onward until cleared. Multithreading is more like a river with many branches: if one is blocked, the others can keep flowing without stopping everything."
+
+Have you been asked about multithreading in an iOS software-engineer interview? I have encountered it quite often. Here is a rather embarrassing scene from one of my interviews 🙈. No laughing!
+
+Interviewer: Do you use multithreading in development?
+
+Me: Yes!
+
+Interviewer: In which development situations have you used multithreading?
+
+Me: In lots of situations… (The atmosphere suddenly became awkward 😓.)
+
+Interviewer: Which multithreading frameworks are available?
+
+Me: `NSThread`, `NSOperationQueue`, and `GCD`—saying their English names with a little flourish. 😄
+
+Interviewer: Explain the advantages and disadvantages of the three approaches. (The atmosphere relaxed a little.)
+
+Me: (I had memorised something I saw online and, feeling rather pleased, confidently recited the following.)  
+ 1.NSThread:
+
+> Creating a thread with an NSThread object is very convenient;
+
+> However, managing multiple threads with NSThread is difficult and not recommended;
+
+> Tip! Use \[NSThread currentThread\] to trace the thread executing a task; this works with all three technologies.
+
+2.NSOperation/NSOperationQueue:
+
+> is a set of Objective-C APIs implemented using GCD;
+
+> is an object-oriented multithreading technology;
+
+> provides features that are less easy to implement with GCD, such as maximum concurrency limits and dependencies between operations.
+
+3.GCD—Grand Central Dispatch:
+
+> is a low-level API based on C;
+
+> Tasks are defined with blocks, making them flexible and convenient to use;
+
+> provides greater control and low-level functions unavailable in operation queues.
+
+Interviewer: With no expression, “Go home and wait to hear from us.” (You can guess the result 😂.)  
+ That was Bison’s understanding of multithreading when first starting out 😄.  
+ Ultimately, that situation arose because I only knew how to use these tools without understanding their underlying implementation. Now let’s look more seriously at what multithreading actually involves.
+
+A single-threaded app has one sequential execution flow. A time-consuming operation blocks the main thread, leaving the app unable to proceed and making it feel unresponsive. Think of a blocked river: water cannot flow downstream until the blockage clears. Multithreading is like a river with many branches; if one is blocked, other branches still run without stopping everything. I hope the analogy is reasonable 😄. iOS provides excellent multithreading support. Programs can start multiple threads easily to handle the situations mentioned above. This reduces the complexity of building multithreaded apps. Almost every operating system can run several tasks at once. A task is usually a program, and each running program is a process. A running program can contain several sequential execution flows, each called a thread. This brings us to the difference between processes and threads, which I used to confuse too 😂. Here is my understanding. For reference only.
+
+> When a program is loaded into memory and runs, it becomes a process. A process is a running program with independent functionality, and an independent unit for system resource allocation and scheduling.
+
+> Threads are parts of a process. A process can contain multiple threads, while every thread must have a parent process. Each thread can have its own stack, program counter and local variables, but does not own separate system resources; it shares all resources owned by the process with the other threads. This makes multithreaded programming convenient, but each thread must avoid interfering with the others.
+
+After that lengthy explanation, you should have a basic understanding of multithreading. Here are several advantages of multithreaded programming; please add any I missed in the comments:
+
+- Processes cannot share memory, whereas threads can share it easily. (This is incorrect: shared memory is one of the most efficient forms of interprocess communication. Processes can read and write it directly without copying data. Thanks to @皮皮彭 for the correction.)
+- Creating a process requires the system to allocate resources anew, whereas creating a thread costs much less. Thus multithreading is more efficient than multiple processes for concurrent tasks.
+- iOS provides several multithreading implementations, simplifying multithreaded programming.
+
+Next, Bison will explain how each is used for multithreading in iOS development.
+
+## NSThread
+
+iOS represents a thread with the ` NSThread  ` class, so creating a new thread means creating an ` NSThread  ` object. There are two ways to create an ` NSThread  `.
+
+```css
+//创建一个新线程对象
+- (instancetype)initWithTarget:(id)target selector:(SEL)selector object:(nullable id)argument NS_AVAILABLE(10_5, 2_0);
+//创建并启动新线程
++ (void)detachNewThreadSelector:(SEL)selector toTarget:(id)target withObject:(nullable id)argument;
+```
+
+Both approaches essentially turn the `target` object's `selector` method into the thread's execution body. The `selector` method accepts at most one parameter, and `argument` is the argument passed to `selector`. There is no substantial difference between these two ways of creating threads. The first is an instance-initialization method that returns an ` NSThread  ` object, whose `start` method must be called to start the thread. The other does not return an ` NSThread  ` object; it creates and starts the new thread directly. Here is a simple example:
+
+```css
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    for(int i = 0 ; i < 100 ; i++)
+    {
+        NSLog(@"===%@===%d" , [NSThread currentThread].name , i);
+    if(i == 7)
+    {
+        // 创建线程对象
+        NSThread *thread = [[NSThread alloc]initWithTarget:self
+        selector:@selector(run) object:nil];
+        // 启动新线程
+        [thread start];
+        // 创建并启动新线程
+        //			[NSThread detachNewThreadSelector:@selector(run) toTarget:self
+        //				withObject:nil];
+        }
+    }
+}
+- (void)run
+{
+    for(int i = 0 ; i < 100 ; i++)
+    {
+        NSLog(@"-----%@----%d" , [NSThread currentThread].name, i);
+    }
+}
+```
+
+Run it; the log output is:
+
+```css
+//主线程正在运行
+2016-01-12 14:30:46.400 NSThreadTest[7498:104912] ======0
+2016-01-12 14:30:46.401 NSThreadTest[7498:104912] ======1
+2016-01-12 14:30:46.401 NSThreadTest[7498:104912] ======2
+2016-01-12 14:30:46.401 NSThreadTest[7498:104912] ======3
+2016-01-12 14:30:46.401 NSThreadTest[7498:104912] ======4
+2016-01-12 14:30:46.401 NSThreadTest[7498:104912] ======5
+2016-01-12 14:30:46.401 NSThreadTest[7498:104912] ======6
+2016-01-12 14:30:46.402 NSThreadTest[7498:104912] ======7
+2016-01-12 14:30:46.402 NSThreadTest[7498:104912] ======8
+//新线程开始运行
+2016-01-12 14:30:46.402 NSThreadTest[7498:104956] ---------0
+2016-01-12 14:30:46.402 NSThreadTest[7498:104912] ======9
+2016-01-12 14:30:46.402 NSThreadTest[7498:104956] ---------1
+2016-01-12 14:30:46.402 NSThreadTest[7498:104912] ======10
+2016-01-12 14:30:46.402 NSThreadTest[7498:104956] ---------2
+2016-01-12 14:30:46.402 NSThreadTest[7498:104912] ======11
+2016-01-12 14:30:46.402 NSThreadTest[7498:104912] ======12
+2016-01-12 14:30:46.402 NSThreadTest[7498:104956] ---------3
+................
+```
+
+The result clearly shows two threads executing concurrently. The example also uses `+ (NSThread *)currentThread;`, which always returns the currently executing thread object.
+
+A newly created and started thread does not necessarily begin executing immediately, nor does it remain executing continuously. Even once running, it cannot monopolize the CPU indefinitely. The CPU switches among threads, so their states repeatedly alternate between running and ready. After the program creates a thread, it is in the new state. Like other Objective-C objects, it has only had memory allocated and member variables initialized. It does not yet exhibit dynamic thread behavior, and its execution body does not run. After the thread object's `start` method is called, it enters the ready state. The system creates a method-call stack and program counter for it. It is not yet running; it is eligible to run, with the timing determined by system scheduling.
+
+#### Terminate a child thread
+
+A thread ends in one of the following 3 ways, after which it is in the dead state.
+
+> The thread’s execution method completes, and the thread ends normally.
+
+> An error occurs during thread execution.
+
+> Call the ` NSThread  ` class's exit method directly to terminate the currently executing thread.
+
+To test whether a thread is running, call its `isExecuting` and `isFinished` methods. During execution, `isExecuting` returns YES; after completion, `isFinished` returns YES as well. To terminate a child thread from the UI thread, note that ` NSThread  ` provides no method that directly terminates a particular child thread. Its `cancel` method only changes the thread's state, causing isCancelled to return NO, rather than actually terminating it. Instead, send a signal to the child thread and check for it within the thread's execution-body method. If the termination signal has been received, the program should call `exit` to stop the current execution loop. Here is an example:
+
+```css
+NSThread* thread;
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    // 创建新线程对象
+    thread = [[NSThread alloc] initWithTarget:self selector:@selector(run)
+    object:nil];
+    // 启动新线程
+    [thread start];
+}
+- (void)run
+{
+    for(int i = 0 ; i < 100 ; i++)
+    {
+        if([NSThread currentThread].isCancelled)
+    {
+        // 终止当前正在执行的线程
+        [NSThread exit];
+    }
+    NSLog(@"-----%@----%d" , [NSThread currentThread].name, i);
+    // 每执行一次，线程暂停0.5秒
+    [NSThread sleepForTimeInterval:0.5];
+}
+}
+- (IBAction)cancelThread:(id)sender
+{
+    // 取消thread线程，调用该方法后，thread的isCancelled方法将会返回NO
+    [thread cancel]; 
+}
+```
+
+To pause the currently executing thread for a while and put it into a blocked state, call the following method.
+
+```css
+//  让当前正在执行的线程暂停到date代表的时间，并进入阻塞状态。
++ (void)sleepUntilDate:(NSDate *)date;
+//  让当前正在执行的线程暂停到ti秒，并进入阻塞状态。
++ (void)sleepForTimeInterval:(NSTimeInterval)ti;
+```
+
+Each executing thread has a priority. Higher-priority threads receive more opportunities to execute, while lower-priority threads receive fewer. The default priority of a child thread is 0.5. The following code demonstrates ` NSThread  ` priorities.
+
+```css
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    NSLog(@"UI线程的优先级为：%g" , [NSThread threadPriority]);
+    // 创建第一个线程对象
+    NSThread* thread1 = [[NSThread alloc]
+    initWithTarget:self selector:@selector(run) object:nil];
+    // 设置第一个线程对象的名字
+    thread1.name = @"线程A";
+    NSLog(@"线程A的优先级为：%g" , thread1.threadPriority);
+    // 设置使用最低优先级
+    thread1.threadPriority = 0.0;
+    // 创建第二个线程对象
+    NSThread* thread2 = [[NSThread alloc]
+    initWithTarget:self selector:@selector(run) object:nil];
+    // 设置第二个线程对象的名字
+    thread2.name = @"线程B";
+    NSLog(@"线程B的优先级为：%g" , thread2.threadPriority);
+    // 设置使用最高优先级
+    thread2.threadPriority = 1.0;
+    // 启动2个线程
+    [thread1 start];
+    [thread2 start];
+}
+- (void)run
+{
+    for(int i = 0 ; i < 100 ; i++)
+    {
+        NSLog(@"-----%@----%d" , [NSThread currentThread].name, i);
+    }
+}
+```
+
+The resulting log is shown below.
+
+```css
+2016-01-12 16:26:26.451 PriorityTest[10135:150983] UI线程的优先级为：0.5
+//新线程默认优先级
+2016-01-12 16:26:26.452 PriorityTest[10135:150983] 线程A的优先级为：0.5
+2016-01-12 16:26:26.452 PriorityTest[10135:150983] 线程B的优先级为：0.5
+//改变优先级后，优先级高的线程，获取更多的执行机会
+2016-01-12 16:26:26.453 PriorityTest[10135:151058] -----线程B----0
+2016-01-12 16:26:26.453 PriorityTest[10135:151058] -----线程B----1
+2016-01-12 16:26:26.453 PriorityTest[10135:151058] -----线程B----2
+2016-01-12 16:26:26.454 PriorityTest[10135:151058] -----线程B----3
+2016-01-12 16:26:26.454 PriorityTest[10135:151058] -----线程B----4
+2016-01-12 16:26:26.454 PriorityTest[10135:151058] -----线程B----5
+2016-01-12 16:26:26.454 PriorityTest[10135:151058] -----线程B----6
+2016-01-12 16:26:26.465 PriorityTest[10135:151056] -----线程A----0
+```
+
+That is enough for today; this has become rather long 😄.
+
+> [Bison's guide to iOS multithreading, part 2](<https://allluckly.cn/en/journal/2016-01-18-bison-s-guide-to-ios-multithreading-part-2/>)
+
+---
+
+> Original article: [https://allluckly.cn/](<https://allluckly.cn/en/>)
+
+Recommended reading: [Understanding and using Core Data for persistence](<https://allluckly.cn/en/journal/2016-01-10-understanding-and-using-core-data-for-persistence/>)
+
+Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.
+{% endraw %}

@@ -1,0 +1,212 @@
+---
+layout: post
+title: Integrating a Baidu Mobile SSP launch ad in one minute
+description: Records the historical integration of Baidu Mobile SSP splash ads, from platform registration and SDK
+  import to system dependencies, compiler options and launch-time delegate callbacks. It follows the main steps
+  for loading an ad during app startup.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2015-12-26 00:00:00 +0800
+technical_translation:
+  topic: tooling-release
+  summary: Records the historical integration of Baidu Mobile SSP splash ads, from platform registration and SDK
+    import to system dependencies, compiler options and launch-time delegate callbacks. It follows the main steps
+    for loading an ad during app startup.
+  keywords:
+  - Baidu SSP
+  - splash ads
+  - BaiduMobAdSplash
+  - SDK integration
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Published in 2015, with iOS 9 compatibility settings and the Baidu SSP SDK of that period.
+  title: Integrating a Baidu Mobile SSP launch ad in one minute
+  source_sha256: dda6fbdfda2ce45db061266b1ed646b3da3ffa899c8aeec90dccbb6b32fbb6e8
+lang: en
+source_path: _posts/2015-12-26-baidu01.md
+source_url: /sdk/baidu01
+permalink: /en/journal/2015-12-26-integrating-a-baidu-mobile-ssp-launch-ad-in-one-minute/
+translation_method: machine-assisted
+translation_source_sha256: dda6fbdfda2ce45db061266b1ed646b3da3ffa899c8aeec90dccbb6b32fbb6e8
+excerpt: Records the historical integration of Baidu Mobile SSP splash ads, from platform registration and SDK import
+  to system dependencies, compiler options and launch-time delegate callbacks. It follows the main steps for loading
+  an ad during app startup.
+translation_date: '2026-10-23T02:34:11+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"Integrate Baidu Mobile SSP launch ads into your APP to increase revenue."</p>
+</blockquote>
+<blockquote>
+<p><small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p><br/></p>
+<p>My free app is about to be released. I have been wondering how to earn back the 99 dollars for my developer membership.<br/>
+Adding ads to my app seemed the easiest way to earn it back. But I am a perfectionist, <br/>
+I dislike ads everywhere, with an interstitial suddenly appearing while you are using an app. Besides harming the user experience, <br/>
+they also spoil the app's appearance, which I cannot tolerate. Caught in that dilemma, I took a look at Baidu Mobile SSP.<br/>
+Baidu SSP offers many ad formats. For me, a launch ad is the best fit: first, it does not interfere with the user's <br/>
+experience, and second, it does not spoil the app's overall appearance. That settled the decision.<br/>
+Now let us see how to integrate it.<br/></p>
+<blockquote>
+<p>Baidu SSP official website <a href="http://mssp.baidu.com/home/developer.html">Go to the resource</a><br/></p>
+</blockquote>
+<p>First register an account with Baidu SSP, add a mobile application under application management, and fill in the relevant information.
+Then download the SDK and drag its <code class="language-plaintext highlighter-rouge">ios_api</code> folder into your project.</p>
+<h2 id="warningios9适配说明-">warning: iOS9 compatibility notes: <br/></h2>
+<blockquote>
+<p>1. In the plist, add baidumobads to the LSApplicationQueriesSchemes array. Note: the Xcode7.0 simulator reports error:(null), whereas a physical device does not. This error can be ignored here.<br/></p>
+</blockquote>
+<figure class="highlight"><pre><code class="language-css" data-lang="css">    <span class="o">&lt;</span><span class="nt">key</span><span class="o">&gt;</span><span class="nt">LSApplicationQueriesSchemes</span><span class="o">&lt;/</span><span class="nt">key</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="nt">array</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="nt">string</span><span class="o">&gt;</span><span class="nt">baidumobads</span><span class="o">&lt;/</span><span class="nt">string</span><span class="o">&gt;</span>
+    <span class="o">&lt;/</span><span class="nt">array</span><span class="o">&gt;</span></code></pre></figure>
+<blockquote>
+<p>2. ENABLE_BITCODE=YES. The SDK supports BITCODE; if you do not need it, simply set this to NO.<br/></p>
+</blockquote>
+<blockquote>
+<p>3. In the plist, set NSAllowsArbitraryLoads to true under NSAppTransportSecurity. Note: in Xcode7.1, set Allow Arbitrary Loads to true under App Transport Security Settings.<br/></p>
+</blockquote>
+<figure class="highlight"><pre><code class="language-css" data-lang="css">    <span class="o">&lt;</span><span class="nt">key</span><span class="o">&gt;</span><span class="nt">NSAppTransportSecurity</span><span class="o">&lt;/</span><span class="nt">key</span><span class="o">&gt;</span> 
+    <span class="o">&lt;</span><span class="nt">dict</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="nt">key</span><span class="o">&gt;</span><span class="nt">NSAllowsArbitraryLoads</span><span class="o">&lt;/</span><span class="nt">key</span><span class="o">&gt;</span> 
+    <span class="o">&lt;</span><span class="nt">true</span><span class="o">/&gt;</span>
+    <span class="o">&lt;/</span><span class="nt">dict</span><span class="o">&gt;</span></code></pre></figure>
+<p><br/></p>
+<blockquote>
+<p>4. The .dylib libraries used by the SDK have .tbd extensions in Xcode7. Import the libraries with the corresponding names.<br/></p>
+</blockquote>
+<h2 id="然后添加frameworks">Then add the <code class="language-plaintext highlighter-rouge">Frameworks</code>.</h2>
+<p><code class="language-plaintext highlighter-rouge">QuartzCore.framework</code> <br/>
+<code class="language-plaintext highlighter-rouge">Security.framework</code> <br/>
+<code class="language-plaintext highlighter-rouge">AdSupport.framework</code><br/>
+<code class="language-plaintext highlighter-rouge">StoreKit.framework</code><br/>
+<code class="language-plaintext highlighter-rouge">libz.dylib</code><br/>
+<code class="language-plaintext highlighter-rouge">AudioToolbox.framework</code> <br/>
+<code class="language-plaintext highlighter-rouge">CoreMotion.framework</code><br/>
+<code class="language-plaintext highlighter-rouge">MediaPlayer.framework</code><br/>
+<code class="language-plaintext highlighter-rouge">AVFoundation.framework</code><br/>
+<code class="language-plaintext highlighter-rouge">MessageUI.framework</code><br/>
+<code class="language-plaintext highlighter-rouge">CoreLocation.framework</code><br/>
+<code class="language-plaintext highlighter-rouge">CoreTelephony.framework</code><br/>
+<code class="language-plaintext highlighter-rouge">SystemConfiguration.framework</code><br/>
+<code class="language-plaintext highlighter-rouge">CoreGraphics.framework</code><br/>
+<code class="language-plaintext highlighter-rouge">WebKit.framework</code><br/></p>
+<h2 id="再编译参数设置">Then configure the compiler parameters.<br/></h2>
+<blockquote>
+<p>targets-&gt;BuildSettings-&gt;Other Linker Flags -&gt; add -ObjC -lstdc++<br/></p>
+</blockquote>
+<p>That completes the configuration. From here, we will discuss only Baidu SSP launch ads.<br/></p>
+<p>Import the headers in <code class="language-plaintext highlighter-rouge">AppDelegate</code>:
+<code class="language-plaintext highlighter-rouge">#import "BaiduMobAdSplashDelegate.h"</code>
+<code class="language-plaintext highlighter-rouge">#import "BaiduMobAdSplash.h"</code>
+Add the <code class="language-plaintext highlighter-rouge">BaiduMobAdSplashDelegate</code> delegate.</p>
+<p>The specific code is as follows.<br/></p>
+<p>.h file</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="k">@property</span> <span class="p">(</span><span class="n">strong</span><span class="p">,</span> <span class="n">nonatomic</span><span class="p">)</span> <span class="n">BaiduMobAdSplash</span> <span class="err">*</span><span class="n">splash</span><span class="p">;</span>
+
+<span class="k">@property</span> <span class="p">(</span><span class="n">strong</span><span class="p">,</span> <span class="n">nonatomic</span><span class="p">)</span> <span class="n">UIView</span> <span class="err">*</span><span class="n">customSplashView</span><span class="p">;</span></code></pre></figure>
+<p>.m file</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">application</span><span class="o">:(</span><span class="nt">UIApplication</span> <span class="o">*)</span><span class="nt">application</span> <span class="nt">didFinishLaunchingWithOptions</span><span class="o">:(</span><span class="nt">NSDictionary</span> <span class="o">*)</span><span class="nt">launchOptions</span> <span class="p">{</span>
+
+    <span class="err">//百度广告</span>
+    <span class="err">[self</span> <span class="err">BaiDuNew];</span>
+
+    <span class="err">return</span> <span class="err">YES;</span>
+<span class="p">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">BaiDuNew</span><span class="p">{</span>
+
+    <span class="err">[self.window</span> <span class="err">makeKeyAndVisible];</span>
+    <span class="err">BaiduMobAdSplash</span>	<span class="err">*splash</span>	<span class="err">=</span>	<span class="err">[[BaiduMobAdSplash</span>	<span class="err">alloc]</span>	<span class="err">init];</span>
+    <span class="err">splash.delegate</span>	<span class="err">=</span> <span class="err">self;</span>
+    <span class="err">//把在mssp.baidu.com上创建后获得的代码位id写到这里</span>
+    <span class="err">splash.AdUnitTag</span> <span class="err">=</span> <span class="err">@"2365464";</span>
+    <span class="err">splash.canSplashClick</span>	<span class="err">=</span>	<span class="err">YES;</span>
+    <span class="err">[splash</span>	<span class="py">loadAndDisplayUsingKeyWindow</span><span class="p">:</span><span class="n">self</span><span class="p">.</span><span class="n">window</span><span class="p">];</span>
+    <span class="err">self.splash</span>	<span class="err">=</span> <span class="err">splash;</span>
+
+    <span class="err">//可以在customSplashView上显示包含icon的自定义开屏</span>
+    <span class="err">self.customSplashView</span> <span class="err">=</span> <span class="err">[[UIView</span> <span class="err">alloc]</span><span class="py">initWithFrame</span><span class="p">:</span><span class="n">self</span><span class="p">.</span><span class="n">window</span><span class="p">.</span><span class="n">frame</span><span class="p">];</span>
+    <span class="err">self.customSplashView.backgroundColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="err">whiteColor];</span>
+    <span class="err">[self.window</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">self</span><span class="p">.</span><span class="n">customSplashView</span><span class="p">];</span>
+    <span class="err">[self.window</span> <span class="py">bringSubviewToFront</span><span class="p">:</span><span class="n">self</span><span class="p">.</span><span class="n">customSplashView</span><span class="p">];</span>
+
+
+    <span class="err">//在baiduSplashContainer用做上展现百度广告的容器，注意尺寸必须大于200*200，并且baiduSplashContainer需要全部在window内，同时开机画面不建议旋转</span>
+    <span class="err">CGFloat</span> <span class="err">width</span> <span class="err">=</span> <span class="err">self.window.frame.size.width;</span>
+    <span class="err">CGFloat</span> <span class="err">height=</span> <span class="err">self.window.frame.size.height;</span>
+    <span class="err">UIView</span> <span class="err">*</span> <span class="err">baiduSplashContainer</span> <span class="err">=</span> <span class="err">[[UIView</span> <span class="err">alloc]</span><span class="py">initWithFrame</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height-100</span><span class="p">)];</span>
+    <span class="err">[self.customSplashView</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">baiduSplashContainer</span><span class="p">];</span>
+
+    <span class="err">UIImageView</span> <span class="err">*iconView</span> <span class="err">=</span> <span class="err">[[UIImageView</span> <span class="err">alloc]</span><span class="py">initWithImage</span><span class="p">:[</span><span class="n">UIImage</span> <span class="n">imageNamed</span><span class="p">:</span><span class="err">@</span><span class="s1">"icon.png"</span><span class="p">]];</span>
+    <span class="err">[iconView</span> <span class="py">setFrame</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="n">width</span><span class="p">/</span><span class="m">2-70-40</span><span class="p">,</span> <span class="n">height-90</span><span class="p">,</span> <span class="m">80</span><span class="p">,</span> <span class="m">80</span><span class="p">)];</span>
+    <span class="err">[self.customSplashView</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">iconView</span><span class="p">];</span>
+
+    <span class="err">UIImageView</span> <span class="err">*logoView</span> <span class="err">=</span> <span class="err">[[UIImageView</span> <span class="err">alloc]</span><span class="py">initWithImage</span><span class="p">:[</span><span class="n">UIImage</span> <span class="n">imageNamed</span><span class="p">:</span><span class="err">@</span><span class="s1">"ITBlog.png"</span><span class="p">]];</span>
+    <span class="err">[logoView</span> <span class="py">setFrame</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="n">CGRectGetMaxX</span><span class="p">(</span><span class="n">iconView</span><span class="p">.</span><span class="n">frame</span><span class="p">)</span><span class="err">+</span><span class="m">40</span><span class="p">,</span> <span class="n">height-90</span><span class="p">,</span> <span class="m">130</span><span class="p">,</span> <span class="m">50</span><span class="p">)];</span>
+    <span class="err">[self.customSplashView</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">logoView</span><span class="p">];</span>
+
+    <span class="err">UILabel</span> <span class="err">*label</span> <span class="err">=</span> <span class="err">[[UILabel</span> <span class="err">alloc]</span><span class="py">initWithFrame</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="n">CGRectGetMinX</span><span class="p">(</span><span class="n">logoView</span><span class="p">.</span><span class="n">frame</span><span class="p">)</span><span class="m">-2</span><span class="p">,</span> <span class="n">CGRectGetMaxY</span><span class="p">(</span><span class="n">logoView</span><span class="p">.</span><span class="n">frame</span><span class="p">),</span> <span class="m">130</span><span class="p">,</span> <span class="m">25</span><span class="p">)];</span>
+    <span class="err">label.font</span> <span class="err">=</span> <span class="err">[UIFont</span> <span class="py">systemFontOfSize</span><span class="p">:</span><span class="m">13</span><span class="p">];</span>
+    <span class="err">label.textAlignment</span> <span class="err">=</span> <span class="err">NSTextAlignmentLeft;</span>
+    <span class="err">label.textColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="err">lightGrayColor];</span>
+    <span class="err">label.text</span> <span class="err">=</span> <span class="err">@"自学iOS开发进阶首选";</span>
+    <span class="err">label.textAlignment</span> <span class="err">=</span> <span class="err">NSTextAlignmentCenter;</span>
+    <span class="err">[self.customSplashView</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">label</span><span class="p">];</span>
+    <span class="err">//在的baiduSplashContainer里展现百度广告</span>
+    <span class="err">[splash</span> <span class="py">loadAndDisplayUsingContainerView</span><span class="p">:</span><span class="n">baiduSplashContainer</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">publisherId</span>
+<span class="p">{</span>
+
+    <span class="err">return</span> <span class="err">@"ab17bd77";</span>
+<span class="p">}</span>
+
+<span class="c">/**
+*  广告展示成功
+*/</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">splashSuccessPresentScreen</span><span class="o">:(</span><span class="nt">BaiduMobAdSplash</span> <span class="o">*)</span><span class="nt">splash</span>
+<span class="p">{</span>
+    <span class="err">NSLog(@"splashSuccessPresentScreen");</span>
+<span class="p">}</span>
+
+<span class="c">/**
+*  广告展示失败
+*/</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">splashlFailPresentScreen</span><span class="o">:(</span><span class="nt">BaiduMobAdSplash</span> <span class="o">*)</span><span class="nt">splash</span> <span class="nt">withError</span><span class="o">:(</span><span class="nt">BaiduMobFailReason</span><span class="o">)</span> <span class="nt">reason</span>
+<span class="p">{</span>
+    <span class="err">NSLog(@"splashlFailPresentScreen</span> <span class="py">withError</span><span class="p">:</span><span class="err">%</span><span class="n">d</span><span class="s1">",reason);
+    //自定义开屏移除
+    [self.customSplashView removeFromSuperview];
+}
+
+/**
+*  广告展示结束
+*/
+- (void)splashDidDismissScreen:(BaiduMobAdSplash *)splash
+{
+    NSLog(@"</span><span class="n">splashDidDismissScreen</span><span class="s1">");
+    //自定义开屏移除
+    [self.customSplashView removeFromSuperview];
+}
+
+/**
+*  广告点击
+*/
+- (void)splashDidClicked:(BaiduMobAdSplash *)splash
+{
+    NSLog(@"</span><span class="n">splashDidClicked</span><span class="err">"</span><span class="p">);</span>
+<span class="p">}</span></code></pre></figure>
+<p><br/></p>
+<p>The result is shown below.</p>
+<p><span class="technical-missing-image">This historical illustration is currently unavailable. <a href="https://github.com/AllLuckly/AllLuckly.github.io/blob/master/images/blog/baidu.gif?raw=true">The original image URL is retained</a> for reference.</span><br/></p>
+<blockquote>
+<p>Demo—<a href="https://github.com/AllLuckly/LBBaiDuSSP_Demo">Download</a><br/></p>
+</blockquote>
+<p>Recommended reading: <a href="/en/journal/2015-06-04-an-illustrated-guide-to-implementing-ios-in-app-purchases/">An illustrated guide to implementing iOS in-app purchases</a><br/></p>
+<p>Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.</p>
+
+{% endraw %}

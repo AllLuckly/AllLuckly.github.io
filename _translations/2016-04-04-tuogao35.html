@@ -1,0 +1,145 @@
+---
+layout: post
+title: Publishing a library to CocoaPods
+description: 'Records the process of publishing an open-source library: preparing the GitHub project, registering
+  with trunk, writing a podspec, checking versions and tags, validating and submitting. It also explains commonly
+  used specification fields.'
+category: Development notes
+imagefeature: null
+date: 2016-04-04 00:00:00 +0800
+technical_translation:
+  topic: tooling-release
+  summary: 'Records the process of publishing an open-source library: preparing the GitHub project, registering
+    with trunk, writing a podspec, checking versions and tags, validating and submitting. It also explains commonly
+    used specification fields.'
+  keywords:
+  - CocoaPods
+  - podspec
+  - trunk
+  - Git tags
+  - open-source publishing
+  provenance: contribution
+  author_name: WzxJiang
+  source_url: http://www.jianshu.com/p/88766e98e363
+  credit: Originally credited to WzxJiang; edited and archived by Bison.
+  version_note: Published in 2016. Commands and repository submission steps reflect the CocoaPods service as it
+    worked then.
+  title: Publishing a library to CocoaPods
+  source_sha256: 092d27ef481b279ccdbe8266be78c8774d0f37b70d34dc1c80922e843b66e49b
+lang: en
+source_path: _posts/2016-04-04-tuogao35.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao35
+permalink: /en/journal/2016-04-04-publishing-a-library-to-cocoapods/
+translation_method: machine-assisted
+translation_source_sha256: 092d27ef481b279ccdbe8266be78c8774d0f37b70d34dc1c80922e843b66e49b
+excerpt: 'Records the process of publishing an open-source library: preparing the GitHub project, registering with
+  trunk, writing a podspec, checking versions and tags, validating and submitting. It also explains commonly used
+  specification fields.'
+translation_date: '2026-10-23T02:34:14+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"Today I wrote WZXSSL, a utility for quick string encryption, and wanted to publish it through CocoaPods. Many small details caused considerable confusion. This tutorial focuses on the likely pitfalls."</p>
+</blockquote>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/88766e98e363">WzxJiang</a><br/></p>
+<h2 id="首先这篇教程的受众">First, the intended audience for this tutorial:<br/></h2>
+<blockquote>
+<p>Know at least basic Git.
+Have CocoaPods installed on your Mac.
+Have a GitHub account.</p>
+</blockquote>
+<p><br/></p>
+<p>If you do not meet these prerequisites…<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao35/1.png"/><br/>
+Result:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao35/2.png"/><br/></p>
+<h3 id="正式开始">Let’s begin:<br/></h3>
+<p>1. Create a project on GitHub and clone it locally.<br/>
+Omitted.</p>
+<p>2. Create a branch<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao35/3.png"/><br/></p>
+<p>Note that this branch is not arbitrary: mine is 1.0.0. Remember that; it matters below.</p>
+<p>3. Register with trunk<br/></p>
+<p>Uploading with trunk is much faster than the previous approach of branching cocoapods/specs.
+In Terminal, enter <br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pod trunk register youremail@email.com 'username'  --verbose
+</code></pre></div></div>
+<p><br/>
+replace these with your email and username.<br/>
+Run pod trunk me to check whether registration succeeded.<br/>
+Success looks like this:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- Name:     xxxx
+- Email:    xxxxxxxx
+- Since:    xxxxxxx
+- Pods:
+- xxxx
+- Sessions:
+- xxxxxx
+</code></pre></div></div>
+<p><br/>
+4. Configure the PodSpec<br/>
+In Terminal, cd to your project folder.<br/>
+Run pod spec create name, replacing name with your preferred name.<br/>
+Open name.podspec in whichever editor you prefer, such as vim or Sublime.<br/>
+The file contains many official comments, most of which you do not need.<br/>
+Here is my configuration.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Pod::Spec.new do |s|
+
+s.name          = "WZXSSL"
+s.version       = "1.0.0"
+s.license       = "MIT"
+s.summary       = "Fast encryption string used on iOS, which implement by Objective-C."
+s.homepage      = "https://github.com/Wzxhaha/WZXSSL"
+s.author        = { "WzxJiang" =&gt; "wzxjiang@foxmail.com" }
+s.source        = { :git =&gt; "https://github.com/Wzxhaha/WZXSSL.git", :tag =&gt; "1.0.0" }
+s.requires_arc  = true
+s.description   = &lt;&lt;-DESC
+Fast encryption string, the current support for MD5 (16, 32), Sha1, Base64
+DESC
+s.source_files  = "WZXSSLTool/*"
+s.platform      = :ios, '7.0'
+s.framework     = 'Foundation', 'CoreGraphics', 'UIKit'  
+
+end
+</code></pre></div></div>
+<p><br/>
+Several parameters need explanation:<br/>
+①s.license<br/>
+The licence used by the pod dependency. Choose the one appropriate to your library.<br/>
+②s.source_files<br/>
+specifies the source-file path, relative to the podspec file.<br/>
+③s.frameworks<br/>
+Required frameworks, without the .frameworks suffix.<br/></p>
+<p>Note s.version = “1.0.0”: if the version is 1.0.0, the branch you use must also be 1.0.0.<br/>
+Otherwise podspec validation later reports Could not find remote branch x.x.x to clone.<br/></p>
+<p>5. Commit the project<br/>
+Commit your project changes to GitHub.<br/>
+Omitted<br/></p>
+<p>6. Validate<br/>
+Enter these separately in Terminal:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>set the new version to 1.0.0  
+set the new tag to 1.0.0
+</code></pre></div></div>
+<p>Bind the version number to a tag.<br/></p>
+<p>Then I recommend entering the following commands separately in Terminal:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pod lib lint --verbose和pod spec lint --verbose，
+</code></pre></div></div>
+<p><br/>
+Check whether validation passes.<br/>
+Adding --verbose displays error details if something fails.<br/>
+A successful check reports XXXXX passed validation.<br/></p>
+<p>7. Submit<br/>
+In Terminal, run pod trunk push XXXXX.podspec.<br/>
+If all goes well, you will see<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao35/4.jpg"/><br/></p>
+<p>CocoaPods review is now quick. Often, after only pod setup, pod search xxxx already finds your project.<br/></p>
+<p>Blog posts I consulted<br/>
+[Original] <a href="http://www.cnblogs.com/wengzilin/p/4742530.html">iOS: publish your code to CocoaPods step by step using Trunk</a>
+<a href="http://blog.csdn.net/wzzvictory/article/details/20067595">CocoaPods explained: creating a pod</a></p>
+<p>Finally, questions are welcome in the comments.
+My <a href="https://github.com/Wzxhaha">GitHub</a>. If you like the project, please give it a star 🌟.</p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-02-01-a-beginner-developer-s-review-of-2015/">A beginner developer's review of 2015</a><br/></p>
+
+{% endraw %}

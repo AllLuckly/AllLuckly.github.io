@@ -1,0 +1,306 @@
+---
+layout: post
+title: Integrating Alipay friend sharing in three minutes
+description: Walks through app registration, SDK import, URL Scheme configuration and callbacks for sharing to Alipay
+  friends. It distinguishes the data objects for text, image and web messages, and records checks for installation
+  detection and authentication failures.
+category: Development notes
+imagefeature: BG.jpg
+date: 2015-10-21 00:00:00 +0800
+technical_translation:
+  topic: data-network
+  summary: Walks through app registration, SDK import, URL Scheme configuration and callbacks for sharing to Alipay
+    friends. It distinguishes the data objects for text, image and web messages, and records checks for installation
+    detection and authentication failures.
+  keywords:
+  - Alipay sharing
+  - SocialSDK
+  - URL Scheme
+  - APMediaMessage
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Uses the 2015 Alipay SocialSDK, with notes on iOS 9 Scheme configuration and Alipay Wallet 9.0.
+  title: Integrating Alipay friend sharing in three minutes
+  source_sha256: 91eba000a422a909223e695bd3b46f80bf5a23dd70bfcd72b2b7258097d019c0
+lang: en
+source_path: _posts/2015-10-21-ZFB.md
+source_url: /%E6%94%AF%E4%BB%98%E5%AE%9D/ZFB
+permalink: /en/journal/2015-10-21-integrating-alipay-friend-sharing-in-three-minutes/
+translation_method: machine-assisted
+translation_source_sha256: 91eba000a422a909223e695bd3b46f80bf5a23dd70bfcd72b2b7258097d019c0
+excerpt: Walks through app registration, SDK import, URL Scheme configuration and callbacks for sharing to Alipay
+  friends. It distinguishes the data objects for text, image and web messages, and records checks for installation
+  detection and authentication failures.
+translation_date: '2026-10-23T02:34:10+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"Work hard, keep working hard, and work harder still. Today’s effort becomes tomorrow’s reward."
+<small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p><br/></p>
+<p>Almost without our noticing, Alipay has become an indispensable <code class="language-plaintext highlighter-rouge">APP</code> in daily life. Evolving from a payment-only <code class="language-plaintext highlighter-rouge">APP</code> into a collection of useful small features has been quite a journey. Today I want to discuss what this change requires of us programmers: quickly adding sharing to Alipay friends.
+I happened to see this in the Weibo client, became curious, and tried it myself. Third-party services such as Umeng and ShareSDK apparently had not added this sharing option at the time.
+Let me show you how to finish this simple task. Yes, very simple—the title says so. 😄
+Now to the main point:</p>
+<hr/>
+<h4 id="准备工作">Preparation</h4>
+<ul>
+<li>Apply for your AppID. Register on the application registration page of the Alipay Open Platform. Once you register and configure a mobile application, you receive an AppID that can be used for development immediately. However, registration must still be submitted for review; only approved applications may be officially released for use.</li>
+<li>Download and extract the interface archive, named SocialSDK.zip.</li>
+</ul>
+<h4 id="步骤1启动ide如xcode把socialsdk文件夹中以下文件拷贝到项目文件夹下并导入到项目工程中">Step 1: Launch your IDE, such as Xcode. Copy the following files from the SocialSDK folder into your project folder and import them into the project.</h4>
+<p><span class="technical-missing-image">This historical illustration is currently unavailable. <a href="http://upload-images.jianshu.io/upload_images/671504-f1b1a1d5e9398e69.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">The original image URL is retained</a> for reference.</span></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">APOpenAPI</span><span class="nc">.h</span>
+<span class="nt">APOpenAPIObject</span><span class="nc">.h</span>
+<span class="nt">libAPOpenSdk</span><span class="nc">.a</span></code></pre></figure>
+<h4 id="步骤2在需要调用socialsdk的文件中增加头文件引用">Step 2: Add the header import in any file that needs to call SocialSDK.</h4>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nf">#import</span> <span class="s1">"APOpenAPI.h"</span></code></pre></figure>
+<h4 id="步骤3工程配置">Step 3: Configure the project</h4>
+<ul>
+<li>
+<p>Add <code class="language-plaintext highlighter-rouge">-all_load </code> to Other Linker Flags.</p>
+</li>
+<li>Add the Alipay callback scheme under URL Types.
+    <blockquote>
+<p> 
+<strong>Note</strong></p>
+<ol>
+<li>The identifier must be <code class="language-plaintext highlighter-rouge">alipayShare</code>.</li>
+<li>URL Schemes naming rule: <code class="language-plaintext highlighter-rouge">ap+AppID</code></li>
+</ol>
+</blockquote>
+</li>
+<li>On iOS 9 and later, add the Alipay sharing scheme.
+    <blockquote>
+<p> 
+<strong>The URL Schemes name for Alipay sharing is: <code class="language-plaintext highlighter-rouge">alipayshare</code></strong></p>
+</blockquote>
+</li>
+</ul>
+<h4 id="步骤4注册应用并添加必要的url-handler">Step 4: Register the application and add the required URL Handler</h4>
+<p>For example, add the import to AppDelegate.m:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nf">#import</span> <span class="s1">"APOpenAPI.h"</span></code></pre></figure>
+<p>Add the following code inside @implementation AppDelegate:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">application</span><span class="o">:(</span><span class="nt">UIApplication</span> <span class="o">*)</span><span class="nt">application</span> <span class="nt">didFinishLaunchingWithOptions</span><span class="o">:(</span><span class="nt">NSDictionary</span> <span class="o">*)</span><span class="nt">launchOptions</span> <span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">self.window</span> <span class="err">=</span> <span class="err">[[UIWindow</span> <span class="err">alloc]</span> <span class="py">initWithFrame</span><span class="p">:[[</span><span class="n">UIScreen</span> <span class="n">mainScreen</span><span class="p">]</span> <span class="n">bounds</span><span class="p">]];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">self.window.backgroundColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="err">whiteColor];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[self.window</span> <span class="err">makeKeyAndVisible];</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">创建供Demo使用的根视图</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">APRootViewController</span> <span class="err">*rootViewController</span> <span class="err">=</span> <span class="err">[[APRootViewController</span> <span class="err">alloc]</span> <span class="py">initWithNibName</span><span class="p">:</span><span class="n">nil</span> <span class="n">bundle</span><span class="p">:</span><span class="n">nil</span><span class="p">];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">UINavigationController</span> <span class="err">*navigationController</span> <span class="err">=</span> <span class="err">[[UINavigationController</span> <span class="err">alloc]</span> <span class="py">initWithRootViewController</span><span class="p">:</span><span class="n">rootViewController</span><span class="p">];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">self.window.rootViewController</span> <span class="err">=</span> <span class="err">navigationController;</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">配置应用的AppId</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err"> </span> <span class="err"> </span> <span class="err">重要：必须先在支付宝开放平台申请您的AppId才能正常使用支付宝社交分享功能</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err"> </span> <span class="err"> </span> <span class="err">Demo中的AppId，使用xxxxxxxxxx代替</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[APOpenAPI</span> <span class="py">registerApp</span><span class="p">:</span><span class="err">@</span><span class="s1">"xxxxxxxxxx"</span><span class="p">];</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">return</span> <span class="err">YES;</span>
+<span class="p">}</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">application</span><span class="o">:(</span><span class="nt">UIApplication</span> <span class="o">*)</span><span class="nt">application</span> <span class="nt">openURL</span><span class="o">:(</span><span class="nt">NSURL</span> <span class="o">*)</span><span class="nt">url</span> <span class="nt">sourceApplication</span><span class="o">:(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">sourceApplication</span> <span class="nt">annotation</span><span class="o">:(</span><span class="nt">id</span><span class="o">)</span><span class="nt">annotation</span>
+<span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">处理支付宝通过URL启动App时传递的数据</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">return</span> <span class="err">[APOpenAPI</span> <span class="py">handleOpenURL</span><span class="p">:</span><span class="nb">url</span> <span class="n">delegate</span><span class="p">:</span><span class="n">self</span><span class="p">];</span>
+<span class="p">}</span></code></pre></figure>
+<h4 id="步骤5分享数据到支付宝钱包">Step 5: Share data to Alipay Wallet</h4>
+<p>Sending a sharing request mainly consists of two parts:</p>
+<ul>
+<li>Assemble an APMediaMessage object.</li>
+<li>Call the sendReq interface to send it.</li>
+</ul>
+<p>Different types of shared data are distinguished primarily by the mediaObject within APMediaMessage:</p>
+<ul>
+<li>APShareTextObject: plain-text data</li>
+<li>APShareImageObject: image data</li>
+<li>APShareWebObject: web-page data</li>
+</ul>
+<p>Share plain text.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="err"> </span> <span class="nt">发送文本消息到支付宝</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">sendText</span>
+<span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">创建消息载体</span> <span class="err">APMediaMessage</span> <span class="err">对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">APMediaMessage</span> <span class="err">*message</span> <span class="err">=</span> <span class="err">[[APMediaMessage</span> <span class="err">alloc]</span> <span class="err">init];</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">创建文本类型的消息对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">APShareTextObject</span> <span class="err">*textObj</span> <span class="err">=</span> <span class="err">[[APShareTextObject</span> <span class="err">alloc]</span> <span class="err">init];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">textObj.text</span> <span class="err">=</span> <span class="err">@"此处填充发送到支付宝的纯文本信息";</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">回填</span> <span class="err">APMediaMessage</span> <span class="err">的消息对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">message.mediaObject</span> <span class="err">=</span> <span class="err">textObj;</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">创建发送请求对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">APSendMessageToAPReq</span> <span class="err">*request</span> <span class="err">=</span> <span class="err">[[APSendMessageToAPReq</span> <span class="err">alloc]</span> <span class="err">init];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">填充消息载体对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">request.message</span> <span class="err">=</span> <span class="err">message;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">发送请求</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[APOpenAPI</span> <span class="py">sendReq</span><span class="p">:</span><span class="n">request</span><span class="p">];</span>
+<span class="p">}</span></code></pre></figure>
+<p>Share an image using an image URL.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="err"> </span> <span class="nt">发送图片消息到支付宝</span><span class="o">(</span><span class="nt">图片链接形式</span><span class="o">)</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">sendPhotoByUrl</span>
+<span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">创建消息载体</span> <span class="err">APMediaMessage</span> <span class="err">对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">APMediaMessage</span> <span class="err">*message</span> <span class="err">=</span> <span class="err">[[APMediaMessage</span> <span class="err">alloc]</span> <span class="err">init];</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">创建图片类型的消息对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">APShareImageObject</span> <span class="err">*imgObj</span> <span class="err">=</span> <span class="err">[[APShareImageObject</span> <span class="err">alloc]</span> <span class="err">init];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">imgObj.imageUrl</span> <span class="err">=</span> <span class="err">@"此处填充图片的url链接地址";</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">回填</span> <span class="err">APMediaMessage</span> <span class="err">的消息对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">message.mediaObject</span> <span class="err">=</span> <span class="err">imgObj;</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">创建发送请求对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">APSendMessageToAPReq</span> <span class="err">*request</span> <span class="err">=</span> <span class="err">[[APSendMessageToAPReq</span> <span class="err">alloc]</span> <span class="err">init];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">填充消息载体对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">request.message</span> <span class="err">=</span> <span class="err">message;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">发送请求</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[APOpenAPI</span> <span class="py">sendReq</span><span class="p">:</span><span class="n">request</span><span class="p">];</span>
+<span class="p">}</span></code></pre></figure>
+<p>Share an image using image data.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="err"> </span> <span class="nt">发送图片消息到支付宝</span><span class="o">(</span><span class="nt">图片数据形式</span><span class="o">)</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">sendPhotoByData</span>
+<span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">创建消息载体</span> <span class="err">APMediaMessage</span> <span class="err">对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">APMediaMessage</span> <span class="err">*message</span> <span class="err">=</span> <span class="err">[[APMediaMessage</span> <span class="err">alloc]</span> <span class="err">init];</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">创建图片类型的消息对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">APShareImageObject</span> <span class="err">*imgObj</span> <span class="err">=</span> <span class="err">[[APShareImageObject</span> <span class="err">alloc]</span> <span class="err">init];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">此处填充图片data数据,例如</span> <span class="err">UIImagePNGRepresentation(UIImage对象)</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">此处必须填充有效的image</span> <span class="err">NSData类型数据，否则无法正常分享</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">imgObj.imageData</span> <span class="err">=</span> <span class="err">nil;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">回填</span> <span class="err">APMediaMessage</span> <span class="err">的消息对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">message.mediaObject</span> <span class="err">=</span> <span class="err">imgObj;</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">创建发送请求对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">APSendMessageToAPReq</span> <span class="err">*request</span> <span class="err">=</span> <span class="err">[[APSendMessageToAPReq</span> <span class="err">alloc]</span> <span class="err">init];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">填充消息载体对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">request.message</span> <span class="err">=</span> <span class="err">message;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">发送请求</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[APOpenAPI</span> <span class="py">sendReq</span><span class="p">:</span><span class="n">request</span><span class="p">];</span>
+<span class="p">}</span></code></pre></figure>
+<p>Share a web page using a thumbnail URL.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="err"> </span> <span class="nt">发送网页消息到支付宝</span><span class="o">(</span><span class="nt">缩略图链接形式</span><span class="o">)</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">sendWebByUrl</span>
+<span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">创建消息载体</span> <span class="err">APMediaMessage</span> <span class="err">对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">APMediaMessage</span> <span class="err">*message</span> <span class="err">=</span> <span class="err">[[APMediaMessage</span> <span class="err">alloc]</span> <span class="err">init];</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">message.title</span> <span class="err">=</span> <span class="err">@"此处填充网页标题";</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">message.desc</span> <span class="err">=</span> <span class="err">@"此处填充网页简要内容";</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">message.thumbUrl</span> <span class="err">=</span> <span class="err">@"此处填充缩略图的url链接地址";</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">创建网页类型的消息对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">APShareWebObject</span> <span class="err">*webObj</span> <span class="err">=</span> <span class="err">[[APShareWebObject</span> <span class="err">alloc]</span> <span class="err">init];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">webObj.wepageUrl</span> <span class="err">=</span> <span class="err">@"此处填充网页url链接地址";</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">回填</span> <span class="err">APMediaMessage</span> <span class="err">的消息对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">message.mediaObject</span> <span class="err">=</span> <span class="err">webObj;</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">创建发送请求对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">APSendMessageToAPReq</span> <span class="err">*request</span> <span class="err">=</span> <span class="err">[[APSendMessageToAPReq</span> <span class="err">alloc]</span> <span class="err">init];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">填充消息载体对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">request.message</span> <span class="err">=</span> <span class="err">message;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">发送请求</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[APOpenAPI</span> <span class="py">sendReq</span><span class="p">:</span><span class="n">request</span><span class="p">];</span>
+<span class="p">}</span></code></pre></figure>
+<p>Share a web page using thumbnail data.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="err"> </span> <span class="nt">发送网页消息到支付宝</span><span class="o">(</span><span class="nt">缩略图链接形式</span><span class="o">)</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">sendWebByData</span>
+<span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">创建消息载体</span> <span class="err">APMediaMessage</span> <span class="err">对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">APMediaMessage</span> <span class="err">*message</span> <span class="err">=</span> <span class="err">[[APMediaMessage</span> <span class="err">alloc]</span> <span class="err">init];</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">message.title</span> <span class="err">=</span> <span class="err">@"此处填充网页标题";</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">message.desc</span> <span class="err">=</span> <span class="err">@"此处填充网页简要内容";</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">此处填充缩略图data数据,例如</span> <span class="err">UIImagePNGRepresentation(UIImage对象)</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">此处必须填充有效的image</span> <span class="err">NSData类型数据，否则无法正常分享</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">message.thumbData</span> <span class="err">=</span> <span class="err">nil;</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">创建网页类型的消息对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">APShareWebObject</span> <span class="err">*webObj</span> <span class="err">=</span> <span class="err">[[APShareWebObject</span> <span class="err">alloc]</span> <span class="err">init];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">webObj.wepageUrl</span> <span class="err">=</span> <span class="err">@"此处填充网页url链接地址";</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">回填</span> <span class="err">APMediaMessage</span> <span class="err">的消息对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">message.mediaObject</span> <span class="err">=</span> <span class="err">webObj;</span>
+<span class="err">  </span> <span class="err"> </span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">创建发送请求对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">APSendMessageToAPReq</span> <span class="err">*request</span> <span class="err">=</span> <span class="err">[[APSendMessageToAPReq</span> <span class="err">alloc]</span> <span class="err">init];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">填充消息载体对象</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">request.message</span> <span class="err">=</span> <span class="err">message;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">发送请求</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">[APOpenAPI</span> <span class="py">sendReq</span><span class="p">:</span><span class="n">request</span><span class="p">];</span>
+<span class="p">}</span></code></pre></figure>
+<blockquote>
+<p> 
+<strong>Note</strong>
+For images and web-page thumbnails, you can use either an image URL or image data.
+Within Alipay, <code class="language-plaintext highlighter-rouge">优先</code> use image data.</p>
+</blockquote>
+<h4 id="步骤6-响应自支付宝返回的分享处理结果">Step 6: Handle the sharing result returned by Alipay</h4>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="c">/*
+ *  收到一个来自支付宝的请求，第三方应用程序处理完后调用sendResp向支付宝发送结果
+ *
+ *  入参
+ *      req : 支付宝向第三方发来的请求类
+ */</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">onReq</span><span class="o">:(</span><span class="nt">APBaseReq</span><span class="o">*)</span><span class="nt">req</span>
+<span class="p">{}</span>
+<span class="c">/*
+ *  第三方应用程序发送一个sendReq后，收到支付宝的响应结果
+ *
+ *  入参
+ *      resp : 第三方应用收到的支付宝的响应结果类，目前支持的类型包括 APSendMessageToAPResp(分享消息)
+ */</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">onResp</span><span class="o">:(</span><span class="nt">APBaseResp</span><span class="o">*)</span><span class="nt">resp</span>
+<span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">// </span> <span class="err">Demo内主要是将响应结果通过alert的形式反馈出来，第三方应用可以根据</span> <span class="err">errCode</span> <span class="err">进行相应的处理。</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">NSString</span> <span class="err">*title</span> <span class="err">=</span> <span class="err">nil;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">NSString</span> <span class="err">*message</span> <span class="err">=</span> <span class="err">nil;</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err">if</span> <span class="err">(resp.errCode</span> <span class="err">==</span> <span class="err">APSuccess)</span> <span class="err">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">title</span> <span class="err">=</span> <span class="err">@"成功";</span>
+<span class="err"> </span> <span class="err"> </span> <span class="p">}</span> <span class="nt">else</span> <span class="p">{</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">title</span> <span class="err">=</span> <span class="err">@"失败";</span>
+<span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span> <span class="err">message</span> <span class="err">=</span> <span class="err">[NSString</span> <span class="py">stringWithFormat</span><span class="p">:</span><span class="err">@</span><span class="s1">"%@(%d)"</span><span class="p">,</span> <span class="n">resp</span><span class="p">.</span><span class="n">errStr</span><span class="p">,</span> <span class="n">resp</span><span class="p">.</span><span class="n">errCode</span><span class="p">];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="p">}</span>
+<span class="err"> </span> <span class="err"> </span> <span class="nt">UIAlertView</span> <span class="o">*</span><span class="nt">alert</span> <span class="o">=</span> <span class="o">[[</span><span class="nt">UIAlertView</span> <span class="nt">alloc</span><span class="o">]</span> <span class="nt">initWithTitle</span><span class="nd">:title</span> <span class="nt">message</span><span class="nd">:message</span> <span class="nt">delegate</span><span class="nd">:nil</span> <span class="nt">cancelButtonTitle</span><span class="o">:@</span><span class="s1">"确定"</span> <span class="nt">otherButtonTitles</span><span class="nd">:nil</span><span class="o">];</span>
+<span class="err"> </span> <span class="err"> </span> <span class="o">[</span><span class="nt">alert</span> <span class="nt">show</span><span class="o">];</span>
+<span class="err">}</span></code></pre></figure>
+<hr/>
+<h3 id="14-判断当前设备是否支持分享">1.4 Determine whether the current device supports sharing</h3>
+<p>Alipay Wallet supports sharing starting with version 9.0. The api provides an interface to determine whether the current device supports sharing to Alipay Wallet.</p>
+<ul>
+<li>[1] Determine whether Alipay Wallet is installed on the current device.</li>
+</ul>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="c">/*! @brief 检查支付宝是否已被用户安装
+ *
+ * @return 支付宝已安装返回YES，未安装返回NO。
+ */</span>
+<span class="o">+(</span><span class="nt">BOOL</span><span class="o">)</span> <span class="nt">isAPAppInstalled</span><span class="o">;</span></code></pre></figure>
+<ul>
+<li>[2] Determine whether the current device supports sharing to Alipay (Alipay is installed &amp;&amp; its version supports sharing).</li>
+</ul>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="c">/*! @brief 判断当前支付宝的版本是否支持OpenApi
+ *
+ * @return 支持返回YES，不支持返回NO。
+ */</span>
+<span class="o">+(</span><span class="nt">BOOL</span><span class="o">)</span> <span class="nt">isAPAppSupportOpenApi</span><span class="o">;</span></code></pre></figure>
+<ul>
+<li>[3] Obtain the Alipay Wallet download link in the AppStore. If Wallet is not installed, use this link to take the user to its installation page.</li>
+</ul>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="c">/*! @brief 获取支付宝的itunes安装地址
+ *
+ * @return 支付宝的安装地址字符串。
+ */</span>
+<span class="o">+(</span><span class="nt">NSString</span> <span class="o">*)</span> <span class="nt">getAPAppInstallUrl</span><span class="o">;</span></code></pre></figure>
+<p><strong>You can now use all the features of the Alipay sharing SDK.
+Refer to the sample code in the demo for the detailed handling logic.</strong></p>
+<h3 id="ps">PS:<br/></h3>
+<h4 id="最后跟大家说下支付宝里面需要填的bundle-id-必须和项目中的一样哦">Finally, the Bundle ID entered in Alipay must match the one in your project!<br/></h4>
+<h4 id="否则会出现-鉴权失败">Otherwise, authentication will fail.<br/></h4>
+<p><a href="https://github.com/AllLuckly/-iOS_Demo">Download the demo</a><br/></p>
+<h3 id="技术交流群511040024">Technical discussion group: 511040024<br/></h3>
+<p>Recommended reading: <a href="/en/journal/2015-10-19-ios-9-3d-touch-quick-actions-with-a-swift-update/">The new iOS9 feature: implementing 3D Touch is so easy</a>
+<br/></p>
+<p>Copyright ©Bison. Reproduction without permission is prohibited.<br/></p>
+
+{% endraw %}

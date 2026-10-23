@@ -1,0 +1,464 @@
+---
+layout: null
+permalink: /投稿/tuogao17/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: Swift2.0之CoreText排版神器(续)
+agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao17
+agent_source_sha256: 21139e0fa501985df0fe659801596164d38bb0c7c2bf3b32108b33588eb9750b
+agent_generator_version: 1
+---
+{% raw %}# Swift2.0之CoreText排版神器(续)
+
+语言：zh-CN
+原文：[Swift2.0之CoreText排版神器(续)](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao17>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao17>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-02-05-core-text-layout-in-swift-2-0-continued/>)
+发布于: 2016-02-05T00:00:00+08:00
+内容更新于: 2016-02-05T00:00:00+08:00
+署名：大石头布
+
+在 Core Text 基础排版之上，分析基线、上升部和下降部等字体度量，逐行绘制统一中文与 emoji 的行高，再扩展链接与提及识别等富文本交互。
+
+原文署名大石头布，Bison 编辑收录。
+
+[原文所列来源](<http://www.jianshu.com/p/e52a38e60e7c>)
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。标题明确面向 Swift 2.0，保留当时的 Core Text 示例语法。
+
+编辑：[Bison](<https://allluckly.cn/>)  
+ 投稿：[大石头布](<http://www.jianshu.com/p/e52a38e60e7c>)
+
+> "本篇是续上篇 [Swift2.0之CoreText排版神器长篇高能)](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao14>) ，没看上篇基础篇的建议从上篇看起.:"
+
+上篇我们介绍了NSAttributeString属性字和CoreText的简单使用，以及简单的图文混排。这节我们使用CoreText来解决些其他问题。
+
+先来看一副图
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao17/1.jpg>)
+
+如图，Origin那块是基线相当于原点，descent是向下的 一般是负值，ascent是正值，还有lineHeight和capHeight还有x-height都在图中标出，那在代码中如何获取这些值呢？
+
+```
+let font = UIFont.systemFontOfSize(14)
+print(font.descender)       //-3.376953125
+print(font.ascender)        //13.330078125
+print(font.lineHeight)      //16.70703125
+print(font.capHeight)       //9.8642578125
+print(font.xHeight)         //7.369140625
+print(font.leading)         //0.0
+```
+
+这里定义一个14号的文字 取出对应的各个值。这些都是只读的
+
+纯文本排版的时候会有一些细节问题，我们先来绘制一个带有中文，英文，数字以及emoji表情的文本看看效果。
+
+未处理前的绘制
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao17/2.png>)
+
+可以看出在含有emoji的那几行占有的高度会比较高，空隙比较大。所以如果按boundingRectWithSize 根据字体大小和宽度来计算文本高度的方法就不行了，而且这样排版看起来也不是很美观，这样我们就不能直接用CTFrameDraw来绘制了，可能需要给定行高，一行一行绘制 ，使用CTLineDraw 。
+
+首先我们需要计算出文字所占的Size.
+
+```
+let SCREEN_WIDTH:CGFloat = UIScreen.mainScreen().bounds.size.width  //屏幕宽度
+/**
+计算Size
+
+- parameter txt: 文本
+
+- returns: size
+*/
+func sizeForText(mutableAttrStr:NSMutableAttributedString)->CGSize{
+    //创建CTFramesetterRef实例
+    let frameSetter = CTFramesetterCreateWithAttributedString(mutableAttrStr)
+
+    // 获得要绘制区域的高度
+    let restrictSize = CGSizeMake(SCREEN_WIDTH-20, CGFloat.max)
+    let coreTextSize = CTFramesetterSuggestFrameSizeWithConstraints(frameSetter, CFRangeMake(0, 0) , nil, restrictSize, nil)
+    return coreTextSize
+} <br>
+```
+
+很简单 ，根据属性字得到framesetter 然后再根据framesetter计算出所占的size。
+
+得到size后要怎么操作呢?
+
+这块我贴下所有代码 注释很详细
+
+```
+import UIKit
+
+class CTextView: UIView {
+
+    let SCREEN_WIDTH:CGFloat = UIScreen.mainScreen().bounds.size.width  //屏幕宽度
+    let SCREEN_HEIGHT:CGFloat = UIScreen.mainScreen().bounds.size.height    //屏幕高度
+
+    override func drawRect(rect: CGRect) {
+        super.drawRect(rect)
+
+        // 1 获取上下文
+        let context = UIGraphicsGetCurrentContext()
+
+        // 2 转换坐标
+        CGContextSetTextMatrix(context, CGAffineTransformIdentity)
+        CGContextTranslateCTM(context, 0, self.bounds.size.height)
+        CGContextScaleCTM(context, 1.0, -1.0)
+
+        // 3 绘制区域
+        let path = UIBezierPath(rect: rect)
+
+        // 4 创建需要绘制的文字
+        let attrString = "来一段数字,文本emoji的哈哈哈29993002-309-sdflslsfl是电话费卡刷卡来这来一段数字,文本emoji的哈哈哈29993002-309-sdflslsfl是电话费卡刷卡来这来一段数字,文本emoji的哈哈哈29993002-309-sdflslsfl是电话费卡刷卡来这来一段数字,文本emoji的哈哈哈29993002-309-兰emoji👿😊😊😊😊😊😊😊😊😊😊水电费洛杉矶大立科技😊😊😊😊😊😊😊索拉卡叫我😊😊😊😊😊sljwolw19287812来一段数字,文本emoji的哈哈哈29993002-309-sdflslsfl是电话费卡刷卡来这来一段数字,文本emoji的哈哈哈29993002-309-sdflslsfl是电话费卡刷卡来这来一段数字,文本emoji的哈哈哈29993002-309-sdflslsfl是电话费卡刷卡来这来一段数字,文本emoji的哈哈哈29993002-309-sdflslsfl是电话费卡刷卡来这"
+
+        // 5 设置frame
+        let mutableAttrStr = NSMutableAttributedString(string: attrString)
+        let framesetter = CTFramesetterCreateWithAttributedString(mutableAttrStr)
+        let frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, mutableAttrStr.length), path.CGPath, nil)
+
+        // 6 取出CTLine 准备一行一行绘制
+        let lines = CTFrameGetLines(frame)
+        let lineCount = CFArrayGetCount(lines)
+
+
+        var lineOrigins:[CGPoint] = Array(count:lineCount,repeatedValue:CGPointZero)
+
+        //把frame里每一行的初始坐标写到数组里，注意CoreText的坐标是左下角为原点
+        CTFrameGetLineOrigins(frame, CFRangeMake(0, 0),&lineOrigins)
+        //获取属性字所占的size
+        let size = sizeForText(mutableAttrStr)
+        let height = size.height
+
+        let font = UIFont.systemFontOfSize(14)
+        var frameY:CGFloat = 0
+        // 计算每行的高度 (总高度除以行数)
+        let lineHeight = height/CGFloat(lineCount)
+        for i in 0..<lineCount{
+
+            let lineRef = unsafeBitCast(CFArrayGetValueAtIndex(lines,i), CTLineRef.self)
+
+            var lineAscent:CGFloat = 0
+            var lineDescent:CGFloat = 0
+            var leading:CGFloat = 0
+            //该函数除了会设置好ascent,descent,leading之外，还会返回这行的宽度
+            CTLineGetTypographicBounds(lineRef, &lineAscent, &lineDescent, &leading)
+
+            var lineOrigin = lineOrigins[i]
+
+            //计算y值(注意左下角是原点)
+            frameY = height - CGFloat(i + 1)*lineHeight - font.descender
+            //设置Y值
+            lineOrigin.y = frameY
+
+            //绘制
+            CGContextSetTextPosition(context,lineOrigin.x, lineOrigin.y)
+            CTLineDraw(lineRef, context!)
+
+            //调整坐标
+            frameY = frameY - lineDescent
+        }
+        //
+        //        CTFrameDraw(frame,context!)
+    }
+
+    /**
+    计算Size
+
+    - parameter txt: 文本
+
+    - returns: size
+    */
+    func sizeForText(mutableAttrStr:NSMutableAttributedString)->CGSize{
+        //创建CTFramesetterRef实例
+        let frameSetter = CTFramesetterCreateWithAttributedString(mutableAttrStr)
+
+        // 获得要绘制区域的高度
+        let restrictSize = CGSizeMake(SCREEN_WIDTH-20, CGFloat.max)
+        let coreTextSize = CTFramesetterSuggestFrameSizeWithConstraints(frameSetter, CFRangeMake(0, 0) , nil, restrictSize, nil)
+        return coreTextSize
+        }
+
+}
+```
+
+前面5步和前一个小结是一样的，这次拿到CTFrame后我们并没有直接调用CTFrameDraw 来绘制。而是获取所有的CTLine，拿到CTLine后再计算总高度。根据总高度计算每行高度，然后循环CTLine，获取每个Line计算Y指标的值，逐行设置位置然后Draw上去。
+
+```
+CGContextSetTextPosition(context,lineOrigin.x, lineOrigin.y) 
+CTLineDraw(lineRef, context!)
+```
+
+看下对比效果
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao17/3.png>)
+
+左边是直接画的，右边是逐行计算后画的，等高了，看起来不会有层次不齐的感觉了！
+
+下面看看怎么自动识别连接等
+
+> 实现的思路主要是给控件添加手势点击并进行监听，在用户点击时拿到点击的位置，并在手势识别结束后用CoreText遍历每一个CTLine，判断点击的位置是否在识别的特定字符串内，如果是则找出该字符串。使CTLineGetStringIndexForPosition函数来找出点击的字符位于整个字符串的位置。
+
+首先写两个正则来检测文本中的@和链接， 如果您有任何需要检测的都可以添加正则去实现。
+
+```
+//url的正则
+let regex_url = "(http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?"
+
+let regex_someone = "@[^\\s@]+?\\s{1}"
+```
+
+关于正则表达式，不再本文讨论范围内，自行google….
+
+然后就要根据正则匹配字符串。返回对应的range并且修改属性字的颜色。
+
+```
+//识别特定字符串并改其颜色，返回识别到的字符串所在的range
+func recognizeSpecialStringWithAttributed(attrStr:NSMutableAttributedString)->[NSRange]{
+    // 1
+    var rangeArray = [NSRange]()
+    //识别人名字
+    // 2
+    let atRegular = try? NSRegularExpression(pattern: regex_someone, options: NSRegularExpressionOptions.CaseInsensitive) //不区分大小写的
+    // 3
+    let atResults = atRegular?.matchesInString(attrStr.string, options: NSMatchingOptions.WithTransparentBounds , range: NSMakeRange(0, attrStr.length))
+    // 4
+    for checkResult in atResults!{
+        attrStr.addAttribute(NSForegroundColorAttributeName, value: UIColor.redColor(), range: NSMakeRange(checkResult.range.location, checkResult.range.length))
+        rangeArray.append(checkResult.range)
+    }
+
+
+    //识别链接
+    let atRegular1 = try? NSRegularExpression(pattern: regex_url, options: NSRegularExpressionOptions.CaseInsensitive) //不区分大小写的
+    let atResults1 = atRegular1?.matchesInString(attrStr.string, options: NSMatchingOptions.WithTransparentBounds , range: NSMakeRange(0, attrStr.length))
+
+    for checkResult in atResults1!{
+        attrStr.addAttribute(NSForegroundColorAttributeName, value: UIColor.blueColor(), range: NSMakeRange(checkResult.range.location, checkResult.range.length))
+        rangeArray.append(checkResult.range)
+    }
+
+
+    return rangeArray
+}
+```
+
+我这里就识别了@和链接，大家自行添加，这里为了方便并没有封装，大家可以封装下，使用一个结构体，有NSRange 数组 和type类型 或者字典类型，自由发挥。这里只做识别。稍微解释下代码
+
+1、定义一个数组存放匹配的Range集合
+
+2、根据前面定义的正则创建一个正则表达式对象，这里会抛出异常为了方便，并没有处理。option这里使用了CaseInsensitive不区分大小写。还有很多别的选项。直接command+点击看。
+
+3、拿到匹配的结果集，包含range属性(我们需要的)
+
+4、循环添加到数组，并给这个range的字符修改颜色属性。
+
+解析方法准备好之后就可以开始绘制了，和前面的大同小异
+
+```
+let SCREEN_WIDTH:CGFloat = UIScreen.mainScreen().bounds.size.width  //屏幕宽度
+let SCREEN_HEIGHT:CGFloat = UIScreen.mainScreen().bounds.size.height    //屏幕高度
+
+
+var lineHeight:CGFloat = 0
+var ctFrame:CTFrameRef?
+
+var spcialRanges = [NSRange]()
+
+//url的正则
+let regex_url = "(http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?"
+
+let regex_someone = "@[^\\s@]+?\\s{1}"
+
+let str = "来一段数 @sd圣诞节 字,文本emoji的哈哈哈29993002-309-sdflslsfl是电话费卡刷卡来这来一段数字,文本emoji的哈哈哈29993002-309-sdflslsfl http://www.baidu.com 是电话费卡刷卡来这来一段数字,文本emoji http://www.zuber.im 的哈哈哈29993002-309-sdflslsfl是电话费卡 @kakakkak 刷卡来这来一段数字,文本emoji的哈哈哈29993002-309-兰emoji👿😊😊😊😊😊😊😊😊😊😊水电费洛杉矶大立科技😊😊😊😊😊😊😊索拉卡叫我😊😊😊😊😊sljwolw19287812来一段数字,文本emoji的哈哈哈29993002-309-sdflslsfl是电话费卡刷卡来这来一段数字,文本emoji的哈哈哈29993002-309-sdflslsfl是电话费卡刷卡来这来一段数字,文本emoji的哈哈哈29993002-309-sdflslsfl是电话费卡刷卡来这来一段数字,文本emoji的哈哈哈29993002-309-sdflslsfl是电话费卡刷卡来这"
+var pressRange:NSRange?
+var mutableAttrStr:NSMutableArray!
+var selfHeight:CGFloat = 0
+
+override func drawRect(rect: CGRect) {
+    super.drawRect(rect)
+    // 1 获取上下文
+    let context = UIGraphicsGetCurrentContext()
+
+    // 2 转换坐标
+    CGContextSetTextMatrix(context, CGAffineTransformIdentity)
+    CGContextTranslateCTM(context, 0, self.bounds.size.height)
+    CGContextScaleCTM(context, 1.0, -1.0)
+
+    // 3 绘制区域
+    let path = UIBezierPath(rect: rect)
+
+    // 4 创建需要绘制的文字
+
+
+    // 5 设置frame
+    let mutableAttrStr = NSMutableAttributedString(string: str)
+    // 获取特殊字符range 绘制特殊字符
+    self.spcialRanges = recognizeSpecialStringWithAttributed(mutableAttrStr)
+
+    let framesetter = CTFramesetterCreateWithAttributedString(mutableAttrStr)
+    ctFrame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, mutableAttrStr.length), path.CGPath, nil)
+
+    // 6 取出CTLine 准备一行一行绘制
+    let lines = CTFrameGetLines(ctFrame!)
+    let lineCount = CFArrayGetCount(lines)
+
+
+    var lineOrigins:[CGPoint] = Array(count:lineCount,repeatedValue:CGPointZero)
+
+    //把frame里每一行的初始坐标写到数组里，注意CoreText的坐标是左下角为原点
+    CTFrameGetLineOrigins(ctFrame!, CFRangeMake(0, 0),&lineOrigins)
+    //获取属性字所占的size
+    let size = sizeForText(mutableAttrStr)
+    let height = size.height
+    //        self.frame.size.height = height
+
+    let font = UIFont.systemFontOfSize(14)
+    var frameY:CGFloat = 0
+    // 计算每行的高度 (总高度除以行数)
+    lineHeight = height/CGFloat(lineCount)
+    for i in 0..<lineCount{
+
+        let lineRef = unsafeBitCast(CFArrayGetValueAtIndex(lines,i), CTLineRef.self)
+
+        var lineAscent:CGFloat = 0
+        var lineDescent:CGFloat = 0
+        var leading:CGFloat = 0
+        //该函数除了会设置好ascent,descent,leading之外，还会返回这行的宽度
+        CTLineGetTypographicBounds(lineRef, &lineAscent, &lineDescent, &leading)
+
+        var lineOrigin = lineOrigins[i]
+
+        //计算y值(注意左下角是原点)
+        frameY = height - CGFloat(i + 1)*lineHeight - font.descender
+        //设置Y值
+        lineOrigin.y = frameY
+
+        //绘制
+        CGContextSetTextPosition(context,lineOrigin.x, lineOrigin.y)
+        CTLineDraw(lineRef, context!)
+
+        //调整坐标
+        frameY = frameY - lineDescent
+    }
+}
+```
+
+这段代码和之前差不多，只不过把一些变量放在外面定义以便别的方法使用。还有就是加上了那个解析的方法
+
+```
+self.spcialRanges = recognizeSpecialStringWithAttributed(mutableAttrStr)
+```
+
+在ViewController中调用
+
+```
+let ctURLView = CTURLView()
+ctURLView.frame = CGRectMake(10, 100, self.view.bounds.width - 20, 300)
+ctURLView.backgroundColor = UIColor.grayColor()
+let mutableAttrStr = NSMutableAttributedString(string: ctURLView.str)
+let size = ctURLView.sizeForText(mutableAttrStr)
+ctURLView.frame.size = size
+self.view.addSubview(ctURLView)
+```
+
+这边要先计算下size
+
+看下效果  
+ ![1](<https://allluckly.cn/images/blog/tuogao/tougao17/4.png>)
+
+不错吧 并没有多少代码就识别出来了，下面看看处理点击事件
+
+首先注册一个tap手势并设置下代理
+
+```
+override init(frame: CGRect) {
+    super.init(frame: frame)
+    //添加手势
+    let tap = UITapGestureRecognizer(target: self, action: "tap:")
+    tap.delegate = self
+    self.addGestureRecognizer(tap)
+}
+```
+
+然后实现手势方法和代理
+
+```
+extension CTURLView:UIGestureRecognizerDelegate{
+
+    func tap(gesture:UITapGestureRecognizer){
+
+        if gesture.state == .Ended{
+            let nStr = self.str as NSString
+            let pressStr = nStr.substringWithRange(self.pressRange!)
+            print(pressStr)
+        }
+    }
+
+    override func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+        //点击处在特定字符串内才进行识别
+        var gestureShouldBegin = false
+        // 1
+        let location = gestureRecognizer.locationInView(self)
+
+        // 2
+        let lineIndex = Int(location.y/lineHeight)
+
+        print("你点击了第\(lineIndex)行")
+
+        // 3 把点击的坐标转换为CoreText坐标系下
+        let clickPoint = CGPointMake(location.x, lineHeight-location.y)
+
+        let lines = CTFrameGetLines(self.ctFrame!);
+        let lineCount = CFArrayGetCount(lines)
+        if lineIndex < lineCount{
+
+        let clickLine =  unsafeBitCast(CFArrayGetValueAtIndex(lines,lineIndex), CTLineRef.self)
+        // 4 点击的index
+        let startIndex = CTLineGetStringIndexForPosition(clickLine, clickPoint)
+
+        print("strIndex = \(startIndex)")
+        // 5
+        for range in self.spcialRanges{
+
+            if startIndex >= range.location && startIndex <= range.location + range.length{
+
+                gestureShouldBegin = true
+                self.pressRange = range
+                print(range)
+
+            }   
+          }
+       }
+        return gestureShouldBegin
+    }
+}
+```
+
+gestureRecognizerShouldBegin是一个代理方法，在这个方法中来检测特殊字符串
+
+1、拿到触摸点在当前view的位置
+
+2、根据y值和行高的比获取line编号，lineHeight是一个全局变量。可以下载本文实例代码对照看
+
+3、转成CoreText下坐标
+
+4、获取字符的index
+
+5、循环特殊字符的range查看index是否在range中 如果在range中 把当前按下的range赋值为此range，打印出来。
+
+这时候 在tap方法中取出这个range对应的字符串 打印出来，如果要处理对应事件。也可在tap这里处理
+
+来看下
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao17/5.gif>)
+
+CoreText 能做的不止这些希望大家这两篇文章可以带大家了解CoreText，不再惧怕使用底层的API。
+
+本文实例代码已上传github: [https://github.com/smalldu/ZZCoreTextDemo](<https://github.com/smalldu/ZZCoreTextDemo>)
+
+---
+
+好文推荐：[iOS开发之详解连连支付集成](<https://allluckly.cn/ios%E6%94%AF%E4%BB%98/lianlianzhifu>)
+{% endraw %}

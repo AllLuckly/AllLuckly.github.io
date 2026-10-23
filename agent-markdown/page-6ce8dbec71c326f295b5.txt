@@ -1,0 +1,110 @@
+---
+layout: null
+permalink: /投稿/tougao58/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发之百度外卖APP个人中心头像<浪>起来的动画效果
+agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao58
+agent_source_sha256: 6924462ec7cccc0c9855917499f7b324a9b623b9478be5b68483f17fe10b40dc
+agent_generator_version: 1
+---
+{% raw %}# iOS开发之百度外卖APP个人中心头像\<浪\>起来的动画效果
+
+语言：zh-CN
+原文：[iOS开发之百度外卖APP个人中心头像\<浪\>起来的动画效果](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao58>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao58>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-09-09-recreating-the-profile-avatar-wave-animation-in-baidu-waimai/>)
+发布于: 2016-09-09T00:00:00+08:00
+内容更新于: 2016-09-09T00:00:00+08:00
+署名：乔同X
+
+拆解个人中心头像周围的波浪效果，利用 CADisplayLink 驱动刷新、三角函数生成曲线，再交给 CAShapeLayer 绘制，说明连续波形动画所需的组成部分。
+
+原文署名乔同X，Bison 编辑收录。
+
+[原文所列来源](<http://qiaotongxin.cc/2016/08/22/20160822/>)
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。涉及的 API、依赖和工具版本请结合发表日期阅读。
+
+作为一个中午下班不肯离开工作岗位且勤奋工作的骚年来说,叫外卖就成了不可或缺的习惯.某日瞬间发现百度外卖的APP波浪效果很是吸引人.相比较其他的外卖APP,颜值略高些.(淘宝也有波浪的效果),遂就思考如何实现这种”浪”的效果.
+
+编辑：[Bison](<https://allluckly.cn/>)  
+ 来源：[乔同X的博客](<http://qiaotongxin.cc/2016/08/22/20160822/>)
+
+## 效果演示
+
+百度外卖 波浪效果图:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao58/1.gif>)
+
+## 你需要知道的
+
+## CADisplayLink
+
+简单的说就是一定时器,其根本利用刷帧和屏幕频率一样来重绘渲染页面. 其创建方式:
+
+```
+CADisplayLink *timer = [CADisplayLink displayLinkWithTarget:self selector:@selector(wave)];
+[timer addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+```
+
+## CAShapeLayer
+
+CALayer的子类,通常结合CGPath来绘制图形.
+
+其创建方式:
+
+```
+CAShapeLayer *Layer = [CAShapeLayer layer];
+Layer.frame =  self.bounds;
+Layer.fillColor = self.realWaveColor.CGColor;
+Layer...等属性
+[self.view.layer addSublayer:Layer];
+```
+
+### 其优点
+
+- 渲染效率高渲染快速。CAShapeLayer使用了硬件加速，绘制同一图形会比用Core Graphics快很多。
+- 高效使用内存。一个CAShapeLayer不需要像普通CALayer一样创建一个寄宿图形，所以无论有多大，都不会占用太多的内存。
+- 不会被图层边界剪裁掉。一个CAShapeLayer可以在边界之外绘制。你的图层路径不会像在使用Core Graphics的普通CALayer一样被剪裁掉。
+- 不会出现像素化。当你给CAShapeLayer做3D变换时，它不像一个有寄宿图的普通图层一样变得像素化。
+
+## 三角函数
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao58/2.png>)
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao58/3.png>)
+
+## 思路实现
+
+```
+UIView –> 2个CAShapeLayer –> imageView.frame.orgin.y调整
+```
+
+## 主要代码实现
+
+### 属性方法
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao58/4.png>)
+
+### 实现
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao58/5.png>)
+
+### 调用
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao58/6.png>)
+
+### 终
+
+最后效果:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao58/7.gif>)
+
+[Demo地址](<https://github.com/Josin22/JSWave>)
+
+---
+
+好文推荐：[分分钟解决iOS开发中App启动动画广告的功能](<https://allluckly.cn/lblaunchimagead/LBLaunchImageAd>)
+{% endraw %}

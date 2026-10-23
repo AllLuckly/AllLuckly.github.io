@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /en/guides/nasbook-calibre-database/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Read a Calibre database in Book Isle: metadata.db and book paths'
+agent_source_url: https://allluckly.cn/en/guides/nasbook-calibre-database/
+agent_source_sha256: 5b57da42a5499502a0e4e01b691b1298cf3f1d9a91819034491bd9316f1103d3
+agent_generator_version: 1
+---
+{% raw %}# Read a Calibre database in Book Isle: metadata.db and book paths
+
+Language: en
+Canonical: [Read a Calibre database in Book Isle: metadata.db and book paths](<https://allluckly.cn/en/guides/nasbook-calibre-database/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/nasbook-calibre-database/>)
+English: [English HTML](<https://allluckly.cn/en/guides/nasbook-calibre-database/>)
+Published: 2026-10-23T00:00:00+08:00
+Modified: 2026-10-23T10:34:08+08:00
+Author: Bison
+
+Access Calibre metadata.db through a NAS, understand the database, library root and relative book paths, and avoid successful catalogue sync with inaccessible book downloads.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/nasbook-calibre-database/>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+Calibre's `metadata.db` stores library metadata, but it is not one file containing every ebook. Book Isle can read this structure through a NAS connection and retrieve individual books as needed. Correct setup preserves the original relative relationships among the database and the author, title, and format files it references.
+
+## First confirm that you have the complete library
+
+Find the Calibre library root on the NAS. It normally contains `metadata.db` and subdirectories organized by author and book. Confirm that this directory comes from your own Calibre library and that the database and ebook files belong to the same valid backup or a currently consistent state. Copying only the database does not bring book content with it.
+
+Do not manually rename internal folders for neatness or move every EPUB from its subdirectory to the root while expecting old paths to remain valid. Calibre's database records file locations, so arbitrary external rearrangement can break those relationships. Test with a small backed-up library copy first rather than moving files in your only master library.
+
+## Establish a readable NAS connection first
+
+Configure WebDAV or SMB in Book Isle's NAS Connections and confirm that you can enter the Calibre root and see the database plus at least one book file. This step only verifies reading; do not grant unnecessary write permissions for importing. The relevant NAS and Calibre features require Collector Pro. Diagnose server permissions separately from membership status.
+
+Note the library root's path relative to the connection's starting location. For example, if the connection already starts at `Books`, and the Calibre library is in its `Calibre Library`, follow the current form's path rules to avoid entering `Books` twice. Spaces in a path do not automatically indicate an error; what matters is matching the actual remote directory.
+
+## Add a Calibre library using the NAS database source type
+
+Go to Settings → Calibre Libraries, add a library, and select the source type for NAS metadata.db. Enter a recognizable name and library path, then choose the NAS connection you just verified. This normally needs the directory containing the database, not an arbitrary ebook path. Check the path example shown by the interface.
+
+Save and run synchronization, waiting for metadata reading to finish. If the linked NAS connection is missing, restore it or select a valid one first. For an invalid path, browse the NAS directory by directory. Do not repeatedly rename the database before confirming the path. The app needs the correct structure, not a name that looks more like a library.
+
+## Verify path relationships with one book
+
+After synchronization, browse the catalog and find a book whose location you know. Check its author, title, and format, then download it, wait for import to finish, and open the text. If the catalog displays but the file cannot be retrieved, first compare database-relative paths with the actual NAS files rather than immediately assuming database parsing failed.
+
+For example, the database may reference an EPUB under an author's directory that you later renamed outside Calibre. Metadata may still display normally while downloading fails to locate the file. Repair the structure through Calibre management or a complete backup process, then synchronize again. Pointing a missing path to a different same-title book creates a more concealed content error.
+
+## Keep the database and files consistent when updating
+
+After adding or moving books in desktop Calibre, use your synchronization or backup process to update both the database and files completely on the NAS, then refresh Book Isle. Do not update only the database and omit new books, or copy only book files without their metadata. These incomplete updates can produce books listed but unopenable, or files present but missing from the catalog.
+
+If copying is still underway, do not rush to refresh a large library. Wait until the destination directory is stable, synchronize, and inspect one newly added book. Protect reading records separately too. Recreating libraries, deleting old records, and replacing databases are not lightweight refresh actions. Keep originals and important notes beforehand instead of combining several operations.
+
+## Verify metadata synchronization and local downloads separately
+
+By the end, verify three things: the catalog lists the correct books, a chosen book downloads and opens, and downloaded content remains readable offline. Each proves a different scope; a synchronization-success message cannot replace the last two checks. A thousand remote books do not require a thousand files on the phone. On-demand downloading suits limited device storage.
+
+Library tags and authors help with discovery, but do not guarantee that every field stays identical in both directions between the phone and Calibre. After obtaining books through the NAS database method, maintain the Calibre catalog in its original management tool. Reading progress has its own synchronization entry point. Configure Book Isle's reading-data synchronization separately to continue across two devices.
+
+## Frequently asked questions
+
+**Why can I see covers or titles after uploading only metadata.db but cannot read?** The database mainly describes the library; book contents remain in linked files. Put the complete library directory on the NAS with its original structure, then check paths and permissions to enable actual downloading.
+
+**Can I reorganize the directories into my preferred category tree?** Do not manually rename items directly inside Calibre's managed structure. Use Calibre metadata or Book Isle tags for classification. If files genuinely need reorganizing, use an appropriate management process, retain a backup, and verify database references afterward.
+
+**Is this better than Content Server?** It suits an existing complete library on a NAS. Content Server suits a running Calibre service that supplies catalogs and files. Choose according to your existing deployment, not simply which option requires one fewer address field.
+
+## Continue with
+
+For the server-based approach, see [Calibre Content Server](<https://allluckly.cn/en/guides/nasbook-calibre-server/>); if the network share is not configured yet, first read [Private SMB library](<https://allluckly.cn/en/guides/nasbook-smb-library/>) or [Private WebDAV library](<https://allluckly.cn/en/guides/nasbook-webdav-library/>).
+
+## Sources and version
+
+Information checked on October 23, 2026. The public release is Book Isle 1.1.3, requiring iOS / iPadOS 15.6 or later. This guide is based on public feature descriptions and their entry points. Interface labels may change with the version. See [Official App Store description](<https://apps.apple.com/cn/app/id6766198898>) and [Apple release information](<https://itunes.apple.com/lookup?id=6766198898&country=cn>).
+{% endraw %}

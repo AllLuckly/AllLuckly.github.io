@@ -1,0 +1,136 @@
+---
+layout: post
+title: 'Swift 3.0 Design Patterns: Flyweight'
+description: Introduces the flyweight pattern through shared local-data managers. A dictionary reuses loaded data
+  and tracks usage counts; unused data is saved and released. The example contrasts this lifecycle with a singleton
+  that remains in memory.
+category: Development notes
+imagefeature: null
+date: 2016-10-13 00:00:00 +0800
+technical_translation:
+  topic: swift-runtime
+  summary: Introduces the flyweight pattern through shared local-data managers. A dictionary reuses loaded data
+    and tracks usage counts; unused data is saved and released. The example contrasts this lifecycle with a singleton
+    that remains in memory.
+  keywords:
+  - Swift 3.0
+  - flyweight pattern
+  - object reuse
+  - data management
+  - reference counting
+  provenance: contribution
+  author_name: Sindri
+  source_url: http://www.jianshu.com/p/25543ae95293
+  credit: Originally credited to Sindri; edited and archived by Bison.
+  version_note: The title explicitly places this design-pattern tutorial in the context of Swift 3.0.
+  title: 'Swift 3.0 Design Patterns: Flyweight'
+  source_sha256: d1a51071e2d0c27e7f9faf86628900112e3caa0efb6ec296c833d0c02c4df848
+lang: en
+source_path: _posts/2016-10-13-tougao66.md
+source_url: /%E6%8A%95%E7%A8%BF/tougao66
+permalink: /en/journal/2016-10-13-swift-3-0-design-patterns-flyweight/
+translation_method: machine-assisted
+translation_source_sha256: d1a51071e2d0c27e7f9faf86628900112e3caa0efb6ec296c833d0c02c4df848
+excerpt: Introduces the flyweight pattern through shared local-data managers. A dictionary reuses loaded data and
+  tracks usage counts; unused data is saved and released. The example contrasts this lifecycle with a singleton
+  that remains in memory.
+translation_date: '2026-10-23T02:34:15+00:00'
+---
+{% raw %}
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao66/1.png"/><br/></p>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Source: <a href="http://www.jianshu.com/p/25543ae95293">Sindri’s Notes</a><br/></p>
+<p>Design patterns are classified, widely known, repeatedly used solutions distilled from code-design experience. The GoF proposed 23 patterns; this series implements them in Swift.</p>
+<h2 id="概述">Overview</h2>
+<p>A design pattern that shares existing objects to reduce allocation overhead is called Flyweight.</p>
+<p>Flyweight and Singleton resemble twins in appearance but serve different purposes:</p>
+<ul>
+<li>Singleton pattern</li>
+</ul>
+<p>ensures that only one instance of the object occupies memory throughout the application's lifecycle and remains accessible at any time.
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao66/2.jpg"/><br/></p>
+<ul>
+<li>Flyweight pattern</li>
+</ul>
+<p>If a reusable object exists, share it rather than create another.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao66/3.jpg"/><br/></p>
+<p>In iOS development, UITableView's reuse mechanism is a classic Flyweight example: offscreen cells are collected into a reuse queue and reused when a new cell is needed.</p>
+<h2 id="实战">Putting it into practice</h2>
+<p>A recent project required nearly all data to be stored locally. Its modules also needed one another's data. Keeping everything in singletons would consume too much memory simultaneously, so I wrapped data management using the Flyweight approach:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class DataManager {
+    //MARK: - Variable
+    private static var shareStorage = [String: AnyObject]()
+    private var storeKey = "DefaultKey"
+    private var storeData = [AnyObject]()
+    var data: [AnyObject] {
+        get {
+            return storeData
+        }
+    }
+
+    //MARK: - Operate
+    func insert(data: AnyObject) { }
+    func delete(at index: Int) { }
+    func save() { }
+}
+</code></pre></div></div>
+<p>I use the data-model class name as the management key and a private static dictionary to retain data currently in use. Because data is encrypted in the sandbox, reading large amounts from disk is expensive. When creating a data-management object, check for reusable data first and load from disk only if none exists:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class DataManager {
+    init() {
+        initalizeData()
+    }
+
+    init(storeKey: String) {
+        self.storeKey = storeKey
+        initalizeData()
+    }
+
+    private func initalizeData() {
+        if let data = DataManager.shareStorage[storeKey] {
+            storeData = data as! [AnyObject]
+        } else {
+            loadData()
+            DataManager.shareStorage[storeKey] = storeData as AnyObject?
+        }
+    }
+
+    private func loadData() {
+        //  load data from local path
+    }
+}
+</code></pre></div></div>
+<p>Data reuse now works. However, the dictionary cannot retain everything forever; a singleton would then be simpler. I use reference counts so unused data can be saved locally and released:</p>
+<p>class DataManager {</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>deinit {
+    let count = DataManager.shareStorage[countKey()] as! Int
+    if count == 1 {
+        save()
+        DataManager.shareStorage[storeKey] = nil
+    } else {
+        DataManager.shareStorage[countKey()] = (count - 1) as AnyObject?
+    }
+}
+
+private func initalizeData() {
+    if let data = DataManager.shareStorage[storeKey] {
+        let count = DataManager.shareStorage[countKey()] as! Int
+        DataManager.shareStorage[countKey()] = (count + 1) as AnyObject?
+        storeData = data as! [AnyObject]
+    } else {
+        loadData()
+        DataManager.shareStorage[countKey()] = 1 as AnyObject
+        DataManager.shareStorage[storeKey] = storeData as AnyObject?
+    }
+}
+
+private func countKey() -&gt; String {
+    return "\(storeKey)Count"
+} }
+</code></pre></div></div>
+<p>This is only the initial logic. Thread safety and other concerns still need handling; those are not implemented here.</p>
+<h2 id="总结">Summary</h2>
+<p>When I first encountered Flyweight, I found it confusing and struggled to distinguish it from Singleton. Briefly, it retains Singleton's advantages while addressing some disadvantages, but is more complex. In a multithreaded environment, data races can be much more severe and dangerous than with a singleton.</p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

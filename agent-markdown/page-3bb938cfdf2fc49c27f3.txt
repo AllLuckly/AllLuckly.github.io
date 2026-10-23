@@ -1,0 +1,113 @@
+---
+layout: null
+permalink: /投稿/tuogao23/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: Xcode版本更新插件失灵批量解决法
+agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao23
+agent_source_sha256: 620ee036ea7593fbef30892387f4c5369e16b64d6704becc522b171b9ae21119
+agent_generator_version: 1
+---
+{% raw %}# Xcode版本更新插件失灵批量解决法
+
+语言：zh-CN
+原文：[Xcode版本更新插件失灵批量解决法](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao23>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao23>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-02-19-restoring-old-xcode-plug-ins-after-a-version-update/>)
+发布于: 2016-02-19T00:00:00+08:00
+内容更新于: 2016-02-19T00:00:00+08:00
+署名：许漠颜
+
+针对旧版 Xcode 更新后插件无法加载，以及误选 Skip Bundles 的情况，介绍检查兼容 UUID、修改插件 Info.plist 和重置加载选择的历史处理步骤。
+
+原文署名许漠颜，Bison 编辑收录。
+
+[原文所列来源](<http://www.jianshu.com/p/875926697402>)
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。正文比较 Xcode 7.1、7.2 与 7.2.1，针对当时的插件加载机制。
+
+编辑：[Bison](<https://allluckly.cn/>)  
+ 投稿：[许漠颜](<http://www.jianshu.com/p/875926697402>)
+
+> "初出茅里的小虾并没有写过插件所以并不太清楚为什么每次更新的时候插件都不可用的原因。但根据修改的内容猜测可能是因为uuid对应的版本不同导致的，我对比了一个7.1版本的Xcode和7.2版本的uuid确实是不一样的。"
+
+问题：  
+ （1）Xcode更新以后插件不可用。
+
+（2）重新启动Xcode的时候Load Bundles点错Skip Bundles
+
+问题（1）：初出茅里的小虾并没有写过插件所以并不太清楚为什么每次更新的时候插件都不可用的原因。但根据修改的内容猜测可能是因为uuid对应的版本不同导致的，我对比了一个7.1版本的Xcode和7.2版本的uuid确实是不一样的。但是前两天更新过的7.2.1版本和7.2版本的uuid是一样的，结果却是相同的。所以至于是不是uuid的原因我也不知道了。希望有人知道了可以回复我一下。
+
+问题（2）：插件DVTPlugInCompatibilityUUIDs配置好uuid以后，Xcode重启会有Load Bundles和Skip Bundles的选择，只会出现一次。很明显如果你点击了Skip Bundles插件肯定是不可用的状态。
+
+解决的问题（1）：首先打开终端输入命令：
+
+```
+defaults read /Applications/Xcode.app/Contents/Info.plist DVTPlugInCompatibilityUUID
+```
+
+得到uuid。然后我们可以去
+
+```
+~/Library/Application Support/Developer/Shared/Xcode/Plug-ins
+```
+
+目录下寻找到我们要使用的插件－显示包内容－Contents－Info.plist－DVTPlugInCompatibilityUUIDs下添加得到的uuid。
+
+解决的问题（2）：同样的获取到Mac的uuid将DVTPlugInCompatibilityUUIDs下相同的删除掉重新添加uuid。
+
+这样我们重启Xcode就可以恢复插件重新使用。但是当我们插件比较多的时候，上边的方法就变得很麻烦。
+
+简便方法：第一种情况发生在Xcode更新的情况下，我们打开终端输入命令
+
+```
+    find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist -maxdepth 3 | xargs -I{} defaults write {} DVTPlugInCompatibilityUUIDs -array-add `defaults read /Applications/Xcode.app/Contents/Info.plist DVTPlugInCompatibilityUUID`（注意的是我们在打开Xcode的情况下输入命令，然后重新启动Xcode）。
+```
+
+简便方法：第二种情况发生在我们已经做了第一种情况，但是在重启的时候失误点击了skip bundles。这样的话我们打开终端输入命令
+
+```
+
+find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist -maxdepth 3 | xargs -I{} defaults delete {} DVTPlugInCompatibilityUUIDs
+
+```
+
+然后我们讲Xcode重启，重启之后再执行
+
+```
+
+find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist -maxdepth 3 | xargs -I{} defaults write {} DVTPlugInCompatibilityUUIDs -array-add `defaults read /Applications/Xcode.app/Contents/Info.plist DVTPlugInCompatibilityUUID`
+
+```
+
+命令，再次重启Xcode即可。
+
+命令行的解释：
+
+```
+
+find ~/Library/Application\ Support/Developer/Shared/Xcode/Plug-ins -name Info.plist 找到目录Plug-in下名字Info.plist的文件
+
+-maxdepth 3 |寻找的范围是三层文件夹<br>
+
+xargs -I{} 将得到的info.plist文件的集合复制给{}<br>
+
+defaults delete {} DVTPlugInCompatibilityUUIDs 删除掉plist文件下的DVTPlugInCompatibilityUUIDs参数
+
+
+defaults write {} DVTPlugInCompatibilityUUIDs -array-add ''在DVTPlugInCompatibilityUUIDs Array下添加key
+
+
+defaults read /Applications/Xcode.app/Contents/Info.plist DVTPlugInCompatibilityUUID 获取Mac的uuid
+
+```
+
+里边可能有说的不准确的地方，但是如果按照这个步骤去做。插件肯定会被恢复。
+
+当然我们也可以使用defaults write、defaults read、 defaults delete在Mac上处理起其他的文件。
+
+---
+
+好文推荐：[Apple Pay强势来袭，开发者应做的事情](<https://allluckly.cn/ios%E6%94%AF%E4%BB%98/Applepay>)
+{% endraw %}

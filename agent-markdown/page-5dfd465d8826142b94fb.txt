@@ -1,0 +1,212 @@
+---
+layout: null
+permalink: /en/journal/2015-12-26-integrating-a-baidu-mobile-ssp-launch-ad-in-one-minute/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Integrating a Baidu Mobile SSP launch ad in one minute
+agent_source_url: https://allluckly.cn/en/journal/2015-12-26-integrating-a-baidu-mobile-ssp-launch-ad-in-one-minute/
+agent_source_sha256: 26257b537b31546b041735b37905466891b2d858fb23b21df665a32fc9b59202
+agent_generator_version: 1
+---
+{% raw %}# Integrating a Baidu Mobile SSP launch ad in one minute
+
+Language: en
+Canonical: [Integrating a Baidu Mobile SSP launch ad in one minute](<https://allluckly.cn/en/journal/2015-12-26-integrating-a-baidu-mobile-ssp-launch-ad-in-one-minute/>)
+中文：[中文 HTML](<https://allluckly.cn/sdk/baidu01>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-12-26-integrating-a-baidu-mobile-ssp-launch-ad-in-one-minute/>)
+Published: 2015-12-26T00:00:00+08:00
+Modified: 2026-10-23T10:34:11+08:00
+Author: [Bison](<https://allluckly.cn/about/>)
+
+Records the historical integration of Baidu Mobile SSP splash ads, from platform registration and SDK import to system dependencies, compiler options and launch-time delegate callbacks. It follows the main steps for loading an ad during app startup.
+
+Originally credited to Bison. Content is retained as published.
+
+English translation of the [Chinese original](<https://allluckly.cn/sdk/baidu01>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Published in 2015, with iOS 9 compatibility settings and the Baidu SSP SDK of that period.
+
+> "Integrate Baidu Mobile SSP launch ads into your APP to increase revenue."
+
+> Bison
+
+My free app is about to be released. I have been wondering how to earn back the 99 dollars for my developer membership.  
+ Adding ads to my app seemed the easiest way to earn it back. But I am a perfectionist,   
+ I dislike ads everywhere, with an interstitial suddenly appearing while you are using an app. Besides harming the user experience,   
+ they also spoil the app's appearance, which I cannot tolerate. Caught in that dilemma, I took a look at Baidu Mobile SSP.  
+ Baidu SSP offers many ad formats. For me, a launch ad is the best fit: first, it does not interfere with the user's   
+ experience, and second, it does not spoil the app's overall appearance. That settled the decision.  
+ Now let us see how to integrate it.
+
+> Baidu SSP official website [Go to the resource](<http://mssp.baidu.com/home/developer.html>)
+
+First register an account with Baidu SSP, add a mobile application under application management, and fill in the relevant information. Then download the SDK and drag its `ios_api` folder into your project.
+
+## warning: iOS9 compatibility notes:
+
+> 1. In the plist, add baidumobads to the LSApplicationQueriesSchemes array. Note: the Xcode7.0 simulator reports error:(null), whereas a physical device does not. This error can be ignored here.
+
+```css
+    <key>LSApplicationQueriesSchemes</key> <array>
+    <string>baidumobads</string>
+    </array>
+```
+
+> 2. ENABLE\_BITCODE=YES. The SDK supports BITCODE; if you do not need it, simply set this to NO.
+
+> 3. In the plist, set NSAllowsArbitraryLoads to true under NSAppTransportSecurity. Note: in Xcode7.1, set Allow Arbitrary Loads to true under App Transport Security Settings.
+
+```css
+    <key>NSAppTransportSecurity</key> 
+    <dict>
+    <key>NSAllowsArbitraryLoads</key> 
+    <true/>
+    </dict>
+```
+
+> 4. The .dylib libraries used by the SDK have .tbd extensions in Xcode7. Import the libraries with the corresponding names.
+
+## Then add the `Frameworks`.
+
+`QuartzCore.framework`   
+ `Security.framework`   
+ `AdSupport.framework`  
+ `StoreKit.framework`  
+ `libz.dylib`  
+ `AudioToolbox.framework`   
+ `CoreMotion.framework`  
+ `MediaPlayer.framework`  
+ `AVFoundation.framework`  
+ `MessageUI.framework`  
+ `CoreLocation.framework`  
+ `CoreTelephony.framework`  
+ `SystemConfiguration.framework`  
+ `CoreGraphics.framework`  
+ `WebKit.framework`
+
+## Then configure the compiler parameters.
+
+> targets-\>BuildSettings-\>Other Linker Flags -\> add -ObjC -lstdc++
+
+That completes the configuration. From here, we will discuss only Baidu SSP launch ads.
+
+Import the headers in `AppDelegate`: `#import "BaiduMobAdSplashDelegate.h"` `#import "BaiduMobAdSplash.h"` Add the `BaiduMobAdSplashDelegate` delegate.
+
+The specific code is as follows.
+
+.h file
+
+```css
+@property (strong, nonatomic) BaiduMobAdSplash *splash;
+
+@property (strong, nonatomic) UIView *customSplashView;
+```
+
+.m file
+
+```css
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+
+    //百度广告
+    [self BaiDuNew];
+
+    return YES;
+}
+
+- (void)BaiDuNew{
+
+    [self.window makeKeyAndVisible];
+    BaiduMobAdSplash	*splash	=	[[BaiduMobAdSplash	alloc]	init];
+    splash.delegate	= self;
+    //把在mssp.baidu.com上创建后获得的代码位id写到这里
+    splash.AdUnitTag = @"2365464";
+    splash.canSplashClick	=	YES;
+    [splash	loadAndDisplayUsingKeyWindow:self.window];
+    self.splash	= splash;
+
+    //可以在customSplashView上显示包含icon的自定义开屏
+    self.customSplashView = [[UIView alloc]initWithFrame:self.window.frame];
+    self.customSplashView.backgroundColor = [UIColor whiteColor];
+    [self.window addSubview:self.customSplashView];
+    [self.window bringSubviewToFront:self.customSplashView];
+
+
+    //在baiduSplashContainer用做上展现百度广告的容器，注意尺寸必须大于200*200，并且baiduSplashContainer需要全部在window内，同时开机画面不建议旋转
+    CGFloat width = self.window.frame.size.width;
+    CGFloat height= self.window.frame.size.height;
+    UIView * baiduSplashContainer = [[UIView alloc]initWithFrame:CGRectMake(0, 0, width, height-100)];
+    [self.customSplashView addSubview:baiduSplashContainer];
+
+    UIImageView *iconView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"icon.png"]];
+    [iconView setFrame:CGRectMake(width/2-70-40, height-90, 80, 80)];
+    [self.customSplashView addSubview:iconView];
+
+    UIImageView *logoView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"ITBlog.png"]];
+    [logoView setFrame:CGRectMake(CGRectGetMaxX(iconView.frame)+40, height-90, 130, 50)];
+    [self.customSplashView addSubview:logoView];
+
+    UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(logoView.frame)-2, CGRectGetMaxY(logoView.frame), 130, 25)];
+    label.font = [UIFont systemFontOfSize:13];
+    label.textAlignment = NSTextAlignmentLeft;
+    label.textColor = [UIColor lightGrayColor];
+    label.text = @"自学iOS开发进阶首选";
+    label.textAlignment = NSTextAlignmentCenter;
+    [self.customSplashView addSubview:label];
+    //在的baiduSplashContainer里展现百度广告
+    [splash loadAndDisplayUsingContainerView:baiduSplashContainer];
+}
+
+- (NSString *)publisherId
+{
+
+    return @"ab17bd77";
+}
+
+/**
+*  广告展示成功
+*/
+- (void)splashSuccessPresentScreen:(BaiduMobAdSplash *)splash
+{
+    NSLog(@"splashSuccessPresentScreen");
+}
+
+/**
+*  广告展示失败
+*/
+- (void)splashlFailPresentScreen:(BaiduMobAdSplash *)splash withError:(BaiduMobFailReason) reason
+{
+    NSLog(@"splashlFailPresentScreen withError:%d",reason);
+    //自定义开屏移除
+    [self.customSplashView removeFromSuperview];
+}
+
+/**
+*  广告展示结束
+*/
+- (void)splashDidDismissScreen:(BaiduMobAdSplash *)splash
+{
+    NSLog(@"splashDidDismissScreen");
+    //自定义开屏移除
+    [self.customSplashView removeFromSuperview];
+}
+
+/**
+*  广告点击
+*/
+- (void)splashDidClicked:(BaiduMobAdSplash *)splash
+{
+    NSLog(@"splashDidClicked");
+}
+```
+
+The result is shown below.
+
+This historical illustration is currently unavailable. [The original image URL is retained](<https://github.com/AllLuckly/AllLuckly.github.io/blob/master/images/blog/baidu.gif?raw=true>) for reference.
+
+> Demo—[Download](<https://github.com/AllLuckly/LBBaiDuSSP_Demo>)
+
+Recommended reading: [An illustrated guide to implementing iOS in-app purchases](<https://allluckly.cn/en/journal/2015-06-04-an-illustrated-guide-to-implementing-ios-in-app-purchases/>)
+
+Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.
+{% endraw %}

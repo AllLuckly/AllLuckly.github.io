@@ -1,0 +1,159 @@
+---
+layout: post
+title: 'GitHub source-code picks, December 25: gesture unlock, a profile SDK and an image carousel'
+description: Collects three open-source components for gesture unlocking, a profile page and an infinite image carousel.
+  Download links and selected integration code help readers identify the component that matches an interface requirement.
+category: Development notes
+imagefeature: BG.jpg
+date: 2015-12-07 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Collects three open-source components for gesture unlocking, a profile page and an infinite image carousel.
+    Download links and selected integration code help readers identify the component that matches an interface requirement.
+  keywords:
+  - PCGestureUnlock
+  - LBPersonalPage
+  - SDCycleScrollView
+  - open-source components
+  provenance: collection
+  author_name: Bison
+  credit: Historical resources collected by Bison. The listed projects belong to their respective authors.
+  author_url: https://allluckly.cn/about/
+  version_note: A 2015 source-code selection. Check project interfaces and maintenance status separately.
+  title: 'GitHub source-code picks, December 25: gesture unlock, a profile SDK and an image carousel'
+  source_sha256: dd185cb630c07c0d9992e2f151a34748261ef27da1d8ff8a3e018a71588cee61
+lang: en
+source_path: _posts/2015-12-07-yuanma01.md
+source_url: /%E6%BA%90%E7%A0%81%E6%8E%A8%E8%8D%90/yuanma01
+permalink: /en/journal/2015-12-07-github-source-code-picks-december-25-gesture-unlock-a-profile-sdk-and-an-image-carousel/
+translation_method: machine-assisted
+translation_source_sha256: dd185cb630c07c0d9992e2f151a34748261ef27da1d8ff8a3e018a71588cee61
+excerpt: Collects three open-source components for gesture unlocking, a profile page and an infinite image carousel.
+  Download links and selected integration code help readers identify the component that matches an interface requirement.
+translation_date: '2026-10-23T02:45:00+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"Comprehensive Alipay-style gesture unlock, profile interface integration, infinitely looping image carousel"</p>
+</blockquote>
+<blockquote>
+<p><small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p><br/></p>
+<h2 id="--no1-最全面最高仿支付宝的手势解锁下载-">- NO.1 A comprehensive Alipay-style gesture unlock –––<a href="https://github.com/iosdeveloperpanc/PCGestureUnlock">Download</a> <br/></h2>
+<p><br/></p>
+<p><img alt="(PCGestureUnlock)" src="https://github.com/iosdeveloperpanc/PCGestureUnlock/blob/master/PCGestureUnlock/arrowDirctions.gif?raw=true"/><br/></p>
+<blockquote>
+<p>Usage is as follows.<br/></p>
+</blockquote>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">viewDidLoad</span> <span class="p">{</span>
+    <span class="err">[super</span> <span class="err">viewDidLoad];</span>
+    <span class="err">//</span> <span class="err">Do</span> <span class="err">any</span> <span class="err">additional</span> <span class="err">setup</span> <span class="err">after</span> <span class="err">loading</span> <span class="err">the</span> <span class="err">view.</span>
+
+    <span class="err">//</span> <span class="err">解锁界面</span>  <span class="py">默认clip</span><span class="p">:</span><span class="n">YES</span><span class="p">,</span> <span class="n">arrow</span><span class="p">:</span><span class="n">YES</span>
+    <span class="n">PCCircleView</span> <span class="err">*</span><span class="n">lockView</span> <span class="err">=</span> <span class="p">[[</span><span class="n">PCCircleView</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>  
+    <span class="err">lockView.delegate</span> <span class="err">=</span> <span class="err">self;</span>
+    <span class="err">self.lockView</span> <span class="err">=</span> <span class="err">lockView;</span>
+    <span class="err">[self.view</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">lockView</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="nf">#pragma</span> <span class="nt">-</span> <span class="nt">mark</span> <span class="nt">-</span> <span class="nt">circleView</span> <span class="nt">-</span> <span class="nt">delegate</span>
+<span class="nf">#pragma</span> <span class="nt">mark</span> <span class="nt">-</span> <span class="nt">circleView</span> <span class="nt">-</span> <span class="nt">delegate</span> <span class="nt">-</span> <span class="nt">setting</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">circleView</span><span class="o">:(</span><span class="nt">PCCircleView</span> <span class="o">*)</span><span class="nt">view</span> <span class="nt">type</span><span class="o">:(</span><span class="nt">CircleViewType</span><span class="o">)</span><span class="nt">type</span> <span class="nt">connectCirclesLessThanNeedWithGesture</span><span class="o">:(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">gesture</span>
+<span class="p">{</span>
+    <span class="err">NSString</span> <span class="err">*gestureOne</span> <span class="err">=</span> <span class="err">[PCCircleViewConst</span> <span class="py">getGestureWithKey</span><span class="p">:</span><span class="n">gestureOneSaveKey</span><span class="p">];</span>
+
+    <span class="err">//</span> <span class="err">看是否存在第一个密码</span>
+    <span class="err">if</span> <span class="err">([gestureOne</span> <span class="err">length])</span> <span class="err">{</span>
+        <span class="err">NSLog(@"提示再次绘制之前绘制的第一个手势密码");</span>
+    <span class="p">}</span> <span class="nt">else</span> <span class="p">{</span>
+        <span class="err">NSLog(@"密码长度不合法%@",</span> <span class="err">gesture);</span>
+    <span class="p">}</span>
+<span class="err">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">circleView</span><span class="o">:(</span><span class="nt">PCCircleView</span> <span class="o">*)</span><span class="nt">view</span> <span class="nt">type</span><span class="o">:(</span><span class="nt">CircleViewType</span><span class="o">)</span><span class="nt">type</span> <span class="nt">didCompleteSetFirstGesture</span><span class="o">:(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">gesture</span>
+<span class="p">{</span>
+    <span class="err">NSLog(@"获得第一个手势密码%@",</span> <span class="err">gesture);</span>
+    <span class="err">//</span> <span class="err">infoView展示对应选中的圆</span>
+<span class="p">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">circleView</span><span class="o">:(</span><span class="nt">PCCircleView</span> <span class="o">*)</span><span class="nt">view</span> <span class="nt">type</span><span class="o">:(</span><span class="nt">CircleViewType</span><span class="o">)</span><span class="nt">type</span> <span class="nt">didCompleteSetSecondGesture</span><span class="o">:(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">gesture</span> <span class="nt">result</span><span class="o">:(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">equal</span>
+<span class="p">{</span>
+    <span class="err">NSLog(@"获得第二个手势密码%@",gesture)；</span>
+    <span class="err">if</span> <span class="err">(equal)</span> <span class="err">{</span>
+        <span class="err">NSLog(@"两次手势匹配！可以进行本地化保存了");</span>
+
+    <span class="p">}</span> <span class="nt">else</span> <span class="p">{</span>
+        <span class="err">NSLog(@"两次手势不匹配！");</span>
+    <span class="p">}</span>
+<span class="err">}</span>
+
+<span class="nf">#pragma</span> <span class="nt">mark</span> <span class="nt">-</span> <span class="nt">circleView</span> <span class="nt">-</span> <span class="nt">delegate</span> <span class="nt">-</span> <span class="nt">login</span> <span class="nt">or</span> <span class="nt">verify</span> <span class="nt">gesture</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">circleView</span><span class="o">:(</span><span class="nt">PCCircleView</span> <span class="o">*)</span><span class="nt">view</span> <span class="nt">type</span><span class="o">:(</span><span class="nt">CircleViewType</span><span class="o">)</span><span class="nt">type</span> <span class="nt">didCompleteLoginGesture</span><span class="o">:(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">gesture</span> <span class="nt">result</span><span class="o">:(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">equal</span>
+<span class="p">{</span>
+    <span class="err">//</span> <span class="err">此时的type有两种情况</span> <span class="err">Login</span> <span class="err">or</span> <span class="err">verify</span>
+    <span class="err">if</span> <span class="err">(type</span> <span class="err">==</span> <span class="err">CircleViewTypeLogin)</span> <span class="err">{</span>
+        <span class="err">if</span> <span class="err">(equal)</span> <span class="err">{</span>
+            <span class="err">NSLog(@"登陆成功！");</span>
+        <span class="p">}</span> <span class="nt">else</span> <span class="p">{</span>
+            <span class="err">NSLog(@"密码错误！");</span>
+        <span class="p">}</span>
+    <span class="err">}</span> <span class="nt">else</span> <span class="nt">if</span> <span class="o">(</span><span class="nt">type</span> <span class="o">==</span> <span class="nt">CircleViewTypeVerify</span><span class="o">)</span> <span class="p">{</span>
+
+        <span class="err">if</span> <span class="err">(equal)</span> <span class="err">{</span>
+            <span class="err">NSLog(@"验证成功，跳转到设置手势界面");</span>
+
+        <span class="p">}</span> <span class="nt">else</span> <span class="p">{</span>
+            <span class="err">NSLog(@"原手势密码输入错误！");</span>
+
+        <span class="p">}</span>
+    <span class="err">}</span>
+<span class="err">}</span></code></pre></figure>
+<p><br/></p>
+<h2 id="--no2-最强个人界面集成下载">- NO.2 Profile interface integration –––<a href="https://github.com/AllLuckly/LBPersonalPageDemo">Download</a><br/></h2>
+<p><br/></p>
+<p><img alt="(LBPersonalPageDemo)" src="https://github.com/AllLuckly/LBPersonalPageDemo/blob/master/123.gif?raw=true"/><br/></p>
+<blockquote>
+<p>Usage is as follows.<br/></p>
+</blockquote>
+<p>Subclass <code class="language-plaintext highlighter-rouge">LBPersonalPage_VC</code>.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">viewDidLoad</span> <span class="p">{</span>
+    <span class="err">[super</span> <span class="err">viewDidLoad];</span>
+
+    <span class="err">//头像设置</span>
+    <span class="err">self.headImageView.image</span> <span class="err">=</span> <span class="err">[UIImage</span> <span class="py">imageNamed</span><span class="p">:</span><span class="err">@</span><span class="s1">"myheadimage.jpeg"</span><span class="p">];</span>
+    <span class="err">//背景设置</span>
+    <span class="err">self.imageBG.image</span> <span class="err">=</span> <span class="err">[UIImage</span> <span class="py">imageNamed</span><span class="p">:</span><span class="err">@</span><span class="s1">"BG.jpg"</span><span class="p">];</span>
+    <span class="err">//昵称设置</span>
+    <span class="err">self.nameLabel.text</span> <span class="err">=</span> <span class="err">@"BISON";</span>
+<span class="p">}</span>
+
+<span class="o">//</span><span class="nt">右边按钮</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">rightBtnAction</span><span class="p">{</span>
+    <span class="err">NSLog(@"hello-rig");</span>
+<span class="p">}</span>
+<span class="o">//</span><span class="nt">左边按钮</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">leftBtnAction</span><span class="p">{</span>
+    <span class="err">NSLog(@"hello-left");</span>
+<span class="p">}</span></code></pre></figure>
+<p><br/></p>
+<h2 id="--no3-无限循环图片轮播下载">- NO.3 An infinitely looping image carousel –––<a href="https://github.com/gsdios/SDCycleScrollView">Download</a><br/></h2>
+<p><br/></p>
+<p><span class="technical-missing-image">This historical illustration is currently unavailable. <a href="https://camo.githubusercontent.com/e5c0f0255483caf06271df08982d078c5e2cc432/687474703a2f2f7777342e73696e61696d672e636e2f626d6964646c652f39623831343665646a7731657376797471376c777267323038703066636538322e676966">The original image URL is retained</a> for reference.</span><br/></p>
+<blockquote>
+<p>Usage is as follows.<br/></p>
+</blockquote>
+<p>Subclass <code class="language-plaintext highlighter-rouge">LBPersonalPage_VC</code>.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">viewDidLoad</span> <span class="p">{</span>
+    <span class="err">[super</span> <span class="err">viewDidLoad];</span>
+
+    <span class="err">//</span> <span class="err">网络加载图片的轮播器</span>
+    <span class="err">cycleScrollView.imageURLStringsGroup</span> <span class="err">=</span> <span class="err">imagesURLStrings;</span>
+
+    <span class="err">//</span> <span class="err">本地加载图片的轮播器</span>
+    <span class="err">SDCycleScrollView</span> <span class="err">*cycleScrollView</span> <span class="err">=</span> <span class="err">[SDCycleScrollView</span> <span class="py">cycleScrollViewWithFrame</span><span class="p">:</span> <span class="n">imagesGroup</span><span class="p">:</span><span class="n">图片数组</span><span class="p">];</span>
+<span class="p">}</span></code></pre></figure>
+<p>Recommended reading: <a href="/en/journal/2015-06-04-an-illustrated-guide-to-implementing-ios-in-app-purchases/">An illustrated guide to implementing iOS in-app purchases</a><br/></p>
+<p>Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.</p>
+
+{% endraw %}

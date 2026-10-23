@@ -1,0 +1,250 @@
+---
+layout: post
+title: 'Remote notifications with JPush: a detailed integration guide'
+description: Prepares remote notifications through App ID configuration, push capabilities and certificate requests,
+  then integrates the JPush SDK. Development and production settings, certificate export and client callbacks document
+  an early push-notification setup workflow.
+category: Development notes
+imagefeature: null
+date: 2016-03-03 00:00:00 +0800
+technical_translation:
+  topic: data-network
+  summary: Prepares remote notifications through App ID configuration, push capabilities and certificate requests,
+    then integrates the JPush SDK. Development and production settings, certificate export and client callbacks
+    document an early push-notification setup workflow.
+  keywords:
+  - APNs
+  - JPush
+  - push certificates
+  - App ID
+  - remote notifications
+  provenance: contribution
+  author_name: WzxJiang
+  source_url: http://www.jianshu.com/p/469bf2a7b16f
+  credit: Originally credited to WzxJiang; edited and archived by Bison.
+  version_note: Published in 2016, using the developer-portal interface, certificate workflow and JPush SDK available
+    at the time.
+  title: 'Remote notifications with JPush: a detailed integration guide'
+  source_sha256: ec90959eb4db8d668eb5458057d92b4fb7365387738ed2cf97db30f926bcead3
+lang: en
+source_path: _posts/2016-03-03-tuogao28.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao28
+permalink: /en/journal/2016-03-03-remote-notifications-with-jpush-a-detailed-integration-guide/
+translation_method: machine-assisted
+translation_source_sha256: ec90959eb4db8d668eb5458057d92b4fb7365387738ed2cf97db30f926bcead3
+excerpt: Prepares remote notifications through App ID configuration, push capabilities and certificate requests,
+  then integrates the JPush SDK. Development and production settings, certificate export and client callbacks document
+  an early push-notification setup workflow.
+translation_date: '2026-10-23T02:34:13+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/469bf2a7b16f">WzxJiang</a><br/></p>
+<p>Yesterday, our company project needed remote notifications. Implementing everything ourselves would be troublesome, so we used JPush. Below, I explain how to create push certificates and use JPush for remote notifications.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/1.jpg"/><br/></p>
+<blockquote>
+<p>First, let's download the push certificates. These initial steps are simple; skip ahead if you already know them. Jianshu does not support jumping within the page.<br/></p>
+</blockquote>
+<p>Most online push-certificate tutorials are several years old. Downloading a certificate is now straightforward.<br/></p>
+<p>First, open <a href="https://developer.apple.com">Apple Developer Center</a><br/></p>
+<ul>
+<li>Click Member Center.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/2.png"/><br/></p>
+<ul>
+<li>After signing in, click Certificates,Identifiers &amp; Profiles.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/3.png"/><br/></p>
+<ul>
+<li>Click either one.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/4.png"/><br/></p>
+<ul>
+<li>Create an App ID.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/5.png"/><br/></p>
+<ul>
+<li>The App ID name can be anything, but pay close attention to Bundle ID: the app project receiving notifications must use exactly this Bundle ID.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/6.png"/><br/></p>
+<ul>
+<li>Under App Services, select Push Notifications now or change it later, then continue.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/7.png"/><br/></p>
+<ul>
+<li>Submit. I had already selected Push Notifications, so it is orange here; otherwise it should be gray.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/8.png"/><br/></p>
+<ul>
+<li>Then click the App ID you just created and choose Edit.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/9.png"/><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/10.png"/><br/></p>
+<ul>
+<li>Create development and production certificates.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/11.png"/><br/></p>
+<p>Here is the distinction between environments: an app compiled and installed through Xcode uses development; an app downloaded through a QR code or the App Store uses production.<br/></p>
+<p>– Clicking Continue here asks you to upload a certificate.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/12.png"/><br/></p>
+<h2 id="现在我们来制作这个证书">Now let's create this certificate.<br/></h2>
+<ul>
+<li>
+<p>Open the Mac's built-in Keychain Access: Launchpad → Other → Keychain Access.<br/></p>
+</li>
+<li>
+<p>After opening it, use Certificate Assistant at the upper left and select Request a Certificate From a Certificate Authority.<br/></p>
+</li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/13.png"/><br/></p>
+<ul>
+<li>Be sure to save it to disk.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/14.png"/><br/></p>
+<ul>
+<li>
+<p>Then save it anywhere you like.<br/></p>
+</li>
+<li>
+<p>Upload the certificate you saved earlier.<br/></p>
+</li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/15.png"/><br/></p>
+<ul>
+<li>Download it and click Done to return to the initial screen. Select your App ID again and click Edit. The development and production push-certificate processes are the same; follow the steps to create and download both certificates.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/16.png"/><br/></p>
+<ul>
+<li>
+<p>Push Notifications should now be green.
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/17.png"/><br/></p>
+</li>
+<li>
+<p>Open Keychain Access; you will find these two additional certificates.<br/></p>
+</li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/18.png"/><br/></p>
+<ul>
+<li>Right-click each one and export it.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/19.png"/><br/></p>
+<ul>
+<li>Set a password<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/20.png"/><br/></p>
+<p>After export succeeds, the files appear. Give them suitable names, preferably in English.</p>
+<h2 id="推送证书的制作到这就结束了下面讲怎么使用极光推送进行远程推送">That completes the push certificates. Next, let's use JPush for remote notifications.<br/></h2>
+<blockquote>
+<p>Using JPush for remote notifications<br/></p>
+</blockquote>
+<ul>
+<li>
+<p>Register for JPush on its official website.<br/></p>
+</li>
+<li>
+<p>Create an application.<br/></p>
+</li>
+<li>
+<p>Import both certificates in the application settings. Mine are already verified; otherwise, buttons for uploading the certificates appear. Bundle ID is filled automatically after import. Upload the certificates one at a time, because uploading together may cause verification to fail.<br/></p>
+</li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/21.png"/><br/></p>
+<p>– Then download <a href="http://docs.jpush.io/resources/#ios-sdk">SDK</a><br/></p>
+<p>– Import the SDK's Lib folder into your project and remember to select Copy.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/22.png"/><br/></p>
+<ul>
+<li>Import the following libraries in Build Phases.<br/></li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/23.png"/><br/></p>
+<ul>
+<li>Modify Capabilities<br/></li>
+</ul>
+<p>Enable remote notifications.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/24.png"/><br/></p>
+<p>Enable Background Modes.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/25.png"/><br/></p>
+<p>Change Bundle ID and select Team.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/26.png"/><br/></p>
+<h2 id="下面便是代码部分">Next comes the code.<br/></h2>
+<blockquote>
+<p>Import the header in Appdelegate.m: #import “JPUSHService.h”.<br/></p>
+</blockquote>
+<blockquote>
+<p>Add the following code in didFinishLaunchingWithOptions, replacing the relevant fields with your own information.<br/></p>
+</blockquote>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Required
+if ([[UIDevice currentDevice].systemVersion floatValue] &gt;= 8.0) {
+    //可以添加自定义categories
+    [JPUSHService registerForRemoteNotificationTypes:(UIUserNotificationTypeBadge |UIUserNotificationTypeSound |UIUserNotificationTypeAlert)categories:nil];
+} else {
+    //categories 必须为nil
+    [JPUSHService registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge |UIRemoteNotificationTypeSound |UIRemoteNotificationTypeAlert)categories:nil];
+}
+
+[JPUSHService setupWithOption:launchOptions appKey:你的appKey(字符串)，在极光的应用详情中可以看到" channel:@""(这个不填就行) apsForProduction:这个值生产环境为YES，开发环境为NO(BOOL值)];
+</code></pre></div></div>
+<p><br/></p>
+<p>Create<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-(void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+</code></pre></div></div>
+<p><br/>
+method to register the device; remove this.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    //这个方法是设置别名和tag 可省
+    // [JPUSHService setTags:nil alias:@"WzxJiang" fetchCompletionHandle:^(int iResCode, NSSet *iTags, NSString *iAlias) {
+    //        NSLog(@"rescode: %d, \ntags: %@, \nalias: %@\n", iResCode, iTags , iAlias);
+    //   }];
+    // Required
+    [JPUSHService registerDeviceToken:deviceToken];
+}
+</code></pre></div></div>
+<p><br/></p>
+<p>Create<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler:
+</code></pre></div></div>
+<p><br/>
+Handling notifications received while the App is in the background<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+    //iOS 7及之后才能用，现在没人适配iOS6了吧...
+    // IOS 7 Support Required 
+    [JPUSHService handleRemoteNotification:userInfo];
+    completionHandler(UIBackgroundFetchResultNewData);
+}
+</code></pre></div></div>
+<p><br/></p>
+<p>Clear the badge in applicationWillEnterForeground, when the App is about to enter the foreground.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)applicationWillEnterForeground:(UIApplication *)application {
+    NSLog(@"进入前台");
+    [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
+}
+</code></pre></div></div>
+<p><br/></p>
+<p>Create<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>didFailToRegisterForRemoteNotificationsWithError
+</code></pre></div></div>
+<p><br/>method to handle errors receiving push notifications, which generally should not occur.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+    //Optional
+    NSLog(@"did Fail To Register For Remote Notifications With Error: %@", error);
+}
+</code></pre></div></div>
+<p><br/></p>
+<ul>
+<li>
+<p>The code is ready. Send a notification now; this must be tested on a physical device.<br/></p>
+</li>
+<li>
+<p>In JPush, click Send Notification and ensure the development environment is selected.<br/></p>
+</li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/27.png"/><br/></p>
+<ul>
+<li>Then you should receive the notification.<br/>
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao28/1.jpg"/><br/></li>
+</ul>
+<p>That concludes the tutorial. Leave a comment if you have questions or want to explore further!<br/>
+<a href="https://github.com/Wzxhaha">My GItHub</a><br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-02-29-bison-s-guide-to-ios-multithreading-part-3/">Bison's guide to iOS multithreading, part 3</a><br/></p>
+
+{% endraw %}

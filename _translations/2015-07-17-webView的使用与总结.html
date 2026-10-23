@@ -1,0 +1,122 @@
+---
+layout: post
+title: 'Using UIWebView: techniques and notes'
+description: Collects common UIWebView settings for loading web pages inside a native interface, including transparent
+  backgrounds, scaling, phone-number detection and JavaScript interaction. It also discusses the layout and communication
+  costs of a cross-platform approach.
+category: Development notes
+imagefeature: picture-35.jpg
+date: 2015-07-17 00:00:00 +0800
+technical_translation:
+  topic: web-notes
+  summary: Collects common UIWebView settings for loading web pages inside a native interface, including transparent
+    backgrounds, scaling, phone-number detection and JavaScript interaction. It also discusses the layout and communication
+    costs of a cross-platform approach.
+  keywords:
+  - UIWebView
+  - JavaScript
+  - hybrid development
+  - web page loading
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Uses UIWebView APIs and is retained as a historical implementation record.
+  title: 'Using UIWebView: techniques and notes'
+  source_sha256: 3e557ac468b2e359ecb3708490f0737f3d7fcd8f7cd19cbb8c19a7c8444549e9
+technical_update_translation:
+  updated: '2026-10-23'
+  note: Apple has deprecated UIWebView. For a current project, start with the migration guidance for WKWebView.
+    This article preserves UIWebView loading methods, delegate callbacks and synchronous JavaScript calls. Migration
+    requires checking the delegate interfaces and asynchronous calls again; replacing the class name alone is insufficient.
+    The old examples have not been revalidated on current iOS versions.
+  references:
+  - title: 'Apple: Replacing UIWebView in your app'
+    url: https://developer.apple.com/documentation/webkit/replacing-uiwebview-in-your-app
+lang: en
+source_path: _posts/2015-07-17-webView的使用与总结.md
+source_url: /webView%E7%9A%84%E4%BD%BF%E7%94%A8%E4%B8%8E%E6%80%BB%E7%BB%93
+permalink: /en/journal/2015-07-17-using-uiwebview-techniques-and-notes/
+translation_method: machine-assisted
+translation_source_sha256: 3e557ac468b2e359ecb3708490f0737f3d7fcd8f7cd19cbb8c19a7c8444549e9
+excerpt: Collects common UIWebView settings for loading web pages inside a native interface, including transparent
+  backgrounds, scaling, phone-number detection and JavaScript interaction. It also discusses the layout and communication
+  costs of a cross-platform approach.
+translation_date: '2026-10-23T02:34:09+00:00'
+---
+{% raw %}
+<blockquote>
+<p>“iOS development is like moving things around; once you become skilled enough, you can start taking shortcuts.”
+<small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p>I previously used UIWebView in a project.<br/>
+Consider UIWebView for complex interface layouts, screens that need flexible control from the server, or existing web pages in your project.<br/>
+Before using it, let me explain its advantages and disadvantages.<br/>
+Advantages:<br/></p>
+<ul>
+<li>Cross-platform support<br/>
+  Develop once and deploy on platforms such as iOS and Android.<br/></li>
+<li>Fast deployment of updates<br/>
+  Deploying on the server updates what clients display in real time, making quick upgrades and urgent bug fixes easier.<br/></li>
+<li>Strong page-layout capabilities<br/>
+  The power of HTML+CSS is impressive.<br/>
+Disadvantages:<br/></li>
+<li>Performance<br/>
+  Compared with a native app, an app using UIWebView has somewhat lower performance, <br/>
+  The user experience also suffers considerably.<br/></li>
+<li>Complicated data communication
+Communication between UIWebView and an app can only take place through javascript or <br/>
+  UIWebViewDelegate. Passing parameters from the client to UIWebView to modify a web page, or <br/>
+  retrieving data from the page, is relatively complicated.</li>
+</ul>
+<p>The specific steps are as follows.<br/></p>
+<p>Common ways to use UIWebView:<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="nt">加载网页或者本地文件</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">loadRequest</span><span class="o">:(</span><span class="nt">NSURLRequest</span> <span class="o">*)</span><span class="nt">request</span><span class="o">;</span>
+
+<span class="o">//</span><span class="nt">直接加载html内容</span><span class="err">，</span><span class="nt">如果html中的图片等资源在本地目录</span><span class="err">，</span><span class="nt">注意将baseURL指向该目录</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">loadHTMLString</span><span class="o">:(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">string</span> <span class="nt">baseURL</span><span class="o">:(</span><span class="nt">NSURL</span> <span class="o">*)</span><span class="nt">baseURL</span><span class="o">;</span>
+
+<span class="o">//</span><span class="nt">功能与上面类似</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">loadData</span><span class="o">:(</span><span class="nt">NSData</span> <span class="o">*)</span><span class="nt">data</span> <span class="nt">MIMEType</span><span class="o">:(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">MIMEType</span> <span class="nt">textEncodingName</span><span class="o">:(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">textEncodingName</span> <span class="nt">baseURL</span><span class="o">:(</span><span class="nt">NSURL</span> <span class="o">*)</span><span class="nt">baseURL</span><span class="o">;</span>
+
+<span class="nt">实现UIWebViewDelegate</span>
+
+<span class="nt">主要使用到的方法</span>
+<span class="nt">-</span><span class="o">(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">webView</span><span class="o">:(</span><span class="nt">UIWebView</span><span class="o">*)</span><span class="nt">webView</span> <span class="nt">shouldStartLoadWithRequest</span><span class="o">:(</span><span class="nt">NSURLRequest</span><span class="o">*)</span> <span class="nt">reuqest</span> <span class="nt">navigationType</span><span class="o">:(</span><span class="nt">UIWebViewNavigationType</span><span class="o">)</span><span class="nt">navigationType</span><span class="o">;//</span><span class="nt">当网页视图被指示载入内容而得到通知</span><span class="err">。</span><span class="nt">应当返回YES</span><span class="err">，</span><span class="nt">这样会进行加载</span><span class="err">。</span><span class="nt">通过导航类型参数可以得到请求发起的原因</span><span class="err">，</span><span class="nt">可以是以下任意值</span><span class="err">：</span>  
+    <span class="nt">UIWebViewNavigationTypeLinkClicked</span> <span class="o">//</span><span class="nt">判断是否是点击事件</span> 
+    <span class="nt">UIWebViewNavigationTypeFormSubmitted</span>  
+    <span class="nt">UIWebViewNavigationTypeBackForward</span>  
+    <span class="nt">UIWebViewNavigationTypeReload</span>  
+    <span class="nt">UIWebViewNavigationTypeFormResubmitted</span>  
+    <span class="nt">UIWebViewNavigationTypeOther</span> 
+<span class="nt">通过</span>
+    <span class="nt">NSURL</span> <span class="o">*</span><span class="nt">url</span> <span class="o">=</span> <span class="o">[</span><span class="nt">request</span> <span class="nt">URL</span><span class="o">];</span>
+    <span class="nt">NSString</span> <span class="o">*</span><span class="nt">curUrl</span><span class="o">=</span> <span class="o">[</span><span class="nt">url</span> <span class="nt">absoluteString</span><span class="o">];</span>
+<span class="nt">可得到点击事件的URL</span>
+
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">webViewDidStartLoad</span><span class="o">:(</span><span class="nt">UIWebView</span><span class="o">*)</span><span class="nt">webView</span> <span class="o">;//</span><span class="nt">当网页视图已经开始加载一个请求后</span><span class="err">，</span><span class="nt">得到通知</span><span class="err">。</span> 
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">webViewDidFinishLoad</span><span class="o">:(</span><span class="nt">UIWebView</span><span class="o">*)</span><span class="nt">webView</span> <span class="o">;//</span><span class="nt">当网页视图结束加载一个请求之后</span><span class="err">，</span><span class="nt">得到通知</span><span class="err">。</span> 
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">webView</span><span class="o">:(</span><span class="nt">UIWebView</span><span class="o">*)</span><span class="nt">webView</span>  <span class="nt">DidFailLoadWithError</span><span class="o">:(</span><span class="nt">NSError</span><span class="o">*)</span><span class="nt">error</span><span class="o">;//</span><span class="nt">当在请求加载中发生错误时</span><span class="err">，</span><span class="nt">得到通知</span><span class="err">。</span><span class="nt">会提供一个NSSError对象</span><span class="err">，</span><span class="nt">以标识所发生错误类型</span><span class="err">。</span>  </code></pre></figure>
+<p>Set a transparent background: <code class="language-plaintext highlighter-rouge">webView.backgroundColor= [UIColor clearColor];webView.opaque=NO;</code>
+Automatically fit the screen: <code class="language-plaintext highlighter-rouge">webView.scalespageToFit = YES;</code>
+Automatically detect phone numbers on the webpage and allow tapping to dial:
+<code class="language-plaintext highlighter-rouge">webView.detectsPhoneNumbers = YES;</code>
+Interact with js</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">我们在webViewDidFinishLoad方法中就可以通过javascript操作界面元素了</span><span class="err">。</span>
+<span class="err">1、</span><span class="nt">获取当前页面的url</span><span class="err">。</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">webViewDidFinishLoad</span><span class="o">:(</span><span class="nt">UIWebView</span> <span class="o">*)</span><span class="nt">webView</span> <span class="p">{</span>
+<span class="err">NSString</span> <span class="err">*currentURL</span> <span class="err">=</span> <span class="err">[webView</span> <span class="py">stringByEvaluatingJavaScriptFromString</span><span class="p">:</span><span class="err">@</span><span class="s1">"document.location.href"</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="err">2、</span><span class="nt">获取页面title</span><span class="err">：</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">webViewDidFinishLoad</span><span class="o">:(</span><span class="nt">UIWebView</span> <span class="o">*)</span><span class="nt">webView</span> <span class="p">{</span>
+<span class="err">NSString</span> <span class="err">*currentURL</span> <span class="err">=</span> <span class="err">[webView</span> <span class="py">stringByEvaluatingJavaScriptFromString</span><span class="p">:</span><span class="err">@</span><span class="s1">"document.location.href"</span><span class="p">];</span>
+
+<span class="err">NSString</span> <span class="err">*title</span> <span class="err">=</span> <span class="err">[webview</span> <span class="py">stringByEvaluatingJavaScriptFromString</span><span class="p">:</span><span class="err">@</span><span class="s1">"document.title"</span><span class="p">];</span>
+<span class="p">}</span></code></pre></figure>
+<p><br/></p>
+
+{% endraw %}

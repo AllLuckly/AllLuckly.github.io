@@ -1,0 +1,81 @@
+---
+layout: post
+title: 'Swift 3.0 Design Patterns: Singleton'
+description: Introduces the uses and trade-offs of Swift singletons, creating shared instances with a static class
+  constant or a global constant. It covers private initializers, access across modules, and the need to consider
+  thread safety for shared mutable state.
+category: Development notes
+imagefeature: null
+date: 2016-10-13 00:00:00 +0800
+technical_translation:
+  topic: swift-runtime
+  summary: Introduces the uses and trade-offs of Swift singletons, creating shared instances with a static class
+    constant or a global constant. It covers private initializers, access across modules, and the need to consider
+    thread safety for shared mutable state.
+  keywords:
+  - Swift 3.0
+  - singleton pattern
+  - static let
+  - thread safety
+  provenance: contribution
+  author_name: Sindri
+  source_url: http://www.jianshu.com/p/6c9423672d54
+  credit: Originally credited to Sindri; edited and archived by Bison.
+  version_note: The article explicitly discusses singleton syntax after Swift 3.0 and changes to the dispatch_once
+    API.
+  title: 'Swift 3.0 Design Patterns: Singleton'
+  source_sha256: 54648ca8cad64ba5ee751a93ec8db3cf7c2ef6bb532ad3bd60283d31b9b4e9f2
+lang: en
+source_path: _posts/2016-10-13-tougao67.md
+source_url: /%E6%8A%95%E7%A8%BF/tougao67
+permalink: /en/journal/2016-10-13-swift-3-0-design-patterns-singleton/
+translation_method: machine-assisted
+translation_source_sha256: 54648ca8cad64ba5ee751a93ec8db3cf7c2ef6bb532ad3bd60283d31b9b4e9f2
+excerpt: Introduces the uses and trade-offs of Swift singletons, creating shared instances with a static class constant
+  or a global constant. It covers private initializers, access across modules, and the need to consider thread safety
+  for shared mutable state.
+translation_date: '2026-10-23T02:34:15+00:00'
+---
+{% raw %}
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao66/1.png"/><br/></p>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Source: <a href="http://www.jianshu.com/p/6c9423672d54">Sindri’s Notes</a><br/></p>
+<p>Design patterns are classified, widely known, repeatedly used solutions distilled from code-design experience. The GoF proposed 23 patterns; this series implements them in Swift.</p>
+<h2 id="概述">Overview</h2>
+<p>A class with exactly one instance throughout an app’s lifetime is a singleton. Sharing that object across modules is the Singleton pattern.</p>
+<p>The Singleton pattern has these advantages:</p>
+<p>Multiple modules share one object, keeping data unique.
+Centralised logic offers flexibility.
+iOS itself provides singletons such as NSNotificaitonCenter and UIApplication. Swift mainly uses two singleton-creation approaches. I usually store user data in a singleton for access across modules:</p>
+<ul>
+<li>Approach 1: declare a static constant inside the class and make its initialiser private.</li>
+</ul>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+    class UserInfo {
+
+        static let sharedInfo = UserInfo()
+
+        private init() {}
+    }
+
+</code></pre></div></div>
+<ul>
+<li>Approach 2: use a global constant object.</li>
+</ul>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+    let singleton = UserInfo()
+
+        class UserInfo {
+            class var sharedInfo : UserInfo {
+                return singleton
+            }
+    }
+
+</code></pre></div></div>
+<p>Developers coming from Objective-C may prefer dispatch_once, but it is no longer available in Swift3.0. Apple already uses dispatch_once in static let implementation to ensure only one instance exists.</p>
+<h2 id="总结">Summary</h2>
+<p>A singleton keeps data unique during the app’s lifetime and avoids duplicate memory usage, but a large singleton itself becomes a burden. Access also raises thread-safety concerns, requiring appropriate locking for stability.</p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

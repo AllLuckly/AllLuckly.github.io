@@ -29,4 +29,16 @@ sitemap: false
   </url>
     {% endunless %}
   {% endfor %}
+  {% for entry in site.translations %}
+    {% assign original_url = entry.source_url | remove: site.url %}
+    {% assign translation = site.data.translations[original_url] %}
+    {% if translation.status == 'complete' %}
+    {% unless entry.sitemap == false or entry.noindex or entry.published == false %}
+  <url>
+    <loc>{{ entry.url | replace: '/index.html', '/' | absolute_url | xml_escape }}</loc>
+    <lastmod>{{ entry.translation_date | default: entry.modified | default: entry.date | date_to_xmlschema }}</lastmod>
+  </url>
+    {% endunless %}
+    {% endif %}
+  {% endfor %}
 </urlset>

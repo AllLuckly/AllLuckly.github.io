@@ -1,0 +1,965 @@
+---
+layout: null
+permalink: /en/journal/2016-03-04-core-graphics-for-swift-developers-an-in-depth-introduction/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Core Graphics for Swift developers: an in-depth introduction'
+agent_source_url: https://allluckly.cn/en/journal/2016-03-04-core-graphics-for-swift-developers-an-in-depth-introduction/
+agent_source_sha256: 42ca336ae57e6c15090f2d78b62f0ec62afedf3c606f3f39840df827b1e8a08e
+agent_generator_version: 1
+---
+{% raw %}# Core Graphics for Swift developers: an in-depth introduction
+
+Language: en
+Canonical: [Core Graphics for Swift developers: an in-depth introduction](<https://allluckly.cn/en/journal/2016-03-04-core-graphics-for-swift-developers-an-in-depth-introduction/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao29>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-03-04-core-graphics-for-swift-developers-an-in-depth-introduction/>)
+Published: 2016-03-04T00:00:00+08:00
+Modified: 2026-10-23T10:34:14+08:00
+Author: 大石头布
+
+Starts with obtaining a drawing context and constructing paths, then draws rectangles, circles, curves, text and images in Swift. Further examples cover linear and radial gradients, blend modes, coordinate transforms, and bitmap and PDF output.
+
+Originally credited to 大石头布; edited and archived by Bison.
+
+[Source listed in the original](<http://www.jianshu.com/p/491b50cb19cb>)
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao29>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Published in 2016, using the Swift and Core Graphics API syntax of that period.
+
+Editor: [Bison](<https://allluckly.cn/en/>)  
+ Contributor: [大石头布](<http://www.jianshu.com/p/491b50cb19cb>)
+
+Core Graphics is a C-based API that can be used for all kinds of drawing.
+
+Quartz 2D is part of Core Graphics and is a powerful two-dimensional drawing engine. UIKit wraps and integrates it well: the UIKit components used in everyday development are drawn by Core Graphics. Importing UIKit automatically imports Core Graphics, and UIKit wraps commonly used drawing APIs for convenience.  
+ Let's get straight to drawing with Core Graphics.
+
+### General steps
+
+1. Obtain the graphics context.  
+ 2. Create and configure a path.  
+ 3. Add the path to the context.  
+ 4. Configure the context state.  
+ 5. Draw the path.
+
+> The graphics context CGContextRef represents an output device—the drawing destination—and contains device information relevant to drawing. Every Quartz 2D object must be drawn into a graphics context.
+
+### Drawing basic shapes
+
+I hope you open Xcode and practice along with the examples.  
+ Create a Single View Application and a View subclass named CGView.
+
+```
+import UIKit
+
+class CGView: UIView {
+
+
+    override func drawRect(rect: CGRect) {
+        super.drawRect(rect)
+        // 1、 获取上下文对象
+        let context = UIGraphicsGetCurrentContext()
+
+        // 2、 创建路径对象
+        let path = CGPathCreateMutable()
+        CGPathMoveToPoint(path, nil, 10,30)
+        CGPathAddLineToPoint(path, nil, 10, 100)
+        CGPathAddLineToPoint(path, nil, 150, 100)
+
+        // 3、 添加路径到图形上下文 
+        CGContextAddPath(context, path)
+
+        // 4、 设置图形上下文状态属性
+        CGContextSetRGBStrokeColor(context, 1, 0, 1, 1) //设置笔触颜色
+        CGContextSetRGBFillColor(context, 1, 1, 0, 1)   //设置填充色
+
+        CGContextSetLineWidth(context, 5)   //设置线条宽度
+        CGContextSetLineCap(context, CGLineCap.Round ) // 设置顶点样式
+        CGContextSetLineJoin(context, CGLineJoin.Round) //设置连接点样式
+        /*设置线段样式
+        phase:虚线开始的位置  这里设置为0
+        lengths:虚线长度间隔
+        count:虚线数组元素个数
+        */
+        let lengths: [CGFloat] = [5,7] //长度间隔
+        CGContextSetLineDash(context, 0 , lengths, 2)
+
+        let color = UIColor.grayColor().CGColor //颜色转化，由于Quartz 2D跨平台，所以其中不能使用UIKit中的对象，但是UIkit提供了转化方法
+        /*设置阴影
+        context:图形上下文
+        offset:偏移量
+        blur:模糊度
+        color:阴影颜色
+        */
+        CGContextSetShadowWithColor(context, CGSizeMake(2, 2), 0.8, color)
+
+        // 5、 绘制图像到指定图形上下文
+        /*
+        CGPathDrawingMode是填充方式,枚举类型
+        Fill:只有填充（非零缠绕数填充），不绘制边框
+        EOFill:奇偶规则填充（多条路径交叉时，奇数交叉填充，偶交叉不填充）
+        Stroke:只有边框
+        FillStroke：既有边框又有填充
+        EOFillStroke：奇偶填充并绘制边框
+        */
+        CGContextDrawPath(context, CGPathDrawingMode.FillStroke) //最后一个参数是填充类型
+    }
+}
+```
+
+UIKit already prepares a context for us. In drawRect:, which runs after loadView and viewDidLoad, obtain it with the UIKit wrapper UIGraphicsGetCurrentContext().  
+ Following the steps above produces this result:  
+ Then add the code in the vc's viewDidLoad.
+
+```
+let cgView = CGView(frame:CGRectMake(0,44,160,110) )
+cgView.backgroundColor = UIColor.whiteColor()
+self.view.addSubview(cgView)
+```
+
+The result is shown here:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/1.png>)
+
+The steps above are somewhat involved, but the code can be simplified.  
+ Create another UIView subclass, CGView2.
+
+```
+import UIKit
+
+class CGView2: UIView {
+
+
+    override func drawRect(rect: CGRect) {
+        super.drawRect(rect)
+
+        // 1、 获取上下文对象
+        let context = UIGraphicsGetCurrentContext()
+
+        // 2、 绘制路径（相当于前面创建路径并添加路径到图形上下文两步操作）
+        CGContextMoveToPoint(context, 10, 30)
+        CGContextAddLineToPoint(context, 10, 100)
+        CGContextAddLineToPoint(context, 150, 100)
+
+        //封闭路径:直接调用路径封闭方法
+        CGContextClosePath(context)
+
+        // 3、 设置图形上下文属性
+        UIColor.redColor().setStroke()
+        UIColor.yellowColor().setFill()
+
+        // 4、 绘制路径
+        CGContextDrawPath(context, CGPathDrawingMode.FillStroke)
+
+    }
+
+}
+```
+
+This greatly simplifies the code. Core Graphics wraps creating the object and adding it to the context into one operation. Continue adding code in the same vc's viewDidLoad:
+
+```
+let cgView = CGView(frame:CGRectMake(0,44,160,110) )
+cgView.backgroundColor = UIColor.whiteColor()
+self.view.addSubview(cgView)
+
+let cgView2 = CGView2(frame:CGRectMake(160,44,160,110))
+cgView2.backgroundColor = UIColor.whiteColor()
+self.view.addSubview(cgView2)
+```
+
+Result:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/2.png>)
+
+### Drawing a rectangle
+
+Create another UIView subclass named CGView3.  
+ /\*\* Draw a rectangle
+
+```
+- parameter context: 上下文对象
+*/
+func drawRectWithContext(context:CGContextRef){
+    let rect = CGRectMake(20, 0 , 280, 50)
+    CGContextAddRect(context, rect)
+    UIColor.blueColor().set()
+    CGContextDrawPath(context, CGPathDrawingMode.FillStroke)
+}
+```
+
+Then call this method in drawrect.
+
+```
+override func drawRect(rect: CGRect) {
+    super.drawRect(rect)
+
+    // 1、 获取上下文对象
+    let context = UIGraphicsGetCurrentContext()
+    //画矩形
+    self.drawRectWithContext(context!)
+}
+在vc对应viewDidLoad中加入此View
+override func viewDidLoad() {
+    super.viewDidLoad()
+    title = "CoreGraphics Demo"
+
+    // Do any additional setup after loading the view, typically from a nib.
+    let cgView = CGView(frame:CGRectMake(0,44,160,110) )
+    cgView.backgroundColor = UIColor.whiteColor()
+    self.view.addSubview(cgView)
+
+    let cgView2 = CGView2(frame:CGRectMake(160,44,160,110))
+    cgView2.backgroundColor = UIColor.whiteColor()
+    self.view.addSubview(cgView2)
+
+    let cgView3 = CGView3(frame:CGRectMake(0,164,self.view.frame.size.width,self.view.frame.size.height - 110))
+    cgView3.backgroundColor = UIColor.whiteColor()
+    self.view.addSubview(cgView3)
+
+}
+```
+
+Result after running:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/3.jpg>)
+
+UIKit's drawing wrappers are simpler to use. Continue adding methods directly in CGView3.  
+ /\*\* Draw a rectangle using UIKit wrappers
+
+```
+- parameter context: 上下文对象
+*/
+func drawRectByUIKitWithContext(context:CGContextRef){
+    let rect = CGRectMake(20, 60, 280.0, 50.0)
+    let rect2 = CGRectMake(20, 120, 280.0, 50.0)
+
+    UIColor.yellowColor().set()
+    UIRectFill(rect)
+
+    UIColor.redColor().setFill()
+    UIRectFill(rect2)
+}
+```
+
+Then call it in drawRect. Result:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/4.png>)
+
+### Drawing ellipses and circles
+
+Continue adding methods in CGView3.
+
+```
+/**
+画椭圆 宽高一样就是正圆
+
+- parameter context: 上下文对象
+*/
+func drawEllipse(context:CGContextRef){
+    let rect = CGRectMake(20, 180 ,100,120)
+
+    CGContextAddEllipseInRect(context, rect)
+    UIColor.purpleColor().set()
+    CGContextDrawPath(context, CGPathDrawingMode.Fill)
+}
+```
+
+The width and height differ here. Set them equal to draw a perfect circle.   
+ Add this method in drawRect.  
+ Result when run:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/5.png>)
+
+### Drawing arcs
+
+```
+/**
+创建弧形
+
+- parameter context: 上下文对象
+*/
+func drawArc(context:CGContextRef){
+    /*
+    添加弧形对象
+    x:中心点x坐标
+    y:中心点y坐标
+    radius:半径
+    startAngle:起始弧度
+    endAngle:终止弧度
+    closewise:是否逆时针绘制，0则顺时针绘制
+    */
+    CGContextAddArc(context, 200, 250 , 50 , 0 , CGFloat(M_PI) , 0)
+    UIColor.greenColor().set()
+    CGContextDrawPath(context, CGPathDrawingMode.Fill)
+}
+```
+
+Add it to drawRect as above.  
+ Result when run
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/6.png>)
+
+### Drawing Bézier curves
+
+Quartz 2D provides quadratic and cubic Bézier curves. A quadratic curve has one control point, while a cubic curve has two, as shown below:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/7.png>)
+
+Here is a demonstration of drawing.
+
+```
+/**
+绘制贝塞尔曲线
+
+- parameter context: 上下文对象
+*/
+func drawCurve(context:CGContextRef){
+    //绘制曲线
+    CGContextMoveToPoint(context, 20, 310) //移动到起始位置
+    /*
+    绘制二次贝塞尔曲线
+    c:图形上下文
+    cpx:控制点x坐标
+    cpy:控制点y坐标
+    x:结束点x坐标
+    y:结束点y坐标
+    */
+    CGContextAddQuadCurveToPoint(context, 220, 310 , 100, 400)
+
+    CGContextMoveToPoint(context, 230, 310)
+    /*绘制三次贝塞尔曲线
+    c:图形上下文
+    cp1x:第一个控制点x坐标
+    cp1y:第一个控制点y坐标
+    cp2x:第二个控制点x坐标
+    cp2y:第二个控制点y坐标
+    x:结束点x坐标
+    y:结束点y坐标
+    */
+    CGContextAddCurveToPoint(context, 100 , 330, 400, 410, 300, 500);
+
+    UIColor.yellowColor().setFill()
+    UIColor.redColor().setStroke()
+    CGContextDrawPath(context, CGPathDrawingMode.FillStroke)
+}
+```
+
+Add all the methods above to drawRect as follows:
+
+```
+override func drawRect(rect: CGRect) {
+    super.drawRect(rect)
+
+    // 1、 获取上下文对象
+    let context = UIGraphicsGetCurrentContext()
+    //画矩形
+    self.drawRectWithContext(context!)
+    //画矩形 用uikit封装的方法
+    self.drawRectByUIKitWithContext(context!)
+    //画椭圆 宽高一样就是正圆
+    self.drawEllipse(context!)
+    //画弧形
+    self.drawArc(context!)
+    //绘制 二次三次贝塞尔曲线
+    self.drawCurve(context!)
+}
+```
+
+Result:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/8.png>)
+
+### Drawing text
+
+Core Graphics draws text as well as shapes. This page is full, so create another page and continue. I will upload all the code to github for reference. Create a new UIView subclass named CGView4.  
+ Add the following method.  
+ /\*\* Draw text
+
+```
+- parameter context: 上下文对象
+*/
+func drawText(context:CGContextRef){
+    let str = "使用CoreGraphics进行文字绘制使用CoreGraphics进行文字绘制使用CoreGraphics进行文字绘制使用CoreGraphics进行文字绘制使用CoreGraphics进行文字绘制使用CoreGraphics进行文字绘制使用CoreGraphics进行文字绘制使用CoreGraphics进行文字绘制使用CoreGraphics进行文字绘制"
+    let rect = CGRectMake(20, 20, 280, 200)
+    let font = UIFont.systemFontOfSize(16)
+    let color = UIColor.redColor()
+    let style = NSMutableParagraphStyle()
+    style.alignment = NSTextAlignment.Left
+    (str as NSString).drawInRect(rect, withAttributes: [NSFontAttributeName:font,NSForegroundColorAttributeName:color,NSParagraphStyleAttributeName:style])
+
+}
+```
+
+Declare a string and configure its drawing rectangle, font, color, paragraph attributes, and so on. Many more attributes are available; see my other article for details.[Swift: A Deep Dive into CoreText Layout](<https://allluckly.cn/en/journal/2016-03-04-core-graphics-for-swift-developers-an-in-depth-introduction/>)  
+ After defining the drawing method, call it in drawRect.  
+ override func drawRect(rect: CGRect) { super.drawRect(rect)
+
+```
+    let context = UIGraphicsGetCurrentContext()
+
+    //文字绘制
+    self.drawText(context!)
+
+}
+```
+
+Add this to the new vc's viewDidLoad method.
+
+```
+override func viewDidLoad() {
+    super.viewDidLoad()
+    let cgView4 = CGView4(frame:CGRectMake(0,64,self.view.frame.width,self.view.frame.height))
+    cgView4.backgroundColor = UIColor.whiteColor()
+    self.view.addSubview(cgView4)
+
+}
+```
+
+Result
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/9.jpg>)
+
+The text is now drawn correctly in the view.
+
+### Drawing images
+
+Core Graphics can also draw images.  
+ Very simple.
+
+```
+/**
+图像绘制
+
+- parameter context: 上下文对象
+*/
+func drawImage(context:CGContextRef){
+
+    let img = UIImage(named: "ddla")
+    //绘制到指定的矩形中，注意如果大小不合适会会进行拉伸
+    img?.drawInRect(CGRectMake(0, 200, 100, 80))
+    //从某一点开始绘制
+    img?.drawAtPoint(CGPoint(x: 0, y: 320))
+
+}
+```
+
+Draw from a starting point or specify a destination rectangle.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/10.jpg>)
+
+### Drawing gradients
+
+Quartz 2D supports two gradient types:
+
+Linear gradient: colors transition along a straight line from the starting position to the ending position.
+
+Radial gradient: colors radiate from a center point, transitioning from the starting color to the ending color.
+
+When drawing gradients in iOS, specify a color space. A color space describes how values along different dimensions combine into a color. For RGB, imagine red, green, and blue as x, y, and z axes: choosing values from 0~255 on each axis produces different colors. Different spaces use different coordinate systems, or representations. Besides RGB, common spaces include CMYK, often used in printing, and Gray.
+
+The following code demonstrates both gradient types. Comments explain the drawing-function parameters in detail:
+
+### Linear gradient
+
+Create CGView5.
+
+```
+class CGView5: UIView {
+
+    override func drawRect(rect: CGRect) {
+        super.drawRect(rect)
+        let context = UIGraphicsGetCurrentContext()
+
+        //绘制线性渐变
+        self.drawLinearGradient(context!)
+
+    }
+
+    /**
+    绘制线性渐变
+
+    - parameter context: 上下文
+    */
+    func drawLinearGradient(context:CGContextRef){
+
+        //使用rgb颜色空间
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        /*
+        指定渐变色
+        space:颜色空间
+        components:颜色数组,注意由于指定了RGB颜色空间，那么四个数组元素表示一个颜色（red、green、blue、alpha），
+        如果有三个颜色则这个数组有4*3个元素
+        locations:颜色所在位置（范围0~1），这个数组的个数不小于components中存放颜色的个数
+        count:渐变个数，等于locations的个数
+        */
+        let compoents:[CGFloat] = [ 248.0/255.0,86.0/255.0,86.0/255.0,1,
+        249.0/255.0,127.0/255.0,127.0/255.0,1,
+        1.0,1.0,1.0,1.0]
+
+        let locations:[CGFloat] = [0,0.4,1]
+        let gradient = CGGradientCreateWithColorComponents(colorSpace, compoents, locations, locations.count)
+        /*
+        绘制线性渐变
+        context:图形上下文
+        gradient:渐变色
+        startPoint:起始位置
+        endPoint:终止位置
+        options:绘制方式,DrawsBeforeStartLocation 开始位置之前就进行绘制，到结束位置之后不再绘制，
+        DrawsAfterEndLocation开始位置之前不进行绘制，到结束点之后继续填充
+        */
+        CGContextDrawLinearGradient(context, gradient , CGPointZero, CGPointMake(self.frame.size.width,100), CGGradientDrawingOptions.DrawsAfterEndLocation)
+    }
+
+}
+```
+
+Then add it to a new vc.
+
+```
+let ctView = CGView5(frame:CGRectMake(0,64,self.view.frame.width,100))
+ctView.backgroundColor = UIColor.whiteColor()
+self.view.addSubview(ctView)
+```
+
+Result
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/11.png>)
+
+### Radial gradient
+
+Create CGView6.
+
+/\*\* Draw a radial gradient
+
+```
+- parameter context: 上下文
+*/
+func drawRadialGradient(context:CGContextRef){
+
+    //使用rgb颜色空间
+    let colorSpace = CGColorSpaceCreateDeviceRGB()
+    /*
+    指定渐变色
+    space:颜色空间
+    components:颜色数组,注意由于指定了RGB颜色空间，那么四个数组元素表示一个颜色（red、green、blue、alpha），
+    如果有三个颜色则这个数组有4*3个元素
+    locations:颜色所在位置（范围0~1），这个数组的个数不小于components中存放颜色的个数
+    count:渐变个数，等于locations的个数
+    */
+    let compoents:[CGFloat] = [ 248.0/255.0,86.0/255.0,86.0/255.0,1,
+    249.0/255.0,127.0/255.0,127.0/255.0,1,
+    1.0,1.0,1.0,1.0]
+
+    let locations:[CGFloat] = [0,0.4,1]
+    let gradient = CGGradientCreateWithColorComponents(colorSpace, compoents, locations, locations.count)
+    /*
+    绘制线性渐变
+    context:图形上下文
+    gradient:渐变色
+    startPoint:起始位置
+    startRadius:起始半径（通常为0，否则在此半径范围内容无任何填充）
+    endCenter:终点位置（通常和起始点相同，否则会有偏移）
+    endRadius:终点半径（也就是渐变的扩散长度）
+    options:绘制方式,DrawsBeforeStartLocation 开始位置之前就进行绘制，到结束位置之后不再绘制，
+    DrawsAfterEndLocation开始位置之前不进行绘制，到结束点之后继续填充
+    */
+    CGContextDrawRadialGradient(context, gradient, CGPointMake(100,100), 0, CGPointMake(105, 105), 80, CGGradientDrawingOptions.DrawsAfterEndLocation)
+}
+```
+
+Add this method to drawRect.   
+ Add the view to the vc.
+
+```
+override func viewDidLoad() {
+    super.viewDidLoad()
+    let ctView = CGView5(frame:CGRectMake(0,64,self.view.frame.width,100))
+    ctView.backgroundColor = UIColor.whiteColor()
+    self.view.addSubview(ctView)
+
+    let ctView1 = CGView6(frame:CGRectMake(0,100,self.view.frame.width,self.view.frame.height-100))
+    ctView1.backgroundColor = UIColor.whiteColor()
+    self.view.addSubview(ctView1)
+}
+```
+
+Running result
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/12.png>)
+
+### Gradient fills
+
+Sometimes a rectangle needs a gradient fill. Gradient clipping can achieve this.  
+ Continue adding the following methods in CGView6.  
+ /\*\* Draw a rectangle filled with a gradient
+
+```
+- parameter context: 上下文对象
+*/
+func drawRectWithLinearGradientFill(context:CGContextRef){
+    //使用rgb颜色空间
+    let colorSpace = CGColorSpaceCreateDeviceRGB()
+    //裁切处一块矩形用于显示，注意必须先裁切再调用渐变
+    //CGContextClipToRect(context, CGRectMake(20, 150, 280, 300))
+    //裁切还可以使用UIKit中对应的方法
+    UIRectClip(CGRectMake(20, 250, 300, 300))
+
+    let compoents:[CGFloat] = [ 248.0/255.0,86.0/255.0,86.0/255.0,1,
+    249.0/255.0,127.0/255.0,127.0/255.0,1,
+    1.0,1.0,1.0,1.0]
+
+    let locations:[CGFloat] = [0,0.4,1]
+    let gradient = CGGradientCreateWithColorComponents(colorSpace, compoents, locations, locations.count)
+    CGContextDrawLinearGradient(context, gradient, CGPointMake(20, 250), CGPointMake(320, 300), CGGradientDrawingOptions.DrawsAfterEndLocation);
+
+}
+```
+
+Result
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/13.png>)
+
+### Blending modes
+
+In Quartz 2D, later drawing covers earlier drawing. By default, covered content is no longer visible, which is not always the desired result. Quartz 2D therefore provides many fill modes for configuring the result.  
+ The following example illustrates this:  
+ Create CGView7.  
+ import UIKit
+
+```
+class CGView7: UIView {
+
+    //相信大家对比代码和显示效果并不难发现每种叠加的效果。例子中只是使用UIKit的封装方法进行叠加模式设置，更一般的方法当然是使用CGContextSetBlendMode(CGContextRef context, CGBlendMode mode)方法进行设置。
+    override func drawRect(rect: CGRect) {
+        super.drawRect(rect)
+        let rect0 = CGRectMake(0, 130.0, 320.0, 50.0)
+        let rect1 = CGRectMake(0, 390.0, 320.0, 50.0)
+
+        let rect2=CGRectMake(20, 50.0, 10.0, 250.0)
+        let rect3=CGRectMake(40.0, 50.0, 10.0, 250.0)
+        let rect4=CGRectMake(60.0, 50.0, 10.0, 250.0)
+        let rect5=CGRectMake(80.0, 50.0, 10.0, 250.0)
+        let rect6=CGRectMake(100.0, 50.0, 10.0, 250.0)
+        let rect7=CGRectMake(120.0, 50.0, 10.0, 250.0)
+        let rect8=CGRectMake(140.0, 50.0, 10.0, 250.0)
+        let rect9=CGRectMake(160.0, 50.0, 10.0, 250.0)
+        let rect10=CGRectMake(180.0, 50.0, 10.0, 250.0)
+        let rect11=CGRectMake(200.0, 50.0, 10.0, 250.0)
+        let rect12=CGRectMake(220.0, 50.0, 10.0, 250.0)
+        let rect13=CGRectMake(240.0, 50.0, 10.0, 250.0)
+        let rect14=CGRectMake(260.0, 50.0, 10.0, 250.0)
+        let rect15=CGRectMake(280.0, 50.0, 10.0, 250.0)
+
+        let rect16=CGRectMake(30.0, 310.0, 10.0, 250.0)
+        let rect17=CGRectMake(50.0, 310.0, 10.0, 250.0)
+        let rect18=CGRectMake(70.0, 310.0, 10.0, 250.0)
+        let rect19=CGRectMake(90.0, 310.0, 10.0, 250.0)
+        let rect20=CGRectMake(110.0, 310.0, 10.0, 250.0)
+        let rect21=CGRectMake(130.0, 310.0, 10.0, 250.0)
+        let rect22=CGRectMake(150.0, 310.0, 10.0, 250.0)
+        let rect23=CGRectMake(170.0, 310.0, 10.0, 250.0)
+        let rect24=CGRectMake(190.0, 310.0, 10.0, 250.0)
+        let rect25=CGRectMake(210.0, 310.0, 10.0, 250.0)
+        let rect26=CGRectMake(230.0, 310.0, 10.0, 250.0)
+        let rect27=CGRectMake(250.0, 310.0, 10.0, 250.0)
+        let rect28=CGRectMake(270.0, 310.0, 10.0, 250.0)
+        let rect29=CGRectMake(290.0, 310.0, 10.0, 250.0)
+
+        UIColor.yellowColor().set()
+        UIRectFill(rect0)
+        UIColor.greenColor().set()
+        UIRectFill(rect1)
+        UIColor.redColor().set()
+        UIRectFillUsingBlendMode(rect2, CGBlendMode.Clear )
+        UIRectFillUsingBlendMode(rect3, CGBlendMode.Color )
+        UIRectFillUsingBlendMode(rect4, CGBlendMode.ColorBurn)
+        UIRectFillUsingBlendMode(rect5, CGBlendMode.ColorDodge)
+        UIRectFillUsingBlendMode(rect6, CGBlendMode.Copy)
+        UIRectFillUsingBlendMode(rect7, CGBlendMode.Darken)
+        UIRectFillUsingBlendMode(rect8, CGBlendMode.DestinationAtop)
+        UIRectFillUsingBlendMode(rect9, CGBlendMode.DestinationIn)
+        UIRectFillUsingBlendMode(rect10, CGBlendMode.DestinationOut)
+        UIRectFillUsingBlendMode(rect11, CGBlendMode.DestinationOver)
+        UIRectFillUsingBlendMode(rect12, CGBlendMode.Difference)
+        UIRectFillUsingBlendMode(rect13, CGBlendMode.Exclusion)
+        UIRectFillUsingBlendMode(rect14, CGBlendMode.HardLight)
+        UIRectFillUsingBlendMode(rect15, CGBlendMode.Hue)
+        UIRectFillUsingBlendMode(rect16, CGBlendMode.Lighten)
+
+        UIRectFillUsingBlendMode(rect17, CGBlendMode.Luminosity)
+        UIRectFillUsingBlendMode(rect18, CGBlendMode.Multiply)
+        UIRectFillUsingBlendMode(rect19, CGBlendMode.Normal)
+        UIRectFillUsingBlendMode(rect20, CGBlendMode.Overlay)
+        UIRectFillUsingBlendMode(rect21, CGBlendMode.PlusDarker)
+        UIRectFillUsingBlendMode(rect22, CGBlendMode.PlusLighter)
+        UIRectFillUsingBlendMode(rect23, CGBlendMode.Saturation)
+        UIRectFillUsingBlendMode(rect24, CGBlendMode.Screen)
+        UIRectFillUsingBlendMode(rect25, CGBlendMode.SoftLight)
+        UIRectFillUsingBlendMode(rect26, CGBlendMode.SourceAtop)
+        UIRectFillUsingBlendMode(rect27, CGBlendMode.SourceIn)
+        UIRectFillUsingBlendMode(rect28, CGBlendMode.SourceOut)
+        UIRectFillUsingBlendMode(rect29, CGBlendMode.XOR)
+
+    }
+}
+```
+
+Add it to a new vc. Result:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/14.png>)
+
+Compare the code and output to inspect each blending effect.
+
+### Context transformations
+
+A view's transform can translate, rotate, and scale it. Drawing often requires transformations too. When drawing text with CoreText, transformations are needed because Core Graphics places its origin at the lower left while UIKit places it at the upper right. The following image transformation demonstrates transforming a graphics context.
+
+```
+class CGView8: UIView {
+
+    override func drawRect(rect: CGRect) {
+        super.drawRect(rect)
+
+        let context = UIGraphicsGetCurrentContext()
+        self.drawImage(context!)
+    }
+    /**
+    平移旋转缩放
+
+    - parameter context: 上下文对象
+    */
+    func drawImage(context:CGContextRef){
+        //保存初始状态
+        CGContextSaveGState(context);
+
+        //形变第一步：图形上下文向右平移100
+        CGContextTranslateCTM(context,100, 0);
+
+        //形变第二步：缩放0.8
+        CGContextScaleCTM(context, 0.8, 0.8);
+
+        //形变第三步：旋转
+        CGContextRotateCTM(context, CGFloat(M_PI_4)/4);
+        let img = UIImage(named: "ddla")
+
+        //从某一点开始绘制
+        img?.drawAtPoint(CGPoint(x: 0, y: 100))
+
+    }
+}
+```
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/15.png>)
+
+Drawing images with Core Graphics
+
+```
+class CGView9: UIView {
+
+    //    在前面基本绘图部分，绘制图像时使用了UIKit中封装的方法进行了图像绘制，我们不妨看一下使用Quartz 2D内置方法绘制是什么效果。
+    override func drawRect(rect: CGRect) {
+        super.drawRect(rect)
+
+        let context = UIGraphicsGetCurrentContext()
+        self.drawImage2(context!)
+    }
+    func drawImage2(context:CGContextRef){
+        let image = UIImage(named: "ddla")
+
+        let size = UIScreen.mainScreen().bounds.size
+        CGContextSaveGState(context)
+        let height:CGFloat = 450
+        let y:CGFloat = 50
+        //图像绘制
+        let rect = CGRectMake(10, y, 300, height)
+
+        //        在Core Graphics中坐标系的y轴正方向是向上的，坐标原点在屏幕左下角，y轴方向刚好和UIKit中y轴方向相反
+        CGContextScaleCTM(context, 1.0, -1.0) //在y轴缩放-1相当于沿着x张旋转180
+        CGContextTranslateCTM(context, 0, -(size.height-(size.height-2*y-height))) //向上平移
+        CGContextDrawImage(context, rect, image?.CGImage)
+
+    }
+
+}
+```
+
+We flip and translate to account for the coordinate system.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/16.png>)
+
+### Drawing to a bitmap
+
+Use a bitmap graphics context to add a watermark. First create the context, draw an image, line, and text into it, then obtain the resulting image from the context and display it in the interface.
+
+```
+class SeventhViewController: UIViewController {
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        let image = self.drawImageAtImageContext()
+        let imageView = UIImageView(image: image)
+        imageView.center=CGPointMake(160, 284)
+
+        self.view.addSubview(imageView)
+    }
+
+    func drawImageAtImageContext()->UIImage{
+        // 获得一个位图图形上下文
+        let size = CGSizeMake(300, 200)
+        UIGraphicsBeginImageContext(size)
+
+        let img = UIImage(named: "ddla")
+        img?.drawInRect(CGRectMake(0, 0, 300, 200))//注意绘图的位置是相对于画布顶点而言，不是屏幕
+
+        //添加水印
+        let context = UIGraphicsGetCurrentContext()
+        CGContextMoveToPoint(context, 200, 178)
+        CGContextAddLineToPoint(context, 265, 178)
+
+        UIColor.redColor().setStroke()
+        CGContextSetLineWidth(context, 2)
+        CGContextDrawPath(context, CGPathDrawingMode.Stroke)
+
+        let str = "ZUBER"
+        (str as NSString).drawInRect(CGRectMake(200, 158, 100, 30), withAttributes: [NSFontAttributeName:UIFont.boldSystemFontOfSize(18),NSForegroundColorAttributeName:UIColor.redColor()])
+        //返回绘制的新图形
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+
+        //保存图片
+        //        let data = UIImagePNGRepresentation(newImage)
+        //        data?.writeToFile("your_path", atomically: true)
+
+        //不要忘记关闭对应上下文
+        UIGraphicsEndImageContext()
+
+        return newImage
+    }
+
+//    注意：上面这种方式绘制的图像除了可以显示在界面上还可以调用对应方法进行保存（代码注释中已经包含保存方法）；除此之外这种方法相比在drawRect：方法中绘制图形效率更高，它不用每次展示时都调用所有图形绘制方法。
+
+}
+```
+
+We draw an image directly in the vc.  
+ Result
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/17.png>)
+
+### Drawing a pdf
+
+Drawing to PDF requires a pdf graphics context, created and used similarly to a bitmap context. The important difference is pagination: call IGraphicsBeginPDFPage(); at the start of every page. The example below draws text and images; other drawing operations work similarly.
+
+```
+class EighthViewController: UIViewController {
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        self.drawContentToPdfContext()
+    }
+
+    func drawContentToPdfContext(){
+
+        //沙盒路径（也就是我们应用程序文件运行的路径）
+        let paths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentationDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+
+        let path = (paths.first! as NSString).stringByAppendingPathComponent("test.pdf")
+        NSFileManager.defaultManager().createFileAtPath(path, contents: nil, attributes: nil)
+
+        //启用pdf图形上下文
+        /**
+        path:保存路径
+        bounds:pdf文档大小，如果设置为CGRectZero则使用默认值：612*792
+        pageInfo:页面设置,为nil则不设置任何信息
+        */
+        UIGraphicsBeginPDFContextToFile(path, CGRectZero, nil)
+        //        [kCGPDFContextAuthor:"ZUBER"]
+        //由于pdf文档是分页的，所以首先要创建一页画布供我们绘制
+        UIGraphicsBeginPDFPage()
+
+        let title = "开心的学习 CoreGraphics 开心的学习Swift"
+        let style = NSMutableParagraphStyle()
+        style.alignment = NSTextAlignment.Center
+        (title as NSString).drawInRect(CGRectMake(26, 20, 300, 50) , withAttributes: [NSFontAttributeName:UIFont.boldSystemFontOfSize(18),NSParagraphStyleAttributeName:style])
+
+        let content = "Learn about Apple products, view online manuals, get the latest downloads, and more. Connect with other Apple users, or get service, support, and professional advice from Apple."
+        let style2 = NSMutableParagraphStyle()
+        style2.alignment = NSTextAlignment.Left
+        (content as NSString).drawInRect(CGRectMake(26, 56, 300, 255) , withAttributes: [NSFontAttributeName:UIFont.systemFontOfSize(15),NSParagraphStyleAttributeName:style2,NSForegroundColorAttributeName:UIColor.grayColor()])
+
+        let img = UIImage(named: "ddla")
+        img?.drawInRect(CGRectMake(316, 20, 290, 305))
+
+        let img2 = UIImage(named: "ddla")
+        img2?.drawInRect(CGRectMake(6, 320, 600, 281))
+
+        //创建新的一页继续绘制
+        UIGraphicsBeginPDFPage()
+        let img3 = UIImage(named: "ddla")
+        img3?.drawInRect(CGRectMake(6, 20, 600, 629))
+
+        //结束pdf上下文
+        UIGraphicsEndPDFContext()
+
+        let scrollView = UIScrollView()
+        scrollView.frame = CGRectMake(0,64,self.view.frame.width,self.view.frame.height-64)
+        scrollView.contentSize = CGSizeMake(self.view.frame.width+200,800)
+        //把pdf显示在view上
+        let ctView = CGView10(frame:CGRectMake(0,64,self.view.frame.width+200,800))
+        ctView.path = path
+        scrollView.addSubview(ctView)
+        self.view.addSubview(scrollView)
+        ctView.backgroundColor = UIColor.whiteColor()
+
+    }
+
+}
+```
+
+First, obtain a directory, append our filename, and create the file so it can be drawn into. Finally, CGView10 reads one page.
+
+```
+import UIKit
+
+class CGView10: UIView {
+
+var path:String!
+
+    override func drawRect(rect: CGRect) {
+        super.drawRect(rect)
+
+        let context = UIGraphicsGetCurrentContext()
+        CGContextTranslateCTM(context, 0.0, self.bounds.size.height)
+        CGContextScaleCTM(context, 1.0, -1.0)
+        let url = NSURL(fileURLWithPath: path) as CFURLRef
+        let pdf = CGPDFDocumentCreateWithURL(url)
+        let page = CGPDFDocumentGetPage(pdf, 1)
+        CGContextSaveGState(context)
+
+        //        let pdfTransform = CGPDFPageGetDrawingTransform(page, CGPDFBox.CropBox, self.bounds, 0, true)
+        //        CGContextConcatCTM(context, pdfTransform)
+
+        CGContextDrawPDFPage(context, page);
+        CGContextRestoreGState(context);
+    }
+}
+```
+
+Result
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao29/18.png>)
+
+To refresh drawRect, call setNeedsLayout at the appropriate time, as you probably already know.  
+ This will likely be useful often when building a drawing app.  
+ [github URL:](<https://github.com/smalldu/ZZCoreGraphics>)
+
+References: [References](<http://www.cnblogs.com/kenshincui/p/3959951.html>)
+
+---
+
+Recommended reading: [Bison's guide to iOS multithreading, part 3](<https://allluckly.cn/en/journal/2016-02-29-bison-s-guide-to-ios-multithreading-part-3/>)
+{% endraw %}

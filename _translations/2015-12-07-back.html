@@ -1,0 +1,140 @@
+---
+layout: post
+title: OCR for debit and credit cards in iOS development
+description: Introduces card.io SDK integration for scanning card numbers, including linker settings, delegates
+  and recognition callbacks. Objective-C and Swift examples accompany the workflow; the article specifies that the
+  selected implementation is for credit-card scanning.
+category: Development notes
+imagefeature: BG.jpg
+date: 2015-12-07 00:00:00 +0800
+technical_translation:
+  topic: data-network
+  summary: Introduces card.io SDK integration for scanning card numbers, including linker settings, delegates and
+    recognition callbacks. Objective-C and Swift examples accompany the workflow; the article specifies that the
+    selected implementation is for credit-card scanning.
+  keywords:
+  - card.io
+  - OCR
+  - credit-card recognition
+  - SDK integration
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Specifies Xcode 7.1 and identifies the selected solution as a credit-card scanner.
+  title: OCR for debit and credit cards in iOS development
+  source_sha256: 6f6a1fda13d2631d137240130fbf31e4c6b5a50881bd0e9d3145418594988137
+lang: en
+source_path: _posts/2015-12-07-back.md
+source_url: /ocr/back
+permalink: /en/journal/2015-12-07-ocr-for-debit-and-credit-cards-in-ios-development/
+translation_method: machine-assisted
+translation_source_sha256: 6f6a1fda13d2631d137240130fbf31e4c6b5a50881bd0e9d3145418594988137
+excerpt: Introduces card.io SDK integration for scanning card numbers, including linker settings, delegates and
+  recognition callbacks. Objective-C and Swift examples accompany the workflow; the article specifies that the selected
+  implementation is for credit-card scanning.
+translation_date: '2026-10-23T02:44:59+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"iOS technical sharing, iOS development, iOS development tips, iOS development blog"
+<small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p><br/>
+Recently our company needed to scan bank cards and obtain card numbers. I searched many related resources online; full bank-card scanning<br/>
+solutions that retrieve card numbers were extremely expensive, and the price only covered licensing. So I looked for an alternative and found one that can<br/>
+a third-party framework that scans credit cards. I am sharing it here, but it only scans credit cards… o.0.<br/>
+The framework is called <code class="language-plaintext highlighter-rouge">CardIO</code><br/>
+<a href="https://github.com/AllLuckly/card.io-iOS-SDK">Download URL</a><br/>
+Here I mainly demonstrate the integration process, so watch these steps carefully.<br/>
+I am using xcode 7.1. First, drag the whole framework into your project, then under<br/>
+TARGETS—Build Phases—Link Binary With Libraries<br/>
+Add the following frameworks there.<br/>
+<code class="language-plaintext highlighter-rouge">Accelerate.framework</code><br/>
+<code class="language-plaintext highlighter-rouge">MobileCoreServices.framework</code><br/>
+<code class="language-plaintext highlighter-rouge">CoreMedia.framework</code><br/>
+<code class="language-plaintext highlighter-rouge">AudioToolbox.framework</code><br/>
+<code class="language-plaintext highlighter-rouge">AVFoundation.framework</code><br/>
+Also add the following under TARGETS → Build Settings → Other Linker Flags:<code class="language-plaintext highlighter-rouge">-ObjC</code> and <code class="language-plaintext highlighter-rouge">-lc++</code></p>
+<p>In the <code class="language-plaintext highlighter-rouge">VC</code> where it will be called, import these headers:
+<code class="language-plaintext highlighter-rouge">#import "CardIO.h"</code>
+<code class="language-plaintext highlighter-rouge">#import "CardIOPaymentViewControllerDelegate.h"</code>
+Then add the <code class="language-plaintext highlighter-rouge">CardIOPaymentViewControllerDelegate</code> delegate.</p>
+<p>Then implement the methods.<br/></p>
+<h2 id="oc版-">Objective-C version <br/></h2>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">viewDidLoad</span> <span class="p">{</span>
+    <span class="err">[super</span> <span class="err">viewDidLoad];</span>
+
+    <span class="err">[CardIOUtilities</span> <span class="err">preload];</span>
+<span class="p">}</span>
+
+<span class="o">//</span><span class="nt">开始调用扫描</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">IBAction</span><span class="o">)</span><span class="nt">begin</span><span class="o">:(</span><span class="nt">id</span><span class="o">)</span><span class="nt">sender</span> <span class="p">{</span>
+
+    <span class="err">CardIOPaymentViewController</span> <span class="err">*scanViewController</span> <span class="err">=</span> <span class="err">[[CardIOPaymentViewController</span> <span class="err">alloc]</span> <span class="py">initWithPaymentDelegate</span><span class="p">:</span><span class="n">self</span><span class="p">];</span>
+
+    <span class="err">[self</span> <span class="py">presentViewController</span><span class="p">:</span><span class="n">scanViewController</span> <span class="n">animated</span><span class="p">:</span><span class="n">YES</span> <span class="n">completion</span><span class="p">:</span><span class="n">nil</span><span class="p">];</span>
+<span class="p">}</span>
+
+
+<span class="o">//</span><span class="nt">取消扫描</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">userDidCancelPaymentViewController</span><span class="o">:(</span><span class="nt">CardIOPaymentViewController</span> <span class="o">*)</span><span class="nt">scanViewController</span>
+
+<span class="p">{</span>
+
+
+    <span class="err">[scanViewController</span> <span class="py">dismissViewControllerAnimated</span><span class="p">:</span><span class="n">YES</span> <span class="n">completion</span><span class="p">:</span><span class="n">nil</span><span class="p">];</span>
+
+<span class="p">}</span>
+
+<span class="o">//</span><span class="nt">扫描完成</span>
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">userDidProvideCreditCardInfo</span><span class="o">:(</span><span class="nt">CardIOCreditCardInfo</span> <span class="o">*)</span><span class="nt">info</span> <span class="nt">inPaymentViewController</span><span class="o">:(</span><span class="nt">CardIOPaymentViewController</span> <span class="o">*)</span><span class="nt">scanViewController</span>
+
+<span class="p">{</span>
+
+    <span class="err">//扫描结果</span>
+    <span class="err">NSLog(@"Received</span> <span class="err">card</span> <span class="err">info.</span> <span class="py">Number</span><span class="p">:</span> <span class="err">%@</span><span class="p">,</span> <span class="n">expiry</span><span class="p">:</span> <span class="err">%</span><span class="m">02</span><span class="n">i</span><span class="p">/</span><span class="err">%</span><span class="n">i</span><span class="p">,</span> <span class="n">cvv</span><span class="p">:</span> <span class="err">%@</span><span class="p">.</span><span class="err">"</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">redactedCardNumber</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">expiryMonth</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">expiryYear</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">cvv</span><span class="p">);</span>
+
+    <span class="err">[scanViewController</span> <span class="py">dismissViewControllerAnimated</span><span class="p">:</span><span class="n">YES</span> <span class="n">completion</span><span class="p">:</span><span class="n">nil</span><span class="p">];</span>
+
+<span class="p">}</span></code></pre></figure>
+<h2 id="swift版">SWIFT version</h2>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">import</span> <span class="nt">UIKit</span>
+
+<span class="nt">class</span> <span class="nt">ViewController</span><span class="o">:</span> <span class="nt">UIViewController</span><span class="o">,</span> <span class="nt">CardIOPaymentViewControllerDelegate</span> <span class="p">{</span>
+
+<span class="err">@IBOutlet</span> <span class="err">weak</span> <span class="err">var</span> <span class="py">resultLabel</span><span class="p">:</span> <span class="n">UILabel</span><span class="err">!</span>
+<span class="n">override</span> <span class="n">func</span> <span class="n">viewDidLoad</span><span class="p">()</span> <span class="err">{</span>
+    <span class="nb">super</span><span class="p">.</span><span class="n">viewDidLoad</span><span class="p">()</span>
+    
+    <span class="n">CardIOUtilities</span><span class="p">.</span><span class="n">preload</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="o">//</span><span class="nt">开始调用扫描</span>
+<span class="k">@IBAction</span> <span class="n">func</span> <span class="n">scanCard</span><span class="p">(</span><span class="n">sender</span><span class="p">:</span> <span class="n">AnyObject</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nt">let</span> <span class="nt">cardIOVC</span> <span class="o">=</span> <span class="nt">CardIOPaymentViewController</span><span class="o">(</span><span class="nt">paymentDelegate</span><span class="o">:</span> <span class="nt">self</span><span class="o">)</span>
+    <span class="nt">cardIOVC</span><span class="nc">.modalPresentationStyle</span> <span class="o">=</span> <span class="nc">.FormSheet</span>
+    <span class="nt">presentViewController</span><span class="o">(</span><span class="nt">cardIOVC</span><span class="o">,</span> <span class="nt">animated</span><span class="o">:</span> <span class="nt">true</span><span class="o">,</span> <span class="nt">completion</span><span class="o">:</span> <span class="nt">nil</span><span class="o">)</span>
+<span class="p">}</span>
+<span class="o">//</span><span class="nt">取消扫描</span>
+<span class="nt">func</span> <span class="nt">userDidCancelPaymentViewController</span><span class="o">(</span><span class="nt">paymentViewController</span><span class="o">:</span> <span class="nt">CardIOPaymentViewController</span><span class="o">!)</span> <span class="p">{</span>
+    <span class="err">resultLabel.text</span> <span class="err">=</span> <span class="err">"user</span> <span class="err">canceled"</span>
+    <span class="err">paymentViewController?.dismissViewControllerAnimated(true,</span> <span class="py">completion</span><span class="p">:</span> <span class="n">nil</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="o">//</span><span class="nt">扫描完成</span>
+<span class="nt">func</span> <span class="nt">userDidProvideCreditCardInfo</span><span class="o">(</span><span class="nt">cardInfo</span><span class="o">:</span> <span class="nt">CardIOCreditCardInfo</span><span class="o">!,</span> <span class="nt">inPaymentViewController</span> <span class="nt">paymentViewController</span><span class="o">:</span> <span class="nt">CardIOPaymentViewController</span><span class="o">!)</span> <span class="p">{</span>
+    <span class="err">if</span> <span class="err">let</span> <span class="err">info</span> <span class="err">=</span> <span class="err">cardInfo</span> <span class="err">{</span>
+        <span class="err">let</span> <span class="err">str</span> <span class="err">=</span> <span class="err">NSString(</span><span class="py">format</span><span class="p">:</span> <span class="s1">"Received card info.\n Number: %@\n expiry: %02lu/%lu\n cvv: %@."</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">redactedCardNumber</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">expiryMonth</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">expiryYear</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">cvv</span><span class="p">)</span>
+        <span class="n">resultLabel</span><span class="p">.</span><span class="nb">text</span> <span class="err">=</span> <span class="n">str</span> <span class="n">as</span> <span class="n">String</span>
+    <span class="p">}</span>
+        <span class="nt">paymentViewController</span><span class="o">?</span><span class="nc">.dismissViewControllerAnimated</span><span class="o">(</span><span class="nt">true</span><span class="o">,</span> <span class="nt">completion</span><span class="o">:</span> <span class="nt">nil</span><span class="o">)</span>
+    <span class="err">}</span>  
+<span class="err">}</span></code></pre></figure>
+<p><br/>
+That completes it. This framework by an overseas developer is very effective; I hope to find a similarly useful third-party bank-card scanner.<br/>
+The final result recognises the number very accurately.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/backing.png"/></p>
+<p>Recommended reading: <a href="/en/journal/2015-06-04-an-illustrated-guide-to-implementing-ios-in-app-purchases/">An illustrated guide to implementing iOS in-app purchases</a><br/></p>
+<p>Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.</p>
+
+{% endraw %}

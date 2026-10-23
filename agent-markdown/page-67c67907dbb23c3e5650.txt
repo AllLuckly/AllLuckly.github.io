@@ -1,0 +1,109 @@
+---
+layout: null
+permalink: /en/journal/2016-01-04-a-windows-aliwangwang-style-login-screen-with-a-paper-feed-animation/index.md
+sitemap: false
+noindex: true
+lang: en
+title: A Windows AliWangWang-style login screen with a paper-feed animation
+agent_source_url: https://allluckly.cn/en/journal/2016-01-04-a-windows-aliwangwang-style-login-screen-with-a-paper-feed-animation/
+agent_source_sha256: d2998071310cea1d022f27ee46f7a659f7f65e19a5a081e9e53bb54b444d3d94
+agent_generator_version: 1
+---
+{% raw %}# A Windows AliWangWang-style login screen with a paper-feed animation
+
+Language: en
+Canonical: [A Windows AliWangWang-style login screen with a paper-feed animation](<https://allluckly.cn/en/journal/2016-01-04-a-windows-aliwangwang-style-login-screen-with-a-paper-feed-animation/>)
+中文：[中文 HTML](<https://allluckly.cn/sdk/aliww>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-01-04-a-windows-aliwangwang-style-login-screen-with-a-paper-feed-animation/>)
+Published: 2016-01-04T00:00:00+08:00
+Modified: 2026-10-23T10:34:11+08:00
+Author: [Bison](<https://allluckly.cn/about/>)
+
+Recreates the printer-paper login animation from Windows AliWangWang. Keeping the view's horizontal position and width fixed while gradually adjusting its height creates the unfolding effect; the LBPrinterPaper project supplies the example.
+
+Originally credited to Bison. Content is retained as published.
+
+English translation of the [Chinese original](<https://allluckly.cn/sdk/aliww>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Read API, dependency and tool details in the context of the original publication date.
+
+> “I happened to notice the interesting login effect in AliWangWang for Windows, so I imitated it with an animation resembling paper coming out of a printer.”
+
+I happened to notice the interesting login effect in AliWangWang for Windows, so I imitated it with an animation resembling paper coming out of a printer.  
+ Something that looks impressive is not necessarily hard to implement. Here is the main source code.
+
+```css
+- (void)createUI{
+    UIImageView *backimageView=[[UIImageView alloc]init];
+    backimageView.image =[UIImage imageNamed:@"1.png"];
+    backimageView.frame = CGRectMake(50, 100, LBSCREEN_WIDTH-100, 30);
+    [self.view addSubview:backimageView];
+    backView = [[UIView alloc]initWithFrame:CGRectMake(60, 115, LBSCREEN_WIDTH-120, 0)];
+    backView.layer.cornerRadius = 5;
+    backView.backgroundColor = [UIColor whiteColor];
+    backView.layer.borderWidth = 1;
+    backView.layer.borderColor = [UIColor blackColor].CGColor;
+    backView.clipsToBounds = YES;
+    [self.view addSubview:backView];
+    login_btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    login_btn.frame = CGRectMake(10, 120, LBSCREEN_WIDTH-140, 35);
+    [login_btn setTitle:@"登陆" forState:UIControlStateNormal];
+    login_btn.backgroundColor = [UIColor lightGrayColor];
+    login_btn.layer.cornerRadius = 5;
+    login_btn.layer.borderWidth = 1;
+    login_btn.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    [login_btn addTarget:self action:@selector(passwordClick:) forControlEvents:UIControlEventTouchUpInside];
+    login_btn.clipsToBounds = YES;
+    pass_btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    pass_btn.frame = CGRectMake(10, 165, LBSCREEN_WIDTH-140, 35);
+    [pass_btn setTitle:@"注册" forState:UIControlStateNormal];
+    pass_btn.backgroundColor = [UIColor redColor];
+    [pass_btn addTarget:self action:@selector(passwordClick:) forControlEvents:UIControlEventTouchUpInside];
+    pass_btn.layer.cornerRadius = 5;
+    pass_btn.layer.borderWidth = 1;
+    pass_btn.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    pass_btn.clipsToBounds = YES;
+    Name_textfield = [[UITextField alloc]initWithFrame:CGRectMake(10, 20, LBSCREEN_WIDTH-140, 40)];
+    Name_textfield.placeholder = @"帐号";
+    Name_textfield.borderStyle = UITextBorderStyleRoundedRect;
+    Pass_textfield = [[UITextField alloc]initWithFrame:CGRectMake(10, 70, LBSCREEN_WIDTH-140, 40)];
+    Pass_textfield.borderStyle = UITextBorderStyleRoundedRect;
+    Pass_textfield.placeholder = @"密码";
+    //2秒后开始一个持续一分钟的动画
+    [UIView animateWithDuration:1 delay:2 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+        backView.frame=CGRectMake(60, 115, LBSCREEN_WIDTH-120, 210);
+    } completion:^(BOOL finished) {
+    
+        [backView addSubview:Name_textfield];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [backView addSubview:Pass_textfield];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [backView addSubview:login_btn];
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [backView addSubview:pass_btn];
+                });
+            });
+        });
+
+    }];
+
+}
+
+- (void)passwordClick:(UIButton *)sender{
+    NSLog(@"hhhhh....");
+}
+```
+
+It is not hard to understand, is it? The main technique is an animation that changes the frame: keep x, y, and width unchanged, and change the height.  
+ Here is the result.
+
+![(https://allluckly.cn/)](<https://github.com/AllLuckly/LBPrinterPaper/blob/master/LBPrinterPaper.gif?raw=true>)
+
+> Oh, I almost forgot the source-code download link. Here it is.
+
+[Download link—click here](<https://github.com/AllLuckly/LBPrinterPaper>)
+
+Recommended reading: [Bison's collection of solutions to common Git errors](<https://allluckly.cn/en/journal/2015-12-28-bison-s-collection-of-solutions-to-common-git-errors/>)
+
+Original article: [https://allluckly.cn/](<https://allluckly.cn/en/>)
+{% endraw %}

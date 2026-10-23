@@ -1,0 +1,423 @@
+---
+layout: post
+title: An introduction to Core Animation on iOS
+description: Introduces Core Animation through CALayer, CAAnimation and CAAction, explaining the relationship between
+  layers and animation objects, timing control and action lookup. Examples distinguish the organisation of implicit
+  and explicit animations.
+category: Development notes
+imagefeature: null
+date: 2016-06-19 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Introduces Core Animation through CALayer, CAAnimation and CAAction, explaining the relationship between
+    layers and animation objects, timing control and action lookup. Examples distinguish the organisation of implicit
+    and explicit animations.
+  keywords:
+  - Core Animation
+  - CALayer
+  - CAAnimation
+  - CAAction
+  - implicit animation
+  provenance: contribution
+  author_name: Sindri
+  source_url: http://www.jianshu.com/p/3d220b9a20f5
+  credit: Originally credited to Sindri; edited and archived by Bison.
+  title: An introduction to Core Animation on iOS
+  source_sha256: 06270ba966a92b41bbae4ae27b93730d1e68120ff76e7ebc27d3f1f668f421e5
+lang: en
+source_path: _posts/2016-06-19-tuogao49.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao49
+permalink: /en/journal/2016-06-19-an-introduction-to-core-animation-on-ios/
+translation_method: machine-assisted
+translation_source_sha256: 06270ba966a92b41bbae4ae27b93730d1e68120ff76e7ebc27d3f1f668f421e5
+excerpt: Introduces Core Animation through CALayer, CAAnimation and CAAction, explaining the relationship between
+  layers and animation objects, timing control and action lookup. Examples distinguish the organisation of implicit
+  and explicit animations.
+translation_date: '2026-10-23T02:45:03+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/3d220b9a20f5">Sindri’s Notes</a><br/></p>
+<p>On iOS, ordinary animations can use methods provided by <code class="language-plaintext highlighter-rouge">UIKit</code>. For complex effects, the animations in <code class="language-plaintext highlighter-rouge">CoreAnimation</code> are the best choice. Compared with the former approach, the latter has benefits including, but not limited to, the following:</p>
+<ul>
+<li>Lightweight data structures allow hundreds of layers to animate simultaneously.</li>
+<li>An independent thread executes our animation interfaces.</li>
+<li>Once configured, Core Animation takes full control of the animation frames.</li>
+<li>Improve application performance: redraw content only when it changes, eliminating application code running at the animation's frame rate.</li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao49/1.jpg"/><br/></p>
+<p>in <code class="language-plaintext highlighter-rouge">CoreAnimation</code> framework, the two main components are the layer <code class="language-plaintext highlighter-rouge">CALayer</code> and animation <code class="language-plaintext highlighter-rouge">CAAnimation</code> classes. The first manages a bitmap context that can be animated; the second is an abstract animation base class providing <code class="language-plaintext highlighter-rouge">CAMediaTiming</code> and <code class="language-plaintext highlighter-rouge">CAAction</code> protocol support, allowing subclass instances to act directly on <code class="language-plaintext highlighter-rouge">CALayer</code> itself to animate. Next, I will discuss these classes individually, using information from <a href="https://developer.apple.com/library/mac/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/Instrument-CoreAnimation.html">Apple's official documentation</a> and <a href="http://objccn.io">objc China</a></p>
+<h2 id="calayer">CALayer</h2>
+<blockquote>
+<p>CALayer class structure</p>
+</blockquote>
+<p>If you enjoy animation, you will often see <code class="language-plaintext highlighter-rouge">CALayer</code> and its subclasses in open-source implementations online. To understand this layer class, start with its structure. The following lists selected properties with comments removed:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public class CALayer : NSObject, NSCoding, CAMediaTiming {
+
+    public func presentationLayer() -&gt; AnyObject?
+    public func modelLayer() -&gt; AnyObject
+
+    public var bounds: CGRect
+    public var position: CGPoint
+    public var anchorPoint: CGPoint
+    public var transform: CATransform3D
+    public var frame: CGRect
+    public var hidden: Bool
+
+    public var superlayer: CALayer? { get }
+    public func removeFromSuperlayer()
+    public func addSublayer(layer: CALayer)
+    public func insertSublayer(layer: CALayer, below sibling: CALayer?)
+    public func insertSublayer(layer: CALayer, above sibling: CALayer?)
+    public func replaceSublayer(layer: CALayer, with layer2: CALayer)
+    public var sublayerTransform: CATransform3D
+
+    public var mask: CALayer?
+    public var masksToBounds: Bool
+
+    public func hitTest(p: CGPoint) -&gt; CALayer?
+    public func containsPoint(p: CGPoint) -&gt; Bool
+
+    public var shadowColor: CGColor?
+    public var shadowOpacity: Float
+    public var shadowOffset: CGSize
+    public var shadowRadius: CGFloat
+
+    public var contents: AnyObject?
+    public var contentsRect: CGRect
+
+    public var cornerRadius: CGFloat
+    public var borderWidth: CGFloat
+    public var borderColor: CGColor?
+    public var opacity: Float
+}
+</code></pre></div></div>
+<p>Based on <a href="https://developer.apple.com/library/tvos/documentation/GraphicsImaging/Reference/CALayer_class/">CALayer Class Reference</a>'s description, every <code class="language-plaintext highlighter-rouge">UIView</code> has an underlying <code class="language-plaintext highlighter-rouge">CALayer</code> object to help display its content. It manages the bitmap contexts we provide for the view and their geometry. The code above shows that:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">CALayer</code> is <code class="language-plaintext highlighter-rouge">NSObject</code>'s subclass rather than <code class="language-plaintext highlighter-rouge">UIResponder</code> subclass. The layer therefore cannot handle user-interaction events itself, even though it has an <a href="http://www.jianshu.com/p/a8926633837b">Event responder chain </a>similar check, so <code class="language-plaintext highlighter-rouge">CALayer</code> must be wrapped in an <code class="language-plaintext highlighter-rouge">UIView</code> container to achieve this.</li>
+<li>Every <code class="language-plaintext highlighter-rouge">UIView</code> has a <code class="language-plaintext highlighter-rouge">CALayer</code> to display content. The latter contains several variables corresponding to <code class="language-plaintext highlighter-rouge">UIView</code>'s visual properties. Thus changing a <code class="language-plaintext highlighter-rouge">UIView</code>'s appearance actually changes the properties of that <code class="language-plaintext highlighter-rouge">UIView</code>'s corresponding <code class="language-plaintext highlighter-rouge">layer</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">CALayer</code> has a tree hierarchy like <code class="language-plaintext highlighter-rouge">UIView</code>, and methods analogous to <code class="language-plaintext highlighter-rouge">UIView</code>'s subview operations, such as <code class="language-plaintext highlighter-rouge">addSublayer</code>. A <code class="language-plaintext highlighter-rouge">CALayer</code> can display independently of a <code class="language-plaintext highlighter-rouge">UIView</code>, but responding to it requires implementing event methods.</li>
+</ul>
+<p>As for why Apple separates <code class="language-plaintext highlighter-rouge">UIView</code> and <code class="language-plaintext highlighter-rouge">CALayer</code> separate. An unusually detailed article online already explains this: <a href="http://www.cocoachina.com/ios/20150828/13257.html">Why UIView is still needed when CALayer already exists</a></p>
+<blockquote>
+<p>Layer trees and implicit animation</p>
+</blockquote>
+<p>Every <code class="language-plaintext highlighter-rouge">CALayer</code> has three important layer trees that coordinate to render and display the layer. They are:</p>
+<ul>
+<li>The model tree, obtained through <code class="language-plaintext highlighter-rouge">layer.modelLayer</code>. When an animatable property of <code class="language-plaintext highlighter-rouge">CALayer</code> changes, the corresponding model-tree property immediately takes the new value.</li>
+<li>The presentation tree, obtained through <code class="language-plaintext highlighter-rouge">layer. presentationLayer</code>. It stores the displayed data for the layer's current state and updates continuously as the animation proceeds.</li>
+<li>The render tree has no public retrieval API in iOS. As its name suggests, it combines the effects configured in <code class="language-plaintext highlighter-rouge">modelLayer</code> and <code class="language-plaintext highlighter-rouge">presentationLayer</code> to render content onscreen.</li>
+</ul>
+<p>Almost all display data in <code class="language-plaintext highlighter-rouge">CALayer</code> consists of animatable properties, providing a strong basis for Core Animation. When a standalone <code class="language-plaintext highlighter-rouge">CALayer</code> is used—that is, a <code class="language-plaintext highlighter-rouge">layer</code> not bound to a <code class="language-plaintext highlighter-rouge">UIView</code>—changing a display property triggers a simple transition from <code class="language-plaintext highlighter-rouge">旧值</code> to <code class="language-plaintext highlighter-rouge">新值</code>. This is called an implicit animation:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class ViewController: UIViewController {
+
+    let layer = CAShapeLayer()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        layer.strokeEnd = 0
+        layer.lineWidth = 6
+        layer.fillColor = UIColor.clearColor().CGColor
+        layer.strokeColor = UIColor.redColor().CGColor
+        self.view.layer.addSublayer(layer)
+    }
+
+    @IBAction func actionToAnimate() {
+        layer.path = UIBezierPath(arcCenter: self.view.center, radius: 100, startAngle: 0, endAngle: 2*CGFloat(M_PI), clockwise: true).CGPath
+        layer.strokeEnd = 1
+    }
+}
+</code></pre></div></div>
+<p>The code above creates a separate <code class="language-plaintext highlighter-rouge">CALayer</code> and adds it to the current view controller's view layer. The <code class="language-plaintext highlighter-rouge">strokeEnd</code> property represents the fill percentage. Changing it produces a circle-drawing animation:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao49/2.gif"/><br/></p>
+<p>The <code class="language-plaintext highlighter-rouge">CAAction</code> protocol plays a crucial role behind implicit animations; that process is explained below. What happens to the model and presentation trees during this example? Since the default animation duration is <code class="language-plaintext highlighter-rouge">0.25</code> seconds, I set a timer to <code class="language-plaintext highlighter-rouge">0.05</code> seconds and inspect both trees on every callback:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@IBAction func actionToAnimate() {
+    timer = NSTimer(timeInterval: 0.05, target: self, selector: #selector(timerCallback), userInfo: nil, repeats: true)
+    NSRunLoop.currentRunLoop().addTimer(timer!, forMode: NSRunLoopCommonModes)
+    layer.path = UIBezierPath(arcCenter: self.view.center, radius: 100, startAngle: 0, endAngle: 2*CGFloat(M_PI), clockwise: true).CGPath
+    layer.strokeEnd = 1
+}
+
+@objc private func timerCallback() {
+    print("========================\nmodelLayer: \t\(layer.modelLayer().strokeEnd)\ntpresentationLayer: \t\(layer.presentationLayer()!.strokeEnd)")
+    if fabs((layer.presentationLayer()?.strokeEnd)! - 1) &lt; 0.01 {
+        if let _ = timer {
+            timer?.invalidate()
+            timer = nil
+        }
+    }
+}
+</code></pre></div></div>
+<p>Console output:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>========================
+modelLayer: 	1.0
+presentationLayer: 	0.294064253568649
+========================
+modelLayer: 	1.0
+presentationLayer: 	0.676515340805054
+========================
+modelLayer: 	1.0
+presentationLayer: 	0.883405208587646
+========================
+modelLayer: 	1.0
+presentationLayer: 	0.974191427230835
+========================
+modelLayer: 	1.0
+presentationLayer: 	0.999998211860657
+</code></pre></div></div>
+<p>When an implicit animation occurs, the <code class="language-plaintext highlighter-rouge">modelLayer</code> property immediately becomes the final value. The system calculates each frame's value from the duration and target, updating <code class="language-plaintext highlighter-rouge">presentationLayer</code> in sequence. The render tree, <code class="language-plaintext highlighter-rouge">renderingTree</code>, then uses those calculated values to render the animation onscreen.</p>
+<p>What can we create with these trees? For the sticky bouncing effect below, I add a <code class="language-plaintext highlighter-rouge">CALayer</code> at the left, right, and center of the interface. Tapping the button gives the two side <code class="language-plaintext highlighter-rouge">layer</code> objects a constant-speed downward <code class="language-plaintext highlighter-rouge">position</code> animation and the <code class="language-plaintext highlighter-rouge">centerLayer</code> a spring animation. A timer reads the presentation-tree coordinates of the three <code class="language-plaintext highlighter-rouge">layer</code> objects along the <code class="language-plaintext highlighter-rouge">y</code> axis and redraws the region to create this effect:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao49/3.gif"/><br/></p>
+<blockquote>
+<p>Other properties</p>
+</blockquote>
+<p>Beyond the key properties above, I will only briefly introduce the following ones. Their detailed use and animation behavior will be covered in later relevant examples:</p>
+<ul>
+<li>
+<p><code class="language-plaintext highlighter-rouge">position</code> and <code class="language-plaintext highlighter-rouge">anchorPoint</code></p>
+<p><code class="language-plaintext highlighter-rouge">anchorPoint </code>is an <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">y</code> value ranges between <code class="language-plaintext highlighter-rouge">0~1</code> between <code class="language-plaintext highlighter-rouge">CGPoint</code> type. It determines the origin used for geometric affine transformations of the layer. The default is <code class="language-plaintext highlighter-rouge">0.5, 0.5</code>, performed by <code class="language-plaintext highlighter-rouge">anchorPoint </code> and <code class="language-plaintext highlighter-rouge">frame</code> calculate the layer's <code class="language-plaintext highlighter-rouge">position</code> value. More information about these two properties is available in <a href="http://www.tuicool.com/articles/MvI7fu3">Understanding position and anchorPoint thoroughly</a></p>
+</li>
+<li>
+<p><code class="language-plaintext highlighter-rouge">mask</code> and <code class="language-plaintext highlighter-rouge">maskToBounds</code></p>
+<p><code class="language-plaintext highlighter-rouge">maskToBounds</code> value to <code class="language-plaintext highlighter-rouge">true</code> means that all sublayers outside the layer's bounds are not rendered. When we set <code class="language-plaintext highlighter-rouge">UIView</code> of <code class="language-plaintext highlighter-rouge">clipsToBounds</code> actually modifies <code class="language-plaintext highlighter-rouge">maskToBounds</code> this property.<code class="language-plaintext highlighter-rouge">mask</code> This property specifies a mask layer. Content outside the mask is not rendered. In the previous animation article,<a href="http://www.jianshu.com/p/e189696dd535">Fragment animation </a>used in <code class="language-plaintext highlighter-rouge">maskView</code> actually modifies this property too</p>
+</li>
+<li>
+<p><code class="language-plaintext highlighter-rouge">cornerRadius</code>, <code class="language-plaintext highlighter-rouge">borderWidth</code>, and <code class="language-plaintext highlighter-rouge">borderColor</code></p>
+<p><code class="language-plaintext highlighter-rouge">borderWidth</code> and <code class="language-plaintext highlighter-rouge">borderColor</code> set the layer border's width and color. These are not often used at the <code class="language-plaintext highlighter-rouge">layer</code> level in ordinary cases. The <code class="language-plaintext highlighter-rouge">cornerRadius</code> property sets the corner radius, which also affects the border's shape.</p>
+</li>
+<li>
+<p><code class="language-plaintext highlighter-rouge">shadowColor</code>, <code class="language-plaintext highlighter-rouge">shadowOpacity</code>, <code class="language-plaintext highlighter-rouge">shadowOffset</code>, and <code class="language-plaintext highlighter-rouge">shadowRadius</code></p>
+<p>Together, these four properties create shadows. By default, <code class="language-plaintext highlighter-rouge">shadowOpacity</code> is <code class="language-plaintext highlighter-rouge">0</code>, so the shadow remains transparent unless that value changes, even if the other three are set. Also, do not dwell on why <code class="language-plaintext highlighter-rouge">shadowOffset</code>, which controls shadow displacement, uses <code class="language-plaintext highlighter-rouge">CGSize</code> rather than <code class="language-plaintext highlighter-rouge">CGPoint</code>. The following code produces this shadow:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>layer.shadowColor = UIColor.grayColor().CGColor
+layer.shadowOffset = CGSize(width: 2, height: 5)
+layer.shadowOpacity = 1
+</code></pre></div> </div>
+</li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao49/4.jpg"/><br/></p>
+<ul>
+<li>
+<p>Other properties</p>
+<p>This includes the <code class="language-plaintext highlighter-rouge">transform</code> transform property. Unlike the same-named property on <code class="language-plaintext highlighter-rouge">UIView</code>, it can set values along the <code class="language-plaintext highlighter-rouge">z</code> axis for additional geometric effects. Other properties such as <code class="language-plaintext highlighter-rouge">bound</code> and <code class="language-plaintext highlighter-rouge">frame</code> affect the layer's display bounds; I will not elaborate further.</p>
+</li>
+</ul>
+<h2 id="caanimation">CAAnimation</h2>
+<blockquote>
+<p>CAAnimation subclasses</p>
+</blockquote>
+<p>As noted at the beginning, <code class="language-plaintext highlighter-rouge">CAAnimation</code> is a base class whose primary purpose is to conform to two important animation protocols. Understanding animation types therefore starts with its subclass hierarchy. Apple's documentation lists these direct subclasses of <code class="language-plaintext highlighter-rouge">CAAnimation</code>:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao49/5.jpg"/><br/></p>
+<p>The diagram shows three subclasses:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">CAAnimationGroup</code> is an animation-group object. It combines several <code class="language-plaintext highlighter-rouge">CAAnimation</code> instances so a layer can perform multiple effects simultaneously. This article does not discuss it further.</li>
+<li><code class="language-plaintext highlighter-rouge">CAPropertyAnimation</code>, the property-animation class, is the superclass of many Core Animation types and an abstract subclass of <code class="language-plaintext highlighter-rouge">CAAnimation</code>—both parent and child are abstract. It provides the important ability to animate layer properties identified by key paths. Its many subclasses are essential tools for implementing animation.</li>
+<li><code class="language-plaintext highlighter-rouge">CATransition</code> transition-animation class. In the current version, its role is rather awkward. In <code class="language-plaintext highlighter-rouge">CATransform3D</code> and custom transition APIs are widespread, its contribution is limited. It may also cause <code class="language-plaintext highlighter-rouge">私有api</code> issues can prevent App Store approval, but learning about the class is still useful. In this <a href="http://blog.csdn.net/aluoshuai/article/details/7954862">Using CATransition </a>you can learn how to use <code class="language-plaintext highlighter-rouge">CATransition</code> Creating animations</li>
+</ul>
+<blockquote>
+<p>Class structure and properties</p>
+</blockquote>
+<p>The diagram shows <code class="language-plaintext highlighter-rouge">CAAnimation</code> conforming to two protocols while declaring few properties itself. Most animation-related properties are declared in the protocols, with <code class="language-plaintext highlighter-rouge">setter</code> and <code class="language-plaintext highlighter-rouge">getter</code> generated dynamically in the implementation.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public class CAAnimation : NSObject, NSCoding, NSCopying, CAMediaTiming, CAAction {
+
+    public class func defaultValueForKey(key: String) -&gt; AnyObject?
+    public func shouldArchiveValueForKey(key: String) -&gt; Bool
+
+    public var timingFunction: CAMediaTimingFunction?
+
+    public var delegate: AnyObject?
+
+    public var removedOnCompletion: Bool
+}
+</code></pre></div></div>
+<p>The structure of <code class="language-plaintext highlighter-rouge">CAAnimation</code> divides into properties and methods, with properties deserving our main attention.</p>
+<ul>
+<li>
+<p><code class="language-plaintext highlighter-rouge">defaultValueForKey</code> and <code class="language-plaintext highlighter-rouge">shouldArchiveValueForKey</code></p>
+<p>Their names suggest a connection with <code class="language-plaintext highlighter-rouge">NSCoding</code>. The latter accepts a key, serializes the animation object for local storage, and returns whether it succeeded. The former retrieves that persisted animation object using the same key.</p>
+</li>
+<li>
+<p><code class="language-plaintext highlighter-rouge">timingFunction</code></p>
+<p>This interesting property determines the animation's visual behavior. In <a href="http://www.jianshu.com/p/6e326068edeb">Starting with UIView animations</a>, I discussed visual animation effects, including <code class="language-plaintext highlighter-rouge">淡入</code>, <code class="language-plaintext highlighter-rouge">淡出</code> and other effects, represented by strings:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public let kCAMediaTimingFunctionLinear: String
+public let kCAMediaTimingFunctionEaseIn: String
+public let kCAMediaTimingFunctionEaseOut: String
+public let kCAMediaTimingFunctionEaseInEaseOut: String
+public let kCAMediaTimingFunctionDefault: String
+  
+let timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+</code></pre></div> </div>
+</li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao49/6.jpg"/><br/></p>
+<ul>
+<li>
+<p><code class="language-plaintext highlighter-rouge">delegate</code></p>
+<p><code class="language-plaintext highlighter-rouge">NSObject</code> implements the callbacks for <code class="language-plaintext highlighter-rouge">CAAnimation</code>, including <code class="language-plaintext highlighter-rouge">animationDidStart</code> and <code class="language-plaintext highlighter-rouge">animationDidStop</code>, among others. Thus any iOS object can serve as a <code class="language-plaintext highlighter-rouge">CAAnimation</code> delegate. The delegate lets us perform operations such as removing an animation when it ends.</p>
+</li>
+<li>
+<p><code class="language-plaintext highlighter-rouge">removedOnCompletion </code></p>
+<p>This determines whether the animation is removed from its layer afterward; the default is <code class="language-plaintext highlighter-rouge">true</code>. Layer animation is effectively a visual illusion: using <code class="language-plaintext highlighter-rouge">CAAnimaiton</code> does not actually change the corresponding property, so the layer returns to its original state afterward. Setting this value to <code class="language-plaintext highlighter-rouge">false</code>, together with other configuration, can prevent that.</p>
+</li>
+</ul>
+<blockquote>
+<p>Animation protocol properties</p>
+</blockquote>
+<p>In addition to <code class="language-plaintext highlighter-rouge">CAAnimation</code>'s own properties, the other two protocols declare key settings for duration and behavior before and after animation:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public protocol CAMediaTiming {
+
+    public var beginTime: CFTimeInterval { get set }
+
+    public var duration: CFTimeInterval { get set }
+
+    public var speed: Float { get set }
+
+    public var timeOffset: CFTimeInterval { get set }
+
+    public var repeatCount: Float { get set }
+
+    public var repeatDuration: CFTimeInterval { get set }
+
+    public var autoreverses: Bool { get set }
+
+    public var fillMode: String { get set }
+}
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">CAMediaTiming</code> is a timing protocol that supplies time-related animation properties. These properties are explained in <a href="http://www.cocoachina.com/programmer/20131218/7569.html">Controlling animation timing </a>article explains this clearly, so I will not repeat it here. There is also another protocol,<code class="language-plaintext highlighter-rouge">CAAction</code> protocol:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public protocol CAAction {
+
+    /* Called to trigger the event named 'path' on the receiver. The object
+     * (e.g. the layer) on which the event happened is 'anObject'. The
+     * arguments dictionary may be nil, if non-nil it carries parameters
+     * associated with the event. */
+
+    @available(iOS 2.0, *)
+    public func runActionForKey(event: String, object anObject: AnyObject, arguments dict: [NSObject : AnyObject]?)
+}
+</code></pre></div></div>
+<p>This method is called when the animation occurs, informing the layer of the action so it can respond, for example by rendering.</p>
+<h2 id="caaction">CAAction</h2>
+<blockquote>
+<p>Explicit animation</p>
+</blockquote>
+<p>Earlier, I described implicit animation as the automatic transition triggered by changing an animatable property of a standalone <code class="language-plaintext highlighter-rouge">layer</code>. There is naturally an explicit counterpart: create an animation object and add it to the target layer. The code below creates a basic animation for <code class="language-plaintext highlighter-rouge">layer.position.y</code>, sets its final value to <code class="language-plaintext highlighter-rouge">160</code>, and adds it to <code class="language-plaintext highlighter-rouge">layer</code>. The default duration is <code class="language-plaintext highlighter-rouge">0.25</code> seconds:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let animation = CABasicAnimation(keyPath: "position.y")
+animation.toValue = NSNumber(float: 160)
+layer.position.y = 160
+layer.addAnimation(animation, forKey: nil)
+</code></pre></div></div>
+<p>Detailed animation coverage is beyond this article. Later Core Animation articles will explore different <code class="language-plaintext highlighter-rouge">CAAnimation</code> subclasses for specific situations. Here is the core code for the sticky popup shown above:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func startAnimation() {
+    let displayLink = CADisplayLink(target: self, selector: #selector(fluctAnimation(_:)))
+    displayLink.addToRunLoop(NSRunLoop.currentRunLoop(), forMode: NSRunLoopCommonModes)
+    let move = CABasicAnimation(keyPath: "position.y")
+    move.toValue = NSNumber(float: 160)
+    leftLayer.position.y = 160
+    rightLayer.position.y = 160
+    leftLayer.addAnimation(move, forKey: nil)
+    rightLayer.addAnimation(move, forKey: nil)
+
+    let spring = CASpringAnimation(keyPath: "position.y")
+    spring.damping = 15
+    spring.initialVelocity = 40
+    spring.toValue = NSNumber(float: 160)
+    centerLayer.position.y = 160
+    centerLayer.addAnimation(spring, forKey: "spring")
+}
+</code></pre></div></div>
+<p>After adding downward animations to the three layers, create a <code class="language-plaintext highlighter-rouge">CADisplayLink</code> timer to update the popup effect in sync with the screen refresh rate:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@objc private func fluctAnimation(link: CADisplayLink) {
+    let path = UIBezierPath()
+    path.moveToPoint(CGPointZero)
+
+    guard let _ = centerLayer.animationForKey("spring") else {
+        return
+    }
+
+    let offset = leftLayer.presentationLayer()!.position.y - centerLayer.presentationLayer()!.position.y
+    var controlY: CGFloat = 160
+    if offset &lt; 0 {
+        controlY = centerLayer.presentationLayer()!.position.y + 30
+    } else if offset &gt; 0 {
+        controlY = centerLayer.presentationLayer()!.position.y - 30
+    }
+
+    path.addLineToPoint(leftLayer.presentationLayer()!.position)
+    path.addQuadCurveToPoint(rightLayer.presentationLayer()!.position, controlPoint: CGPoint(x: centerLayer.position.x, y: controlY))
+    path.addLineToPoint(CGPoint(x: UIScreen.mainScreen().bounds.width, y: 0))
+    path.closePath()
+    fluctLayer.path = path.CGPath
+}
+</code></pre></div></div>
+<blockquote>
+<p>What happens during implicit animation</p>
+</blockquote>
+<p>As noted above, implicit animation occurs when an animatable property of a standalone <code class="language-plaintext highlighter-rouge">CALayer</code> changes. If the <code class="language-plaintext highlighter-rouge">layer</code> is already bound to a <code class="language-plaintext highlighter-rouge">UIView</code>, directly changing the <code class="language-plaintext highlighter-rouge">layer</code> property makes it jump from <code class="language-plaintext highlighter-rouge">旧值</code> to <code class="language-plaintext highlighter-rouge">新值</code> without an extra transition. The <code class="language-plaintext highlighter-rouge">CoreAnimation</code> programming guide explains: <code class="language-plaintext highlighter-rouge">UIView默认情况下禁止了layer动画，但在animate block中重新启用了它们</code>. That is the observable behavior, but examining the mechanism reveals the careful cooperation between <code class="language-plaintext highlighter-rouge">view</code> and <code class="language-plaintext highlighter-rouge">layer</code>. This brings us to <code class="language-plaintext highlighter-rouge">CAAction</code>.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao49/7.jpg"/><br/></p>
+<p>When any animatable <code class="language-plaintext highlighter-rouge">layer</code> property changes, the <code class="language-plaintext highlighter-rouge">layer</code> asks its delegate through <code class="language-plaintext highlighter-rouge">actionForLayer(layer:event:)</code> for a <code class="language-plaintext highlighter-rouge">CAAction</code> object corresponding to that change. The method can return three kinds of result:</p>
+<ul>
+<li>An object conforming to <code class="language-plaintext highlighter-rouge">CAAction</code>, in which case the <code class="language-plaintext highlighter-rouge">layer</code> uses that action to perform the animation.</li>
+<li><code class="language-plaintext highlighter-rouge">nil</code>, which tells the <code class="language-plaintext highlighter-rouge">layer</code> to continue searching elsewhere.</li>
+<li>An <code class="language-plaintext highlighter-rouge">NSNull</code> object, which tells the <code class="language-plaintext highlighter-rouge">layer</code> to stop searching and perform no animation.</li>
+</ul>
+<p>Normally, when a <code class="language-plaintext highlighter-rouge">CALayer</code> is associated with a <code class="language-plaintext highlighter-rouge">UIView</code>, that <code class="language-plaintext highlighter-rouge">UIView</code> becomes the <code class="language-plaintext highlighter-rouge">layer</code>'s delegate. When we change a <code class="language-plaintext highlighter-rouge">layer</code> property, the associated <code class="language-plaintext highlighter-rouge">UIView</code> therefore usually returns <code class="language-plaintext highlighter-rouge">NSNull</code>. Only within an <code class="language-plaintext highlighter-rouge">animate block</code> does it return an actual animation, providing an action for the layer to perform. Let's verify this in code:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>print("===========normal call===========")
+print("\(self.view.actionForLayer(self.view.layer, forKey: "opacity"))")
+UIView.animateWithDuration(0.25) {
+    print("===========animate block call===========")
+    print("\(self.view.actionForLayer(self.view.layer, forKey: "opacity"))")
+}
+</code></pre></div></div>
+<p>The console output confirms that inside the animation <code class="language-plaintext highlighter-rouge">block</code>, a <code class="language-plaintext highlighter-rouge">CABasicAnimation</code> object is returned to help carry out the effect.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>===========normal call===========
+Optional(&lt;null&gt;)
+===========animate block call===========
+Optional(&lt;CABasicAnimation:0x7f8712d30c90; delegate = &lt;UIViewAnimationState: 0x7f8712d304d0&gt;; fillMode = both; timingFunction = easeInEaseOut; duration = 0.25; fromValue = 1; keyPath = opacity&gt;)
+</code></pre></div></div>
+<p>A <code class="language-plaintext highlighter-rouge">UIView</code> inside an animation block usually returns such a Core Animation object. If it returns <code class="language-plaintext highlighter-rouge">nil</code>, however, the layer continues looking for another action. There are four stages in the full search, as explained in the <code class="language-plaintext highlighter-rouge">CALayer</code> header:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao49/8.jpg"/><br/></p>
+<p>Once the <code class="language-plaintext highlighter-rouge">layer</code> finds an animation action for the property change, it calls <code class="language-plaintext highlighter-rouge">addAnimation(_:forKey:)</code> to begin the effect. We can subclass <code class="language-plaintext highlighter-rouge">CALayer</code> and override that method too:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class LXDActionLayer: CALayer {
+    override func addAnimation(anim: CAAnimation, forKey key: String?) {
+        print("***********************************************")
+        print("Layer will add an animation: \(anim)")
+        super.addAnimation(anim, forKey: key)
+    }
+}
+
+class LXDActionView: UIView {
+
+    override class func layerClass() -&gt; AnyClass {
+        return LXDActionLayer.classForCoder()
+    }
+}
+
+override func viewDidLoad() {
+    super.viewDidLoad()
+
+    let actionView = LXDActionView()
+    view.addSubview(actionView)
+    print("===========normal call===========")
+    print("\(self.view.actionForLayer(self.view.layer, forKey: "opacity"))")
+    actionView.layer.opacity = 0.5
+    UIView.animateWithDuration(0.25) {
+        print("===========animate block call===========")
+        print("\(self.view.actionForLayer(self.view.layer, forKey: "opacity"))")
+    actionView.layer.opacity = 0
+}
+</code></pre></div></div>
+<p>Console output:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>===========normal call===========
+Optional(&lt;null&gt;)
+===========animate block call===========
+Optional(&lt;CABasicAnimation:0x7f8f00eb1850; delegate = &lt;UIViewAnimationState: 0x7f8f00eb0e90&gt;; fillMode = both; timingFunction = easeInEaseOut; duration = 0.25; fromValue = 1; keyPath = opacity&gt;)
+***********************************************
+Layer will add an animation: &lt;CABasicAnimation: 0x7f8f00eb2400&gt;
+</code></pre></div></div>
+<p>You may wonder why the two printed <code class="language-plaintext highlighter-rouge">CABasicAnimation</code> addresses differ. To allow one animation object to run on multiple <code class="language-plaintext highlighter-rouge">CALayer</code> objects, every call to <code class="language-plaintext highlighter-rouge">addAnimation(_:forKey:)</code> makes the <code class="language-plaintext highlighter-rouge">CAAnimation</code> object undergo a <code class="language-plaintext highlighter-rouge">copy</code> operation. You can test this by subclassing <code class="language-plaintext highlighter-rouge">CABasicAnimation</code> and overriding <code class="language-plaintext highlighter-rouge">copy</code>.</p>
+<h2 id="尾言">Closing notes</h2>
+<p>I originally intended to begin explaining Core Animation with animation particles. However, a broader introduction to the framework should help both later articles and the creation of particle animations.</p>
+<p><a href="https://github.com/JustKeepRunning/Animations">Demo for this article</a></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-04-29-rich-text-with-hyperlinks-on-ios/">Rich text with hyperlinks on iOS</a><br/></p>
+
+{% endraw %}

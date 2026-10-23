@@ -1,0 +1,178 @@
+---
+layout: post
+title: Building a WeChat-style iOS app, part 4
+description: Adds cloud-storage and instant-messaging dependencies, wraps sign-in and registration methods, and
+  records troubleshooting while querying user data. An early experiment with a password field is included as part
+  of this historical development account.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-02-03 00:00:00 +0800
+technical_translation:
+  topic: data-network
+  summary: Adds cloud-storage and instant-messaging dependencies, wraps sign-in and registration methods, and records
+    troubleshooting while querying user data. An early experiment with a password field is included as part of this
+    historical development account.
+  keywords:
+  - WeChat-style app
+  - cloud storage
+  - user sign-in
+  - user registration
+  provenance: contribution
+  author_name: WzxJiang
+  source_url: http://www.jianshu.com/users/389c20d5a244/latest_articles
+  author_url: http://www.jianshu.com/users/389c20d5a244/latest_articles
+  credit: Originally credited to WzxJiang; edited and archived by Bison.
+  version_note: Uses the LeanCloud-related APIs available at the time and records an experiment with a custom passWord
+    field. It is not an account-security design.
+  title: Building a WeChat-style iOS app, part 4
+  source_sha256: c4588b37cd93a1a8305c544a22edda38b9da4aa61d0850d00b78e57d4c92fcd2
+lang: en
+source_path: _posts/2016-02-03-tuogao16.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao16
+permalink: /en/journal/2016-02-03-building-a-wechat-style-ios-app-part-4/
+translation_method: machine-assisted
+translation_source_sha256: c4588b37cd93a1a8305c544a22edda38b9da4aa61d0850d00b78e57d4c92fcd2
+excerpt: Adds cloud-storage and instant-messaging dependencies, wraps sign-in and registration methods, and records
+  troubleshooting while querying user data. An early experiment with a password field is included as part of this
+  historical development account.
+translation_date: '2026-10-23T02:34:13+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/users/389c20d5a244/latest_articles">WzxJiang</a><br/></p>
+<blockquote>
+<p>"I only got home today and attended banquets at both lunchtime and evening. LearnCloud also caused real difficulties, so today’s additions are limited:"</p>
+</blockquote>
+<p><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao12/1.png"/><br/></p>
+<p>Completed today<br/></p>
+<p>– Import the LeadCloud storage and IM dynamic libraries; I do not know backend development and wanted to try IM.<br/></p>
+<p>– Write login and registration methods, beginning the networking work.<br/></p>
+<p>For an independent iOS developer without backend experience, LearnCloud is useful: free enough and simple enough. I will skip importing its dynamic libraries and describe my login and registration implementation and the pitfalls encountered.<br/></p>
+<ul>
+<li>Let’s proceed step by step.<br/></li>
+</ul>
+<p>Create an NSObject class called WWeChatApi.<br/></p>
+<ul>
+<li>Create a singleton.<br/></li>
+</ul>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">+</span> <span class="o">(</span><span class="nt">WWeChatApi</span> <span class="o">*)</span><span class="nt">giveMeApi</span>
+<span class="p">{</span>
+    <span class="err">static</span> <span class="err">WWeChatApi</span> <span class="err">*</span> <span class="err">api</span> <span class="err">=</span> <span class="err">nil;</span>
+    <span class="err">if</span> <span class="err">(api</span> <span class="err">==</span> <span class="err">nil)</span> <span class="err">{</span>
+        <span class="err">api</span> <span class="err">=</span> <span class="err">[[WWeChatApi</span> <span class="err">alloc]init];</span>
+    <span class="p">}</span>
+    <span class="nt">return</span> <span class="nt">api</span><span class="o">;</span>
+<span class="err">}</span></code></pre></figure>
+<ul>
+<li>Write the login method first; this is where the pitfall appears.<br/></li>
+</ul>
+<p><br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)loginWithUserName:(NSString *)userName andPassWord:(NSString *)passWord andSuccess:(void (^)(id))successBlock andFailure:(void (^)(NSError *))failureBlock
+{
+    AVQuery *query = [AVQuery queryWithClassName:@"_User"];
+
+    [query whereKey:@"username" equalTo:userName];
+
+    [query whereKey:@"password" equalTo:passWord];
+
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) {
+            if (objects.count&gt;0)
+            {
+                successBlock(nil);
+            }
+        } else {
+            failureBlock(error);
+        }
+    }];
+}
+</code></pre></div></div>
+<p><br/>
+AVQuery here is a LearnCloud method; ignore it for now.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao16/1.png"/><br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//这里也是LearnCloud动态库的方法
+//@"username"的值等于@"WzxJiang" And @"password"的值等于@"123456"
+[query whereKey:@"username" equalTo:@“WzxJiang”];
+
+[query whereKey:@"password" equalTo:@"123456"];
+</code></pre></div></div>
+<p><br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//然后通过这个方法获取符合的AVObject Arr
+[query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+    if (!error) {
+        if (objects.count&gt;0)
+        {
+            successBlock(nil);
+        }
+    } else {
+        failureBlock(error);
+    }
+}];
+</code></pre></div></div>
+<p>In principle this should return the one matching AVObject, but it actually returns nothing!<br/></p>
+<p>After considerable debugging, I found that<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[query whereKey:@"password" equalTo:@"123456"]
+</code></pre></div></div>
+<p><br/>
+password cannot be queried using whereKey:equalTo here.<br/>
+Surely this is a joke! If the built-in password cannot be checked, how can I validate login?<br/></p>
+<p>Solution: add a passWord class in the LearnCloud backend and use it to store the password. The built-in password cannot even be deleted.<br/></p>
+<ul>
+<li>Registration<br/></li>
+</ul>
+<p><br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)registerWithUserName:(NSString *)userName andPassWord:(NSString *)passWord andSuccess:(void (^)(id response))successBlock andFailure:(void (^)(NSError * error))failureBlock
+{
+    AVObject * user = [AVObject objectWithClassName:@"_User"];
+
+    user[@"username"] = userName;
+
+    user[@"password"] = @"123";
+
+    user[@"passWord"] = passWord;
+
+    AVQuery *query = [AVQuery queryWithClassName:@"_User"];
+
+    [query whereKey:@"username" equalTo:userName];
+
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) {
+            if (objects.count == 0)
+            {
+                [user saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                    if (successBlock)
+                    {
+                    successBlock(nil);
+                    }
+                    else
+                    {
+                    failureBlock(error);
+                    }
+                }];
+            
+            }
+            else
+            {
+                failureBlock(nil);
+            }
+            } else {
+                failureBlock(error);
+            }
+        }];
+}
+</code></pre></div></div>
+<p><br/></p>
+<p>Registration has another pitfall here:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user[@"password"] = @"123"，password
+</code></pre></div></div>
+<p><br/>
+It refuses registration unless a value is supplied.<br/></p>
+<p>That is all for today!<br/></p>
+<p>Current code, to be updated until the project is complete<br/>
+<a href="https://github.com/Wzxhaha/WWeChat">GitHub:WzxJiang</a><br/></p>
+<p>If you have suggestions or questions, please leave a comment!<br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-02-01-a-beginner-developer-s-review-of-2015/">A beginner developer's review of 2015</a><br/></p>
+
+{% endraw %}

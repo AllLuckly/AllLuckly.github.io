@@ -1,0 +1,100 @@
+---
+layout: null
+permalink: /en/journal/2015-07-15-creating-long-form-weibo-images-in-an-ios-app/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Creating long-form Weibo images in an iOS app
+agent_source_url: https://allluckly.cn/en/journal/2015-07-15-creating-long-form-weibo-images-in-an-ios-app/
+agent_source_sha256: 23c5dcf30825101e84888b719bcd146ce67f51b9ad6c7cffc30266cf974e65dc
+agent_generator_version: 1
+---
+{% raw %}# Creating long-form Weibo images in an iOS app
+
+Language: en
+Canonical: [Creating long-form Weibo images in an iOS app](<https://allluckly.cn/en/journal/2015-07-15-creating-long-form-weibo-images-in-an-ios-app/>)
+中文：[中文 HTML](<https://allluckly.cn/iOS%E5%BC%80%E5%8F%91%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%95%BF%E5%BE%AE%E5%8D%9A>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-07-15-creating-long-form-weibo-images-in-an-ios-app/>)
+Published: 2015-07-15T00:00:00+08:00
+Modified: 2026-10-23T10:34:09+08:00
+Author: [Bison](<https://allluckly.cn/about/>)
+
+Turns a long passage of text into an image for a long-form Weibo post. The code works through text width, font size, required height and image drawing, demonstrating an early UIKit approach to generating a tall image at a fixed width.
+
+Originally credited to Bison. Content is retained as published.
+
+English translation of the [Chinese original](<https://allluckly.cn/iOS%E5%BC%80%E5%8F%91%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%95%BF%E5%BE%AE%E5%8D%9A>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Read API, dependency and tool details in the context of the original publication date.
+
+> “iOS development is like moving things around; once you become skilled enough, you can start taking shortcuts.” Bison
+
+How can we implement long Weibo posts in iOS development?  
+ Put simply, convert the text into an image for display too.  
+ See the code below.
+
+```css
+#define CONTENT_MAX_WIDTH   300.0f
+
++(UIImage *)imageFromText:(NSArray*)arrContent withFont:(CGFloat)fontSize withTextColor:(UIColor *)textColor withBgImage:(UIImage *)bgImage withBgColor:(UIColor *)bgColor
+{
+// 设置字体类型和大小
+
+    UIFont *font = [UIFont fontWithName:@"Heiti SC" size:fontSize];
+    NSMutableArray *arrHeight = [[NSMutableArray alloc] initWithCapacity:arrContent.count];
+
+    CGFloat fHeight = 0.0f;
+    for (NSString *sContent in arrContent) {
+        CGSize stringSize = [sContent sizeWithFont:font constrainedToSize:CGSizeMake(CONTENT_MAX_WIDTH, 10000) lineBreakMode:NSLineBreakByWordWrapping];
+        [arrHeight addObject:[NSNumber numberWithFloat:stringSize.height]];
+
+        fHeight += stringSize.height;
+    }
+
+    CGSize newSize = CGSizeMake(CONTENT_MAX_WIDTH+20, fHeight+50);
+
+
+    // 创建一个可拉伸的图像的背景上画
+    UIGraphicsBeginImageContextWithOptions(newSize,NO,0.0);
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+
+
+    //如果设置了背景图片
+    if(bgImage){
+        UIImage* stretchedTopImage = [bgImage stretchableImageWithLeftCapWidth:0 topCapHeight:0];
+        [stretchedTopImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    }else{
+        if(bgColor){
+            //填充背景颜色
+            [bgColor set];
+            UIRectFill(CGRectMake(0, 0, newSize.width, newSize.height));
+        }
+    }
+
+        CGContextSetCharacterSpacing(ctx, 10);
+        CGContextSetTextDrawingMode (ctx, kCGTextFill);
+        [textColor set];
+
+
+        int nIndex = 0;
+        CGFloat fPosY = 20.0f;
+        for (NSString *sContent in arrContent) {
+        NSNumber *numHeight = [arrHeight objectAtIndex:nIndex];
+        CGRect rect = CGRectMake(10, fPosY, CONTENT_MAX_WIDTH , [numHeight floatValue]);
+
+
+        [sContent drawInRect:rect withFont:font lineBreakMode:NSLineBreakByWordWrapping alignment:NSTextAlignmentLeft];
+
+        fPosY += [numHeight floatValue];
+        nIndex++;
+    }
+
+    // 传递图像
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    return image;
+
+}
+```
+{% endraw %}

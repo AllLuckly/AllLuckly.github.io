@@ -1,0 +1,205 @@
+---
+layout: post
+title: Moving cell images as a table view scrolls
+description: Adjusts an image's position using the offset between the cell's centre and its parent view's centre,
+  creating parallax during UITableView scrolling. It records the custom cell and visible-item updates, with adapted
+  code and a link to the original project.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-01-28 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Adjusts an image's position using the offset between the cell's centre and its parent view's centre,
+    creating parallax during UITableView scrolling. It records the custom cell and visible-item updates, with adapted
+    code and a link to the original project.
+  keywords:
+  - UITableView
+  - parallax
+  - cell reuse
+  - image offsets
+  provenance: contribution
+  author_name: WzxJiang
+  source_url: http://www.jianshu.com/users/389c20d5a244/latest_articles
+  author_url: http://www.jianshu.com/users/389c20d5a244/latest_articles
+  credit: Contributed by WzxJiang and edited and archived by Bison. The article identifies juvham’s kaiyan project
+    as the basis of the adaptation.
+  title: Moving cell images as a table view scrolls
+  source_sha256: 4344e95c3832f9304ed8821b29124d8691491bb5da818164c0d65ca9e9453444
+lang: en
+source_path: _posts/2016-01-28-tuogao11.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao11
+permalink: /en/journal/2016-01-28-moving-cell-images-as-a-table-view-scrolls/
+translation_method: machine-assisted
+translation_source_sha256: 4344e95c3832f9304ed8821b29124d8691491bb5da818164c0d65ca9e9453444
+excerpt: Adjusts an image's position using the offset between the cell's centre and its parent view's centre, creating
+  parallax during UITableView scrolling. It records the custom cell and visible-item updates, with adapted code
+  and a link to the original project.
+translation_date: '2026-10-23T02:34:12+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/users/389c20d5a244/latest_articles">WzxJiang</a><br/></p>
+<blockquote>
+<p>“Today I saw an excellent effect on CocoaChina by juvham. The author uses many efficient techniques, but provides few comments. I extracted my favorite effect, changed some code, and added comments. I hope you like it. First, here is the effect I extracted:”</p>
+</blockquote>
+<p><br/>
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao11/1.gif"/><br/></p>
+<h2 id="这个效果是如何实现的">How this effect is implemented</h2>
+<ul>
+<li>First, create a UITableView.<br/></li>
+<li>Then create a custom UITableViewCell, for example myCell.h.<br/></li>
+<li>Create several member variables in myCell.h:<br/></li>
+</ul>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="c">/**
+*  图片imgView
+*/</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span> <span class="n">strong</span><span class="p">)</span> <span class="n">UIImageView</span> <span class="err">*</span> <span class="n">pictureView</span><span class="p">;</span>
+
+<span class="c">/**
+*  标题label
+*/</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span> <span class="n">strong</span><span class="p">)</span> <span class="n">UILabel</span> <span class="err">*</span> <span class="n">titleLabel</span><span class="p">;</span>
+
+<span class="c">/**
+*  内容Label
+*/</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span> <span class="n">strong</span><span class="p">)</span> <span class="n">UILabel</span> <span class="err">*</span> <span class="n">littleLabel</span><span class="p">;</span></code></pre></figure>
+<ul>
+<li>Implement them.<br/></li>
+</ul>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">instancetype</span><span class="o">)</span><span class="nt">initWithStyle</span><span class="o">:(</span><span class="nt">UITableViewCellStyle</span><span class="o">)</span><span class="nt">style</span> <span class="nt">reuseIdentifier</span><span class="o">:(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">reuseIdentifier</span>
+<span class="p">{</span>
+    <span class="err">if</span> <span class="err">([super</span> <span class="py">initWithStyle</span><span class="p">:</span><span class="n">style</span> <span class="n">reuseIdentifier</span><span class="p">:</span><span class="n">reuseIdentifier</span><span class="p">])</span> <span class="err">{</span>
+
+
+        <span class="p">//</span><span class="n">取消选中效果</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">selectionStyle</span> <span class="err">=</span> <span class="n">UITableViewCellSeparatorStyleNone</span><span class="p">;</span>
+
+        <span class="err">//裁剪看不到的</span>
+        <span class="err">self.clipsToBounds</span> <span class="err">=</span> <span class="err">YES;</span>
+
+        <span class="err">//pictureView的Y往上加一半cellHeight</span> <span class="err">高度为2</span> <span class="err">*</span> <span class="err">cellHeight，这样上下多出一半的cellHeight</span>
+        <span class="err">_pictureView</span> <span class="err">=</span> <span class="err">({</span>
+            <span class="err">UIImageView</span> <span class="err">*</span> <span class="err">picture</span> <span class="err">=</span> <span class="err">[[UIImageView</span> <span class="err">alloc]</span><span class="py">initWithFrame</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="n">-cellHeight</span><span class="p">/</span><span class="m">2</span><span class="p">,</span> <span class="n">kWidth</span><span class="p">,</span> <span class="n">cellHeight</span> <span class="err">*</span> <span class="m">2</span><span class="p">)];</span>
+
+            <span class="err">picture.contentMode</span> <span class="err">=</span> <span class="err">UIViewContentModeScaleAspectFill;</span>
+
+            <span class="err">picture;</span>
+        <span class="p">}</span><span class="o">);</span>
+        <span class="o">[</span><span class="nt">self</span><span class="nc">.contentView</span>  <span class="nt">addSubview</span><span class="nd">:_pictureView</span><span class="o">];</span>
+
+        <span class="nt">_titleLabel</span> <span class="o">=</span> <span class="o">(</span><span class="p">{</span>
+            <span class="err">UILabel</span> <span class="err">*</span> <span class="err">titleLabel</span> <span class="err">=</span> <span class="err">[[UILabel</span> <span class="err">alloc]</span><span class="py">initWithFrame</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="n">cellHeight</span> <span class="p">/</span> <span class="m">2</span> <span class="n">-</span> <span class="m">30</span><span class="p">,</span> <span class="n">kWidth</span><span class="p">,</span> <span class="m">30</span><span class="p">)];</span>
+
+            <span class="err">titleLabel.font</span> <span class="err">=</span> <span class="err">[UIFont</span> <span class="py">boldSystemFontOfSize</span><span class="p">:</span><span class="m">16</span><span class="p">];</span>
+
+            <span class="err">titleLabel.textAlignment</span> <span class="err">=</span> <span class="err">NSTextAlignmentCenter;</span>
+
+            <span class="err">titleLabel.textColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="err">whiteColor];</span>
+
+            <span class="err">titleLabel.text</span> <span class="err">=</span> <span class="err">@"标题";</span>
+
+            <span class="err">titleLabel;</span>
+        <span class="p">}</span><span class="o">);</span>
+        <span class="o">[</span><span class="nt">self</span><span class="nc">.contentView</span> <span class="nt">addSubview</span><span class="nd">:_titleLabel</span><span class="o">];</span>
+
+        <span class="nt">_littleLabel</span> <span class="o">=</span> <span class="o">(</span><span class="p">{</span>
+            <span class="err">UILabel</span> <span class="err">*</span> <span class="err">littleLabel</span> <span class="err">=</span> <span class="err">[[UILabel</span> <span class="err">alloc]</span><span class="py">initWithFrame</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="n">cellHeight</span> <span class="p">/</span> <span class="m">2</span> <span class="err">+</span> <span class="m">30</span><span class="p">,</span> <span class="n">kWidth</span><span class="p">,</span> <span class="m">30</span><span class="p">)];</span>
+
+            <span class="err">littleLabel.font</span> <span class="err">=</span> <span class="err">[UIFont</span> <span class="py">systemFontOfSize</span><span class="p">:</span><span class="m">14</span><span class="p">];</span>
+
+            <span class="err">littleLabel.textAlignment</span> <span class="err">=</span> <span class="err">NSTextAlignmentCenter;</span>
+
+            <span class="err">littleLabel.textColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="err">whiteColor];</span>
+
+            <span class="err">littleLabel.text</span> <span class="err">=</span> <span class="err">@"xxxxxxxxxxx";</span>
+
+            <span class="err">littleLabel;</span>
+
+        <span class="p">}</span><span class="o">);</span>
+        <span class="o">[</span><span class="nt">self</span><span class="nc">.contentView</span> <span class="nt">addSubview</span><span class="nd">:_littleLabel</span><span class="o">];</span>
+
+
+
+    <span class="err">}</span>
+    <span class="nt">return</span> <span class="nt">self</span><span class="o">;</span>
+
+<span class="err">}</span></code></pre></figure>
+<ul>
+<li>Next, we need a method that supplies an image to the cell's _pictureView.<br/></li>
+</ul>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">setImg</span><span class="o">:(</span><span class="nt">UIImage</span> <span class="o">*)</span><span class="nt">img</span>
+<span class="p">{</span>
+    <span class="err">self.pictureView.image</span> <span class="err">=</span> <span class="err">img;</span>
+<span class="p">}</span></code></pre></figure>
+<p><br/></p>
+<ul>
+<li>Processing data in willDisplayCell can improve scrolling performance.<br/></li>
+</ul>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">tableView</span><span class="o">:(</span><span class="nt">UITableView</span> <span class="o">*)</span><span class="nt">tableView</span> <span class="nt">willDisplayCell</span><span class="o">:(</span><span class="nt">UITableViewCell</span> <span class="o">*)</span><span class="nt">cell</span> <span class="nt">forRowAtIndexPath</span><span class="o">:(</span><span class="nt">NSIndexPath</span> <span class="o">*)</span><span class="nt">indexPath</span>
+<span class="p">{</span>
+    <span class="err">MyCell</span> <span class="err">*</span> <span class="err">myCell</span> <span class="err">=</span> <span class="err">(MyCell</span> <span class="err">*)cell;</span>
+
+    <span class="err">[myCell</span> <span class="py">setImg</span><span class="p">:</span><span class="n">_dataArray</span><span class="p">[</span><span class="n">indexPath</span><span class="p">.</span><span class="n">row</span><span class="p">]];</span>
+
+    <span class="err">[myCell</span> <span class="err">cellOffset];</span>
+<span class="p">}</span></code></pre></figure>
+<p><br/>
+[myCell cellOffset] is the cell-offset method explained later. Ignore it for now.<br/></p>
+<ul>
+<li>The data is ready. Now let's discuss the important part: scrolling.<br/></li>
+</ul>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">scrollViewDidScroll</span><span class="o">:(</span><span class="nt">UIScrollView</span> <span class="o">*)</span><span class="nt">scrollView</span>
+<span class="p">{</span>
+    <span class="err">//</span> <span class="err">visibleCells</span> <span class="err">获取界面上能显示出来了cell</span>
+    <span class="err">NSArray&lt;MyCell</span> <span class="err">*&gt;</span> <span class="err">*array</span> <span class="err">=</span> <span class="err">[self.tableView</span> <span class="err">visibleCells];</span>
+
+    <span class="err">//enumerateObjectsUsingBlock</span> <span class="err">类似于for，但是比for更快</span>
+    <span class="err">[array</span> <span class="py">enumerateObjectsUsingBlock</span><span class="p">:</span><span class="err">^</span><span class="p">(</span><span class="n">MyCell</span> <span class="err">*</span> <span class="n">_Nonnull</span> <span class="n">obj</span><span class="p">,</span> <span class="n">NSUInteger</span> <span class="n">idx</span><span class="p">,</span> <span class="n">BOOL</span> <span class="err">*</span> <span class="n">_Nonnull</span> <span class="n">stop</span><span class="p">)</span> <span class="err">{</span>
+
+        <span class="p">[</span><span class="n">obj</span> <span class="n">cellOffset</span><span class="p">];</span>
+
+    <span class="p">}</span><span class="o">];</span> 
+<span class="err">}</span></code></pre></figure>
+<p><br/>
+This method is useful and worth remembering. Someone has tested enumerateObjectsUsingBlock and found it about 4ms faster than for. If you understand it better, please share your thoughts in the comments.<br/></p>
+<ul>
+<li>Now let's discuss cellOffset.<br/></li>
+</ul>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">CGFloat</span><span class="o">)</span><span class="nt">cellOffset</span>
+<span class="p">{</span>
+    <span class="c">/*
+    - (CGRect)convertRect:(CGRect)rect toView:(nullable UIView *)view;
+    将rect由rect所在视图转换到目标视图view中，返回在目标视图view中的rect
+    这里用来获取self在window上的位置
+    */</span>
+    <span class="err">CGRect</span> <span class="err">toWindow</span> <span class="err">=</span> <span class="err">[self</span> <span class="py">convertRect</span><span class="p">:</span><span class="n">self</span><span class="p">.</span><span class="n">bounds</span> <span class="n">toView</span><span class="p">:</span><span class="n">self</span><span class="p">.</span><span class="n">window</span><span class="p">];</span>
+
+    <span class="err">//获取父视图的中心</span>
+    <span class="err">CGPoint</span> <span class="err">windowCenter</span> <span class="err">=</span> <span class="err">self.superview.center;</span>
+
+    <span class="err">//cell在y轴上的位移</span>  <span class="err">CGRectGetMidY之前讲过,获取中心Y值</span>
+    <span class="err">CGFloat</span> <span class="err">cellOffsetY</span> <span class="err">=</span> <span class="err">CGRectGetMidY(toWindow)</span> <span class="err">-</span> <span class="err">windowCenter.y;</span>
+
+    <span class="err">//位移比例</span>
+    <span class="err">CGFloat</span> <span class="err">offsetDig</span> <span class="err">=</span> <span class="err">2</span> <span class="err">*</span> <span class="err">cellOffsetY</span> <span class="err">/</span> <span class="err">self.superview.frame.size.height</span> <span class="err">;</span>
+
+    <span class="err">//要补偿的位移</span>
+    <span class="err">CGFloat</span> <span class="err">offset</span> <span class="err">=</span>  <span class="err">-offsetDig</span> <span class="err">*</span> <span class="err">cellHeight/2;</span>
+
+    <span class="err">//让pictureViewY轴方向位移offset</span>
+    <span class="err">CGAffineTransform</span> <span class="err">transY</span> <span class="err">=</span> <span class="err">CGAffineTransformMakeTranslation(0,offset);</span>
+    <span class="err">self.pictureView.transform</span> <span class="err">=</span> <span class="err">transY;</span>
+
+    <span class="err">return</span> <span class="err">offset;</span>
+<span class="p">}</span></code></pre></figure>
+<p><br/>
+cellOffsetY is the key parameter. It obtains the offset between the cell's center and its parent view's center, then shifts the pictureView on the cell.<br/></p>
+<p>That completes the animation.<br/></p>
+<p>Code<br/>
+<a href="https://github.com/Wzxhaha/WZXKaiYanDemo">My code</a>(If your fundamentals are still developing, start with my version; its comments are detailed.)<br/>
+<a href="https://github.com/juvham/kaiyan">Code by the original author, juvham</a>(It includes more effects, although the code is somewhat difficult to follow.)<br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-01-20-integrating-lianlian-pay-into-an-ios-app/">Integrating LianLian Pay into an iOS app</a><br/></p>
+
+{% endraw %}

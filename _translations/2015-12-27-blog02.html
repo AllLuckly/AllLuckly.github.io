@@ -1,0 +1,95 @@
+---
+layout: post
+title: 'Helping Baidu discover a GitHub Pages blog: a historical workflow'
+description: Records mirroring a GitHub Pages blog to GitCafe Pages, using SourceTree to clone and push branches,
+  bind a domain and configure regional DNS. The workflow aimed to improve access and search indexing in mainland
+  China at the time.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2015-12-27 00:00:00 +0800
+technical_translation:
+  topic: web-notes
+  summary: Records mirroring a GitHub Pages blog to GitCafe Pages, using SourceTree to clone and push branches,
+    bind a domain and configure regional DNS. The workflow aimed to improve access and search indexing in mainland
+    China at the time.
+  keywords:
+  - GitHub Pages
+  - GitCafe
+  - SourceTree
+  - DNS configuration
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Published in 2015. The workflow depends on the GitCafe Pages service and search-indexing conditions
+    of that period.
+  title: 'Helping Baidu discover a GitHub Pages blog: a historical workflow'
+  source_sha256: 10d1e8c1e72de3a71edd124681a962bce522d410b489900f608aeabf1857bb60
+lang: en
+source_path: _posts/2015-12-27-blog02.md
+source_url: /mac/blog02
+permalink: /en/journal/2015-12-27-helping-baidu-discover-a-github-pages-blog-a-historical-workflow/
+translation_method: machine-assisted
+translation_source_sha256: 10d1e8c1e72de3a71edd124681a962bce522d410b489900f608aeabf1857bb60
+excerpt: Records mirroring a GitHub Pages blog to GitCafe Pages, using SourceTree to clone and push branches, bind
+  a domain and configure regional DNS. The workflow aimed to improve access and search indexing in mainland China
+  at the time.
+translation_date: '2026-10-23T02:34:11+00:00'
+---
+{% raw %}
+<blockquote>
+<p>“The only drawback of a Github blog is that Baidu cannot index it, costing a substantial amount of traffic.”</p>
+</blockquote>
+<p>3 months ago, I set up my own technical blog on Github to record my experiences developing for iOS<br/>
+along the way. After working on it for a while, the blog gradually accumulated content, and the major search engines<br/>
+could generally find my blog posts, except Baidu. This made me anxious, so I searched for why Github<br/>
+why a blog could not be indexed by Baidu. The explanation I found was that Baidu IP addresses had previously attacked Github's servers.<br/>
+This led Github hosting to block Baidu's crawler. Most people solve this through CDN acceleration.<br/>
+However, this seems unstable: Baidu's crawler may not succeed every time, reducing the site's Baidu ranking weight, whereas<br/>
+The solution I will describe today is relatively stable: use <a href="https://gitcafe.com">Gitcafe </a>hosting to solve the problem. Gitcafe<br/>
+is a website similar to Github and also provides a pages service. What we need to do is copy our Github<br/>
+website repository to <a href="https://gitcafe.com">Gitcafe</a>. There are, of course, rules to follow when copying it.<a href="https://gitcafe.com">Gitcafe</a>'s pages<br/>
+service differs somewhat from Github pages. Next, let's explain how to put a copy of the blog on <a href="https://gitcafe.com">Gitcafe</a><br/></p>
+<blockquote>
+<p>First, register a <a href="https://gitcafe.com">Gitcafe </a>account. One thing to watch when creating the account<br/>
+is that the username must not start with “_”, or problems will occur. After creating it, you may encounter a 404 page-not-found error.<br/>
+I will not dwell on registration here. Let's explain the specific steps for creating Gitcafe pages.<br/></p>
+</blockquote>
+<blockquote>
+<p>## First, create a repository with the same name as your username, as shown below.<br/></p>
+</blockquote>
+<p><img alt="1" src="https://allluckly.cn/images/blog/gitcafe/8.png"/><br/></p>
+<blockquote>
+<p>## Then fill in the relevant information, as shown below.<br/></p>
+</blockquote>
+<p><img alt="1" src="https://allluckly.cn/images/blog/gitcafe/1.png"/><br/></p>
+<p>That completes the setup.<br/></p>
+<blockquote>
+<p>## Next, let's put the blog into the repository we just created.<br/></p>
+</blockquote>
+<p>Many online tutorials use the terminal <code class="language-plaintext highlighter-rouge">git</code> Create a branch and upload to that branch.<br/>
+Today, let's cover something new and easy to understand, setting the terminal aside.<code class="language-plaintext highlighter-rouge">git</code> Use <br/>
+<code class="language-plaintext highlighter-rouge">git</code> graphical tool <code class="language-plaintext highlighter-rouge">SourceTree</code> to do this. It is easy to understand and convenient for later maintenance.<br/>
+For the Mac version, go to <code class="language-plaintext highlighter-rouge">APP Store</code> to download it. After downloading, open the application and add a repository.<br/>
+<img alt="1" src="https://allluckly.cn/images/blog/gitcafe/3.png"/><br/></p>
+<p>Next clone the repository created earlier to your computer. Create a local folder such as <code class="language-plaintext highlighter-rouge">GitcafePages</code>; its name is up to you. See the image below.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/gitcafe/4.png"/><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/gitcafe/5.png"/><br/>
+Next, copy all the files from the existing Github blog into this folder. Then, in <code class="language-plaintext highlighter-rouge">SourceTree</code> to create a<br/>
+branch <code class="language-plaintext highlighter-rouge">gitcafe-pages</code> as shown below<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/gitcafe/6.png"/><br/></p>
+<p>Switch to <code class="language-plaintext highlighter-rouge">gitcafe-pages</code>, then <code class="language-plaintext highlighter-rouge">Add</code>, <code class="language-plaintext highlighter-rouge">Commit</code>, and finally <code class="language-plaintext highlighter-rouge">Push</code>. Wait for the upload to finish.</p>
+<blockquote>
+<p>## Bind a domain: open Project Settings → Pages Service, as shown below.<br/></p>
+</blockquote>
+<p><img alt="1" src="https://allluckly.cn/images/blog/gitcafe/2.png"/><br/></p>
+<p>Then use region-based DNS resolution to direct visitors to different hosting locations. Below, I use Wanwang's domain resolution as an example.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/gitcafe/9.png"/><br/>
+The benefit of this setup is fast access both inside and outside China, so being indexed by Baidu follows naturally.<br/>
+If you are skeptical, try searching Baidu for 😄 “Bison的技术博客”.<br/>
+You can keep using this tool to maintain the blog later.<code class="language-plaintext highlighter-rouge">SourceTree</code> Whether using Github or Gitcafe, the only drawback<br/>
+is that you must upload to both sides separately; they do not synchronize.<br/></p>
+<p>Recommended reading: <a href="/en/journal/2015-12-26-integrating-a-baidu-mobile-ssp-launch-ad-in-one-minute/">Integrating a Baidu Mobile SSP launch ad in one minute</a><br/></p>
+<p>Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.</p>
+
+{% endraw %}

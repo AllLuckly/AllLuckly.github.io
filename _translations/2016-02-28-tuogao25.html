@@ -1,0 +1,160 @@
+---
+layout: post
+title: A first look at Auto Layout animation on iOS
+description: Introduces constraints through text layouts in portrait and landscape, then breaks down an interface
+  that animates as a list scrolls. Changing constraint values controls element positions and sizes, demonstrating
+  the basics of combining Auto Layout with animation.
+category: Development notes
+imagefeature: null
+date: 2016-02-28 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Introduces constraints through text layouts in portrait and landscape, then breaks down an interface
+    that animates as a list scrolls. Changing constraint values controls element positions and sizes, demonstrating
+    the basics of combining Auto Layout with animation.
+  keywords:
+  - Auto Layout
+  - NSLayoutConstraint
+  - constraint animation
+  - scroll interaction
+  provenance: contribution
+  author_name: SindriLin
+  source_url: http://sindrilin.com
+  author_url: http://sindrilin.com
+  credit: Originally credited to SindriLin; edited and archived by Bison.
+  title: A first look at Auto Layout animation on iOS
+  source_sha256: fc29398f4fe391132037cdf7028857383a407dfdd4092d43765ae7888a9951dd
+lang: en
+source_path: _posts/2016-02-28-tuogao25.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao25
+permalink: /en/journal/2016-02-28-a-first-look-at-auto-layout-animation-on-ios/
+translation_method: machine-assisted
+translation_source_sha256: fc29398f4fe391132037cdf7028857383a407dfdd4092d43765ae7888a9951dd
+excerpt: Introduces constraints through text layouts in portrait and landscape, then breaks down an interface that
+  animates as a list scrolls. Changing constraint values controls element positions and sizes, demonstrating the
+  basics of combining Auto Layout with animation.
+translation_date: '2026-10-23T02:45:02+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://sindrilin.com">SindriLin</a><br/></p>
+<p>This constraint-animation article arrived later than expected because I could not find an animation I considered suitable—not because constraint animation is difficult. It is so simple that choosing a good simple demonstration was surprisingly hard. I recreated the following animation from a friend’s company app for today’s demo:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao25/1.gif"/><br/></p>
+<h2 id="关于约束">About constraints</h2>
+<p>This section briefly introduces constraints. If you already develop with storyboards, you can skip it.</p>
+<p>Suppose you need to centre an article on screen, with about 30pt on either side and a 20pt top margin, as shown:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao25/2.jpg"/><br/></p>
+<p>Thinking the task is trivial, you casually write:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>self.textView = [[UITextView alloc] initWithFrame: CGRectMake(30, 20, self.view.bounds.size.width - 60, 0)];
+self.textView.text = ..........
+[self.textView sizeToFit];
+</code></pre></div></div>
+<p>Run the code: it looks good. But hold command and press the left or right arrow. The interface becomes:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao25/3.jpg"/><br/></p>
+<p>You quickly recognise the issue and observe the screen-orientation notification<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>UIApplicationWillChangeStatusBarOrientationNotification，
+</code></pre></div></div>
+<p><br/>
+Then change the text width again in the callback:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)notifyToAdjustTextView: (NSNotification *)notification
+{
+    switch ([UIDevice currentDevice].orientation) {
+        case UIDeviceOrientationLandscapeLeft:
+        case UIDeviceOrientationLandscapeRight:
+            CGRect frame = self.textView.frame;
+            frame.size.width = self.view.bounds.size.height - 60;
+            self.textView.frame = frame;
+            [self.textView sizeToFit];
+        //more
+        ......
+    }
+}
+</code></pre></div></div>
+<p>Run again. No matter how you rotate the screen, the text stays centred. Success! But that was a lot of work for one layout issue, which brings us to today’s subject: constraints.</p>
+<p>A newly created project contains a <code class="language-plaintext highlighter-rouge">Main.storyboard</code>. Open it and add text directly to the controller Xcode created:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao25/4.jpg"/><br/></p>
+<p>Select the textView. Xcode provides the buttons below for adding constraints. Here I set the top spacing to 20pt and the left and right spacing to 30pt. Click <code class="language-plaintext highlighter-rouge">Add 3 Constraints</code> to finish adding them:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao25/5.jpg"/><br/></p>
+<p>Run the project and rotate the screen. The text always retains a 20pt top margin and 30pt side margins. Constraints simplify the work, do they not?</p>
+<p>Every animation displays a sequence of calculations, including constraint animation. How are constraints calculated? In the basic demo above, adding constraints to the text control produces lines around textView in the storyboard, each representing a constraint. Double-click a line for more settings.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao25/6.jpg"/><br/></p>
+<p>For this constraint, all constraint calculations follow the equation:</p>
+<p>TextView.Left = 1 * superView.Left + 30</p>
+<p>The parent view's left coordinate is calculated from 0pt, so the constraint relative to it is represented by <code class="language-plaintext highlighter-rouge">constant</code>. Changing <code class="language-plaintext highlighter-rouge">constant</code> and redrawing the interface can therefore produce animation.</p>
+<p>For more Auto Layout instruction, see <a href="http://www.cocoachina.com/ios/20141217/10669.html">this article</a></p>
+<h2 id="动画分析">Animation analysis</h2>
+<p>Analysing the implementation before starting clarifies the animation. You can see that it depends on <code class="language-plaintext highlighter-rouge">tableView</code> scrolling condition, so observing <code class="language-plaintext highlighter-rouge">tableView</code> scroll offset is central to this animation. (<em>P.S. Why KVO rather than a delegate callback? When the tableView delegate and animation handler may be different objects, KVO is the safest choice.</em>)</p>
+<p>From the user’s scrolling, we can identify the following effects:</p>
+<ul>
+<li>The navigation-bar title fades out with a colour transition.</li>
+<li>The navigation-bar title moves upward.</li>
+<li>The red background moves up and disappears.</li>
+<li>The countdown and text move upward into the navigation bar.</li>
+</ul>
+<p>Combining this information, I defined the required macros:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#define OBSERVERKEY @"contentOffset"            ///&lt;    监听属性
+#define MAXMOVE 64.0                            ///&lt;    滚动最大值
+#define TITLEMAXMOVE 16.0                       ///&lt;    导航文本位移最大值
+#define TOPANDBOTTOMCONSTANT 9                  ///&lt;    红色背景上下间距约束值
+</code></pre></div></div>
+<p>This is a parallax animation, using different view layers and displacements to create the visual effect. First write out the hierarchy of views that move; that helps implement it.</p>
+<p>During the animation, the red background disappears after moving upward, so it must sit below the navigation bar's blue view. The countdown and text remain visible after moving upward, so they must be above the navigation view. The resulting order is text and countdown controls → navigation bar → red background. Moving each text and countdown control separately would require considerable code. Instead, put them all inside a transparent <code class="language-plaintext highlighter-rouge">UIView</code> and move that <code class="language-plaintext highlighter-rouge">UIView</code>. Below is Apple's view-hierarchy diagram for a navigation controller:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao25/7.jpg"/><br/></p>
+<p>Combining these conclusions, we know:</p>
+<ul>
+<li>The transparent view sits between <code class="language-plaintext highlighter-rouge">Custom view hierarchy</code> and <code class="language-plaintext highlighter-rouge">Navigation View</code>.</li>
+<li>The red background sits between <code class="language-plaintext highlighter-rouge">Navigation view</code> and <code class="language-plaintext highlighter-rouge">UIWindow</code>.</li>
+</ul>
+<p>Because the animation controller is the demo's top-level screen, I chose a simple approach to save code: a <code class="language-plaintext highlighter-rouge">UIViewController</code> with a view pretending to be a navigation bar. To implement the animation on a second-level or deeper screen, you may need to subclass <code class="language-plaintext highlighter-rouge">UINavigationController</code> and customize the effect.</p>
+<h2 id="准备工作">Preparation</h2>
+<p>First build the interface in the storyboard. Drag a UIView from the lower-right controls panel. Its top must extend into the status-bar area; otherwise its top constraint starts below the status bar, placing it 20pt lower than intended.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao25/8.jpg"/><br/></p>
+<p>Next, drag a <code class="language-plaintext highlighter-rouge">UILabel</code> onto this navigation-bar view and connect it as <code class="language-plaintext highlighter-rouge">navigationTitle</code>. Set bottom, left, and right constraints to 0 and height to 44pt. Center the text and use white, 18-point system type.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao25/9.jpg"/><br/></p>
+<p>Most importantly, create a transparent view for the countdown and labels. I will not repeat adding views and constraints; here is the completed setup:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao25/10.jpg"/><br/></p>
+<p>Afterwards, reorder views in the left-hand hierarchy so the red background is below the navigation-bar view and the transparent content view is above it. Connect the key constraints to the file, including:</p>
+<ul>
+<li>The scrolling view: <code class="language-plaintext highlighter-rouge">tableView</code>.</li>
+<li>The centering constraint for the transparent view's child: <code class="language-plaintext highlighter-rouge">titleCenterX</code>.</li>
+<li>The transparent content view's top constraint: <code class="language-plaintext highlighter-rouge">contentTopConstraint</code>.</li>
+<li>The red background view's top constraint: <code class="language-plaintext highlighter-rouge">backgroundTopConstraint</code>.</li>
+<li>The imitation navigation title's bottom constraint: <code class="language-plaintext highlighter-rouge">labelBottomConstraint</code>.</li>
+</ul>
+<h2 id="动画制作">Building the animation</h2>
+<p>First, observe scrolling in the <code class="language-plaintext highlighter-rouge">tableView</code>. I usually place this code in <code class="language-plaintext highlighter-rouge">viewDidAppear:</code>, and remove observers or notifications in <code class="language-plaintext highlighter-rouge">viewDidDisappear:</code>.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear: animated];
+    [self.tableView addObserver: self forKeyPath: OBSERVERKEY options: NSKeyValueObservingOptionNew context: nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [self.tableView removeObserver: self forKeyPath: OBSERVERKEY];
+}
+</code></pre></div></div>
+<p>As discussed earlier, the observer needs to obtain the scroll offset and calculate the percentage of the scrolling effect:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CGFloat yOffset = self.tableView.contentOffset.y / MAXMOVE;
+yOffset = MAX(0, MIN(1, yOffset));
+</code></pre></div></div>
+<p>This value increases with scrolling until reaching 1, the final animation state. During this process, the navigation-bar title both moves upward and fades out:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>self.navigationTitle.alpha = 1 - yOffset;
+self.labelBottomConstraint.constant = yOffset * TITLEMAXMOVE;
+</code></pre></div></div>
+<p>Next, move the red background and countdown controls upward. Because all data-display controls belong to the transparent view, only that view needs to move:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CGFloat yPoint = TOPANDBOTTOMCONSTANT - yOffset * MAXMOVE;
+self.backgroundTopConstraint.constant = self.contentTopConstraint.constant = yPoint;
+</code></pre></div></div>
+<p>All movement code is now complete. Run it and notice that the transparent view’s child controls seem to move a little too far upward.</p>
+<p>Normally, a navigation bar is <code class="language-plaintext highlighter-rouge">44pt</code> high, with a <code class="language-plaintext highlighter-rouge">20pt</code> status bar above it, so I set the maximum movement to <code class="language-plaintext highlighter-rouge">44+20=64pt</code>. In the demo, after a <code class="language-plaintext highlighter-rouge">64pt</code> movement, the red background and transparent view reach the center of the <code class="language-plaintext highlighter-rouge">64pt</code> region. Since these two views are <code class="language-plaintext highlighter-rouge">45pt</code> high, <code class="language-plaintext highlighter-rouge">9.5pt</code> of their height extends into the status-bar area. To center the text at the navigation bar position during the animation, we therefore also need to move the text down by <code class="language-plaintext highlighter-rouge">9.5pt</code>. Add this line to the observation callback:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>self.infoCenterX.constant = TOPANDBOTTOMCONSTANT * yOffset;
+</code></pre></div></div>
+<p>Add this line and run again; the animation is complete!</p>
+<h2 id="尾言">Closing notes</h2>
+<p>I spent a long time planning this first post on constraint animation. This demo is closer to a <code class="language-plaintext highlighter-rouge">UIView</code> animation in that it changes coordinate values. Ultimately, I felt it would make the transition from <code class="language-plaintext highlighter-rouge">UIView</code> animation to constraint animation quicker. In the next post, I will explain using layout methods to animate constraint resets, as well as replacing and updating constraints during an animation.</p>
+<p><a href="https://github.com/JustKeepRunning/LXDBaseAnimation">Demo for this article</a><br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-02-18-preparing-an-ios-app-for-apple-pay/">Preparing an iOS app for Apple Pay</a><br/></p>
+
+{% endraw %}

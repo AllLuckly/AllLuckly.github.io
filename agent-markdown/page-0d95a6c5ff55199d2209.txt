@@ -1,0 +1,144 @@
+---
+layout: null
+permalink: /地图/iOS调用Google-地图/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS使用Google地图Api创建的地图显示标注及轨迹回放
+agent_source_url: https://allluckly.cn/%E5%9C%B0%E5%9B%BE/iOS%E8%B0%83%E7%94%A8Google-%E5%9C%B0%E5%9B%BE
+agent_source_sha256: 3fa5477d92628fa267c67813d067e192fbf8cd618c5d8f7956b8ad1dbae47123
+agent_generator_version: 1
+---
+{% raw %}# iOS使用Google地图Api创建的地图显示标注及轨迹回放
+
+语言：zh-CN
+原文：[iOS使用Google地图Api创建的地图显示标注及轨迹回放](<https://allluckly.cn/%E5%9C%B0%E5%9B%BE/iOS%E8%B0%83%E7%94%A8Google-%E5%9C%B0%E5%9B%BE>)
+中文：[中文 HTML](<https://allluckly.cn/%E5%9C%B0%E5%9B%BE/iOS%E8%B0%83%E7%94%A8Google-%E5%9C%B0%E5%9B%BE>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-06-21-google-maps-on-ios-markers-and-route-playback/>)
+发布于: 2015-06-21T00:00:00+08:00
+内容更新于: 2015-06-21T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+记录为 iOS 与 Android 统一地图效果而接入 Google Maps 的过程，给出地图初始化、标注与轨迹线的主要代码，并说明申请地图 API Key 的配置入口。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。涉及的 API、依赖和工具版本请结合发表日期阅读。
+
+> "iOS开发就像搬运工，当搬到一定境界的时候就可以偷懒了" Bison
+
+最近做的项目需要和安卓的地图同步，安卓没有使用百度地图，而是用的Google Map.  
+ 说实话有点坑，以前没有和安卓端一起做的时候一般用的苹果自带的地图高德的地图或者百度  
+ 对于Google地图基本上没接触过，主要代码如下
+
+.h 文件
+
+`@property (strong, nonatomic) GMSMapView *_mapView;`
+
+.m 文件
+
+//创建地图
+
+```css
+- (void)creatMap{
+
+    _mapView = [[GMSMapView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+    [self.view addSubview:_mapView];
+    [_mapView clear];
+    [self initMapView];
+}
+```
+
+就是以下三部分。
+
+```css
+- (void)initMapView
+{
+
+    GMSCameraPosition *camera = [GMSCameraPosition cameraWithLatitude:-6.13631
+    longitude:106.789352
+    zoom:ZOOM_LEVEL];
+    _mapView.mapType = kGMSTypeNormal;
+    _mapView.camera = camera;
+    _mapView.delegate = self;
+    _geocoder = [[GMSGeocoder alloc] init];
+
+    polyline = [[GMSPolyline alloc] init];
+    linepath = [GMSMutablePath path];
+
+
+    CLLocationCoordinate2D coords;
+    coords.latitude = -6.136271;
+    coords.longitude = 106.789216;
+
+
+    _mapView.camera = [GMSCameraPosition cameraWithTarget:coords
+    zoom:ZOOM_LEVEL];
+
+    //显示标注
+    GMSReverseGeocodeCallback handler = ^(GMSReverseGeocodeResponse *response,
+    NSError *error) {
+    if (response && response.firstResult) {
+
+        GMSMarker *marker = [[GMSMarker alloc] init];
+        marker.position = coords;
+        marker.title = response.firstResult.addressLine1;
+        marker.snippet = response.firstResult.addressLine2;
+        _addressData = response.firstResult.addressLine2;
+        [self refreshGpsInfo];
+        marker.appearAnimation = kGMSMarkerAnimationNone;
+        marker.icon = SETIMAGE(@"deviceannotation.png");
+        marker.map = _mapView;
+    } else {
+        NSLog(@"Could not reverse geocode point (%f,%f): %@",
+        coords.latitude, coords.longitude, error);
+    }
+    };
+
+    [_geocoder reverseGeocodeCoordinate:coords
+    completionHandler:handler];
+    //画线，轨迹回放
+    [linepath removeAllCoordinates];
+    [self drawLineWithLocationArray:trackArray];
+
+
+    /*
+    注，trackArray里面的数据格式
+    CLLocation *nowLocation = [[CLLocation alloc] initWithLatitude:coords.latitude longitude:coords.longitude];
+    [trackArray addObject:nowLocation];
+
+    */
+
+}
+```
+
+//画线，使用轨迹回放
+
+```css
+- (void)drawLineWithLocationArray:(NSArray *)locationArray
+{
+
+    if(current_type == _CURRENT_TRACK)
+    polyline.strokeColor = [UIColor blueColor];
+    else
+    polyline.strokeColor = [UIColor redColor];
+    polyline.strokeWidth = 6.f;
+
+    // for(int idx = 0; idx < pointStrings.count; idx++)
+    for(int idx = 0; idx < locationArray.count; idx++)
+    {
+    CLLocation *location = [locationArray objectAtIndex:idx];
+    CLLocationDegrees latitude  = location.coordinate.latitude;
+    CLLocationDegrees longitude = location.coordinate.longitude;
+
+    // create our coordinate and add it to the correct spot in the array
+    CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(latitude, longitude);
+    [linepath addCoordinate:coordinate];
+    }
+    polyline.path = linepath;
+    polyline.map = _mapView;
+}
+```
+
+谷歌Api请到谷歌开发者网站注册，填写相关你自己的app信息自然就有apikey了
+{% endraw %}

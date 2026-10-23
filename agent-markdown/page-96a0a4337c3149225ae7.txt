@@ -1,0 +1,80 @@
+---
+layout: null
+permalink: /en/journal/2015-07-31-detecting-device-locking-in-an-ios-app/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Detecting device locking in an iOS app
+agent_source_url: https://allluckly.cn/en/journal/2015-07-31-detecting-device-locking-in-an-ios-app/
+agent_source_sha256: 157bc9646c472e2c80f52368d8e5672a3dd7196848e25d9453467f8c8ccfe9be
+agent_generator_version: 1
+---
+{% raw %}# Detecting device locking in an iOS app
+
+Language: en
+Canonical: [Detecting device locking in an iOS app](<https://allluckly.cn/en/journal/2015-07-31-detecting-device-locking-in-an-ios-app/>)
+中文：[中文 HTML](<https://allluckly.cn/iOS%E5%BC%80%E5%8F%91%E4%B9%8B%E6%A3%80%E6%B5%8B%E8%AE%BE%E5%A4%87%E9%94%81%E5%B1%8F>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-07-31-detecting-device-locking-in-an-ios-app/>)
+Published: 2015-07-31T00:00:00+08:00
+Modified: 2026-10-23T10:34:09+08:00
+Author: [Bison](<https://allluckly.cn/about/>)
+
+Records SpringBoard lock-notification handling used to investigate a failure in an embedded game when the device locked. It preserves the troubleshooting approach and callback code; the conditions under which those interfaces may be used need separate verification.
+
+Originally credited to Bison. Content is retained as published.
+
+English translation of the [Chinese original](<https://allluckly.cn/iOS%E5%BC%80%E5%8F%91%E4%B9%8B%E6%A3%80%E6%B5%8B%E8%AE%BE%E5%A4%87%E9%94%81%E5%B1%8F>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Published in 2015. The example listens for com.apple.springboard lock-screen notifications.
+
+> "Health is the foundation of everything. Getting more exercise is the way to go." Bison
+
+A recent project contains an embedded game, and the app crashes as soon as the screen locks. I spent a long time looking for a solution.
+
+The code is as follows
+
+Core code
+
+```css
+#define NotificationLock CFSTR("com.apple.springboard.lockcomplete")
+
+#define NotificationChange CFSTR("com.apple.springboard.lockstate")
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+
+    
+    [self lookLockScreen];
+
+    return YES;
+    
+}
+
+- (void)lookLockScreen
+{
+    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, screenLockStateChanged, NotificationLock, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+
+    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, screenLockStateChanged, NotificationChange, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+
+
+}
+
+static void screenLockStateChanged(CFNotificationCenterRef center,void* observer,CFStringRef name,const void* object,CFDictionaryRef userInfo)
+
+{
+
+    NSString* lockstate = (__bridge NSString*)name;
+
+    if ([lockstate isEqualToString:(__bridge  NSString*)NotificationLock]) {
+
+        //锁屏
+        NSLog(@"locked.");
+
+    } else {
+        //锁屏状态改变
+        NSLog(@"lock state changed.");
+
+    }
+
+}
+```
+{% endraw %}

@@ -1,0 +1,171 @@
+---
+layout: post
+title: Integrating LianLian Pay into an iOS app
+description: Organises the linker options, resource styles and business fields required by the LianLian Pay SDK.
+  It explains user identifiers, card-binding agreements and server callbacks, with notes on signatures and UI customisation
+  settings that are easy to confuse.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-01-20 00:00:00 +0800
+technical_translation:
+  topic: data-network
+  summary: Organises the linker options, resource styles and business fields required by the LianLian Pay SDK. It
+    explains user identifiers, card-binding agreements and server callbacks, with notes on signatures and UI customisation
+    settings that are easy to confuse.
+  keywords:
+  - LianLian Pay
+  - payment SDK
+  - server-side signatures
+  - notify_url
+  - resource customisation
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Published in 2016, based on the LianLian Pay SDK documentation and resource structure available
+    then.
+  title: Integrating LianLian Pay into an iOS app
+  source_sha256: 8807e40dec2804632f1ab698b0d19c11aaadc4260bcfb9d0011eadf568aa899c
+lang: en
+source_path: _posts/2016-01-20-lianlianzhifu.md
+source_url: /ios%E6%94%AF%E4%BB%98/lianlianzhifu
+permalink: /en/journal/2016-01-20-integrating-lianlian-pay-into-an-ios-app/
+translation_method: machine-assisted
+translation_source_sha256: 8807e40dec2804632f1ab698b0d19c11aaadc4260bcfb9d0011eadf568aa899c
+excerpt: Organises the linker options, resource styles and business fields required by the LianLian Pay SDK. It
+  explains user identifiers, card-binding agreements and server callbacks, with notes on signatures and UI customisation
+  settings that are easy to confuse.
+translation_date: '2026-10-23T02:34:12+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"Our company project recently needed Lianlian Pay integration. The documentation was unclear and we encountered several pitfalls, so I recorded them in the hope of helping others."</p>
+</blockquote>
+<p><br/></p>
+<p>The basic integration did not cause problems. Here I organise the official integration documentation into the following steps.<br/></p>
+<blockquote>
+<p>Import files<br/></p>
+</blockquote>
+<blockquote>
+<p>Add the header-file reference.<br/></p>
+</blockquote>
+<blockquote>
+<p>Set Target → Build Setting → Other Linker Flags to -all_load.
+If -all_load conflicts with another library, try -force_load to load one library. Follow force_load with the full path to the lib file:
+-force_load $(SRCROOT)/<strong><em>/libPaySdkColor.a (</em></strong>*Choose this according to the path where your library is stored.)<br/></p>
+</blockquote>
+<blockquote>
+<p>Call the SDK to display it. Retain it: calling it after autorelease causes a crash.<br/></p>
+</blockquote>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>self.sdk = [[[LLPaySdk alloc] init] autorealse]; // 创建
+self.sdk.sdkDelegate = self;  // 设置回调
+NSDictionary* signedDic = [payUtil signedOrderDic:orderParam andSignKey:md5key_or_rsakey] // 加过签名的订单字典
+[self.sdk presentPaySdkInViewController:rootVC withTraderInfo:signedDic];
+</code></pre></div></div>
+<blockquote>
+<p>Write the result callback.<br/></p>
+</blockquote>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 订单支付结果返回，主要是异常和成功的不同状态
+- (void)paymentEnd:(LLWalletPayResult)resultCode withResultDic:(NSDictionary *)dic
+</code></pre></div></div>
+<p><br/></p>
+<h3 id="sdk可配置部分">Configurable SDK components<br/></h3>
+<p>The iOS SDK can be customised through its resource bundle. Because the resources are inside the bundle, clean the project after modifying them for the changes to take effect.<br/></p>
+<blockquote>
+<p>1. Replace the internal images with your own designs.<br/></p>
+</blockquote>
+<blockquote>
+<p>2. Modify colours in default.css. Both #abcdef and 123,123,123 notation are supported.<br/></p>
+</blockquote>
+<blockquote>
+<p>3. List of configurable values and their meanings<br/></p>
+</blockquote>
+<p>Navigation-bar colour: replace shoushi3.png and modify background-color under NavBar in the CSS file. All field names below refer to default.css.
+Navigation-bar title: titleIconName and titleText under NavBar.<br/>
+<br/></p>
+<h3 id="注意有点坑的是这里这是非第一次付款时弹出框的定制框子的背景不能改只能修改下颜色来和app搭配下">This is a slightly tricky part: it customises the dialog for payments after the first payment. Its background cannot be changed; only the colours can be adjusted to match the app.<br/></h3>
+<p>The changes are shown in the screenshot below:<br/></p>
+<p><img alt="2" src="/images/blog/lianlianzhifu.png"/><br/></p>
+<p>Confirm button: #a-button<br/>
+Cancel button: #b-button<br/>
+Text field: UITextField<br/>
+Confirmation-text colour in the dialog: #TX-3<br/></p>
+<p>The original official appearance is shown below:<br/></p>
+<p><img alt="3" src="/images/blog/lianlianzhifu01.png"/><br/></p>
+<p>After modification, it looks like this:<br/></p>
+<p><img alt="4" src="/images/blog/lianlianzhifu02.png"/><br/>
+<br/></p>
+<h3 id="参数字段部分">Parameter fields<br/></h3>
+<p>The demo contains parameter descriptions. Field names differ from WAP, so consult those descriptions. user_id is not the merchant number; it is the user identifier in the merchant’s own system. For card-number-first input, no_agree is the linked-card sequence number obtained through the API.
+<br/></p>
+<h2 id="使用部分">Usage<br/></h2>
+<p>The demo’s input fields test different payment conditions, including authenticated payment with name and ID number, and card-first payment with card and agreement numbers. They are not mandatory; test according to your payment method.
+The number of supported banks depends on payment type and merchant configuration. Contact operations to configure it.
+Payment verification methods—SMS, gesture code or payment password—must be configured by our server staff. Contact the relevant server-integration staff.
+<br/></p>
+<h3 id="常见问题">Frequently asked questions<br/></h3>
+<p>Prefer generating signatures on the server. If signing on the client, use payutil from the demo.<br/></p>
+<blockquote>
+<p>1. The app crashes immediately when run.<br/></p>
+</blockquote>
+<p>Answer: the SDK was not retained.<br/></p>
+<blockquote>
+<p>2. The SDK uses class extensions; add -all_load to Other Linker Flags.<br/></p>
+</blockquote>
+<blockquote>
+<p>3. An initialisation error is reported.<br/></p>
+</blockquote>
+<p>Answer: 1. Check that the environment and merchant number match. 2. Check the signing method against the signature tool. 3. Check for omitted order information.<br/></p>
+<blockquote>
+<p>4. Common initialisation errors, explanations and responses<br/></p>
+</blockquote>
+<p>1. The supplied type is not NSString.<br/>
+Explanation: Lianlian orders require values in the form {“strkey”: “strvalue”, “strkey1″ : “strvalue2“}. Do not pass {“key”: [v1, v2]} or {“key”: {“ikey”:”v”}}.
+Response: change the order-value format, especially risk_item, to a form such as {“risk_item”:”{\”r_key\”:\”v\”}”}.</p>
+<p>2. The merchant does not have permission for this payment product.<br/></p>
+<p>Explanation: our products include authenticated payment, quick payment and other methods. Each method has a different package, payment call and merchant number.<br/>
+Response: first check that the merchant number is correct, for example &lt;authenticated-payment test merchant number 201408071000001543&gt; and &lt;quick-payment test merchant number 201408071000001546&gt;. <br/>
+Then check the corresponding package and call method. Dedicated methods have already been extracted for iOS.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 快捷支付
+- (void)presentQuickPaySdkInViewController:(UIViewController*)viewController withTraderInfo:(NSDictionary*)traderInfo;
+// 认证支付
+- (void)presentVerifyPaySdkInViewController:(UIViewController*)viewController withTraderInfo:(NSDictionary*)traderInfo;
+</code></pre></div></div>
+<p>3. The merchant does not have permission for this payment method.<br/>
+Explanation: each merchant number supports a limited set of product business types.<br/>
+Response: change the merchant business type. busi_partner is String(6). Virtual-goods sales: 101001.<br/>
+Physical-goods sales: 109001<br/>
+External-account top-up: 108001<br/></p>
+<p>4. Signature verification fails.<br/>
+Explanation: signing follows specific rules and includes specific order parameters.<br/>
+Response: the latest iOS demo provides payUtil, which directly generates an order with a valid signature. Again, we strongly recommend that merchants sign on the server.<br/>
+<br/></p>
+<h3 id="支付成功之后不需要做额外的处理后台那边通过回调地址已提交了但集成的时候字典里边传的notify_url为服务器的回调地址此地址为后台人员集成连连支付时给">After payment succeeds, no extra handling is required here; the backend has submitted through the callback URL. During integration, notify_url in the dictionary must be the server callback URL supplied by the backend staff integrating Lianlian Pay.<br/></h3>
+<p>A later issue required applying for the merchant-product configuration form, shown below:</p>
+<p><img alt="3" src="/images/blog/lianlianzhifu04.jpg"/><br/></p>
+<p>The Lianlian Tongyin merchant configuration form is also shown below:</p>
+<p><img alt="3" src="/images/blog/lianlianzhifu03.png"/><br/></p>
+<p>The biggest pitfall was the risk-control parameters: 8 are required, but the demo only supplied one and did not mention the others. They are:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/*
+frms_ware_category  *商品类目(固定2009)
+user_info_mercht_userno 商户用户唯一标识（token）
+user_info_bind_phone 绑定手机号(已有)
+user_info_dt_register 注册时间
+user_info_full_name  用户注册姓名（认证姓名）
+user_info_id_no 用户注册证件号码
+user_info_identify_state 是否实名认证 1是0非
+user_info_identify_type 实名认证方式
+*/
+
+
+</code></pre></div></div>
+<hr/>
+<blockquote>
+<p>Recommended reading: <a href="/en/journal/2016-01-19-a-league-of-legends-skin-selection-animation-with-uicollectionviewflowlayout/">A League of Legends skin-selection animation with UICollectionViewFlowLayout</a><br/></p>
+</blockquote>
+<blockquote>
+<p>Original article: <a href="/en/">https://allluckly.cn/</a><br/></p>
+</blockquote>
+<p>Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.</p>
+
+{% endraw %}

@@ -1,0 +1,73 @@
+---
+layout: null
+permalink: /sdk/git01/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: Biosn收集的Git常见的错误解决方式
+agent_source_url: https://allluckly.cn/sdk/git01
+agent_source_sha256: 8aedc2c1307d064309441c63343d64ddfdef9969eb935281a3eb95c0bbd2e623
+agent_generator_version: 1
+---
+{% raw %}# Biosn收集的Git常见的错误解决方式
+
+语言：zh-CN
+原文：[Biosn收集的Git常见的错误解决方式](<https://allluckly.cn/sdk/git01>)
+中文：[中文 HTML](<https://allluckly.cn/sdk/git01>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-12-28-bison-s-collection-of-solutions-to-common-git-errors/>)
+发布于: 2015-12-28T00:00:00+08:00
+内容更新于: 2015-12-28T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+汇总使用 Git 时遇到的索引锁和 push 默认行为警告，列出报错画面及当时采用的配置命令。适合按错误类型回顾排查过程，执行前需确认现场状态。
+
+Bison 整理的 Git 使用问题记录。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文记录 Windows 7 环境下的 Git 问题与当时的默认推送设置。
+
+> "最近一直在使用window 7系统，有些事情必须使用`Git`一开始我是拒绝的"
+
+最近一直在使用window 7系统，有些事情必须使用`Git`一开始我是拒绝的，  
+ 但么有办法只好硬着头皮上咯，下面是我在使用`Git`时所遇到的一些问题以  
+ 及解决方法！
+
+### -NO.1 执行` git add  `文件时，出现如下错误
+
+```css
+If no other git process is currently running, this probably means a
+git process crashed in this repository earlier. Make sure no other git
+process is running and remove the file manually to continue.
+```
+
+#### 解决方式`rm -f ./.git/index.lock`
+
+### -NO.2 执行` git push  `文件时，出现如下警告
+
+```css
+warning: push.default is unset; its implicit value is changing in
+Git 2.0 from 'matching' to 'simple'. To squelch this message
+and maintain the current behavior after the default changes, use:
+
+git config --global push.default matching
+
+To squelch this message and adopt the new behavior now, use:
+
+git config --global push.default simple
+```
+
+#### 解决方式`git config --global push.default matching`再执行git push
+
+### -NO.3 git 提交出现,如下错误
+
+```css
+fatal: Unable to create ‘project_path/.git/index.lock’: File exists. exists
+```
+
+#### 解决方式`rm -f ./.git/index.lock`
+
+暂时就遇到了这么多，以后有遇到新问题随时更新
+
+好文推荐：[Bison教你1分钟集成百度移动SSP启动广告](<https://allluckly.cn/sdk/baidu01>)
+
+版权归©Bison所有 如需转载请保留原文超链接地址！否则后果自负！
+{% endraw %}

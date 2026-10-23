@@ -1,0 +1,11 @@
+{%- assign search_key = post.source_path | default: post.path -%}
+{%- assign search_technical = site.data.technical_articles[search_key] -%}
+{%- assign search_apps = site.data.apps -%}
+{%- if include.lang == 'en' -%}{%- assign search_technical = site.data.technical_articles_en[search_key] -%}{%- assign search_apps = site.data.apps_en -%}{%- endif -%}
+{%- assign search_app = search_apps | where: 'id', post.app_id | first -%}
+{%- assign search_description = search_technical.summary | default: post.description -%}
+{%- assign search_author = search_technical.author_name | default: post.author.name | default: post.author -%}
+{%- assign search_path = post.url | replace: '/index.html', '/' -%}
+{%- assign search_last = search_path | slice: -1, 1 -%}
+{%- if search_last == '/' -%}{%- assign search_length = search_path.size | minus: 1 -%}{%- assign search_path = search_path | slice: 0, search_length -%}{%- endif -%}
+{"title":{{ post.title | jsonify }},"category":{{ post.category | jsonify }},"url":{{ post.url | absolute_url | jsonify }},"markdown_url":{{ search_path | append: '/index.md' | absolute_url | jsonify }},"description":{{ search_description | default: '' | strip_html | normalize_whitespace | jsonify }},"date":{{ post.date | date_to_xmlschema | jsonify }},"shortdate":{{ post.date | date: '%B %d, %Y' | jsonify }},"lang":{{ include.lang | jsonify }},"author":{{ search_author | jsonify }},"app_name":{{ search_app.name | jsonify }},"keywords":{{ search_technical.keywords | default: post.tags | jsonify }},"version_note":{{ search_technical.version_note | default: '' | jsonify }}}

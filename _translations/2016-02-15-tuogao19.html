@@ -1,0 +1,192 @@
+---
+layout: post
+title: 'iOS animation: transforms and keyframes'
+description: Uses changing seasonal text and falling leaves to explain affine transforms and keyframe animation.
+  Scaling, translation and rotation are combined step by step, showing how transform parameters and animation stages
+  affect the resulting motion.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-02-15 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Uses changing seasonal text and falling leaves to explain affine transforms and keyframe animation. Scaling,
+    translation and rotation are combined step by step, showing how transform parameters and animation stages affect
+    the resulting motion.
+  keywords:
+  - CGAffineTransform
+  - keyframe animation
+  - UIView
+  - rotation
+  - scaling
+  provenance: contribution
+  author_name: SindriLin
+  source_url: http://www.jianshu.com/p/a071bba99a1b
+  credit: Originally credited to SindriLin; edited and archived by Bison.
+  title: 'iOS animation: transforms and keyframes'
+  source_sha256: 629244c5f5976c2edd22a32440dd4af1ab7be57fab859d34eb84eb5720e3fdaf
+lang: en
+source_path: _posts/2016-02-15-tuogao19.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao19
+permalink: /en/journal/2016-02-15-ios-animation-transforms-and-keyframes/
+translation_method: machine-assisted
+translation_source_sha256: 629244c5f5976c2edd22a32440dd4af1ab7be57fab859d34eb84eb5720e3fdaf
+excerpt: Uses changing seasonal text and falling leaves to explain affine transforms and keyframe animation. Scaling,
+  translation and rotation are combined step by step, showing how transform parameters and animation stages affect
+  the resulting motion.
+translation_date: '2026-10-23T02:34:13+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/a071bba99a1b">SindriLin’s Notes</a><br/></p>
+<blockquote>
+<p>"The pursuit of beauty is human nature, and programmers are no exception. We always seek more impressive implementations. Look closely, though, and a good animation can be broken down into simple animation steps. Sensibly combining those fundamentals creates something surprisingly compelling. Mastering basic animation is therefore the foundation of more ambitious development."</p>
+</blockquote>
+<p>For this second animation article, in <a href="http://www.jianshu.com/p/6e326068edeb">Starting with UIView animations </a>I briefly introduced several basic UIView animations. Combining them gave our login screen a lively feel, but these alone cannot meet all our animation needs. This article likewise starts with a small demo to explain the powerful <code class="language-plaintext highlighter-rouge">transform</code> animations and keyframe <code class="language-plaintext highlighter-rouge">keyFrame</code> animation.]</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao19/1.gif"/><br/></p>
+<p>There are two animations: a leaf blown downward by the wind, and the text on the left changing from <code class="language-plaintext highlighter-rouge">summer</code> to <code class="language-plaintext highlighter-rouge">autumn</code>. Both animations are based on the powerful <code class="language-plaintext highlighter-rouge">transform</code> transformations. The falling-leaf effect uses keyframe animation.<a href="https://github.com/JustKeepRunning/LXDAnimationSecondDemo">Demo link</a></p>
+<h2 id="transform动画">Transform animation</h2>
+<p><code class="language-plaintext highlighter-rouge">transform</code> is an important property that changes a view's appearance through matrix transformations, including rotation, deformation, and translation. Modifying it also changes the view's frame. Two data types represent a <code class="language-plaintext highlighter-rouge">transform</code>: <code class="language-plaintext highlighter-rouge">CGAffineTransform</code> and <code class="language-plaintext highlighter-rouge">CATransform3D</code>. The former applies to <code class="language-plaintext highlighter-rouge">UIView</code>, while the latter works at the <code class="language-plaintext highlighter-rouge">layer</code> level. The latter enables more powerful effects, but we first need to learn <code class="language-plaintext highlighter-rouge">CGAffineTransform</code>, which is the transformation type covered here.</p>
+<p>To understand how matrix transformations work, see this blog post: <a href="http://blog.csdn.net/dyllove98/article/details/9051139">CGAffineTransform affine transformations</a></p>
+<blockquote>
+<p>talk is cheap show you the code</p>
+</blockquote>
+<p>Before you use <code class="language-plaintext highlighter-rouge">transform</code> for animation, let me introduce several common functions:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/// 用来连接两个变换效果并返回。返回的t = t1 * t2
+CGAffineTransformConcat(CGAffineTransform t1, CGAffineTransform t2)
+
+/// 矩阵初始值。[ 1 0 0 1 0 0 ]
+CGAffineTransformIdentity
+
+/// 自定义矩阵变换，需要掌握矩阵变换的知识才知道怎么用。参照上面推荐的原理链接
+CGAffineTransformMake(CGFloat a, CGFloat b, CGFloat c, CGFloat d, CGFloat tx, CGFloat ty)
+
+/// 旋转视图。传入参数为 角度 * (M_PI / 180)。等同于 CGAffineTransformRotate(self.transform, angle)
+CGAffineTransformMakeRotation(CGFloat angle)
+CGAffineTransformRotate(CGAffineTransform t, CGFloat angle)
+
+/// 缩放视图。等同于CGAffineTransformScale(self.transform, sx, sy)
+CGAffineTransformMakeScale(CGFloat sx, CGFloat sy)
+CGAffineTransformScale(CGAffineTransform t, CGFloat sx, CGFloat sy)
+
+/// 缩放视图。等同于CGAffineTransformTranslate(self.transform, tx, ty)
+CGAffineTransformMakeTranslation(CGFloat tx, CGFloat ty)
+CGAffineTransformTranslate(CGAffineTransform t, CGFloat tx, CGFloat ty)
+</code></pre></div></div>
+<p>I recorded the transformation of the text at the demo's bottom-left. I recommend this Mac application for capturing animated images: <a href="http://www.pc6.com/mac/135257.html">licecap</a>, which is simple and convenient. I use it to break animations into steps and reproduce them.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao19/2.jpeg"/><br/></p>
+<p>The text animation clearly combines two effects: shrinking along the y-axis and fading. First, add two UILabels to the project, named label1 and label2. Then add the following code in viewDidAppear:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)viewDidAppear: (BOOL)animated {
+    label1.transform = CGAffineTransformMakeScale(0, 0);
+    label1.alpha = 0;
+    [UIView animateWithDuration: 3. animations: ^ {
+        label1.transform = CGAffineTransformMakeScale(0, 1);
+        label2.transform = CGAffineTransformMakeScale(0, 0.1);
+        label1.alpha = 1;
+        label2.alpha = 0;
+    }];
+}
+</code></pre></div></div>
+<p>Why does label2 shrink to 0.1 on the y-axis rather than 0? If we set it to 0, label2 immediately stays in its final state after the animation is committed, owing to an automatic performance optimization. Therefore, for any shrinking transform, use a very small scale if needed, but not 0.</p>
+<p>Run the code and the text deformation is complete. But the demo combines deformation with movement. We could obviously achieve movement by changing <code class="language-plaintext highlighter-rouge">center</code>, yet that is not today's goal. Learning a new animation approach is more worthwhile.</p>
+<p>At the beginning, the appearing label has a height of 0, which gradually grows to <code class="language-plaintext highlighter-rouge">height</code>, while its top remains fixed throughout. In the label's own coordinate system, its y position is initially 0 and its center after appearing is <code class="language-plaintext highlighter-rouge">height / 2</code>. The animation code can therefore be written as follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)viewDidAppear: (BOOL)animated {
+    ///  初始化动画开始前label的位置
+    CGFloat offset = label1.frame.size.height * 0.5;
+
+    label1.transform = CGAffineTransformConcat(
+      CGAffineTransformMakeScale(0, 0),
+      CGAffineTransformTranslate(0, -offset)
+    );
+    label1.alpha = 0;
+    [UIView animateWithDuration: 3. animations: ^ {
+        ///  还原label1的变换状态并形变和偏移label2
+        label1.transform = CGAffineTransformIdentifier;
+        label1.transform = CGAffineTransformConcat(
+          CGAffineTransformMakeScale(0, 0),
+          CGAffineTransformTranslate(0, offset)
+        );
+        label1.alpha = 1;
+        label2.alpha = 0;
+    }];
+}
+</code></pre></div></div>
+<p>Adjust the positions of the two labels and make one transparent. Run the code, and the text-transition animation is complete.</p>
+<h2 id="keyframe动画">Keyframe animation</h2>
+<p>Save the opening gif locally and open it in Preview. You will see that Preview displays it as many separate images. Animations, movies, and CG effects can all be viewed as a succession of rendered images. When those images change fast enough, we perceive motion. For the UIView translation described earlier, after the animation is committed, the system calculates each frame of the view's movement from the duration and then renders them in sequence.</p>
+<p>Returning to the falling-leaf demo, I changed the leaf's <code class="language-plaintext highlighter-rouge">center</code> five times. Here is its piecewise linear translation path with the important turning points marked:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao19/3.jpeg"/><br/></p>
+<p>How would we implement the translation above with UIView animation code? We would need to nest UIView animations repeatedly, as shown here:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[self moveLeafWithOffset: (CGPoint){ 15, 80 } completion: ^(BOOL finished) {
+    [self moveLeafWithOffset: (CGPoint){ 30, 105 } completion: ^(BOOL finished) {
+        [self moveLeafWithOffset: (CGPoint){ 40, 110 } completion: ^(BOOL finished) {
+            [self moveLeafWithOffset: (CGPoint){ 90, 80 } completion: ^(BOOL finished) {
+                [self moveLeafWithOffset: (CGPoint){ 80, 60 } completion: nil duration: 0.6];
+            } duration: 1.2];
+        } duration: 1.2];
+    } duration: 0.6];
+} duration: 0.4];
+
+- (void)moveLeafWithOffset: (CGPoint)offset completion: (void(^)(BOOL finished))completion duration: (NSTimeInterval)duration
+{
+    [UIView animateWithDuration: duration delay: 0 options: UIViewAnimationOptionCurveLinear animations: ^{
+        CGPoint center = _leaf.center;
+        center.x += offset.x;
+        center.y += offset.y;
+        _leaf.center = center;
+    } completion: completion];
+}
+</code></pre></div></div>
+<p>That looks fairly easy. The code above only moves the leaf, but the leaf in the gif also rotates, so we need to add this code:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[UIView animateWithDuration: 4 animations: ^{
+    _leaf.transform = CGAffineTransformMakeRotation(M_PI);
+}];
+</code></pre></div></div>
+<p>Run this code and the leaf moves stiffly, with obvious corners. Also, the supplied <code class="language-plaintext highlighter-rouge">duration</code> has no meaningful role here: one fixed animation duration does not express the stages of the falling motion.</p>
+<p>UIView provides another animation technique to address both issues: keyframe animation.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (void)animateKeyframesWithDuration:(NSTimeInterval)duration delay:(NSTimeInterval)delay options:(UIViewKeyframeAnimationOptions)options animations:(void (^)(void))animations completion:(void (^ __nullable)(BOOL finished))completion
++ (void)addKeyframeWithRelativeStartTime:(double)frameStartTime relativeDuration:(double)frameDuration animations:(void (^)(void))animations
+</code></pre></div></div>
+<p>The first method creates a keyframe animation; the second inserts keyframe information into its animation block. The two parameters mean:</p>
+<ul>
+<li>frameStartTime expresses the keyframe animation's starting point as a proportion of the entire animation.</li>
+<li>frameDuration expresses the proportion of the total animation duration occupied by this keyframe animation.</li>
+</ul>
+<p>I made a diagram to explain the parameters:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao19/4.jpeg"/><br/></p>
+<p>Compared with <code class="language-plaintext highlighter-rouge">UIView</code> animations, keyframe animation introduces relative durations, letting us control the share of time occupied by each keyframe instead of supplying a meaningless duration that makes the code harder to understand. Beyond relative timing, the keyframe <code class="language-plaintext highlighter-rouge">options</code> parameter can also smooth the motion. The following options are specific to keyframes:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>UIViewKeyframeAnimationOptionCalculationModeLinear      // 连续运算模式，线性
+UIViewKeyframeAnimationOptionCalculationModeDiscrete    // 离散运算模式，只显示关键帧
+UIViewKeyframeAnimationOptionCalculationModePaced       // 均匀执行运算模式，线性
+UIViewKeyframeAnimationOptionCalculationModeCubic       // 平滑运算模式
+UIViewKeyframeAnimationOptionCalculationModeCubicPaced  // 平滑均匀运算模式
+</code></pre></div></div>
+<p>The demo uses <code class="language-plaintext highlighter-rouge">UIViewKeyframeAnimationOptionCalculationModeCubic</code>, which applies Bézier curves to smooth the falling leaf. See the opening gif for the result, and change the demo's option to compare effects. We can now convert the preceding <code class="language-plaintext highlighter-rouge">UIView</code> animation into keyframes using this method:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[UIView animateKeyframesWithDuration: 4 delay: 0 options: UIViewKeyframeAnimationOptionCalculationModeLinear animations: ^{
+    __block CGPoint center = _leaf.center;
+    [UIView addKeyframeWithRelativeStartTime: 0 relativeDuration: 0.1 animations: ^{
+        _leaf.center = (CGPoint){ center.x + 15, center.y + 80 };
+    }];
+    [UIView addKeyframeWithRelativeStartTime: 0.1 relativeDuration: 0.15 animations: ^{
+        _leaf.center = (CGPoint){ center.x + 45, center.y + 185 };
+    }];
+    [UIView addKeyframeWithRelativeStartTime: 0.25 relativeDuration: 0.3 animations: ^{
+        _leaf.center = (CGPoint){ center.x + 90, center.y + 295 };
+    }];
+    [UIView addKeyframeWithRelativeStartTime: 0.55 relativeDuration: 0.3 animations: ^{
+        _leaf.center = (CGPoint){ center.x + 180, center.y + 375 };
+    }];
+    [UIView addKeyframeWithRelativeStartTime: 0.85 relativeDuration: 0.15 animations: ^{
+        _leaf.center = (CGPoint){ center.x + 260, center.y + 435 };
+    }];
+    [UIView addKeyframeWithRelativeStartTime: 0 relativeDuration: 1 animations: ^{
+        _leaf.transform = CGAffineTransformMakeRotation(M_PI);
+    }];
+} completion: nil];
+</code></pre></div></div>
+<p>Compared with the <code class="language-plaintext highlighter-rouge">UIView</code> animation, keyframes make each translation's share of the total time clearer, with more concise code.</p>
+<h2 id="尾言">Closing notes</h2>
+<p>This is the second article in the animation series. At this point, the <code class="language-plaintext highlighter-rouge">UIView</code> animation tutorials are now complete. Future articles will explore <code class="language-plaintext highlighter-rouge">autolayout</code> animation and layer-level animation. As the New Year approaches, I wish everyone a happy Year of the Monkey 🐵 and the fulfillment of your wishes! <a href="https://github.com/JustKeepRunning/LXDAnimationSecondDemo">Demo URL for this article</a></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-01-20-integrating-lianlian-pay-into-an-ios-app/">Integrating LianLian Pay into an iOS app</a><br/></p>
+
+{% endraw %}

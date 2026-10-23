@@ -1,0 +1,54 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay folder scans: turn a file source into a browsable library'
+description: Begin with one clear source folder, choose the scan scope and verify items and categories, then handle
+  missed files, matching names and rescan limits.
+permalink: /en/guides/icouldplay-folder-scan/
+date: 2026-10-23 00:00:00 +0800
+category: Tutorials
+level: Beginner
+series_order: 10
+topic: Servers and library setup
+reading_time: 11
+lang: en
+source_path: _posts/2026-10-23-icouldplay-folder-scan.md
+source_url: /guides/icouldplay-folder-scan/
+translation_method: machine-assisted
+translation_source_sha256: bdc4614124322e59c9af0b1770750445e7a9141c090875777aa987dd7da94c62
+excerpt: Begin with one clear source folder, choose the scan scope and verify items and categories, then handle
+  missed files, matching names and rescan limits.
+translation_date: '2026-10-23T02:34:08+00:00'
+---
+{% raw %}
+<p>After connecting a file source, its videos still need media-library records for browsing by cards, titles, and categories. Scanning reads file information and creates records; it does not copy every video to the phone or guarantee a correct poster match for every file. Use a small folder to establish a verifiable scan process before expanding.</p>
+<h2 id="先确认这次扫描的是文件源">Confirm that you are scanning a file source</h2>
+<p>This tutorial covers local folders and file sources such as SMB and WebDAV. Emby, Jellyfin, and Plex manage their libraries on the server, so organize them there first and let iCouldPlay read them. Keep the workflows separate. If you do not yet have an accessible file source, first complete <a href="/en/guides/icouldplay-smb-nas/">SMB connection</a> or <a href="/en/guides/icouldplay-webdav-cloud/">WebDAV connection</a>.</p>
+<p>Prepare a folder with three files: one ordinary short video and two episodes from the same series. Record file count, names, and paths. Initially avoid same-named copies and do not include subtitle or cover-image files in the video count. Confirm all three appear in file browsing and play at least one; scanning cannot repair an unreadable folder.</p>
+<h2 id="选择明确且尽量小的范围">Choose a small, explicit scope</h2>
+<p>In Sources, find the target file source and open folder selection or video scanning. If folder selection appears while adding the source, select the test folder then. If you postponed it, return to the source controls now. Avoid selecting both a parent folder and several already-included children, which makes the actual traversal scope harder to understand.</p>
+<p>After selecting, confirm the source name and folder path, then start scanning. A clear initial scope makes results easier to compare. Starting at the entire NAS root may include backups, samples, and historical copies, increasing waiting and duplicate checks. Scan the content you want to browse rather than everything the server exposes.</p>
+<h2 id="理解快速扫描与完整扫描">Understand quick and full scans</h2>
+<p>Some interfaces offer quick and full scanning. Quick scanning targets common media directories; full scanning covers a broader area and may take longer. Use the options actually shown in your version. If your folder names do not follow common structures, a quick scan missing them does not prove unsupported video formats. Check an explicit folder selection or broader scan scope first.</p>
+<p>Observe progress and result messages, waiting for completion before repeating an operation. Avoid launching repeated scans of one source from multiple entry points simultaneously, which makes it hard to connect results to scope. For large folders, finish evaluating the practice scope first and add folders in batches rather than continually enlarging the task and expecting immediate completion.</p>
+<h2 id="用来源与全部分类检查结果">Check results by source and the All category</h2>
+<p>After scanning, return to the media library, select the target source, and open “All.” Find each of the three samples and compare names, durations, and actual content. Item count need not always equal file count: episodes may be grouped into series, and some files may be unrecognized or deduplicated against existing records. Inspect series or details rather than judging solely by homepage card count.</p>
+<p>If Movies is empty but All contains items, classification or matching may be the issue, not a completely failed scan. Personal clips should not be forced into movie metadata. Confirm that the file is in the library and opens before addressing titles and posters. For naming, continue with <a href="/en/guides/icouldplay-movie-naming/">Movie matching and release years</a> and <a href="/en/guides/icouldplay-episode-naming/">Series seasons and episodes</a>.</p>
+<h2 id="区分漏扫错误匹配与播放失败">Distinguish missed scans, wrong matches, and playback failures</h2>
+<p>A missed scan means a file appears in browsing but not in the library. A wrong match means its entry exists but points to another work's information. A playback failure means the entry and metadata may be correct but opening the video fails. These require different checks, not one universal rescan. Record the sample path and behavior before choosing the next step.</p>
+<p>For missing items, check whether the scan includes the folder, whether the extension is supported in that workflow, file integrity, and possible merging with an existing same-path record. For wrong matches, check title, year, and series information. For playback failures, open the same file directly in file browsing and compare with a local copy, avoiding confusion between network access and missing library records.</p>
+<h2 id="重新扫描不是自动重置全部资料">Rescanning does not automatically reset all metadata</h2>
+<p>After adding a file, scan through the available entry point and see whether the new item appears. Existing files or metadata may be skipped or retained; do not assume every scan clears and rebuilds everything. Renamed files, moved folders, and changed source addresses require checking old records against new locations, not just reading the completion message.</p>
+<p>Do not delete local video entries merely to rematch posters. A deletion confirmation may also remove in-app video files, unlike refreshing metadata. Retain important originals and read the current confirmation carefully before any cleanup. Confirm the relationship between server files, local app copies, and media records for your specific source type before acting.</p>
+<h2 id="用分批扩展保持媒体库可解释">Expand in batches to keep the library understandable</h2>
+<p>Once the three samples pass, add a movie folder or one season. After each batch, check source, approximate counts, and representative entries, recording obvious errors. If a folder mixes finished videos, editing exports, and low-resolution previews, first select a clear scope containing the viewing versions so automatic matching does not combine similar names under one work.</p>
+<p>Stable file organization makes later updates easier to track. You do not need to reorganize all storage for the app; choose a suitable library scope first. Confirm that each new scope works before expanding to avoid a large scan whose entry origins are difficult to explain.</p>
+<h2 id="常见问题与完成标准">Common questions and completion criteria</h2>
+<p><strong>Does scanning download every video to the device?</strong> No. Scanning a network file source mainly creates media-information and path records. Playback may still require the server and network. Offline availability requires an actual local file or a download completed through the current version's available workflow; it cannot be inferred from a successful scan.</p>
+<p><strong>Why does the same file not create a second card?</strong> The workflow may deduplicate by existing paths or records. Repeated scans are not a file-copying method. If two different videos share a name, check actual paths and files before adjusting names rather than repeatedly scanning to create more indistinguishable entries.</p>
+<p>At completion, you should be able to reach the correct content for every sample from the media library, identify its source and folder, and explain whether missing items involve scope, classification, matching, or playback. Such a library is ready to expand, rather than merely containing more cards.</p>
+<h2 id="资料来源与版本">Sources and version</h2>
+<p>Based on <a href="https://apps.apple.com/cn/app/id6755653178">iCouldPlay official store description </a>for public media-management and automatic-matching capabilities, together with the existing folder-selection and scan controls. The public version checked on October 23, 2026 was 1.1.0. Scan scope, deduplication, and options may change by version. Check matches after scanning; a media entry is not proof of an offline file.</p>
+
+{% endraw %}

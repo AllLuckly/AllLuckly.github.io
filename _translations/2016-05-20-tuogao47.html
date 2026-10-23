@@ -1,0 +1,613 @@
+---
+layout: post
+title: Reading the Objective-C runtime source to understand messaging
+description: Uses an unrecognized selector error to introduce Objective-C messaging, examining method lookup, caching
+  and forwarding in the source. Runtime examples then explain how a method call is resolved during execution.
+category: Development notes
+imagefeature: null
+date: 2016-05-20 00:00:00 +0800
+technical_translation:
+  topic: swift-runtime
+  summary: Uses an unrecognized selector error to introduce Objective-C messaging, examining method lookup, caching
+    and forwarding in the source. Runtime examples then explain how a method call is resolved during execution.
+  keywords:
+  - Objective-C Runtime
+  - message sending
+  - method cache
+  - message forwarding
+  - unrecognized selector
+  provenance: contribution
+  author_name: Sindri
+  source_url: http://www.jianshu.com/p/a63b5d973c63/comments/2459972#comment-2459972
+  credit: Originally credited to Sindri; edited and archived by Bison.
+  version_note: Published in 2016. Source structure and implementation details refer to the Objective-C runtime
+    of that period.
+  title: Reading the Objective-C runtime source to understand messaging
+  source_sha256: b883b43946fb4150c0f2e0749677166922aa52a22433070d98caf6b80e132de1
+lang: en
+source_path: _posts/2016-05-20-tuogao47.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao47
+permalink: /en/journal/2016-05-20-reading-the-objective-c-runtime-source-to-understand-messaging/
+translation_method: machine-assisted
+translation_source_sha256: b883b43946fb4150c0f2e0749677166922aa52a22433070d98caf6b80e132de1
+excerpt: Uses an unrecognized selector error to introduce Objective-C messaging, examining method lookup, caching
+  and forwarding in the source. Runtime examples then explain how a method call is resolved during execution.
+translation_date: '2026-10-23T02:45:03+00:00'
+---
+{% raw %}
+<p>iOS has a general object type, <code class="language-plaintext highlighter-rouge">id</code>, that can represent any object. Calling any existing method on an object typed as <code class="language-plaintext highlighter-rouge">id</code> therefore does not produce a compiler error. For example:</p>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/a63b5d973c63/comments/2459972#comment-2459972">Sindri’s Notes</a><br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>id wrongArr = @"This is a NSString instance.";
+[wrongArr addObject: @"The operate will crash your application"];
+</code></pre></div></div>
+<p><br/>
+As expected, the compiler displays this message and the app crashes. Almost every developer has encountered it:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-[__NSCFConstantString addObject:]: unrecognized selector sent to instance 0x10675c060
+</code></pre></div></div>
+<p>The reason is simple: we sent a method not belonging to the instance at <code class="language-plaintext highlighter-rouge">0x10675c060 </code>. This is not saying <code class="language-plaintext highlighter-rouge">instance 0x10675c060 called unrecognized selector</code>, but reporting a message-send error. Every method call on an <code class="language-plaintext highlighter-rouge">OC对象</code> is actually a message send.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao47/1.jpg"/><br/></p>
+<h2 id="关于静态语言和动态语言">Static and dynamic languages<br/></h2>
+<p>First, a programming-language distinction: dynamic versus static languages. Objective-C is dynamic. The differences are:<br/></p>
+<ul>
+<li>
+<p>Static languages check types before execution. The memory addresses of class members and methods are determined at compile time, and members can access only their own methods and variables. A call like the one above would fail compilation and produce an error. This also gives static languages a structured form, easier debugging, and various opportunities for performance optimization. Common examples include <code class="language-plaintext highlighter-rouge">java</code>, <code class="language-plaintext highlighter-rouge">C++</code>, and <code class="language-plaintext highlighter-rouge">C</code>.</p>
+</li>
+<li>
+<p>Dynamic languages defer most checks to runtime, resolving member variables and method addresses then. Members and methods can be added dynamically at runtime. They are flexible, customisable and readable, but methods generally cannot benefit from inlining and similar optimisations.<br/></p>
+</li>
+</ul>
+<p>I will not judge which approach is better here, but <code class="language-plaintext highlighter-rouge">smalltalk</code> is a pioneer of dynamic languages and a major influence on Objective-C. In <code class="language-plaintext highlighter-rouge">smalltalk</code>, everything is an object, or should be treated as one. For example, <code class="language-plaintext highlighter-rouge">2 + 3</code> is understood as sending the object <code class="language-plaintext highlighter-rouge">2</code> the message <code class="language-plaintext highlighter-rouge">+</code> with the argument <code class="language-plaintext highlighter-rouge">3</code>.</p>
+<h2 id="消息发送">Message sending<br/></h2>
+<p>In the previous article,<a href="http://www.jianshu.com/p/2c0305676621">Runtime: properties and variables </a>we imported a runtime header for one-step archiving. Today we import a different file:<code class="language-plaintext highlighter-rouge">&lt;objc/message.h&gt;</code><br/></p>
+<p>In Objective-C, a method call looks like this:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[davin playWith: friend];
+</code></pre></div></div>
+<p>When a method is called, the runtime converts it into a C function call, sending <code class="language-plaintext highlighter-rouge">davin</code> the <code class="language-plaintext highlighter-rouge">playWith:</code> message with the argument <code class="language-plaintext highlighter-rouge">friend</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>objc_msgSend(davin, @selector(playWith:), friend);
+</code></pre></div></div>
+<p><br/>
+What happens inside this C function, and how is the class method found? Apple has open-sourced <a href="http://opensource.apple.com//tarballs/">runtime </a>implementation. For performance, Apple wrote this function in assembly. The source is under <code class="language-plaintext highlighter-rouge">Source/objc-msg-arm.s</code> file):<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/*****************************************************************
+ *
+ * id objc_msgSend(id self, SEL	_cmd,...);
+ *
+ *****************************************************************/
+    ENTRY objc_msgSend
+    MESSENGER_START
+
+    cbz	r0, LNilReceiver_f    // 判断消息接收者是否为nil
+
+    ldr	r9, [r0]		      // r9 = self-&gt;isa
+    CacheLookup NORMAL           // 到缓存中查找方法
+
+LCacheMiss:                      // 方法未缓存
+    MESSENGER_END_SLOW
+    ldr	r9, [r0, #ISA]		
+    b	__objc_msgSend_uncached
+
+LNilReceiver:                    // 消息接收者为nil处理
+    mov	r1, #0
+    mov	r2, #0
+    mov	r3, #0
+    FP_RETURN_ZERO
+    MESSENGER_END_NIL
+    bx	lr	
+
+LMsgSendExit:
+    END_ENTRY objc_msgSend
+</code></pre></div></div>
+<p><br/>
+Even without assembly knowledge, the comments reveal what is happening. The code shows the following stages of a method call:<br/></p>
+<ul>
+<li>
+<p>Check whether the receiver is nil. If so, clear registers and return nil from message sending.<br/></p>
+</li>
+<li>
+<p>Search the class cache; if the method exists, return it directly.<br/></p>
+</li>
+<li>
+<p>If uncached, search the class’s method list in order.<br/></p>
+</li>
+</ul>
+<p>The method implementation is looked up through the unusually named function <code class="language-plaintext highlighter-rouge">_class_lookupMethodAndLoadCache3</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>IMP _class_lookupMethodAndLoadCache3(id obj, SEL sel, Class cls)
+{
+    return lookUpImpOrForward(cls, sel, obj, 
+                          YES/*initialize*/, NO/*cache*/, YES/*resolver*/);
+}
+
+IMP lookUpImpOrForward(Class cls, SEL sel, id inst, 
+                   bool initialize, bool cache, bool resolver)
+{
+    Class curClass;
+    IMP methodPC = nil;
+    Method meth;
+    bool triedResolver = NO;
+    
+    methodListLock.assertUnlocked();
+
+    // 如果传入的cache为YES，到类缓存中查找方法缓存
+    if (cache) {
+        methodPC = _cache_getImp(cls, sel);
+        if (methodPC) return methodPC;    
+    }
+
+    // 判断类是否已经被释放
+    if (cls == _class_getFreedObjectClass())
+        return (IMP) _freedHandler;
+
+    // 如果类未初始化，对其进行初始化。如果这个消息是initialize，那么直接进行类的初始化
+    if (initialize  &amp;&amp;  !cls-&gt;isInitialized()) {
+        _class_initialize (_class_getNonMetaClass(cls, inst));
+    }
+
+ retry:
+    methodListLock.lock();
+
+    // 忽略在GC环境下的部分消息，比如retain、release等
+    if (ignoreSelector(sel)) {
+        methodPC = _cache_addIgnoredEntry(cls, sel);
+        goto done;
+    }
+
+    // 遍历缓存方法，如果找到，直接返回
+    methodPC = _cache_getImp(cls, sel);
+    if (methodPC) goto done;
+
+    // 遍历类自身的方法列表查找方法实现
+    meth = _class_getMethodNoSuper_nolock(cls, sel);
+    if (meth) {
+        log_and_fill_cache(cls, cls, meth, sel);
+        methodPC = method_getImplementation(meth);
+        goto done;
+    }
+
+    // 尝试向上遍历父类的方法列表查找实现
+    curClass = cls;
+    while ((curClass = curClass-&gt;superclass)) {
+        // Superclass cache.
+        meth = _cache_getMethod(curClass, sel, _objc_msgForward_impcache);
+        if (meth) {
+            if (meth != (Method)1) { 
+                log_and_fill_cache(cls, curClass, meth, sel);
+                methodPC = method_getImplementation(meth);
+                goto done;
+            }
+            else {
+                // Found a forward:: entry in a superclass.
+                // Stop searching, but don't cache yet; call method 
+                // resolver for this class first.
+                break;
+            }
+        }
+
+        // 查找父类的方法列表
+        meth = _class_getMethodNoSuper_nolock(curClass, sel);
+        if (meth) {
+            log_and_fill_cache(cls, curClass, meth, sel);
+            methodPC = method_getImplementation(meth);
+            goto done;
+        }
+    }
+
+    // 没有找到任何的方法实现，进入消息转发第一阶段“动态方法解析”
+    // 调用+ (BOOL)resolveInstanceMethod: (SEL)selector
+    // 征询接收者所属的类是否能够动态的添加这个未实现的方法来解决问题
+    if (resolver  &amp;&amp;  !triedResolver) {
+        methodListLock.unlock();
+        _class_resolveMethod(cls, sel, inst);
+        triedResolver = YES;
+        goto retry;
+    }
+
+    // 仍然没有找到方法实现进入消息转发第二阶段“备援接收者”
+    // 先后会调用 -(id)forwardingTargetForSelector: (SEL)selector 
+    // 以及 - (void)forwardInvocation: (NSInvocation*)invocation 进行最后的补救
+    // 如果补救未成功抛出消息发送错误异常
+    _cache_addForwardEntry(cls, sel);
+    methodPC = _objc_msgForward_impcache;
+
+ done:
+    methodListLock.unlock();
+
+    assert(!(ignoreSelector(sel)  &amp;&amp;  methodPC != (IMP)&amp;_objc_ignored_method));
+    return methodPC;
+}
+</code></pre></div></div>
+<p><br/>
+That is the complete method-call process, divided into three main parts:<br/></p>
+<ul>
+<li>
+<p>Look for a corresponding cached method; if found, call it directly.<br/>
+For performance, the method cache uses a hash table, discussed in more detail next.<br/></p>
+</li>
+<li>
+<p>If the cache misses, search the class itself and then up its hierarchy for the implementation. The returned <code class="language-plaintext highlighter-rouge">method_t *</code> type is also named <code class="language-plaintext highlighter-rouge">Method</code>.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//非加锁状态下查找方法实现
+static method_t * getMethodNoSuper_nolock(Class cls, SEL sel)
+{
+    runtimeLock.assertLocked();
+
+    assert(cls-&gt;isRealized());
+    // fixme nil cls? 
+    // fixme nil sel?
+    for (auto mlists = cls-&gt;data()-&gt;methods.beginLists(), 
+            end = cls-&gt;data()-&gt;methods.endLists(); 
+             mlists != end;
+               ++mlists)
+    {
+        method_t *m = search_method_list(*mlists, sel);
+        if (m) return m;
+    }
+
+    return nil;
+}
+
+// 搜索方法列表
+static method_t * search_method_list(const method_list_t *mlist, SEL sel)
+{
+    int methodListIsFixedUp = mlist-&gt;isFixedUp();
+    int methodListHasExpectedSize = mlist-&gt;entsize() == sizeof(method_t);
+
+    if (__builtin_expect(methodListIsFixedUp &amp;&amp; methodListHasExpectedSize, 1)) {
+          // 对有序数组进行线性探测
+          return findMethodInSortedMethodList(sel, mlist);
+    } else {
+        // Linear search of unsorted method list
+        for (auto&amp; meth : *mlist) {
+            if (meth.name == sel) return &amp;meth;
+        }
+    }
+
+#if DEBUG
+    // sanity-check negative results
+    if (mlist-&gt;isFixedUp()) {
+        for (auto&amp; meth : *mlist) {
+            if (meth.name == sel) {
+                _objc_fatal("linear search worked when binary search did not");
+            }
+        }
+    }
+#endif
+
+    return nil;
+}
+</code></pre></div> </div>
+</li>
+</ul>
+<p><br/>
+  If an implementation is found here, add it to the method cache so the next call can find it quickly:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  // 记录并且缓存方法
+  static void log_and_fill_cache(Class cls, IMP imp, SEL sel, id receiver, Class implementer)
+  {
+  #if SUPPORT_MESSAGE_LOGGING
+      if (objcMsgLogEnabled) {
+          bool cacheIt = logMessageSend(implementer-&gt;isMetaClass(), 
+                                  cls-&gt;nameForLogging(),
+                                  implementer-&gt;nameForLogging(), 
+                                  sel);
+          if (!cacheIt) return;
+      }
+  #endif
+      cache_fill (cls, sel, imp, receiver);
+  }
+
+  //在无加锁状态下缓存方法
+  static void cache_fill_nolock(Class cls, SEL sel, IMP imp, id receiver)
+  {
+      cacheUpdateLock.assertLocked();
+
+      if (!cls-&gt;isInitialized()) return;
+      if (cache_getImp(cls, sel)) return;
+
+      cache_t *cache = getCache(cls);
+      cache_key_t key = getKey(sel);
+
+      // 如果缓存占用不到3/4，进行缓存。
+      mask_t newOccupied = cache-&gt;occupied() + 1;
+      mask_t capacity = cache-&gt;capacity();
+      if (cache-&gt;isConstantEmptyCache()) {
+          cache-&gt;reallocate(capacity, capacity ?: INIT_CACHE_SIZE);
+      }
+      else if (newOccupied &lt;= capacity / 4 * 3) {
+      }
+      else {
+          // 扩充缓存。为了性能，扩充后原有缓存方法全部移除
+          cache-&gt;expand();
+      }
+      bucket_t *bucket = cache-&gt;find(key, receiver);
+      if (bucket-&gt;key() == 0) cache-&gt;incrementOccupied();
+      bucket-&gt;set(key, imp);
+  }
+</code></pre></div></div>
+<p><br/>
+  If no implementation exists in the class, repeatedly obtain the superclass and search again. Once found, cache it in the original class rather than the superclass.<br/></p>
+<ul>
+<li>
+<p>If no implementation is found, message forwarding provides a final recovery mechanism.<br/></p>
+<p>Message forwarding has two stages here. In the first, we can add a method dynamically and let the lookup run again. The second is called <code class="language-plaintext highlighter-rouge">备援的接收者</code>: finding another object to handle the event.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void _class_resolveMethod(Class cls, SEL sel, id inst)
+{
+    // 非beta类的情况下直接调用 resolveInstanceMethod 方法
+    if (! cls-&gt;isMetaClass()) {
+        _class_resolveInstanceMethod(cls, sel, inst);
+    } 
+    else {
+        // 先调用 resolveClassMethod 请求动态添加方法
+        // 然后进行一次查找判断是否处理完成
+        // 如果没有添加，再调用 resolveInstanceMethod 方法
+        _class_resolveClassMethod(cls, sel, inst);
+        if (!lookUpImpOrNil(cls, sel, inst, 
+                      NO/*initialize*/, YES/*cache*/, NO/*resolver*/)) 
+        {
+            _class_resolveInstanceMethod(cls, sel, inst);
+        }
+    }
+}
+</code></pre></div> </div>
+</li>
+</ul>
+<p><br/></p>
+<h2 id="方法缓存">Method caching<br/></h2>
+<p>As explained in the previous runtime article, every Objective-C object is essentially wrapped in an <code class="language-plaintext highlighter-rouge">objc_class</code> structure. In <code class="language-plaintext highlighter-rouge">objc-runtime-new.h</code> in the latest runtime source, <code class="language-plaintext highlighter-rouge">objc_class</code> has the following structure, with most functions omitted here:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct objc_class : objc_object {
+    Class superclass;          // Class ISA;
+    cache_t cache;             // formerly cache pointer and vtable
+    class_data_bits_t bits;    // class_rw_t * plus custom rr/alloc flags
+
+    class_rw_t *data() { 
+        return bits.data();
+    }
+    void setData(class_rw_t *newData) {
+    bits.setData(newData);
+    }
+    // .........
+}
+</code></pre></div></div>
+<p>The structure is clear: <code class="language-plaintext highlighter-rouge">cache</code> stores the method cache used during lookup. The <code class="language-plaintext highlighter-rouge">cache</code> uses a hash table to greatly accelerate retrieval:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#define CACHE_HASH(sel, mask) (((uintptr_t)(sel)&gt;&gt;2) &amp; (mask))
+
+struct cache_t {
+    struct bucket_t *_buckets;
+    mask_t _mask;
+    mask_t _occupied;
+    // functions
+}
+
+// cache method
+buckets = (cache_entry **)cache-&gt;buckets;
+for (index = CACHE_HASH(sel, cache-&gt;mask); 
+     buckets[index] != NULL; 
+     index = (index+1) &amp; cache-&gt;mask)
+{ }
+buckets[index] = entry;
+</code></pre></div></div>
+<p>After each call to a method not already cached, the cache-insertion code below runs. Apple performs a simple bitwise operation on the <code class="language-plaintext highlighter-rouge">sel</code> pointer and <code class="language-plaintext highlighter-rouge">mask</code>, then finds an empty slot to store it. From this, we can infer how <code class="language-plaintext highlighter-rouge">sel</code> implementations are found in the cache through <code class="language-plaintext highlighter-rouge">CacheLookup </code>. For maximum performance, Apple implements the lookup in assembly. The official comments are sufficient to follow its broad outline:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.macro CacheLookup
+
+    ldrh	r12, [r9, #CACHE_MASK]	// r12 = mask
+    ldr	r9, [r9, #CACHE]	// r9 = buckets
+.if $0 == STRET  ||  $0 == SUPER_STRET
+    and	r12, r12, r2		// r12 = index = SEL &amp; mask
+.else
+    and	r12, r12, r1		// r12 = index = SEL &amp; mask
+.endif
+    add	r9, r9, r12, LSL #3	// r9 = bucket = buckets+index*8
+    ldr	r12, [r9]		// r12 = bucket-&gt;sel
+2:
+.if $0 == STRET  ||  $0 == SUPER_STRET
+    teq	r12, r2
+.else
+    teq	r12, r1
+.endif
+    bne	1f
+    CacheHit $0
+1:	
+    cmp	r12, #1
+    blo	LCacheMiss_f		// if (bucket-&gt;sel == 0) cache miss
+    it	eq			// if (bucket-&gt;sel == 1) cache wrap
+    ldreq	r9, [r9, #4]		// bucket-&gt;imp is before first bucket
+    ldr	r12, [r9, #8]!		// r12 = (++bucket)-&gt;sel
+    b	2b
+
+.endmacro
+</code></pre></div></div>
+<p><br/>
+The source can be downloaded from <a href="http://opensource.apple.com//tarballs/">Apple open source </a>here. Apple’s comments explain this method clearly.<br/></p>
+<p>Everything above concerns method caching and lookup, but what is a method itself? Objective-C abstracts a method as the <code class="language-plaintext highlighter-rouge">Method</code> data type. Readers who have used the runtime may recognize it. Its structure is:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct old_method {
+    SEL method_name;
+    char *method_types;
+    IMP method_imp;
+};
+typedef struct method_t *Method;
+</code></pre></div></div>
+<p><br/></p>
+<ul>
+<li>
+<p><code class="language-plaintext highlighter-rouge">method_imp</code> is the method's implementation code, which you can think of as a <code class="language-plaintext highlighter-rouge">block</code>. In fact, the latter can be converted to an <code class="language-plaintext highlighter-rouge">IMP</code> to perform certain runtime tricks.</p>
+</li>
+<li>
+<p><code class="language-plaintext highlighter-rouge">method_types</code> method-argument encoding. What does that mean? In <a href="http://www.jianshu.com/p/2c0305676621">Properties and variables </a>I explained that each data type has its own character encoding. Here these encode method return values and parameters, for example:<code class="language-plaintext highlighter-rouge">-(void)playWith:(id)</code> has the character encoding <code class="language-plaintext highlighter-rouge">v@:@</code><br/></p>
+</li>
+<li>
+<p><code class="language-plaintext highlighter-rouge">method_name</code>, as its name suggests, is the method name. We normally use <code class="language-plaintext highlighter-rouge">@selector()</code> to obtain a method's <code class="language-plaintext highlighter-rouge">sel地址</code>, which participates in hashing to store its <code class="language-plaintext highlighter-rouge">imp</code> implementation. Since <code class="language-plaintext highlighter-rouge">SEL</code> uses hashing, identically named methods in the same class prevent the <code class="language-plaintext highlighter-rouge">imp</code> address from being unique. This is also why Apple does not allow same-named methods distinguished only by parameter type.</p>
+</li>
+</ul>
+<h2 id="消息转发">Message forwarding<br/></h2>
+<p>Calling a method that does not belong to an object usually crashes the app. I have encountered multiple reports of crashes caused by <code class="language-plaintext highlighter-rouge">NSNull</code> values returned by a backend. The method-call source above shows that a missing implementation does not trigger an immediate crash. Before crashing, message forwarding gives us three opportunities to avoid it and find an object that can respond.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao47/2.jpg"/><br/></p>
+<p>Consider the first stage. User experience matters in iOS development, and crashing merely because of an unexpected data type is disruptive. We can use <code class="language-plaintext highlighter-rouge">class_addMethod</code> to add handling dynamically. A class can add methods after registration with <code class="language-plaintext highlighter-rouge">objc_registerClassPair</code>, but cannot dynamically add properties; see the <code class="language-plaintext highlighter-rouge">category</code> mechanism.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>id wrongTypeGetter(id object, SEL sel) {
+    return nil;
+}
+
+void wrongTypeSetter(id object, SEL sel, id value) {
+    // do nothing
+}
+
++ (BOOL)resolveInstanceMethod: (SEL)selector
+{
+    NSString * selName = NSStringFromSelector(selector);
+    if ([sel hasPrefix: @"set"]) {
+        class_addMethod(self, selector, (IMP)wrongTypeSetter, "v@:@");
+    } else {
+        class_addMethod(self, selector, (IMP)wrongTypeGetter, "@@:")
+    }
+}
+</code></pre></div></div>
+<p>At the beginning of the second stage, it is assumed that the original receiver will not handle this method, so we need a <code class="language-plaintext highlighter-rouge">消息接盘侠</code>. This can be useful. iOS does not support multiple inheritance, although protocols and composition can simulate it. The difference is that <code class="language-plaintext highlighter-rouge">多继承是将多个类的功能组合到一个对象当中</code>, whereas <code class="language-plaintext highlighter-rouge">伪多继承多个类的功能依旧分布在不同对象当中，但是对象彼此对消息发送者透明</code>. Forwarding a message to another object can implement this form of simulated multiple inheritance.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface Person: NSObject
+
+@property (nonatomic, strong) NSNumber * age;
+
+@end
+
+@implementation Person
+
+- (id)forwardingTargetForSelector: (SEL)aSelector
+{
+    // 甚至可以通过runtime遍历自己属性找到可以响应方法的接盘侠
+    NSString * selName = NSStringFromSelector(aSelector);
+    if ([selName hasSuffix: @"Value"]) {
+        return self.age;
+    }
+    return nil;
+}
+
+@end
+
+// View controller
+id p = [[Person alloc] init];
+[p setAge: @(18)];
+NSLog(@"%lu, %.2f", [p integerValue], [p doubleValue]);    //18, 18.00
+</code></pre></div></div>
+<p>If you still have not found another object to handle the method, this is the last chance to prevent a crash. The runtime needs to build a <code class="language-plaintext highlighter-rouge">methodSignature</code>, obtained by calling the receiver's <code class="language-plaintext highlighter-rouge">-(NSMethodSignature *)methodSignatureForSelector:</code>. It contains parameter types, parameter count, receiver information, and so on. This is assembled into an <code class="language-plaintext highlighter-rouge">NSInvocation</code> for the final forwarding attempt, calling the receiver's <code class="language-plaintext highlighter-rouge">-forwardInvocation:</code>. We can modify the <code class="language-plaintext highlighter-rouge">invocation</code> freely, including its argument values and receiver. I most often use this to reduce array iteration:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@implementation NSArray(LXDRuntime)
+
+- (void)forwardInvocation: (NSInvocation *)anInvocation
+{
+    for (id item in self) {
+        if ([item respondsToSelector: anInvocation.selector]) {
+            [anInvocation invokeWithTarget: item];
+        }
+    }
+}
+
+@end
+</code></pre></div></div>
+<p><br/>
+The message-sending process is summarised in this diagram:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao47/3.jpeg"/><br/></p>
+<p>Although message forwarding can significantly reduce crashes, do not add these protections during development. Add them only around store submission, so unexpected message-sending problems are not overlooked during development.</p>
+<h2 id="消息机制黑魔法">Message-mechanism techniques<br/></h2>
+<p>The sequence behind a method call is clearly complex, but these features are worth learning and using. The <code class="language-plaintext highlighter-rouge">runtime</code> provides a series of <code class="language-plaintext highlighter-rouge">Method</code> operations for aspect-oriented programming, including replacing and exchanging method implementations.</p>
+<p>Suppose I need a round button that responds only to taps within its circle. Use a <code class="language-plaintext highlighter-rouge">UIButton+LXDRuntime</code> extension to replace the existing <code class="language-plaintext highlighter-rouge">-pointInside:withEvent:</code> method.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface UIButton(LXDRuntime)
+
+@property (nonatomic, assign) BOOL roundTouchEnable;
+
+@end
+
+
+const void * LXDRoundTouchEnableKey = &amp; LXDRoundTouchEnableKey;
+@implementation UIButton(LXDRuntime)
+
+- (BOOL)roundTouchEnable
+{
+    return [objc_getAssociatedObject(self, LXDRoundTouchEnableKey) boolValue];
+}
+
+- (void)setRoundTouchEnable: (BOOL)roundTouchEnable
+{
+    objc_setAssociatedObject(self, LXDRoundTouchEnableKey, @(roundTouchEnable), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (BOOL)replacePointInside: (CGPoint)point withEvent: (UIEvent *)event
+{
+    if (CGRectGetWidth(self.frame) != CGRectGetHeight(self.frame) 
+        || !self. roundTouchEnable)
+    {
+        return [super pointInside: point withEvent: event];
+    }
+    CGFloat radius = CGRectGetWidth(self.frame) / 2;
+    CGPoint offset = CGPointMake(point.x - radius, point.y - radius);
+    return sqrt(offset.x * offset.x + offset.y * offset.y) &lt;= radius;
+}
+
+// 替换方法实现
++ (void)initialize
+{
+    [super initialize];
+    Method replaceMethod = class_getInstanceMethod([self class], @selector(replacePointInside:withEvent:));
+    Method originMethod = class_getInstanceMethod([self class], @selector(pointInside:withEvent:));
+    method_setImplementation(originMethod, method_getImplementation(replaceMethod));
+}
+
+@end
+</code></pre></div></div>
+<p>When I need a button to respond only within a circular region, setting <code class="language-plaintext highlighter-rouge">button.roundTouchEnable  = YES</code> enables that hit test automatically. Besides method replacement, another common runtime trick exchanges two implementations. This is possible because the <code class="language-plaintext highlighter-rouge">Method</code> structure separates the method name <code class="language-plaintext highlighter-rouge">sel</code> from the implementation <code class="language-plaintext highlighter-rouge">imp</code>. Think of an <code class="language-plaintext highlighter-rouge">imp</code> as a <code class="language-plaintext highlighter-rouge">block</code> code block: exchanging implementations is like swapping these two <code class="language-plaintext highlighter-rouge">block</code> s.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface Person : NSObject
+
+@property (nonatomic, strong) NSString * name;
+@property (nonatomic, strong) NSNumber * age;
+
+@end
+
+@implementation Person
+
++ (void)initialize
+{
+    [super initialize];
+    Method ageGetter = class_getInstanceMethod([self class], @selector(age));
+    Method nameGetter = class_getInstanceMethod([self class], @selector(name));
+    method_exchangeImplementations(ageGetter, nameGetter);
+}
+
+// View controller
+Person * p = [[Person alloc] init];
+p.age = @(56);
+p.name = @"Job Steve";
+
+NSLog(@"%@ is %@ year old", p.name, p.age); 
+// LXDRuntimeDemo[7316:244912] 56 is Job Steve year old
+
+@end
+</code></pre></div></div>
+<p>The code above exchanges the implementations of <code class="language-plaintext highlighter-rouge">name</code> and <code class="language-plaintext highlighter-rouge">age</code>, illustrated as follows:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao47/4.jpeg"/><br/></p>
+<p>It is easy to see why <code class="language-plaintext highlighter-rouge">method_exchangeImplementations </code> is favored: this exchange does not alter the original implementation code. Throughout the process, <code class="language-plaintext highlighter-rouge">age</code> and its <code class="language-plaintext highlighter-rouge">IMP</code>, and <code class="language-plaintext highlighter-rouge">name</code> and its <code class="language-plaintext highlighter-rouge">IMP</code>, are not modified. Its disadvantages are also clear:</p>
+<ul>
+<li>
+<p>If multiple developers swizzle the same method, business logic becomes complex and debugging difficult.<br/></p>
+</li>
+<li>
+<p>Swapping affects every instance and subclass of that class, making it unsuitable for changing a single object.<br/></p>
+</li>
+</ul>
+<p>The tricks offered by the <code class="language-plaintext highlighter-rouge">runtime</code> are double-edged tools; sensible use makes them powerful. Beyond <code class="language-plaintext highlighter-rouge">Method</code>, there is an <code class="language-plaintext highlighter-rouge">IMP</code> pitfall worth mentioning. As noted above, <code class="language-plaintext highlighter-rouge">IMP</code> and <code class="language-plaintext highlighter-rouge">block</code> are similar. The former can be cast to a function pointer and viewed as a special <code class="language-plaintext highlighter-rouge">block</code>. The system provides conversions through <code class="language-plaintext highlighter-rouge">imp_implementationWithBlock</code> and <code class="language-plaintext highlighter-rouge">imp_getBlock</code>. When a method call becomes a message send, <code class="language-plaintext highlighter-rouge">objc_msgSend</code> already has two parameters, <code class="language-plaintext highlighter-rouge">id object</code> and <code class="language-plaintext highlighter-rouge">SEL aSelector</code>. Following that reasoning, conversion between <code class="language-plaintext highlighter-rouge">IMP</code> and <code class="language-plaintext highlighter-rouge">block</code> might appear to work like this:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (void)initialize
+    void (^requestBlock)(id object, SEL aSelector, id URL, id parameters) = 
+        ^(id object, SEL aSelector, id URL, id parameters) {
+        // do some networking request
+    };
+    IMP requestIMP = imp_implementationWithBlock(requestBlock);
+    class_addMethod([self class], @selector(networkReuqest:parameters:), requestIMP, "v@:@@");
+}
+
+// View controller
+[self performSelector: @selector(networkReuqest:parameters:) withObject: URL withObject: parameters];
+</code></pre></div></div>
+<p><br/></p>
+<p>The code above crashes in a puzzling way with an <code class="language-plaintext highlighter-rouge">EXC_BAD_ACCESS</code> error. This point bears repeating three times:</p>
+<p>The block argument has no SEL!<br/>
+The block argument has no SEL!<br/>
+The block argument has no SEL!<br/></p>
+<p>Remove the <code class="language-plaintext highlighter-rouge">SEL aSelector</code> parameter and the code executes normally.</p>
+<h2 id="尾话">Closing remarks<br/></h2>
+<p><code class="language-plaintext highlighter-rouge">runtime</code> Every iOS developer should understand this. Through <code class="language-plaintext highlighter-rouge">runtime</code> source reveals Apple’s extensive performance optimisations and the hidden implementation beneath the code we write. As <code class="language-plaintext highlighter-rouge">runtime</code> The second article in the series took a long time to begin; reading the source was overwhelming, but it deepened my understanding of development and code structure. This article has no companion code, but provides Apple’s <a href="http://opensource.apple.com//tarballs/">Runtime source URL</a></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-04-29-rich-text-with-hyperlinks-on-ios/">Rich text with hyperlinks on iOS</a><br/></p>
+
+{% endraw %}

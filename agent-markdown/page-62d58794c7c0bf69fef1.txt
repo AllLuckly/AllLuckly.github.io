@@ -1,0 +1,132 @@
+---
+layout: null
+permalink: /ios之xmpp/一点一滴慢慢的揭开XMPP的神秘面纱/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 一点一滴慢慢的揭开XMPP的神秘面纱
+agent_source_url: https://allluckly.cn/ios%E4%B9%8Bxmpp/%E4%B8%80%E7%82%B9%E4%B8%80%E6%BB%B4%E6%85%A2%E6%85%A2%E7%9A%84%E6%8F%AD%E5%BC%80XMPP%E7%9A%84%E7%A5%9E%E7%A7%98%E9%9D%A2%E7%BA%B1
+agent_source_sha256: e605ee971d7ca9eea3cd2821e6b48691678e8bdaceb0928ff4c3806b6c8f4935
+agent_generator_version: 1
+---
+{% raw %}# 一点一滴慢慢的揭开XMPP的神秘面纱
+
+语言：zh-CN
+原文：[一点一滴慢慢的揭开XMPP的神秘面纱](<https://allluckly.cn/ios%E4%B9%8Bxmpp/%E4%B8%80%E7%82%B9%E4%B8%80%E6%BB%B4%E6%85%A2%E6%85%A2%E7%9A%84%E6%8F%AD%E5%BC%80XMPP%E7%9A%84%E7%A5%9E%E7%A7%98%E9%9D%A2%E7%BA%B1>)
+中文：[中文 HTML](<https://allluckly.cn/ios%E4%B9%8Bxmpp/%E4%B8%80%E7%82%B9%E4%B8%80%E6%BB%B4%E6%85%A2%E6%85%A2%E7%9A%84%E6%8F%AD%E5%BC%80XMPP%E7%9A%84%E7%A5%9E%E7%A7%98%E9%9D%A2%E7%BA%B1>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-09-23-getting-started-with-xmpp-step-by-step/>)
+发布于: 2015-09-23T00:00:00+08:00
+内容更新于: 2015-09-23T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+记录 XMPP 聊天接入的初步流程，包括导入依赖、使用用户信息连接 Openfire、处理注册与登录验证，以及消息收发相关回调，提供客户端集成代码。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。涉及的 API、依赖和工具版本请结合发表日期阅读。
+
+> "充实自我，提升自我的价值；唯有多学" Bison
+
+`XMPP`是干嘛的在此就不多探讨了，我也是刚开始尝试着学习。  
+ 首先我们把`XMPP`拉进工程，然后必须导入的几个框架：  
+ `CFNetwork.framework`  
+ `Security.framework`  
+ `libxml2.dylib`  
+ `libresolv.dylib`  
+ `SystemConfiguration.framework`  
+ `CoreLocation.framework`  
+ `AudioToolbox.framework`  
+ `AVFoundation.framework`  
+ 运行下不报错就对了。。。。。  
+ 在我们开发中做聊天的话，我们首先是需要登陆，登陆之后获取用户的信息，  
+ 获取到信息之后我们判断下该用户是否已经在`Openfire`存在，不存在就直接给用户注册，存在就自动赋值登陆`Openfire`  
+ `[self XmppLogin:dic];`
+
+```css
+#pragma mark 登陆xmpp
+-(void)XmppLogin:(NSDictionary*)userdic{
+    App.IM_Account =  [NSString stringWithFormat:@"Bison%@",App.UserId];//拼上前缀
+    App.IM_Password =  @"**************";
+    [[JEXMPP Shared] XmppLogin];
+}
+```
+
+```css
+#pragma mark -  登录 退出
+-(BOOL)XmppLogin{
+    if (![XMPP_Stream isDisconnected]) {
+        return YES;
+    }
+    [XMPP_Stream setHostName:kIM_Host];//设置服务器
+    [XMPP_Stream setHostPort:[kIM_Port intValue]];//设置端口
+
+    NSLog(@"jid:%@ ps:%@",App.IM_Account,App.IM_Password);
+    if (App.IM_Account == nil || App.IM_Password == nil) {
+        return NO;
+    }
+
+ XMPPJID *myjid = [XMPPJID jidWithString:[NSString stringWithFormat:@"%@@%@",App.IM_Account,kIM_Domain] resource:@"jp"];//设置了 jid 的 resource 即限制了多点登陆
+    
+    NSError *error ;
+    [XMPP_Stream setMyJID:myjid];
+    if (![XMPP_Stream connectWithTimeout:XMPPStreamTimeoutNone error:&error]) {
+        NSLog(@"my connected error : %@",error.description);
+        return NO;
+    }
+    return YES;
+}
+```
+
+接下来就是验证是否登陆了`Openfire`
+
+```css
+//将要连上
+- (void)xmppStreamWillConnect:(XMPPStream *)sender{
+    NSLog(@"==xmppStreamWillConnect");
+}
+//连上了 还要验证密码
+- (void)xmppStreamDidConnect:(XMPPStream *)sender{
+    NSLog(@"xmppStreamDidConnect");
+    if (App.IM_Password) {
+        NSError *error ;
+        if (![XMPP_Stream authenticateWithPassword:App.IM_Password error:&error]) {
+            NSLog(@"error authenticate : %@",error.description);
+        }
+    }
+}
+
+//突然掉线了
+- (void)xmppReconnect:(XMPPReconnect *)sender didDetectAccidentalDisconnect:(SCNetworkReachabilityFlags)reachabilityFlags {
+    NSLog(@"didDetectAccidentalDisconnect : \n %u ", reachabilityFlags);
+}
+//YES 重连 
+- (BOOL)xmppReconnect:(XMPPReconnect *)sender shouldAttemptAutoReconnect:(SCNetworkReachabilityFlags)reachabilityFlags{
+    NSLog(@"shouldAttemptAutoReconnect : \n %u ", reachabilityFlags);
+    return YES;
+}
+
+#pragma mark 发送 成功  失败
+- (void)xmppStream:(XMPPStream *)sender didSendMessage:(XMPPMessage *)message{
+
+}
+//发送失败
+- (void)xmppStream:(XMPPStream *)sender didFailToSendMessage:(XMPPMessage *)message error:(NSError *)error{
+
+}
+//发送 成功或失败的 反馈给聊天页面
+-(void)XmppSend_Status:(NSInteger)status Msg:(JEChatMessage *)msg{
+    NSLog(@"XmppSend_Status 消息发送:%@ \n内容:%@", status == 1 ? @"成功" : @"失败",msg.TextContent);
+   
+   
+}
+
+#pragma mark 接收消息
+- (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message{
+    NSLog(@"%@\n 来新消息了\n from:%@\n to:%@\n type:%@\n message:%@\n body:%@",message,[[message attributeForName:@"from"] stringValue],[[message attributeForName:@"to"] stringValue],[[message attributeForName:@"type"] stringValue],[[message attributeForName:@"message"] stringValue],[[message elementForName:@"body"] stringValue]);
+}
+```
+
+今天暂时讲到这。。。。。  
+ 有不足之处希望大家指点出来哦，因为我也对xmpp刚接触不久  
+ 版权归©Bison所有 任何转载请标明出处！
+{% endraw %}

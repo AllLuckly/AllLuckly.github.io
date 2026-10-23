@@ -1,0 +1,233 @@
+---
+layout: null
+permalink: /投稿/tougao04/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发仿美国国家地理App的一个炫酷的动画
+agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao04
+agent_source_sha256: 270799d8ca1e587120cafd3e0f6d21b8cce0fd393b1327db39c5a11ef9d27036
+agent_generator_version: 1
+---
+{% raw %}# iOS开发仿美国国家地理App的一个炫酷的动画
+
+语言：zh-CN
+原文：[iOS开发仿美国国家地理App的一个炫酷的动画](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao04>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao04>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-01-14-recreating-an-animation-from-the-national-geographic-ios-app/>)
+发布于: 2016-01-14T00:00:00+08:00
+内容更新于: 2016-01-14T00:00:00+08:00
+署名：WzxJiang
+
+拆解仿国家地理应用的弹出页面动画，逐项处理状态栏隐藏、视图拖动与回弹、导航栏衔接和返回按钮变色，展示多层界面联动效果的实现过程。
+
+原文署名WzxJiang，Bison 编辑收录。
+
+[原文所列来源](<http://www.jianshu.com/p/e6dfc28e0e39>)
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。涉及的 API、依赖和工具版本请结合发表日期阅读。
+
+编辑：[Bison](<https://allluckly.cn/>)  
+ 投稿：[WzxJiang](<http://www.jianshu.com/p/e6dfc28e0e39>)
+
+> "这个是模仿美国国家地理App的一个View弹出动画，看上去很简单但却有很多细节，废话不多说，直接讲解。"
+
+前几天，产品那边给了这样一个需求给我：
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao04/1.gif>)
+
+这个是模仿美国国家地理App的一个View弹出动画，看上去很简单但却有很多细节，废话不多说，直接讲解。
+
+### 把这个gif分解可以看出这个View弹出的时候有这几步：
+
+> 状态栏隐藏
+
+> 弹出View
+
+> 能拖动View，往上拖到一定位置导航栏显示正好和View切合，往下拖有回弹效果
+
+> 屏幕左上角有个返回按钮，且能随着导航栏显示变色
+
+#### 让我们一步步来解决
+
+1.状态栏隐藏
+
+可以通过下面这个方法来解决
+
+```css
+- (BOOL)prefersStatusBarHidden
+{
+    return YES;//隐藏为YES，显示为NO
+}
+```
+
+2.弹出View
+
+这个不难直接贴代码了
+
+```css
+//如果_popView不存在 创建
+if (!_popView)
+{
+    _popView = ({
+        UIView * popView = [[UIView alloc]initWithFrame:CGRectMake(0,0,self.view.frame.size.width,self.view.frame.size.height)];
+
+        popView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.1];
+
+        popView.userInteractionEnabled = YES;
+
+        popView;
+    });
+
+    _popSubView = ({
+        UIView * popSubView = [[UIView alloc]initWithFrame:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, self.view.frame.size.height)];
+
+        [popSubView addGestureRecognizer:[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(pan:)]];
+
+        popSubView.backgroundColor = [UIColor whiteColor];
+
+        popSubView;
+    });
+        [_popView addSubview:_popSubView];
+    }
+
+    [self.view addSubview:_popView];
+
+    [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+
+        CGRect rect    = _popSubView.frame;
+        rect.origin.y  = self.view.frame.size.height/3.0;
+        _popSubView.frame = rect;
+
+    } completion:^(BOOL finished) {
+
+    }];
+}
+```
+
+3.能拖动View，往上拖到一定位置导航栏显示正好和View切合，往下拖有回弹效果  
+ 上面我们已经添加了拖动手势
+
+```css
+[popSubView addGestureRecognizer:[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(pan:)]];
+```
+
+先贴这个方法中的全部代码，看代码的注释应该就能看懂了
+
+```css
+- (void)pan:(UIPanGestureRecognizer *)sender
+{
+    //手指在self.view上的偏移量
+    CGPoint trans = [sender translationInView:sender.view];
+
+    CGPoint oldCenter = sender.view.center;
+
+    oldCenter.y += trans.y;
+
+    //设置view最高点  self.navigationController.navigationBar.frame.size.height使得View能完美切合
+    if (oldCenter.y <= self.view.center.y + self.navigationController.navigationBar.frame.size.height)
+    {
+        oldCenter.y = self.view.center.y + self.navigationController.navigationBar.frame.size.height;
+        //使导航栏以动画效果显示
+        [self.navigationController setNavigationBarHidden:NO animated:YES];
+        [_backBtn setBackgroundImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
+    }
+    else
+    {
+        [self.navigationController setNavigationBarHidden:YES animated:YES];
+        [_backBtn setBackgroundImage:[UIImage imageNamed:@"back(white)"] forState:UIControlStateNormal];
+    }
+
+    //设置view最低点 ＋50是为了回弹效果
+    if(oldCenter.y  > self.view.center.y + self.view.frame.size.height/3.0 + 50)
+    {
+        oldCenter.y = self.view.center.y + self.view.frame.size.height/3.0 + 50;
+    }
+
+    //回弹效果
+    if (sender.state == UIGestureRecognizerStateEnded)
+    {
+        if(oldCenter.y  >= self.view.center.y + self.view.frame.size.height/3.0)
+        {
+            oldCenter.y = self.view.center.y + self.view.frame.size.height/3.0;
+        }
+
+        [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            sender.view.center = oldCenter;
+        } completion:^(BOOL finished) {
+
+        }];
+    }
+    else
+    {
+        sender.view.center = oldCenter;
+    }
+    [sender setTranslation:CGPointZero inView:sender.view];
+}
+```
+
+4.屏幕左上角有个返回按钮，且能随着导航栏显示变色
+
+能不被导航栏覆盖说明肯定要加在window上，而且要变色的话有两种方式：
+
+画CAlayer，这样的颜色变化动画会更逼真
+
+我这里用的是第二种方法，直接用两种颜色的icon，变btn的背景图片就行了
+
+```css
+if (!_backBtn)
+{
+    _backBtn = ({
+
+        UIButton * backBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+
+        backBtn.frame = CGRectMake(10, 10, 13, self.navigationController.navigationBar.frame.size.height - 20);
+
+        [backBtn addTarget:self action:@selector(hidePopView) forControlEvents:UIControlEventTouchUpInside];
+
+        [backBtn setBackgroundImage:[UIImage imageNamed:@"back(white)"] forState:UIControlStateNormal];
+
+        backBtn;
+    });
+}
+[[UIApplication sharedApplication].windows[0] addSubview:_backBtn];
+```
+
+隐藏就很简单了
+
+```css
+- (void)hidePopView
+{
+    [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+
+        CGRect rect    = _popSubView.frame;
+        rect.origin.y  = self.view.frame.size.height;
+        _popSubView.frame = rect;
+        if (self.navigationController.navigationBarHidden == NO)
+        {
+        [self.navigationController setNavigationBarHidden:YES animated:YES];
+        }
+        [_backBtn removeFromSuperview];
+
+    } completion:^(BOOL finished) {
+
+        [self changeBarStatus];
+        [_popView removeFromSuperview];
+
+    }];
+}
+```
+
+btn的点击方法就直接用这个了
+
+```css
+[backBtn addTarget:self action:@selector(hidePopView) forControlEvents:UIControlEventTouchUpInside];
+```
+
+完整代码  
+ GitHub:[Wzxhaha](<https://github.com/Wzxhaha>)
+
+---
+
+好文推荐：[Bison眼中的iOS开发多线程是这样的（一）](<https://allluckly.cn/%E5%A4%9A%E7%BA%BF%E7%A8%8B/duoxiancheng01>)
+{% endraw %}

@@ -1,0 +1,141 @@
+---
+layout: post
+title: 'Google Maps on iOS: markers and route playback'
+description: Records a Google Maps integration intended to make map presentation consistent across iOS and Android.
+  It includes the main code for map initialisation, markers and route lines, along with the setup entry point for
+  obtaining a maps API key.
+category: Development notes
+imagefeature: picture-38.jpg
+date: 2015-06-21 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Records a Google Maps integration intended to make map presentation consistent across iOS and Android.
+    It includes the main code for map initialisation, markers and route lines, along with the setup entry point
+    for obtaining a maps API key.
+  keywords:
+  - Google Maps
+  - GMSMapView
+  - map markers
+  - route playback
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  title: 'Google Maps on iOS: markers and route playback'
+  source_sha256: 59ee01fc950dd223114babef0bee3cac640c8a915d9de99eb06429b63595f6ba
+lang: en
+source_path: _posts/2015-06-21-iOS调用Google 地图.md
+source_url: /%E5%9C%B0%E5%9B%BE/iOS%E8%B0%83%E7%94%A8Google-%E5%9C%B0%E5%9B%BE
+permalink: /en/journal/2015-06-21-google-maps-on-ios-markers-and-route-playback/
+translation_method: machine-assisted
+translation_source_sha256: 59ee01fc950dd223114babef0bee3cac640c8a915d9de99eb06429b63595f6ba
+excerpt: Records a Google Maps integration intended to make map presentation consistent across iOS and Android.
+  It includes the main code for map initialisation, markers and route lines, along with the setup entry point for
+  obtaining a maps API key.
+translation_date: '2026-10-23T02:34:09+00:00'
+---
+{% raw %}
+<blockquote>
+<p>“iOS development is like moving things around; once you become skilled enough, you can start taking shortcuts.”
+<small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p>The project I recently worked on needed its maps to match the Android client, which used Google Map rather than Baidu Maps.<br/>
+To be honest, it was a bit troublesome. Before working alongside an Android client, I usually used Apple's built-in maps, Amap, or Baidu.<br/>
+I had hardly worked with Google Maps before. The main code is below.<br/></p>
+<p>.h file</p>
+<p><code class="language-plaintext highlighter-rouge">@property (strong, nonatomic) GMSMapView *_mapView;</code></p>
+<p>.m file</p>
+<p>// Create the map<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">creatMap</span><span class="p">{</span>
+
+    <span class="err">_mapView</span> <span class="err">=</span> <span class="err">[[GMSMapView</span> <span class="err">alloc]</span><span class="py">initWithFrame</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">)];</span>
+    <span class="err">[self.view</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">_mapView</span><span class="p">];</span>
+    <span class="err">[_mapView</span> <span class="err">clear];</span>
+    <span class="err">[self</span> <span class="err">initMapView];</span>
+<span class="p">}</span></code></pre></figure>
+<p>It consists of the following three parts.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">initMapView</span>
+<span class="p">{</span>
+
+    <span class="err">GMSCameraPosition</span> <span class="err">*camera</span> <span class="err">=</span> <span class="err">[GMSCameraPosition</span> <span class="py">cameraWithLatitude</span><span class="p">:</span><span class="m">-6.13631</span>
+    <span class="n">longitude</span><span class="p">:</span><span class="m">106.789352</span>
+    <span class="n">zoom</span><span class="p">:</span><span class="n">ZOOM_LEVEL</span><span class="p">];</span>
+    <span class="err">_mapView.mapType</span> <span class="err">=</span> <span class="err">kGMSTypeNormal;</span>
+    <span class="err">_mapView.camera</span> <span class="err">=</span> <span class="err">camera;</span>
+    <span class="err">_mapView.delegate</span> <span class="err">=</span> <span class="err">self;</span>
+    <span class="err">_geocoder</span> <span class="err">=</span> <span class="err">[[GMSGeocoder</span> <span class="err">alloc]</span> <span class="err">init];</span>
+
+    <span class="err">polyline</span> <span class="err">=</span> <span class="err">[[GMSPolyline</span> <span class="err">alloc]</span> <span class="err">init];</span>
+    <span class="err">linepath</span> <span class="err">=</span> <span class="err">[GMSMutablePath</span> <span class="err">path];</span>
+
+
+    <span class="err">CLLocationCoordinate2D</span> <span class="err">coords;</span>
+    <span class="err">coords.latitude</span> <span class="err">=</span> <span class="err">-6.136271;</span>
+    <span class="err">coords.longitude</span> <span class="err">=</span> <span class="err">106.789216;</span>
+
+
+    <span class="err">_mapView.camera</span> <span class="err">=</span> <span class="err">[GMSCameraPosition</span> <span class="py">cameraWithTarget</span><span class="p">:</span><span class="n">coords</span>
+    <span class="n">zoom</span><span class="p">:</span><span class="n">ZOOM_LEVEL</span><span class="p">];</span>
+
+    <span class="err">//显示标注</span>
+    <span class="err">GMSReverseGeocodeCallback</span> <span class="err">handler</span> <span class="err">=</span> <span class="err">^(GMSReverseGeocodeResponse</span> <span class="err">*response,</span>
+    <span class="err">NSError</span> <span class="err">*error)</span> <span class="err">{</span>
+    <span class="err">if</span> <span class="err">(response</span> <span class="err">&amp;&amp;</span> <span class="err">response.firstResult)</span> <span class="err">{</span>
+
+        <span class="err">GMSMarker</span> <span class="err">*marker</span> <span class="err">=</span> <span class="err">[[GMSMarker</span> <span class="err">alloc]</span> <span class="err">init];</span>
+        <span class="err">marker.position</span> <span class="err">=</span> <span class="err">coords;</span>
+        <span class="err">marker.title</span> <span class="err">=</span> <span class="err">response.firstResult.addressLine1;</span>
+        <span class="err">marker.snippet</span> <span class="err">=</span> <span class="err">response.firstResult.addressLine2;</span>
+        <span class="err">_addressData</span> <span class="err">=</span> <span class="err">response.firstResult.addressLine2;</span>
+        <span class="err">[self</span> <span class="err">refreshGpsInfo];</span>
+        <span class="err">marker.appearAnimation</span> <span class="err">=</span> <span class="err">kGMSMarkerAnimationNone;</span>
+        <span class="err">marker.icon</span> <span class="err">=</span> <span class="err">SETIMAGE(@"deviceannotation.png");</span>
+        <span class="err">marker.map</span> <span class="err">=</span> <span class="err">_mapView;</span>
+    <span class="p">}</span> <span class="nt">else</span> <span class="p">{</span>
+        <span class="err">NSLog(@"Could</span> <span class="err">not</span> <span class="err">reverse</span> <span class="err">geocode</span> <span class="err">point</span> <span class="err">(%f,%f):</span> <span class="err">%@",</span>
+        <span class="err">coords.latitude,</span> <span class="err">coords.longitude,</span> <span class="err">error);</span>
+    <span class="p">}</span>
+    <span class="err">}</span><span class="o">;</span>
+
+    <span class="o">[</span><span class="nt">_geocoder</span> <span class="nt">reverseGeocodeCoordinate</span><span class="nd">:coords</span>
+    <span class="nt">completionHandler</span><span class="nd">:handler</span><span class="o">];</span>
+    <span class="o">//</span><span class="nt">画线</span><span class="err">，</span><span class="nt">轨迹回放</span>
+    <span class="o">[</span><span class="nt">linepath</span> <span class="nt">removeAllCoordinates</span><span class="o">];</span>
+    <span class="o">[</span><span class="nt">self</span> <span class="nt">drawLineWithLocationArray</span><span class="nd">:trackArray</span><span class="o">];</span>
+
+
+    <span class="c">/*
+    注，trackArray里面的数据格式
+    CLLocation *nowLocation = [[CLLocation alloc] initWithLatitude:coords.latitude longitude:coords.longitude];
+    [trackArray addObject:nowLocation];
+
+    */</span>
+
+<span class="err">}</span></code></pre></figure>
+<p>// Draw a line for route playback<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">drawLineWithLocationArray</span><span class="o">:(</span><span class="nt">NSArray</span> <span class="o">*)</span><span class="nt">locationArray</span>
+<span class="p">{</span>
+
+    <span class="err">if(current_type</span> <span class="err">==</span> <span class="err">_CURRENT_TRACK)</span>
+    <span class="err">polyline.strokeColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="err">blueColor];</span>
+    <span class="err">else</span>
+    <span class="err">polyline.strokeColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="err">redColor];</span>
+    <span class="err">polyline.strokeWidth</span> <span class="err">=</span> <span class="err">6.f;</span>
+
+    <span class="err">//</span> <span class="err">for(int</span> <span class="err">idx</span> <span class="err">=</span> <span class="err">0;</span> <span class="err">idx</span> <span class="err">&lt;</span> <span class="err">pointStrings.count;</span> <span class="err">idx++)</span>
+    <span class="err">for(int</span> <span class="err">idx</span> <span class="err">=</span> <span class="err">0;</span> <span class="err">idx</span> <span class="err">&lt;</span> <span class="err">locationArray.count;</span> <span class="err">idx++)</span>
+    <span class="err">{</span>
+    <span class="err">CLLocation</span> <span class="err">*location</span> <span class="err">=</span> <span class="err">[locationArray</span> <span class="py">objectAtIndex</span><span class="p">:</span><span class="n">idx</span><span class="p">];</span>
+    <span class="err">CLLocationDegrees</span> <span class="err">latitude</span>  <span class="err">=</span> <span class="err">location.coordinate.latitude;</span>
+    <span class="err">CLLocationDegrees</span> <span class="err">longitude</span> <span class="err">=</span> <span class="err">location.coordinate.longitude;</span>
+
+    <span class="err">//</span> <span class="err">create</span> <span class="err">our</span> <span class="err">coordinate</span> <span class="err">and</span> <span class="err">add</span> <span class="err">it</span> <span class="err">to</span> <span class="err">the</span> <span class="err">correct</span> <span class="err">spot</span> <span class="err">in</span> <span class="err">the</span> <span class="err">array</span>
+    <span class="err">CLLocationCoordinate2D</span> <span class="err">coordinate</span> <span class="err">=</span> <span class="err">CLLocationCoordinate2DMake(latitude,</span> <span class="err">longitude);</span>
+    <span class="err">[linepath</span> <span class="py">addCoordinate</span><span class="p">:</span><span class="n">coordinate</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="nt">polyline</span><span class="nc">.path</span> <span class="o">=</span> <span class="nt">linepath</span><span class="o">;</span>
+    <span class="nt">polyline</span><span class="nc">.map</span> <span class="o">=</span> <span class="nt">_mapView</span><span class="o">;</span>
+<span class="err">}</span></code></pre></figure>
+<p>For the Google Api, register on Google's developer website and enter the relevant information about your own app to obtain an apikey.<br/></p>
+
+{% endraw %}

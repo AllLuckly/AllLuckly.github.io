@@ -1,0 +1,308 @@
+---
+layout: null
+permalink: /投稿/tuogao22/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发Swift自定义下拉刷新如此简单
+agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao22
+agent_source_sha256: 2a8305c8f5495bd8982b4dc06609ac76048a514028de3e13e27cc1da46dcd5fa
+agent_generator_version: 1
+---
+{% raw %}# iOS开发Swift自定义下拉刷新如此简单
+
+语言：zh-CN
+原文：[iOS开发Swift自定义下拉刷新如此简单](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao22>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao22>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-02-17-a-custom-pull-to-refresh-control-in-swift/>)
+发布于: 2016-02-17T00:00:00+08:00
+内容更新于: 2016-02-17T00:00:00+08:00
+署名：威權在B612等着那阵温柔的风
+
+使用 xib 创建文字视图覆盖 UIRefreshControl 的默认样式，分阶段旋转、变色和缩放文字，再模拟数据加载与插入，串起自定义下拉刷新从开始到结束的流程。
+
+原文署名威權在B612等着那阵温柔的风，Bison 编辑收录。
+
+[原文所列来源](<http://www.jianshu.com/p/61094c18ffd9>)
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文发表于 2016 年，使用当时的 Swift 与 NSTimer 示例语法。
+
+编辑：[Bison](<https://allluckly.cn/>)  
+ 投稿：[威權在B612等着那阵温柔的风](<http://www.jianshu.com/p/61094c18ffd9>)
+
+> "Swift正在完成一个惊人的壮举，它正在改变我们在苹果设备上编程的方式，引入了很多现代范例，例如：函数式编程和相比于OC这种纯面向对象语言更丰富的类型检查。"
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao22/1.gif>)
+
+### 前言
+
+通过这篇文你会学到：
+
+- 个性化下拉刷新
+- 做出如图的动画效果
+- 插入数据到UITableView
+
+### 下拉刷新
+
+首先自己弄好如图的TableView，这个自己弄吧。这篇文主要专注于下拉刷新。
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao22/2.png>)
+
+添加TableView的映射到ViewController为tblDemo
+
+```
+@IBOutlet weak var tblDemo: UITableView!
+```
+
+要做出下拉刷新需要用到UIRefreshControl 在viewController添加变量：
+
+```
+var refreshControl: UIRefreshControl! <br> 然后在viewDidLoad()添加：<br>
+
+refreshControl = UIRefreshControl()
+//设置背景颜色
+refreshControl.backgroundColor = UIColor.redColor()
+//设置菊花转的颜色
+refreshControl.tintColor = UIColor.yellowColor()
+
+//往tableView添加刷新控件
+tblDemo.addSubview(refreshControl) <br>
+```
+
+运行如下：
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao22/3.gif>)
+
+个性化下拉刷新  
+ 原理：因为UIRefreshControl实际是UIView的子类，所以直接在上面添加view来覆盖默认的刷新菊花转view
+
+### 1.使用xib创建view
+
+首先弄出自己定制的view：
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao22/4.png>)
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao22/5.png>)
+
+文件名字为RefreshContents  
+ ![1](<https://allluckly.cn/images/blog/tuogao/tougao22/6.png>)
+
+接着在右边的侧边栏中设置view的大小
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao22/7.png>)
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao22/8.png>)
+
+然后一个个地将Label拖进去并设置好constrain:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao22/9.png>)
+
+然后将里面的Label用tag标记，首先是‘我’为Tag 1，‘是’为 2,..以此类推：
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao22/10.png>)
+
+### 2.覆盖UIRefreshControl的默认view
+
+```
+//存储定制好的view和label
+var customView: UIView!
+var labelsArray: Array<UILabel> = []
+
+func loadCustomRefreshContens(){
+    //读取xib里的view
+    let refreshContents = NSBundle.mainBundle().loadNibNamed("RefreshContents", owner: self, options: nil)
+
+    customView = refreshContents[0] as! UIView
+    //按照refreshControl的大小设置view的大小
+    customView.frame = refreshControl.bounds
+
+    //读取view 里 label 到labelsArray
+    for var i=0; i < customView.subviews.count; ++i{
+        labelsArray.append(customView.viewWithTag(i + 1) as! UILabel)
+    }
+
+    //覆盖默认view   
+    refreshControl.addSubview(customView)
+} <br> 接着在viewDidLoad()添加<br>
+
+loadCustomRefreshContents() <br> 运行，下拉就能看到<br>
+```
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao22/11.png>)
+
+### 3.添加动画效果
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao22/12.gif>)
+
+观察图中的动画，可以将动画分解为以下两个步骤：
+
+- 由第一个字倾斜45度，变一种颜色，然后再摆正，变为黑色。接着下一个字，如此循环到最后一个。
+- 全部字放大再变为正常。
+
+先在viewController定义下面的变量：
+
+```
+//用来判断是否可以执行动画，防止动画未完时又启动了动画
+var isAnimating = false
+
+var currentColorIndex = 0
+
+var currentLabelIndex = 0 <br> 第一步的实现如下：<br>
+
+func animateRefreshStep1(){
+    isAnimating = true
+
+    UIView.animateWithDuration(0.1, delay: 0.0, options: .CurveLinear, animations: {
+    self.labelsArray[self.currentLabelIndex].transform = CGAffineTransformMakeRotation(CGFloat(M_PI_4))
+    self.labelsArray[self.currentLabelIndex].textColor = self.getNextColor()
+
+
+    }, completion: {(finished) -> Void in
+        UIView.animateWithDuration(0.05, delay: 0.0, options: .CurveLinear, animations: {
+        self.labelsArray[self.currentLabelIndex].transform = CGAffineTransformIdentity
+        self.labelsArray[self.currentLabelIndex].textColor = UIColor.blackColor()
+
+        }, completion: {(fin) -> Void in
+            ++self.currentLabelIndex
+
+            if self.currentLabelIndex < self.labelsArray.count{
+                self.animateRefreshStep1()
+            }
+            else{
+                self.animateRefreshStep2()
+            }
+
+        }
+       )
+    })
+}
+
+//返回下个颜色
+func getNextColor() -> UIColor{
+    var colorsArray: Array<UIColor> = [UIColor.magentaColor(),UIColor.brownColor(),UIColor.yellowColor(),UIColor.redColor(),UIColor.greenColor(),UIColor.blueColor(),UIColor.orangeColor()]
+    if currentColorIndex == colorsArray.count{
+        currentColorIndex = 0
+    }
+
+    let returnColor = colorsArray[currentColorIndex]
+    ++currentColorIndex
+
+    return returnColor
+}
+```
+
+第二步的实现:
+
+```
+func animateRefreshStep2(){
+    UIView.animateWithDuration(0.35, delay: 0.0, options: .CurveLinear, animations: {
+        self.labelsArray[0].transform = CGAffineTransformMakeScale(1.5,1.5)
+        self.labelsArray[1].transform = CGAffineTransformMakeScale(1.5,1.5)
+        self.labelsArray[2].transform = CGAffineTransformMakeScale(1.5,1.5)
+        self.labelsArray[3].transform = CGAffineTransformMakeScale(1.5,1.5)
+        self.labelsArray[4].transform = CGAffineTransformMakeScale(1.5,1.5)
+        self.labelsArray[5].transform = CGAffineTransformMakeScale(1.5,1.5)
+        self.labelsArray[6].transform = CGAffineTransformMakeScale(1.5,1.5)
+
+
+    }, completion: {(fin) -> Void in
+    UIView.animateWithDuration(0.25, delay: 0.0, options: .CurveLinear, animations: {
+        self.labelsArray[0].transform = CGAffineTransformIdentity
+        self.labelsArray[1].transform = CGAffineTransformIdentity
+        self.labelsArray[2].transform = CGAffineTransformIdentity
+        self.labelsArray[3].transform = CGAffineTransformIdentity
+        self.labelsArray[4].transform = CGAffineTransformIdentity
+        self.labelsArray[5].transform = CGAffineTransformIdentity
+        self.labelsArray[6].transform = CGAffineTransformIdentity
+
+    }, completion: {(fin) -> Void in
+        //如果还未结束刷新则回到第一步再来一次
+        if self.refreshControl.refreshing{
+            self.currentLabelIndex = 0
+            self.animateRefreshStep1()
+        }else{
+            //完成，设置为原始状态
+            self.isAnimating  = false
+            self.currentLabelIndex = 0
+            for var i = 0; i<self.labelsArray.count; ++i{
+                self.labelsArray[i].textColor = UIColor.blackColor()
+                self.labelsArray[i].transform = CGAffineTransformIdentity
+            }
+        }
+    })
+
+    })
+} <br> 接着就是设置当下拉刷新时启动动画：<br>
+
+func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+    if refreshControl.refreshing{
+        if !isAnimating{
+            animateRefreshStep1()
+        }
+    }
+} <br> 运行就能见到动画效果了。<br>
+```
+
+### 4.插入数据并且结束下拉刷新
+
+这里为了模拟读取网络上的数据所以用NSTimer设置4秒的延迟。然后结束下拉刷新，并且插入数据。
+
+定义如下函数：
+
+```
+func doSomething(){
+    //4秒后触发endOfWork
+    timer = NSTimer.scheduledTimerWithTimeInterval(4.0, target: self, selector: "endOfWork", userInfo: nil, repeats: true)
+}
+
+func endOfWork(){
+    //结束下拉刷新
+    refreshControl.endRefreshing()
+
+    timer.invalidate()
+    timer = nil
+
+    //插入数据
+    insertLoveData()
+}
+
+func insertLoveData(){
+    let lastIndexpath = NSIndexPath(forRow: dataArray.count, inSection: 0)
+
+    //往数据里添加新的数据
+    dataArray.append("其实我也喜欢你")
+
+    //更新tableView数据
+    tblDemo.beginUpdates()
+    tblDemo.insertRowsAtIndexPaths([lastIndexpath], withRowAnimation: .Middle)
+    tblDemo.endUpdates()
+}
+```
+
+接着在在scrollViewDidEndDecelerating插入doSomething如下：
+
+```
+func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+    if refreshControl.refreshing{
+        if !isAnimating{
+            doSomething()
+            animateRefreshStep1()
+        }
+    }
+} <br> 运行，如下效果：<br>
+```
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao22/1.gif>)
+
+### 最后
+
+因为写这文时刚好是情人节，所以就应下境。虐狗节快乐吧:)
+
+#### (End And Thank U)
+
+[参考链接](<http://www.appcoda.com/custom-pull-to-refresh/>)
+
+---
+
+好文推荐：[iOS开发之详解连连支付集成](<https://allluckly.cn/ios%E6%94%AF%E4%BB%98/lianlianzhifu>)
+{% endraw %}

@@ -45,4 +45,6 @@ bundle exec jekyll serve --host 127.0.0.1 --port 4000
 
 可使用 `python3 scripts/preview.py` 在 `http://127.0.0.1:4173` 预览生产构建。该服务支持 GitHub Pages 的无扩展名旧文章路径，且不会改变 canonical 的生产域名。
 
+文章或翻译更新后，还需运行 [Agent Readiness 构建与验证流程](agent-readiness.md#更新与验证)，重新生成对应 Markdown、分层阅读目录与技能文件摘要，再进行最终构建。GitHub Pages 直接发布已提交的静态源；不会在服务端替你运行 Python 生成器。
+
 此工作副本采用 Git 稀疏检出，已包含旧文章的 `images/` 与新应用资源，部分历史静态目录仍未展开；它们仍在 Git 仓库中，没有删除。需要完整检出时，可运行 `git sparse-checkout disable`。

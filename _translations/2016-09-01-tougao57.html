@@ -1,0 +1,355 @@
+---
+layout: post
+title: Protocols and Delegation in iOS
+description: Uses UITableView and custom controls to distinguish protocols from delegation. It compares delegate
+  and block callbacks, then discusses how data sources and protocol abstractions can reduce coupling between objects.
+category: Development notes
+imagefeature: null
+date: 2016-09-01 00:00:00 +0800
+technical_translation:
+  topic: swift-runtime
+  summary: Uses UITableView and custom controls to distinguish protocols from delegation. It compares delegate and
+    block callbacks, then discusses how data sources and protocol abstractions can reduce coupling between objects.
+  keywords:
+  - protocol
+  - delegate
+  - block
+  - data sources
+  - abstraction and decoupling
+  provenance: contribution
+  author_name: Sindri
+  source_url: http://sindrilin.com/ios-dev/2016/08/25/聊聊协议
+  credit: Originally credited to Sindri; edited and archived by Bison.
+  title: Protocols and Delegation in iOS
+  source_sha256: 9369205ba12e704774a4412f7bdc792f1a1c3cb18c1b7b1bacef7155047897b9
+lang: en
+source_path: _posts/2016-09-01-tougao57.md
+source_url: /%E6%8A%95%E7%A8%BF/tougao57
+permalink: /en/journal/2016-09-01-protocols-and-delegation-in-ios/
+translation_method: machine-assisted
+translation_source_sha256: 9369205ba12e704774a4412f7bdc792f1a1c3cb18c1b7b1bacef7155047897b9
+excerpt: Uses UITableView and custom controls to distinguish protocols from delegation. It compares delegate and
+  block callbacks, then discusses how data sources and protocol abstractions can reduce coupling between objects.
+translation_date: '2026-10-23T02:52:08+00:00'
+---
+{% raw %}
+<p>What is a protocol? In Objective-C, declare one with <code class="language-plaintext highlighter-rouge">@protocol</code> and add properties and methods for conforming types to implement. From one perspective, it differs from the <code class="language-plaintext highlighter-rouge">category</code> mechanism while acting as a kind of <code class="language-plaintext highlighter-rouge">category</code>. Protocols are everywhere in daily development. The central example, <code class="language-plaintext highlighter-rouge">UITableView</code>, uses them to obtain data and handle events. Here is a very simple protocol:</p>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Source: <a href="http://sindrilin.com/ios-dev/2016/08/25/聊聊协议">Sindri’s Notes</a><br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@protocol CustomProtocol
+
+- (void)doSomething;
+
+@end
+</code></pre></div></div>
+<p>Many developers still equate <code class="language-plaintext highlighter-rouge">委托-代理</code> with <code class="language-plaintext highlighter-rouge">协议</code>. The former relies on the latter, but the latter can achieve abstraction and decoupling without the former. Before discussing what protocols can do, we need to understand what they are:</p>
+<blockquote>
+<p>A protocol specifies behaviour that conforming classes must implement.</p>
+</blockquote>
+<h2 id="协议应用">Protocol applications</h2>
+<h4 id="代理回调"><em>Delegate callbacks</em></h4>
+<p>Almost everyone writes <code class="language-plaintext highlighter-rouge">UITableView</code> delegate and data-source methods. Apple's view is elegant and powerful. Even as its verbose data-source methods attract criticism, it is hard to imagine a better implementation of <code class="language-plaintext highlighter-rouge">UITableView</code>. This control demonstrates the power of <code class="language-plaintext highlighter-rouge">委托-代理</code>.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao57/1.jpg"/><br/></p>
+<p>The simplest and most direct protocol application is the <code class="language-plaintext highlighter-rouge">委托-代理</code> design pattern. When encapsulating custom controls, I like custom protocols for handling taps and other actions. To understand <code class="language-plaintext highlighter-rouge">代理</code>, I believe you should at least have defined your own delegate protocol:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@protocol SegmentControlDelegate
+
+@optional
+- (void)segmentControl: (SegmentControl *)segmentControl didSelectItemAtIndex: (NSUInteger)index;
+
+@end
+
+
+@interface SegmentControl: UIView
+
+@property (nonatomic, weak) id&lt;SegmentControlDelegate&gt; delegate;
+
+@end
+
+
+@implementation SegmentControl
+
+- (voice)clickItem: (UIButton *)item
+{
+    if ([_delegate respondsToSelector: @selector(segmentControl:didSelectItemAtInex:)]) {
+        [_delegate segmentControl: self didSelectItemAtIndex: item.tag];
+    }
+}
+
+@end
+</code></pre></div></div>
+<p>The code above sketches a delegate implementation for a segmented controller I once built. In project development, advantages of delegate callbacks include <code class="language-plaintext highlighter-rouge">接口目的性强、易于追溯调试</code>, among others.</p>
+<h4 id="什么时候用代理"><em>When to use delegates</em></h4>
+<p>Alongside <code class="language-plaintext highlighter-rouge">Delegate</code>, another equally useful and popular mechanism is <code class="language-plaintext highlighter-rouge">Block</code>. For example, sharing features commonly return results through a <code class="language-plaintext highlighter-rouge">block</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef NS_ENUM(NSInteger, ShareResult) {
+    ShareResultSuccess,
+    ShareResultFailed,
+    ShareResultCancel
+};
+
+- (void)share {
+    [shareManager shareWithResult: ^(ShareResult result) {
+        switch (result) {
+            case ShareResultSuccess:
+                //....
+
+            case ShareResultFailed:
+                //....
+
+            case ShareResultCancel:
+                //....
+        }
+    }];
+}
+</code></pre></div></div>
+<p>This code looks compact and concise. Returning the result through a <code class="language-plaintext highlighter-rouge">Delegate</code> feels quite different:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)share
+{
+    ShareManager * shareManager = [[ShareManager alloc] initWithUrl: @"http://sindrilin.com" title: @"" content: @""];
+    shareManager.delegate = self;
+    [shareManager share];
+}
+
+- (void)shareManager: (ShareManager *)shareManager didCompleteShare: (ShareResult)result
+{
+    switch (result) {
+            case ShareResultSuccess:
+                //....
+
+            case ShareResultFailed:
+                //....
+
+            case ShareResultCancel:
+                //....
+        }
+}
+</code></pre></div></div>
+<p>The same logic in a <code class="language-plaintext highlighter-rouge">Delegate</code> does not look as <code class="language-plaintext highlighter-rouge">nice</code>. Why? My reasons are:</p>
+<ul>
+<li>A delegate lacks <code class="language-plaintext highlighter-rouge">Block</code>'s ability to capture context, so caller parameters must be passed in. Yet <code class="language-plaintext highlighter-rouge">ShareManager</code> serves no purpose inside the method.</li>
+<li>Compared with a <code class="language-plaintext highlighter-rouge">block</code>, a delegate splits sharing and result handling between two places, making the logic less compact.</li>
+</ul>
+<p>Similarly, if the sharing example becomes a network request that also reports download progress, using only a <code class="language-plaintext highlighter-rouge">Block</code> might look like this:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)requestData {
+    [manager requestWithProgress: ^(CGFloat progress) {
+        NSLog(@"download progress: %g", progress);
+        self.progressView.progress = progress;
+    } complete: ^(id receiveData, NSError * error) {
+        if (error) {
+            [self showErrorWithMsg: error.description];
+        } else {
+            // handle receive data
+        }
+    }];
+}
+</code></pre></div></div>
+<p>The <code class="language-plaintext highlighter-rouge">Block</code> is now rather cluttered and hard to follow. This comparison suggests that a <code class="language-plaintext highlighter-rouge">Block</code> works better than a delegate when a task needs an additional operation at completion. For an event with multiple states requiring callbacks as each occurs or changes, defining a protocol is a better choice.</p>
+<h4 id="数据源"><em>Data sources</em></h4>
+<p>Although Apple separates data sources and delegates, both belong to the <code class="language-plaintext highlighter-rouge">委托-代理</code> mechanism. Apple has not explained exactly how to divide them; from their names, the distinction is roughly:</p>
+<ul>
+<li>Data sources expose an interface supplying display data to controls.</li>
+<li>Delegates expose an interface for responding to control events.</li>
+</ul>
+<p>For a custom control with a data source, when should that source be called? Following <code class="language-plaintext highlighter-rouge">UITableView</code> behavior, its data-source methods are not called in the following situations:</p>
+<ul>
+<li>
+<p>UITableView has not been added to a view.</p>
+</li>
+<li>
+<p>One of UITableView’s dimensions is 0.</p>
+</li>
+<li>
+<p>UITableView has no delegate set.</p>
+</li>
+</ul>
+<p>First, address the first two issues. <code class="language-plaintext highlighter-rouge">UIView</code>, the superclass of all views, exposes <code class="language-plaintext highlighter-rouge">didMoveToSuperview</code>, called after the view is added with <code class="language-plaintext highlighter-rouge">addSubview:</code>. Override it and fetch data from the data source:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@protocol CustomViewDataSource&lt;NSObject&gt;
+
+- (CustomViewCell *)customView: (CustomView *)customView cellForRowAtIndexPath: (IndexPath *)indexPath;    
+
+@end
+
+
+@interface CustomView
+
+@property (nonatomic, weak) id&lt;CustomViewDataSource&gt; dataSource;
+
+@end
+
+
+@implementation CustomView
+
+- (void)didMoveToSuperview
+{
+    [super didMoveToSuperview];
+    if (!_delegate) { return; }
+    if ( CGRectGetWidth(self.frame) == 0 || CGRectGetHeight(self.frame) == 0 ) { return; }
+
+    for (IndexPath * index in _visableIndexPaths) {
+        id cell = [_dataSource customView: self cellForRowAtIndexPath: index];
+        // configure cell
+        [self addSubview: cell];
+    }
+}
+
+@end
+</code></pre></div></div>
+<p>Similar to <code class="language-plaintext highlighter-rouge">didMoveToSuperview </code>, <code class="language-plaintext highlighter-rouge">didMoveToWindow</code> is called once on either side of the former method. Appropriate overrides can defer some data-source calls, reducing the chance that many simultaneous calls lower the frame rate.</p>
+<p>Although both use <code class="language-plaintext highlighter-rouge">委托-代理</code>, a data source requires more considerations than a simple delegate. Data-source design is therefore a further step in applying protocols.</p>
+<h4 id="协议抽象"><em>Protocol abstraction</em></h4>
+<p>Here we will discuss <code class="language-plaintext highlighter-rouge">面向对象编程</code>, nearly any experienced developer can immediately name <code class="language-plaintext highlighter-rouge">面向对象编程</code> features: <code class="language-plaintext highlighter-rouge">多态、抽象、封装</code> greatly improve productivity, but their convenience has a cost. In Casa’s <a href="http://casatwy.com/tiao-chu-mian-xiang-dui-xiang-si-xiang-yi-ji-cheng.html">Think beyond object-oriented habits </a>series discusses inheritance’s weaknesses.</p>
+<blockquote>
+<p>But how does this relate to the article?</p>
+</blockquote>
+<p>iPad development has a special component, <code class="language-plaintext highlighter-rouge">UISplitViewController</code>, that divides the screen into smaller and larger regions and displays two controllers simultaneously. The left is a management view and the right shows details. With multiple possible detail views, a tap on the left can require extensive controller creation and configuration code:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import "AppDelegate.h"
+#import "AddContactViewController.h"
+#import "ContactDetailViewController.h"
+
+@interface MasterViewController ()
+
+@property (nonatomic, weak) UISplitViewController * splitViewController;
+@property (nonatomic, strong) NSArray * contacts;
+
+@end
+
+@implementation MasterViewController
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    AppDelegate * appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    self.splitViewController = appDelegate.splitViewController;
+}
+
+- (void)contactDetail: (NSInteger)index
+{
+    ContactDetailViewController * contactDetailVC = [[ContactDetailViewController alloc] init];
+    contactDetailVC.contact = _contacts[index];
+    [_splitViewController showDetailViewController: contactDetailVC sender: self];
+}
+
+- (void)addContact
+{
+    AddContactViewController * addContactVC = [[AddContactViewController alloc] initWithNibName: @"AddContactViewController" bundle: nil];
+    [_splitViewController showDetailViewController: addContactVC sender: self];
+}
+
+@end
+</code></pre></div></div>
+<p>In practice, the right side required more than a dozen screens, even before counting complex <code class="language-plaintext highlighter-rouge">nib</code> controllers. This made the left-side <code class="language-plaintext highlighter-rouge">MasterViewController</code> messy. Although only a weak reference was involved, <code class="language-plaintext highlighter-rouge">MasterViewController</code> still needed its containing <code class="language-plaintext highlighter-rouge">splitViewController</code>, and much controller creation and configuration code was repetitive. Protocols can improve this. Define a class construction method to unify creation of right-side controllers, plus a method for configuring their data:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@protocol DetailViewControllerProtocol
+
++ (instancetype)detailViewController;
+
+- (void)configurateWithData: (id)data;
+
+@end
+</code></pre></div></div>
+<p>Also define a delegate callback for the left controller, passing the class name of the right controller to show and its configuration data, so <code class="language-plaintext highlighter-rouge">splitViewController</code> can handle presentation itself:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>///  MasterViewController.h
+@protocol MasterViewControllerDelegate
+
+- (void)showDetailWithClass: (Class)aClass data: (id)data;
+
+@end
+
+
+@interface MasterViewController: NSObject
+
+@property (nonatomic, weak) id&lt;MasterViewControllerDelegate&gt; delegate;
+
+@end
+
+
+
+///  MasterViewController.m
+@implementation MasterViewController- (void)contactDetail: (NSInteger)index
+
+- (void)contactDetail: (NSInteger)index
+{
+    [self showDetail: NSClassFromString(@"ContactDetailViewController") data: _contacts[index]];
+}
+
+- (void)addContact
+{
+    [self showDetail: NSClassFromString(@"AddContactViewController") data: nil];
+}
+
+
+- (void)showDetail: (Class)aClass data: (id)data
+{
+    if ([_delegate respondsToSelector: @selector(showDetailWithClass:data:)]) {
+        [_delegate showDetailWithClass: aClass data: data];
+    }
+}
+
+@end
+</code></pre></div></div>
+<p>After the change, <code class="language-plaintext highlighter-rouge">MasterViewController</code> retains only the data and the right controller's name. Everything else is handled by its delegate, <code class="language-plaintext highlighter-rouge">UISplitViewController</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import "MasterViewController.h"
+#import "DetailViewControllerProtocol.h"
+
+@interface SplitViewController ()&lt;MasterViewControllerDelegate&gt;
+
+@end
+
+@implementation SplitViewController
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    for (UIViewController * viewController in self.viewControllers) {
+        if ([viewController isKindOfClass: [MasterViewController class]]) {
+            MasterViewController * masterVC = (MasterViewController *)viewController;
+            masterVC.delegate = self;
+            break;
+        }
+    }
+}
+
+- (void)showDetailWithClass: (Class)aClass data: (id)data
+{
+    UIViewController&lt;DetailViewControllerProtocol&gt; * detailVC = [aClass detailViewController];
+    [detailVC configurateWithData: data];
+    [self showDetailViewController: detailVC sender: self];
+}
+
+@end
+</code></pre></div></div>
+<p>Finally, each right-hand controller implements the protocol to create and configure itself:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@implementation  ContactDetailViewController
+
++ (instancetype)detailViewController
+{
+    return [[[self class] alloc] init];
+}
+
+- (void)configurateWithData: (Contact *)data
+{
+    self.phone = data.phone;
+    self.fullName = data.fullName;
+}
+
+@end
+
+@implementation AddContactViewController
+
++ (instancetype)detailViewController
+{
+    return [[[self class] alloc] initWithNibName: NSStringFromClass([self class) bundle: nil];
+}
+
+- (void)configurateWithData: (id)data {  }
+
+///  More. Load from storyboard etc
+
+@end
+</code></pre></div></div>
+<p>This example abstracts common controller behavior—creation and configuration—into a protocol to reduce repeated code. It also lowers coupling: any controller implementing the protocol can be presented in this <code class="language-plaintext highlighter-rouge">splitViewController</code>.</p>
+<h2 id="结束语">Closing remarks</h2>
+<p>When first teaching myself iOS, I could not understand the point of protocols. After discovering <code class="language-plaintext highlighter-rouge">Block</code>, I thought it was so useful that delegates seemed pointless. I overused <code class="language-plaintext highlighter-rouge">Block</code> until realizing it was not magic and could introduce subtle bugs, then returned to <code class="language-plaintext highlighter-rouge">Delegate</code>. Since then, I have experimented with custom controls using notifications, delegates, and <code class="language-plaintext highlighter-rouge">Block</code> callbacks. This article is, strictly speaking, a record of one stage of that learning.</p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

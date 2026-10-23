@@ -1,0 +1,250 @@
+---
+layout: null
+permalink: /en/journal/2016-04-26-mvvm-and-chained-network-request-architecture/index.md
+sitemap: false
+noindex: true
+lang: en
+title: MVVM and chained network-request architecture
+agent_source_url: https://allluckly.cn/en/journal/2016-04-26-mvvm-and-chained-network-request-architecture/
+agent_source_sha256: 276c812f88ea69f2b9ce8f1a10d764b36fc3d7ed33978c1b16d652b9e1c660b8
+agent_generator_version: 1
+---
+{% raw %}# MVVM and chained network-request architecture
+
+Language: en
+Canonical: [MVVM and chained network-request architecture](<https://allluckly.cn/en/journal/2016-04-26-mvvm-and-chained-network-request-architecture/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao41>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-04-26-mvvm-and-chained-network-request-architecture/>)
+Published: 2016-04-26T00:00:00+08:00
+Modified: 2026-10-23T10:34:14+08:00
+Author: WzxJiang
+
+Begins with growing business logic in a view controller, using a sign-in decision to separate Model, ViewModel and ViewController responsibilities. It then introduces ReactiveCocoa and a chained network-request wrapper for organising business calls.
+
+Originally credited to WzxJiang; edited and archived by Bison.
+
+[Source listed in the original](<http://www.jianshu.com/p/06bab2058c53>)
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao41>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Read API, dependency and tool details in the context of the original publication date.
+
+> "I have been studying iOS architecture lately. Why? Our company has always used MVC. By launch, the project had more than a hundred thousand lines of code, and the main VCs generally exceeded 2000 lines. The problem is that the current version implements only a third of the business logic… Time to refactor the architecture."
+
+Editor: [Bison](<https://allluckly.cn/en/>)  
+ Contributor: [WzxJiang](<http://www.jianshu.com/p/06bab2058c53>)
+
+## Main article
+
+## MVVM
+
+MVVM: Model-View-ViewModel  
+ MVVM is an evolution of MVC. It decouples business logic from the VC into a ViewModel, substantially slimming the VC down.
+
+Let the code explain it!
+
+Implement a simple sign-in check:
+
+Create LoginViewModel for logic, LoginModel for data only, and LoginViewController. I am not using a separate LoginView here, so beginners can focus on decoupling through the ViewModel.
+
+If you already understand all this, go directly to [Wzxhaha/RandomerFramework](<https://github.com/Wzxhaha/RandomerFramework>), which is the basic architecture of my independent project Randomer—SubClasses+Protocol+MVVM+RAC—and its sign-in and registration module. Also, thanks to [This article by 王隆帅](<http://www.jianshu.com/p/3beb21d5def2>)opened the door to a new world for me.
+
+### Add a method to LoginModel.
+
+```
+//.h
+- (instancetype)initWithUserName:(NSString *)username password:(NSString *)password;
+
+@property (nonatomic,copy,readonly)NSString * username;
+@property (nonatomic,copy,readonly)NSString * password;
+```
+
+```
+//.m
+- (instancetype)initWithUserName:(NSString *)username password:(NSString *)password {
+    if (self = [super init]) {
+        _username = username;
+        _password = password;
+    }
+    return self;
+}
+```
+
+There is little to explain here: simply add an initializer to the Model.
+
+### Add a method to LoginViewModel.
+
+```
+#import "PersonModel.h"
+
+- (instancetype)initWithPerson:(PersonModel *)person;
+@property (nonatomic,assign,readonly)BOOL canLogin;
+- (instancetype)initWithPerson:(PersonModel *)person {
+    if (self = [super init]) {
+     //在这做你绑定model后的处理
+      _canLogin = [self valiCanLoginWithUserName:person.username password:person.password];
+    }
+    return self;
+}
+
+- (BOOL)valiCanLoginWithUserName:(NSString *)username password:(NSString *)password {
+    if (username.length && password.length) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
+```
+
+Add an initializer that binds a Model to the ViewModel, along with a method to determine whether the account and password are valid.
+
+## The VC or View can then obtain the checked result directly like this:
+
+```
+PersonModel * person = [[PersonModel alloc]initWithUserName:@"10" password:@"10"];
+PersonViewModel * viewModel = [[PersonViewModel alloc]initWithPerson:person];
+
+NSLog(@"%d",viewModel.canLogin);
+```
+
+The difference is small for simple features, but MVVM has major advantages when dealing with complex logic.
+
+I will also discuss ReactiveCocoa. A main reason I recommend MVVM so strongly is how well RAC fits with it!
+
+## ReactiveCocoa
+
+RAC combines functional and reactive programming. If those ideas are unfamiliar, see my [WZXProgrammingIdeas](<https://github.com/Wzxhaha/WZXProgrammingIdeas>)
+
+RAC's main value is observing events, which it calls signal streams, and receiving those signals through block callbacks. It uses blocks extensively, so use @weakify(self) and @strongify(self) properly.
+
+## Why do RAC and MVVM fit together so well?
+
+MVVM moves methods into a ViewModel, but the VC or View must still call them. The logic deciding when to make those calls can remain complicated.
+
+RAC solves this by observing events and calling ViewModel to perform the logic.
+
+For example:
+
+```
+   [[_registerBtn rac_signalForControlEvents:UIControlEventTouchUpInside]subscribeNext:^(id x) {
+        @strongify(self)
+        [self.viewModel toRegisterWithType:Register];
+    }];
+
+    [[_loginBtn rac_signalForControlEvents:UIControlEventTouchUpInside]subscribeNext:^(id x) {
+        @strongify(self)
+        [self.viewModel loginWithUserName:self.usernameTextField.text password:self.usernameTextField.text Success:^(id response) {
+        } failure:^{
+            SHOW_ERROR(@"错误", @"账号或密码错误")
+        } error:^(NSError *error) {
+            SHOW_ERROR(@"错误", @"网络连接失败")
+        }];
+    }];
+```
+
+RAC observes the sign-in and registration buttons, keeping the code concise and the structure compact.
+
+For a demo, see this one instead.[Wzxhaha/RandomerFramework](<https://github.com/Wzxhaha/RandomerFramework>)
+
+or the simplified version of [WZXRACDemo](<https://github.com/Wzxhaha/WZXRACDemo>)
+
+## A chainable networking framework
+
+### Why wrap networking in WZXNetworking?
+
+This framework is remarkably tolerant of errors.
+
+```
+ [[WZXNetworkManager manager].setRequest(@"http://192.168.1.40:8001").RequestType(POST).HTTPHeader(nil).Parameters(nil).RequestSerialize(RequestSerializerHTTP).ResponseSerialize(ResponseSerializerJSON) startRequestWithSuccess:^(id response) {
+
+        NSLog(@"success");
+    } failure:^{
+
+        NSLog(@"failure");
+    }];
+```
+
+Here, everything except .setRequest(url) and startRequestWithSuccess failure is optional.
+
+You can do this:
+
+```
+[[WZXNetworkManager manager].setRequest(@"http://192.168.1.40:8001") startRequestWithSuccess:^(id response) {
+
+        NSLog(@"success");
+    } failure:^{
+
+        NSLog(@"failure");
+    }];
+```
+
+Chaining is particularly useful when there are many parameters and choices, or when they are likely to change. Modifications are easy: just add or change a method.
+
+For example:
+
+### A centralized API wrapper would look like this:
+
+```
+- (void)GET:(NSString *)url
+        parameters:(id)Parameters
+        success:(SuccessBlock)success
+        failure:(FailureBlock)failure;
+```
+
+If you need a Version property to check API versions, what can you do? Rewrite the method with a Version parameter, then update every network request that calls it.
+
+We will leave a distributed API wrapper out of this comparison…
+
+```
+GeneralAPI *apiGeGet            = [[GeneralAPI alloc] initWithRequestMethod:@"get"];
+apiGeGet.apiRequestMethodType      = RequestMethodTypeGET;
+apiGeGet.apiRequestSerializerType  = RequestSerializerTypeHTTP;
+apiGeGet.apiResponseSerializerType = ResponseSerializerTypeHTTP;
+[apiGeGet setApiCompletionHandler:^(id responseObject, NSError * error) {
+    NSLog(@"responseObject is %@", responseObject);
+    if (error) {
+        NSLog(@"Error is %@", error.localizedDescription);
+    }
+}];
+[apiGeGet start];
+```
+
+Is this structure too loosely connected?
+
+## Now replace it with WZXNetworking.
+
+All we need is another method and instance variable, then append .method() to the existing call.
+
+```
+- (WZXNetworkManager * (^) (id some))method {
+  return ^WZXNetworkManager (id some) {
+     self.XXX = some
+     return self;
+  }
+}
+```
+
+```
+[[WZXNetworkManager manager].setRequest(@"http://192.168.1.40:8001").method(some) startRequestWithSuccess:^(id response) {
+
+        NSLog(@"success");
+    } failure:^{
+
+        NSLog(@"failure");
+    }];
+```
+
+The code is here: [WZXNetworking](<https://github.com/Wzxhaha/WZXNetworking>)  
+ For how chaining is implemented, see that [WZXProgrammingIdeas](<https://github.com/Wzxhaha/WZXProgrammingIdeas>)
+
+## Finally
+
+in [My own blog](<http://wzxjiang.com>)for a better viewing experience.  
+ Leave any questions or suggestions in the comments.  
+ If you find a project you like here, please give it a star ✨.  
+ My [GitHub](<https://github.com/Wzxhaha>)
+
+---
+
+Recommended reading: [Combining AES encryption with Base64 encoding on iOS](<https://allluckly.cn/en/journal/2016-03-30-combining-aes-encryption-with-base64-encoding-on-ios/>)
+{% endraw %}

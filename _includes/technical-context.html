@@ -1,0 +1,12 @@
+{%- assign technical_document = include.document | default: page -%}
+{%- assign technical_source_key = technical_document.source_path | default: technical_document.path -%}
+{%- assign technical_source = site.data.technical_articles[technical_source_key] -%}
+{%- assign technical_update_source = site.data.technical_updates[technical_source_key] -%}
+{%- assign technical_article = technical_document.technical_translation | default: technical_source -%}
+{%- assign technical_update = technical_document.technical_update_translation | default: technical_update_source -%}
+{%- if technical_document.lang == 'en' -%}
+  {%- assign technical_article = technical_document.technical_translation | default: site.data.technical_articles_en[technical_source_key] -%}
+  {%- assign technical_update = technical_document.technical_update_translation | default: site.data.technical_updates_en[technical_source_key] -%}
+{%- endif -%}
+{%- assign topic_id = technical_article.topic | default: technical_source.topic | default: technical_document.topic_id | default: 'web-notes' -%}
+{%- assign technical_topic = localized_topics | where: 'id', topic_id | first -%}

@@ -1,0 +1,74 @@
+---
+layout: null
+permalink: /swift/Swift初探之纯代码写tabBar/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: Swift初探之纯代码写tabBar
+agent_source_url: https://allluckly.cn/swift/Swift%E5%88%9D%E6%8E%A2%E4%B9%8B%E7%BA%AF%E4%BB%A3%E7%A0%81%E5%86%99tabBar
+agent_source_sha256: 14d49ed8d61cdc439e01aba11cd42a40c5559d6187862641e23252b1f4445e74
+agent_generator_version: 1
+---
+{% raw %}# Swift初探之纯代码写tabBar
+
+语言：zh-CN
+原文：[Swift初探之纯代码写tabBar](<https://allluckly.cn/swift/Swift%E5%88%9D%E6%8E%A2%E4%B9%8B%E7%BA%AF%E4%BB%A3%E7%A0%81%E5%86%99tabBar>)
+中文：[中文 HTML](<https://allluckly.cn/swift/Swift%E5%88%9D%E6%8E%A2%E4%B9%8B%E7%BA%AF%E4%BB%A3%E7%A0%81%E5%86%99tabBar>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-08-25-exploring-swift-building-a-tab-bar-entirely-in-code/>)
+发布于: 2015-08-25T00:00:00+08:00
+内容更新于: 2015-08-25T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+用早期 Swift 代码构建仿折800的标签栏，演示创建多个子控制器、配置标题与图标并加入系统 TabBar 的过程，适合对照理解纯代码组织导航结构。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文发表于 2015 年，使用早期 Swift 语法。
+
+> "充实自我，提升自我的价值；唯有多学" Bison
+
+最近的项目新版本基本完成了,闲来无事学习学习新出的语言Swift。 对于有OC基础的人来说学习Swift还是很简单的，下面是我自学写的Tabbar，当  
+ 然这并不是自定义的。不过对于一般的需求还是可以满足的。  
+ 下面是我仿“折800”写的一个Tabbar，由于图片原因导致有点小小的瑕疵
+
+代码如下
+
+核心代码
+
+```css
+class func CusTomTabBar() ->UITabBarController{
+
+var vc1 = Home_VC()
+var vc2 = Class_VC()
+var vc3 = Brand_VC()
+var vc4 = Shoping_VC()
+var vc5 = Personal_VC()
+var nvc1:UINavigationController = LBNvc(rootViewController: vc1)
+var nvc2:UINavigationController = LBNvc(rootViewController: vc2)
+var nvc3:UINavigationController = LBNvc(rootViewController: vc3)
+var nvc4:UINavigationController = LBNvc(rootViewController: vc4)
+var nvc5:UINavigationController = LBNvc(rootViewController: vc5)
+let tabbar1 = UITabBarItem(title: "首页", image: (Public .getImgView("home_tab_home_btn@2x")) , selectedImage: (Public .getImgView("home_tab_home_selected_btn@2x")))
+let tabbar2 = UITabBarItem(title: "分类", image: (Public .getImgView("home_tab_saunter_btn@2x")), selectedImage: (Public .getImgView("home_tab_saunter_selected_btn@2x")))
+let tabbar3 = UITabBarItem(title: "品牌团", image: (Public .getImgView("home_tab_branc_btn@2x")), selectedImage: (Public .getImgView("home_tab_branc_selected_btn@2x")))
+let tabbar4 = UITabBarItem(title: "积分商城", image: (Public .getImgView("home_tab_point_btn@2x")), selectedImage: (Public .getImgView("home_tab_point_selected_btn@2x")))
+let tabbar5 = UITabBarItem(title: "个人中心", image: (Public .getImgView("home_tab_personal_btn@2x")), selectedImage: (Public .getImgView("home_tab_personal_selected_btn@2x")))
+nvc1.tabBarItem = tabbar1;
+nvc2.tabBarItem = tabbar2;
+nvc3.tabBarItem = tabbar3;
+nvc4.tabBarItem = tabbar4;
+nvc5.tabBarItem = tabbar5;
+var tc = UITabBarController()
+
+tc.tabBar.tintColor = UIColor .redColor()
+//        tc.tabBar.backgroundImage = Public.getImgView("3.png")
+tc.viewControllers = [nvc1,nvc2,nvc3,nvc4,nvc5];
+return tc;
+}
+ 
+```
+
+> [点击下载Demo](<https://github.com/AllLuckly/LBSwift_TabBar>)
+
+![(LBSwift\_TabBar)](<https://github.com/AllLuckly/LBSwift_TabBar/blob/master/123.gif?raw=true>)
+{% endraw %}

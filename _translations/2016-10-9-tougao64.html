@@ -1,0 +1,329 @@
+---
+layout: post
+title: Practical UITextField Input Rules and Keyboard Handling
+description: Addresses text length, numeric and currency input, Chinese input composition, and keyboard overlap.
+  Categories and runtime features organize extensible input rules, while keyboard notifications are used to adjust
+  the interface position.
+category: Development notes
+imagefeature: null
+date: 2016-10-09 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Addresses text length, numeric and currency input, Chinese input composition, and keyboard overlap. Categories
+    and runtime features organize extensible input rules, while keyboard notifications are used to adjust the interface
+    position.
+  keywords:
+  - UITextField
+  - input validation
+  - Chinese text input
+  - keyboard notifications
+  - Runtime
+  provenance: contribution
+  author_name: Sindri
+  source_url: http://www.jianshu.com/p/4b9957f2afc2
+  credit: Originally credited to Sindri; edited and archived by Bison.
+  version_note: Published in 2016, the keyboard-handling example uses the keyWindow and window-moving approaches
+    of that period.
+  title: Practical UITextField Input Rules and Keyboard Handling
+  source_sha256: 2d88d154556e1e761ead2178b1d0f8fc3b83dcfc1acf28dfff6a40656792c50f
+lang: en
+source_path: _posts/2016-10-9-tougao64.md
+source_url: /%E6%8A%95%E7%A8%BF/tougao64
+permalink: /en/journal/2016-10-09-practical-uitextfield-input-rules-and-keyboard-handling/
+translation_method: machine-assisted
+translation_source_sha256: 2d88d154556e1e761ead2178b1d0f8fc3b83dcfc1acf28dfff6a40656792c50f
+excerpt: Addresses text length, numeric and currency input, Chinese input composition, and keyboard overlap. Categories
+  and runtime features organize extensible input rules, while keyboard notifications are used to adjust the interface
+  position.
+translation_date: '2026-10-23T02:34:15+00:00'
+---
+{% raw %}
+<p><code class="language-plaintext highlighter-rouge">UITextField</code> is an important control for collecting user information, but practical use has pitfalls. Setting <code class="language-plaintext highlighter-rouge">keyboardType</code> restricts the keyboard type without easily restricting third-party keyboard input. Delegate limits on length and content may not withstand Chinese predictive input. When the keyboard covers the field, we must receive show/hide notifications, calculate coordinates, and animate movement.</p>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Source: <a href="http://www.jianshu.com/p/4b9957f2afc2">Sindri’s Notes</a><br/></p>
+<p>Apple supplies text fields without solutions to those problems, so this article addresses them through <code class="language-plaintext highlighter-rouge">category+runtime</code>. It assumes you already understand the event sequence from a <code class="language-plaintext highlighter-rouge">UITextField</code> becoming first responder through editing completion.</p>
+<h2 id="输入限制">Input restrictions</h2>
+<p>The most common restrictions are phone numbers and monetary amounts. The former permits only digits; the latter also permits a decimal point. I initially define three enumeration cases for three text restrictions:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef NS_ENUM(NSInteger, LXDRestrictType)
+{
+    LXDRestrictTypeOnlyNumber = 1,      ///&lt; 只允许输入数字
+    LXDRestrictTypeOnlyDecimal = 2,     ///&lt;  只允许输入实数，包括.
+    LXDRestrictTypeOnlyCharacter = 3,  ///&lt;  只允许非中文输入
+};
+</code></pre></div></div>
+<p>Text input has two callbacks: the delegate's <code class="language-plaintext highlighter-rouge">replace</code> replacement method and the manually registered <code class="language-plaintext highlighter-rouge">EditingChanged</code> editing-change event. The former cannot accurately obtain final text during Chinese composition. The latter is called once the input is confirmed, making it suitable for filtering. This code removes every nondigit:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)viewDidLoad
+{
+    [textField addTarget: self action: @selector(textDidChanged:) forControlEvents: UIControlEventEditingChanged];
+}
+
+- (void)textDidChanged: (UITextField *)textField
+{
+    NSMutableString * modifyText = textField.text.mutableCopy;
+    for (NSInteger idx = 0; idx &lt; modifyText.length; idx++) {
+        NSString * subString = [modifyText substringWithRange: NSMakeRange(idx, 1)];
+        // 使用正则表达式筛选
+        NSString * matchExp = @"^\\d$";
+        NSPredicate * predicate = [NSPredicate predicateWithFormat: @"SELF MATCHES %@", matchExp];
+        if ([predicate evaluateWithObject: subString]) {
+            idx++;
+        } else {
+            [modifyString deleteCharactersInRange: NSMakeRange(idx, 1)];
+        }
+    }
+}
+</code></pre></div></div>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao64/1.gif"/><br/></p>
+<h2 id="限制扩展">Extending restrictions</h2>
+<p>Repeating that code every time input needs limiting would be unpleasant. How can we encapsulate it and support custom restrictions? I use a factory, with a separate class for each restriction type. Extract a parent class exposing one text-change interface and an integer property of type <code class="language-plaintext highlighter-rouge">NSUInteger</code> for the maximum length:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#pragma mark - h文件
+@interface LXDTextRestrict : NSObject
+
+@property (nonatomic, assign) NSUInteger maxLength;
+@property (nonatomic, readonly) LXDRestrictType restrictType;
+
+// 工厂
++ (instancetype)textRestrictWithRestrictType: (LXDRestrictType)restrictType;
+// 子类实现来限制文本内容
+- (void)textDidChanged: (UITextField *)textField;
+
+@end
+
+
+#pragma mark - 继承关系
+@interface LXDTextRestrict ()
+
+@property (nonatomic, readwrite) LXDRestrictType restrictType;
+
+@end
+
+@interface LXDNumberTextRestrict : LXDTextRestrict
+@end
+
+@interface LXDDecimalTextRestrict : LXDTextRestrict
+@end
+
+@interface LXDCharacterTextRestrict : LXDTextRestrict
+@end
+
+#pragma mark - 父类实现
+@implementation LXDTextRestrict
+
++ (instancetype)textRestrictWithRestrictType: (LXDRestrictType)restrictType
+{
+    LXDTextRestrict * textRestrict;
+    switch (restrictType) {
+        case LXDRestrictTypeOnlyNumber:
+            textRestrict = [[LXDNumberTextRestrict alloc] init];
+            break;
+        
+        case LXDRestrictTypeOnlyDecimal:
+            textRestrict = [[LXDDecimalTextRestrict alloc] init];
+            break;
+        
+        case LXDRestrictTypeOnlyCharacter:
+            textRestrict = [[LXDCharacterTextRestrict alloc] init];
+            break;
+        
+        default:
+            break;
+    }
+    textRestrict.maxLength = NSUIntegerMax;
+    textRestrict.restrictType = restrictType;
+    return textRestrict;
+}
+
+- (void)textDidChanged: (UITextField *)textField
+{
+
+}
+
+@end
+</code></pre></div></div>
+<p>All subclasses iterate strings and validate regular expressions during filtering, so encapsulate that shared logic. Following <code class="language-plaintext highlighter-rouge">EOC</code> principles, prefer a <code class="language-plaintext highlighter-rouge">static inline</code> function to a macro:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef BOOL(^LXDStringFilter)(NSString * aString);
+static inline NSString * kFilterString(NSString * handleString, LXDStringFilter subStringFilter)
+{
+    NSMutableString * modifyString = handleString.mutableCopy;
+    for (NSInteger idx = 0; idx &lt; modifyString.length;) {
+        NSString * subString = [modifyString substringWithRange: NSMakeRange(idx, 1)];
+        if (subStringFilter(subString)) {
+            idx++;
+        } else {
+            [modifyString deleteCharactersInRange: NSMakeRange(idx, 1)];
+        }
+    }
+    return modifyString;
+}
+
+static inline BOOL kMatchStringFormat(NSString * aString, NSString * matchFormat)
+{
+    NSPredicate * predicate = [NSPredicate predicateWithFormat: @"SELF MATCHES %@", matchFormat];
+    return [predicate evaluateWithObject: aString];
+}
+
+
+#pragma mark - 子类实现
+@implementation LXDNumberTextRestrict
+
+- (void)textDidChanged: (UITextField *)textField
+{
+    textField.text = kFilterString(textField.text, ^BOOL(NSString *aString) {
+        return kMatchStringFormat(aString, @"^\\d$");
+    });
+}
+
+@end
+
+@implementation LXDDecimalTextRestrict
+
+- (void)textDidChanged: (UITextField *)textField
+{
+    textField.text = kFilterString(textField.text, ^BOOL(NSString *aString) {
+        return kMatchStringFormat(aString, @"^[0-9.]$");
+    });
+}
+
+@end
+
+@implementation LXDCharacterTextRestrict
+
+- (void)textDidChanged: (UITextField *)textField
+{
+    textField.text = kFilterString(textField.text, ^BOOL(NSString *aString) {
+        return kMatchStringFormat(aString, @"^[^[\\u4e00-\\u9fa5]]$");
+    });
+}
+
+@end
+</code></pre></div></div>
+<p>With restriction classes ready, create a <code class="language-plaintext highlighter-rouge">UITextField</code> category to add the input-limiting feature, mainly through three new properties:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface UITextField (LXDRestrict)
+
+/// 设置后生效
+@property (nonatomic, assign) LXDRestrictType restrictType;
+/// 文本最长长度
+@property (nonatomic, assign) NSUInteger maxTextLength;
+/// 设置自定义的文本限制
+@property (nonatomic, strong) LXDTextRestrict * textRestrict;
+
+@end
+</code></pre></div></div>
+<p>Because these properties are added in a <code class="language-plaintext highlighter-rouge">category</code>, implement their <code class="language-plaintext highlighter-rouge">getter</code> and <code class="language-plaintext highlighter-rouge">setter</code> methods manually. Here, the dynamic association mechanism <code class="language-plaintext highlighter-rouge">objc_associate</code> provides the implementation. The core methods follow:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)setRestrictType: (LXDRestrictType)restrictType
+{
+    objc_setAssociatedObject(self, LXDRestrictTypeKey, @(restrictType), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    self.textRestrict = [LXDTextRestrict textRestrictWithRestrictType: restrictType];
+}
+
+- (void)setTextRestrict: (LXDTextRestrict *)textRestrict
+{
+    if (self.textRestrict) {
+        [self removeTarget: self.text action: @selector(textDidChanged:) forControlEvents: UIControlEventEditingChanged];
+    }
+    textRestrict.maxLength = self.maxTextLength;
+    [self addTarget: textRestrict action: @selector(textDidChanged:) forControlEvents: UIControlEventEditingChanged];
+    objc_setAssociatedObject(self, LXDTextRestrictKey, textRestrict, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+</code></pre></div></div>
+<p>With that work complete, one line limits input in a <code class="language-plaintext highlighter-rouge">UITextField</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>self.textField.restrictType = LXDRestrictTypeOnlyDecimal;
+</code></pre></div></div>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao64/2.gif"/><br/></p>
+<h2 id="自定义的限制">Custom restrictions</h2>
+<p>Suppose a field must accept only <code class="language-plaintext highlighter-rouge">emoji</code>, which none of the three enum options supports. Create a custom subclass to meet that requirement.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface LXDEmojiTextRestrict : LXDTextRestrict
+
+@end
+
+@implementation LXDEmojiTextRestrict
+
+- (void)textDidChanged: (UITextField *)textField
+{
+    NSMutableString * modifyString = textField.text.mutableCopy;
+    for (NSInteger idx = 0; idx &lt; modifyString.length;) {
+        NSString * subString = [modifyString substringWithRange: NSMakeRange(idx, 1)];
+        NSString * emojiExp = @"^[\\ud83c\\udc00-\\ud83c\\udfff]|[\\ud83d\\udc00-\\ud83d\\udfff]|[\\u2600-\\u27ff]$";
+        NSPredicate * predicate = [NSPredicate predicateWithFormat: @"SELF MATCHES %@", emojiExp];
+        if ([predicate evaluateWithObject: subString]) {
+            idx++;
+        } else {
+            [modifyString deleteCharactersInRange: NSMakeRange(idx, 1)];
+        }
+    }
+    textField.text = modifyString;
+}
+
+@end
+</code></pre></div></div>
+<p>The regular expression for <code class="language-plaintext highlighter-rouge">emoji</code> in this code is incomplete, so many <code class="language-plaintext highlighter-rouge">emoji</code> inputs are filtered out in practice. The result is shown below:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao64/3.gif"/><br/></p>
+<h2 id="键盘遮盖">Keyboard overlap</h2>
+<p>Another headache is the keyboard covering an input field. Add keyboard notifications in the <code class="language-plaintext highlighter-rouge">category</code> to move the entire <code class="language-plaintext highlighter-rouge">window</code>. This method obtains the field's relative coordinates inside <code class="language-plaintext highlighter-rouge">keyWindow</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (CGPoint)convertPoint:(CGPoint)point toView:(nullable UIView *)view
+</code></pre></div></div>
+<p>Provide an interface that enables automatic adjustment for an input field:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface UITextField (LXDAdjust)
+
+/// 自动适应
+- (void)setAutoAdjust: (BOOL)autoAdjust;
+
+@end
+
+@implementation UITextField (LXDAdjust)
+
+- (void)setAutoAdjust: (BOOL)autoAdjust
+{
+    if (autoAdjust) {
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(keyboardWillShow:) name: UIKeyboardWillShowNotification object: nil];
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(keyboardWillHide:) name: UIKeyboardWillHideNotification object: nil];
+    } else {
+        [[NSNotificationCenter defaultCenter] removeObserver: self];
+    }
+}
+
+- (void)keyboardWillShow: (NSNotification *)notification
+{
+    if (self.isFirstResponder) {
+        CGPoint relativePoint = [self convertPoint: CGPointZero toView: [UIApplication sharedApplication].keyWindow];
+    
+        CGFloat keyboardHeight = [notification.userInfo[UIKeyboardFrameBeginUserInfoKey] CGRectValue].size.height;
+        CGFloat actualHeight = CGRectGetHeight(self.frame) + relativePoint.y + keyboardHeight;
+        CGFloat overstep = actualHeight - CGRectGetHeight([UIScreen mainScreen].bounds) + 5;
+        if (overstep &gt; 0) {
+            CGFloat duration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+            CGRect frame = [UIScreen mainScreen].bounds;
+            frame.origin.y -= overstep;
+            [UIView animateWithDuration: duration delay: 0 options: UIViewAnimationOptionCurveLinear animations: ^{
+                [UIApplication sharedApplication].keyWindow.frame = frame;
+            } completion: nil];
+        }
+    }
+}
+
+- (void)keyboardWillHide: (NSNotification *)notification
+{
+    if (self.isFirstResponder) {
+        CGFloat duration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+        CGRect frame = [UIScreen mainScreen].bounds;
+        [UIView animateWithDuration: duration delay: 0 options: UIViewAnimationOptionCurveLinear animations: ^{
+            [UIApplication sharedApplication].keyWindow.frame = frame;
+        } completion: nil];
+    }
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+}
+
+@end
+</code></pre></div></div>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao64/4.gif"/><br/></p>
+<p>If the project has a custom <code class="language-plaintext highlighter-rouge">UITextField</code> subclass, the <code class="language-plaintext highlighter-rouge">dealloc</code> implementation above should use <code class="language-plaintext highlighter-rouge">method_swillzing</code> to remove notification observers.</p>
+<h2 id="尾语">Closing thoughts</h2>
+<p>Small refinements often require only a little code, but implementing them well means understanding the full event flow. Also, yesterday WeChat's <code class="language-plaintext highlighter-rouge">小程序</code> filled my feed. To fellow iOS developers: rather than worrying whether you will keep your job, focus on doing it well and learn some js to keep up with the trend.<a href="https://github.com/JustKeepRunning/LXDTextFieldAdjust">Demo for this article</a></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

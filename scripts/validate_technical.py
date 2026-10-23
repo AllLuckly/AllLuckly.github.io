@@ -47,7 +47,9 @@ pages = {path: Page(path.read_text()) for path in ROOT.rglob('*.html')}
 articles = {}
 for path, page in pages.items():
     for entity in page.entities:
-        if entity['@type'] == 'BlogPosting': articles[entity['headline']] = (path, page, entity)
+        if entity['@type'] == 'BlogPosting' and entity.get('inLanguage') != 'en':
+            assert entity['headline'] not in articles, f'duplicate Chinese article title: {entity["headline"]}'
+            articles[entity['headline']] = (path, page, entity)
 sources = {}
 for source in (REPO / '_posts').glob('*.md'):
     fields = yaml.safe_load(source.read_text().split('---', 2)[1])

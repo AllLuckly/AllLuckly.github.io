@@ -1,0 +1,67 @@
+---
+layout: null
+sitemap: false
+lang: en
+permalink: /en/feed.xml
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en" xml:base="{{ '/en/' | absolute_url | xml_escape }}">
+  <title type="text">Bison’s Creative &amp; Development Notes</title>
+  <subtitle type="text">English app tutorials, creative projects and historical development notes.</subtitle>
+  <generator uri="https://jekyllrb.com/">Jekyll</generator>
+  <link rel="self" type="application/atom+xml" href="{{ '/en/feed.xml' | absolute_url | xml_escape }}" />
+  <link rel="alternate" type="text/html" href="{{ '/en/' | absolute_url | xml_escape }}" />
+  <id>{{ '/en/feed.xml' | absolute_url | xml_escape }}</id>
+  {% assign english_posts = site.translations | where: 'lang', 'en' | sort: 'date' | reverse %}
+  {% assign feed_updated = '1970-01-01' %}
+  {% assign feed_updated_epoch = feed_updated | date: '%s' | plus: 0 %}
+  {% for post in english_posts %}
+    {% unless post.noindex or post.published == false or post.feed == false %}
+      {% assign post_update = post.technical_update_translation | default: site.data.technical_updates_en[post.source_path] %}
+      {% assign post_updated = post.translation_date | default: post.modified | default: post_update.updated | default: post.date %}
+      {% assign post_updated_epoch = post_updated | date: '%s' | plus: 0 %}
+      {% if post_updated_epoch > feed_updated_epoch %}
+        {% assign feed_updated = post_updated %}
+        {% assign feed_updated_epoch = post_updated_epoch %}
+      {% endif %}
+    {% endunless %}
+  {% endfor %}
+  <updated>{{ feed_updated | date_to_xmlschema }}</updated>
+  <author>
+    <name>Bison’s Creative &amp; Development Notes (publisher)</name>
+    <uri>{{ '/en/about/' | absolute_url | xml_escape }}</uri>
+  </author>
+  {% comment %}XML escaping alone does not remove invalid control characters in legacy posts.{% endcomment %}
+  {% assign xml_forbidden_controls = '%00,%01,%02,%03,%04,%05,%06,%07,%08,%0B,%0C,%0E,%0F,%10,%11,%12,%13,%14,%15,%16,%17,%18,%19,%1A,%1B,%1C,%1D,%1E,%1F,%EF%BF%BE,%EF%BF%BF' | split: ',' %}
+  {% assign feed_count = 0 %}
+  {% for post in english_posts %}
+    {% unless post.noindex or post.published == false or post.feed == false %}
+      {% if feed_count < 30 %}
+        {% assign post_canonical = post.url | replace: '/index.html', '/' | absolute_url %}
+        {% assign post_technical = post.technical_translation | default: site.data.technical_articles_en[post.source_path] %}
+        {% assign source_technical = site.data.technical_articles[post.source_path] %}
+        {% assign post_update = post.technical_update_translation | default: site.data.technical_updates_en[post.source_path] %}
+        {% assign feed_content = post.content %}
+        {% assign feed_summary = post_technical.summary | default: post.description | default: post.excerpt | strip_html | normalize_whitespace %}
+        {% for encoded_control in xml_forbidden_controls %}
+          {% assign xml_control = encoded_control | url_decode %}
+          {% assign feed_content = feed_content | remove: xml_control %}
+          {% assign feed_summary = feed_summary | remove: xml_control %}
+        {% endfor %}
+  <entry xml:base="{{ post_canonical | xml_escape }}">
+    <title type="text">{{ post.title | xml_escape }}</title>
+    <link rel="alternate" type="text/html" href="{{ post_canonical | xml_escape }}" />
+    <id>{{ post_canonical | xml_escape }}</id>
+    <published>{{ post.date | date_to_xmlschema }}</published>
+    <updated>{{ post.translation_date | default: post.modified | default: post_update.updated | default: post.date | date_to_xmlschema }}</updated>
+    {% if post.author or source_technical.author_name %}<author>
+      <name>{{ source_technical.author_name | default: post.author.name | default: post.author | xml_escape }}</name>
+    </author>{% endif %}
+    <summary type="text">{{ feed_summary | xml_escape }}</summary>
+    <content type="html">{{ feed_content | xml_escape }}</content>
+  </entry>
+        {% assign feed_count = feed_count | plus: 1 %}
+      {% endif %}
+    {% endunless %}
+  {% endfor %}
+</feed>

@@ -1,0 +1,70 @@
+---
+layout: post
+title: Bison's collection of solutions to common Git errors
+description: Collects index-lock errors and warnings about Git's default push behaviour, with error screenshots
+  and the configuration commands used at the time. It supports reviewing troubleshooting by error type; inspect
+  the current repository state before applying a command.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2015-12-28 00:00:00 +0800
+technical_translation:
+  topic: tooling-release
+  summary: Collects index-lock errors and warnings about Git's default push behaviour, with error screenshots and
+    the configuration commands used at the time. It supports reviewing troubleshooting by error type; inspect the
+    current repository state before applying a command.
+  keywords:
+  - Git
+  - index.lock
+  - push.default
+  - commit troubleshooting
+  provenance: collection
+  author_name: Bison
+  credit: Git troubleshooting notes collected by Bison.
+  author_url: https://allluckly.cn/about/
+  version_note: Records Git issues on Windows 7 and the default push settings used at the time.
+  title: Bison's collection of solutions to common Git errors
+  source_sha256: 71b06ddd004e9868e55e54b8d49baac1ff66e1be0a5e076cc81b975c64b0de26
+lang: en
+source_path: _posts/2015-12-28-git01.md
+source_url: /sdk/git01
+permalink: /en/journal/2015-12-28-bison-s-collection-of-solutions-to-common-git-errors/
+translation_method: machine-assisted
+translation_source_sha256: 71b06ddd004e9868e55e54b8d49baac1ff66e1be0a5e076cc81b975c64b0de26
+excerpt: Collects index-lock errors and warnings about Git's default push behaviour, with error screenshots and
+  the configuration commands used at the time. It supports reviewing troubleshooting by error type; inspect the
+  current repository state before applying a command.
+translation_date: '2026-10-23T02:34:11+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"I have been using Windows 7 recently, and some tasks require <code class="language-plaintext highlighter-rouge">Git</code>. At first, I resisted."</p>
+</blockquote>
+<p>I have been using Windows 7 recently, and some tasks require <code class="language-plaintext highlighter-rouge">Git</code>. I resisted at first, but had no choice but to give it a go. Here are some problems I encountered while using <code class="language-plaintext highlighter-rouge">Git</code> and how I solved them.</p>
+<h3 id="-no1-执行git-add-文件时出现如下错误">-NO.1: Running <code class="language-plaintext highlighter-rouge">git add </code> on a file produces the following error.</h3>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">If</span> <span class="nt">no</span> <span class="nt">other</span> <span class="nt">git</span> <span class="nt">process</span> <span class="nt">is</span> <span class="nt">currently</span> <span class="nt">running</span><span class="o">,</span> <span class="nt">this</span> <span class="nt">probably</span> <span class="nt">means</span> <span class="nt">a</span>
+<span class="nt">git</span> <span class="nt">process</span> <span class="nt">crashed</span> <span class="nt">in</span> <span class="nt">this</span> <span class="nt">repository</span> <span class="nt">earlier</span><span class="o">.</span> <span class="nt">Make</span> <span class="nt">sure</span> <span class="nt">no</span> <span class="nt">other</span> <span class="nt">git</span>
+<span class="nt">process</span> <span class="nt">is</span> <span class="nt">running</span> <span class="nt">and</span> <span class="nt">remove</span> <span class="nt">the</span> <span class="nt">file</span> <span class="nt">manually</span> <span class="nt">to</span> <span class="nt">continue</span><span class="o">.</span></code></pre></figure>
+<p><br/></p>
+<h4 id="解决方式rm--f-gitindexlock">Solution: <code class="language-plaintext highlighter-rouge">rm -f ./.git/index.lock</code></h4>
+<h3 id="-no2-执行git-push-文件时出现如下警告">-NO.2: Running <code class="language-plaintext highlighter-rouge">git push </code> produces the following warning.</h3>
+<p><br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">warning</span><span class="o">:</span> <span class="nt">push</span><span class="nc">.default</span> <span class="nt">is</span> <span class="nt">unset</span><span class="o">;</span> <span class="nt">its</span> <span class="nt">implicit</span> <span class="nt">value</span> <span class="nt">is</span> <span class="nt">changing</span> <span class="nt">in</span>
+<span class="nt">Git</span> <span class="err">2</span><span class="o">.</span><span class="err">0</span> <span class="nt">from</span> <span class="s2">'matching'</span> <span class="nt">to</span> <span class="s2">'simple'</span><span class="o">.</span> <span class="nt">To</span> <span class="nt">squelch</span> <span class="nt">this</span> <span class="nt">message</span>
+<span class="nt">and</span> <span class="nt">maintain</span> <span class="nt">the</span> <span class="nt">current</span> <span class="nt">behavior</span> <span class="nt">after</span> <span class="nt">the</span> <span class="nt">default</span> <span class="nt">changes</span><span class="o">,</span> <span class="nt">use</span><span class="o">:</span>
+
+<span class="nt">git</span> <span class="nt">config</span> <span class="nt">--global</span> <span class="nt">push</span><span class="nc">.default</span> <span class="nt">matching</span>
+
+<span class="nt">To</span> <span class="nt">squelch</span> <span class="nt">this</span> <span class="nt">message</span> <span class="nt">and</span> <span class="nt">adopt</span> <span class="nt">the</span> <span class="nt">new</span> <span class="nt">behavior</span> <span class="nt">now</span><span class="o">,</span> <span class="nt">use</span><span class="o">:</span>
+
+<span class="nt">git</span> <span class="nt">config</span> <span class="nt">--global</span> <span class="nt">push</span><span class="nc">.default</span> <span class="nt">simple</span></code></pre></figure>
+<p><br/></p>
+<h4 id="解决方式git-config---global-pushdefault-matching再执行git-push-">Solution: run <code class="language-plaintext highlighter-rouge">git config --global push.default matching</code>, then run git push again.</h4>
+<h3 id="-no3-git-提交出现如下错误">-NO.3 A git commit produces the following error:<br/></h3>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">fatal</span><span class="o">:</span> <span class="nt">Unable</span> <span class="nt">to</span> <span class="nt">create</span> <span class="err">‘</span><span class="nt">project_path</span><span class="o">/</span><span class="nc">.git</span><span class="o">/</span><span class="nt">index</span><span class="nc">.lock</span><span class="err">’</span><span class="o">:</span> <span class="nt">File</span> <span class="nt">exists</span><span class="o">.</span> <span class="nt">exists</span></code></pre></figure>
+<p><br/></p>
+<h4 id="解决方式rm--f-gitindexlock-1">Solution: <code class="language-plaintext highlighter-rouge">rm -f ./.git/index.lock</code></h4>
+<p>These are all the issues I have encountered so far. I will update this whenever new ones arise.<br/></p>
+<p>Recommended reading: <a href="/en/journal/2015-12-26-integrating-a-baidu-mobile-ssp-launch-ad-in-one-minute/">Integrating a Baidu Mobile SSP launch ad in one minute</a><br/></p>
+<p>Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.</p>
+
+{% endraw %}

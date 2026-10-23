@@ -1,0 +1,128 @@
+---
+layout: null
+permalink: /swift/Alamofire/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: Swift2.0后Alamofire的使用方法
+agent_source_url: https://allluckly.cn/swift/Alamofire
+agent_source_sha256: 010c4f1a12995cebd1f1521190d092b447ecd33ce40c237a2ece22865ea534bf
+agent_generator_version: 1
+---
+{% raw %}# Swift2.0后Alamofire的使用方法
+
+语言：zh-CN
+原文：[Swift2.0后Alamofire的使用方法](<https://allluckly.cn/swift/Alamofire>)
+中文：[中文 HTML](<https://allluckly.cn/swift/Alamofire>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-11-09-using-alamofire-with-swift-2-0/>)
+发布于: 2015-11-09T00:00:00+08:00
+内容更新于: 2026-10-23T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+展示 Swift 2.0 环境下手动导入 Alamofire、配置项目依赖并发起网络请求的步骤，配合截图说明工程链接位置，适合回顾早期框架接入和调用方式。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文面向 Swift 2.0 与当时的 Alamofire 接口。
+
+这篇使用 Swift 2.0 时代的 Alamofire 接口，适合回看请求、参数和响应处理的组织方式。为新项目接入库时，请核对官方仓库中对应版本的系统、Swift 和安装要求，使用该版本的示例；本文中的旧语法没有重新迁移或编译。
+
+- [Alamofire 官方仓库与使用文档](<https://github.com/Alamofire/Alamofire>)
+
+阅读说明补充于 2026-10-23
+
+> "iOS技术分享,iOS开发,iOS开发技巧,iOS开发博客" Bison
+
+## 第一部分，配置项目
+
+在此只讲纯手打拉第三方框架的方法，`Pods`的自行百度哦！不懂`Pods`的可以点击传送 [传送门](<https://allluckly.cn/cocoapods/CocoaPods%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8>) 首先我们创建一个工程如下图
+
+![1](<https://allluckly.cn/images/blog/Alamofire/1.png>)
+
+然后把下载的`Alamofire`解压文件全部放进创建的项目文件夹中，如下图
+
+![2](<https://allluckly.cn/images/blog/Alamofire/2.png>)
+
+关键时刻到了哦，集中精神，注意！！！
+
+![3](<https://allluckly.cn/images/blog/Alamofire/3.png>)
+
+这个图以后呢，就是最重要的时候了，请看好红色框框的部分，千万不要选择错了哦！！！
+
+![4](<https://allluckly.cn/images/blog/Alamofire/4.jpg>)
+
+接着我们要把`Alamofire`的静态库加到工程里面来，具体操作如下图
+
+![5](<https://allluckly.cn/images/blog/Alamofire/5.png>)
+
+再然后呢，我们导入`Alamofire`的头文件，运行下，看是否报错，不报错呢，我们导入的文件配置工程就是对的！
+
+#### PS
+
+告诉大家一个小秘密，Bison发现第三方框架很多都是这个样子导入的哦！例如`HanekeSwift`
+
+## 第二部分，Bison教你怎么使用`Alamofire`
+
+```css
+import UIKit
+
+import Alamofire
+
+class ViewController: UIViewController {
+
+    let BaiduURL = "http://apis.haoservice.com/lifeservice/cook/query?"
+
+override func viewDidLoad() {
+    super.viewDidLoad()
+    //网络请求
+    self .reloadData()
+}
+
+func reloadData(){
+
+
+    let parameters = [
+    "menu": "土豆",
+    "pn":  1,
+    "rn": "10",
+    "key": "2ba215a3f83b4b898d0f6fdca4e16c7c",
+    ]
+
+
+    Alamofire.request(.POST, BaiduURL, parameters:parameters ).responseJSON {response in
+
+    //            debugPrint(response)
+    switch response.result {
+        case .Success:
+            //把得到的JSON数据转为字典
+            if let j = response.result.value as? NSDictionary{
+                //获取字典里面的key为数组
+                let Items = j.valueForKey("result")as! NSArray
+            //便利数组得到每一个字典模型
+            for dict in Items{
+
+                print(dict)
+            }
+
+        }
+        case .Failure(let error):
+
+            print(error)
+        }
+
+
+        }
+
+    }
+
+}
+```
+
+到此我们的教程就结束了，有什么问题可以留言哦！会抽空解答大家的疑问
+
+好文推荐：[iOS开发内购全套图文教程](<http://www.jianshu.com/p/05a3087cd796>)
+
+原文在：https://allluckly.cn/
+
+版权归©Bison所有 如需转载请保留原文超链接地址！否则后果自负！
+{% endraw %}

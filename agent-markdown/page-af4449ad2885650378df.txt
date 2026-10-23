@@ -1,0 +1,112 @@
+---
+layout: null
+permalink: /journal/topics/concurrency-performance/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 并发与性能
+agent_source_url: https://allluckly.cn/journal/topics/concurrency-performance/
+agent_source_sha256: 6df665ae9670871622a52c26fec33b92b2d52ff4f8bdeee1bbbf3bcb2658c997
+agent_generator_version: 1
+---
+{% raw %}# 并发与性能
+
+语言：zh-CN
+原文：[并发与性能](<https://allluckly.cn/journal/topics/concurrency-performance/>)
+中文：[中文 HTML](<https://allluckly.cn/journal/topics/concurrency-performance/>)
+English: [English HTML](<https://allluckly.cn/en/journal/topics/concurrency-performance/>)
+
+DEVELOPMENT NOTES · 7 篇
+
+这一组围绕任务在哪执行、界面为何卡顿展开。既有多线程基础，也有 RunLoop 和检测手段，适合把执行顺序画清楚，再回到代码核对。
+
+## 怎么读这一组
+
+1. 多线程系列按一、二、三阅读，区分任务、队列、线程和同步等待；遇到嵌套调用时，先写出可能的执行顺序。
+2. 再读 RunLoop 与线程保活，关注线程在什么情况下等待、被什么事件唤醒，而不是把“保活”当成通用解决方案。
+3. 卡顿检测和 UIKit 调优要联系实际负载来看：先明确测量对象，再比较耗时、调用栈和屏幕表现，旧示例的数值不作为当前设备结论。
+
+这是 2015–2017 年的历史记录，示例未在本次整理中重新运行验证。先核对文章日期和版本说明，再决定哪些思路适合当前项目。
+
+## 主题文章
+
+7 篇 · 新到旧
+
+- 2017-03-27 
+
+  ### [iOS开发优化篇之卡顿检测](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao73>)
+
+   
+
+  通过监控主线程 RunLoop 状态和等待超时检测卡顿，并介绍获取线程栈帧、遍历调用栈与符号化的过程，说明如何在应用运行期间留下可排查的上下文。
+
+   
+
+  SindriLin RunLoop · 卡顿检测 · 调用栈
+- 2016-07-26 
+
+  ### [iOS开发深入研究Runloop与线程保活](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao55>)
+
+   
+
+  结合 AFNetworking 2.x 的网络线程分析 RunLoop 保活方式，说明照搬循环运行代码可能造成的对象持有与线程退出问题，再用示例验证更可控的生命周期处理。
+
+   
+
+  bestswifter RunLoop · NSThread · AFNetworking
+- 2016-04-25 
+
+  ### [Swift之优化UITableViewCell高度计算](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao40>)
+
+   
+
+  围绕 UITableView 重复计算单元格高度的问题，结合 FDTemplateLayoutCell 的思路介绍模板测量与高度缓存，并用 Swift 封装接口来减少滚动过程中的重复工作。
+
+   
+
+  大石头布 UITableViewCell · 行高缓存 · FDTemplateLayoutCell
+- 2016-03-02 
+
+  ### [iOS开发之UIKit性能调优实战讲解](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao27>)
+
+   
+
+  以列表界面为实验对象，结合 Instruments 的 Core Animation 工具观察图层混合、图片尺寸、颜色格式和离屏渲染，解释常见滚动性能问题与针对性的调整思路。
+
+   
+
+  bestswifter Instruments · Core Animation · 离屏渲染
+- 2016-02-29 
+
+  ### [Bison眼中的iOS开发多线程是这样的（三）](<https://allluckly.cn/%E5%A4%9A%E7%BA%BF%E7%A8%8B/duoxiancheng03>)
+
+   
+
+  围绕 GCD 的任务与队列展开，比较主队列、全局队列、自建串行和并发队列，并用图片下载、重复执行和一次性初始化示例说明常见任务提交方式。
+
+   
+
+  Bison GCD · dispatch\_async · dispatch\_sync
+- 2016-01-18 
+
+  ### [Bison眼中的iOS开发多线程是这样的（二）](<https://allluckly.cn/%E5%A4%9A%E7%BA%BF%E7%A8%8B/duoxiancheng02>)
+
+   
+
+  围绕共享数据被多个线程访问的情形，介绍 synchronized 同步代码块和 NSLock 的加解锁方式，再用 NSCondition 的等待、唤醒与广播解释线程之间的协调。
+
+   
+
+  Bison 线程安全 · synchronized · NSLock
+- 2016-01-13 
+
+  ### [Bison眼中的iOS开发多线程是这样的（一）](<https://allluckly.cn/%E5%A4%9A%E7%BA%BF%E7%A8%8B/duoxiancheng01>)
+
+   
+
+  从进程与线程的区别引入 iOS 多线程，比较 NSThread、NSOperationQueue 与 GCD，再具体演示线程创建、执行、终止和优先级，结合日志观察调度现象。
+
+   
+
+  Bison NSThread · 多线程 · 线程调度
+{% endraw %}

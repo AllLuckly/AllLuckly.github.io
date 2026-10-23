@@ -1,0 +1,169 @@
+---
+layout: null
+permalink: /ios支付/lianlianzhifu/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发之详解连连支付集成
+agent_source_url: https://allluckly.cn/ios%E6%94%AF%E4%BB%98/lianlianzhifu
+agent_source_sha256: 2a4c07b6329e12b6329b35df489884a4436fdf2cdeb89db31152b31ca7ff3c0f
+agent_generator_version: 1
+---
+{% raw %}# iOS开发之详解连连支付集成
+
+语言：zh-CN
+原文：[iOS开发之详解连连支付集成](<https://allluckly.cn/ios%E6%94%AF%E4%BB%98/lianlianzhifu>)
+中文：[中文 HTML](<https://allluckly.cn/ios%E6%94%AF%E4%BB%98/lianlianzhifu>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-01-20-integrating-lianlian-pay-into-an-ios-app/>)
+发布于: 2016-01-20T00:00:00+08:00
+内容更新于: 2016-01-20T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+整理连连支付 SDK 接入时的链接参数、资源样式和业务字段，说明用户编号、绑卡协议与服务端回调的含义，并记录签名、界面定制等容易混淆的配置点。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文发表于 2016 年，按当时的连连支付 SDK 文档和资源结构整理。
+
+> "最近由于公司项目需要集成连连支付，文档写的不是很清楚，遇到了一些坑，因此记录一下，希望能帮到有需要的人。"
+
+前面简单的集成没有遇到什么坑，在此整理一下官方的集成文档，具体步骤如下
+
+> 导入文件
+
+> 添加头文件引用
+
+> 设置link标志Target-\>Build Setting ，Other Linker Flags 设置为 -all\_load 可能添加-all\_load以后和其他库冲突，可以尝试使用 -force\_load 单独load库, force\_load后面跟的是 lib库的完整路径 -force\_load $(SRCROOT)/***/libPaySdkColor.a (***\*需要按照你的库放置的路径决定)
+
+> 调用sdk显示，注意retain，自动释放以后，调用后会崩溃
+
+```
+self.sdk = [[[LLPaySdk alloc] init] autorealse]; // 创建
+self.sdk.sdkDelegate = self;  // 设置回调
+NSDictionary* signedDic = [payUtil signedOrderDic:orderParam andSignKey:md5key_or_rsakey] // 加过签名的订单字典
+[self.sdk presentPaySdkInViewController:rootVC withTraderInfo:signedDic];
+```
+
+> 编写结果回调
+
+```
+// 订单支付结果返回，主要是异常和成功的不同状态
+- (void)paymentEnd:(LLWalletPayResult)resultCode withResultDic:(NSDictionary *)dic
+```
+
+### SDK可配置部分
+
+iOS SDK可以通过修改资源bundle进行定制， 因为是在bundle里面，请在修改好以后clean proj，这样才会生效。
+
+> 1、图片的替换，在内部的图片可以替换修改位自己的样式
+
+> 2、颜色等的修改，可以修改default.css文件，支持#abcdef，123,123,123两种颜色表示
+
+> 3、修改值意义列表
+
+导航栏颜色：替换shoushi3.png文件，以及修改css文件中NavBar字段（后面只表示字段，都是在default.css文件中）中的background-color 导航栏标题：NavBar字段中的titleIconName; titleText
+
+### 注意有点坑的是这里，这是非第一次付款时弹出框的定制，框子的背景不能改，只能修改下颜色来和app搭配下
+
+修改的地方如下截图：
+
+![2](<https://allluckly.cn/images/blog/lianlianzhifu.png>)
+
+确认按钮：#a-button  
+ 取消按钮：#b-button  
+ 文本框：UITextField  
+ 弹出对话框的确认字体颜色: #TX-3
+
+官方原来的效果是下面这样的：
+
+![3](<https://allluckly.cn/images/blog/lianlianzhifu01.png>)
+
+修改后是这样的：
+
+![4](<https://allluckly.cn/images/blog/lianlianzhifu02.png>)
+
+### 参数字段部分
+
+参数说明在demo中有，可以参考。字段名和wap不一致，请参考demo中的参数说明，参数中的user\_id 不是商户号，是商户自己体系中的用户编号，前置卡输入时，no\_agree是通过API查询得到的绑卡序号
+
+## 使用部分
+
+Demo中的输入项，是用来测试各种支付条件，包括认证支付（输入姓名，身份证），前置支付（输入卡号，协议号）。不是必须，请根据自己的支付方式测试。 支持银行数量，是根据支付类型以及商户来，可以配置，请联系运营。 支付的验密方式（短信，手势码，支付密码）需要通过我们的服务器人员配置的，请联系相关服务器对接人员。
+
+### 常见问题
+
+签名请尽量使用服务器端签名，假如使用客户端签名，请使用Demo中的payutil
+
+> 1、运行直接崩溃
+
+答：sdk没有retain保管。
+
+> 2、sdk中使用了类扩展，请在other link flag中添加 -all\_load
+
+> 3、提示初始化错误
+
+答：1、检查环境和商户号等是否匹配；2、检查签名方法是否正确（参考签名工具）；3、订单信息是否有遗漏项；
+
+> 4、初始化常见错误提示，解释，以及应对方法
+
+1、所传的类型不是NSString  
+ 解释：连连的订单需要传入的订单格式为{“strkey”: “strvalue”, “strkey1″ : “strvalue2“}，请不要传递 {“key”: \[v1, v2\]} 或者 {“key”: {“ikey”:”v”}} 这种 应对，修改订单内值的格式，特别是risk\_item，需要变成 {“risk\_item”:”{\\”r\_key\\”:\\”v\\”}”}这样
+
+2、商户无此支付产品权限
+
+解释：我们的产品分为认证支付、快捷支付等多种支付方式。一种支付方式对应的包、支付调用方法、商户号都有所不同。  
+ 应对：先检查商户号是否是正确的商户号，比如 \<认证支付测试商户号 201408071000001543\> \<快捷支付测试商户号 201408071000001546\>   
+ 然后检查所对应的包或者调用方法对不对。在iOS中，已经提取了专门的调用方法。
+
+```
+// 快捷支付
+- (void)presentQuickPaySdkInViewController:(UIViewController*)viewController withTraderInfo:(NSDictionary*)traderInfo;
+// 认证支付
+- (void)presentVerifyPaySdkInViewController:(UIViewController*)viewController withTraderInfo:(NSDictionary*)traderInfo;
+```
+
+3、商户无此支付权限  
+ 解释：一个商户号对应的商品业务类型是有限的。  
+ 应对：修改 商户业务类型 busi\_partner 是 String(6) 虚拟商品销售：101001  
+ 实物商品销售：109001  
+ 外部账户充值：108001
+
+4、签名验证不对  
+ 解释：签名有特定规则，订单里面的特定参数参与签名。  
+ 应对：ios最新的Demo中提供了payUtil函数，直接调用，就能生成签名正确的订单。然后再次提醒，我们墙裂建议商户在服务器端完成签名操作。
+
+### 支付成功之后，不需要做额外的处理，后台那边通过回调地址已提交了，但集成的时候字典里边传的notify\_url为服务器的回调地址，此地址为后台人员集成连连支付时给。
+
+后面持续遇到到坑有必需申请商户产品配置表如下图：
+
+![3](<https://allluckly.cn/images/blog/lianlianzhifu04.jpg>)
+
+还有连连通银商户配置表如下图：
+
+![3](<https://allluckly.cn/images/blog/lianlianzhifu03.png>)
+
+最最坑爹的是“风险控制参数”，需要8个之多，而demo才写了一个，也没说要写其他的，参数如下：
+
+```
+/*
+frms_ware_category  *商品类目(固定2009)
+user_info_mercht_userno 商户用户唯一标识（token）
+user_info_bind_phone 绑定手机号(已有)
+user_info_dt_register 注册时间
+user_info_full_name  用户注册姓名（认证姓名）
+user_info_id_no 用户注册证件号码
+user_info_identify_state 是否实名认证 1是0非
+user_info_identify_type 实名认证方式
+*/
+
+
+```
+
+---
+
+> 好文推荐：[iOS开发之CollectionViewFlowLayout实现LOL皮肤选择动画](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao07>)
+
+> 原文地址：[https://allluckly.cn/](<https://allluckly.cn/>)
+
+版权归©Bison所有 如需转载请保留原文超链接地址！否则后果自负！
+{% endraw %}

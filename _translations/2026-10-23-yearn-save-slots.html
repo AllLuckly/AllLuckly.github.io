@@ -1,0 +1,55 @@
+---
+layout: guide
+author: Bison
+app_id: yearn
+title: 'Yearn save states: keep key progress in separate slots'
+description: Distinguish Save from Load, record different scenes in two slots and verify loading in the same session
+  and after reopening, avoiding overwriting your only progress.
+permalink: /en/guides/yearn-save-slots/
+date: 2026-10-23 00:00:00 +0800
+modified: 2026-10-23 00:00:00 +0800
+category: Tutorials
+level: Intermediate
+series_order: 11
+topic: Saved games and offline use
+reading_time: 8
+lang: en
+source_path: _posts/2026-10-23-yearn-save-slots.md
+source_url: /guides/yearn-save-slots/
+translation_method: machine-assisted
+translation_source_sha256: 3163c4173433770ab36237b18d379451177befbc6632623505ec483547752e8f
+excerpt: Distinguish Save from Load, record different scenes in two slots and verify loading in the same session
+  and after reopening, avoiding overwriting your only progress.
+translation_date: '2026-10-23T02:34:09+00:00'
+---
+{% raw %}
+<p>Save states create checkpoints at identifiable moments, such as before a level, after an action sequence, or before new settings. Yearn's save list provides multiple slots. This article distinguishes saving from loading and verifies the scene a record restores instead of assuming that a timestamp means progress is safe.</p>
+<h2 id="先分清两种按钮的方向">Understand the two buttons' directions first</h2>
+<p>The save list in the game menu commonly offers Save and Load. Save writes the current runtime state into the slot; Load brings the slot's state into the running game. One changes the saved record, the other changes the current game. Pressing Save when you intended to restore old progress may overwrite it with the present scene.</p>
+<p>Learn with one practice game and an empty slot. Write 'store = Save; restore = Load' in your notes and remember the current slot number. Do not make your first experiment on the only save from a long game or tap a button simply because its color is prominent. Read the action name first.</p>
+<h2 id="给槽位安排不同用途">Give slots different purposes</h2>
+<p>Use the first slot for a fixed milestone, the second for current practice, and another for temporary comparisons. The app need not name their purposes automatically. Record them yourself, such as Before Level Two, Before Jump Practice, or Before Speed Adjustment. Then Slot and a timestamp are enough to identify each record.</p>
+<p>Multiple slots preserve different checkpoints, not repeated copies of one state. Before saving, check the character's position, current menu, and existing timestamps. If you cannot explain why a slot should be overwritten, choose an empty one first. Verify the new record before deciding whether the old one is still needed.</p>
+<h2 id="保存后用场景变化确认读回">Verify loading through scene changes after saving</h2>
+<p>Save at a recognizable position, return to the game, and move forward slightly or open another menu. Reopen the same slot, tap Load, and observe whether the scene returns. Character direction, objects, or menu options can be references, provided the before and after states are clearly distinct.</p>
+<p>If the timestamp changes but the loaded picture does not visibly change, the two states may be too similar or loading may have failed. Try a more recognizable checkpoint and watch for errors or a waiting state. Do not judge by repeatedly pressing Load; allow time to observe each operation.</p>
+<h2 id="同次运行成功以后再检查重新进入">After success within one run, check reopening</h2>
+<p>After the first successful load, exit safely through the game menu, reenter the same game, and inspect whether the slots remain. This differs from testing in one run: it checks whether the app finds the associated records when it identifies the game again.</p>
+<p>Rescanning, renaming, reimporting, and changing devices all require rechecking game-to-save associations. Complete this check on first use. If slots are empty after reopening, retain current app data and originals. Do not delete the game and retry or create many new records that overwrite useful diagnostic clues.</p>
+<h2 id="游戏版本与核心变化要保守处理">Treat game-version and core changes cautiously</h2>
+<p>Save states are generally tied to the game data and emulation state at the time. Do not assume another regional version, modification, or file sharing the same name can load an old slot. After app or core updates, test copies and noncritical records first. Identical filenames do not establish complete identity.</p>
+<p>Keep the relationship among original ROM, app version, save time, and slot purpose. It is more helpful than only a Save Successful screenshot. Before trying another edition, make an independent backup rather than silently replacing active content through same-name overwriting.</p>
+<h2 id="覆盖旧槽位前先检查场景">Check the scene before overwriting an old slot</h2>
+<p>Before overwriting an old slot, recall its purpose and compare the displayed time. If the character is in a failed state, pause menu, or temporary test scene, choose another empty slot rather than replacing a reliable milestone.</p>
+<p>Before a key scene, place a reliable milestone in a separately documented slot and use another slot for repeated temporary attempts. The list selects current records; it does not automatically retain history before every overwrite. Read the slot's purpose before deciding whether its old record is worth replacing.</p>
+<h2 id="常见问题与完成检查">Questions and final checks</h2>
+<p><strong>Why is Load unavailable?</strong> Check whether the slot contains a record or shows Empty. An empty slot has nothing to load. If an existing record cannot load, note the game version, slot number, and error instead of overwriting it first.</p>
+<p><strong>Does a missing slot after exit mean its file was definitely deleted?</strong> Not necessarily. The visible list and its association with underlying records are different matters. Retain data and begin with backup and diagnosis instead of reinstalling and potentially removing material that still exists.</p>
+<p>At completion, you should have two slots with different purposes, at least one verified scene restoration, and a record of the result after reopening. Apply the process to important progress only after confirming those facts. Keep failures as unresolved issues rather than replacing checks with 'it should have saved.'</p>
+<h2 id="让两个检查点保持清楚差异">Keep two checkpoints visibly distinct</h2>
+<p>Put one checkpoint before a level and another at a recognizable place within it. After loading, compare scene, character position, and menu state rather than only time. If the records are too similar, create an obvious difference in the practice copy and check again so nearly identical pictures do not make the button seem ineffective.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p>Continue reading <a href="/en/guides/yearn-autosave-battery/">In-game saving and loading</a> and <a href="/en/guides/yearn-backup-delete/">Back up before deleting</a>.</p>
+<p>Information dated October 23, 2026. Public release information comes from  <a href="https://apps.apple.com/cn/app/id6756637059">Yearn App Store description</a> and  <a href="https://itunes.apple.com/lookup?id=6756637059&amp;country=cn">Apple release lookup</a>, and lists version 1.0.2. Check compatibility with your game and saved state using the save, exit and load steps in this guide.</p>
+
+{% endraw %}

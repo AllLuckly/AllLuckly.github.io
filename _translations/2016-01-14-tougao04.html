@@ -1,0 +1,210 @@
+---
+layout: post
+title: Recreating an animation from the National Geographic iOS app
+description: Breaks down a National Geographic-inspired pop-up page animation into status-bar hiding, view dragging
+  and spring-back, navigation-bar coordination and back-button colour changes. The implementation follows how several
+  interface layers move together.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-01-14 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Breaks down a National Geographic-inspired pop-up page animation into status-bar hiding, view dragging
+    and spring-back, navigation-bar coordination and back-button colour changes. The implementation follows how
+    several interface layers move together.
+  keywords:
+  - UIView animation
+  - drag gestures
+  - navigation bar
+  - status bar
+  provenance: contribution
+  author_name: WzxJiang
+  source_url: http://www.jianshu.com/p/e6dfc28e0e39
+  credit: Originally credited to WzxJiang; edited and archived by Bison.
+  title: Recreating an animation from the National Geographic iOS app
+  source_sha256: 6d20dc811875b1ac855c9014626956b405de70769273f413beeaf707f5384dcb
+lang: en
+source_path: _posts/2016-01-14-tougao04.md
+source_url: /%E6%8A%95%E7%A8%BF/tougao04
+permalink: /en/journal/2016-01-14-recreating-an-animation-from-the-national-geographic-ios-app/
+translation_method: machine-assisted
+translation_source_sha256: 6d20dc811875b1ac855c9014626956b405de70769273f413beeaf707f5384dcb
+excerpt: Breaks down a National Geographic-inspired pop-up page animation into status-bar hiding, view dragging
+  and spring-back, navigation-bar coordination and back-button colour changes. The implementation follows how several
+  interface layers move together.
+translation_date: '2026-10-23T02:34:12+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/e6dfc28e0e39">WzxJiang</a><br/></p>
+<blockquote>
+<p>"This recreates a view pop-up animation from the National Geographic app. It looks simple, but there are many details. Let us go straight to the explanation."</p>
+</blockquote>
+<p><br/>
+A few days ago, the product team gave me this requirement:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao04/1.gif"/><br/></p>
+<p>This recreates a view pop-up animation from the National Geographic app. It looks simple, but there are many details. Let us go straight to the explanation.<br/></p>
+<h3 id="把这个gif分解可以看出这个view弹出的时候有这几步">Breaking down the gif shows these steps when the view appears:<br/></h3>
+<blockquote>
+<p>Hide the status bar.<br/></p>
+</blockquote>
+<blockquote>
+<p>Present the view.<br/></p>
+</blockquote>
+<blockquote>
+<p>The view can be dragged. Dragging upward far enough reveals a navigation bar that aligns exactly with the view; dragging downward produces a bounce.<br/></p>
+</blockquote>
+<blockquote>
+<p>A back button at the top-left corner changes color as the navigation bar appears.<br/></p>
+</blockquote>
+<h4 id="让我们一步步来解决">Let us work through it step by step.<br/></h4>
+<p>1. Hide the status bar.<br/></p>
+<p>The following method solves it.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">prefersStatusBarHidden</span>
+<span class="p">{</span>
+    <span class="err">return</span> <span class="err">YES;//隐藏为YES，显示为NO</span>
+<span class="p">}</span></code></pre></figure>
+<p>2. Present the view.<br/></p>
+<p>This is straightforward, so here is the code.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="nt">如果_popView不存在</span> <span class="nt">创建</span>
+<span class="nt">if</span> <span class="o">(!</span><span class="nt">_popView</span><span class="o">)</span>
+<span class="p">{</span>
+    <span class="err">_popView</span> <span class="err">=</span> <span class="err">({</span>
+        <span class="err">UIView</span> <span class="err">*</span> <span class="err">popView</span> <span class="err">=</span> <span class="err">[[UIView</span> <span class="err">alloc]</span><span class="py">initWithFrame</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="n">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span><span class="n">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">)];</span>
+
+        <span class="err">popView.backgroundColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="py">colorWithWhite</span><span class="p">:</span><span class="m">0</span> <span class="n">alpha</span><span class="p">:</span><span class="m">0.1</span><span class="p">];</span>
+
+        <span class="err">popView.userInteractionEnabled</span> <span class="err">=</span> <span class="err">YES;</span>
+
+        <span class="err">popView;</span>
+    <span class="p">}</span><span class="o">);</span>
+
+    <span class="nt">_popSubView</span> <span class="o">=</span> <span class="o">(</span><span class="p">{</span>
+        <span class="err">UIView</span> <span class="err">*</span> <span class="err">popSubView</span> <span class="err">=</span> <span class="err">[[UIView</span> <span class="err">alloc]</span><span class="py">initWithFrame</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">)];</span>
+
+        <span class="err">[popSubView</span> <span class="py">addGestureRecognizer</span><span class="p">:[[</span><span class="n">UIPanGestureRecognizer</span> <span class="n">alloc</span><span class="p">]</span><span class="n">initWithTarget</span><span class="p">:</span><span class="n">self</span> <span class="n">action</span><span class="p">:</span><span class="err">@</span><span class="n">selector</span><span class="p">(</span><span class="n">pan</span><span class="p">:)]];</span>
+
+        <span class="err">popSubView.backgroundColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="err">whiteColor];</span>
+
+        <span class="err">popSubView;</span>
+    <span class="p">}</span><span class="o">);</span>
+        <span class="o">[</span><span class="nt">_popView</span> <span class="nt">addSubview</span><span class="nd">:_popSubView</span><span class="o">];</span>
+    <span class="err">}</span>
+
+    <span class="o">[</span><span class="nt">self</span><span class="nc">.view</span> <span class="nt">addSubview</span><span class="nd">:_popView</span><span class="o">];</span>
+
+    <span class="o">[</span><span class="nt">UIView</span> <span class="nt">animateWithDuration</span><span class="o">:</span><span class="err">0</span><span class="o">.</span><span class="err">5</span> <span class="nt">delay</span><span class="o">:</span><span class="err">0</span> <span class="nt">options</span><span class="nd">:UIViewAnimationOptionCurveEaseInOut</span> <span class="nt">animations</span><span class="o">:^</span><span class="p">{</span>
+
+        <span class="err">CGRect</span> <span class="err">rect</span>    <span class="err">=</span> <span class="err">_popSubView.frame;</span>
+        <span class="err">rect.origin.y</span>  <span class="err">=</span> <span class="err">self.view.frame.size.height/3.0;</span>
+        <span class="err">_popSubView.frame</span> <span class="err">=</span> <span class="err">rect;</span>
+
+    <span class="p">}</span> <span class="nt">completion</span><span class="o">:^(</span><span class="nt">BOOL</span> <span class="nt">finished</span><span class="o">)</span> <span class="p">{</span>
+
+    <span class="p">}</span><span class="o">];</span>
+<span class="err">}</span></code></pre></figure>
+<p>3. The view can be dragged. Dragging upward far enough reveals a navigation bar that aligns exactly with the view; dragging downward produces a bounce.<br/>
+We have already added the drag gesture above.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">[</span><span class="nt">popSubView</span> <span class="nt">addGestureRecognizer</span><span class="o">:[[</span><span class="nt">UIPanGestureRecognizer</span> <span class="nt">alloc</span><span class="o">]</span><span class="nt">initWithTarget</span><span class="nd">:self</span> <span class="nt">action</span><span class="o">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">pan</span><span class="p">:)]];</span></code></pre></figure>
+<p><br/>
+Here is all the code for this method. The comments should make it understandable.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">pan</span><span class="o">:(</span><span class="nt">UIPanGestureRecognizer</span> <span class="o">*)</span><span class="nt">sender</span>
+<span class="p">{</span>
+    <span class="err">//手指在self.view上的偏移量</span>
+    <span class="err">CGPoint</span> <span class="err">trans</span> <span class="err">=</span> <span class="err">[sender</span> <span class="py">translationInView</span><span class="p">:</span><span class="n">sender</span><span class="p">.</span><span class="n">view</span><span class="p">];</span>
+
+    <span class="err">CGPoint</span> <span class="err">oldCenter</span> <span class="err">=</span> <span class="err">sender.view.center;</span>
+
+    <span class="err">oldCenter.y</span> <span class="err">+=</span> <span class="err">trans.y;</span>
+
+    <span class="err">//设置view最高点</span>  <span class="err">self.navigationController.navigationBar.frame.size.height使得View能完美切合</span>
+    <span class="err">if</span> <span class="err">(oldCenter.y</span> <span class="err">&lt;=</span> <span class="err">self.view.center.y</span> <span class="err">+</span> <span class="err">self.navigationController.navigationBar.frame.size.height)</span>
+    <span class="err">{</span>
+        <span class="err">oldCenter.y</span> <span class="err">=</span> <span class="err">self.view.center.y</span> <span class="err">+</span> <span class="err">self.navigationController.navigationBar.frame.size.height;</span>
+        <span class="err">//使导航栏以动画效果显示</span>
+        <span class="err">[self.navigationController</span> <span class="py">setNavigationBarHidden</span><span class="p">:</span><span class="n">NO</span> <span class="n">animated</span><span class="p">:</span><span class="n">YES</span><span class="p">];</span>
+        <span class="err">[_backBtn</span> <span class="py">setBackgroundImage</span><span class="p">:[</span><span class="n">UIImage</span> <span class="n">imageNamed</span><span class="p">:</span><span class="err">@</span><span class="s1">"back"</span><span class="p">]</span> <span class="n">forState</span><span class="p">:</span><span class="n">UIControlStateNormal</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="nt">else</span>
+    <span class="p">{</span>
+        <span class="err">[self.navigationController</span> <span class="py">setNavigationBarHidden</span><span class="p">:</span><span class="n">YES</span> <span class="n">animated</span><span class="p">:</span><span class="n">YES</span><span class="p">];</span>
+        <span class="err">[_backBtn</span> <span class="py">setBackgroundImage</span><span class="p">:[</span><span class="n">UIImage</span> <span class="n">imageNamed</span><span class="p">:</span><span class="err">@</span><span class="s1">"back(white)"</span><span class="p">]</span> <span class="n">forState</span><span class="p">:</span><span class="n">UIControlStateNormal</span><span class="p">];</span>
+    <span class="p">}</span>
+
+    <span class="o">//</span><span class="nt">设置view最低点</span> <span class="err">＋50</span><span class="nt">是为了回弹效果</span>
+    <span class="nt">if</span><span class="o">(</span><span class="nt">oldCenter</span><span class="nc">.y</span>  <span class="o">&gt;</span> <span class="nt">self</span><span class="nc">.view.center.y</span> <span class="o">+</span> <span class="nt">self</span><span class="nc">.view.frame.size.height</span><span class="o">/</span><span class="err">3</span><span class="o">.</span><span class="err">0</span> <span class="o">+</span> <span class="err">50</span><span class="o">)</span>
+    <span class="p">{</span>
+        <span class="err">oldCenter.y</span> <span class="err">=</span> <span class="err">self.view.center.y</span> <span class="err">+</span> <span class="err">self.view.frame.size.height/3.0</span> <span class="err">+</span> <span class="err">50;</span>
+    <span class="p">}</span>
+
+    <span class="o">//</span><span class="nt">回弹效果</span>
+    <span class="nt">if</span> <span class="o">(</span><span class="nt">sender</span><span class="nc">.state</span> <span class="o">==</span> <span class="nt">UIGestureRecognizerStateEnded</span><span class="o">)</span>
+    <span class="p">{</span>
+        <span class="err">if(oldCenter.y</span>  <span class="err">&gt;=</span> <span class="err">self.view.center.y</span> <span class="err">+</span> <span class="err">self.view.frame.size.height/3.0)</span>
+        <span class="err">{</span>
+            <span class="err">oldCenter.y</span> <span class="err">=</span> <span class="err">self.view.center.y</span> <span class="err">+</span> <span class="err">self.view.frame.size.height/3.0;</span>
+        <span class="p">}</span>
+
+        <span class="o">[</span><span class="nt">UIView</span> <span class="nt">animateWithDuration</span><span class="o">:</span><span class="err">0</span><span class="o">.</span><span class="err">3</span> <span class="nt">delay</span><span class="o">:</span><span class="err">0</span> <span class="nt">options</span><span class="nd">:UIViewAnimationOptionCurveEaseInOut</span> <span class="nt">animations</span><span class="o">:^</span><span class="p">{</span>
+            <span class="err">sender.view.center</span> <span class="err">=</span> <span class="err">oldCenter;</span>
+        <span class="p">}</span> <span class="nt">completion</span><span class="o">:^(</span><span class="nt">BOOL</span> <span class="nt">finished</span><span class="o">)</span> <span class="p">{</span>
+
+        <span class="p">}</span><span class="o">];</span>
+    <span class="err">}</span>
+    <span class="nt">else</span>
+    <span class="p">{</span>
+        <span class="err">sender.view.center</span> <span class="err">=</span> <span class="err">oldCenter;</span>
+    <span class="p">}</span>
+    <span class="o">[</span><span class="nt">sender</span> <span class="nt">setTranslation</span><span class="nd">:CGPointZero</span> <span class="nt">inView</span><span class="nd">:sender</span><span class="nc">.view</span><span class="o">];</span>
+<span class="err">}</span></code></pre></figure>
+<p><br/>
+4. A back button at the top-left corner changes color as the navigation bar appears.<br/></p>
+<p>For the button to remain above the navigation bar, it must be added to the window. There are two ways to change its color:<br/></p>
+<p>Draw a CAlayer; the color-change animation will look more realistic.<br/></p>
+<p>I used the second approach here: prepare icons in two colors and change the btn's background image.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">if</span> <span class="o">(!</span><span class="nt">_backBtn</span><span class="o">)</span>
+<span class="p">{</span>
+    <span class="err">_backBtn</span> <span class="err">=</span> <span class="err">({</span>
+
+        <span class="err">UIButton</span> <span class="err">*</span> <span class="err">backBtn</span> <span class="err">=</span> <span class="err">[UIButton</span> <span class="py">buttonWithType</span><span class="p">:</span><span class="n">UIButtonTypeCustom</span><span class="p">];</span>
+
+        <span class="err">backBtn.frame</span> <span class="err">=</span> <span class="err">CGRectMake(10,</span> <span class="err">10,</span> <span class="err">13,</span> <span class="err">self.navigationController.navigationBar.frame.size.height</span> <span class="err">-</span> <span class="err">20);</span>
+
+        <span class="err">[backBtn</span> <span class="py">addTarget</span><span class="p">:</span><span class="n">self</span> <span class="n">action</span><span class="p">:</span><span class="err">@</span><span class="n">selector</span><span class="p">(</span><span class="n">hidePopView</span><span class="p">)</span> <span class="n">forControlEvents</span><span class="p">:</span><span class="n">UIControlEventTouchUpInside</span><span class="p">];</span>
+
+        <span class="err">[backBtn</span> <span class="py">setBackgroundImage</span><span class="p">:[</span><span class="n">UIImage</span> <span class="n">imageNamed</span><span class="p">:</span><span class="err">@</span><span class="s1">"back(white)"</span><span class="p">]</span> <span class="n">forState</span><span class="p">:</span><span class="n">UIControlStateNormal</span><span class="p">];</span>
+
+        <span class="err">backBtn;</span>
+    <span class="p">}</span><span class="o">);</span>
+<span class="err">}</span>
+<span class="o">[[</span><span class="nt">UIApplication</span> <span class="nt">sharedApplication</span><span class="o">]</span><span class="nc">.windows</span><span class="o">[</span><span class="err">0</span><span class="o">]</span> <span class="nt">addSubview</span><span class="nd">:_backBtn</span><span class="o">];</span></code></pre></figure>
+<p>Hiding it is simple.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">hidePopView</span>
+<span class="p">{</span>
+    <span class="err">[UIView</span> <span class="py">animateWithDuration</span><span class="p">:</span><span class="m">0.5</span> <span class="n">delay</span><span class="p">:</span><span class="m">0</span> <span class="n">options</span><span class="p">:</span><span class="n">UIViewAnimationOptionCurveEaseInOut</span> <span class="n">animations</span><span class="p">:</span><span class="err">^{</span>
+
+        <span class="n">CGRect</span> <span class="n">rect</span>    <span class="err">=</span> <span class="n">_popSubView</span><span class="p">.</span><span class="n">frame</span><span class="p">;</span>
+        <span class="err">rect.origin.y</span>  <span class="err">=</span> <span class="err">self.view.frame.size.height;</span>
+        <span class="err">_popSubView.frame</span> <span class="err">=</span> <span class="err">rect;</span>
+        <span class="err">if</span> <span class="err">(self.navigationController.navigationBarHidden</span> <span class="err">==</span> <span class="err">NO)</span>
+        <span class="err">{</span>
+        <span class="err">[self.navigationController</span> <span class="py">setNavigationBarHidden</span><span class="p">:</span><span class="n">YES</span> <span class="n">animated</span><span class="p">:</span><span class="n">YES</span><span class="p">];</span>
+        <span class="p">}</span>
+        <span class="o">[</span><span class="nt">_backBtn</span> <span class="nt">removeFromSuperview</span><span class="o">];</span>
+
+    <span class="err">}</span> <span class="nt">completion</span><span class="o">:^(</span><span class="nt">BOOL</span> <span class="nt">finished</span><span class="o">)</span> <span class="p">{</span>
+
+        <span class="err">[self</span> <span class="err">changeBarStatus];</span>
+        <span class="err">[_popView</span> <span class="err">removeFromSuperview];</span>
+
+    <span class="p">}</span><span class="o">];</span>
+<span class="err">}</span></code></pre></figure>
+<p><br/></p>
+<p>Use this directly as the btn's tap handler.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">[</span><span class="nt">backBtn</span> <span class="nt">addTarget</span><span class="nd">:self</span> <span class="nt">action</span><span class="o">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">hidePopView</span><span class="p">)</span> <span class="n">forControlEvents</span><span class="p">:</span><span class="n">UIControlEventTouchUpInside</span><span class="p">];</span></code></pre></figure>
+<p>Complete code<br/>
+GitHub: <a href="https://github.com/Wzxhaha">Wzxhaha</a><br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-01-13-bison-s-guide-to-ios-multithreading-part-1/">Bison's guide to iOS multithreading, part 1</a><br/></p>
+
+{% endraw %}

@@ -1,0 +1,69 @@
+---
+layout: post
+title: A small iOS scrolling demo inspired by Zhe800
+description: Uses a Zhe800-style scrolling interaction to demonstrate recording contentOffset when dragging begins
+  and comparing offsets in scroll callbacks to determine direction. An example project shows how the interface elements
+  respond together.
+imagefeature: ''
+imagecredit: null
+imagecreditlink: ''
+published: true
+date: 2015-06-15 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Uses a Zhe800-style scrolling interaction to demonstrate recording contentOffset when dragging begins
+    and comparing offsets in scroll callbacks to determine direction. An example project shows how the interface
+    elements respond together.
+  keywords:
+  - UIScrollView
+  - contentOffset
+  - scroll direction
+  - delegate callbacks
+  provenance: archive
+  credit: The original does not clearly identify an author. Retained as a historical article.
+  title: A small iOS scrolling demo inspired by Zhe800
+  source_sha256: b067cba25f1fce147fc0100eb3ea5e2d02c914b18bb80445776e818898164b71
+category: Development notes
+lang: en
+source_path: _posts/2015-06-15-类似折800功能中的一个小Demo.md
+source_url: /uiscrollview/%E7%B1%BB%E4%BC%BC%E6%8A%98800%E5%8A%9F%E8%83%BD%E4%B8%AD%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8FDemo
+permalink: /en/journal/2015-06-15-a-small-ios-scrolling-demo-inspired-by-zhe800/
+translation_method: machine-assisted
+translation_source_sha256: b067cba25f1fce147fc0100eb3ea5e2d02c914b18bb80445776e818898164b71
+excerpt: Uses a Zhe800-style scrolling interaction to demonstrate recording contentOffset when dragging begins and
+  comparing offsets in scroll callbacks to determine direction. An example project shows how the interface elements
+  respond together.
+translation_date: '2026-10-23T02:34:09+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"The beginning is the most important part of the work."
+<small><cite title="Plato">Plato</cite></small></p>
+</blockquote>
+<p>– Core code –</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">scrollViewWillBeginDragging</span><span class="o">:(</span><span class="nt">UIScrollView</span><span class="o">*)</span><span class="nt">scrollView</span><span class="p">{</span>
+
+    <span class="err">//使用的时候用全局变量</span>
+    <span class="err">CGFloat</span> <span class="err">lastContentOffset</span> <span class="err">=</span> <span class="err">scrollView.contentOffset.y;</span>
+<span class="p">}</span>
+
+
+<span class="nt">-</span><span class="o">(</span> <span class="nt">void</span> <span class="o">)</span><span class="nt">scrollViewDidScroll</span><span class="o">:(</span> <span class="nt">UIScrollView</span> <span class="o">*)</span><span class="nt">scrollView</span> <span class="p">{</span>
+    
+    <span class="err">if</span> <span class="err">(scrollView.contentOffset.y</span> <span class="err">&lt;</span> <span class="err">lastContentOffset</span> <span class="err">)</span>
+    <span class="err">{</span>
+
+        <span class="err">//向上</span>
+        <span class="err">NSLog(@"向上");</span>
+
+    <span class="p">}</span> <span class="nt">else</span> <span class="nt">if</span> <span class="o">(</span><span class="nt">scrollView</span><span class="o">.</span> <span class="nt">contentOffset</span><span class="nc">.y</span> <span class="o">&gt;</span><span class="nt">lastContentOffset</span> <span class="o">)</span><span class="p">{</span>
+        <span class="err">//向下</span>
+        <span class="err">NSLog(@"向下");</span>
+    <span class="p">}</span>
+<span class="err">}</span></code></pre></figure>
+<blockquote>
+<p><a href="https://github.com/AllLuckly/LBMoviesPossession">Click here → download the demo</a> <br/></p>
+</blockquote>
+<p><img alt="(LBMoviesPossession)" src="https://github.com/AllLuckly/LBMoviesPossession/blob/master/Move.gif?raw=true"/></p>
+
+{% endraw %}

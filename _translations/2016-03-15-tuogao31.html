@@ -1,0 +1,179 @@
+---
+layout: post
+title: Building a WeChat-style iOS app, part 7
+description: Breaks down the chat input bar and message cells, using blocks to send submission and visibility events
+  to the controller. Message ownership determines avatars and stretchable bubble backgrounds, while model-side sizing
+  accommodates messages of different lengths.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-03-15 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Breaks down the chat input bar and message cells, using blocks to send submission and visibility events
+    to the controller. Message ownership determines avatars and stretchable bubble backgrounds, while model-side
+    sizing accommodates messages of different lengths.
+  keywords:
+  - chat interface
+  - UITableViewCell
+  - bubble layout
+  - block
+  - dynamic row heights
+  provenance: contribution
+  author_name: WzxJiang
+  source_url: http://www.jianshu.com/users/389c20d5a244/latest_articles
+  author_url: http://www.jianshu.com/users/389c20d5a244/latest_articles
+  credit: Originally credited to WzxJiang; edited and archived by Bison.
+  title: Building a WeChat-style iOS app, part 7
+  source_sha256: bd6f224f804a5d8d2353b8054351d837a472f0d2f41fa1eb2fc9c192daa3fe03
+lang: en
+source_path: _posts/2016-03-15-tuogao31.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao31
+permalink: /en/journal/2016-03-15-building-a-wechat-style-ios-app-part-7/
+translation_method: machine-assisted
+translation_source_sha256: bd6f224f804a5d8d2353b8054351d837a472f0d2f41fa1eb2fc9c192daa3fe03
+excerpt: Breaks down the chat input bar and message cells, using blocks to send submission and visibility events
+  to the controller. Message ownership determines avatars and stretchable bubble backgrounds, while model-side sizing
+  accommodates messages of different lengths.
+translation_date: '2026-10-23T02:34:14+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/users/389c20d5a244/latest_articles">WzxJiang</a><br/></p>
+<blockquote>
+<p>"I built the chat page a few days ago, which took considerable work. Using RongCloud IM and a LeanCloud server meant implementing several normally server-side algorithms on the client. Today I will explain the chat UI rather than the algorithms. Questions and better approaches are welcome in the comments."</p>
+</blockquote>
+<p><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao12/1.png"/><br/></p>
+<p>Result:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao31/1.gif"/><br/></p>
+<p>1. Building the bottom chat bar<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao31/2.png"/><br/></p>
+<p>I decouple the interface using a custom View. Its ShowBlock, HideBlock and SendBlock let the VC respond to showing, hiding and sending from the chat bar.
+The preceding article explained observing keyboard show/hide events and moving the bar smoothly with it.<a href="/en/journal/2016-03-14-building-a-wechat-style-ios-app-part-6/">Build WeChat Yourself, Part 6: problems encountered so far</a>.</p>
+<p>2. Creating cells<br/></p>
+<p>This is how I create chat cells in WWeChat:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao31/3.png"/><br/></p>
+<p>There are two ImageViews here. I hide one depending on whether the message is mine or the other person’s.
+Because height varies, anchor constraints from the upper-left or upper-right corner.</p>
+<p>3. Creating message bubbles<br/></p>
+<p>The bubble’s starting X coordinate, width and height vary, so creating it in a Xib would be troublesome.<br/>
+So I handle it as follows:<br/>
+In Cell.m, create self.bubbleView manually according to whether the message is mine.<br/>
+    //如果是你
+    if (model.isMe)
+    {
+        [_AiConView removeFromSuperview];</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    [_BiConView setImageWithURL:[NSURL URLWithString:[[UserInfoManager manager]avaterUrl]] placeholderImage:[UIImage imageNamed:@"avater.jpg"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+
+    }];
+    self.bubbleView.frame = CGRectMake([UIScreen mainScreen].bounds.size.width - 40 - 10 - 5 - width,10,width,height);
+    UIImage * bubbleImg = [UIImage imageNamed:@"SenderTextNodeBkg"];
+    UIEdgeInsets insets = UIEdgeInsetsMake(30, 15,30,15);
+    UIImage *insetImage = [bubbleImg resizableImageWithCapInsets:insets];
+    self.bubbleView.image = insetImage;
+}
+else
+{
+    [_BiConView removeFromSuperview];
+
+    self.bubbleView.frame = CGRectMake(10 + 40 + 5,10,width,height);
+    UIImage * bubbleImg = [UIImage imageNamed:@"ReceiverTextNodeBkgHL"];
+    UIEdgeInsets insets = UIEdgeInsetsMake(30, 15,30,15);
+    UIImage *insetImage = [bubbleImg resizableImageWithCapInsets:insets];
+    self.bubbleView.image = insetImage;
+}
+[self.contentView addSubview:_bubbleView];
+</code></pre></div></div>
+<p><br/></p>
+<p>resizableImageWithCapInsets controls which parts of the bubble do not stretch. Its values depend on the image’s actual pixels.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>UIEdgeInsets insets = {top, left, bottom, right};
+</code></pre></div></div>
+<p><br/>
+Then add the Label manually.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>UILabel * messageLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 3, _bubbleView.frame.size.width - 40, _bubbleView.frame.size.height - 12)];
+messageLabel.font = [UIFont systemFontOfSize:14];
+
+messageLabel.text = model.message;
+
+messageLabel.numberOfLines = 0;
+
+[_bubbleView addSubview:messageLabel];
+</code></pre></div></div>
+<p><br/>
+3. Automatic cell sizing<br/>
+I used a shortcut to make the cell size adapt automatically.<br/>
+I added a bubbleSize property to MessageModel.<br/>
+    - (void)setMessage:(NSString *)message
+    {
+        _message = message;
+        self.bubbleSize = [self giveSizeForStr:self.message];
+    }</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (CGSize)giveSizeForStr:(NSString *)str
+{
+    UIFont * font = [UIFont systemFontOfSize:14.0];
+    NSDictionary * dic = [NSDictionary dictionaryWithObjectsAndKeys:font,NSFontAttributeName,nil];
+    CGSize size = [str boundingRectWithSize:CGSizeMake(200 - 20 - 20, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:dic context:nil].size;
+
+    return CGSizeMake(size.width + 40, size.height + 20);
+}
+</code></pre></div></div>
+<p><br/>
+When assigning message in the model, calculate the cell’s height. Adding 40 to width and 20 to height accounts for margins between the text and bubble.<br/>
+Then, in the VC:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSDictionary * dic = _dataArr[indexPath.section];
+    NSArray * arr = dic[@"messages"];
+    MessageModel * model = arr[indexPath.row];
+    return model.bubbleSize.height &gt; 40 ? model.bubbleSize.height + 20: 40+20;
+}
+</code></pre></div></div>
+<p><br/>
+The bubble needs at least 40px. Adding 20 compensates for distortion when stretching it.<br/></p>
+<p>4. Creating time labels<br/>
+My algorithm groups messages less than 60 seconds apart into one array. A message already assigned to one array cannot enter another. Then set each group’s header view.
+P.S. For the algorithm, see the method in WWeChatApi:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)getMessagesWithConversationID:(NSString *)conversationID andNum:(int)num andType:(RCConversationType)type AndSuccess:(void (^)(NSArray * messageArr))successBlock
+andFailure:(void(^)())failureBlock
+andError:(void(^)(NSError * error))errorBlock;
+</code></pre></div></div>
+<p><br/>
+Method for setting the header view<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UIView * headerView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 40)];
+
+    UILabel *timeLabel = [[UILabel alloc]initWithFrame:CGRectMake((self.view.frame.size.width - 60)/2.0, 10, 60, 20)];
+
+    NSDictionary * dic = _dataArr[section];
+
+    timeLabel.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
+    timeLabel.layer.cornerRadius = 5;
+    timeLabel.clipsToBounds = YES;
+
+    double times = [dic[@"timestamp"]doubleValue];
+
+    timeLabel.text = [[WZXTimeStampToTimeTool tool]compareWithTimeDic:[[WZXTimeStampToTimeTool tool]timeStampToTimeToolWithTimeStamp:times andScale:3]];
+
+    timeLabel.font = [UIFont systemFontOfSize:12];
+
+    timeLabel.textColor = [UIColor whiteColor];
+
+    timeLabel.textAlignment = NSTextAlignmentCenter;
+
+    [headerView addSubview:timeLabel];
+
+    return headerView;
+}
+</code></pre></div></div>
+<p><br/>
+WZXTimeStampToTimeTool is a utility I wrote to compare a timestamp with local time and convert it into a string quickly.<br/>
+I use double for the NSTimeInterval timestamp. Other types, such as NSInteger, can produce an incorrect value on the 5 and 5s, showing a date 46 years ago in 1970. double is NSTimeInterval’s underlying type: typedef double NSTimeInterval;<br/></p>
+<p>That is all for today. If you have questions about other areas, comment and I will explain them next time.<br/>1</p>
+<h3 id="完整代码">Complete code<br/></h3>
+<p><a href="https://github.com/Wzxhaha/WWeChat">Download here—GitHub: WzxJiang</a><br/></p>
+<p>If you like the project, please Star or Fork it!<br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-02-01-a-beginner-developer-s-review-of-2015/">A beginner developer's review of 2015</a><br/></p>
+
+{% endraw %}

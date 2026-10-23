@@ -1,0 +1,74 @@
+---
+layout: null
+permalink: /en/journal/2015-09-29-practical-lessons-from-localising-an-ios-app/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Practical lessons from localising an iOS app
+agent_source_url: https://allluckly.cn/en/journal/2015-09-29-practical-lessons-from-localising-an-ios-app/
+agent_source_sha256: 8eae03bd20db8b11ef6e2c690acc774cf53ee8f81dc9db27834977ec19d5a84f
+agent_generator_version: 1
+---
+{% raw %}# Practical lessons from localising an iOS app
+
+Language: en
+Canonical: [Practical lessons from localising an iOS app](<https://allluckly.cn/en/journal/2015-09-29-practical-lessons-from-localising-an-ios-app/>)
+中文：[中文 HTML](<https://allluckly.cn/ios%E4%B9%8B%E5%9B%BD%E9%99%85%E5%8C%96/On-the-experience-of-the-international-experience-of-iOS>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-09-29-practical-lessons-from-localising-an-ios-app/>)
+Published: 2015-09-29T00:00:00+08:00
+Modified: 2026-10-23T10:44:59+08:00
+Author: [Bison](<https://allluckly.cn/about/>)
+
+Reviews translation-file organisation, button-label length, language-region identifiers and localised image names. It focuses on how the language identifier changes in iOS 9 affected logic that detected Chinese in a multilingual project.
+
+Originally credited to Bison. Content is retained as published.
+
+English translation of the [Chinese original](<https://allluckly.cn/ios%E4%B9%8B%E5%9B%BD%E9%99%85%E5%8C%96/On-the-experience-of-the-international-experience-of-iOS>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Specifically records adaptation to the region codes added to language identifiers in iOS 9.
+
+> "Work hard, keep working hard, and work harder still. Today’s effort becomes tomorrow’s reward." Bison
+
+This was my first attempt at multilingual iOS localization, and I encountered quite a few problems. Here I will share some of them. I will skip the basic localization setup, which you can look up yourself if interested. 1. First, consider the translation format: `"你好" = "hello"`; We can prepare the text to be translated in a Word document using `"你好" = "";`, with one document per language. This makes localization much faster because you do not have to hunt for entries. We used a table this time, and inserting all the translations was painfully tedious. 2. Try to keep translations within the same `VC` roughly similar in length. Imagine a row of equally spaced buttons where one translated `title` is very long and another very short. How should the layout adapt? Our simplest approach was: `btn.titleLabel.adjustsFontSizeToFitWidth = YES;` You can imagine how frustrating that was. If you are reading this, at least next time you can raise the requirement with your translators early. 3. Some languages have multiple variants. During testing, a language may appear to be missing when the real issue is that you did not select the relevant variant, just as Chinese has Simplified and Traditional forms. The ones I encountered most often were: Spanish, which required selecting three variants before it worked; Danish; Russian; Portuguese; Italian.
+
+4. Initially, we only considered Chinese. The international version, however, needed one fewer `tabBarItem`, so we checked whether the language was Chinese. I implemented this as a method in a singleton class:
+
+```css
+//判断是否为中文简体
+- (BOOL)isSimpleChinese
+{
+    NSString *language = [[NSLocale preferredLanguages] firstObject];
+    if ([language isEqualToString:@"zh-Hans"]) {
+          return 1;
+    }else{
+        return 0;
+    }
+}
+```
+
+Unfortunately, our timing coincided with the iOS9 upgrade and this stopped working. A breakpoint revealed that Apple had added a region code after the language in iOS9: `zh-Hanz` had become `zh-Hanz-CN`. The solution was to update the code. Here is the revised version.
+
+```css
+//判断是否为中文简体
+- (BOOL)isSimpleChinese
+{
+    NSString *language = [[NSLocale preferredLanguages] firstObject];
+    if ([language hasPrefix:@"zh-Hans"]) {
+            return 1;
+        }else {
+            return 0;
+        }
+}
+```
+
+Did you notice the difference in the code?
+
+5. Pay particular attention to image names during localization, for example: `hello_en@2x.png` for English. The benefit is that, when replacing images, we can check whether the suffix is `en` to identify the image needed for the current language. Here is a screenshot.
+
+This historical illustration is currently unavailable. [The original image URL is retained](<http://upload-images.jianshu.io/upload_images/671504-cc907a133a676790.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240>) for reference.  
+ Remember to ask the designer to name the files correctly; they will be much quicker to use.
+
+That is all I have found for now. If you have anything to add, you can email me.
+
+Copyright © Bison. Please credit the source when reproducing this article!
+{% endraw %}

@@ -1,0 +1,158 @@
+---
+layout: null
+permalink: /投稿/tuogao35/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 提交代码到CocoaPods看我就够了
+agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao35
+agent_source_sha256: 2a0a573bef45ada76a72c84ebe6cadeaccc1067dba7cc4c8ba2caf3d1945059d
+agent_generator_version: 1
+---
+{% raw %}# 提交代码到CocoaPods看我就够了
+
+语言：zh-CN
+原文：[提交代码到CocoaPods看我就够了](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao35>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao35>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-04-04-publishing-a-library-to-cocoapods/>)
+发布于: 2016-04-04T00:00:00+08:00
+内容更新于: 2016-04-04T00:00:00+08:00
+署名：WzxJiang
+
+记录将开源库发布到 CocoaPods 的步骤，包括准备 GitHub 工程、注册 trunk、编写 podspec、核对版本与标签、执行校验和提交，并解释常用配置字段。
+
+原文署名WzxJiang，Bison 编辑收录。
+
+[原文所列来源](<http://www.jianshu.com/p/88766e98e363>)
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文发表于 2016 年，命令与仓库提交过程按当时的 CocoaPods 服务整理。
+
+> "今天写了一个快速字符串加密的工具类WZXSSL，想提交至CocoaPods管理，遇到了很多细节问题，着实困惑了很久…在这个教程里，我会把容易遇到的问题着重说明。"
+
+编辑：[Bison](<https://allluckly.cn/>)  
+ 投稿：[WzxJiang](<http://www.jianshu.com/p/88766e98e363>)
+
+## 首先这篇教程的受众:
+
+> 至少会git了。 mac上安装了CocoaPods环境了。 有个GitHub
+
+如果这些你没满足…
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao35/1.png>)  
+ 效果图:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao35/2.png>)
+
+### 正式开始:
+
+1.首先在GitHub创建一个工程，并clone到本地  
+ 略.
+
+2.拉一个分支
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao35/3.png>)
+
+这里注意一下，你这里拉的分支不是随便拉的，我这里拉的是1.0.0,大家先记一下，下面会提到。
+
+3.注册trunk
+
+用trunk来上传可比之前去cocoapods/specs拉分支快多了。 在终端输入
+
+```
+pod trunk register youremail@email.com 'username'  --verbose
+```
+
+里面看着替换成你的邮箱和用户名.  
+ 输入 pod trunk me来检查是否成功.  
+ 成功应该是这样的:
+
+```
+- Name:     xxxx
+- Email:    xxxxxxxx
+- Since:    xxxxxxx
+- Pods:
+- xxxx
+- Sessions:
+- xxxxxx
+```
+
+4.配置PodSpec  
+ 终端，cd到你工程文件夹中,  
+ 输入pod spec create name，name是你想要的名字。  
+ 然后打开name.podspec，你喜欢用vim打开就vim打开，Sublime就Sublime。  
+ 打开后，你会发现官方注释太多了，而且很多是用不上的。  
+ 这里贴出我的配置
+
+```
+Pod::Spec.new do |s|
+
+s.name          = "WZXSSL"
+s.version       = "1.0.0"
+s.license       = "MIT"
+s.summary       = "Fast encryption string used on iOS, which implement by Objective-C."
+s.homepage      = "https://github.com/Wzxhaha/WZXSSL"
+s.author        = { "WzxJiang" => "wzxjiang@foxmail.com" }
+s.source        = { :git => "https://github.com/Wzxhaha/WZXSSL.git", :tag => "1.0.0" }
+s.requires_arc  = true
+s.description   = <<-DESC
+Fast encryption string, the current support for MD5 (16, 32), Sha1, Base64
+DESC
+s.source_files  = "WZXSSLTool/*"
+s.platform      = :ios, '7.0'
+s.framework     = 'Foundation', 'CoreGraphics', 'UIKit'  
+
+end
+```
+
+其中需要说明的有几个参数：  
+ ①s.license  
+ Pods依赖库使用的license类型，大家填上自己对应的选择即可。  
+ ②s.source\_files  
+ 表示源文件的路径，注意这个路径是相对podspec文件而言的。  
+ ③s.frameworks  
+ 需要用到的frameworks，不需要加.frameworks后缀。
+
+注意这里面的 s.version = “1.0.0”，你这里是1.0.0，那你拉的分支也只能是1.0.0。  
+ 不然，后期验证podspec的时候会出现Could not find remote branch x.x.x to clone错误。
+
+5.提交项目  
+ 把你的项目改动提交到github吧。  
+ 略
+
+6.验证  
+ 分别在终端输入
+
+```
+set the new version to 1.0.0  
+set the new tag to 1.0.0
+```
+
+绑定版本号和标签。
+
+然后我建议先分别在终端输入
+
+```
+pod lib lint --verbose和pod spec lint --verbose，
+```
+
+验证是否通过。  
+ 加–verbose的作用就是若有错误会提示错误。  
+ 若通过了会提示XXXXX passed validation.
+
+7.提交  
+ 在终端输入pod trunk push XXXXX.podspec。  
+ 一切顺利的话你会看到
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao35/4.jpg>)
+
+现在的CocoaPods审核非常快，往往你只是pod setup了一下，就能pod search xxxx到你的项目了。
+
+我参考了的博文  
+ \[原\][iOS：手把手教你发布代码到CocoaPods(Trunk方式)](<http://www.cnblogs.com/wengzilin/p/4742530.html>) [CocoaPods详解之—-制作篇](<http://blog.csdn.net/wzzvictory/article/details/20067595>)
+
+最后 如果你有任何问题，欢迎评论～ 我的[GitHub](<https://github.com/Wzxhaha>),如果你喜欢我的项目，请给我点个🌟。
+
+---
+
+好文推荐：[菜鸟程序员2015年年终总结](<https://allluckly.cn/%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/zongjie2015>)
+{% endraw %}

@@ -1,0 +1,95 @@
+---
+layout: post
+title: Integrating ijkplayer for live video on iOS
+description: Records downloading the source, initialising dependencies, compiling FFmpeg, packaging IJKMediaFramework
+  and adding it to an iOS project. The focus is on the role of each directory and build step in the ijkplayer integration.
+category: Development notes
+imagefeature: null
+date: 2016-05-13 00:00:00 +0800
+technical_translation:
+  topic: audio-video
+  summary: Records downloading the source, initialising dependencies, compiling FFmpeg, packaging IJKMediaFramework
+    and adding it to an iOS project. The focus is on the role of each directory and build step in the ijkplayer
+    integration.
+  keywords:
+  - ijkplayer
+  - FFmpeg
+  - IJKMediaFramework
+  - video playback
+  - framework compilation
+  provenance: contribution
+  author_name: jianshu_wl
+  source_url: http://www.jianshu.com/p/1f06b27b3ac0
+  credit: Originally credited to jianshu_wl; edited and archived by Bison.
+  version_note: Published in 2016. The scripts and project configuration correspond to the ijkplayer source used
+    at the time.
+  title: Integrating ijkplayer for live video on iOS
+  source_sha256: 5910bf415de1310b27fadd8c9a8539371f3ce493a8ca30f9d2a1ac11166a20fc
+lang: en
+source_path: _posts/2016-05-13-tuogao46.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao46
+permalink: /en/journal/2016-05-13-integrating-ijkplayer-for-live-video-on-ios/
+translation_method: machine-assisted
+translation_source_sha256: 5910bf415de1310b27fadd8c9a8539371f3ce493a8ca30f9d2a1ac11166a20fc
+excerpt: Records downloading the source, initialising dependencies, compiling FFmpeg, packaging IJKMediaFramework
+  and adding it to an iOS project. The focus is on the role of each directory and build step in the ijkplayer integration.
+translation_date: '2026-10-23T02:34:14+00:00'
+---
+{% raw %}
+<p>ijkplayer is an ffmpeg-based framework for live video that supports Android and iOS. Many integration guides exist, but I find them insufficiently detailed. Here is a detailed iOS integration guide that you can follow even if you have never used ijkplayer before.<br/></p>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/1f06b27b3ac0">jianshu_wl</a><br/></p>
+<h2 id="一-下载ijkplayer">I. Download ijkplayer</h2>
+<p><a href="https://github.com/Bilibili/ijkplayer">ijkplayer download</a></p>
+<p>Extract the download. Its folder structure is shown below:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/1.png"/><br/></p>
+<h2 id="二-编译-ijkplayer">II. Compile ijkplayer</h2>
+<p>Although this is called compiling ijkplayer, we are actually compiling ffmpeg. Since ijkplayer is already downloaded, some steps in the github README.md's Build iOS section are unnecessary.</p>
+<p>Let's compile step by step:</p>
+<p>1. Open the terminal and cd into jkplayer-master, the extracted download folder, as shown:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/2.png"/><br/></p>
+<p>2. Run ./init-ios.sh to download ffmpeg. This takes some time, so be patient. See below:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/3.png"/><br/></p>
+<p>3. After the download in step 2 completes, run cd ios to enter the ios directory, as shown:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/4.png"/><br/></p>
+<p>4. In the ios folder, run ./compile-ffmpeg.sh clean followed by ./compile-ffmpeg.sh all to compile ffmpeg. These correspond to the two README.md steps shown below:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/5.png"/><br/></p>
+<p>Compilation takes a while; please wait.<br/></p>
+<h2 id="三-打包ijkmediaframeworkframework框架">III. Package IJKMediaFramework.framework<br/></h2>
+<p>There are two ways to integrate ijkplayer. One is to import IJKMediaPlayer.xcodeproj directly, as IJKMediaDemo does. That approach is not covered here; it is shown below:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/6.png"/><br/></p>
+<p>The second integration approach packages ijkplayer as a framework and imports it into the project. Follow these steps to package IJKMediaFramework.framework:</p>
+<p>First, open IJKMediaPlayer.xcodeproj at the following location:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/7.png"/><br/></p>
+<p>After opening it, you will see:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/8.png"/><br/></p>
+<p>2. After opening the project, configure its scheme as shown:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/9.png"/><br/>
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/10.png"/><br/></p>
+<p>3. Once the scheme is configured, build separately for a device and simulator. When both builds finish, open Finder as shown:
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/11.png"/><br/></p>
+<p>In Finder, you can see separate device and simulator build results:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/12.png"/><br/></p>
+<p>Now merge the device and simulator frameworks. Make sure you merge the correct file, shown here:
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/13.png"/><br/></p>
+<p>Open the terminal and merge them using this command format:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lipo -create "真机版本路径" "模拟器版本路径" -output "合并后的文件路径"
+</code></pre></div></div>
+<p><br/>
+After merging, it looks like this:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/14.png"/><br/></p>
+<p>This is important: replace the original IJKMediaFramework with the merged IJKMediaFramework, as illustrated below. Please examine the image carefully.<br/>
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/15.png"/><br/></p>
+<p>After steps 1 and 2 in the image, the IJKMediaFramework.framework outlined in green is the framework we need. Copy it out; we will import it into the project shortly.<br/></p>
+<h2 id="四-ios工程中集成ijkplayer">IV. Integrate ijkplayer into an iOS project<br/></h2>
+<p>Create a project and import the merged IJKMediaFramework.framework and its required dependency frameworks, as shown:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/16.png"/><br/></p>
+<p>After importing the framework, test it in ViewController.m. First, import IJKMediaFramework.h and compile. If no errors occur, integration has succeeded.<br/>
+Next, test IJKMediaFramework in ViewController.m with a simple live-video example. The running result is shown here, and a downloadable Demo appears later.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao46/17.png"/><br/></p>
+<p>ijkplayer integration is now complete!<br/></p>
+<p><a href="https://coding.net/u/wanglei123/p/ijkplayerDemo/git">Demo download</a><br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-04-29-rich-text-with-hyperlinks-on-ios/">Rich text with hyperlinks on iOS</a><br/></p>
+
+{% endraw %}

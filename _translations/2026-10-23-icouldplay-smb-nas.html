@@ -1,0 +1,51 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'Connect iCouldPlay to SMB: play home videos from a NAS share'
+description: Distinguish the SMB host, share name and base path, connect a home NAS and use a small folder to check
+  permissions, scanning and actual playback.
+permalink: /en/guides/icouldplay-smb-nas/
+date: 2026-10-23 00:00:00 +0800
+category: Tutorials
+level: Beginner
+series_order: 3
+topic: Local files and sources
+reading_time: 11
+lang: en
+source_path: _posts/2026-10-23-icouldplay-smb-nas.md
+source_url: /guides/icouldplay-smb-nas/
+translation_method: machine-assisted
+translation_source_sha256: 8928a8b1a2e2c7024950f48fffd7c99bf7cf9be99989dd2532d0dbaf0a60e331
+excerpt: Distinguish the SMB host, share name and base path, connect a home NAS and use a small folder to check
+  permissions, scanning and actual playback.
+translation_date: '2026-10-23T02:34:08+00:00'
+---
+{% raw %}
+<p>SMB is suitable for accessing a NAS or shared computer directory on a home network. The most common confusion is between the server address, share name, and path within the share: these describe three different levels, and a complete computer file path cannot simply go into one field. This guide uses a test directory containing just two family videos to check the process from connection to playback.</p>
+<h2 id="在-nas-上准备一个小范围共享">Prepare a small share on the NAS</h2>
+<p>First confirm that the NAS has SMB enabled and that the current account has read access to the target share. For this exercise, you can use a share named <code class="language-plaintext highlighter-rouge">Videos</code> as the share, then create <code class="language-plaintext highlighter-rouge">FamilyTest</code> folder and place two known-good short videos inside it. The account only needs access to the directory you want to watch; you need not expose every private file just to connect a player. The NAS or computer manages sharing permissions. iCouldPlay does not create directory permissions on the server.</p>
+<p>Put the iPhone or iPad and the NAS on a network where they can reach each other. Note the NAS's current address, for example <code class="language-plaintext highlighter-rouge">192.168.1.20</code>. This is only an example; use your own address. First confirm from another trusted device that the account can open the share, rather than leaving every unresolved server configuration problem to the player.</p>
+<h2 id="在文件源中选择-smb">Choose SMB under File Sources</h2>
+<p>Open “Sources” in iCouldPlay, add a “File Source,” and choose SMB. Give the source a recognizable name such as “Home NAS Videos.” Enter the NAS host address as the server address, and enter <code class="language-plaintext highlighter-rouge">Videos</code> as the share name, rather than a disk path from the computer. The base path limits the starting point inside the share. For the first test, you can leave it at the share root and use directory selection to enter the test folder.</p>
+<p>Enter a server account with read access in the username and password fields. Fill in a domain or workgroup only if the server actually requires one; do not copy a workgroup name merely because it appears in an example. The current form requires account information, so anonymous access is not the default workflow. After entering the values, check leading and trailing spaces, letter case, and keyboard substitutions, especially when copying an address from a chat.</p>
+<h2 id="处理本地网络权限并测试连接">Handle Local Network permission and test the connection</h2>
+<p>When connecting to a local-network device for the first time, the system may request Local Network access. Allow it before continuing the test. If you previously denied it, check iCouldPlay's Local Network permission in system settings; the exact location varies by system version. This permission only allows the app to reach devices on the local network. It does not automatically grant NAS file permissions; both requirements must be met separately.</p>
+<p>Tap Add or Test and wait for the result. A successful connection should let you choose a directory or browse files. If it fails, first check whether the address changed, whether the NAS is online, and whether the phone is on an isolated guest network. Do not begin by changing every permission on the share. Use a verified account and a small directory to check network reachability and successful login separately.</p>
+<h2 id="选择测试目录而不是整个磁盘">Select the test directory rather than the entire disk</h2>
+<p>In the directory list, find <code class="language-plaintext highlighter-rouge">FamilyTest</code>, and select only this folder for the first scan. Seeing a share name does not mean that all its subdirectories are readable. Enter the test directory and confirm that both videos are present. If the list is empty, compare the path visible to the account on the server, and check whether the base path includes an extra directory level or whether the share name has been confused with the folder name.</p>
+<p>After saving, follow the current interface's prompts to scan videos, then return to the library and select this SMB source. The item count should match the test files; personal videos can play without movie posters. For scan scope and incremental organization, continue with <a href="/en/guides/icouldplay-folder-scan/">Folder scanning</a>; avoid scanning many nested directories at once on the first attempt.</p>
+<h2 id="实际播放比连接提示更重要">Actual playback matters more than a connection message</h2>
+<p>Play both videos in turn and check the beginning, middle, and end. Use a smaller ordinary video first, then a larger file to compare transfer load. Listing folders only proves that directory access succeeded; it does not guarantee video-data reading, seeking, or support for every encoding. If the beginning plays but seeking causes a long wait, note the exact position and file size before comparing.</p>
+<p>Copy the same file to the device and use <a href="/en/guides/icouldplay-getting-started/">Local import workflow </a>to play it. If local playback is smooth but SMB stutters, check the network and server disk access first. If both behave abnormally, investigate the file or playback compatibility. Changing only the transfer method in this comparison is more useful than changing the file, network, and app installation at the same time.</p>
+<h2 id="扩大目录前保存连接信息">Save connection details before expanding the directory scope</h2>
+<p>After verifying the small directory, record the source name, host address, share name, base path, and playable samples, without putting a plaintext password in public notes. Add other folders gradually, keeping clear boundaries between movies, series, and family footage. If the NAS address changes often, arrange a stable address in your own network management, but do not blindly copy the tutorial's example address.</p>
+<p>After leaving home, a local-network address is usually not directly accessible over mobile data. Do not expose SMB directly to the public internet just to connect the player. Use a reliable remote-access method you have already configured, or a service suited to remote use. Saving a source in iCouldPlay does not establish a remote tunnel.</p>
+<h2 id="常见问题与完成检查">Questions and final checks</h2>
+<p><strong>Why is access denied even though the username and password are correct?</strong> An account that can log in to the NAS management page does not necessarily have read access to the target share. Check share permissions, subdirectory permissions, and the connection methods allowed by the server. First open the same path in another client using the same account to determine whether the problem occurs during login, directory listing, or file reading.</p>
+<p><strong>Can the share name be left blank?</strong> Some environments allow shares to be listed, but permission depends on the server and account. For the first connection, this guide recommends specifying a share you know is authorized to reduce variables. A blank field does not automatically grant access to every share, and a share's root path is not the NAS system root directory.</p>
+<p>By the end, you should be able to enter the test directory from the source, find both videos in the library, seek during playback, and understand the access limits after leaving the current network. Connecting does not download every NAS file to the phone. If you need a local copy, use a workflow actually offered and verified in the app; do not infer offline access from a “connected” status.</p>
+<h2 id="资料来源与版本">Sources and version</h2>
+<p>Based on <a href="https://apps.apple.com/cn/app/id6755653178">iCouldPlay official store description </a>Compiled from the publicly described SMB / CIFS capabilities and the existing connection form. The public version checked on October 23, 2026 was 1.1.0. NAS brand, permissions, and network configuration affect results. The interface may change between versions; replace example addresses and directories with your own actual values.</p>
+
+{% endraw %}

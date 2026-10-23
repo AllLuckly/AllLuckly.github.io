@@ -1,0 +1,48 @@
+---
+layout: null
+permalink: /ios动画/iOS开发动画之绕View旋转的View/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发动画之绕View旋转的View
+agent_source_url: https://allluckly.cn/ios%E5%8A%A8%E7%94%BB/iOS%E5%BC%80%E5%8F%91%E5%8A%A8%E7%94%BB%E4%B9%8B%E7%BB%95View%E6%97%8B%E8%BD%AC%E7%9A%84View
+agent_source_sha256: ef1305d00552c2547bfdc2bc3660b59e2d62f84e517904e77771abf5451030fb
+agent_generator_version: 1
+---
+{% raw %}# iOS开发动画之绕View旋转的View
+
+语言：zh-CN
+原文：[iOS开发动画之绕View旋转的View](<https://allluckly.cn/ios%E5%8A%A8%E7%94%BB/iOS%E5%BC%80%E5%8F%91%E5%8A%A8%E7%94%BB%E4%B9%8B%E7%BB%95View%E6%97%8B%E8%BD%AC%E7%9A%84View>)
+中文：[中文 HTML](<https://allluckly.cn/ios%E5%8A%A8%E7%94%BB/iOS%E5%BC%80%E5%8F%91%E5%8A%A8%E7%94%BB%E4%B9%8B%E7%BB%95View%E6%97%8B%E8%BD%AC%E7%9A%84View>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-07-29-animating-a-view-around-another-view-on-ios/>)
+发布于: 2015-07-29T00:00:00+08:00
+内容更新于: 2015-07-29T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+为视图围绕图片中心运动的需求给出实现思路，利用三角函数计算圆周上的位置并更新视图坐标，展示不依赖复杂动画框架的环绕运动代码。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。涉及的 API、依赖和工具版本请结合发表日期阅读。
+
+> "身体是革命的本钱，多锻炼才是王道" Bison
+
+最近项目中出现了个动画，找了很多相关资料  
+ 发现并没有适合的，于是自定义了一个  
+ 主要的原理是根据改变三角形的正弦定理   
+ 余弦定理来实现view绕图片中心点运行的动画。
+
+下面请看代码
+
+核心代码
+
+```css
+self.center = CGPointMake(_radius * cosf(_angle) + imgView.center.x, _radius * sinf(_angle) + imgView.center.y);
+
+_timer = [NSTimer scheduledTimerWithTimeInterval:_time target:self selector:@selector(moveView) userInfo:nil repeats:YES];
+```
+
+> [点击下载Demo](<https://github.com/AllLuckly/RadiusOperation>)
+
+![(RadiusOperation)](<https://github.com/AllLuckly/RadiusOperation/blob/master/123.gif?raw=true>)
+{% endraw %}

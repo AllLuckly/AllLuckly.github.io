@@ -1,0 +1,301 @@
+---
+layout: null
+permalink: /en/journal/2016-01-10-objective-c-runtime-fundamentals-properties-and-instance-variables/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Objective-C runtime fundamentals: properties and instance variables'
+agent_source_url: https://allluckly.cn/en/journal/2016-01-10-objective-c-runtime-fundamentals-properties-and-instance-variables/
+agent_source_sha256: 29d0e364fea43572182d431109fd4768b3e4b8f0db84eb54f5c03c1cb646abc7
+agent_generator_version: 1
+---
+{% raw %}# Objective-C runtime fundamentals: properties and instance variables
+
+Language: en
+Canonical: [Objective-C runtime fundamentals: properties and instance variables](<https://allluckly.cn/en/journal/2016-01-10-objective-c-runtime-fundamentals-properties-and-instance-variables/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao01>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-01-10-objective-c-runtime-fundamentals-properties-and-instance-variables/>)
+Published: 2016-01-10T00:00:00+08:00
+Modified: 2026-10-23T10:34:11+08:00
+Author: SindriLin
+
+Distinguishes Objective-C properties from instance variables, examining runtime structures, memory offsets and synthesize to explain how properties are generated. Examples then show why dynamically inspecting and manipulating an object's structure can be useful.
+
+Originally credited to SindriLin; edited and archived by Bison.
+
+[Source listed in the original](<http://sindrilin.com/runtime/2016/01/08/%E5%B1%9E%E6%80%A7%E4%B8%8E%E5%8F%98%E9%87%8F.html>)
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao01>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Read API, dependency and tool details in the context of the original publication date.
+
+Editor: [Bison](<https://allluckly.cn/en/>)  
+ Contributor: [SindriLin’s Notes](<http://sindrilin.com/runtime/2016/01/08/%E5%B1%9E%E6%80%A7%E4%B8%8E%E5%8F%98%E9%87%8F.html>)
+
+> “The runtime refers to mechanisms that operate while a program is running. In iOS development, runtime features give oc its distinctive appeal.”
+
+The runtime refers to mechanisms that operate while a program is running. In iOS development, runtime features give oc its distinctive appeal.  
+ For C and C++, the methods a class object can call and the operations it can perform are determined when the program is compiled. The runtime mechanism allows  
+ oc can dynamically create classes, perform black-box testing, extend properties, and more at runtime, greatly increasing its flexibility. Today, using some runtime mechanisms,  
+ let's discuss properties and variables in oc. (This is the first article in my runtime series. If you disagree with any of the points raised, please join the  
+ comments to discuss them with me.)
+
+## property and ivar
+
+First, properties (property) and member variables (ivar) are different things. In oc, the distinction is as follows:
+
+- **Member variables**  
+   Member variables are usually declared in a class declaration's`@interface` or class implementation`@implementation` variables declared in the braces that follow,  
+   Their default visibility is`@protected` protected visibility (inaccessible outside the file), as well as`@public` public visibility,`@private`  
+   private visibility and`@package` package visibility
+
+```css
+@interface Person
+{
+    @public       ///< 所有可视范围都能访问
+    NSString * name;
+    NSString * sex;
+    @private      ///<  只有本类能够访问
+    NSString * personalWealth;
+    @protected    ///< 本类和子类都能访问 
+    NSString * housesNumber;
+    @package      ///<  框架内视为public，框架外为private
+    NSString * familyWealth;
+}
+```
+
+- Properties
+
+Compared with a variable, a property involves several compiler operations: 1. Use `@synthesize` to generate its corresponding ivar, usually named `下划线+属性名`. 2. Generate a `setter` to set the ivar. 3. Generate a `getter` to retrieve it.
+
+In a sense, a property wraps a member variable, adding setter and getter methods to make it  
+ better suited to object-oriented programming. (If you do not understand why setters and getters are needed, see this article:  
+ [What getter and setter methods are for](<http://www.zhihu.com/question/21401198>))
+
+## Property memory structure and @synthesize
+
+In my earlier article,[KVO implementation](<http://www.jianshu.com/users/0cf7d455eb9e/latest_articles>)article  
+ , I briefly discussed class memory structure. Here, we will look more closely at how memory changes after declaring properties and running the program. We will find that  
+ `@synthesize` actually does.
+
+My `Person` class now looks like this:
+
+```css
+@interface Person: NSObject {
+    NSString * _name;
+    NSString * _sex;
+    char _ch;
+}
+
+@property(nonatomic, copy) NSString * abc;
+@property(nonatomic, copy) NSString * efg;
+
+@end    
+
+
+@implementation Person
+
+- (instancetype)init {
+    if (self = [super init]) {
+        NSLog(@"%p, %p, %p, %p, %p, %p, %p", self, &_name, &_sex, &_ch, _abc, _efg);
+    }
+    return self;
+}
+
+@end
+```
+
+- **Question one: Address offsets of member variables**
+
+Although OC has its own characteristics as a dynamic language, its class structure does not differ greatly from that of other languages.  
+ In terms of class structure, member-variable addresses are offsets from the class object's own address, so these variables'  
+ addresses should increase by 0x8 each time, or 0x4 on a 32-bit system. The log output from the code above is as follows:
+
+```css
+0x7fb649c0c9b0, 0x7fb649c0c9c0, 0x7fb649c0c9c8, 
+0x7fb649c0c9d0, 0x7fb649c0c9d8, 0x7fb649c0c9e0
+```
+
+As expected, the last three addresses differ by 0x8. However, the class object and its first member variable differ by 0x10. Why  
+ is that? In [Apple's open-source file](<http://opensource.apple.com>)'s relevant code, we can find `Class`  
+ type definition
+
+```css
+typedef struct objc_class *Class;
+struct objc_class {
+    Class isa;
+    ······
+}
+```
+
+`Class` represents the Objective-C class structure. This code shows that it is a pointer to the `objc_class` struct, which contains an `isa` pointer. That extra pointer also explains the 0x10 offset in the output above: the two addresses differ by an `isa`. A later runtime article will discuss this in more detail.
+
+- **Question two: How are address offsets calculated?**
+
+A pointer occupies 8bit on a 64-bit system, but `char` uses only one bit, so why is the offset also 8 here? Is it calculated like a structure's address offset? This brings us to `class_addIvar(const char *, NSUInteger *, NSUInteger *)`, a function for adding a variable to a class. Its final parameter specifies the variable's memory alignment. Apple explains that parameter as follows:
+
+> The instance variable’s minimum alignment in bytes is 1«align. The minimum alignment of an instance variable depends on the ivar’s type and the machine architecture. For variables of any pointer type, pass log2(sizeof(pointer\_type)).
+
+This states that `alignment` is the variable's minimum alignment in bytes, but it does not explain exactly how the alignment works. In  
+ [objc-runtime-new.mm](<http://www.opensource.apple.com/source/objc4/objc4-647/runtime/objc-runtime-new.mm>)  
+ contains code that calculates address offsets. Looking at that code makes this clearer:
+
+```css
+    uint32_t offset = cls->unalignedInstanceSize();
+    uint32_t alignMask = (1<<alignment)-1;
+    offset = (offset + alignMask) & ~alignMask;
+```
+
+In brief, Apple specifies a default variable offset of `1 << alignment`, which in this context is the pointer length. Thus Objective-C class-structure offsets differ from ordinary struct offsets: anything shorter than 8bit is assigned an 8bit offset.
+
+- **Question three: How are property backing variables stored?**
+
+As discussed earlier, a property declared with `@property` automatically receives an underscore-prefixed ivar and associated setter and getter during compilation, allowing \_property access within the class. The offset output shows that property-generated variables follow the member variables. How does that happen? In question two, I mentioned the runtime function `class_addIvar()`, described in Xcode as follows:
+
+```css
+    * @note This function may only be called after objc_allocateClassPair and before objc_registerClassPair. 
+    *       Adding an instance variable to an existing class is not supported.
+    * @note The class must not be a metaclass. Adding an instance variable to a metaclass is not supported.
+    * @note The instance variable's minimum alignment in bytes is 1<<align. The minimum alignment of an instance 
+    *       variable depends on the ivar's type and the machine architecture. 
+    *       For variables of any pointer type, pass log2(sizeof(pointer_type)).
+```
+
+During compilation, class operations include allocating class memory and adding variables, properties, and method lists. The class must then be registered before use. The `class_addIvar()` function is used before registration to add instance variables to the class and its variable list. From this, we infer that `@synthesize` uses it during compilation to add and store a property's instance variable. If this guess is correct, those variables should appear in the instance-variable list. The runtime provides a way to test that too: `Ivar * class_copyIvarList(Class, unsigned int *)` returns the class structure's variable list. The following code retrieves all variables of `Person` and prints their names:
+
+```css
+unsigned int ivarCount;
+Ivar * ivars = class_copyIvarList([Person class], &ivarCount);
+
+for (int idx = 0; idx < ivarCount; idx++) {
+    Ivar ivar = ivars[idx];
+    NSLog(@"%s", ivar_getName(ivar));
+}
+free(ivars);
+```
+
+The instance-variable list for the Person class above is printed as follows:
+
+```css
+2016-01-07 21:59:49.580 LXDCodingDemo[3036:255608] _omg
+2016-01-07 21:59:49.581 LXDCodingDemo[3036:255608] _name
+2016-01-07 21:59:49.581 LXDCodingDemo[3036:255608] _ch
+2016-01-07 21:59:49.581 LXDCodingDemo[3036:255608] sct
+2016-01-07 21:59:49.581 LXDCodingDemo[3036:255608] _sex
+2016-01-07 21:59:49.581 LXDCodingDemo[3036:255608] _copying
+2016-01-07 21:59:49.581 LXDCodingDemo[3036:255608] _egf
+2016-01-07 21:59:49.581 LXDCodingDemo[3036:255608] _hij
+```
+
+We can see that `@synthesize` does call this method, binding property and variable memory through `class_addIvar()`.
+
+- **Question four: What exactly does @synthesize do?**
+
+This question may seem surprising. From the preceding code and discussion, `@synthesize` clearly generates and binds variable memory. In the `Person` class, for example, declaring the `abc` property makes the compiler automatically generate `@synthesize abc = _abc;`, which means we can write it ourselves. What if we bind the property to an existing member variable instead, using `@synthesize abc = _name`? What addresses will be printed afterward?
+
+```css
+@implementation Person
+@synthesize abc = _name;      ///< 自定义绑定属性
+
+- (instancetype)init {
+    if (self = [super init]) {
+        NSLog(@"%p, %p, %p, %p", &_name, &_sex, &_ch, &_efg);
+    }
+    return self;
+}
+
+@end
+```
+
+Adding this custom binding causes an error in the original code. Binding the `abc` property to `_name` means the compiler no longer generates `_abc`, so that variable cannot be found in the class. After creating a `Person` instance, the console's address output remains unchanged, still differing by 0x8.
+
+0x7ff92b45a438, 0x7ff92b45a440, 0x7ff92b45a448, 0x7ff92b45a458
+
+To test the relationship between `abc` and `_name`, I added this code to main:
+
+```css
+Person * p = [Person new];
+p.abc = @"123";
+NSLog(@"%@, %@", p.abc, p->_name);
+```
+
+The output for `abc` matches `_name`. This small example shows that when `@synthesize` supplies memory for a property, it first searches for an existing instance variable with the same name. If found, it generates a getter and setter to access that memory. Otherwise, it creates a new member variable and then binds the accessors. Thus `@synthesize` does more than simply call `class_addIvar()` when adding a variable; it also traverses the variable list.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tuogao01/tuogao01.jpg>)
+
+Just as black has its opposite in white, `@synthesize` has a counterpart. In Objective-C, `@dynamic propertyName` prevents the compiler from binding variable storage and generating setters and getters for the property, leaving us to provide these methods at runtime. The runtime messaging article will explain this.
+
+- **Question five: How does @synthesize determine a property's type?**
+
+What if the custom binding changed from `_name` to `_ch`? The compiler reports an error because of type checking. But how does it determine a property's type when generating default storage? Properties also have attributes such as `copy`, `strong`, and `weak`, which affect setter implementation. How does `@synthesize` distinguish them? The less commonly used keyword `@encode` returns a type-encoding description. I added the following code to main and obtained this console output:
+
+```css
+NSLog(@"%s, %s, %s", @encode(Person), @encode(CGRect), @encode(NSInteger));
+
+///输出
+{Person=#@@c}, {CGRect={CGPoint=dd}{CGSize=dd}}, q
+```
+
+looks rather confusing. Apple's official documentation explains that the compiler uses C characters to represent every OC type, while using`@encode(type)`  
+ returns the encoding for this type. The mappings between these encodings can be found in [Type encoding](<https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html>)  
+.
+
+The output shows that `Person` has encoding `#@@c`, where # denotes an object and the following elements represent `id`, `id`, and `char`. In the class file, these correspond to `_name`, `_sex`, and `_ch`. This shows how `@synthesize` identifies the type of a property's bound variable. The `class_addIvar()` function accepts a `const char *` argument describing attributes and variable types, allowing `@synthesize` to pass the obtained encoding and generate the corresponding variable.
+
+How is a property's type determined? Apple also provides the following in the runtime: `property_getAttributes()`  
+ to obtain an object's type attributes. These attributes likewise use`@encode` a similar set of type encodings. These type encodings'  
+ standard table can also be found in [Property type encoding](<https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtPropertyIntrospection.html>).  
+ If you enjoy reading the code of open-source frameworks, the recently emerging `YYModel` you can see the author's extensive use of type encoding:
+
+![2](<https://allluckly.cn/images/blog/tuogao/tuogao01/tuogao02.jpg>)
+
+## Application
+
+> Theory that cannot be put into practice is nonsense. — 沃德天·毫率
+
+I have outlined many plausible theories, but they are of little use unless we can apply them. Data persistence is unavoidable in development. My company's projects are small and do not store much data, so I generally use the archiving provided by `NSCoding`. That often leads to code like this:
+
+![3](<https://allluckly.cn/images/blog/tuogao/tuogao01/tuogao03.jpg>)
+
+Writing it this way is not a problem while the model contains little data. As the amount of model data grows, this approach  
+ may cause:
+
+1. With many fields, mismatched strings in archiving can cause saving or loading to fail. 2. The workload increases. As mentioned above, runtime's `class_copyIvarList()` retrieves every instance variable of a class; `class_copyPropertyList()` does the equivalent for properties. We can use it to enumerate properties and their names, then implement a one-step archiving macro similar to a singleton macro. The core code follows:
+
+```css
+unsigned int propertyCount; 
+objc_property_t * properties = class_copyPropertyList([self class], &propertyCount);    
+
+for (int idx = 0; idx < propertyCount; idx++) {
+    objc_property_t property = properties[idx];
+    NSLog(@"\n--name: %s\n--attributes: %s", property_getName(property), property_getAttributes(property));  }   
+}   
+free(properties);
+```
+
+Print the property's information in the console:
+
+```css
+--name: abc
+--attributes: T@"NSString",C,N,V_abc
+
+--name: efg
+--attributes: T@"NSString",C,N,V_efg
+
+--name: hij
+--attributes: T@"NSString",C,N,V_hij
+```
+
+Both runtime-based archiving and unarchiving enumerate the class's properties. Define an `LXDCodingHandler` block to hold the processing for each `objc_property_t` property and pass it into this enumeration:
+
+```css
+typedef void(^LXDCodingHandler)(objc_property_t property, NSString * propertyName);
+```
+
+I have already wrapped the relevant code so that a model can be serialized in a single line.  
+ [Demo project](<https://github.com/JustKeepRunning/LXDEncoding>)
+
+---
+
+Recommended reading: [A Windows AliWangWang-style login screen with a paper-feed animation](<https://allluckly.cn/en/journal/2016-01-04-a-windows-aliwangwang-style-login-screen-with-a-paper-feed-animation/>)
+{% endraw %}

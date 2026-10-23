@@ -1,0 +1,405 @@
+---
+layout: null
+permalink: /投稿/tuogao14/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: Swift2.0之CoreText排版神器(长篇高能)
+agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao14
+agent_source_sha256: a118abcf990603b68d78028708481da1b94132ccb6d12d63a66c68fddd96dbe7
+agent_generator_version: 1
+---
+{% raw %}# Swift2.0之CoreText排版神器(长篇高能)
+
+语言：zh-CN
+原文：[Swift2.0之CoreText排版神器(长篇高能)](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao14>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao14>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-01-31-core-text-layout-in-swift-2-0-an-in-depth-introduction/>)
+发布于: 2016-01-31T00:00:00+08:00
+内容更新于: 2016-01-31T00:00:00+08:00
+署名：大石头布
+
+从富文本属性设置进入 Core Text，介绍字体、颜色与文本范围，再结合底层排版和绘制步骤实现图文混排，帮助理解复杂文本界面所需的基本对象。
+
+原文署名大石头布，Bison 编辑收录。
+
+[原文所列来源](<http://www.jianshu.com/p/e52a38e60e7c>)
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。标题明确面向 Swift 2.0，正文使用当时的富文本常量和 Core Text 写法。
+
+编辑：[Bison](<https://allluckly.cn/>)  
+ 投稿：[大石头布](<http://www.jianshu.com/p/e52a38e60e7c>)
+
+> "CoreText是一个进阶的比较底层的布局文本和处理字体的技术，CoreText API在OS X v10.5 和 iOS3.2时引入，在OS X 和iOS 环境下均可以使用。:"
+
+不是特别复杂的需求一般情况下UILabel、UITextView都可以搞定，他们是Apple帮我们封装好的显示文本的控件，但是像复杂的图文，链接识别并替换成 “点击链接” ， @someone 绑定 ，电话识别，文字大小不一 ，当然这些可以使用UIWebView,但是CoreText 技术相对于 UIWebView，有着更少的内存占用，以及可以在后台渲染的优点，非常适合用于内容的排版工作。CoreText 提供了非常高的灵活性，但是操作起来的比较复杂，学技术不就应该找最难的攻克吗？
+
+来看一张框架图
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao14/1.png>)
+
+要学习CoreText 首先得了解属性字—NSAttributedString 或者 NSMutableAttributedString
+
+NSAttributedString 和 NSMutableAttributedString  
+ NSAttributedString是一个带有属性的字符串,通过该类可以灵活地操作和呈现多种样式的文字数据
+
+可以事先定义好属性 然后加到文字上
+
+```css
+let str = "这是一段用来测试的字符串 this is a string for test"
+let dic = [NSFontAttributeName:UIFont.boldSystemFontOfSize(20),
+NSForegroundColorAttributeName:UIColor.redColor()]
+let attrStr = NSAttributedString(string: str, attributes: dic)
+label.attributedText = attrStr
+```
+
+效果
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao14/2.png>)
+
+可以看到我们并没有给label设置颜色和字体，创建了一个带两个属性的NSAttributedString ， 没有使用label.text而是 label.attributedText
+
+如果只能给所有的文字设置一样的属性，那这个属性字也太没劲了。我们可以给一段文字设置不同的属性
+
+```css
+let mutableAttrStr = NSMutableAttributedString(string: str)
+mutableAttrStr.addAttributes(dic, range: NSMakeRange(0, 2))
+mutableAttrStr.addAttributes([NSFontAttributeName:UIFont.systemFontOfSize(13),NSUnderlineStyleAttributeName: 1 ], range: NSMakeRange(2,8))
+label.attributedText = mutableAttrStr
+```
+
+我们可以给不同位置的文字指定不同的样式，位置通过NSRange给出(NSRange是一个结构体，有两个参数 一个location 一个 length ,这两个参数可以唯一的确定一段字串)
+
+效果
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao14/3.png>)
+
+这样我们就给前面的文字设置了两种不同的属性。
+
+那么我们可以设置哪些属性呢。
+
+- NSFontAttributeName 设置字体属性，默认值：字体：Helvetica(Neue) 字号12
+- NSForegroundColorAttributeName 设置字体颜色，取值为 UIColor对象，默认值为
+- NSBackgroundColorAttributeName 设置字体所在区域背景颜色，取值为 UIColor对象，默认值为nil, 透明
+- NSLigatureAttributeName 设置连体属性，取值为NSNumber 对象(整数)，0 表示没有连体字符，1 表示使用默认的连体字符
+- NSKernAttributeName 设定字符间距，取值为 NSNumber 对象（整数），正值间距加宽，负值间距变窄
+- NSStrikethroughStyleAttributeName 设置删除线，取值为 NSNumber 对象（整数）
+- NSStrikethroughColorAttributeName 设置删除线颜色，取值为 UIColor 对象，默认值为黑色
+- NSUnderlineStyleAttributeName 设置下划线，取值为 NSNumber 对象（整数），枚举常量 NSUnderlineStyle中的值，与删除线类似NSUnderlineColorAttributeName 设置下划线颜色，取值为 UIColor 对象，默认值为黑色
+- NSStrokeWidthAttributeName 设置笔画宽度，取值为 NSNumber 对象（整数），负值填充效果，正值中空效果
+- NSStrokeColorAttributeName 填充部分颜色，不是字体颜色，取值为 UIColor 对象NSShadowAttributeName 设置阴影属性，取值为 NSShadow 对象
+- NSTextEffectAttributeName 设置文本特殊效果，取值为 NSString 对象，目前只有图版印刷效果可用：
+- NSBaselineOffsetAttributeName 设置基线偏移值，取值为 NSNumber （float）,正值上偏，负值下偏
+- NSObliquenessAttributeName 设置字形倾斜度，取值为 NSNumber （float）,正值右倾，负值左倾
+- NSExpansionAttributeName 设置文本横向拉伸属性，取值为 NSNumber （float）,正值横向拉伸文本，负值横向压缩文本
+- NSWritingDirectionAttributeName 设置文字书写方向，从左向右书写或者从右向左书写
+- NSVerticalGlyphFormAttributeName 设置文字排版方向，取值为 NSNumber 对象(整数)，0 表示横排文本，1 表示竖排文本
+- NSLinkAttributeName 设置链接属性，点击后调用浏览器打开指定URL地址
+- NSAttachmentAttributeName 设置文本附件,取值为NSTextAttachment对象,常用于文字图片混排
+- NSParagraphStyleAttributeName 设置文本段落排版格式，取值为 NSParagraphStyle 对象
+
+这么多属性使用的也记不住，使用的时候自行google用法，还是很强大的😄！！
+
+属性字就介绍这么多，简单富文本使用它就能搞定。下面介绍我们的主角–CoreText
+
+### CoreText
+
+属性字是用来给文本设置样式，那么CoreText就是用来给文本进行排版的，可以自定每行高度，每个字符占位 等等
+
+CoreText 是用于处理文字和字体的底层技术。它直接和 Core Graphics（又被称为 Quartz）打交道。Quartz 是一个 2D 图形渲染引擎。Quartz 能够直接处理字体（font）和字形（glyphs），将文字渲染到界面上，它是基础库中唯一能够处理字形的模块。因此，CoreText 为了排版，需要将显示的文本内容、位置、字体、字形直接传递给 Quartz。相比其它 UI 组件，由于 CoreText 直接和 Quartz 来交互，所以它具有高速的排版效果。
+
+我们来看一个CoreText对象模型图
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao14/4.png>)
+
+来一段枯燥的讲解(后面会有🌰的)
+
+> 如上图所述，其中Framesetter对应的类型是CTFramesetter，通过CFAttributedString(NSAttributeString 也可以无缝桥接)进行初始化，它作为CTFrame对象的生产工厂，负责根据path生产对应的CTFrame。CTFrame是可以通过CTFrameDraw函数直接绘制到context上的，当然你可以在绘制之前，操作CTFrame中的CTLine，进行一些参数的微调。CTLine 可以看做Core Text绘制中的一行的对象 通过它可以获得当前行的line ascent,line descent ,line leading,还可以获得Line下的所有Glyph Runs。CTRun 或者叫做 Glyph Run，是一组共享相同attributes（属性）的字形的集合体。CTFrame是指整个该UIView子控件的绘制区域，CTLine则是指每一行，CTRun则是每一段具有一样属性的字符串。比如某段字体大小、颜色都一致的字符串为一个CTRun，CTRun不可以跨行，不管属性一致或不一致。通常的结构是每一个CTFrame有多个CTLine，每一个CTLine有多个CTRun。
+
+由于CoreText一开始便是定位于桌面的排版系统，所以使用了传统的原点在左下角的坐标系，所以它在绘制文本的时候都是参照左下角的原点进行绘制的。
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao14/5.png>)
+
+如果你啥也不做处理，直接在这个context上进行CoreText绘制，你会发现文字是镜像且上下颠倒。
+
+🌰来啦！先来看一个最简单的CoreText使用的例子
+
+一个简单的例子 首先新建一个CTView继承自UIView
+
+```css
+import UIKit
+
+class CTView: UIView {
+
+    override func drawRect(rect: CGRect) {
+        super.drawRect(rect)
+
+        // 1
+        let context = UIGraphicsGetCurrentContext()
+
+        // 2
+        CGContextSetTextMatrix(context, CGAffineTransformIdentity)
+        CGContextTranslateCTM(context, 0, self.bounds.size.height)
+        CGContextScaleCTM(context, 1.0, -1.0)
+
+        // 3
+        let path = CGPathCreateMutable()
+        CGPathAddRect(path, nil, self.bounds)
+
+        // 4
+        let attrString = NSAttributedString(string:"Hello CoreText!")
+        let framesetter = CTFramesetterCreateWithAttributedString(attrString)
+        let frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, attrString.length), path, nil)
+
+        // 5
+        CTFrameDraw(frame,context!)
+    }
+}
+```
+
+然后把这个view加在ViewController上
+
+```css
+let ctView = CTView()
+ctView.frame = CGRectMake(10, 150, self.view.bounds.width - 20, 200)
+ctView.backgroundColor = UIColor.whiteColor()
+self.view.addSubview(ctView)
+```
+
+运行效果:
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao14/6.png>)
+
+### 解释：
+
+1、 通过UIGraphisGetCurrentContext()获取当前的环境  
+ 2、将坐标系上下翻转。对于底层的绘制引擎来说，屏幕的左下角是（0, 0）坐标。而对于上层的 UIKit 来说，左上角是 (0, 0) 坐标。所以我们为了之后的坐标系描述按 UIKit 来做，所以先在这里做一个坐标系的上下翻转操作。翻转之后，底层和上层的 (0, 0) 坐标就是重合的了。  
+ 3、创建绘制区域CGPathCreateMutable(),CoreText 本身支持各种文字排版的区域，我们这里简单地将 UIView 的整个界面作为排版的区域。
+
+当然这里如果觉得CGMutablePath 不好用 可以选择使用更方便的UIBezierPath来操作排版区域.   
+ 把上文中的3改成
+
+```css
+let path1 = UIBezierPath(roundedRect: self.bounds, cornerRadius:self.bounds.size.width/2 )
+```
+
+把4改成 顺便给文字加了点属性
+
+```css
+// 4
+let attrString = "Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!"
+
+let mutableAttrStr = NSMutableAttributedString(string: attrString)
+mutableAttrStr.addAttributes([NSFontAttributeName:UIFont.systemFontOfSize(20),
+NSForegroundColorAttributeName:UIColor.redColor() ], range: NSMakeRange(0, 20))
+mutableAttrStr.addAttributes([NSFontAttributeName:UIFont.systemFontOfSize(13),NSUnderlineStyleAttributeName: 1 ], range: NSMakeRange(20,18))
+let framesetter = CTFramesetterCreateWithAttributedString(mutableAttrStr)
+let frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, mutableAttrStr.length), path1.CGPath, nil)
+```
+
+排版区域就变了 而且使用了UIBezierPath的API
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao14/7.png>)
+
+4、根据AttributedString生成CTFramesetterRef，根据framesetter和绘图区域创建CTFrame
+
+5、使用CTFrameDraw进行绘制(后面复杂的可能不会直接画frame 而是选择一行一行的画 )
+
+图文混排
+
+CoreText如果只能定义文本绘制区域，那就太没劲了，CoreText还可以支持图文混排，本地图片和网络图片。
+
+CoreText从绘制纯文本到绘制图片，依然是使用NSAttributedString，只不过图片的实现方式是用一个空白字符作为在NSAttributedString中的占位符，然后设置代理，告诉CoreText给该占位字符留出一定的宽高。最后把图片绘制到预留的位置上。
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao14/8.png>)
+
+图中 第一个图片是存在本地，第二个图片是来自网络。下面看看怎么做。代码有点长 但是思路应该清晰。
+
+```css
+import UIKit
+
+class CTPicTxtView: UIView {
+
+var image:UIImage?
+
+    override func drawRect(rect: CGRect) {
+        super.drawRect(rect)
+
+        // 1 获取上下文
+        let context = UIGraphicsGetCurrentContext()
+
+        // 2 转换坐标
+        CGContextSetTextMatrix(context, CGAffineTransformIdentity)
+        CGContextTranslateCTM(context, 0, self.bounds.size.height)
+        CGContextScaleCTM(context, 1.0, -1.0)
+
+        // 3 绘制区域
+        let path = UIBezierPath(rect: rect)
+
+        // 4 创建需要绘制的文字
+        let attrString = "Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!"
+
+        let mutableAttrStr = NSMutableAttributedString(string: attrString)
+        mutableAttrStr.addAttributes([NSFontAttributeName:UIFont.systemFontOfSize(20),
+        NSForegroundColorAttributeName:UIColor.redColor() ], range: NSMakeRange(0, 5))
+        mutableAttrStr.addAttributes([NSFontAttributeName:UIFont.systemFontOfSize(13),NSUnderlineStyleAttributeName: 1 ], range: NSMakeRange(3,10))
+        let style = NSMutableParagraphStyle()   //用来设置段落样式
+        style.lineSpacing = 6 //行间距
+        mutableAttrStr.addAttributes([NSParagraphStyleAttributeName:style], range: NSMakeRange(0, mutableAttrStr.length))
+
+        // 5 为图片设置CTRunDelegate,delegate决定留给图片的空间大小
+        var imageName = "mc"
+        var  imageCallback =  CTRunDelegateCallbacks(version: kCTRunDelegateVersion1, dealloc: { (refCon) -> Void in
+
+        }, getAscent: { ( refCon) -> CGFloat in
+
+            //                let imageName = "mc"
+            //                refCon.initialize()
+            //                let image = UIImage(named: imageName)
+            return 100  //返回高度
+
+        }, getDescent: { (refCon) -> CGFloat in
+
+            return 50  //返回底部距离
+
+        }) { (refCon) -> CGFloat in
+
+            //                let imageName = String("mc")
+            //                let image = UIImage(named: imageName)
+            return 100  //返回宽度
+
+        }
+        let runDelegate  = CTRunDelegateCreate(&imageCallback, &imageName)
+        let imgString = NSMutableAttributedString(string: " ")  // 空格用于给图片留位置
+        imgString.addAttribute(kCTRunDelegateAttributeName as String, value: runDelegate!, range: NSMakeRange(0, 1))  //rundelegate  占一个位置
+        imgString.addAttribute("imageName", value: imageName, range: NSMakeRange(0, 1))//添加属性，在CTRun中可以识别出这个字符是图片
+        mutableAttrStr.insertAttributedString(imgString, atIndex: 15)
+
+
+        //网络图片相关
+        var  imageCallback1 =  CTRunDelegateCallbacks(version: kCTRunDelegateVersion1, dealloc: { (refCon) -> Void in
+
+        }, getAscent: { ( refCon) -> CGFloat in
+            return 70  //返回高度
+
+        }, getDescent: { (refCon) -> CGFloat in
+
+            return 50  //返回底部距离
+
+        }) { (refCon) -> CGFloat in
+            return 100  //返回宽度
+
+        }
+        var imageUrl = "http://img3.3lian.com/2013/c2/64/d/65.jpg" //网络图片链接
+        let urlRunDelegate  = CTRunDelegateCreate(&imageCallback1, &imageUrl)
+        let imgUrlString = NSMutableAttributedString(string: " ")  // 空格用于给图片留位置
+        imgUrlString.addAttribute(kCTRunDelegateAttributeName as String, value: urlRunDelegate!, range: NSMakeRange(0, 1))  //rundelegate  占一个位置
+        imgUrlString.addAttribute("urlImageName", value: imageUrl, range: NSMakeRange(0, 1))//添加属性，在CTRun中可以识别出这个字符是图片
+        mutableAttrStr.insertAttributedString(imgUrlString, atIndex: 50)
+
+
+        // 6 生成framesetter
+        let framesetter = CTFramesetterCreateWithAttributedString(mutableAttrStr)
+        let frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, mutableAttrStr.length), path.CGPath, nil)
+
+        // 7 绘制除图片以外的部分
+        CTFrameDraw(frame,context!)
+
+        // 8 处理绘制图片逻辑
+        let lines = CTFrameGetLines(frame) as NSArray //存取frame中的ctlines
+
+
+        let ctLinesArray = lines as Array
+        var originsArray = [CGPoint](count:ctLinesArray.count, repeatedValue: CGPointZero)
+        let range: CFRange = CFRangeMake(0, 0)
+        CTFrameGetLineOrigins(frame,range,&originsArray)
+
+        //遍历CTRun找出图片所在的CTRun并进行绘制,每一行可能有多个
+        for i in 0..<lines.count{
+            //遍历每一行CTLine
+            let line = lines[i]
+            var lineAscent = CGFloat()
+            var lineDescent = CGFloat()
+            var lineLeading = CGFloat()
+            //该函数除了会设置好ascent,descent,leading之外，还会返回这行的宽度
+            CTLineGetTypographicBounds(line as! CTLineRef, &lineAscent, &lineDescent, &lineLeading)
+
+            let runs = CTLineGetGlyphRuns(line as! CTLine) as NSArray
+            for j in 0..<runs.count{
+            // 遍历每一个CTRun
+            var  runAscent = CGFloat()
+            var  runDescent = CGFloat()
+            let  lineOrigin = originsArray[i]// 获取该行的初始坐标
+            let run = runs[j] // 获取当前的CTRun
+            let attributes = CTRunGetAttributes(run as! CTRun) as NSDictionary
+
+            let width =  CGFloat( CTRunGetTypographicBounds(run as! CTRun, CFRangeMake(0,0), &runAscent, &runDescent, nil))
+
+            let  runRect = CGRectMake(lineOrigin.x + CTLineGetOffsetForStringIndex(line as! CTLine, CTRunGetStringRange(run as! CTRun).location, nil), lineOrigin.y - runDescent, width, runAscent + runDescent)
+            let imageNames = attributes.objectForKey("imageName")
+            let urlImageName = attributes.objectForKey("urlImageName")
+
+            if imageNames is NSString {
+                //本地图片
+                let image = UIImage(named: imageName as String)
+                let imageDrawRect = CGRectMake(runRect.origin.x, lineOrigin.y-runDescent, 100, 100)
+                CGContextDrawImage(context, imageDrawRect, image?.CGImage)
+            }
+
+            if let urlImageName = urlImageName as? String{
+                var image:UIImage?
+                let imageDrawRect = CGRectMake(runRect.origin.x, lineOrigin.y-runDescent, 100, 100)
+                if self.image == nil{
+                image = UIImage(named:"hs") //灰色图片占位
+                //去下载
+                if let url = NSURL(string: urlImageName){
+                    let request = NSURLRequest(URL: url)
+                    NSURLSession.sharedSession().dataTaskWithRequest(request, completionHandler: { (data, resp, err) -> Void in
+
+                    if let data = data{
+                        dispatch_sync(dispatch_get_main_queue(), { () -> Void in
+                        self.image = UIImage(data: data)
+                        self.setNeedsDisplay()  //下载完成会重绘
+                        })
+
+                    }
+                }).resume()
+                }
+
+             }else{
+                image = self.image
+             }
+            CGContextDrawImage(context, imageDrawRect, image?.CGImage)
+          }
+         }
+        }
+
+    }
+
+}
+```
+
+1、2、3、4和前面简单Demo是一模一样的 ，只是加了个行间距。
+
+5、 这块用一个回调设置了图片大小等信息 ，然会创建了一个CTRun的代理，创建一个空白占位字符，给它加了个属性，后面绘制的时候好识别。 最后把这个占位符加到我们属性文本的某个位置。
+
+地下网络图片 name换成了url 其他如法炮制
+
+6、7和上小结一样的
+
+8、 正式开始处理图片部分
+
+根据CTFrame 获取 CTLine 获取 originsArray 每一行的原点，用来定位 。根据CTLine获取到 CTRun 。 CTRun是每一个相同属性字符串 ，但是不会隔行。
+
+遍历CTRun 根据我们前面设置的属性 找到本地图片进行绘制
+
+网络图片的绘制也很简单如果没有下载 先放个灰色的图占位，然后去下载，下载好了 赋值给self的一个变量 ，然后重绘就OK了 关于NSURLSession不会使用的可以看我的另一篇文章。[NSURLSession](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao10>)
+
+关于CoreText还有很多，逐行排版 文字和emoji 混排问题 ， 连接识别 ，点击图片 点击连接等等。。篇幅有点长。。下一篇接着介绍，这篇先到这边。
+
+本文实例代码已上传github: [https://github.com/smalldu/ZZCoreTextDemo](<https://github.com/smalldu/ZZCoreTextDemo>)
+
+---
+
+好文推荐：[iOS开发之详解连连支付集成](<https://allluckly.cn/ios%E6%94%AF%E4%BB%98/lianlianzhifu>)
+{% endraw %}

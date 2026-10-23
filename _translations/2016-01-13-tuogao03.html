@@ -1,0 +1,211 @@
+---
+layout: post
+title: Building a custom pop-up view with HWPopTool
+description: Introduces HWPopTool integration and its controls for the content view, background overlay and close
+  button. It also explains how to handle closing after the component changed its callback mechanism from a delegate
+  to a block.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-01-13 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Introduces HWPopTool integration and its controls for the content view, background overlay and close
+    button. It also explains how to handle closing after the component changed its callback mechanism from a delegate
+    to a block.
+  keywords:
+  - HWPopTool
+  - pop-up views
+  - overlays
+  - block callbacks
+  provenance: contribution
+  author_name: HenryCheng
+  source_url: http://www.jianshu.com/users/233c37d8a732/latest_articles
+  author_url: http://www.jianshu.com/users/233c37d8a732/latest_articles
+  credit: Originally credited to HenryCheng; edited and archived by Bison.
+  title: Building a custom pop-up view with HWPopTool
+  source_sha256: c88c99eca514b2e4aa6d2fe786c9b0f42982e179128fd618f7c0f48dd8964df0
+lang: en
+source_path: _posts/2016-01-13-tuogao03.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao03
+permalink: /en/journal/2016-01-13-building-a-custom-pop-up-view-with-hwpoptool/
+translation_method: machine-assisted
+translation_source_sha256: c88c99eca514b2e4aa6d2fe786c9b0f42982e179128fd618f7c0f48dd8964df0
+excerpt: Introduces HWPopTool integration and its controls for the content view, background overlay and close button.
+  It also explains how to handle closing after the component changed its callback mechanism from a delegate to a
+  block.
+translation_date: '2026-10-23T02:34:12+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/users/233c37d8a732/latest_articles">HenryCheng</a><br/></p>
+<blockquote>
+<p>“A while ago, a project required a red-packet popup after payment, allowing the user to send a red packet. The final result looked roughly as follows:”</p>
+</blockquote>
+<p><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao03/1.gif"/><br/></p>
+<h3 id="一使用方法">I. Usage<br/></h3>
+<p>The ViewController code is roughly as follows:<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span>
+<span class="o">//</span>  <span class="nt">SecondViewController</span><span class="nc">.m</span>
+<span class="o">//</span>  <span class="nt">HWPopTool</span>
+<span class="o">//</span>
+<span class="o">//</span>  <span class="nt">Created</span> <span class="nt">by</span> <span class="nt">HenryCheng</span> <span class="nt">on</span> <span class="err">16</span><span class="o">/</span><span class="err">1</span><span class="o">/</span><span class="err">11</span><span class="o">.</span>
+<span class="o">//</span>  <span class="nt">Copyright</span> <span class="err">©</span> <span class="err">2016</span><span class="nt">年</span> <span class="nt">www</span><span class="nc">.igancao.com</span><span class="o">.</span> <span class="nt">All</span> <span class="nt">rights</span> <span class="nt">reserved</span><span class="o">.</span>
+<span class="o">//</span>
+
+<span class="nf">#import</span> <span class="s1">"SecondViewController.h"</span>
+<span class="nf">#import</span> <span class="s1">"HWPopTool.h"</span>
+
+<span class="k">@interface</span> <span class="n">SecondViewController</span> <span class="p">()</span>
+
+<span class="err">@</span><span class="n">property</span> <span class="p">(</span><span class="n">strong</span><span class="p">,</span> <span class="n">nonatomic</span><span class="p">)</span> <span class="n">UIView</span> <span class="err">*</span><span class="n">contentView</span><span class="p">;</span>
+
+<span class="k">@end</span>
+
+<span class="err">@</span><span class="n">implementation</span> <span class="n">SecondViewController</span>
+
+<span class="n">-</span> <span class="p">(</span><span class="n">void</span><span class="p">)</span><span class="n">viewDidLoad</span> <span class="p">{</span>
+    <span class="o">[</span><span class="nt">super</span> <span class="nt">viewDidLoad</span><span class="o">];</span>
+    <span class="nt">self</span><span class="nc">.view.backgroundColor</span> <span class="o">=</span> <span class="o">[</span><span class="nt">UIColor</span> <span class="nt">whiteColor</span><span class="o">];</span>
+
+    <span class="nt">_contentView</span> <span class="o">=</span> <span class="o">[[</span><span class="nt">UIView</span> <span class="nt">alloc</span><span class="o">]</span> <span class="nt">initWithFrame</span><span class="nd">:CGRectMake</span><span class="o">(</span><span class="err">0</span><span class="o">,</span> <span class="err">0</span><span class="o">,</span> <span class="err">200</span><span class="o">,</span> <span class="err">300</span><span class="o">)];</span>
+    <span class="nt">_contentView</span><span class="nc">.backgroundColor</span> <span class="o">=</span> <span class="o">[</span><span class="nt">UIColor</span> <span class="nt">clearColor</span><span class="o">];</span>
+
+    <span class="nt">UIButton</span> <span class="o">*</span><span class="nt">btn</span> <span class="o">=</span> <span class="o">[</span><span class="nt">UIButton</span> <span class="nt">buttonWithType</span><span class="nd">:UIButtonTypeCustom</span><span class="o">];</span>
+    <span class="nt">btn</span><span class="nc">.frame</span> <span class="o">=</span> <span class="nt">CGRectMake</span><span class="o">(</span><span class="err">100</span><span class="o">,</span> <span class="err">200</span><span class="o">,</span> <span class="err">100</span><span class="o">,</span> <span class="err">50</span><span class="o">);</span>
+    <span class="nt">btn</span><span class="nc">.backgroundColor</span> <span class="o">=</span> <span class="o">[</span><span class="nt">UIColor</span> <span class="nt">greenColor</span><span class="o">];</span>
+    <span class="o">[</span><span class="nt">btn</span> <span class="nt">addTarget</span><span class="nd">:self</span> <span class="nt">action</span><span class="o">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">popViewShow</span><span class="p">)</span> <span class="n">forControlEvents</span><span class="p">:</span><span class="n">UIControlEventTouchUpInside</span><span class="p">];</span>
+    <span class="o">[</span><span class="nt">self</span><span class="nc">.view</span> <span class="nt">addSubview</span><span class="nd">:btn</span><span class="o">];</span>
+<span class="p">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">popViewShow</span> <span class="p">{</span>
+    <span class="err">UIImageView</span> <span class="err">*imageV</span> <span class="err">=</span> <span class="err">[[UIImageView</span> <span class="err">alloc]</span><span class="py">initWithFrame</span><span class="p">:</span><span class="n">_contentView</span><span class="p">.</span><span class="n">bounds</span><span class="p">];</span>
+    <span class="err">imageV.image</span> <span class="err">=</span> <span class="err">[UIImage</span> <span class="py">imageNamed</span><span class="p">:</span><span class="err">@</span><span class="s1">"jei"</span><span class="p">];</span>
+    <span class="err">[_contentView</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">imageV</span><span class="p">];</span>
+
+    <span class="err">[HWPopTool</span> <span class="err">sharedInstance].shadeBackgroundType</span> <span class="err">=</span> <span class="err">ShadeBackgroundTypeSolid;</span>
+    <span class="err">[HWPopTool</span> <span class="err">sharedInstance].closeButtonType</span> <span class="err">=</span> <span class="err">ButtonPositionTypeRight;</span>
+    <span class="err">[[HWPopTool</span> <span class="err">sharedInstance]</span> <span class="py">showWithPresentView</span><span class="p">:</span><span class="n">_contentView</span> <span class="n">animated</span><span class="p">:</span><span class="n">YES</span><span class="p">];</span>
+
+<span class="p">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">didReceiveMemoryWarning</span> <span class="p">{</span>
+    <span class="err">[super</span> <span class="err">didReceiveMemoryWarning];</span>
+    <span class="err">//</span> <span class="err">Dispose</span> <span class="err">of</span> <span class="err">any</span> <span class="err">resources</span> <span class="err">that</span> <span class="err">can</span> <span class="err">be</span> <span class="err">recreated.</span>
+<span class="p">}</span>
+
+<span class="k">@end</span></code></pre></figure>
+<p><br/>
+We import HWPopTool.h and create a button. Its click handler is popViewShow.<br/>
+Let's look at the code:<br/>
+<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">popViewShow</span> <span class="p">{</span>
+
+    <span class="err">UIImageView</span> <span class="err">*imageV</span> <span class="err">=</span> <span class="err">[[UIImageView</span> <span class="err">alloc]</span><span class="py">initWithFrame</span><span class="p">:</span><span class="n">_contentView</span><span class="p">.</span><span class="n">bounds</span><span class="p">];</span>
+    <span class="err">imageV.image</span> <span class="err">=</span> <span class="err">[UIImage</span> <span class="py">imageNamed</span><span class="p">:</span><span class="err">@</span><span class="s1">"jei"</span><span class="p">];</span>
+    <span class="err">[_contentView</span> <span class="py">addSubview</span><span class="p">:</span><span class="n">imageV</span><span class="p">];</span>
+
+    <span class="err">[HWPopTool</span> <span class="err">sharedInstance].shadeBackgroundType</span> <span class="err">=</span> <span class="err">ShadeBackgroundTypeSolid;</span>
+    <span class="err">[HWPopTool</span> <span class="err">sharedInstance].closeButtonType</span> <span class="err">=</span> <span class="err">ButtonPositionTypeRight;</span>
+    <span class="err">[[HWPopTool</span> <span class="err">sharedInstance]</span> <span class="py">showWithPresentView</span><span class="p">:</span><span class="n">_contentView</span> <span class="n">animated</span><span class="p">:</span><span class="n">YES</span><span class="p">];</span>
+
+<span class="p">}</span></code></pre></figure>
+<p><br/>
+Here, we place an imageView on _contentView and then set shadeBackgroundType<br/>
+and closeButtonType. The next line displays popView. The main idea here is to present<br/>
+a view. You decide how large it is and what to place on it.<br/></p>
+<h3 id="二关于hwpoptool里面的一些属性和方法">II. Some HWPopTool properties and methods<br/></h3>
+<p>First, look at HWPopTool.h.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span>
+<span class="o">//</span>  <span class="nt">HWPopTool</span><span class="nc">.h</span>
+<span class="o">//</span>  <span class="nt">HWPopTool</span>
+<span class="o">//</span>
+<span class="o">//</span>  <span class="nt">Created</span> <span class="nt">by</span> <span class="nt">HenryCheng</span> <span class="nt">on</span> <span class="err">16</span><span class="o">/</span><span class="err">1</span><span class="o">/</span><span class="err">11</span><span class="o">.</span>
+<span class="o">//</span>  <span class="nt">Copyright</span> <span class="err">©</span> <span class="err">2016</span><span class="nt">年</span> <span class="nt">www</span><span class="nc">.igancao.com</span><span class="o">.</span> <span class="nt">All</span> <span class="nt">rights</span> <span class="nt">reserved</span><span class="o">.</span>
+<span class="o">//</span>
+
+<span class="nf">#import</span> <span class="o">&lt;</span><span class="nt">Foundation</span><span class="o">/</span><span class="nt">Foundation</span><span class="nc">.h</span><span class="o">&gt;</span>
+<span class="nf">#import</span> <span class="o">&lt;</span><span class="nt">UIKit</span><span class="o">/</span><span class="nt">UIKit</span><span class="nc">.h</span><span class="o">&gt;</span>
+<span class="c">/**
+*  关闭按钮的位置
+*/</span>
+<span class="nt">typedef</span> <span class="nt">NS_ENUM</span><span class="o">(</span><span class="nt">NSInteger</span><span class="o">,</span> <span class="nt">ButtonPositionType</span><span class="o">)</span> <span class="p">{</span>
+    <span class="c">/**
+    *  无
+    */</span>
+    <span class="err">ButtonPositionTypeNone</span> <span class="err">=</span> <span class="err">0,</span>
+    <span class="c">/**
+    *  左上角
+    */</span>
+    <span class="err">ButtonPositionTypeLeft</span> <span class="err">=</span> <span class="err">1</span> <span class="err">&lt;&lt;</span> <span class="err">0,</span>
+    <span class="c">/**
+    *  右上角
+    */</span>
+    <span class="err">ButtonPositionTypeRight</span> <span class="err">=</span> <span class="err">2</span> <span class="err">&lt;&lt;</span> <span class="err">0</span>
+<span class="p">}</span><span class="o">;</span>
+<span class="c">/**
+*  蒙板的背景色
+*/</span>
+<span class="nt">typedef</span> <span class="nt">NS_ENUM</span><span class="o">(</span><span class="nt">NSInteger</span><span class="o">,</span> <span class="nt">ShadeBackgroundType</span><span class="o">)</span> <span class="p">{</span>
+    <span class="c">/**
+    *  渐变色
+    */</span>
+    <span class="err">ShadeBackgroundTypeGradient</span> <span class="err">=</span> <span class="err">0,</span>
+    <span class="c">/**
+    *  固定色
+    */</span>
+    <span class="err">ShadeBackgroundTypeSolid</span> <span class="err">=</span> <span class="err">1</span> <span class="err">&lt;&lt;</span> <span class="err">0</span>
+<span class="p">}</span><span class="o">;</span>
+
+<span class="nt">typedef</span> <span class="nt">void</span><span class="o">(^</span><span class="nt">completeBlock</span><span class="o">)(</span><span class="nt">void</span><span class="o">);</span>
+
+<span class="k">@interface</span> <span class="n">HWPopTool</span> <span class="p">:</span> <span class="n">NSObject</span>
+
+<span class="err">@</span><span class="n">property</span> <span class="p">(</span><span class="n">strong</span><span class="p">,</span> <span class="n">nonatomic</span><span class="p">)</span> <span class="n">UIColor</span> <span class="err">*</span><span class="n">popBackgroudColor</span><span class="p">;</span><span class="o">//</span><span class="nt">弹出视图的背景色</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">assign</span><span class="p">,</span> <span class="n">nonatomic</span><span class="p">)</span> <span class="n">BOOL</span> <span class="n">tapOutsideToDismiss</span><span class="p">;</span><span class="o">//</span><span class="nt">点击蒙板是否弹出视图消失</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">assign</span><span class="p">,</span> <span class="n">nonatomic</span><span class="p">)</span> <span class="n">ButtonPositionType</span> <span class="n">closeButtonType</span><span class="p">;</span><span class="o">//</span><span class="nt">关闭按钮的类型</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">assign</span><span class="p">,</span> <span class="n">nonatomic</span><span class="p">)</span> <span class="n">ShadeBackgroundType</span> <span class="n">shadeBackgroundType</span><span class="p">;</span><span class="o">//</span><span class="nt">蒙板的背景色</span>
+
+<span class="c">/**
+*  创建一个实例
+*
+*  @return CHWPopTool
+*/</span>
+<span class="o">+</span> <span class="o">(</span><span class="nt">HWPopTool</span> <span class="o">*)</span><span class="nt">sharedInstance</span><span class="o">;</span>
+<span class="c">/**
+*  弹出要展示的View
+*
+*  @param presentView show View
+*  @param animated    是否动画
+*/</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">showWithPresentView</span><span class="o">:(</span><span class="nt">UIView</span> <span class="o">*)</span><span class="nt">presentView</span> <span class="nt">animated</span><span class="o">:(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">animated</span><span class="o">;</span>
+<span class="c">/**
+*  关闭弹出视图
+*
+*  @param complete complete block
+*/</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">closeWithBlcok</span><span class="o">:(</span><span class="nt">void</span><span class="o">(^)())</span><span class="nt">complete</span><span class="o">;</span>
+
+<span class="k">@end</span></code></pre></figure>
+<p>The earlier version was written in a hurry, so I used some free time today to reorganize the code. For example, the callback after closing originally used a <code class="language-plaintext highlighter-rouge">delegate</code>; I rewrote it with a <code class="language-plaintext highlighter-rouge">block</code> for a simpler implementation. I also commented nearly every method, property, and enumeration, as is my habit. A few points need explanation:</p>
+<blockquote>
+<p>1. <code class="language-plaintext highlighter-rouge">ShadeBackgroundType</code> controls the overlay background type, with solid and gradient options (ShadeBackgroundTypeGradient). If interested in the gradient, explore CAGradientLayer; it is quite interesting and will appear in a later article.</p>
+</blockquote>
+<p><br/></p>
+<blockquote>
+<p>2. <code class="language-plaintext highlighter-rouge">tapOutsideToDismiss</code> determines whether tapping the overlay dismisses <code class="language-plaintext highlighter-rouge">popView</code>. Its default is YES.</p>
+</blockquote>
+<p><br/></p>
+<blockquote>
+<p>3. <code class="language-plaintext highlighter-rouge">- (void)closeWithBlcok:(void(^)())complete</code> is the callback after closing, useful for cases such as returning to the previous page after sending a red envelope and waiting for <code class="language-plaintext highlighter-rouge">popView</code> to disappear.</p>
+</blockquote>
+<p><br/></p>
+<p>The comments explain most things clearly, so I will not elaborate here.<br/></p>
+<h3 id="三最后">III. Finally</h3>
+<p>When writing blog posts, I usually prefer to include the full code because I think it is easier to follow, except when it is very long.<br/>
+Finally, all the demo code can be found at<br/>
+<a href="https://github.com/Loveway/HWPopTool">Here,</a> .<br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-01-13-bison-s-guide-to-ios-multithreading-part-1/">Bison's guide to iOS multithreading, part 1</a><br/></p>
+
+{% endraw %}

@@ -64,8 +64,11 @@ for url in urls:
 ElementTree.parse(ROOT/'feed.xml')
 video_sitemap=ElementTree.parse(ROOT/'video-sitemap.xml')
 video_sitemap_entries=video_sitemap.findall('sm:url',SITEMAP_NS)
+# English watch pages are checked against their translated sources by validate_i18n.py.
+video_sitemap_entries=[entry for entry in video_sitemap_entries if not urlparse(entry.findtext('sm:loc',namespaces=SITEMAP_NS)).path.startswith('/en/')]
 robot_sitemaps=re.findall(r'^Sitemap:\s*(\S+)',(ROOT/'robots.txt').read_text(),re.M)
 new=[ROOT/'index.html',ROOT/'about/index.html',ROOT/'journal/index.html']+list((ROOT/'apps').rglob('*.html'))+list((ROOT/'guides').rglob('*.html'))+list((ROOT/'works').rglob('*.html'))
+new+=list((ROOT/'en').rglob('*.html'))
 for file in new:
     page=pages[file]; assert page.h1==1, f'expected one h1: {file}'
     for url in page.links:
@@ -81,9 +84,14 @@ for file,page in pages.items():
         for entity in graph['@graph']:
             if entity['@type']=='SoftwareApplication': apps.append(entity)
             if entity['@type']=='BlogPosting' and 'about' in entity: articles.append(entity)
-            if entity['@type']=='VideoObject': videos.append(entity)
-assert len(apps)==len(catalog) and len(catalog_by_id)==len(catalog)
+            if entity['@type']=='VideoObject' and not urlparse(entity['mainEntityOfPage']['@id']).path.startswith('/en/'): videos.append(entity)
+assert len(catalog_by_id)==len(catalog)
 app_ids={app['@id'] for app in apps}
+assert app_ids=={urljoin(SITE_URL,app['url'])+'#app' for app in catalog}, 'localized pages must share the six original product entities'
+expected_app_pages=[urljoin(SITE_URL,app['url']) for app in catalog]
+if (ROOT/'en/apps/index.html').is_file():
+    expected_app_pages += [urljoin(SITE_URL,'en/'+app['url'].lstrip('/')) for app in catalog]
+assert Counter(app['url'] for app in apps)==Counter(expected_app_pages), 'each app page must declare exactly one shared product entity'
 articles=[article for article in articles if article['about'].get('@id') in app_ids]
 for article in articles:
     assert article['about']['@id'] in app_ids

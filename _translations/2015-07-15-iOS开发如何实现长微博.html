@@ -1,0 +1,109 @@
+---
+layout: post
+title: Creating long-form Weibo images in an iOS app
+description: Turns a long passage of text into an image for a long-form Weibo post. The code works through text
+  width, font size, required height and image drawing, demonstrating an early UIKit approach to generating a tall
+  image at a fixed width.
+category: Development notes
+imagefeature: picture-35.jpg
+date: 2015-07-15 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Turns a long passage of text into an image for a long-form Weibo post. The code works through text width,
+    font size, required height and image drawing, demonstrating an early UIKit approach to generating a tall image
+    at a fixed width.
+  keywords:
+  - tall images
+  - text drawing
+  - UIKit
+  - image generation
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  title: Creating long-form Weibo images in an iOS app
+  source_sha256: 1d7140c1b0dae785afe6c26c9322e1303617d04427c62fd1b1b3030157aaa918
+lang: en
+source_path: _posts/2015-07-15-iOS开发如何实现长微博.md
+source_url: /iOS%E5%BC%80%E5%8F%91%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%95%BF%E5%BE%AE%E5%8D%9A
+permalink: /en/journal/2015-07-15-creating-long-form-weibo-images-in-an-ios-app/
+translation_method: machine-assisted
+translation_source_sha256: 1d7140c1b0dae785afe6c26c9322e1303617d04427c62fd1b1b3030157aaa918
+excerpt: Turns a long passage of text into an image for a long-form Weibo post. The code works through text width,
+  font size, required height and image drawing, demonstrating an early UIKit approach to generating a tall image
+  at a fixed width.
+translation_date: '2026-10-23T02:34:09+00:00'
+---
+{% raw %}
+<blockquote>
+<p>“iOS development is like moving things around; once you become skilled enough, you can start taking shortcuts.”
+<small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p>How can we implement long Weibo posts in iOS development?<br/>
+Put simply, convert the text into an image for display too.<br/>
+See the code below.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nf">#define</span> <span class="nt">CONTENT_MAX_WIDTH</span>   <span class="err">300</span><span class="o">.</span><span class="err">0</span><span class="nt">f</span>
+
+<span class="o">+(</span><span class="nt">UIImage</span> <span class="o">*)</span><span class="nt">imageFromText</span><span class="o">:(</span><span class="nt">NSArray</span><span class="o">*)</span><span class="nt">arrContent</span> <span class="nt">withFont</span><span class="o">:(</span><span class="nt">CGFloat</span><span class="o">)</span><span class="nt">fontSize</span> <span class="nt">withTextColor</span><span class="o">:(</span><span class="nt">UIColor</span> <span class="o">*)</span><span class="nt">textColor</span> <span class="nt">withBgImage</span><span class="o">:(</span><span class="nt">UIImage</span> <span class="o">*)</span><span class="nt">bgImage</span> <span class="nt">withBgColor</span><span class="o">:(</span><span class="nt">UIColor</span> <span class="o">*)</span><span class="nt">bgColor</span>
+<span class="p">{</span>
+<span class="err">//</span> <span class="err">设置字体类型和大小</span>
+
+    <span class="err">UIFont</span> <span class="err">*font</span> <span class="err">=</span> <span class="err">[UIFont</span> <span class="py">fontWithName</span><span class="p">:</span><span class="err">@</span><span class="s1">"Heiti SC"</span> <span class="n">size</span><span class="p">:</span><span class="n">fontSize</span><span class="p">];</span>
+    <span class="err">NSMutableArray</span> <span class="err">*arrHeight</span> <span class="err">=</span> <span class="err">[[NSMutableArray</span> <span class="err">alloc]</span> <span class="py">initWithCapacity</span><span class="p">:</span><span class="n">arrContent</span><span class="p">.</span><span class="n">count</span><span class="p">];</span>
+
+    <span class="err">CGFloat</span> <span class="err">fHeight</span> <span class="err">=</span> <span class="err">0.0f;</span>
+    <span class="err">for</span> <span class="err">(NSString</span> <span class="err">*sContent</span> <span class="err">in</span> <span class="err">arrContent)</span> <span class="err">{</span>
+        <span class="err">CGSize</span> <span class="err">stringSize</span> <span class="err">=</span> <span class="err">[sContent</span> <span class="py">sizeWithFont</span><span class="p">:</span><span class="n">font</span> <span class="n">constrainedToSize</span><span class="p">:</span><span class="n">CGSizeMake</span><span class="p">(</span><span class="n">CONTENT_MAX_WIDTH</span><span class="p">,</span> <span class="m">10000</span><span class="p">)</span> <span class="n">lineBreakMode</span><span class="p">:</span><span class="n">NSLineBreakByWordWrapping</span><span class="p">];</span>
+        <span class="err">[arrHeight</span> <span class="py">addObject</span><span class="p">:[</span><span class="n">NSNumber</span> <span class="n">numberWithFloat</span><span class="p">:</span><span class="n">stringSize</span><span class="p">.</span><span class="n">height</span><span class="p">]];</span>
+
+        <span class="err">fHeight</span> <span class="err">+=</span> <span class="err">stringSize.height;</span>
+    <span class="p">}</span>
+
+    <span class="nt">CGSize</span> <span class="nt">newSize</span> <span class="o">=</span> <span class="nt">CGSizeMake</span><span class="o">(</span><span class="nt">CONTENT_MAX_WIDTH</span><span class="o">+</span><span class="err">20</span><span class="o">,</span> <span class="nt">fHeight</span><span class="o">+</span><span class="err">50</span><span class="o">);</span>
+
+
+    <span class="o">//</span> <span class="nt">创建一个可拉伸的图像的背景上画</span>
+    <span class="nt">UIGraphicsBeginImageContextWithOptions</span><span class="o">(</span><span class="nt">newSize</span><span class="o">,</span><span class="nt">NO</span><span class="o">,</span><span class="err">0</span><span class="o">.</span><span class="err">0</span><span class="o">);</span>
+    <span class="nt">CGContextRef</span> <span class="nt">ctx</span> <span class="o">=</span> <span class="nt">UIGraphicsGetCurrentContext</span><span class="o">();</span>
+
+
+    <span class="o">//</span><span class="nt">如果设置了背景图片</span>
+    <span class="nt">if</span><span class="o">(</span><span class="nt">bgImage</span><span class="o">)</span><span class="p">{</span>
+        <span class="err">UIImage*</span> <span class="err">stretchedTopImage</span> <span class="err">=</span> <span class="err">[bgImage</span> <span class="py">stretchableImageWithLeftCapWidth</span><span class="p">:</span><span class="m">0</span> <span class="n">topCapHeight</span><span class="p">:</span><span class="m">0</span><span class="p">];</span>
+        <span class="err">[stretchedTopImage</span> <span class="py">drawInRect</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="n">newSize</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="n">newSize</span><span class="p">.</span><span class="n">height</span><span class="p">)];</span>
+    <span class="p">}</span><span class="nt">else</span><span class="p">{</span>
+        <span class="err">if(bgColor){</span>
+            <span class="err">//填充背景颜色</span>
+            <span class="err">[bgColor</span> <span class="err">set];</span>
+            <span class="err">UIRectFill(CGRectMake(0,</span> <span class="err">0,</span> <span class="err">newSize.width,</span> <span class="err">newSize.height));</span>
+        <span class="p">}</span>
+    <span class="err">}</span>
+
+        <span class="nt">CGContextSetCharacterSpacing</span><span class="o">(</span><span class="nt">ctx</span><span class="o">,</span> <span class="err">10</span><span class="o">);</span>
+        <span class="nt">CGContextSetTextDrawingMode</span> <span class="o">(</span><span class="nt">ctx</span><span class="o">,</span> <span class="nt">kCGTextFill</span><span class="o">);</span>
+        <span class="o">[</span><span class="nt">textColor</span> <span class="nt">set</span><span class="o">];</span>
+
+
+        <span class="nt">int</span> <span class="nt">nIndex</span> <span class="o">=</span> <span class="err">0</span><span class="o">;</span>
+        <span class="nt">CGFloat</span> <span class="nt">fPosY</span> <span class="o">=</span> <span class="err">20</span><span class="o">.</span><span class="err">0</span><span class="nt">f</span><span class="o">;</span>
+        <span class="nt">for</span> <span class="o">(</span><span class="nt">NSString</span> <span class="o">*</span><span class="nt">sContent</span> <span class="nt">in</span> <span class="nt">arrContent</span><span class="o">)</span> <span class="p">{</span>
+        <span class="err">NSNumber</span> <span class="err">*numHeight</span> <span class="err">=</span> <span class="err">[arrHeight</span> <span class="py">objectAtIndex</span><span class="p">:</span><span class="n">nIndex</span><span class="p">];</span>
+        <span class="err">CGRect</span> <span class="err">rect</span> <span class="err">=</span> <span class="err">CGRectMake(10,</span> <span class="err">fPosY,</span> <span class="err">CONTENT_MAX_WIDTH</span> <span class="err">,</span> <span class="err">[numHeight</span> <span class="err">floatValue]);</span>
+
+
+        <span class="err">[sContent</span> <span class="py">drawInRect</span><span class="p">:</span><span class="n">rect</span> <span class="n">withFont</span><span class="p">:</span><span class="n">font</span> <span class="n">lineBreakMode</span><span class="p">:</span><span class="n">NSLineBreakByWordWrapping</span> <span class="n">alignment</span><span class="p">:</span><span class="n">NSTextAlignmentLeft</span><span class="p">];</span>
+
+        <span class="err">fPosY</span> <span class="err">+=</span> <span class="err">[numHeight</span> <span class="err">floatValue];</span>
+        <span class="err">nIndex++;</span>
+    <span class="p">}</span>
+
+    <span class="o">//</span> <span class="nt">传递图像</span>
+    <span class="nt">UIImage</span> <span class="o">*</span><span class="nt">image</span> <span class="o">=</span> <span class="nt">UIGraphicsGetImageFromCurrentImageContext</span><span class="o">();</span>
+    <span class="nt">UIGraphicsEndImageContext</span><span class="o">();</span>
+
+    <span class="nt">return</span> <span class="nt">image</span><span class="o">;</span>
+
+<span class="err">}</span></code></pre></figure>
+<p><br/></p>
+
+{% endraw %}

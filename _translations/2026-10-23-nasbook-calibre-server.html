@@ -1,0 +1,54 @@
+---
+layout: guide
+author: Bison
+app_id: nas_book
+title: 'Connect Book Isle to Calibre Content Server: read your computer library on iPad'
+description: Configure Calibre Content Server, distinguish catalogue-metadata sync from actual downloads, and check
+  computer sleep, permissions and offline-reading limits.
+permalink: /en/guides/nasbook-calibre-server/
+date: 2026-10-23 00:00:00 +0800
+modified: 2026-10-23 00:00:00 +0800
+category: Tutorials
+level: Beginner
+series_order: 14
+topic: Private libraries
+reading_time: 8
+lang: en
+source_path: _posts/2026-10-23-nasbook-calibre-server.md
+source_url: /guides/nasbook-calibre-server/
+translation_method: machine-assisted
+translation_source_sha256: 9b2583091998eb87a33d1a88cfba9b863b016178e0b7aa19520ed43812b9f102
+excerpt: Configure Calibre Content Server, distinguish catalogue-metadata sync from actual downloads, and check
+  computer sleep, permissions and offline-reading limits.
+translation_date: '2026-10-23T02:34:08+00:00'
+---
+{% raw %}
+<p>If Calibre manages your ebooks, its content server can provide the library to Book Isle for browsing metadata and downloading as needed. “Sync library” first means obtaining catalog records and metadata, not necessarily moving every computer file to the iPad.</p>
+<h2 id="先让内容服务器确实可访问">Make sure the content server is reachable first</h2>
+<p>On the computer running Calibre, enable its content server, confirm the actual listening address and port, and use your configured account. The computer must keep the service running; having opened Calibre previously does not make it reachable while shut down or asleep. For the first attempt, put the computer and iPad on the same trusted network.</p>
+<p>Prepare a text-based EPUB that opens correctly in Calibre. Visit the content server from another device and confirm the account can access it. Book Isle's private Calibre-library feature requires Collector Pro. Server operation, account permissions, and app entitlements need separate checks.</p>
+<h2 id="在书屿选择-content-server-方式">Choose Content Server in Book Isle</h2>
+<p>Open Settings → Calibre Library and tap Add. Choose Content Server as the source type and enter a library name, server address, and required username and password. An example address may look like <code class="language-plaintext highlighter-rouge">http://192.168.1.20:8080</code>; use your actual configured port, and do not enter the computer-local <code class="language-plaintext highlighter-rouge">localhost</code> on another device.</p>
+<p>If deployed beneath a reverse-proxy subpath, retain the correct prefix. Point to the Calibre content service, not a NAS dashboard or unrelated webpage. Put credentials in their dedicated fields rather than embedding them in links. If saving offers an additional OPDS source, choose according to whether you want a lightweight catalog entry; two duplicate libraries are not required.</p>
+<h2 id="同步元数据再浏览具体书籍">Synchronize metadata, then browse individual books</h2>
+<p>Use Sync Now or the corresponding control on the configured library and wait. Check the reported book count and last-sync time, then open Browse Library. This mainly confirms that the service provides titles, authors, formats, and catalog information. Hundreds of visible covers do not mean hundreds of books have downloaded.</p>
+<p>Select the practice book and check author and available formats. If the same record already exists locally, catalog refresh may update its information. For a new book, follow the actual interface to sync its record or download it. Metadata refresh is not replacement of the local reading file; do not delete an existing book record before confirming content.</p>
+<h2 id="下载合适格式并进行阅读检查">Download a suitable format and check reading</h2>
+<p>Choose a readable format in the book controls and download, preferably EPUB or PDF for the first test. If an import preview appears, check duplicate and merge suggestions against the actual edition relationship. Return to the local bookshelf, open the text, jump to a later chapter, and close and reopen it. Server-side opening proves only the source file is good; verify the phone's download too.</p>
+<p>Temporarily disable networking and check that downloaded book. Undownloaded entries still require the server; a cached catalog is not a complete offline library. To take five books with you, confirm each download and inspect at least the beginning and latter half. Catalog-sync count is not offline-file count.</p>
+<h2 id="给电脑书库和手机记录划清边界">Distinguish the computer library from mobile reading records</h2>
+<p>Calibre manages your books, while Book Isle retains its own progress, notes, and tags. Content-server browsing and downloads obtain books; reading-data synchronization uses another entry. Check which category an operation handles. Even if a version offers advanced two-way operations, read its scope and confirmations first rather than assuming every phone edit is safely written back to the computer.</p>
+<p>Keep existing computer-side backups for the main library. Verify metadata updates one book at a time to detect field differences more easily. Give two translations or revisions of a work explicit edition identifiers rather than merging them in an import preview merely because names resemble each other.</p>
+<h2 id="常见连接问题的检查顺序">An ordered check for common connection problems</h2>
+<p>If connection fails, confirm the computer is awake and the content server running, then check address, port, and network. For authentication failures, inspect content-server accounts rather than repeatedly trying the computer's system password. If the catalog reads but downloads fail, check the book format, access permissions, and returned content.</p>
+<p>After changing a server address, edit or clearly distinguish connection names to avoid indistinguishable library copies. If a reverse proxy returns an HTML login page, the app may not read the catalog or files as expected. Configure a compatible access method; changing a webpage suffix to an ebook suffix will not solve it.</p>
+<h2 id="常见问题">Frequently asked questions</h2>
+<p><strong>Why do covers remain visible after the computer shuts down, while new books will not open?</strong> Covers and catalog records may be cached locally while undownloaded files still require the content server. Test downloaded books offline separately; covers do not establish server status.</p>
+<p><strong>Should I choose Content Server or metadata.db?</strong> Use this method when you already have a stable content server. If the NAS contains a complete Calibre library folder, consider the database method too. They require different addresses and paths; a database file path does not belong in the server URL field.</p>
+<p><strong>Does synchronization send every ebook to the developer's server?</strong> Book Isle's public purpose is access to your own private library. This workflow connects to the Calibre service you configured. Understand catalog and reading-data storage according to each feature's explanation rather than mistaking a private connection for a public cloud library.</p>
+<h2 id="相关教程">Related tutorials</h2>
+<p>To read a Calibre folder structure directly from a NAS, continue with <a href="/en/guides/nasbook-calibre-database/">metadata.db and file paths</a>; for catalog navigation alone, see <a href="/en/guides/nasbook-opds-library/">OPDS connection</a>. For reading-note synchronization between devices, use the separate <a href="/en/guides/nasbook-webdav-sync/">WebDAV synchronization workflow</a>.</p>
+<h2 id="资料与版本">Sources and version</h2>
+<p>Information checked on October 23, 2026. The public release is Book Isle 1.1.3, requiring iOS / iPadOS 15.6 or later. This guide is based on public feature descriptions and their entry points. Interface labels may change with the version. See <a href="https://apps.apple.com/cn/app/id6766198898">Official App Store description</a> and <a href="https://itunes.apple.com/lookup?id=6766198898&amp;country=cn">Apple release information</a>.</p>
+
+{% endraw %}

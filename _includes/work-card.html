@@ -1,5 +1,5 @@
-{% assign work_app = site.data.apps | where: 'id', post.app_id | first %}
+{% assign work_app = localized_apps | default: site.data.apps | where: 'id', post.app_id | first %}
 <article class="work-card" data-work-item="{{ post.url | relative_url }}" data-work-app="{{ post.app_id }}">
-  <a class="work-cover" href="{{ post.url | relative_url }}" tabindex="-1" aria-hidden="true"><img src="{{ post.video.poster | default: post.image | relative_url }}" alt="" loading="lazy"><span class="work-play" aria-hidden="true">▶</span><span class="work-cover-label">观看创作过程</span></a>
+  <a class="work-cover" href="{{ post.url | relative_url }}" tabindex="-1" aria-hidden="true"><img src="{{ post.video.poster | default: post.image | relative_url }}" alt="" loading="lazy"><span class="work-play" aria-hidden="true">▶</span><span class="work-cover-label">{% if content_lang == 'en' %}Watch the process{% else %}观看创作过程{% endif %}</span></a>
   <div class="work-card-copy"><p class="work-meta">{{ work_app.name }} <span>·</span> <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%Y.%m.%d' }}</time></p><h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3><p>{{ post.description }}</p></div>
 </article>

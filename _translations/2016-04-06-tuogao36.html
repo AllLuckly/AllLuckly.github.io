@@ -1,0 +1,287 @@
+---
+layout: post
+title: Understanding blocks in iOS development
+description: Starts with block declarations and calls, then examines captured variables and callback wrappers. Examples
+  modelled on Swift's higher-order functions demonstrate how blocks can be used to process data in Objective-C.
+category: Development notes
+imagefeature: null
+date: 2016-04-06 00:00:00 +0800
+technical_translation:
+  topic: swift-runtime
+  summary: Starts with block declarations and calls, then examines captured variables and callback wrappers. Examples
+    modelled on Swift's higher-order functions demonstrate how blocks can be used to process data in Objective-C.
+  keywords:
+  - block
+  - variable capture
+  - Objective-C
+  - callbacks
+  - higher-order functions
+  provenance: contribution
+  author_name: Sindri
+  source_url: http://www.jianshu.com/p/29d70274374b
+  credit: Originally credited to Sindri; edited and archived by Bison.
+  title: Understanding blocks in iOS development
+  source_sha256: 0e83a3c58cbb620ffd8eb0fc16b8b4b72001d7331f27310fd84752b0f50150e0
+lang: en
+source_path: _posts/2016-04-06-tuogao36.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao36
+permalink: /en/journal/2016-04-06-understanding-blocks-in-ios-development/
+translation_method: machine-assisted
+translation_source_sha256: 0e83a3c58cbb620ffd8eb0fc16b8b4b72001d7331f27310fd84752b0f50150e0
+excerpt: Starts with block declarations and calls, then examines captured variables and callback wrappers. Examples
+  modelled on Swift's higher-order functions demonstrate how blocks can be used to process data in Objective-C.
+translation_date: '2026-10-23T02:34:14+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"Blocks arrived after iOS4.0. They encapsulate code, treat it as a variable, and invoke it through block(). This brings to mind C function pointers, which can be declared and called as follows:"</p>
+</blockquote>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/29d70274374b">Sindri’s Notes</a><br/></p>
+<h2 id="关于block">About blocks<br/></h2>
+<p>Blocks arrived after iOS4.0. They encapsulate code, treat it as a variable, and invoke it through block(). This brings to mind C function pointers, which can be declared and called as follows:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bool executeSomeTask(void) {
+    //do something and return if success or not
+}
+bool (*taskPoint)(void);
+taskPoint = something
+</code></pre></div></div>
+<p><br/>
+The function pointer above invokes executeSomeTask directly as (*taskPoint)(). This makes a block look much like a C function pointer, but the two still differ in the following ways:
+<br/>
+A block's code is inline and more efficient than a function call.<br/>
+External variables are read-only inside a block by default.<br/>
+Objective-C treats blocks as objects.<br/>
+There is already extensive information online about the internals of blocks, and their source is available at opensource.apple.com. This article focuses more on using them.<br/></p>
+<h2 id="block特性">Block characteristics<br/></h2>
+<ul>
+<li>Understanding blocks<br/></li>
+</ul>
+<p>Start with a simple requirement: take two numbers and calculate their sum. We create this block:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int (^sumOfNumbers)(int a, int b) = ^(int a, int b) {
+    return a + b;
+};
+</code></pre></div></div>
+<p><br/>
+On the left of the equals sign, this declares a block named sumOfNumbers. The ^ before the name identifies it as a block name. The leftmost int is the return type, and the parentheses contain the parameter list: two int parameters here. The right-hand side defines the block. Its return type may be omitted because the compiler infers it from context. A ^ followed by a parenthesized parameter list identifies a block to the compiler; braces enclose its code.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao36/1.jpg"/><br/></p>
+<ul>
+<li>
+<p>Capturing external variables<br/>
+A block can also access external local variables. The following code from my article on UIView animations uses a local variable from outside the block:<br/></p>
+<p>CGPoint center = cell.center;
+  CGPoint startCenter = center;
+  startCenter.y += LXD_SCREEN_HEIGHT;
+  cell.center = startCenter;</p>
+<p>[UIView animateWithDuration: 0.5 delay: 0.35 * indexPath.item usingSpringWithDamping: 0.6 initialSpringVelocity: 0 options: UIViewAnimationOptionCurveLinear animations: ^{
+      cell.center = center;
+  } completion: ^(BOOL finished) {
+      NSLog(“animation %@ finished”, finished? @”is”, @”isn’t”);
+  }];</p>
+</li>
+</ul>
+<p><br/>
+This uses <br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void(^animations)(void)跟void(^completion)(BOOL finished)
+</code></pre></div></div>
+<p><br/>
+two blocks, which the system invokes when the animation starts and ends, respectively. Inside the animation block, the code accesses the center property described above. By the time the animation starts, that animation function's lifetime has already ended, but the block captures local variables outside its body. Such access is read-only. Attempting to modify an external variable inside the block produces a compiler error:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao36/2.jpg"/><br/>
+For external local variables we want to modify inside a block, add the __block qualifier. They can then be changed within the block. Variable capture has another interesting mechanism; change the code above as follows:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CGPoint center = CGPointZero;
+CGPoint (^pointAddHandler)(CGPoint addPoint) = ^(CGPoint addPoint) {
+    return CGPointMake(center.x + addPoint.x, center.y + addPoint.y);
+}
+center = CGPointMake(100, 100);
+NSLog(@"%@", pointAddHandler(CGPointMake(10, 10)));    //输出{10,10}
+</code></pre></div></div>
+<p><br/>
+When a block captures a variable, it saves only that variable's state at capture time, except for object variables. Subsequent changes do not change the value inside the block. Therefore, in the code above, center is still CGPointZero when the new coordinates are calculated.</p>
+<ul>
+<li>Retain cycles <br/></li>
+</ul>
+<p>As noted at the beginning, iOS treats a block as an object, so its lifetime continues until that of its owner ends. However, because blocks capture variables, a block may also retain the object that owns it. This creates a retain cycle, preventing either object from being released:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@implementation LXDObject
+{
+   void (^_cycleReferenceBlock)(void);
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    _cycleReferenceBlock = ^{ 
+        NSLog(@"%@", self);   //引发循环引用
+    };
+}
+
+@end
+</code></pre></div></div>
+<p><br/>
+The compiler only warns about code like this. Warnings are often ignored, eventually causing a memory leak because neither object can be released. Just as __block is available for ordinary variables, __weak can qualify an object variable as a weak reference and thereby resolve the retain cycle:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>__weak typeof(*&amp;self) weakSelf = self;
+_cycleReferenceBlock = ^{ 
+    NSLog(@"%@", weakSelf);   //弱指针引用，不会造成循环引用
+};
+</code></pre></div></div>
+<p><br/>
+This interesting aspect of blocks is discussed in Tang Qiao's <a href="http://blog.devtang.com/2013/07/28/a-look-inside-blocks/">On the implementation of Objective-C blocks </a>provides a detailed account of the underlying implementation, so I will not repeat it here.</p>
+<h2 id="使用block">Using blocks<br/></h2>
+<p>Before blocks, developers mainly implemented callbacks through delegation. For example, the native networking class NSURLConnection uses several protocol methods to handle events during a request. In newer environments, NSURLSession uses blocks to handle request tasks, and third-party networking frameworks use them for callbacks too. Much of this shift comes from their simplicity, clear logic, and flexibility. Next, I will make a network request and handle its callbacks with blocks, including request completion and download progress.</p>
+<p>Declaring blocks as returnValue(^blockName)(parameters) is rather cumbersome. Use typedef to name a block type, then create blocks directly through that type name:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface LXDDownloadManager: NSObject&lt; NSURLSessionDownloadDelegate &gt;
+
+//block重命名
+typedef void(^LXDDownloadHandler)(NSData * receiveData, NSError * error);
+typedef void(^LXDDownloadProgressHandler)(CGFloat progress);
+
+- (void)downloadWithURL: (NSString *)URL parameters: (NSDictionary *)parameters handler: (LXDDownloadHandler)handler progress: (LXDDownloadProgressHandler)progress;
+
+@end
+
+@implementation LXDDownloadManager
+{
+    LXDDownloadProgressHandler _progress;
+}
+
+- (void)downloadWithURL: (NSString *)URL parameters: (NSDictionary *)parameters handler: (LXDDownloadHandler)handler progress: (LXDDownloadProgressHandler)progress
+{
+    //创建请求对象
+    NSURLRequest * request = [self postRequestWithURL: URL params: parameters]; 
+    NSURLSession * session = [NSURLSession sharedSession];
+
+    //执行请求任务
+    NSURLSessionDataTask * task = [session dataTaskWithRequest: request completionHandler: ^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        if (handler) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                handler(data, error);
+            }); 
+        }
+    }];
+    [task resume];
+}
+
+//进度协议方法
+- (void)URLSession:(NSURLSession *)session
+     downloadTask:(NSURLSessionDownloadTask *)downloadTask 
+    didWriteData:(int64_t)bytesWritten // 每次写入的data字节数  
+   totalBytesWritten:(int64_t)totalBytesWritten // 当前一共写入的data字节数  
+  totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite // 期望收到的所有data字节数  
+{   
+    double downloadProgress = totalBytesWritten / (double)totalBytesExpectedToWrite;  
+    if (_progress) { _progress(downloadProgress); }
+}  
+
+@end
+</code></pre></div></div>
+<p><br/>
+The NSURLSession wrapper above takes a block that handles the result and automatically executes the request task on a worker thread. Call it from the networking logic as follows:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#define QQMUSICURL @"https://www.baidu.com/link?url=UTiLwaXdh_-UZG31tkXPU62Jtsg2mSbZgSPSR3ME3YwOBSe97Hw6U6DNceQ2Ln1vXnb2krx0ezIuziBIuL4fWNi3dZ02t2NdN6946XwN0-a&amp;wd=&amp;eqid=ce6864b50004af120000000656fe235f"
+[[LXDDownloadManager alloc] downloadWithURL: QQMUSICURL parameters: nil handler ^(NSData * receiveData, NSError * error) {
+    if (error) { NSLog(@"下载失败：%@", error) }
+    else {
+        //处理下载数据
+    }
+} progress: ^(CGFloat progress) {
+    NSLog(@"下载进度%lu%%", progress*100);
+}];
+</code></pre></div></div>
+<p><br/></p>
+<h2 id="仿swift高阶函数">Recreating Swift-style higher-order functions<br/></h2>
+<p>Developers who have used swift know that its function calls support chaining well: several operations are joined with . for better readability, for example <br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ocString.stringByAppendingFormat("abc").stringByAppendingFormat("edf")
+</code></pre></div></div>
+<p><br/>
+calls the string-append method successively. One requirement for this style is that each function returns a value. Objective-C methods are normally called as [target action], but blocks are invoked as blockName(parameters), which lends itself to similar chaining.</p>
+<p>Swift provides concise, useful higher-order functions such as map, filter, and reduce for manipulating arrays. For comparison, here is how traversing and summing an array looks in oc without kvc and in swift:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#pragma mark - OC code
+NSArray numbers = @[@10, @15, @99, @66, @25];
+NSInteger totalNumber = 0;
+for (NSNumber number in numbers) {
+    totalNumber += number.integerValue;
+}
+
+#pragma mark - swift code
+let numbers = [10, 15, 99, 66, 25];
+let totalNumber = numbers.reduce(0, { $0+$1 })
+</code></pre></div></div>
+<p><br/>
+At this point, oc cannot match swift in either code size or conciseness. Next, we will use blocks to add these higher-order functions to oc. Create an NSArray category named NSArray+LXDExtension.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import &lt;UIkit/UIKit.h&gt;
+
+/// 数组元素转换
+typedef id(^LXDItemMap)(id item);
+typedef NSArray *(^LXDArrayMap)(LXDItemMap itemMap);
+
+/// 数组元素筛选
+typedef BOOL(^LXDItemFilter)(id item);
+typedef NSArray *(^LXDArrayFilter)(LXDItemFilter itemFilter);
+
+/**
+ *  扩展数组高级方法仿swift调用
+ */
+@interface NSArray (LXDExtension)
+
+@property (nonatomic, copy, readonly) LXDArrayMap map;
+@property (nonatomic, copy, readonly) LXDArrayFilter filter;
+
+@end
+</code></pre></div></div>
+<p><br/>
+As discussed earlier, chaining requires function calls to return an object. I therefore used typedef to declare several block types. LXDArrayMap and LXDArrayFilter are fundamentally the same type, but separate names help distinguish their purposes. Here is the implementation file:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef void(^LXDEnumerateHandler)(id item);
+
+@implementation NSArray (LXDTopMethod)
+
+- (LXDArrayMap)map
+{
+    LXDArrayMap map = (LXDArrayMap)^(LXDItemMap itemMap) {
+        NSMutableArray * items = @[].mutableCopy;
+        for (id item in self) {
+            [items addObject: itemMap(item)];
+        }
+        return items;
+    };
+    return map;
+}    
+
+- (LXDArrayFilter)filter
+{
+    LXDArrayFilter filter = (LXDArrayFilter)^(LXDItemFilter itemFilter) {
+        NSMutableArray * items = @[].mutableCopy;
+        for (id item in self) {
+            if (itemFilter(item)) { [items addObject: item]; }
+        }
+        return items;
+    };
+    return filter;
+}
+
+- (void)setFilter:(LXDArrayFilter)filter {}
+- (void)setMap:(LXDArrayMap)map {}
+
+@end
+</code></pre></div></div>
+<p><br/>
+We override the setter to prevent external replacement of the block implementation. In the getter, we iterate over the array and invoke the supplied code to implement map, filter, and similar functions. These two implementations are simple. Here are two examples of calling higher-order functions:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#pragma mark - 筛选数组中大于20的数值并转换成字符串
+NSArray&lt;NSNumber *&gt; * numbers = @[@10, @15, @99, @66, @25, @28.1, @7.5, @11.2, @66.2];
+NSArray * result = numbers.filter((LXDArrayFilter)^(NSNumber * item) {
+    return item.doubleValue &gt; 20
+}).map((LXDArrayMap)^(NSNumber * item) {
+    return [NSString stringWithFormat: @"string %g", item.doubleValue];
+});
+
+#pragma mark - 将数组中的字典转换成对应的数据模型
+NSArray&lt;NSDictionary *&gt; * jsons = @[@{ ... }, @{ ... }, @{ ... }];
+NSArray&lt;LXDModel *&gt; * models = jsons.map((LXDArrayMap)^(id item) {
+    return [[LXDModel alloc] initWithJSON: item];
+})
+</code></pre></div></div>
+<p><br/>
+Syntax restrictions still make this more complicated than native swift calls, but using blocks for chained calls makes the oc code considerably cleaner.</p>
+<h2 id="总结">Summary<br/></h2>
+<p>Variable capture, passing code around, and inline code give blocks capabilities and flexibility beyond delegation. They also have drawbacks, including retain cycles and difficulties with debugging and tracing, but their advantages are understandably popular with developers. Learning to use blocks more flexibly requires continued practice and exploration.</p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-02-01-a-beginner-developer-s-review-of-2015/">A beginner developer's review of 2015</a><br/></p>
+
+{% endraw %}

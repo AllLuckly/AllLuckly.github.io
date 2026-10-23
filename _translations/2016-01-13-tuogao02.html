@@ -1,0 +1,175 @@
+---
+layout: post
+title: Event delivery and the responder chain in iOS
+description: Uses UIResponder, UIEvent and UITouch to explain how touch events reach views. Custom views reveal
+  the relationship between the responder chain and gestures, followed by discussion of how event-delivery behaviour
+  can be used in an interface.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-01-13 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Uses UIResponder, UIEvent and UITouch to explain how touch events reach views. Custom views reveal the
+    relationship between the responder chain and gestures, followed by discussion of how event-delivery behaviour
+    can be used in an interface.
+  keywords:
+  - UIResponder
+  - responder chain
+  - UITouch
+  - UIEvent
+  - gesture recognition
+  provenance: contribution
+  author_name: SindriLin
+  source_url: http://sindrilin.com/ios-dev/2015/12/27/事件传递响应链.html
+  credit: Originally credited to SindriLin; edited and archived by Bison.
+  title: Event delivery and the responder chain in iOS
+  source_sha256: e93d2581d357099d775187a6f194f157d1c38f203de0908ec896a63b2d674bbd
+lang: en
+source_path: _posts/2016-01-13-tuogao02.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao02
+permalink: /en/journal/2016-01-13-event-delivery-and-the-responder-chain-in-ios/
+translation_method: machine-assisted
+translation_source_sha256: e93d2581d357099d775187a6f194f157d1c38f203de0908ec896a63b2d674bbd
+excerpt: Uses UIResponder, UIEvent and UITouch to explain how touch events reach views. Custom views reveal the
+  relationship between the responder chain and gestures, followed by discussion of how event-delivery behaviour
+  can be used in an interface.
+translation_date: '2026-10-23T02:34:12+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://sindrilin.com/ios-dev/2015/12/27/事件传递响应链.html">SindriLin’s Notes</a><br/></p>
+<blockquote>
+<p>"When using a tool such as WeChat, tapping Scan opens a QR-code scanning view. When we tap the screen, iphone OS detects the tap, packages the information into UITouch and UIEvent instances, finds the currently running application, and searches level by level for objects capable of responding, until no responder handles it. This search is called the event responder chain."</p>
+</blockquote>
+<p>When using a tool such as WeChat, tapping Scan opens a QR-code scanning view. When we tap the screen, iphone OS detects the tap, packages information about it into UITouch and UIEvent instances, finds the currently running application, and searches level by level for objects capable of responding, until no responder handles it. This search is called the event responder chain. As illustrated below, different responders are searched in a chain.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao02/1.jpg"/><br/></p>
+<h2 id="响应者">Responder</h2>
+<p>In iOS, objects that can respond to events are instances of subclasses of <code class="language-plaintext highlighter-rouge">UIResponder</code>. <code class="language-plaintext highlighter-rouge">UIResponder</code> provides four touch callbacks, corresponding to touch begin, movement, end, and cancellation. The cancellation callback is invoked only when the application is forcibly terminated or a call arrives.</p>
+<p><img alt="2" src="/images/blog/tuogao/tougao02/2.jpg"/><br/></p>
+<p>When making custom controls based on UIView, we can override these methods for touch callbacks. Each receives two arguments: a set of <code class="language-plaintext highlighter-rouge">UITouch</code> objects and a <code class="language-plaintext highlighter-rouge">UIEvent</code> object. These represent the touches and the event, respectively.</p>
+<ul>
+<li>Event object</li>
+</ul>
+<p>iOS represents user-interaction events with <code class="language-plaintext highlighter-rouge">UIEvent</code>. In <code class="language-plaintext highlighter-rouge">UIEvent.h</code>, a property of type <code class="language-plaintext highlighter-rouge">UIEventType</code> indicates the current event type: multitouch, motion such as shaking, or remote control. A 3DTouch event type was added in a later iOS version. Throughout one user-touch event's handling, the <code class="language-plaintext highlighter-rouge">UIEvent</code> object is unique.</p>
+<ul>
+<li>Tapped object</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">UITouch</code> represents an individual touch. Its declaration contains a property of enum type <code class="language-plaintext highlighter-rouge">UITouchPhase</code>, describing one of five states: began, moved, stationary, ended, or canceled. When touches occur, their objects are passed as a set to <code class="language-plaintext highlighter-rouge">UIResponder</code> callbacks. We obtain touch positions from these objects: <code class="language-plaintext highlighter-rouge">- (CGPoint)locationInView:(nullable UIView *)view</code> gives the current coordinates, and <code class="language-plaintext highlighter-rouge">- (CGPoint)previousLocationInView:(nullable UIView *)view</code> gives the previous coordinates.</p>
+<p>To confirm that UIView responds through the touch methods of <code class="language-plaintext highlighter-rouge">UIResponder</code>, I created a UIView category, overrode <code class="language-plaintext highlighter-rouge">+ (void)load</code>, and used method_swizzling to exchange the touch-event implementations.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">+</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">load</span>
+<span class="p">{</span>   
+    <span class="err">Method</span> <span class="err">origin</span> <span class="err">=</span> <span class="err">class_getInstanceMethod([UIView</span> <span class="err">class],</span> <span class="err">@selector(</span><span class="py">touchesBegan</span><span class="p">:</span><span class="n">withEvent</span><span class="p">:));</span>
+    <span class="err">Method</span> <span class="err">custom</span> <span class="err">=</span> <span class="err">class_getInstanceMethod([UIView</span> <span class="err">class],</span> <span class="err">@selector(</span><span class="py">lxd_touchesBegan</span><span class="p">:</span><span class="n">withEvent</span><span class="p">:));</span>
+    <span class="err">method_exchangeImplementations(origin,</span> <span class="err">custom);</span>
+
+    <span class="err">origin</span> <span class="err">=</span> <span class="err">class_getInstanceMethod([UIView</span> <span class="err">class],</span> <span class="err">@selector(</span><span class="py">touchesMoved</span><span class="p">:</span><span class="n">withEvent</span><span class="p">:));</span>
+    <span class="err">custom</span> <span class="err">=</span> <span class="err">class_getInstanceMethod([UIView</span> <span class="err">class],</span> <span class="err">@selector(</span><span class="py">lxd_touchesMoved</span><span class="p">:</span><span class="n">withEvent</span><span class="p">:));</span>
+    <span class="err">method_exchangeImplementations(origin,</span> <span class="err">custom);</span>
+
+    <span class="err">origin</span> <span class="err">=</span> <span class="err">class_getInstanceMethod([UIView</span> <span class="err">class],</span> <span class="err">@selector(</span><span class="py">touchesEnded</span><span class="p">:</span><span class="n">withEvent</span><span class="p">:));</span>
+    <span class="err">custom</span> <span class="err">=</span> <span class="err">class_getInstanceMethod([UIView</span> <span class="err">class],</span> <span class="err">@selector(</span><span class="py">lxd_touchesEnded</span><span class="p">:</span><span class="n">withEvent</span><span class="p">:));</span>
+    <span class="err">method_exchangeImplementations(origin,</span> <span class="err">custom);</span>
+<span class="p">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">lxd_touchesBegan</span><span class="o">:</span> <span class="o">(</span><span class="nt">NSSet</span><span class="o">&lt;</span><span class="nt">UITouch</span> <span class="o">*&gt;</span> <span class="o">*)</span><span class="nt">touches</span> <span class="nt">withEvent</span><span class="o">:</span> <span class="o">(</span><span class="nt">UIEvent</span> <span class="o">*)</span><span class="nt">event</span>
+<span class="p">{</span>
+    <span class="err">NSLog(@"%@</span> <span class="err">---</span> <span class="err">begin",</span> <span class="err">self.class);</span>
+    <span class="err">[self</span> <span class="py">lxd_touchesBegan</span><span class="p">:</span> <span class="n">touches</span> <span class="n">withEvent</span><span class="p">:</span> <span class="n">event</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">lxd_touchesMoved</span><span class="o">:</span> <span class="o">(</span><span class="nt">NSSet</span><span class="o">&lt;</span><span class="nt">UITouch</span> <span class="o">*&gt;</span> <span class="o">*)</span><span class="nt">touches</span> <span class="nt">withEvent</span><span class="o">:</span> <span class="o">(</span><span class="nt">UIEvent</span> <span class="o">*)</span><span class="nt">event</span>
+<span class="p">{</span>
+    <span class="err">NSLog(@"%@</span> <span class="err">---</span> <span class="err">move",</span> <span class="err">self.class);</span>
+    <span class="err">[self</span> <span class="py">lxd_touchesMoved</span><span class="p">:</span> <span class="n">touches</span> <span class="n">withEvent</span><span class="p">:</span> <span class="n">event</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">lxd_touchesEnded</span><span class="o">:</span> <span class="o">(</span><span class="nt">NSSet</span><span class="o">&lt;</span><span class="nt">UITouch</span> <span class="o">*&gt;</span> <span class="o">*)</span><span class="nt">touches</span> <span class="nt">withEvent</span><span class="o">:</span> <span class="o">(</span><span class="nt">UIEvent</span> <span class="o">*)</span><span class="nt">event</span>
+<span class="p">{</span>
+    <span class="err">NSLog(@"%@</span> <span class="err">---</span> <span class="err">end",</span> <span class="err">self.class);</span>
+    <span class="err">[self</span> <span class="py">lxd_touchesEnded</span><span class="p">:</span> <span class="n">touches</span> <span class="n">withEvent</span><span class="p">:</span> <span class="n">event</span><span class="p">];</span>
+<span class="p">}</span></code></pre></figure>
+<p>In a new project, I created four UIView subclasses—AView, BView, CView, and DView—and then tapped an arbitrary position:</p>
+<p><img alt="3" src="/images/blog/tuogao/tougao02/3.jpg"/><br/></p>
+<p>When I tapped the green view above, the console printed the following log, with the date portion removed:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">CView</span> <span class="nt">---</span> <span class="nt">begin</span>
+<span class="nt">CView</span> <span class="nt">---</span> <span class="nt">end</span></code></pre></figure>
+<p>This shows that tapping a UIView is handled through the callbacks associated with touches events.</p>
+<p>Besides the touches callbacks, a <code class="language-plaintext highlighter-rouge">UIGestureRecognizer</code> can be attached to a view to support richer gestures. After adding a tap recognizer, the original touchesEnded no longer worked. I initially thought all touches methods became ineffective, but the test demo still called touchesBegan while moved and ended were not called. Therefore, I suspected that system touch handling contains a method after touchesBegan that schedules subsequent events, a nextHandler. My guess at that scheduling process is shown below:</p>
+<p><img alt="4" src="/images/blog/tuogao/tougao02/4.jpg"/><br/></p>
+<h2 id="响应链传递">Responder-chain delivery</h2>
+<p>We have described how a control handles a tap it receives. But how does the system find the view that should handle a tap at the user's chosen position?</p>
+<p>As discussed above, the system responds to touches by repeatedly finding the next responder, and all interactive controls directly or indirectly subclass <code class="language-plaintext highlighter-rouge">UIResponder</code>. Can we find the key property in its header?</p>
+<p>There is indeed a method, <code class="language-plaintext highlighter-rouge">- (nullable UIResponder *)nextResponder</code>. Its name suggests it retrieves the current view's next responder. Let's override touchesBegan and obtain successive responders until there is no next one. The relevant code follows:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">touchesBegan</span><span class="o">:(</span><span class="nt">NSSet</span><span class="o">&lt;</span><span class="nt">UITouch</span> <span class="o">*&gt;</span> <span class="o">*)</span><span class="nt">touches</span> <span class="nt">withEvent</span><span class="o">:(</span><span class="nt">UIEvent</span> <span class="o">*)</span><span class="nt">event</span>
+<span class="p">{</span>
+    <span class="err">UIResponder</span> <span class="err">*</span> <span class="err">next</span> <span class="err">=</span> <span class="err">[self</span> <span class="err">nextResponder];</span>
+    <span class="err">NSMutableString</span> <span class="err">*</span> <span class="err">prefix</span> <span class="err">=</span> <span class="err">@"".mutableCopy;</span>
+
+    <span class="err">while</span> <span class="err">(next</span> <span class="err">!=</span> <span class="err">nil)</span> <span class="err">{</span>
+        <span class="err">NSLog(@"%@%@",</span> <span class="err">prefix,</span> <span class="err">[next</span> <span class="err">class]);</span>
+        <span class="err">[prefix</span> <span class="py">appendString</span><span class="p">:</span> <span class="err">@</span><span class="s1">"--"</span><span class="p">];</span>
+        <span class="err">next</span> <span class="err">=</span> <span class="err">[next</span> <span class="err">nextResponder];</span>
+    <span class="p">}</span>    
+<span class="err">}</span></code></pre></figure>
+<p>The console lists all the subsequent event responders as follows:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">AView</span>
+<span class="nt">--UIView</span>
+<span class="nt">----ViewController</span>
+<span class="nt">------UIWindow</span>
+<span class="nt">--------UIApplication</span>
+<span class="nt">----------AppDelegate</span></code></pre></figure>
+<p>The output has a clear hierarchy, but its order is exactly the reverse of the system's step-by-step responder search. Why? The output includes a ViewController, showing that <code class="language-plaintext highlighter-rouge">UIViewController</code> also subclasses <code class="language-plaintext highlighter-rouge">UIResponder</code>. However, a controller manages a view. Even as a member of the responder chain, logically it should not be among the system's search targets. Following nextResponder is therefore not the correct approach to that search.</p>
+<p>I later found two methods in the <code class="language-plaintext highlighter-rouge">UIView</code> header, returning <code class="language-plaintext highlighter-rouge">UIView</code> and <code class="language-plaintext highlighter-rouge">BOOL</code>, respectively:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">nullable</span> <span class="nt">UIView</span> <span class="o">*)</span><span class="nt">hitTest</span><span class="o">:(</span><span class="nt">CGPoint</span><span class="o">)</span><span class="nt">point</span> <span class="nt">withEvent</span><span class="o">:(</span><span class="nt">nullable</span> <span class="nt">UIEvent</span> <span class="o">*)</span><span class="nt">event</span><span class="o">;</span>   <span class="o">//</span> <span class="nt">recursively</span> <span class="nt">calls</span> <span class="nt">-pointInside</span><span class="nd">:withEvent</span><span class="o">:.</span> <span class="nt">point</span> <span class="nt">is</span> <span class="nt">in</span> <span class="nt">the</span> <span class="nt">receiver</span><span class="err">'</span><span class="nt">s</span> <span class="nt">coordinate</span> <span class="nt">system</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">pointInside</span><span class="o">:(</span><span class="nt">CGPoint</span><span class="o">)</span><span class="nt">point</span> <span class="nt">withEvent</span><span class="o">:(</span><span class="nt">nullable</span> <span class="nt">UIEvent</span> <span class="o">*)</span><span class="nt">event</span><span class="o">;</span>   <span class="o">//</span> <span class="nt">default</span> <span class="nt">returns</span> <span class="nt">YES</span> <span class="nt">if</span> <span class="nt">point</span> <span class="nt">is</span> <span class="nt">in</span> <span class="nt">bounds</span></code></pre></figure>
+<p>Judging by their names, one method uses the tap coordinates to report whether the event occurred inside this view, while the other returns the object that responds to the tap. We can infer that, on receiving a tap, the system repeatedly invokes these methods on the current view's subviews to find the next responding view. I therefore used method_swizzling to replace the implementations of both methods and obtained the following test output:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">UIStatusBarWindow</span> <span class="nt">can</span> <span class="nt">answer</span> <span class="err">1</span>
+<span class="nt">UIStatusBar</span> <span class="nt">can</span> <span class="nt">answer</span> <span class="err">0</span>
+<span class="nt">UIStatusBarForegroundView</span> <span class="nt">can</span> <span class="nt">answer</span> <span class="err">0</span>
+<span class="nt">UIStatusBarServiceItemView</span> <span class="nt">can</span> <span class="nt">answer</span> <span class="err">0</span>
+<span class="nt">UIStatusBarDataNetworkItemView</span> <span class="nt">can</span> <span class="nt">answer</span> <span class="err">0</span>
+<span class="nt">UIStatusBarBatteryItemView</span> <span class="nt">can</span> <span class="nt">answer</span> <span class="err">0</span>
+<span class="nt">UIStatusBarTimeItemView</span> <span class="nt">can</span> <span class="nt">answer</span> <span class="err">0</span>
+<span class="nt">hit</span> <span class="nt">view</span><span class="o">:</span> <span class="nt">UIStatusBar</span>
+<span class="nt">hit</span> <span class="nt">view</span><span class="o">:</span> <span class="nt">UIStatusBarWindow</span>
+<span class="nt">UIWindow</span> <span class="nt">can</span> <span class="nt">answer</span> <span class="err">1</span>
+<span class="nt">UIView</span> <span class="nt">can</span> <span class="nt">answer</span> <span class="err">1</span>
+<span class="nt">hit</span> <span class="nt">view</span><span class="o">:</span> <span class="nt">_UILayoutGuide</span>
+<span class="nt">hit</span> <span class="nt">view</span><span class="o">:</span> <span class="nt">_UILayoutGuide</span>
+<span class="nt">AView</span> <span class="nt">can</span> <span class="nt">answer</span> <span class="err">1</span>
+<span class="nt">DView</span> <span class="nt">can</span> <span class="nt">answer</span> <span class="err">0</span>
+<span class="nt">hit</span> <span class="nt">view</span><span class="o">:</span> <span class="nt">DView</span>
+<span class="nt">BView</span> <span class="nt">can</span> <span class="nt">answer</span> <span class="err">0</span>
+<span class="nt">hit</span> <span class="nt">view</span><span class="o">:</span> <span class="nt">BView</span>
+<span class="nt">hit</span> <span class="nt">view</span><span class="o">:</span> <span class="nt">AView</span>
+<span class="nt">hit</span> <span class="nt">view</span><span class="o">:</span> <span class="nt">UIView</span>
+<span class="nt">hit</span> <span class="nt">view</span><span class="o">:</span> <span class="nt">UIWindow</span>
+<span class="o">......</span>  <span class="o">//</span><span class="nt">下面是touches方法的输出</span></code></pre></figure>
+<p>You may not recognize the types beginning with UIStatusBar at the top, but they are evidently status-bar-related views. You can look them up in Apple's documentation center, opened in Xcode with shift+command+0. The output suggests that the system first calls <code class="language-plaintext highlighter-rouge">pointInSide: WithEvent: </code> to determine whether a view and its subviews can receive this touch, then calls <code class="language-plaintext highlighter-rouge">hitTest: withEvent: </code> to obtain the views that can handle it. Once those objects have been found, their touches callbacks begin.</p>
+<p>The method-call output shows the search order: <code class="language-plaintext highlighter-rouge">UIStatusBar</code>-related views → <code class="language-plaintext highlighter-rouge">UIWindow</code> → <code class="language-plaintext highlighter-rouge">UIView</code> → <code class="language-plaintext highlighter-rouge">AView</code> → <code class="language-plaintext highlighter-rouge">DView</code> → <code class="language-plaintext highlighter-rouge">BView</code>. The system traverses every subview while passing along the event chain to determine whether it can respond to the touch. For this article's demo, the search can be diagrammed as follows:</p>
+<p><img alt="5" src="/images/blog/tuogao/tougao02/5.jpg"/><br/></p>
+<p>After this responder search finishes, the system converts the event's touches into <code class="language-plaintext highlighter-rouge">UITouch</code> objects and passes them, together with an event object of type <code class="language-plaintext highlighter-rouge">UIEvent</code>, to touchesBegan, you</p>
+<p>Furthermore, the nextResponder output above shows responders returned as touch-responsive views during the search. We can therefore infer that <code class="language-plaintext highlighter-rouge">UIApplication</code> maintains a responder stack of its own: when <code class="language-plaintext highlighter-rouge">pointInSide: withEvent: </code> returns yes, the responder is pushed onto it.</p>
+<p><img alt="2" src="/images/blog/tuogao/tougao02/6.jpg"/><br/></p>
+<p>The responder at the top has first priority. If AView does not handle the event, it is popped and the event passes to UIView, continuing until handled or discarded after reaching AppDelegate without a response. This also makes the controller an exception in the stack: even without a <code class="language-plaintext highlighter-rouge">pointInSide: withEvent: </code> result declaring it responsive, the controller can still be pushed as the next responder after <code class="language-plaintext highlighter-rouge">UIView</code>.</p>
+<h2 id="响应链应用">Applying the responder chain</h2>
+<p>Now that we know how the system finds the responding view, we can override the event-handler lookup method to support tapping irregular shapes. A circle is the most common example. In the demo, I set both the view's width and height to 200, then override the method as follows:</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">BOOL</span><span class="o">)</span><span class="nt">pointInside</span><span class="o">:(</span><span class="nt">CGPoint</span><span class="o">)</span><span class="nt">point</span> <span class="nt">withEvent</span><span class="o">:(</span><span class="nt">UIEvent</span> <span class="o">*)</span><span class="nt">event</span>
+<span class="p">{</span>
+    <span class="err">const</span> <span class="err">CGFloat</span> <span class="err">halfWidth</span> <span class="err">=</span> <span class="err">100;</span>
+    <span class="err">CGFloat</span> <span class="err">xOffset</span> <span class="err">=</span> <span class="err">point.x</span> <span class="err">-</span> <span class="err">100;</span>
+    <span class="err">CGFloat</span> <span class="err">yOffset</span> <span class="err">=</span> <span class="err">point.y</span> <span class="err">-</span> <span class="err">100;</span>
+    <span class="err">CGFloat</span> <span class="err">radius</span> <span class="err">=</span> <span class="err">sqrt(xOffset</span> <span class="err">*</span> <span class="err">xOffset</span> <span class="err">+</span> <span class="err">yOffset</span> <span class="err">*</span> <span class="err">yOffset);</span>
+    <span class="err">return</span> <span class="err">radius</span> <span class="err">&lt;=</span> <span class="err">halfWidth;</span>
+<span class="p">}</span></code></pre></figure>
+<p><br/></p>
+<p>The final result is shown below:<br/></p>
+<p><img alt="2" src="/images/blog/tuogao/tougao02/1.gif"/><br/></p>
+<blockquote>
+<p><a href="https://github.com/JustKeepRunning/LXDEventChain">Demo project</a></p>
+</blockquote>
+<p><br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-01-13-bison-s-guide-to-ios-multithreading-part-1/">Bison's guide to iOS multithreading, part 1</a><br/></p>
+
+{% endraw %}

@@ -1,0 +1,383 @@
+---
+layout: post
+title: 'Core Text layout in Swift 2.0: an in-depth introduction'
+description: Begins with attributed-text properties such as fonts, colours and ranges, then introduces Core Text's
+  layout and drawing steps. Combining text and images illustrates the basic objects needed for more complex text
+  interfaces.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-01-31 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Begins with attributed-text properties such as fonts, colours and ranges, then introduces Core Text's
+    layout and drawing steps. Combining text and images illustrates the basic objects needed for more complex text
+    interfaces.
+  keywords:
+  - Swift 2.0
+  - Core Text
+  - NSAttributedString
+  - mixed text and images
+  provenance: contribution
+  author_name: 大石头布
+  source_url: http://www.jianshu.com/p/e52a38e60e7c
+  credit: Originally credited to 大石头布; edited and archived by Bison.
+  version_note: Explicitly targets Swift 2.0, using the attributed-text constants and Core Text syntax current at
+    the time.
+  title: 'Core Text layout in Swift 2.0: an in-depth introduction'
+  source_sha256: 80b9b37698006a1ff1d6b5b2c44a3a49d66b30851ed31dcfdbe35776680afa29
+lang: en
+source_path: _posts/2016-01-31-tuogao14.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao14
+permalink: /en/journal/2016-01-31-core-text-layout-in-swift-2-0-an-in-depth-introduction/
+translation_method: machine-assisted
+translation_source_sha256: 80b9b37698006a1ff1d6b5b2c44a3a49d66b30851ed31dcfdbe35776680afa29
+excerpt: Begins with attributed-text properties such as fonts, colours and ranges, then introduces Core Text's layout
+  and drawing steps. Combining text and images illustrates the basic objects needed for more complex text interfaces.
+translation_date: '2026-10-23T02:34:13+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/e52a38e60e7c">大石头布</a><br/></p>
+<blockquote>
+<p>"CoreText is an advanced, relatively low-level technology for text layout and font handling. Its API was introduced in OS X v10.5 and iOS3.2 and is available in both OS X and iOS.:"</p>
+</blockquote>
+<p><br/></p>
+<p>For requirements that are not especially complex, UILabel and UITextView usually suffice. Apple has wrapped text display for us in these controls. More complex cases include mixed images and text, recognizing links and replacing them with “Click link,” binding @someone mentions, recognizing phone numbers, and mixing text sizes. UIWebView can handle these too, but CoreText uses less memory and can render in the background, making it well suited to content layout. CoreText is highly flexible, although using it is more involved. When learning a technology, why not tackle the hardest part?<br/></p>
+<p>Let us look at an overview diagram.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao14/1.png"/><br/></p>
+<p>Before learning CoreText, you need to understand attributed strings: NSAttributedString or NSMutableAttributedString.<br/></p>
+<p>NSAttributedString and NSMutableAttributedString<br/>
+NSAttributedString is a string with attributes. It lets you manipulate and display text in a variety of styles flexibly.<br/></p>
+<p>You can define the attributes in advance and then apply them to the text.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">let</span> <span class="nt">str</span> <span class="o">=</span> <span class="s1">"这是一段用来测试的字符串 this is a string for test"</span>
+<span class="nt">let</span> <span class="nt">dic</span> <span class="o">=</span> <span class="o">[</span><span class="nt">NSFontAttributeName</span><span class="nd">:UIFont</span><span class="nc">.boldSystemFontOfSize</span><span class="o">(</span><span class="err">20</span><span class="o">),</span>
+<span class="nt">NSForegroundColorAttributeName</span><span class="nd">:UIColor</span><span class="nc">.redColor</span><span class="o">()]</span>
+<span class="nt">let</span> <span class="nt">attrStr</span> <span class="o">=</span> <span class="nt">NSAttributedString</span><span class="o">(</span><span class="nt">string</span><span class="o">:</span> <span class="nt">str</span><span class="o">,</span> <span class="nt">attributes</span><span class="o">:</span> <span class="nt">dic</span><span class="o">)</span>
+<span class="nt">label</span><span class="nc">.attributedText</span> <span class="o">=</span> <span class="nt">attrStr</span></code></pre></figure>
+<p>Result<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao14/2.png"/><br/></p>
+<p>Notice that we did not set the label's color or font directly. We created an NSAttributedString with two attributes and used label.attributedText rather than label.text.<br/></p>
+<p>If we could only apply the same attributes to all the text, attributed strings would not be very interesting. We can assign different attributes to a portion of the text.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">let</span> <span class="nt">mutableAttrStr</span> <span class="o">=</span> <span class="nt">NSMutableAttributedString</span><span class="o">(</span><span class="nt">string</span><span class="o">:</span> <span class="nt">str</span><span class="o">)</span>
+<span class="nt">mutableAttrStr</span><span class="nc">.addAttributes</span><span class="o">(</span><span class="nt">dic</span><span class="o">,</span> <span class="nt">range</span><span class="o">:</span> <span class="nt">NSMakeRange</span><span class="o">(</span><span class="err">0</span><span class="o">,</span> <span class="err">2</span><span class="o">))</span>
+<span class="nt">mutableAttrStr</span><span class="nc">.addAttributes</span><span class="o">([</span><span class="nt">NSFontAttributeName</span><span class="nd">:UIFont</span><span class="nc">.systemFontOfSize</span><span class="o">(</span><span class="err">13</span><span class="o">),</span><span class="nt">NSUnderlineStyleAttributeName</span><span class="o">:</span> <span class="err">1</span> <span class="o">],</span> <span class="nt">range</span><span class="o">:</span> <span class="nt">NSMakeRange</span><span class="o">(</span><span class="err">2</span><span class="o">,</span><span class="err">8</span><span class="o">))</span>
+<span class="nt">label</span><span class="nc">.attributedText</span> <span class="o">=</span> <span class="nt">mutableAttrStr</span></code></pre></figure>
+<p>We can apply different styles to text at different positions, using NSRange to specify the range. NSRange is a structure with location and length fields; together, they uniquely identify a substring.<br/></p>
+<p>Result<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao14/3.png"/><br/></p>
+<p>We have now applied two different attributes to the preceding text.<br/></p>
+<p>Which attributes can we set?<br/></p>
+<ul>
+<li>
+<p>NSFontAttributeName sets the font. Default: Helvetica(Neue), size 12.<br/></p>
+</li>
+<li>
+<p>NSForegroundColorAttributeName sets the text color using a UIColor object. Its default is <br/></p>
+</li>
+<li>
+<p>NSBackgroundColorAttributeName sets the text area's background color using a UIColor object. The default is nil, meaning transparent.<br/></p>
+</li>
+<li>
+<p>NSLigatureAttributeName sets ligatures using an NSNumber integer: 0 disables ligatures; 1 uses the default ligatures.<br/></p>
+</li>
+<li>
+<p>NSKernAttributeName sets character spacing using an NSNumber integer. Positive values increase spacing; negative values decrease it.<br/></p>
+</li>
+<li>
+<p>NSStrikethroughStyleAttributeName sets the strikethrough style using an NSNumber integer.<br/></p>
+</li>
+<li>
+<p>NSStrikethroughColorAttributeName sets the strikethrough color using a UIColor object. The default is black.<br/></p>
+</li>
+<li>
+<p>NSUnderlineStyleAttributeName sets the underline using an NSNumber integer from the NSUnderlineStyle enumeration, similarly to strikethrough. NSUnderlineColorAttributeName sets the underline color using a UIColor object; the default is black.<br/></p>
+</li>
+<li>
+<p>NSStrokeWidthAttributeName sets the stroke width using an NSNumber integer. A negative value produces filled text; a positive value produces outlined text.<br/></p>
+</li>
+<li>
+<p>NSStrokeColorAttributeName specifies the fill-part color rather than the text color, using a UIColor object. NSShadowAttributeName sets shadow attributes using an NSShadow object.<br/></p>
+</li>
+<li>
+<p>NSTextEffectAttributeName sets a special text effect using an NSString. Currently, only the letterpress effect is available:<br/></p>
+</li>
+<li>
+<p>NSBaselineOffsetAttributeName sets the baseline offset using an NSNumber float. Positive values move it up; negative values move it down.<br/></p>
+</li>
+<li>
+<p>NSObliquenessAttributeName sets glyph slant using an NSNumber float. Positive values slant right; negative values slant left.<br/></p>
+</li>
+<li>
+<p>NSExpansionAttributeName sets horizontal text expansion using an NSNumber float. Positive values expand the text horizontally; negative values compress it.<br/></p>
+</li>
+<li>
+<p>NSWritingDirectionAttributeName sets the writing direction, either left to right or right to left.<br/></p>
+</li>
+<li>
+<p>NSVerticalGlyphFormAttributeName sets the text-layout orientation using an NSNumber integer: 0 means horizontal text and 1 means vertical text.<br/></p>
+</li>
+<li>
+<p>NSLinkAttributeName sets a link; tapping it opens the specified URL in a browser.<br/></p>
+</li>
+<li>
+<p>NSAttachmentAttributeName sets a text attachment using an NSTextAttachment object, commonly for mixing text and images.<br/></p>
+</li>
+<li>
+<p>NSParagraphStyleAttributeName sets paragraph layout using an NSParagraphStyle object.<br/></p>
+</li>
+</ul>
+<p>There are too many attributes to remember. Google their usage when needed—they are powerful! 😄<br/></p>
+<p>That is enough about attributed strings. They are sufficient for simple rich text. Now let us turn to the main topic: CoreText.<br/></p>
+<h3 id="coretext">CoreText<br/></h3>
+<p>Attributed strings style text, whereas CoreText lays it out. You can customize each line's height, the space occupied by each character, and more.<br/></p>
+<p>CoreText is a low-level technology for working with text and fonts. It interacts directly with Core Graphics, also known as Quartz, a 2D rendering engine. Quartz can process fonts and glyphs directly to render text on screen; it is the only module in the foundational libraries that handles glyphs. For layout, CoreText therefore passes the text, positions, fonts, and glyphs directly to Quartz. This direct interaction gives CoreText fast layout performance compared with other UI components.<br/></p>
+<p>Let us look at a diagram of the CoreText object model.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao14/4.png"/><br/></p>
+<p>First, a somewhat dry explanation; examples will follow. 🌰<br/></p>
+<blockquote>
+<p>In the diagram, Framesetter corresponds to CTFramesetter. It is initialized with a CFAttributedString; NSAttributeString can also be bridged seamlessly. It acts as a factory for CTFrame objects, producing a frame for the supplied path. CTFrame can be drawn directly into a context with CTFrameDraw. Before drawing, you can also manipulate its CTLine objects to fine-tune parameters. A CTLine represents one line of Core Text drawing. It provides the line ascent, line descent, and line leading, as well as all the line's Glyph Runs. CTRun, or Glyph Run, is a collection of glyphs sharing the same attributes. CTFrame represents the drawing area of the entire UIView subview; CTLine represents a line; and CTRun represents a string segment with identical attributes. For example, a string with a consistent font size and color forms a CTRun. A CTRun cannot cross a line boundary, regardless of whether attributes match. Typically, each CTFrame contains several CTLines, and each CTLine contains several CTRuns.<br/></p>
+</blockquote>
+<p>CoreText was originally designed as a desktop typesetting system, so it uses the traditional coordinate system with its origin at the bottom-left. Its text drawing is therefore relative to that bottom-left origin.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao14/5.png"/><br/></p>
+<p>If you draw with CoreText directly in this context without any adjustment, the text will appear mirrored and upside down.</p>
+<p>Here comes an example! 🌰 First, let us look at the simplest use of CoreText.</p>
+<p>A simple example
+First, create a CTView subclass of UIView.</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">import</span> <span class="nt">UIKit</span>
+
+<span class="nt">class</span> <span class="nt">CTView</span><span class="o">:</span> <span class="nt">UIView</span> <span class="p">{</span>
+
+    <span class="err">override</span> <span class="err">func</span> <span class="err">drawRect(</span><span class="py">rect</span><span class="p">:</span> <span class="n">CGRect</span><span class="p">)</span> <span class="err">{</span>
+        <span class="nb">super</span><span class="p">.</span><span class="n">drawRect</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span>
+
+        <span class="p">//</span> <span class="m">1</span>
+        <span class="n">let</span> <span class="n">context</span> <span class="err">=</span> <span class="n">UIGraphicsGetCurrentContext</span><span class="p">()</span>
+
+        <span class="p">//</span> <span class="m">2</span>
+        <span class="n">CGContextSetTextMatrix</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">CGAffineTransformIdentity</span><span class="p">)</span>
+        <span class="n">CGContextTranslateCTM</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">bounds</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">)</span>
+        <span class="n">CGContextScaleCTM</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="m">1.0</span><span class="p">,</span> <span class="m">-1.0</span><span class="p">)</span>
+
+        <span class="p">//</span> <span class="m">3</span>
+        <span class="n">let</span> <span class="n">path</span> <span class="err">=</span> <span class="n">CGPathCreateMutable</span><span class="p">()</span>
+        <span class="n">CGPathAddRect</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">nil</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">bounds</span><span class="p">)</span>
+
+        <span class="p">//</span> <span class="m">4</span>
+        <span class="n">let</span> <span class="n">attrString</span> <span class="err">=</span> <span class="n">NSAttributedString</span><span class="p">(</span><span class="n">string</span><span class="p">:</span><span class="s1">"Hello CoreText!"</span><span class="p">)</span>
+        <span class="n">let</span> <span class="n">framesetter</span> <span class="err">=</span> <span class="n">CTFramesetterCreateWithAttributedString</span><span class="p">(</span><span class="n">attrString</span><span class="p">)</span>
+        <span class="n">let</span> <span class="n">frame</span> <span class="err">=</span> <span class="n">CTFramesetterCreateFrame</span><span class="p">(</span><span class="n">framesetter</span><span class="p">,</span> <span class="n">CFRangeMake</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="n">attrString</span><span class="p">.</span><span class="n">length</span><span class="p">),</span> <span class="n">path</span><span class="p">,</span> <span class="n">nil</span><span class="p">)</span>
+
+        <span class="p">//</span> <span class="m">5</span>
+        <span class="n">CTFrameDraw</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span><span class="n">context</span><span class="err">!</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="err">}</span></code></pre></figure>
+<p>Then add this view to the ViewController.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">let</span> <span class="nt">ctView</span> <span class="o">=</span> <span class="nt">CTView</span><span class="o">()</span>
+<span class="nt">ctView</span><span class="nc">.frame</span> <span class="o">=</span> <span class="nt">CGRectMake</span><span class="o">(</span><span class="err">10</span><span class="o">,</span> <span class="err">150</span><span class="o">,</span> <span class="nt">self</span><span class="nc">.view.bounds.width</span> <span class="nt">-</span> <span class="err">20</span><span class="o">,</span> <span class="err">200</span><span class="o">)</span>
+<span class="nt">ctView</span><span class="nc">.backgroundColor</span> <span class="o">=</span> <span class="nt">UIColor</span><span class="nc">.whiteColor</span><span class="o">()</span>
+<span class="nt">self</span><span class="nc">.view.addSubview</span><span class="o">(</span><span class="nt">ctView</span><span class="o">)</span></code></pre></figure>
+<p>Result:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao14/6.png"/><br/></p>
+<h3 id="解释">Explanation:<br/></h3>
+<p>1. Obtain the current context with UIGraphisGetCurrentContext().<br/>
+2. Flip the coordinate system vertically. The lower-level drawing engine places (0, 0) at the bottom-left of the screen, whereas UIKit places (0, 0) at the top-left. To describe subsequent coordinates in UIKit terms, we first flip the coordinate system vertically. The lower- and higher-level (0, 0) positions then coincide.<br/>
+3. Create the drawing area with CGPathCreateMutable(). CoreText supports various text-layout regions. Here, we simply use the entire UIView as the layout area.<br/></p>
+<p>If CGMutablePath feels awkward, you can use the more convenient UIBezierPath to work with the text-layout area instead.
+<br/>
+Replace step 3 above with:<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">let</span> <span class="nt">path1</span> <span class="o">=</span> <span class="nt">UIBezierPath</span><span class="o">(</span><span class="nt">roundedRect</span><span class="o">:</span> <span class="nt">self</span><span class="nc">.bounds</span><span class="o">,</span> <span class="nt">cornerRadius</span><span class="nd">:self</span><span class="nc">.bounds.size.width</span><span class="o">/</span><span class="err">2</span> <span class="o">)</span></code></pre></figure>
+<p>Replace step 4 with the following, adding a few text attributes along the way.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span> <span class="err">4</span>
+<span class="nt">let</span> <span class="nt">attrString</span> <span class="o">=</span> <span class="s1">"Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!"</span>
+
+<span class="nt">let</span> <span class="nt">mutableAttrStr</span> <span class="o">=</span> <span class="nt">NSMutableAttributedString</span><span class="o">(</span><span class="nt">string</span><span class="o">:</span> <span class="nt">attrString</span><span class="o">)</span>
+<span class="nt">mutableAttrStr</span><span class="nc">.addAttributes</span><span class="o">([</span><span class="nt">NSFontAttributeName</span><span class="nd">:UIFont</span><span class="nc">.systemFontOfSize</span><span class="o">(</span><span class="err">20</span><span class="o">),</span>
+<span class="nt">NSForegroundColorAttributeName</span><span class="nd">:UIColor</span><span class="nc">.redColor</span><span class="o">()</span> <span class="o">],</span> <span class="nt">range</span><span class="o">:</span> <span class="nt">NSMakeRange</span><span class="o">(</span><span class="err">0</span><span class="o">,</span> <span class="err">20</span><span class="o">))</span>
+<span class="nt">mutableAttrStr</span><span class="nc">.addAttributes</span><span class="o">([</span><span class="nt">NSFontAttributeName</span><span class="nd">:UIFont</span><span class="nc">.systemFontOfSize</span><span class="o">(</span><span class="err">13</span><span class="o">),</span><span class="nt">NSUnderlineStyleAttributeName</span><span class="o">:</span> <span class="err">1</span> <span class="o">],</span> <span class="nt">range</span><span class="o">:</span> <span class="nt">NSMakeRange</span><span class="o">(</span><span class="err">20</span><span class="o">,</span><span class="err">18</span><span class="o">))</span>
+<span class="nt">let</span> <span class="nt">framesetter</span> <span class="o">=</span> <span class="nt">CTFramesetterCreateWithAttributedString</span><span class="o">(</span><span class="nt">mutableAttrStr</span><span class="o">)</span>
+<span class="nt">let</span> <span class="nt">frame</span> <span class="o">=</span> <span class="nt">CTFramesetterCreateFrame</span><span class="o">(</span><span class="nt">framesetter</span><span class="o">,</span> <span class="nt">CFRangeMake</span><span class="o">(</span><span class="err">0</span><span class="o">,</span> <span class="nt">mutableAttrStr</span><span class="nc">.length</span><span class="o">),</span> <span class="nt">path1</span><span class="nc">.CGPath</span><span class="o">,</span> <span class="nt">nil</span><span class="o">)</span></code></pre></figure>
+<p>The layout area has now changed, using the UIBezierPath API.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao14/7.png"/><br/></p>
+<p>4. Generate a CTFramesetterRef from the AttributedString, then create a CTFrame from the framesetter and drawing area.<br/></p>
+<p>5. Draw with CTFrameDraw. More complex examples later may draw line by line instead of drawing the entire frame directly.<br/></p>
+<p>Mixing images and text<br/></p>
+<p>CoreText would be rather uninteresting if it could only define text-drawing areas. It also supports mixed text and images, including both local and remote images.<br/></p>
+<p>CoreText still uses NSAttributedString when moving from plain text to images. An image is represented by a blank-character placeholder in NSAttributedString. A delegate tells CoreText how much width and height to reserve for that character. Finally, draw the image in the reserved position.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao14/8.png"/><br/></p>
+<p>In the image, the first picture is local and the second comes from the web. Let us see how this works. The code is rather long, but the approach should be clear.<br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">import</span> <span class="nt">UIKit</span>
+
+<span class="nt">class</span> <span class="nt">CTPicTxtView</span><span class="o">:</span> <span class="nt">UIView</span> <span class="p">{</span>
+
+<span class="err">var</span> <span class="py">image</span><span class="p">:</span><span class="n">UIImage</span><span class="err">?</span>
+
+    <span class="n">override</span> <span class="n">func</span> <span class="n">drawRect</span><span class="p">(</span><span class="n">rect</span><span class="p">:</span> <span class="n">CGRect</span><span class="p">)</span> <span class="err">{</span>
+        <span class="nb">super</span><span class="p">.</span><span class="n">drawRect</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span>
+
+        <span class="p">//</span> <span class="m">1</span> <span class="n">获取上下文</span>
+        <span class="n">let</span> <span class="n">context</span> <span class="err">=</span> <span class="n">UIGraphicsGetCurrentContext</span><span class="p">()</span>
+
+        <span class="p">//</span> <span class="m">2</span> <span class="n">转换坐标</span>
+        <span class="n">CGContextSetTextMatrix</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">CGAffineTransformIdentity</span><span class="p">)</span>
+        <span class="n">CGContextTranslateCTM</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">bounds</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">)</span>
+        <span class="n">CGContextScaleCTM</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="m">1.0</span><span class="p">,</span> <span class="m">-1.0</span><span class="p">)</span>
+
+        <span class="p">//</span> <span class="m">3</span> <span class="n">绘制区域</span>
+        <span class="n">let</span> <span class="n">path</span> <span class="err">=</span> <span class="n">UIBezierPath</span><span class="p">(</span><span class="n">rect</span><span class="p">:</span> <span class="n">rect</span><span class="p">)</span>
+
+        <span class="p">//</span> <span class="m">4</span> <span class="n">创建需要绘制的文字</span>
+        <span class="n">let</span> <span class="n">attrString</span> <span class="err">=</span> <span class="s1">"Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!Hello CoreText!"</span>
+
+        <span class="n">let</span> <span class="n">mutableAttrStr</span> <span class="err">=</span> <span class="n">NSMutableAttributedString</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="n">attrString</span><span class="p">)</span>
+        <span class="n">mutableAttrStr</span><span class="p">.</span><span class="n">addAttributes</span><span class="p">([</span><span class="n">NSFontAttributeName</span><span class="p">:</span><span class="n">UIFont</span><span class="p">.</span><span class="n">systemFontOfSize</span><span class="p">(</span><span class="m">20</span><span class="p">),</span>
+        <span class="n">NSForegroundColorAttributeName</span><span class="p">:</span><span class="n">UIColor</span><span class="p">.</span><span class="n">redColor</span><span class="p">()</span> <span class="p">],</span> <span class="n">range</span><span class="p">:</span> <span class="n">NSMakeRange</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">5</span><span class="p">))</span>
+        <span class="n">mutableAttrStr</span><span class="p">.</span><span class="n">addAttributes</span><span class="p">([</span><span class="n">NSFontAttributeName</span><span class="p">:</span><span class="n">UIFont</span><span class="p">.</span><span class="n">systemFontOfSize</span><span class="p">(</span><span class="m">13</span><span class="p">),</span><span class="n">NSUnderlineStyleAttributeName</span><span class="p">:</span> <span class="m">1</span> <span class="p">],</span> <span class="n">range</span><span class="p">:</span> <span class="n">NSMakeRange</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="m">10</span><span class="p">))</span>
+        <span class="n">let</span> <span class="n">style</span> <span class="err">=</span> <span class="n">NSMutableParagraphStyle</span><span class="p">()</span>   <span class="p">//</span><span class="n">用来设置段落样式</span>
+        <span class="n">style</span><span class="p">.</span><span class="n">lineSpacing</span> <span class="err">=</span> <span class="m">6</span> <span class="p">//</span><span class="n">行间距</span>
+        <span class="n">mutableAttrStr</span><span class="p">.</span><span class="n">addAttributes</span><span class="p">([</span><span class="n">NSParagraphStyleAttributeName</span><span class="p">:</span><span class="n">style</span><span class="p">],</span> <span class="n">range</span><span class="p">:</span> <span class="n">NSMakeRange</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="n">mutableAttrStr</span><span class="p">.</span><span class="n">length</span><span class="p">))</span>
+
+        <span class="p">//</span> <span class="m">5</span> <span class="n">为图片设置CTRunDelegate</span><span class="p">,</span><span class="n">delegate决定留给图片的空间大小</span>
+        <span class="n">var</span> <span class="n">imageName</span> <span class="err">=</span> <span class="s1">"mc"</span>
+        <span class="n">var</span>  <span class="n">imageCallback</span> <span class="err">=</span>  <span class="n">CTRunDelegateCallbacks</span><span class="p">(</span><span class="n">version</span><span class="p">:</span> <span class="n">kCTRunDelegateVersion1</span><span class="p">,</span> <span class="n">dealloc</span><span class="p">:</span> <span class="err">{</span> <span class="p">(</span><span class="n">refCon</span><span class="p">)</span> <span class="n">-</span><span class="err">&gt;</span> <span class="n">Void</span> <span class="n">in</span>
+
+        <span class="p">}</span><span class="o">,</span> <span class="nt">getAscent</span><span class="o">:</span> <span class="p">{</span> <span class="err">(</span> <span class="err">refCon)</span> <span class="err">-&gt;</span> <span class="err">CGFloat</span> <span class="err">in</span>
+
+            <span class="err">//</span>                <span class="err">let</span> <span class="err">imageName</span> <span class="err">=</span> <span class="err">"mc"</span>
+            <span class="err">//</span>                <span class="err">refCon.initialize()</span>
+            <span class="err">//</span>                <span class="err">let</span> <span class="err">image</span> <span class="err">=</span> <span class="err">UIImage(</span><span class="py">named</span><span class="p">:</span> <span class="n">imageName</span><span class="p">)</span>
+            <span class="n">return</span> <span class="m">100</span>  <span class="p">//</span><span class="n">返回高度</span>
+
+        <span class="p">}</span><span class="o">,</span> <span class="nt">getDescent</span><span class="o">:</span> <span class="p">{</span> <span class="err">(refCon)</span> <span class="err">-&gt;</span> <span class="err">CGFloat</span> <span class="err">in</span>
+
+            <span class="err">return</span> <span class="err">50</span>  <span class="err">//返回底部距离</span>
+
+        <span class="p">}</span><span class="o">)</span> <span class="p">{</span> <span class="err">(refCon)</span> <span class="err">-&gt;</span> <span class="err">CGFloat</span> <span class="err">in</span>
+
+            <span class="err">//</span>                <span class="err">let</span> <span class="err">imageName</span> <span class="err">=</span> <span class="err">String("mc")</span>
+            <span class="err">//</span>                <span class="err">let</span> <span class="err">image</span> <span class="err">=</span> <span class="err">UIImage(</span><span class="py">named</span><span class="p">:</span> <span class="n">imageName</span><span class="p">)</span>
+            <span class="n">return</span> <span class="m">100</span>  <span class="p">//</span><span class="n">返回宽度</span>
+
+        <span class="p">}</span>
+        <span class="nt">let</span> <span class="nt">runDelegate</span>  <span class="o">=</span> <span class="nt">CTRunDelegateCreate</span><span class="o">(&amp;</span><span class="nt">imageCallback</span><span class="o">,</span> <span class="o">&amp;</span><span class="nt">imageName</span><span class="o">)</span>
+        <span class="nt">let</span> <span class="nt">imgString</span> <span class="o">=</span> <span class="nt">NSMutableAttributedString</span><span class="o">(</span><span class="nt">string</span><span class="o">:</span> <span class="s1">" "</span><span class="o">)</span>  <span class="o">//</span> <span class="nt">空格用于给图片留位置</span>
+        <span class="nt">imgString</span><span class="nc">.addAttribute</span><span class="o">(</span><span class="nt">kCTRunDelegateAttributeName</span> <span class="nt">as</span> <span class="nt">String</span><span class="o">,</span> <span class="nt">value</span><span class="o">:</span> <span class="nt">runDelegate</span><span class="o">!,</span> <span class="nt">range</span><span class="o">:</span> <span class="nt">NSMakeRange</span><span class="o">(</span><span class="err">0</span><span class="o">,</span> <span class="err">1</span><span class="o">))</span>  <span class="o">//</span><span class="nt">rundelegate</span>  <span class="nt">占一个位置</span>
+        <span class="nt">imgString</span><span class="nc">.addAttribute</span><span class="o">(</span><span class="s1">"imageName"</span><span class="o">,</span> <span class="nt">value</span><span class="o">:</span> <span class="nt">imageName</span><span class="o">,</span> <span class="nt">range</span><span class="o">:</span> <span class="nt">NSMakeRange</span><span class="o">(</span><span class="err">0</span><span class="o">,</span> <span class="err">1</span><span class="o">))//</span><span class="nt">添加属性</span><span class="err">，</span><span class="nt">在CTRun中可以识别出这个字符是图片</span>
+        <span class="nt">mutableAttrStr</span><span class="nc">.insertAttributedString</span><span class="o">(</span><span class="nt">imgString</span><span class="o">,</span> <span class="nt">atIndex</span><span class="o">:</span> <span class="err">15</span><span class="o">)</span>
+
+
+        <span class="o">//</span><span class="nt">网络图片相关</span>
+        <span class="nt">var</span>  <span class="nt">imageCallback1</span> <span class="o">=</span>  <span class="nt">CTRunDelegateCallbacks</span><span class="o">(</span><span class="nt">version</span><span class="o">:</span> <span class="nt">kCTRunDelegateVersion1</span><span class="o">,</span> <span class="nt">dealloc</span><span class="o">:</span> <span class="p">{</span> <span class="err">(refCon)</span> <span class="err">-&gt;</span> <span class="err">Void</span> <span class="err">in</span>
+
+        <span class="p">}</span><span class="o">,</span> <span class="nt">getAscent</span><span class="o">:</span> <span class="p">{</span> <span class="err">(</span> <span class="err">refCon)</span> <span class="err">-&gt;</span> <span class="err">CGFloat</span> <span class="err">in</span>
+            <span class="err">return</span> <span class="err">70</span>  <span class="err">//返回高度</span>
+
+        <span class="p">}</span><span class="o">,</span> <span class="nt">getDescent</span><span class="o">:</span> <span class="p">{</span> <span class="err">(refCon)</span> <span class="err">-&gt;</span> <span class="err">CGFloat</span> <span class="err">in</span>
+
+            <span class="err">return</span> <span class="err">50</span>  <span class="err">//返回底部距离</span>
+
+        <span class="p">}</span><span class="o">)</span> <span class="p">{</span> <span class="err">(refCon)</span> <span class="err">-&gt;</span> <span class="err">CGFloat</span> <span class="err">in</span>
+            <span class="err">return</span> <span class="err">100</span>  <span class="err">//返回宽度</span>
+
+        <span class="p">}</span>
+        <span class="nt">var</span> <span class="nt">imageUrl</span> <span class="o">=</span> <span class="s1">"http://img3.3lian.com/2013/c2/64/d/65.jpg"</span> <span class="o">//</span><span class="nt">网络图片链接</span>
+        <span class="nt">let</span> <span class="nt">urlRunDelegate</span>  <span class="o">=</span> <span class="nt">CTRunDelegateCreate</span><span class="o">(&amp;</span><span class="nt">imageCallback1</span><span class="o">,</span> <span class="o">&amp;</span><span class="nt">imageUrl</span><span class="o">)</span>
+        <span class="nt">let</span> <span class="nt">imgUrlString</span> <span class="o">=</span> <span class="nt">NSMutableAttributedString</span><span class="o">(</span><span class="nt">string</span><span class="o">:</span> <span class="s1">" "</span><span class="o">)</span>  <span class="o">//</span> <span class="nt">空格用于给图片留位置</span>
+        <span class="nt">imgUrlString</span><span class="nc">.addAttribute</span><span class="o">(</span><span class="nt">kCTRunDelegateAttributeName</span> <span class="nt">as</span> <span class="nt">String</span><span class="o">,</span> <span class="nt">value</span><span class="o">:</span> <span class="nt">urlRunDelegate</span><span class="o">!,</span> <span class="nt">range</span><span class="o">:</span> <span class="nt">NSMakeRange</span><span class="o">(</span><span class="err">0</span><span class="o">,</span> <span class="err">1</span><span class="o">))</span>  <span class="o">//</span><span class="nt">rundelegate</span>  <span class="nt">占一个位置</span>
+        <span class="nt">imgUrlString</span><span class="nc">.addAttribute</span><span class="o">(</span><span class="s1">"urlImageName"</span><span class="o">,</span> <span class="nt">value</span><span class="o">:</span> <span class="nt">imageUrl</span><span class="o">,</span> <span class="nt">range</span><span class="o">:</span> <span class="nt">NSMakeRange</span><span class="o">(</span><span class="err">0</span><span class="o">,</span> <span class="err">1</span><span class="o">))//</span><span class="nt">添加属性</span><span class="err">，</span><span class="nt">在CTRun中可以识别出这个字符是图片</span>
+        <span class="nt">mutableAttrStr</span><span class="nc">.insertAttributedString</span><span class="o">(</span><span class="nt">imgUrlString</span><span class="o">,</span> <span class="nt">atIndex</span><span class="o">:</span> <span class="err">50</span><span class="o">)</span>
+
+
+        <span class="o">//</span> <span class="err">6</span> <span class="nt">生成framesetter</span>
+        <span class="nt">let</span> <span class="nt">framesetter</span> <span class="o">=</span> <span class="nt">CTFramesetterCreateWithAttributedString</span><span class="o">(</span><span class="nt">mutableAttrStr</span><span class="o">)</span>
+        <span class="nt">let</span> <span class="nt">frame</span> <span class="o">=</span> <span class="nt">CTFramesetterCreateFrame</span><span class="o">(</span><span class="nt">framesetter</span><span class="o">,</span> <span class="nt">CFRangeMake</span><span class="o">(</span><span class="err">0</span><span class="o">,</span> <span class="nt">mutableAttrStr</span><span class="nc">.length</span><span class="o">),</span> <span class="nt">path</span><span class="nc">.CGPath</span><span class="o">,</span> <span class="nt">nil</span><span class="o">)</span>
+
+        <span class="o">//</span> <span class="err">7</span> <span class="nt">绘制除图片以外的部分</span>
+        <span class="nt">CTFrameDraw</span><span class="o">(</span><span class="nt">frame</span><span class="o">,</span><span class="nt">context</span><span class="o">!)</span>
+
+        <span class="o">//</span> <span class="err">8</span> <span class="nt">处理绘制图片逻辑</span>
+        <span class="nt">let</span> <span class="nt">lines</span> <span class="o">=</span> <span class="nt">CTFrameGetLines</span><span class="o">(</span><span class="nt">frame</span><span class="o">)</span> <span class="nt">as</span> <span class="nt">NSArray</span> <span class="o">//</span><span class="nt">存取frame中的ctlines</span>
+
+
+        <span class="nt">let</span> <span class="nt">ctLinesArray</span> <span class="o">=</span> <span class="nt">lines</span> <span class="nt">as</span> <span class="nt">Array</span>
+        <span class="nt">var</span> <span class="nt">originsArray</span> <span class="o">=</span> <span class="o">[</span><span class="nt">CGPoint</span><span class="o">](</span><span class="nt">count</span><span class="nd">:ctLinesArray</span><span class="nc">.count</span><span class="o">,</span> <span class="nt">repeatedValue</span><span class="o">:</span> <span class="nt">CGPointZero</span><span class="o">)</span>
+        <span class="nt">let</span> <span class="nt">range</span><span class="o">:</span> <span class="nt">CFRange</span> <span class="o">=</span> <span class="nt">CFRangeMake</span><span class="o">(</span><span class="err">0</span><span class="o">,</span> <span class="err">0</span><span class="o">)</span>
+        <span class="nt">CTFrameGetLineOrigins</span><span class="o">(</span><span class="nt">frame</span><span class="o">,</span><span class="nt">range</span><span class="o">,&amp;</span><span class="nt">originsArray</span><span class="o">)</span>
+
+        <span class="o">//</span><span class="nt">遍历CTRun找出图片所在的CTRun并进行绘制</span><span class="o">,</span><span class="nt">每一行可能有多个</span>
+        <span class="nt">for</span> <span class="nt">i</span> <span class="nt">in</span> <span class="err">0</span><span class="o">..&lt;</span><span class="nt">lines</span><span class="nc">.count</span><span class="p">{</span>
+            <span class="err">//遍历每一行CTLine</span>
+            <span class="err">let</span> <span class="err">line</span> <span class="err">=</span> <span class="err">lines[i]</span>
+            <span class="err">var</span> <span class="err">lineAscent</span> <span class="err">=</span> <span class="err">CGFloat()</span>
+            <span class="err">var</span> <span class="err">lineDescent</span> <span class="err">=</span> <span class="err">CGFloat()</span>
+            <span class="err">var</span> <span class="err">lineLeading</span> <span class="err">=</span> <span class="err">CGFloat()</span>
+            <span class="err">//该函数除了会设置好ascent,descent,leading之外，还会返回这行的宽度</span>
+            <span class="err">CTLineGetTypographicBounds(line</span> <span class="err">as!</span> <span class="err">CTLineRef,</span> <span class="err">&amp;lineAscent,</span> <span class="err">&amp;lineDescent,</span> <span class="err">&amp;lineLeading)</span>
+
+            <span class="err">let</span> <span class="err">runs</span> <span class="err">=</span> <span class="err">CTLineGetGlyphRuns(line</span> <span class="err">as!</span> <span class="err">CTLine)</span> <span class="err">as</span> <span class="err">NSArray</span>
+            <span class="err">for</span> <span class="err">j</span> <span class="err">in</span> <span class="err">0..&lt;runs.count{</span>
+            <span class="err">//</span> <span class="err">遍历每一个CTRun</span>
+            <span class="err">var</span>  <span class="err">runAscent</span> <span class="err">=</span> <span class="err">CGFloat()</span>
+            <span class="err">var</span>  <span class="err">runDescent</span> <span class="err">=</span> <span class="err">CGFloat()</span>
+            <span class="err">let</span>  <span class="err">lineOrigin</span> <span class="err">=</span> <span class="err">originsArray[i]//</span> <span class="err">获取该行的初始坐标</span>
+            <span class="err">let</span> <span class="err">run</span> <span class="err">=</span> <span class="err">runs[j]</span> <span class="err">//</span> <span class="err">获取当前的CTRun</span>
+            <span class="err">let</span> <span class="err">attributes</span> <span class="err">=</span> <span class="err">CTRunGetAttributes(run</span> <span class="err">as!</span> <span class="err">CTRun)</span> <span class="err">as</span> <span class="err">NSDictionary</span>
+
+            <span class="err">let</span> <span class="err">width</span> <span class="err">=</span>  <span class="err">CGFloat(</span> <span class="err">CTRunGetTypographicBounds(run</span> <span class="err">as!</span> <span class="err">CTRun,</span> <span class="err">CFRangeMake(0,0),</span> <span class="err">&amp;runAscent,</span> <span class="err">&amp;runDescent,</span> <span class="err">nil))</span>
+
+            <span class="err">let</span>  <span class="err">runRect</span> <span class="err">=</span> <span class="err">CGRectMake(lineOrigin.x</span> <span class="err">+</span> <span class="err">CTLineGetOffsetForStringIndex(line</span> <span class="err">as!</span> <span class="err">CTLine,</span> <span class="err">CTRunGetStringRange(run</span> <span class="err">as!</span> <span class="err">CTRun).location,</span> <span class="err">nil),</span> <span class="err">lineOrigin.y</span> <span class="err">-</span> <span class="err">runDescent,</span> <span class="err">width,</span> <span class="err">runAscent</span> <span class="err">+</span> <span class="err">runDescent)</span>
+            <span class="err">let</span> <span class="err">imageNames</span> <span class="err">=</span> <span class="err">attributes.objectForKey("imageName")</span>
+            <span class="err">let</span> <span class="err">urlImageName</span> <span class="err">=</span> <span class="err">attributes.objectForKey("urlImageName")</span>
+
+            <span class="err">if</span> <span class="err">imageNames</span> <span class="err">is</span> <span class="err">NSString</span> <span class="err">{</span>
+                <span class="err">//本地图片</span>
+                <span class="err">let</span> <span class="err">image</span> <span class="err">=</span> <span class="err">UIImage(</span><span class="py">named</span><span class="p">:</span> <span class="n">imageName</span> <span class="n">as</span> <span class="n">String</span><span class="p">)</span>
+                <span class="n">let</span> <span class="n">imageDrawRect</span> <span class="err">=</span> <span class="n">CGRectMake</span><span class="p">(</span><span class="n">runRect</span><span class="p">.</span><span class="n">origin</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">lineOrigin</span><span class="p">.</span><span class="n">y-runDescent</span><span class="p">,</span> <span class="m">100</span><span class="p">,</span> <span class="m">100</span><span class="p">)</span>
+                <span class="n">CGContextDrawImage</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">imageDrawRect</span><span class="p">,</span> <span class="n">image</span><span class="err">?</span><span class="p">.</span><span class="n">CGImage</span><span class="p">)</span>
+            <span class="p">}</span>
+
+            <span class="nt">if</span> <span class="nt">let</span> <span class="nt">urlImageName</span> <span class="o">=</span> <span class="nt">urlImageName</span> <span class="nt">as</span><span class="o">?</span> <span class="nt">String</span><span class="p">{</span>
+                <span class="err">var</span> <span class="py">image</span><span class="p">:</span><span class="n">UIImage</span><span class="err">?</span>
+                <span class="n">let</span> <span class="n">imageDrawRect</span> <span class="err">=</span> <span class="n">CGRectMake</span><span class="p">(</span><span class="n">runRect</span><span class="p">.</span><span class="n">origin</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">lineOrigin</span><span class="p">.</span><span class="n">y-runDescent</span><span class="p">,</span> <span class="m">100</span><span class="p">,</span> <span class="m">100</span><span class="p">)</span>
+                <span class="n">if</span> <span class="n">self</span><span class="p">.</span><span class="n">image</span> <span class="err">==</span> <span class="n">nil</span><span class="err">{</span>
+                <span class="n">image</span> <span class="err">=</span> <span class="n">UIImage</span><span class="p">(</span><span class="n">named</span><span class="p">:</span><span class="s1">"hs"</span><span class="p">)</span> <span class="p">//</span><span class="n">灰色图片占位</span>
+                <span class="p">//</span><span class="n">去下载</span>
+                <span class="n">if</span> <span class="n">let</span> <span class="nb">url</span> <span class="err">=</span> <span class="n">NSURL</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="n">urlImageName</span><span class="p">)</span><span class="err">{</span>
+                    <span class="n">let</span> <span class="n">request</span> <span class="err">=</span> <span class="n">NSURLRequest</span><span class="p">(</span><span class="n">URL</span><span class="p">:</span> <span class="nb">url</span><span class="p">)</span>
+                    <span class="n">NSURLSession</span><span class="p">.</span><span class="n">sharedSession</span><span class="p">().</span><span class="n">dataTaskWithRequest</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">completionHandler</span><span class="p">:</span> <span class="err">{</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">resp</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="n">-</span><span class="err">&gt;</span> <span class="n">Void</span> <span class="n">in</span>
+
+                    <span class="n">if</span> <span class="n">let</span> <span class="n">data</span> <span class="err">=</span> <span class="n">data</span><span class="err">{</span>
+                        <span class="n">dispatch_sync</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="err">{</span> <span class="p">()</span> <span class="n">-</span><span class="err">&gt;</span> <span class="n">Void</span> <span class="n">in</span>
+                        <span class="n">self</span><span class="p">.</span><span class="n">image</span> <span class="err">=</span> <span class="n">UIImage</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">data</span><span class="p">)</span>
+                        <span class="n">self</span><span class="p">.</span><span class="n">setNeedsDisplay</span><span class="p">()</span>  <span class="p">//</span><span class="n">下载完成会重绘</span>
+                        <span class="p">}</span><span class="o">)</span>
+
+                    <span class="err">}</span>
+                <span class="err">}</span><span class="o">)</span><span class="nc">.resume</span><span class="o">()</span>
+                <span class="err">}</span>
+
+             <span class="err">}</span><span class="nt">else</span><span class="p">{</span>
+                <span class="err">image</span> <span class="err">=</span> <span class="err">self.image</span>
+             <span class="p">}</span>
+            <span class="nt">CGContextDrawImage</span><span class="o">(</span><span class="nt">context</span><span class="o">,</span> <span class="nt">imageDrawRect</span><span class="o">,</span> <span class="nt">image</span><span class="o">?</span><span class="nc">.CGImage</span><span class="o">)</span>
+          <span class="err">}</span>
+         <span class="err">}</span>
+        <span class="err">}</span>
+
+    <span class="err">}</span>
+
+<span class="err">}</span></code></pre></figure>
+<p><br/></p>
+<p>1, 2, 3, and 4 are identical to the earlier simple demo, except that line spacing has been added.<br/></p>
+<p>5. A callback sets information such as the image size. We then create a CTRun delegate, create a blank placeholder character, and give it an attribute so it can be identified during drawing. Finally, insert that placeholder at a chosen position in the attributed text.<br/></p>
+<p>For the remote image below, replace name with url; the rest follows the same approach.<br/></p>
+<p>6 and 7 are the same as in the preceding section.<br/></p>
+<p>8. Begin handling the images.<br/></p>
+<p>Obtain the CTLines from CTFrame, then use originsArray to get each line's origin for positioning. Obtain the CTRuns from each CTLine. Each CTRun is a string segment with identical attributes and does not cross line boundaries.<br/></p>
+<p>Traverse the CTRuns and use the attributes we set earlier to locate and draw the local image.<br/></p>
+<p>Drawing remote images is simple too. If an image has not downloaded yet, use a gray placeholder, then download it. Once downloaded, assign it to a variable on self and redraw. If you are unfamiliar with NSURLSession, see my other article.<a href="/en/journal/2016-01-25-do-you-need-alamofire-trying-nsurlsession-instead/">NSURLSession</a><br/></p>
+<p>There is much more to CoreText: line-by-line layout, mixing text and emoji, recognizing links, handling taps on images and links, and so on. This article is getting long, so I will continue in the next one and stop here for now.<br/></p>
+<p>The example code for this article is on github: <a href="https://github.com/smalldu/ZZCoreTextDemo">https://github.com/smalldu/ZZCoreTextDemo</a><br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-01-20-integrating-lianlian-pay-into-an-ios-app/">Integrating LianLian Pay into an iOS app</a><br/></p>
+
+{% endraw %}

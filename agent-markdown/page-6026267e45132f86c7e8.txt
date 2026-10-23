@@ -1,0 +1,209 @@
+---
+layout: null
+permalink: /投稿/tuogao11/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: Cell特效之图片随着TableView的滑动上下移动
+agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao11
+agent_source_sha256: 639fa2db76a6a2ad0d18c8569dcc64072532354c192f16b5c677f47fa173ad5c
+agent_generator_version: 1
+---
+{% raw %}# Cell特效之图片随着TableView的滑动上下移动
+
+语言：zh-CN
+原文：[Cell特效之图片随着TableView的滑动上下移动](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao11>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao11>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-01-28-moving-cell-images-as-a-table-view-scrolls/>)
+发布于: 2016-01-28T00:00:00+08:00
+内容更新于: 2016-01-28T00:00:00+08:00
+署名：[WzxJiang](<http://www.jianshu.com/users/389c20d5a244/latest_articles>)
+
+根据单元格中心与父视图中心的偏移调整图片位置，使图片随 UITableView 滚动形成视差，并记录自定义 Cell 与可见项更新方式，附改编代码和原项目链接。
+
+WzxJiang 投稿，正文注明改编自 juvham 的 kaiyan 项目，Bison 编辑收录。
+
+[原文所列来源](<http://www.jianshu.com/users/389c20d5a244/latest_articles>)
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。涉及的 API、依赖和工具版本请结合发表日期阅读。
+
+编辑：[Bison](<https://allluckly.cn/>)  
+ 投稿：[WzxJiang](<http://www.jianshu.com/users/389c20d5a244/latest_articles>)
+
+> "今天在CocoaChina上看到一个非常好的效果，作者:juvham 代码实力强劲，用了很多高效的方法，但是注释太少。。所以我在他的基础上分离出了我最喜欢的一个效果，改了一部分代码，加上注释，希望大家能喜欢。。先上我分离出来的效果图:"
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao11/1.gif>)
+
+## 这个效果是如何实现的
+
+- 首先你需要创建一个UITableView
+- 然后自定义一个UITableViewCell,例:myCell.h
+- 在myCell.h中创建几个成员变量:
+
+```css
+/**
+*  图片imgView
+*/
+@property (nonatomic, strong) UIImageView * pictureView;
+
+/**
+*  标题label
+*/
+@property (nonatomic, strong) UILabel * titleLabel;
+
+/**
+*  内容Label
+*/
+@property (nonatomic, strong) UILabel * littleLabel;
+```
+
+- 实现它们
+
+```css
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+{
+    if ([super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
+
+
+        //取消选中效果
+        self.selectionStyle = UITableViewCellSeparatorStyleNone;
+
+        //裁剪看不到的
+        self.clipsToBounds = YES;
+
+        //pictureView的Y往上加一半cellHeight 高度为2 * cellHeight，这样上下多出一半的cellHeight
+        _pictureView = ({
+            UIImageView * picture = [[UIImageView alloc]initWithFrame:CGRectMake(0, -cellHeight/2, kWidth, cellHeight * 2)];
+
+            picture.contentMode = UIViewContentModeScaleAspectFill;
+
+            picture;
+        });
+        [self.contentView  addSubview:_pictureView];
+
+        _titleLabel = ({
+            UILabel * titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, cellHeight / 2 - 30, kWidth, 30)];
+
+            titleLabel.font = [UIFont boldSystemFontOfSize:16];
+
+            titleLabel.textAlignment = NSTextAlignmentCenter;
+
+            titleLabel.textColor = [UIColor whiteColor];
+
+            titleLabel.text = @"标题";
+
+            titleLabel;
+        });
+        [self.contentView addSubview:_titleLabel];
+
+        _littleLabel = ({
+            UILabel * littleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, cellHeight / 2 + 30, kWidth, 30)];
+
+            littleLabel.font = [UIFont systemFontOfSize:14];
+
+            littleLabel.textAlignment = NSTextAlignmentCenter;
+
+            littleLabel.textColor = [UIColor whiteColor];
+
+            littleLabel.text = @"xxxxxxxxxxx";
+
+            littleLabel;
+
+        });
+        [self.contentView addSubview:_littleLabel];
+
+
+
+    }
+    return self;
+
+}
+```
+
+- 然后我们需要一个方法，让cell上的\_pictureView得到image
+
+```css
+- (void)setImg:(UIImage *)img
+{
+    self.pictureView.image = img;
+}
+```
+
+- 在willDisplayCell方法中处理数据，能优化滑动性能
+
+```css
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    MyCell * myCell = (MyCell *)cell;
+
+    [myCell setImg:_dataArray[indexPath.row]];
+
+    [myCell cellOffset];
+}
+```
+
+这里出现的\[myCell cellOffset\]是后面再讲的cell位移方法，这里先当作没看到。。
+
+- 数据都处理完了，现在来讲重点的滑动方法
+
+```css
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    // visibleCells 获取界面上能显示出来了cell
+    NSArray<MyCell *> *array = [self.tableView visibleCells];
+
+    //enumerateObjectsUsingBlock 类似于for，但是比for更快
+    [array enumerateObjectsUsingBlock:^(MyCell * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+
+        [obj cellOffset];
+
+    }]; 
+}
+```
+
+这里的方法很有用，可以记一下，而enumerateObjectsUsingBlock有人测试过，会比for快4ms左右，要是你对它有更好的理解，欢迎评论告诉我。
+
+- 现在来讲cellOffset方法
+
+```css
+- (CGFloat)cellOffset
+{
+    /*
+    - (CGRect)convertRect:(CGRect)rect toView:(nullable UIView *)view;
+    将rect由rect所在视图转换到目标视图view中，返回在目标视图view中的rect
+    这里用来获取self在window上的位置
+    */
+    CGRect toWindow = [self convertRect:self.bounds toView:self.window];
+
+    //获取父视图的中心
+    CGPoint windowCenter = self.superview.center;
+
+    //cell在y轴上的位移  CGRectGetMidY之前讲过,获取中心Y值
+    CGFloat cellOffsetY = CGRectGetMidY(toWindow) - windowCenter.y;
+
+    //位移比例
+    CGFloat offsetDig = 2 * cellOffsetY / self.superview.frame.size.height ;
+
+    //要补偿的位移
+    CGFloat offset =  -offsetDig * cellHeight/2;
+
+    //让pictureViewY轴方向位移offset
+    CGAffineTransform transY = CGAffineTransformMakeTranslation(0,offset);
+    self.pictureView.transform = transY;
+
+    return offset;
+}
+```
+
+这里主要是cellOffsetY很重要，这个参数获取了cell的中心与父视图中心的位移差，然后位移cell上的pictureView。
+
+这个动画就完成了.
+
+代码  
+ [我的代码](<https://github.com/Wzxhaha/WZXKaiYanDemo>)(基础不是很好的可以先看看我的..注释写的很详细)  
+ [原作者juvham的代码](<https://github.com/juvham/kaiyan>)(里面还有更多效果，就是有点难看懂)
+
+---
+
+好文推荐：[iOS开发之详解连连支付集成](<https://allluckly.cn/ios%E6%94%AF%E4%BB%98/lianlianzhifu>)
+{% endraw %}

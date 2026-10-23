@@ -1,0 +1,54 @@
+---
+layout: guide
+author: Bison
+app_id: nas_book
+title: 'Connect Book Isle to WebDAV: download a book from a private library'
+description: Set up a private WebDAV library, check address, path and permissions, download one ebook and verify
+  offline reading, separating library access from reading-data sync.
+permalink: /en/guides/nasbook-webdav-library/
+date: 2026-10-23 00:00:00 +0800
+modified: 2026-10-23 00:00:00 +0800
+category: Tutorials
+level: Beginner
+series_order: 11
+topic: Private libraries
+reading_time: 8
+lang: en
+source_path: _posts/2026-10-23-nasbook-webdav-library.md
+source_url: /guides/nasbook-webdav-library/
+translation_method: machine-assisted
+translation_source_sha256: d1e4e8529ee29c9b1ba2ee59886642a6d001977b04be29b3a57c78a4fb069e63
+excerpt: Set up a private WebDAV library, check address, path and permissions, download one ebook and verify offline
+  reading, separating library access from reading-data sync.
+translation_date: '2026-10-23T02:34:08+00:00'
+---
+{% raw %}
+<p>WebDAV makes ebooks on a NAS or your own server available to phones and tablets. After connecting in Book Isle, browse remote directories and download selected books locally. Keep the first goal small: reach one correct directory, download one EPUB, and confirm that it opens without a network connection.</p>
+<h2 id="在服务器准备一个阅读目录">Prepare a reading directory on the server</h2>
+<p>Confirm that WebDAV is enabled on your server and that you know its service address, port, username, password, and book directory. Place one small EPUB in a dedicated test directory, which could be named  <code class="language-plaintext highlighter-rouge">Books/Test</code>. The server configuration determines these values. Do not copy someone else's port or use the NAS administration website as the WebDAV service address.</p>
+<p>The phone and server must be mutually reachable. Start on the same home network and handle remote access through your existing deployment later. NAS browsing, downloading, and remote reading belong to Collector Pro in Book Isle. You can verify local reading first without configuring every remote feature. Membership and server permissions are separate prerequisites.</p>
+<h2 id="在书屿添加-webdav-连接">Add a WebDAV connection in Book Isle</h2>
+<p>Open NAS Connections in Settings and use Add to open the form. Give the connection a purpose-specific name, such as Home Library, and choose WebDAV. Fill in address, port, path, and credentials according to the separate fields. If the address already contains the protocol or path, avoid appending the same part again elsewhere.</p>
+<p>For example, if the server actually exposes  <code class="language-plaintext highlighter-rouge">https://books.example.com/dav/</code>, split host and path according to the current form. The domain here only illustrates structure and cannot be used directly. Put usernames and passwords in dedicated fields rather than inside address text, or copying connection details and screenshots for help can disclose credentials.</p>
+<h2 id="先测试再保存并浏览">Test first, then save and browse</h2>
+<p>Use Test Connection and inspect the result. After success, save and browse the connection. A passed test only confirms the current connection check. You still need to enter the target folder, find the practice book, and download it to verify the book path and read permissions. If a failed test still allows saving, that saves configuration; it does not prove connectivity.</p>
+<p>When browsing, first navigate level by level to  <code class="language-plaintext highlighter-rouge">Books/Test</code>, comparing filenames on the server and in the app. For an empty directory, check directory-read permissions and whether the path has an extra or missing level. Do not immediately scan the whole NAS. A known small directory helps separate address, permission, and format issues.</p>
+<h2 id="下载到书架并检查本地结果">Download to the shelf and verify the local result</h2>
+<p>Select the practice book and use Download to Shelf among the available actions. If an import preview follows, verify the title and format and finish importing. Wait for both downloading and importing, then open the body from the shelf. A cover, filename, or size in a remote directory cannot replace this step. Local reading needs usable content actually saved.</p>
+<p>Read to chapter two, return to the shelf, temporarily disable the network, and reopen. If later chapters remain readable, that book is ready for local use. For a trip, verifying one download before preparing the others is more reliable than queuing dozens without checking. Judge completion separately for each book from the actual result.</p>
+<h2 id="区分书库连接和阅读数据同步">Distinguish a library connection from reading-data synchronization</h2>
+<p>This connection points to where books are stored. Book Isle separately provides Full Sync to write progress, notes, tags, and other reading data into a WebDAV directory you choose. They serve different purposes. Downloading ebooks does not mean reading-record synchronization is enabled; successful synchronization does not mean the whole set of book files was copied automatically to another device.</p>
+<p>To enable synchronization later, prepare a separate sync directory so reading-database files do not mix with original books. The server account also needs relevant write permission, while downloading books may require only reading. Do not grant broad write access just to diagnose a download problem. Identify the permission actually missing for the current purpose.</p>
+<h2 id="按错误现象检查连接">Check the connection according to the error</h2>
+<p>For authentication failures, check the account, password, and whether the account is allowed WebDAV access. Signing in to an administration website does not necessarily grant the same file-protocol permissions. For a missing path, check case, spaces, and reverse-proxy prefixes. For timeouts, confirm that the server is online and reachable and that the specified port actually serves WebDAV.</p>
+<p>Fix HTTPS certificate, domain, or certificate-chain errors on the server rather than disabling validation to continue the tutorial. A download that is actually a login webpage is not an EPUB. Retain the error type and time to help the administrator check logs. Share only necessary details when requesting help, hiding passwords and sensitive parts of private addresses.</p>
+<h2 id="常见问题">Frequently asked questions</h2>
+<p><strong>Why can I not connect on the same Wi-Fi?</strong> The device may be on a guest network or isolated subnet, or the server firewall may not allow the access. Check routing and server settings before repeatedly testing the app. Renaming files usually does not solve connectivity problems.</p>
+<p><strong>Will downloaded books stop opening when membership expires?</strong> The public description separates remote membership features from local use: downloaded local books and local reading remain available. After expiration, distinguish remote-directory access from local-file readability, and still perform an actual offline check before leaving.</p>
+<p><strong>Can I share books by simply sending someone the WebDAV address?</strong> An address alone is not authorization and should not be shared together with personal account credentials. Arrange sharing separately according to your content rights and server management. This article establishes only your own private access.</p>
+<h2 id="后续路线">Next steps</h2>
+<p>For an existing SMB share on your home LAN, compare <a href="/en/guides/nasbook-smb-library/">The SMB connection method</a>; to continue notes and progress across two devices, proceed to <a href="/en/guides/nasbook-webdav-sync/">WebDAV reading-data synchronization</a>.</p>
+<h2 id="资料与版本">Sources and version</h2>
+<p>Information checked on October 23, 2026. The public release is Book Isle 1.1.3, requiring iOS / iPadOS 15.6 or later. This guide is based on public feature descriptions and their entry points. Interface labels may change with the version. See <a href="https://apps.apple.com/cn/app/id6766198898">Official App Store description</a> and <a href="https://itunes.apple.com/lookup?id=6766198898&amp;country=cn">Apple release information</a>.</p>
+
+{% endraw %}

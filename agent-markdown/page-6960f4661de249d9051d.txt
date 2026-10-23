@@ -1,0 +1,338 @@
+---
+layout: null
+permalink: /en/journal/2015-10-21-integrating-alipay-friend-sharing-in-three-minutes/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Integrating Alipay friend sharing in three minutes
+agent_source_url: https://allluckly.cn/en/journal/2015-10-21-integrating-alipay-friend-sharing-in-three-minutes/
+agent_source_sha256: dbe8dc6b18dc5a7bf66411796bccad960a48d2ec36610716910823a72fb08446
+agent_generator_version: 1
+---
+{% raw %}# Integrating Alipay friend sharing in three minutes
+
+Language: en
+Canonical: [Integrating Alipay friend sharing in three minutes](<https://allluckly.cn/en/journal/2015-10-21-integrating-alipay-friend-sharing-in-three-minutes/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%94%AF%E4%BB%98%E5%AE%9D/ZFB>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-10-21-integrating-alipay-friend-sharing-in-three-minutes/>)
+Published: 2015-10-21T00:00:00+08:00
+Modified: 2026-10-23T10:34:10+08:00
+Author: [Bison](<https://allluckly.cn/about/>)
+
+Walks through app registration, SDK import, URL Scheme configuration and callbacks for sharing to Alipay friends. It distinguishes the data objects for text, image and web messages, and records checks for installation detection and authentication failures.
+
+Originally credited to Bison. Content is retained as published.
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%94%AF%E4%BB%98%E5%AE%9D/ZFB>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Uses the 2015 Alipay SocialSDK, with notes on iOS 9 Scheme configuration and Alipay Wallet 9.0.
+
+> "Work hard, keep working hard, and work harder still. Today’s effort becomes tomorrow’s reward." Bison
+
+Almost without our noticing, Alipay has become an indispensable `APP` in daily life. Evolving from a payment-only `APP` into a collection of useful small features has been quite a journey. Today I want to discuss what this change requires of us programmers: quickly adding sharing to Alipay friends. I happened to see this in the Weibo client, became curious, and tried it myself. Third-party services such as Umeng and ShareSDK apparently had not added this sharing option at the time. Let me show you how to finish this simple task. Yes, very simple—the title says so. 😄 Now to the main point:
+
+---
+
+#### Preparation
+
+- Apply for your AppID. Register on the application registration page of the Alipay Open Platform. Once you register and configure a mobile application, you receive an AppID that can be used for development immediately. However, registration must still be submitted for review; only approved applications may be officially released for use.
+- Download and extract the interface archive, named SocialSDK.zip.
+
+#### Step 1: Launch your IDE, such as Xcode. Copy the following files from the SocialSDK folder into your project folder and import them into the project.
+
+This historical illustration is currently unavailable. [The original image URL is retained](<http://upload-images.jianshu.io/upload_images/671504-f1b1a1d5e9398e69.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240>) for reference.
+
+```css
+APOpenAPI.h
+APOpenAPIObject.h
+libAPOpenSdk.a
+```
+
+#### Step 2: Add the header import in any file that needs to call SocialSDK.
+
+```css
+#import "APOpenAPI.h"
+```
+
+#### Step 3: Configure the project
+
+- Add ` -all_load  ` to Other Linker Flags.
+- Add the Alipay callback scheme under URL Types. 
+
+  > **Note**
+  > 
+  >  
+  > 
+  > 1. The identifier must be `alipayShare`.
+  > 2. URL Schemes naming rule: `ap+AppID`
+- On iOS 9 and later, add the Alipay sharing scheme. 
+
+  > **The URL Schemes name for Alipay sharing is: `alipayshare`**
+
+#### Step 4: Register the application and add the required URL Handler
+
+For example, add the import to AppDelegate.m:
+
+```css
+#import "APOpenAPI.h"
+```
+
+Add the following code inside @implementation AppDelegate:
+
+```css
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.window.backgroundColor = [UIColor whiteColor];
+    [self.window makeKeyAndVisible];
+    
+    //  创建供Demo使用的根视图
+    APRootViewController *rootViewController = [[APRootViewController alloc] initWithNibName:nil bundle:nil];
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:rootViewController];
+    self.window.rootViewController = navigationController;
+    
+    //  配置应用的AppId
+    //      重要：必须先在支付宝开放平台申请您的AppId才能正常使用支付宝社交分享功能
+    //      Demo中的AppId，使用xxxxxxxxxx代替
+    [APOpenAPI registerApp:@"xxxxxxxxxx"];
+    
+    return YES;
+}
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
+{
+    //  处理支付宝通过URL启动App时传递的数据
+    return [APOpenAPI handleOpenURL:url delegate:self];
+}
+```
+
+#### Step 5: Share data to Alipay Wallet
+
+Sending a sharing request mainly consists of two parts:
+
+- Assemble an APMediaMessage object.
+- Call the sendReq interface to send it.
+
+Different types of shared data are distinguished primarily by the mediaObject within APMediaMessage:
+
+- APShareTextObject: plain-text data
+- APShareImageObject: image data
+- APShareWebObject: web-page data
+
+Share plain text.
+
+```css
+//  发送文本消息到支付宝
+- (void)sendText
+{
+    //  创建消息载体 APMediaMessage 对象
+    APMediaMessage *message = [[APMediaMessage alloc] init];
+    
+    //  创建文本类型的消息对象
+    APShareTextObject *textObj = [[APShareTextObject alloc] init];
+    textObj.text = @"此处填充发送到支付宝的纯文本信息";
+    //  回填 APMediaMessage 的消息对象
+    message.mediaObject = textObj;
+    
+    //  创建发送请求对象
+    APSendMessageToAPReq *request = [[APSendMessageToAPReq alloc] init];
+    //  填充消息载体对象
+    request.message = message;
+    //  发送请求
+    [APOpenAPI sendReq:request];
+}
+```
+
+Share an image using an image URL.
+
+```css
+//  发送图片消息到支付宝(图片链接形式)
+- (void)sendPhotoByUrl
+{
+    //  创建消息载体 APMediaMessage 对象
+    APMediaMessage *message = [[APMediaMessage alloc] init];
+    
+    //  创建图片类型的消息对象
+    APShareImageObject *imgObj = [[APShareImageObject alloc] init];
+    imgObj.imageUrl = @"此处填充图片的url链接地址";
+    //  回填 APMediaMessage 的消息对象
+    message.mediaObject = imgObj;
+    
+    //  创建发送请求对象
+    APSendMessageToAPReq *request = [[APSendMessageToAPReq alloc] init];
+    //  填充消息载体对象
+    request.message = message;
+    //  发送请求
+    [APOpenAPI sendReq:request];
+}
+```
+
+Share an image using image data.
+
+```css
+//  发送图片消息到支付宝(图片数据形式)
+- (void)sendPhotoByData
+{
+    //  创建消息载体 APMediaMessage 对象
+    APMediaMessage *message = [[APMediaMessage alloc] init];
+    
+    //  创建图片类型的消息对象
+    APShareImageObject *imgObj = [[APShareImageObject alloc] init];
+    //  此处填充图片data数据,例如 UIImagePNGRepresentation(UIImage对象)
+    //  此处必须填充有效的image NSData类型数据，否则无法正常分享
+    imgObj.imageData = nil;
+    //  回填 APMediaMessage 的消息对象
+    message.mediaObject = imgObj;
+    
+    //  创建发送请求对象
+    APSendMessageToAPReq *request = [[APSendMessageToAPReq alloc] init];
+    //  填充消息载体对象
+    request.message = message;
+    //  发送请求
+    [APOpenAPI sendReq:request];
+}
+```
+
+Share a web page using a thumbnail URL.
+
+```css
+//  发送网页消息到支付宝(缩略图链接形式)
+- (void)sendWebByUrl
+{
+    //  创建消息载体 APMediaMessage 对象
+    APMediaMessage *message = [[APMediaMessage alloc] init];
+    
+    message.title = @"此处填充网页标题";
+    message.desc = @"此处填充网页简要内容";
+    message.thumbUrl = @"此处填充缩略图的url链接地址";
+    
+    //  创建网页类型的消息对象
+    APShareWebObject *webObj = [[APShareWebObject alloc] init];
+    webObj.wepageUrl = @"此处填充网页url链接地址";
+    //  回填 APMediaMessage 的消息对象
+    message.mediaObject = webObj;
+    
+    //  创建发送请求对象
+    APSendMessageToAPReq *request = [[APSendMessageToAPReq alloc] init];
+    //  填充消息载体对象
+    request.message = message;
+    //  发送请求
+    [APOpenAPI sendReq:request];
+}
+```
+
+Share a web page using thumbnail data.
+
+```css
+//  发送网页消息到支付宝(缩略图链接形式)
+- (void)sendWebByData
+{
+    //  创建消息载体 APMediaMessage 对象
+    APMediaMessage *message = [[APMediaMessage alloc] init];
+    
+    message.title = @"此处填充网页标题";
+    message.desc = @"此处填充网页简要内容";
+    //  此处填充缩略图data数据,例如 UIImagePNGRepresentation(UIImage对象)
+    //  此处必须填充有效的image NSData类型数据，否则无法正常分享
+    message.thumbData = nil;
+    
+    //  创建网页类型的消息对象
+    APShareWebObject *webObj = [[APShareWebObject alloc] init];
+    webObj.wepageUrl = @"此处填充网页url链接地址";
+    //  回填 APMediaMessage 的消息对象
+    message.mediaObject = webObj;
+    
+    //  创建发送请求对象
+    APSendMessageToAPReq *request = [[APSendMessageToAPReq alloc] init];
+    //  填充消息载体对象
+    request.message = message;
+    //  发送请求
+    [APOpenAPI sendReq:request];
+}
+```
+
+> **Note** For images and web-page thumbnails, you can use either an image URL or image data. Within Alipay, `优先` use image data.
+
+#### Step 6: Handle the sharing result returned by Alipay
+
+```css
+/*
+ *  收到一个来自支付宝的请求，第三方应用程序处理完后调用sendResp向支付宝发送结果
+ *
+ *  入参
+ *      req : 支付宝向第三方发来的请求类
+ */
+- (void)onReq:(APBaseReq*)req
+{}
+/*
+ *  第三方应用程序发送一个sendReq后，收到支付宝的响应结果
+ *
+ *  入参
+ *      resp : 第三方应用收到的支付宝的响应结果类，目前支持的类型包括 APSendMessageToAPResp(分享消息)
+ */
+- (void)onResp:(APBaseResp*)resp
+{
+    //  Demo内主要是将响应结果通过alert的形式反馈出来，第三方应用可以根据 errCode 进行相应的处理。
+    NSString *title = nil;
+    NSString *message = nil;
+    if (resp.errCode == APSuccess) {
+        title = @"成功";
+    } else {
+        title = @"失败";
+        message = [NSString stringWithFormat:@"%@(%d)", resp.errStr, resp.errCode];
+    }
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil];
+    [alert show];
+}
+```
+
+---
+
+### 1.4 Determine whether the current device supports sharing
+
+Alipay Wallet supports sharing starting with version 9.0. The api provides an interface to determine whether the current device supports sharing to Alipay Wallet.
+
+- \[1\] Determine whether Alipay Wallet is installed on the current device.
+
+```css
+/*! @brief 检查支付宝是否已被用户安装
+ *
+ * @return 支付宝已安装返回YES，未安装返回NO。
+ */
++(BOOL) isAPAppInstalled;
+```
+
+- \[2\] Determine whether the current device supports sharing to Alipay (Alipay is installed && its version supports sharing).
+
+```css
+/*! @brief 判断当前支付宝的版本是否支持OpenApi
+ *
+ * @return 支持返回YES，不支持返回NO。
+ */
++(BOOL) isAPAppSupportOpenApi;
+```
+
+- \[3\] Obtain the Alipay Wallet download link in the AppStore. If Wallet is not installed, use this link to take the user to its installation page.
+
+```css
+/*! @brief 获取支付宝的itunes安装地址
+ *
+ * @return 支付宝的安装地址字符串。
+ */
++(NSString *) getAPAppInstallUrl;
+```
+
+**You can now use all the features of the Alipay sharing SDK. Refer to the sample code in the demo for the detailed handling logic.**
+
+### PS:
+
+#### Finally, the Bundle ID entered in Alipay must match the one in your project!
+
+#### Otherwise, authentication will fail.
+
+[Download the demo](<https://github.com/AllLuckly/-iOS_Demo>)
+
+### Technical discussion group: 511040024
+
+Recommended reading: [The new iOS9 feature: implementing 3D Touch is so easy](<https://allluckly.cn/en/journal/2015-10-19-ios-9-3d-touch-quick-actions-with-a-swift-update/>)
+
+Copyright ©Bison. Reproduction without permission is prohibited.
+{% endraw %}

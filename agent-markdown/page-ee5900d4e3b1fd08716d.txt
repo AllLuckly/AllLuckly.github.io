@@ -1,0 +1,305 @@
+---
+layout: null
+permalink: /aso/GoToAppStore/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: iOS开发之诱导用户为自己的App评论
+agent_source_url: https://allluckly.cn/aso/GoToAppStore
+agent_source_sha256: 08c709fbf98c184b28ceca37cbd2a42461a97e3eb1db24d4fa66c5abdbd42053
+agent_generator_version: 1
+---
+{% raw %}# iOS开发之诱导用户为自己的App评论
+
+语言：zh-CN
+原文：[iOS开发之诱导用户为自己的App评论](<https://allluckly.cn/aso/GoToAppStore>)
+中文：[中文 HTML](<https://allluckly.cn/aso/GoToAppStore>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-05-03-prompting-users-to-review-an-ios-app/>)
+发布于: 2016-05-03T00:00:00+08:00
+内容更新于: 2016-05-03T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+介绍 LBToAppStore 评价提醒封装，使用应用版本、间隔天数与用户上次选择控制弹窗时机，再根据选择跳转到商店或推迟提醒，展示早期评价入口的实现思路。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。原文发表于 2016 年，采用 UIAlertView、UIAlertController 和跳转商店的旧式提醒流程。
+
+> "由于我自己的App下载量少，评论也少，出于App的aso优化，想尽办法，而评论是aso里边比较重视的一块，前面的版本都没有诱导用户评论的这一功能，导致有些被动。"
+
+由此自己简单的封装了该功能，下面我们先看看效果图：
+
+![1](<https://allluckly.cn/images/blog/LBAppStoreReview/1.png>)
+
+弹出试图并没有做什么处理，就是系统的8.0以前用的`UIAlertView`8.0以上用的`UIAlertController`
+
+具体的一些算法，都可以看代码，闲话不多说，直接贴码，😄
+
+新建一个NSObject的类命名为`LBToAppStore` 具体代码如下
+
+## .h文件
+
+```
+#import <Foundation/Foundation.h>
+
+#import <UIKit/UIKit.h>
+
+
+
+@interface LBToAppStore : NSObject<UIAlertViewDelegate>
+{
+    #if __IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_8_0
+
+    UIAlertView *alertViewTest;
+
+    #else
+
+    UIAlertController *alertController;
+
+    #endif
+
+}
+
+@property (nonatomic,strong) NSString * myAppID;//appID
+
+
+
+- (void)showGotoAppStore:(UIViewController *)VC;
+
+@end
+```
+
+## .m文件
+
+```
+#import "LBToAppStore.h"
+
+@implementation LBToAppStore
+
+
+- (void)showGotoAppStore:(UIViewController *)VC{
+    //当前版本号
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    float appVersion = [[infoDictionary objectForKey:@"CFBundleShortVersionString"] floatValue];
+    //userDefaults里的天数
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    int udtheDays = [[userDefaults objectForKey:@"theDays"] intValue];
+    //userDefaults里的版本号
+    float udAppVersion = [[userDefaults objectForKey:@"appVersion"] intValue];
+    //userDefaults里用户上次的选项
+    int udUserChoose = [[userDefaults objectForKey:@"userOptChoose"] intValue];
+    //时间戳的天数
+    NSTimeInterval interval = [[NSDate date] timeIntervalSince1970];
+    int daySeconds = 24 * 60 * 60;
+    NSInteger theDays = interval / daySeconds;
+
+    //版本升级之后的处理,全部规则清空,开始弹窗
+    if (udAppVersion && appVersion>udAppVersion) {
+        [userDefaults removeObjectForKey:@"theDays"];
+        [userDefaults removeObjectForKey:@"appVersion"];
+        [userDefaults removeObjectForKey:@"userOptChoose"];
+        [self alertUserCommentView:VC];
+    }
+    //1,从来没弹出过的
+    //2,用户选择😓我要吐槽，7天之后再弹出
+    //3,用户选择😭残忍拒绝后，7天内，每过1天会弹一次
+    //4,用户选择😭残忍拒绝的30天后，才会弹出
+    else if (!udUserChoose ||
+    (udUserChoose==2 && theDays-udtheDays>7) ||
+    (udUserChoose>=3 && theDays-udtheDays<=7 && theDays-udtheDays>udUserChoose-3) ||
+    (udUserChoose>=3 && theDays-udtheDays>30))
+    {
+        [self alertUserCommentView:VC];
+
+    }
+
+}
+
+-(void)alertUserCommentView:(UIViewController *)VC{
+
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0) {
+
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    //当前时间戳的天数
+    NSTimeInterval interval = [[NSDate date] timeIntervalSince1970];
+    int daySeconds = 24 * 60 * 60;
+    NSInteger theDays = interval / daySeconds;
+    //当前版本号
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    float appVersion = [[infoDictionary objectForKey:@"CFBundleShortVersionString"] floatValue];
+    //userDefaults里版本号
+    float udAppVersion = [[userDefaults objectForKey:@"appVersion"] intValue];
+    //userDefaults里用户选择项目
+    int udUserChoose = [[userDefaults objectForKey:@"userOptChoose"] intValue];
+    //userDefaults里用户天数
+    int udtheDays = [[userDefaults objectForKey:@"theDays"] intValue];
+
+    //当前版本比userDefaults里版本号高
+    if (appVersion>udAppVersion) {
+        [userDefaults setObject:[NSString stringWithFormat:@"%f",appVersion] forKey:@"appVersion"];
+    }
+
+    alertController = [UIAlertController alertControllerWithTitle:@"致开发者的一封信" message:@"有了您的支持才能更好的为您服务，提供更加优质的，更加适合您的App，当然您也可以直接反馈问题给到我们" preferredStyle:(UIAlertControllerStyleAlert)];
+
+    UIAlertAction *refuseAction = [UIAlertAction actionWithTitle:@"😭残忍拒绝" style:(UIAlertActionStyleDefault) handler:^(UIAlertAction *action) {
+
+    [userDefaults setObject:@"1" forKey:@"userOptChoose"];
+    [userDefaults setObject:[NSString stringWithFormat:@"%d",(int)theDays] forKey:@"theDays"];
+    }];
+
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"😄好评赞赏" style:(UIAlertActionStyleDefault) handler:^(UIAlertAction *action) {
+
+    [userDefaults setObject:@"2" forKey:@"userOptChoose"];
+    [userDefaults setObject:[NSString stringWithFormat:@"%d",(int)theDays] forKey:@"theDays"];
+
+    NSString *str = [NSString stringWithFormat:
+    @"https://itunes.apple.com/cn/app/id%@?mt=8",
+    self.myAppID ];
+
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
+
+    }];
+
+    UIAlertAction *showAction = [UIAlertAction actionWithTitle:@"😓我要吐槽" style:(UIAlertActionStyleDefault) handler:^(UIAlertAction *action) {
+
+    if (udUserChoose<=3 || theDays-[[userDefaults objectForKey:@"theDays"] intValue]>30) {
+    [userDefaults setObject:@"3" forKey:@"userOptChoose"];
+    [userDefaults setObject:[NSString stringWithFormat:@"%d",(int)theDays] forKey:@"theDays"];
+    }else{
+    [userDefaults setObject:[NSString stringWithFormat:@"%d",(int)(theDays-udtheDays+3)] forKey:@"userOptChoose"];
+    }
+    NSString *str = [NSString stringWithFormat:
+    @"https://itunes.apple.com/cn/app/id%@?mt=8",
+    self.myAppID ];
+
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
+    }];
+
+
+    [alertController addAction:refuseAction];
+    [alertController addAction:okAction];
+    [alertController addAction:showAction];
+
+    //        NSLog(@"%@",[userDefaults objectForKey:@"appVersion"]);
+    //        NSLog(@"%@",[userDefaults objectForKey:@"userOptChoose"]);
+    //        NSLog(@"%@",[userDefaults objectForKey:@"theDays"]);
+
+    [VC presentViewController:alertController animated:YES completion:nil];
+
+    }else{
+        #if __IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_8_0
+        alertViewTest = [[UIAlertView alloc] initWithTitle:@"致开发者的一封信" message:@"有了您的支持才能更好的为您服务，提供更加优质的，更加适合您的App，当然您也可以直接反馈问题给到我们" delegate:self cancelButtonTitle:@"😭残忍拒绝" otherButtonTitles:@"😄好评赞赏",@"😓我要吐槽", nil];
+        [alertViewTest show];
+        #endif
+    }
+
+}
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_8_0
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    //当前时间戳的天数
+    NSTimeInterval interval = [[NSDate date] timeIntervalSince1970];
+    int daySeconds = 24 * 60 * 60;
+    NSInteger theDays = interval / daySeconds;
+    //当前版本号
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    float appVersion = [[infoDictionary objectForKey:@"CFBundleShortVersionString"] floatValue];
+    //userDefaults里版本号
+    float udAppVersion = [[userDefaults objectForKey:@"appVersion"] intValue];
+    //userDefaults里用户选择项目
+    int udUserChoose = [[userDefaults objectForKey:@"userOptChoose"] intValue];
+    //userDefaults里用户天数
+    int udtheDays = [[userDefaults objectForKey:@"theDays"] intValue];
+
+    //当前版本比userDefaults里版本号高
+    if (appVersion>udAppVersion) {
+        [userDefaults setObject:[NSString stringWithFormat:@"%f",appVersion] forKey:@"appVersion"];
+    }
+
+    switch (buttonIndex) {
+        case 0: //残忍的拒绝
+        if (udUserChoose<=3 || theDays-[[userDefaults objectForKey:@"theDays"] intValue]>30) {
+            [userDefaults setObject:@"3" forKey:@"userOptChoose"];
+            [userDefaults setObject:[NSString stringWithFormat:@"%d",(int)theDays] forKey:@"theDays"];
+        }else{
+            [userDefaults setObject:[NSString stringWithFormat:@"%d",(int)(theDays-udtheDays+3)] forKey:@"userOptChoose"];
+        }
+        break;
+        case 1:{ //好评
+            [userDefaults setObject:@"1" forKey:@"userOptChoose"];
+            [userDefaults setObject:[NSString stringWithFormat:@"%d",(int)theDays] forKey:@"theDays"];
+            NSString *str = [NSString stringWithFormat:
+            @"https://itunes.apple.com/cn/app/id%@?mt=8",
+            self.myAppID ];
+
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
+        }
+        break;
+        case 2:{ //不好用，我要提意见
+            [userDefaults setObject:@"2" forKey:@"userOptChoose"];
+            [userDefaults setObject:[NSString stringWithFormat:@"%d",(int)theDays] forKey:@"theDays"];
+            NSString *str = [NSString stringWithFormat:
+            @"https://itunes.apple.com/cn/app/id%@?mt=8",
+            self.myAppID ];
+
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
+        }
+        break;
+
+        default:
+        break;
+        }
+    //    NSLog(@"%@",[userDefaults objectForKey:@"appVersion"]);
+    //    NSLog(@"%@",[userDefaults objectForKey:@"userOptChoose"]);
+    //    NSLog(@"%@",[userDefaults objectForKey:@"theDays"]);
+
+}
+
+#endif
+
+
+@end
+```
+
+具体使用方法如下：
+
+```
+#import "ViewController.h"
+#import "LBToAppStore.h"
+@interface ViewController ()
+
+@end
+
+@implementation ViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view, typically from a nib.
+}
+
+-(void)viewDidAppear:(BOOL)animated{
+
+    //用户好评系统
+    LBToAppStore *toAppStore = [[LBToAppStore alloc]init];
+    toAppStore.myAppID = @"1067787090";
+    [toAppStore showGotoAppStore:self];
+
+}
+
+
+@end
+```
+
+[demo下载地址戳我](<https://github.com/AllLuckly/LBAppStoreReview>)
+
+如对你有帮助，请不要吝惜你的star哦！
+
+版权归©Bison所有 如需转载请保留原文超链接地址！否则后果自负！
+
+---
+
+好文推荐：[iOS开发之超链接富文本](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao42>)
+{% endraw %}

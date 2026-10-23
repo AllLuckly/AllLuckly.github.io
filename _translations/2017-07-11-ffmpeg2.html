@@ -1,0 +1,346 @@
+---
+layout: post
+title: H.264 Decoding with FFmpeg-iOS
+description: Starts by importing FFmpeg-iOS and configuring header search paths, then traces opening media, finding
+  a video stream, initializing the decoder, reading packets, and releasing resources. A wrapper example brings the
+  H.264 decoding steps together.
+category: Development notes
+imagefeature: null
+date: 2017-07-11 00:00:00 +0800
+technical_translation:
+  topic: audio-video
+  summary: Starts by importing FFmpeg-iOS and configuring header search paths, then traces opening media, finding
+    a video stream, initializing the decoder, reading packets, and releasing resources. A wrapper example brings
+    the H.264 decoding steps together.
+  keywords:
+  - FFmpeg
+  - H.264
+  - avcodec
+  - video decoding
+  - Header Search Paths
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Published in 2017, the article uses older FFmpeg APIs, including av_register_all and avcodec_decode_video.
+  title: H.264 Decoding with FFmpeg-iOS
+  source_sha256: 328d00a8f9f796515edc5b9e3d80df7b088f0ed16b34122071997974532be720
+technical_update_translation:
+  updated: '2026-10-23'
+  note: Calls such as av_register_all and avcodec_decode_video2 belong to the older APIs used in the original article.
+    First follow the sequence of demuxing, finding the video stream, decoding and releasing resources. To implement
+    decoding with current FFmpeg, consult the send/receive API and handle submitting input and repeatedly receiving
+    frames as separate steps. The old project has not been recompiled.
+  references:
+  - title: 'FFmpeg: send/receive encoding and decoding API'
+    url: https://ffmpeg.org/doxygen/trunk/group__lavc__encdec.html
+lang: en
+source_path: _posts/2017-07-11-ffmpeg2.md
+source_url: /ffmpeg/ffmpeg2
+permalink: /en/journal/2017-07-11-h-264-decoding-with-ffmpeg-ios/
+translation_method: machine-assisted
+translation_source_sha256: 328d00a8f9f796515edc5b9e3d80df7b088f0ed16b34122071997974532be720
+excerpt: Starts by importing FFmpeg-iOS and configuring header search paths, then traces opening media, finding
+  a video stream, initializing the decoder, reading packets, and releasing resources. A wrapper example brings the
+  H.264 decoding steps together.
+translation_date: '2026-10-23T02:34:16+00:00'
+---
+{% raw %}
+<p><span class="technical-missing-image">This historical illustration is currently unavailable. <a href="http://upload-images.jianshu.io/upload_images/671504-ada1e50c34918b9b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">The original image URL is retained</a> for reference.</span></p>
+<p>Create a project and import the libraries built by <a href="http://www.jianshu.com/p/5511eea1b29e">Building FFmpeg-iOS on a Mac </a>the compiled <code class="language-plaintext highlighter-rouge">FFmpeg-iOS</code>, then import the required system libraries.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>AudioToolbox.framework
+CoreMedia.framework
+VideoToolbox.framework
+libiconv.tbd
+libbz2.tbd
+libz.tbd
+</code></pre></div></div>
+<p>If compilation reports ‘libavcodec/avcodec.h’ file not found, change the path in Header search paths:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$(PROJECT_DIR)/FFmpeg-iOS/include
+</code></pre></div></div>
+<p>Then import the header.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/*----------------解码必须导入-----------------*/
+#import "avformat.h"
+#include &lt;libavcodec/avcodec.h&gt;
+#include &lt;libavformat/avformat.h&gt;
+#include &lt;libavutil/imgutils.h&gt;
+#include &lt;libswscale/swscale.h&gt;
+/*-------------------------------------------*/
+</code></pre></div></div>
+<p>If the project runs without errors, we can begin decoding and rendering. Let us start with decoding.</p>
+<h3 id="h264解码">H.264 decoding</h3>
+<p>The broad FFmpeg video-decoding sequence is:</p>
+<p>1. Register all container formats and CODECs with av_register_all().</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    static dispatch_once_t onceToken;
+    dispatch_once(&amp;onceToken, ^{
+        av_register_all();
+    });
+</code></pre></div></div>
+<p>2. Open the file with av_open_input_file().</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    pFormatContext = avformat_alloc_context();
+    NSString *fileName = [[NSBundle mainBundle] pathForResource:@"zjd.h264" ofType:nil];
+    if (fileName == nil)
+    {
+        NSLog(@"Couldn't open file:%@",fileName);
+        return;
+    }
+    //[1]函数调用成功之后处理过的AVFormatContext结构体;[2]打开的视音频流的URL;[3]强制指定AVFormatContext中AVInputFormat的。这个参数一般情况下可以设置为NULL，这样FFmpeg可以自动检测AVInputFormat;[4]附加的一些选项，一般情况下可以设置为NULL。)
+    if (avformat_open_input(&amp;pFormatContext, [fileName cStringUsingEncoding:NSASCIIStringEncoding], NULL, NULL) != 0)
+    {
+        NSLog(@"无法打开文件");
+        return;
+    }
+</code></pre></div></div>
+<p>3. Extract stream information with av_find_stream_info().</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>if (avformat_find_stream_info(pFormatContext, NULL) &lt; 0) {
+        NSLog(@"无法提取流信息");
+        return;
+ }
+</code></pre></div></div>
+<p>4. Iterate through all streams to find one of type CODEC_TYPE_VIDEO.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    int videoStream = -1;
+    for (int i = 0; i &lt; pFormatContext -&gt; nb_streams; i++)
+    {
+        if (pFormatContext -&gt; streams[i] -&gt; codec -&gt; codec_type == AVMEDIA_TYPE_VIDEO)
+        {
+            videoStream = i;
+        }
+    }
+    if (videoStream == -1) {
+        NSLog(@"Didn't find a video stream.");
+        return;
+    }
+</code></pre></div></div>
+<p>5. Find the corresponding decoder with avcodec_find_decoder().</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pCodecCtx = pFormatContext-&gt;streams[videoStream]-&gt;codec;
+    AVCodec *pCodec = avcodec_find_decoder(AV_CODEC_ID_H264);
+    if (pCodec == NULL) {
+        NSLog(@"pVideoCodec not found.");
+        return NO;
+    }
+</code></pre></div></div>
+<p>6. Open the codec with avcodec_open().</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>avcodec_open2(pCodecCtx, pCodec, NULL);
+</code></pre></div></div>
+<p>7. Allocate memory for a decoded frame with avcodec_alloc_frame().</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pFrame = av_frame_alloc();
+</code></pre></div></div>
+<p>8. Repeatedly read frame data from the stream with av_read_frame().</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    AVPacket packet;
+    av_init_packet(&amp;packet);
+
+    if (av_read_frame(pFormatContext, &amp;packet) &gt;= 0)
+    {//已经读取到了数据
+    
+    }else{//没读取到数据
+
+    }
+</code></pre></div></div>
+<p>9. Determine the frame type. For video frames, call avcodec_decode_video().</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>      //作用是解码一帧视频数据。输入一个压缩编码的结构体AVPacket，输出一个解码后的结构体AVFrame
+    avcodec_decode_video2(pCodecCtx, pFrame, &amp;frameFinished, &amp;packet);
+    av_free_packet(&amp;packet);
+    if (frameFinished) //解码成功
+    {
+   
+    }
+</code></pre></div></div>
+<p>10. After decoding, release the decoder with avcodec_close().</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>avcodec_close()
+</code></pre></div></div>
+<p>11. Close the input file with av_close_input_file().</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>av_close_input_file()
+</code></pre></div></div>
+<p>Here is the final wrapped implementation:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+/*input_str  输入的文件路径
+ *output_str 输出的文件路径
+ *return 解码后的信息
+ */
+
+#pragma mark - 基于FFmpeg的视频解码器
+- (NSString *)decoder:(NSString *)input_str output_str:(NSString *)output_str{
+    AVFormatContext	*pFormatCtx;
+    int				i, videoindex;
+    AVCodecContext	*pCodecCtx;
+    AVCodec			*pCodec;
+    AVFrame	*pFrame,*pFrameYUV;
+    uint8_t *out_buffer;
+    AVPacket *packet;
+    int y_size;
+    int ret, got_picture;
+    struct SwsContext *img_convert_ctx;
+    FILE *fp_yuv;
+    int frame_cnt;
+    clock_t time_start, time_finish;
+    double  time_duration = 0.0;
+    
+    char input_str_full[500]={0};
+    char output_str_full[500]={0};
+    char info[1000]={0};
+    
+//    NSString *input_str= [NSString stringWithFormat:@"resource.bundle/sintel.mov"];
+//    NSString *output_str= [NSString stringWithFormat:@"resource.bundle/test.yuv"];
+    
+    NSString *input_nsstr=[[[NSBundle mainBundle]resourcePath] stringByAppendingPathComponent:input_str];
+    NSString *output_nsstr=[[[NSBundle mainBundle]resourcePath] stringByAppendingPathComponent:output_str];
+    
+    sprintf(input_str_full,"%s",[input_nsstr UTF8String]);
+    sprintf(output_str_full,"%s",[output_nsstr UTF8String]);
+    
+    printf("Input Path:%s\n",input_str_full);
+    printf("Output Path:%s\n",output_str_full);
+    //注册编解码器
+    av_register_all();
+    //打开网络流
+    avformat_network_init();
+    //初始化AVFormatContext
+    pFormatCtx = avformat_alloc_context();
+    
+    if(avformat_open_input(&amp;pFormatCtx,input_str_full,NULL,NULL)!=0){
+        printf("Couldn't open input stream.\n");
+        return nil;
+    }
+    if(avformat_find_stream_info(pFormatCtx,NULL)&lt;0){
+        printf("Couldn't find stream information.\n");
+        return nil;
+    }
+    videoindex=-1;
+    for(i=0; i&lt;pFormatCtx-&gt;nb_streams; i++)
+        if(pFormatCtx-&gt;streams[i]-&gt;codecpar-&gt;codec_type==AVMEDIA_TYPE_VIDEO){
+            videoindex=i;
+            break;
+        }
+    if(videoindex==-1){
+        printf("Couldn't find a video stream.\n");
+        return nil;
+    }
+    pCodecCtx = avcodec_alloc_context3(NULL);
+    if (pCodecCtx == NULL)
+    {
+        printf("Could not allocate AVCodecContext\n");
+        return nil;
+    }
+    avcodec_parameters_to_context(pCodecCtx, pFormatCtx-&gt;streams[videoindex]-&gt;codecpar);
+    
+    pCodec = avcodec_find_decoder(pCodecCtx-&gt;codec_id);  //指向AVCodec的指针.查找解码器
+    if(pCodec==NULL){
+        printf("Couldn't find Codec.\n");
+        return nil;
+    }
+    if(avcodec_open2(pCodecCtx, pCodec,NULL)&lt;0){
+        printf("Couldn't open codec.\n");
+        return nil;
+    }
+    
+    pFrame=av_frame_alloc();
+    pFrameYUV=av_frame_alloc();
+    out_buffer=(unsigned char *)av_malloc(av_image_get_buffer_size(AV_PIX_FMT_YUV420P,  pCodecCtx-&gt;width, pCodecCtx-&gt;height,1));
+    av_image_fill_arrays(pFrameYUV-&gt;data, pFrameYUV-&gt;linesize,out_buffer,
+                         AV_PIX_FMT_YUV420P,pCodecCtx-&gt;width, pCodecCtx-&gt;height,1);
+    packet=(AVPacket *)av_malloc(sizeof(AVPacket));
+    
+    img_convert_ctx = sws_getContext(pCodecCtx-&gt;width, pCodecCtx-&gt;height, pCodecCtx-&gt;pix_fmt,
+                                     pCodecCtx-&gt;width, pCodecCtx-&gt;height, AV_PIX_FMT_YUV420P, SWS_BICUBIC, NULL, NULL, NULL);
+    
+    
+    sprintf(info,   "[Input     ]%s\n", [input_str UTF8String]);
+    sprintf(info, "%s[Output    ]%s\n",info,[output_str UTF8String]);
+    sprintf(info, "%s[Format    ]%s\n",info, pFormatCtx-&gt;iformat-&gt;name);
+    sprintf(info, "%s[Codec     ]%s\n",info, pCodecCtx-&gt;codec-&gt;name);
+    sprintf(info, "%s[Resolution]%dx%d\n",info, pCodecCtx-&gt;width,pCodecCtx-&gt;height);
+    
+    
+    fp_yuv=fopen(output_str_full,"wb+");
+    if(fp_yuv==NULL){
+        printf("Cannot open output file.\n");
+        return nil;
+    }
+    
+    frame_cnt=0;
+    time_start = clock();
+    
+    while(av_read_frame(pFormatCtx, packet)&gt;=0){
+        if(packet-&gt;stream_index==videoindex){
+            ret = avcodec_decode_video2(pCodecCtx, pFrame, &amp;got_picture, packet);
+            if(ret &lt; 0){
+                printf("Decode Error.\n");
+                return nil;
+            }
+            if(got_picture){
+                sws_scale(img_convert_ctx, (const uint8_t* const*)pFrame-&gt;data, pFrame-&gt;linesize, 0, pCodecCtx-&gt;height,
+                          pFrameYUV-&gt;data, pFrameYUV-&gt;linesize);
+                
+                y_size=pCodecCtx-&gt;width*pCodecCtx-&gt;height;
+                fwrite(pFrameYUV-&gt;data[0],1,y_size,fp_yuv);    //Y
+                fwrite(pFrameYUV-&gt;data[1],1,y_size/4,fp_yuv);  //U
+                fwrite(pFrameYUV-&gt;data[2],1,y_size/4,fp_yuv);  //V
+                //Output info
+                char pictype_str[10]={0};
+                switch(pFrame-&gt;pict_type){
+                    case AV_PICTURE_TYPE_I:sprintf(pictype_str,"I");break;
+                    case AV_PICTURE_TYPE_P:sprintf(pictype_str,"P");break;
+                    case AV_PICTURE_TYPE_B:sprintf(pictype_str,"B");break;
+                    default:sprintf(pictype_str,"Other");break;
+                }
+                printf("Frame Index: %5d. Type:%s\n",frame_cnt,pictype_str);
+                frame_cnt++;
+            }
+        }
+        av_packet_unref(packet);
+    }
+    //flush decoder
+    //FIX: Flush Frames remained in Codec
+    while (1) {
+        ret = avcodec_decode_video2(pCodecCtx, pFrame, &amp;got_picture, packet);
+        if (ret &lt; 0)
+            break;
+        if (!got_picture)
+            break;
+        sws_scale(img_convert_ctx, (const uint8_t* const*)pFrame-&gt;data, pFrame-&gt;linesize, 0, pCodecCtx-&gt;height,
+                  pFrameYUV-&gt;data, pFrameYUV-&gt;linesize);
+        int y_size=pCodecCtx-&gt;width*pCodecCtx-&gt;height;
+        fwrite(pFrameYUV-&gt;data[0],1,y_size,fp_yuv);    //Y
+        fwrite(pFrameYUV-&gt;data[1],1,y_size/4,fp_yuv);  //U
+        fwrite(pFrameYUV-&gt;data[2],1,y_size/4,fp_yuv);  //V
+        //Output info
+        char pictype_str[10]={0};
+        switch(pFrame-&gt;pict_type){
+            case AV_PICTURE_TYPE_I:sprintf(pictype_str,"I");break;
+            case AV_PICTURE_TYPE_P:sprintf(pictype_str,"P");break;
+            case AV_PICTURE_TYPE_B:sprintf(pictype_str,"B");break;
+            default:sprintf(pictype_str,"Other");break;
+        }
+        printf("Frame Index: %5d. Type:%s\n",frame_cnt,pictype_str);
+        frame_cnt++;
+    }
+    time_finish = clock();
+    time_duration=(double)(time_finish - time_start);
+    
+    sprintf(info, "%s[Time      ]%fus\n",info,time_duration);
+    sprintf(info, "%s[Count     ]%d\n",info,frame_cnt);
+    
+    sws_freeContext(img_convert_ctx);
+    
+    fclose(fp_yuv);
+    
+    av_frame_free(&amp;pFrameYUV);
+    av_frame_free(&amp;pFrame);
+    avcodec_close(pCodecCtx);
+    avformat_close_input(&amp;pFormatCtx);
+    
+    NSString * info_ns = [NSString stringWithFormat:@"%s", info];
+    
+//    NSLog(@"解码后的信息%@",info_ns);
+    NSLog(@"文件输出路径%@",output_nsstr);
+    
+    return info_ns;
+    
+}
+</code></pre></div></div>
+<p>References: <a href="http://blog.csdn.net/leixiaohua1020/article/details/47072257">雷神's FFmpeg decoding article</a></p>
+<p><a href="https://github.com/AllLuckly/LBffmpegDemo">Download LBffmpegDemo</a>;</p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-02-01-a-beginner-developer-s-review-of-2015/">A beginner developer's review of 2015</a><br/></p>
+
+{% endraw %}

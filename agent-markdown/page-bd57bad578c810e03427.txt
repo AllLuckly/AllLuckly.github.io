@@ -1,0 +1,364 @@
+---
+layout: null
+permalink: /en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Adding a launch advertisement to an iOS app
+agent_source_url: https://allluckly.cn/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/
+agent_source_sha256: 6b76a6fa00bee84c2b8a9f6bd9ec672ee2399be4a256cc0f5461cb783c5b39cc
+agent_generator_version: 1
+---
+{% raw %}# Adding a launch advertisement to an iOS app
+
+Language: en
+Canonical: [Adding a launch advertisement to an iOS app](<https://allluckly.cn/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/>)
+中文：[中文 HTML](<https://allluckly.cn/lblaunchimagead/LBLaunchImageAd>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/>)
+Published: 2016-06-12T00:00:00+08:00
+Modified: 2026-10-23T10:45:03+08:00
+Author: [Bison](<https://allluckly.cn/about/>)
+
+Wraps a launch-ad view with full-screen and bottom-logo layouts. SDWebImage fetches the ad image, while opacity animation and block callbacks handle presentation, taps and dismissal.
+
+Originally credited to Bison. Content is retained as published.
+
+English translation of the [Chinese original](<https://allluckly.cn/lblaunchimagead/LBLaunchImageAd>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Read API, dependency and tool details in the context of the original publication date.
+
+A friend recently needed a launch-ad feature. I pointed out that many were available online, but none suited him, so he asked me to write one. I made time for a simple, readable wrapper with block callbacks for events and two ad styles: full screen, or a layout leaving a logo visible at the bottom, similar to a news app's launch ad. It depends on `SDWebImage` mainly to download ad images. Since many projects already use it for network images, I will not explain it in detail. Here is the encapsulation process; beginners can use it to learn the approach.
+
+## 1. Create LBLaunchImageAdView as a View subclass.
+
+#### The .h file:
+
+```
+
+//
+//  LBLaunchImageAdView.h
+//  LBLaunchImageAd
+//  技术交流群：534926022（免费） 511040024(0.8/人付费)
+//  Created by gold on 16/6/8.
+//  Copyright © 2016年 Bison. All rights reserved.
+//  iOS开发学习app下载https://itunes.apple.com/cn/app/it-blog-for-ios-developers/id1067787090?mt=8
+
+typedef enum {
+    
+    FullScreenAdType = 1,//全屏的广告
+    LogoAdType = 0,//带logo的广告
+    
+}AdType;
+
+
+#import <UIKit/UIKit.h>
+#import "UIImageView+WebCache.h"
+
+#define mainHeight      [[UIScreen mainScreen] bounds].size.height
+#define mainWidth       [[UIScreen mainScreen] bounds].size.width
+
+typedef void (^LBClick) (NSInteger tag);
+@interface LBLaunchImageAdView : UIView
+
+@property (strong, nonatomic) UIImageView *aDImgView;
+@property (strong, nonatomic) UIWindow *window;
+@property (assign, nonatomic) NSInteger adTime; //倒计时总时长,默认6秒
+@property (strong, nonatomic) UIButton *skipBtn;
+@property (nonatomic, copy)LBClick clickBlock;
+
+
+- (instancetype)initWithWindow:(UIWindow *)window andType:(NSInteger)type andImgUrl:(NSString *)url;
+
+@end
+
+
+```
+
+It mainly overrides init, letting callers pass parameters during initialisation. I pass only three essential parameters, expose the others through @property and use a block callback for events. Here is the .m implementation:
+
+```
+//
+//  LBLaunchImageAdView.m
+//  LBLaunchImageAd
+//  技术交流群：534926022（免费） 511040024(0.8/人付费)
+//  Created by gold on 16/6/8.
+//  Copyright © 2016年 Bison. All rights reserved.
+//  iOS开发学习app下载https://itunes.apple.com/cn/app/it-blog-for-ios-developers/id1067787090?mt=8
+
+#import "LBLaunchImageAdView.h"
+
+@interface LBLaunchImageAdView()
+{
+    NSTimer *countDownTimer;
+}
+@property (strong, nonatomic) NSString *isClick;
+@property (assign, nonatomic) NSInteger secondsCountDown; //倒计时总时长
+@end
+
+@implementation LBLaunchImageAdView
+
+- (instancetype)initWithWindow:(UIWindow *)window andType:(NSInteger)type andImgUrl:(NSString *)url
+{
+    self = [super init];
+    if (self) {
+        self.window = window;
+        _secondsCountDown = 0;
+        [window makeKeyAndVisible];
+        //获取启动图片
+        CGSize viewSize = window.bounds.size;
+        //横屏请设置成 @"Landscape"
+        NSString *viewOrientation = @"Portrait";
+        
+        NSString *launchImageName = nil;
+        
+        NSArray* imagesDict = [[[NSBundle mainBundle] infoDictionary] valueForKey:@"UILaunchImages"];
+        for (NSDictionary* dict in imagesDict)
+            
+        {
+            CGSize imageSize = CGSizeFromString(dict[@"UILaunchImageSize"]);
+            if (CGSizeEqualToSize(imageSize, viewSize) && [viewOrientation isEqualToString:dict[@"UILaunchImageOrientation"]])
+                
+            {
+                launchImageName = dict[@"UILaunchImageName"];
+            }
+            
+        }
+        UIImage * launchImage = [UIImage imageNamed:launchImageName];
+        self.backgroundColor = [UIColor colorWithPatternImage:launchImage];
+        self.frame = CGRectMake(0, 0, mainWidth, mainHeight);
+        if (type == FullScreenAdType) {
+            self.aDImgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, mainWidth, mainHeight)];
+            
+        }else{
+            self.aDImgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, mainWidth, mainHeight - mainWidth/3)];
+        }
+        
+        self.skipBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        self.skipBtn.frame = CGRectMake(mainWidth - 70, 20, 60, 30);
+        self.skipBtn.backgroundColor = [UIColor brownColor];
+        self.skipBtn.titleLabel.font = [UIFont systemFontOfSize:14];
+        [self.skipBtn addTarget:self action:@selector(skipBtnClick) forControlEvents:UIControlEventTouchUpInside];
+        [self.aDImgView addSubview:self.skipBtn];
+        UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:self.skipBtn.bounds byRoundingCorners:UIRectCornerBottomRight | UIRectCornerTopRight cornerRadii:CGSizeMake(15, 15)];
+        CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
+        maskLayer.frame = self.skipBtn.bounds;
+        maskLayer.path = maskPath.CGPath;
+        self.skipBtn.layer.mask = maskLayer;
+        SDWebImageManager *manager = [SDWebImageManager sharedManager];
+        [manager downloadImageWithURL:[NSURL URLWithString:url] options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+            
+        } completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+            if (image) {
+                 [self.aDImgView setImage:[self imageCompressForWidth:image targetWidth:mainWidth]];
+            }
+        }];
+        self.aDImgView.tag = 1101;
+        self.aDImgView.backgroundColor = [UIColor redColor];
+        [self addSubview:self.aDImgView];
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(activiTap:)];
+        // 允许用户交互
+        self.aDImgView.userInteractionEnabled = YES;
+        [self.aDImgView addGestureRecognizer:tap];
+        
+        CABasicAnimation *opacityAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+        opacityAnimation.duration = 0.8;
+        opacityAnimation.fromValue = [NSNumber numberWithFloat:0.0];
+        opacityAnimation.toValue = [NSNumber numberWithFloat:0.8];
+        
+        opacityAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
+        
+        [self.aDImgView.layer addAnimation:opacityAnimation forKey:@"animateOpacity"];
+        countDownTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(onTimer) userInfo:nil repeats:YES];
+        [self.window addSubview:self];
+    }
+    return self;
+}
+
+#pragma mark - 点击广告
+- (void)activiTap:(UITapGestureRecognizer*)recognizer{
+    _isClick = @"1";
+    [self startcloseAnimation];
+}
+
+#pragma mark - 开启关闭动画
+- (void)startcloseAnimation{
+    CABasicAnimation *opacityAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    opacityAnimation.duration = 0.5;
+    opacityAnimation.fromValue = [NSNumber numberWithFloat:1.0];
+    opacityAnimation.toValue = [NSNumber numberWithFloat:0.3];
+    opacityAnimation.removedOnCompletion = NO;
+    opacityAnimation.fillMode = kCAFillModeForwards;
+    
+    [self.aDImgView.layer addAnimation:opacityAnimation forKey:@"animateOpacity"];
+    [NSTimer scheduledTimerWithTimeInterval:opacityAnimation.duration
+                                     target:self
+                                   selector:@selector(closeAddImgAnimation)
+                                   userInfo:nil
+                                    repeats:NO];
+    
+}
+
+- (void)skipBtnClick{
+    _isClick = @"2";
+    [self startcloseAnimation];
+}
+
+#pragma mark - 关闭动画完成时处理事件
+-(void)closeAddImgAnimation
+{
+    [countDownTimer invalidate];
+    countDownTimer = nil;
+    self.hidden = YES;
+    self.aDImgView.hidden = YES;
+    self.hidden = YES;
+    if ([_isClick integerValue] == 1) {
+        
+        if (self.clickBlock) {//点击广告
+            self.clickBlock(1100);
+        }
+    }else if([_isClick integerValue] == 2){
+        if (self.clickBlock) {//点击跳过
+            self.clickBlock(1101);
+        }
+    }else{
+        if (self.clickBlock) {//点击跳过
+            self.clickBlock(1102);
+        }
+    }
+    
+    
+    
+}
+
+- (void)onTimer {
+    
+    if (_adTime == 0) {
+        _adTime = 6;
+    }
+    if (_secondsCountDown < _adTime) {
+        _secondsCountDown++;
+        [self.skipBtn setTitle:[NSString stringWithFormat:@"%ld | 跳过",_secondsCountDown] forState:UIControlStateNormal];
+    }else{
+        
+        [countDownTimer invalidate];
+        countDownTimer = nil;
+        [self startcloseAnimation];
+        
+    }
+}
+
+#pragma mark - 指定宽度按比例缩放
+- (UIImage *)imageCompressForWidth:(UIImage *)sourceImage targetWidth:(CGFloat)defineWidth {
+    UIImage *newImage = nil;
+    CGSize imageSize = sourceImage.size;
+    CGFloat width = imageSize.width;
+    CGFloat height = imageSize.height;
+    CGFloat targetWidth = defineWidth;
+    CGFloat targetHeight = height / (width / targetWidth);
+    CGSize size = CGSizeMake(targetWidth, targetHeight);
+    CGFloat scaleFactor = 0.0;
+    CGFloat scaledWidth = targetWidth;
+    CGFloat scaledHeight = targetHeight;
+    CGPoint thumbnailPoint = CGPointMake(0.0, 0.0);
+    
+    if(CGSizeEqualToSize(imageSize, size) == NO){
+        
+        CGFloat widthFactor = targetWidth / width;
+        CGFloat heightFactor = targetHeight / height;
+        
+        if(widthFactor > heightFactor){
+            scaleFactor = widthFactor;
+        }
+        else{
+            scaleFactor = heightFactor;
+        }
+        scaledWidth = width * scaleFactor;
+        scaledHeight = height * scaleFactor;
+        
+        if(widthFactor > heightFactor){
+            
+            thumbnailPoint.y = (targetHeight - scaledHeight) * 0.5;
+            
+        }else if(widthFactor < heightFactor){
+            
+            thumbnailPoint.x = (targetWidth - scaledWidth) * 0.5;
+        }
+    }
+    
+    //    UIGraphicsBeginImageContext(size);
+    UIGraphicsBeginImageContextWithOptions(size, NO, [UIScreen mainScreen].scale);
+    CGRect thumbnailRect = CGRectZero;
+    thumbnailRect.origin = thumbnailPoint;
+    thumbnailRect.size.width = scaledWidth;
+    thumbnailRect.size.height = scaledHeight;
+    
+    [sourceImage drawInRect:thumbnailRect];
+    
+    newImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    if(newImage == nil){
+        NSLog(@"scale image fail");
+    }
+    
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+
+@end
+
+```
+
+There was little reusable UI work, so I kept it in init rather than extracting more methods, making that method somewhat bulky. I will not cover the UI in detail. It mainly uses a fade through `CABasicAnimation` and its `opacity` property; interested readers can inspect the source. There is also an image-reconstruction method to prevent distortion.
+
+Integrating this wrapped feature is simple. First, look at the code:
+
+```
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    /* FullScreenAdType 全屏广告
+     * LogoAdType 带logo的广告类似网易广告，值得注意的是启动图片必须带logo图
+     * ImgUrl  图片url
+     */
+    LBLaunchImageAdView * adView = [[LBLaunchImageAdView alloc]initWithWindow:self.window andType:LogoAdType andImgUrl:@"http://www.uisheji.com/wp-content/uploads/2013/04/19/app-design-uisheji-ui-icon20121_55.jpg"];
+    
+    //各种回调
+    adView.clickBlock = ^(NSInteger tag){
+        switch (tag) {
+            case 1100:{
+                NSLog(@"点击广告回调");
+                TestViewController *vc = [[TestViewController alloc]init];
+                vc.view.backgroundColor = [UIColor whiteColor];
+                [self.window.rootViewController presentViewController:vc animated:YES completion:^{
+                    
+                }];
+            }
+                break;
+            case 1101:
+                NSLog(@"点击跳过回调");
+                break;
+            case 1102:
+                NSLog(@"倒计时完成后的回调");
+                break;
+            default:
+                break;
+        }
+       
+    };
+    
+    return YES;
+}
+
+```
+
+Import #import “LBLaunchImageAdView.h” in AppDelegate.m, initialise it in didFinishLaunchingWithOptions and handle tap callbacks. That completes the explanation; the result and download link follow.
+
+![1](<https://allluckly.cn/images/blog/LBLaunchImageAd/1.gif>)
+
+[Download → click here](<https://github.com/AllLuckly/LBLaunchImageAd>)
+
+Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.
+
+---
+
+Recommended reading: [An automatically archiving and unarchiving class](<https://allluckly.cn/en/journal/2016-06-02-wrapping-automatic-object-archiving-and-unarchiving-on-ios/>)
+{% endraw %}

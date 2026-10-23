@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /en/guides/manyue-suwayomi-library/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Connect ManYue to Suwayomi: browse server libraries and chapters'
+agent_source_url: https://allluckly.cn/en/guides/manyue-suwayomi-library/
+agent_source_sha256: afcdb8c62b870ca3c2b701b19623ab54f825ea7e4c626273e76a8e8654972ab1
+agent_generator_version: 1
+---
+{% raw %}# Connect ManYue to Suwayomi: browse server libraries and chapters
+
+Language: en
+Canonical: [Connect ManYue to Suwayomi: browse server libraries and chapters](<https://allluckly.cn/en/guides/manyue-suwayomi-library/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-suwayomi-library/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-suwayomi-library/>)
+Published: 2026-10-23T00:00:00+08:00
+Modified: 2026-10-23T10:34:08+08:00
+Author: Bison
+
+Connect an existing Suwayomi / Tachidesk library, check chapters and progress, and distinguish server downloads, local offline files and connection identity after a server move.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-suwayomi-library/>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+Suwayomi manages comics on your own server, and ManYue can connect as a reader. This connects to Suwayomi Server, not to another client application itself. Starting with a comic already in the server library, this article verifies the catalog, chapters, reading, and local downloads.
+
+## Confirm that the server library is ready
+
+Prepare a running Suwayomi / Tachidesk server, confirm access rights, and add the practice comic to its library. Open it through the existing service interface and inspect chapters and pages. This ManYue connection mainly browses the existing library; it does not install server extensions, configure site sources, or manage the entire service for you.
+
+Record the server root address, port, and authentication method. An example is `http://192.168.1.20:4567/`, but use your actual deployment values. When accessing a computer's service from a phone, do not use the computer's own `localhost` as the address. ManYue's Suwayomi server library requires Ultra. App entitlement and server account permissions are separate requirements.
+
+## Add a connection through Manage Libraries
+
+Open the upper-right menu in Library, choose Manage Libraries, add a library, and select Suwayomi / Tachidesk. Enter a name that identifies the device, such as Home Suwayomi, and use the service root path as the address. Retain a subpath prefix if the reverse proxy deploys the service there; do not arbitrarily reduce it to the domain root.
+
+For an anonymous service, leave credentials empty as appropriate. For HTTP Basic authentication, enter the relevant username and password. Do not interpret this integration as supporting every form-based login or arbitrary token scheme. A browser session copied from the management website is not a universal password, and credentials should not be included in shared URLs.
+
+## Check the catalog and categories after saving
+
+Tap Connect and Save or the current equivalent and wait for permission validation and catalog retrieval. After success, find the practice comic and check its source name, cover, and chapters. Large server catalogs may continue loading; the first screen's count does not prove everything has been retrieved. If it fails, retain the form configuration and correct it according to the specific error.
+
+Categories come from existing server settings and can narrow the scope, but do not expect this entry point to edit every server category. Test search with a title known to exist in the server library. If a work appears only in a server site's search results and has not been added to the library, its absence from this catalog is not necessarily a connection failure.
+
+## Read a chapter and compare progress
+
+Choose a chapter in details, open its first page, and read to a recognizable image midway through. Exit normally, reopen, and check the resume position. Suwayomi progress handling differs from other server integrations. If you need to confirm the server state, inspect the corresponding chapter on your own server too. Local display is not proof that every remote update has finished.
+
+Compare the same chapter and page rather than only an ordinal chapter position after the server reorders its list. Use chapter titles and visual content when extras are inserted or names change. To resume across clients, first ensure the current record has completed the relevant synchronization before switching, reducing differences from simultaneous edits.
+
+## Check offline reading after downloading into ManYue
+
+Use the download entry point in the work's details and download only this chapter first. Wait for completion, open it from the local or offline scope, and temporarily disconnect from the server to check the beginning, middle, and end. Downloaded on the server and downloaded locally in ManYue are different storage locations. Files on the computer do not mean the phone has taken them along.
+
+Content fully downloaded locally can continue to use ManYue's local reading method, but undownloaded chapters still require the service online. Before removing a server connection, check how local files and important records will be retained. A once-cached catalog does not mean all body pages remain permanently readable offline.
+
+## Distinguish a server move from a new library when changing addresses
+
+If only the same server's domain or port changes, use the same-library migration options actually offered while editing the connection and retain a backup first. If changing to a different server or account, establish a separate source so different works with identical numeric identifiers are not mixed together.
+
+Changing only a display name differs from changing source identity. After renaming, check that history and downloads still belong to the original connection. After creating a new one, recheck library contents. Do not repeatedly create same-name connections to remove an error message. Clear names and identities make old progress easier to find later.
+
+## Frequently asked questions
+
+**Can I install Suwayomi extensions from ManYue?** This ManYue entry point reads an existing server library. Install extensions, search site sources, and configure the server in Suwayomi's management interface. After preparing a work and adding it to the server library, return to ManYue and refresh to check it.
+
+**Why can I sign in on the website but not connect in the app?** The website may use authentication other than HTTP Basic, or the address may point to an administration page instead of the service root. Check supported authentication and deployment methods first. The app does not automatically inherit an already logged-in browser's credentials.
+
+**Can I keep reading after the server goes offline?** Chapters downloaded into ManYue and verified offline can be used locally. Works with only cached catalogs and covers still depend on the server. Check these separately.
+
+## Related tutorials
+
+For multiple servers, see [Library source and visible scope](<https://allluckly.cn/en/guides/manyue-server-library-scope/>); to organize local files, see [Download queue](<https://allluckly.cn/en/guides/manyue-download-queue/>) and [Offline checks](<https://allluckly.cn/en/guides/manyue-offline-preflight/>).
+
+## Sources and version
+
+Information checked on October 23, 2026. The public release is ManYue 2.0.2, requiring iOS / iPadOS 15.0 or later. This guide is based on public feature descriptions and their entry points; available options depend on the installed version. See [Official App Store description](<https://apps.apple.com/cn/app/id6753895889>) and [Apple release information](<https://itunes.apple.com/lookup?id=6753895889&country=cn>).
+{% endraw %}

@@ -1,0 +1,225 @@
+---
+layout: post
+title: Building a Pomodoro timer app for iOS
+description: Connects timers, notification reminders, music playback and a Today Widget in a Pomodoro app. It identifies
+  implementation entry points for card layouts, transitions, xib files and URL Schemes, helping readers follow how
+  the features fit together in the project.
+category: Development notes
+imagefeature: null
+date: 2016-04-15 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Connects timers, notification reminders, music playback and a Today Widget in a Pomodoro app. It identifies
+    implementation entry points for card layouts, transitions, xib files and URL Schemes, helping readers follow
+    how the features fit together in the project.
+  keywords:
+  - Pomodoro timer
+  - NSTimer
+  - Today Widget
+  - local notifications
+  - custom layouts
+  provenance: contribution
+  author_name: 威權在B612等着那阵温柔的风
+  source_url: http://www.jianshu.com/p/7dedfd704008
+  credit: Originally credited to 威權在B612等着那阵温柔的风; edited and archived by Bison.
+  version_note: Published in 2016, using the Today Widget, notification and Swift interfaces available at the time.
+  title: Building a Pomodoro timer app for iOS
+  source_sha256: c60d4c5227cc81949626f16bc48c508bc98a4464eaf7a75b18419bd20b7aac7f
+lang: en
+source_path: _posts/2016-04-15-tuogao37.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao37
+permalink: /en/journal/2016-04-15-building-a-pomodoro-timer-app-for-ios/
+translation_method: machine-assisted
+translation_source_sha256: c60d4c5227cc81949626f16bc48c508bc98a4464eaf7a75b18419bd20b7aac7f
+excerpt: Connects timers, notification reminders, music playback and a Today Widget in a Pomodoro app. It identifies
+  implementation entry points for card layouts, transitions, xib files and URL Schemes, helping readers follow how
+  the features fit together in the project.
+translation_date: '2026-10-23T02:34:14+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"This is a Pomodoro-style app. Next I will show its features, explain their implementations and organise the sources I consulted. Choose a feature and add it to your own app."</p>
+</blockquote>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/7dedfd704008">威權在B612等着那阵温柔的风</a><br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao37/1.gif"/><br/></p>
+<h2 id="前言">Introduction</h2>
+<hr/>
+<p>App project URL: <a href="https://github.com/PoBlue/25min">Click to download</a><br/></p>
+<p>For this app I investigated existing Pomodoro apps and wrote a Pomodoro App Survey.<a href="http://www.jianshu.com/p/e997bb222409">article</a><br/></p>
+<h2 id="本文章目录">Article contents<br/></h2>
+<ul>
+<li>
+<p>Timer functionality<br/></p>
+</li>
+<li>
+<p>Notification reminders<br/></p>
+</li>
+<li>
+<p>Music playback<br/></p>
+</li>
+<li>
+<p>Today Widget<br/></p>
+</li>
+<li>
+<p>Custom UICollectionView Layout<br/></p>
+</li>
+<li>
+<p>Custom transitions<br/></p>
+</li>
+<li>
+<p>lldb<br/></p>
+</li>
+<li>
+<p>Read file paths<br/></p>
+</li>
+<li>
+<p>Developing with xib<br/></p>
+</li>
+<li>
+<p>Capsule-shaped Button<br/></p>
+</li>
+<li>
+<p>Using CocoaPods<br/></p>
+</li>
+<li>
+<p>UILabel and URL Scheme<br/></p>
+</li>
+</ul>
+<h2 id="定时功能">Timer functionality<br/></h2>
+<h3 id="nstimer">NSTimer<br/></h3>
+<p>The following code runs timeUp every second.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: "timeUp:", userInfo: nil, repeats: true)
+</code></pre></div></div>
+<p><br/>
+Use an if statement in timeUp to implement the timer.<br/></p>
+<h3 id="能执行操作的通知">Actionable notifications<br/></h3>
+<p>The result is shown below:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao37/2.gif"/><br/></p>
+<p>When a notification arrives, users can choose an action directly, avoiding opening the app and navigating to perform it.</p>
+<p>The implementation article is here: <a href="http://www.jianshu.com/p/c46b60f06880">Notification reminders — iOS development</a></p>
+<p>This <a href="https://github.com/PoBlue/25min/blob/master/README.md">Item</a> This <a href="https://github.com/PoBlue/25min/blob/master/25分/AppDelegate.swift">File </a>uses this technique.<br/></p>
+<h2 id="播放音乐">Play music<br/></h2>
+<p>The implementation article is here. <a href="http://www.jianshu.com/p/3fb9a8c4b1b1">Music player</a><br/></p>
+<p>This <a href="https://github.com/PoBlue/25min/blob/master/README.md">Item</a> This <a href="https://github.com/PoBlue/25min/blob/master/25分/convinence.swift">File </a>uses this technique.<br/></p>
+<h2 id="通知栏的today-widget">TODAY WIDGET in Notification Centre<br/></h2>
+<p>The result is:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao37/3.gif"/><br/></p>
+<p>This <a href="https://github.com/PoBlue/25min/blob/master/25min/TodayViewController.swift">File </a>uses this technique.<br/></p>
+<p><a href="http://www.brianjcoleman.com/tutorial-today-widget-ios8/">Tutorial link</a><br/>
+<a href="http://www.jianshu.com/p/6b6e74095ec4">App Extension</a><br/></p>
+<h2 id="轮转式的卡片效果">Rotating card effect<br/></h2>
+<p>First, here is the effect:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao37/4.gif"/><br/></p>
+<p>Because the tutorial is long, I wrote a separate article.<br/>
+Use collectionView layout with a little mathematics.<br/></p>
+<p>This article explains creating your own layout rather than using UICollectionViewFlowLayout.<br/></p>
+<p>This <a href="https://github.com/PoBlue/25min/blob/master/README.md">Item</a> This <a href="https://github.com/PoBlue/25min/blob/master/25分/CircularCollectionViewLayout.swift">File </a>uses this technique.<br/></p>
+<p>Article link: <a href="http://www.jianshu.com/p/45f39b70263d">Make a UICollectionView rotate like a wheel</a><br/></p>
+<h2 id="自定义present-viewcontroller">Custom Present ViewController<br/></h2>
+<p>The result is:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao37/5.gif"/><br/>
+Tutorial: <a href="http://www.jianshu.com/p/23613f2679ef">Custom presentation transitions</a><br/>
+This <a href="https://github.com/PoBlue/25min/blob/master/README.md">Item</a> This <a href="https://github.com/PoBlue/25min/blob/master/25分/CustomPresent.swift">File </a>uses this technique.<br/></p>
+<h2 id="lldb">lldb<br/></h2>
+<p>In this project I frequently use the expression command to pause the app at a breakpoint, change data and test.</p>
+<p>As shown, change dimingView’s alpha directly:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao37/6.png"/><br/></p>
+<p>Link:<br/></p>
+<p><a href="http://www.dreamingwish.com/article/lldb-usage-a.html">More LLDB commands</a><br/></p>
+<h2 id="读取目录下的所有文件路径">Read every file path in a directory<br/></h2>
+<p>Use fileManager’s enumeratorAtPath and nextObject() to enumerate.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let appMainBundlePath = NSBundle.mainBundle().bundlePath
+
+func filePathesInDir(dirPath:String) -&gt; [String]{
+    var filePathes = [String]()
+    var fileURL:String
+
+
+    let fileManager = NSFileManager.defaultManager()
+    let enumerator = fileManager.enumeratorAtPath(appMainBundlePath + dirPath)
+
+
+    while let element = enumerator?.nextObject() as? String{
+        if let ext = ext {
+                fileURL = appMainBundlePath + dirPath + "/" + element
+                filePathes.append(fileURL)
+
+    }
+
+    return filePathes
+}
+</code></pre></div></div>
+<p><br/>
+An article about file-path access: <a href="http://www.hangge.com/blog/cache/detail_765.html">Follow this link</a><br/></p>
+<h2 id="使用-xib-开发">Develop using xib<br/></h2>
+<p>This makes UI setup quick.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao37/7.jpg"/><br/></p>
+<p>Each tutorial uses a demo, making it easy to learn. Links follow:<br/>
+<a href="http://www.ifun.cc/blog/2014/02/22/ioskai-fa-zhi-xibji-qiao-jie-shao/">Tutorial link</a><br/></p>
+<h2 id="胶囊形状button">Capsule-shaped Button<br/></h2>
+<p>The result is shown below:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao37/8.png"/><br/></p>
+<p>Principle: use the layer’s radius, as shown:<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao37/9.png"/><br/></p>
+<p>Then simply set radius = button height / 2.<br/></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao37/10.jpg"/><br/></p>
+<p>The code is as follows:<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func makeRadiusBtn(btn:UIButton,borderColor:CGColor){
+    let btnH:CGFloat = CGRectGetHeight(btn.bounds)
+
+    btn.layer.borderColor = borderColor
+    btn.layer.borderWidth = 1.0
+    btn.layer.cornerRadius = btnH / 2
+}
+</code></pre></div></div>
+<p><br/>
+For more button effects, such as folded corners, see this blog:<br/>
+Link:</p>
+<p><a href="http://www.wutongwei.com/front/infor_showone.tweb?id=88">Button tutorial</a><br/>
+<a href="https://robots.thoughtbot.com/designing-for-ios-taming-uibutton">timing Button</a><br/></p>
+<h2 id="cocoapod的使用">Using CocoaPods<br/></h2>
+<p>Article URL: <a href="http://www.jianshu.com/p/0b6bc7d9b491">CocoaPods usage notes</a><br/></p>
+<h2 id="用16进制获取-uicolor">Get UIColor from hexadecimal<br/></h2>
+<p>Since RGB colours online are commonly hexadecimal, supporting that notation in UIColor is useful.<br/></p>
+<p>One macro definition meets the requirement.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#define UIColorFromRGB(rgbValue) ［UIColor colorWithRed:((float)((rgbValue &amp; 0xFF0000) &gt;&gt; 16))/255.0 green:((float)((rgbValue &amp; 0xFF00) &gt;&gt; 8))/255.0 blue:((float)(rgbValue &amp; 0xFF))/255.0 alpha:1.0] &lt;br&gt;
+</code></pre></div></div>
+<p>Usage is as follows.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>self.view.backgroundColor = UIColorFromRGB(0xCECECE);
+</code></pre></div></div>
+<p><br/>
+How it works<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#define UIColorFromRGB(rgbValue) \\\\\\\\\\\\\\\\
+[UIColor colorWithRed:((float)((rgbValue &amp; 0xFF0000) &gt;&gt; 16))/255.0 \\\\\\\\\\\\\\\\
+                green:((float)((rgbValue &amp; 0x00FF00) &gt;&gt;  8))/255.0 \\\\\\\\\\\\\\\\
+                 blue:((float)((rgbValue &amp; 0x0000FF) &gt;&gt;  0))/255.0 \\\\\\\\\\\\\\\\
+                alpha:1.0]
+</code></pre></div></div>
+<p><br/>
+Apply masks to extract the corresponding RGB digits, then right-shift using ».<br/></p>
+<p>For red, for example, 0xCECECE &amp; 0xFF00000 = 0xCE0000.
+One hexadecimal zero represents four binary zeros, so 0xCE0000 » 16 = 0xCE.
+Divide by 0xFF (255) to obtain the proportion.</p>
+<h2 id="uilabel">UILabel<br/></h2>
+<p><a href="http://cnbin.github.io/blog/2015/10/15/ios-label-xiang-jie/">Label properties</a><br/>
+<a href="https://www.skyfox.org/uilabel-ajust-font-for-size.html">Automatic sizing</a><br/></p>
+<h2 id="设置url-scheme">Set the URL Scheme<br/></h2>
+<p>For example, I have an app called 25min.</p>
+<p>In 25min’s info.plist, add a URL type, set the URL identifier and add URL Schemes. Item 0 under URL Schemes defines the beginning of the URL scheme.
+<img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao37/11.png"/><br/></p>
+<p>Then add the URL Schemes handling method in appDelegate.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//return true 则启动app，false则不启动。
+    func application(app: UIApplication, openURL url: NSURL, options: [String : AnyObject]) -&gt; Bool {
+        return true
+    }
+</code></pre></div></div>
+<p><br/>
+Now 25min:// opens the 25min app. Test the URL in Safari to check whether it switches apps.<br/></p>
+<p>This <a href="https://github.com/PoBlue/25min/blob/master/README.md">Item</a> This <a href="https://github.com/PoBlue/25min/blob/master/25min/TodayViewController.swift">File </a>uses this technique.<br/></p>
+<p>(END And Thank U)<br/></p>
+<p><a href="https://github.com/PoBlue/25min/blob/master/README.md">Here,</a>Includes complete project source code<br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-03-30-combining-aes-encryption-with-base64-encoding-on-ios/">Combining AES encryption with Base64 encoding on iOS</a><br/></p>
+
+{% endraw %}

@@ -1,0 +1,107 @@
+---
+layout: null
+permalink: /sdk/aliww/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 仿window阿里旺旺登陆界面,打印机吐纸动画效果
+agent_source_url: https://allluckly.cn/sdk/aliww
+agent_source_sha256: c2e98e1c25651b1d15bd300936a10474c5eedb99c702b65f50864dafd49c3b2b
+agent_generator_version: 1
+---
+{% raw %}# 仿window阿里旺旺登陆界面,打印机吐纸动画效果
+
+语言：zh-CN
+原文：[仿window阿里旺旺登陆界面,打印机吐纸动画效果](<https://allluckly.cn/sdk/aliww>)
+中文：[中文 HTML](<https://allluckly.cn/sdk/aliww>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-01-04-a-windows-aliwangwang-style-login-screen-with-a-paper-feed-animation/>)
+发布于: 2016-01-04T00:00:00+08:00
+内容更新于: 2016-01-04T00:00:00+08:00
+署名：[Bison](<https://allluckly.cn/about/>)
+
+模仿 Windows 阿里旺旺的打印机吐纸登录动画，通过保持视图横向位置与宽度不变、逐步调整高度实现展开效果，并提供 LBPrinterPaper 示例工程。
+
+原文署名 Bison，保留原发布时的内容。
+
+**阅读前** 这是 2015–2017 年间的技术记录，本次整理未重新运行验证示例。涉及的 API、依赖和工具版本请结合发表日期阅读。
+
+> "偶然的机会发现window的阿里旺旺的登陆效果蛮有意思的，于是就模仿着做了一下打印机吐纸的动画效果"
+
+偶然的机会发现window的阿里旺旺的登陆效果蛮有意思的，于是就模仿着做了一下打印机吐纸的动画效果  
+ 看起来很神奇的东西，实现起来却不难，下面我给大家看下主要的源码。
+
+```css
+- (void)createUI{
+    UIImageView *backimageView=[[UIImageView alloc]init];
+    backimageView.image =[UIImage imageNamed:@"1.png"];
+    backimageView.frame = CGRectMake(50, 100, LBSCREEN_WIDTH-100, 30);
+    [self.view addSubview:backimageView];
+    backView = [[UIView alloc]initWithFrame:CGRectMake(60, 115, LBSCREEN_WIDTH-120, 0)];
+    backView.layer.cornerRadius = 5;
+    backView.backgroundColor = [UIColor whiteColor];
+    backView.layer.borderWidth = 1;
+    backView.layer.borderColor = [UIColor blackColor].CGColor;
+    backView.clipsToBounds = YES;
+    [self.view addSubview:backView];
+    login_btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    login_btn.frame = CGRectMake(10, 120, LBSCREEN_WIDTH-140, 35);
+    [login_btn setTitle:@"登陆" forState:UIControlStateNormal];
+    login_btn.backgroundColor = [UIColor lightGrayColor];
+    login_btn.layer.cornerRadius = 5;
+    login_btn.layer.borderWidth = 1;
+    login_btn.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    [login_btn addTarget:self action:@selector(passwordClick:) forControlEvents:UIControlEventTouchUpInside];
+    login_btn.clipsToBounds = YES;
+    pass_btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    pass_btn.frame = CGRectMake(10, 165, LBSCREEN_WIDTH-140, 35);
+    [pass_btn setTitle:@"注册" forState:UIControlStateNormal];
+    pass_btn.backgroundColor = [UIColor redColor];
+    [pass_btn addTarget:self action:@selector(passwordClick:) forControlEvents:UIControlEventTouchUpInside];
+    pass_btn.layer.cornerRadius = 5;
+    pass_btn.layer.borderWidth = 1;
+    pass_btn.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    pass_btn.clipsToBounds = YES;
+    Name_textfield = [[UITextField alloc]initWithFrame:CGRectMake(10, 20, LBSCREEN_WIDTH-140, 40)];
+    Name_textfield.placeholder = @"帐号";
+    Name_textfield.borderStyle = UITextBorderStyleRoundedRect;
+    Pass_textfield = [[UITextField alloc]initWithFrame:CGRectMake(10, 70, LBSCREEN_WIDTH-140, 40)];
+    Pass_textfield.borderStyle = UITextBorderStyleRoundedRect;
+    Pass_textfield.placeholder = @"密码";
+    //2秒后开始一个持续一分钟的动画
+    [UIView animateWithDuration:1 delay:2 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+        backView.frame=CGRectMake(60, 115, LBSCREEN_WIDTH-120, 210);
+    } completion:^(BOOL finished) {
+    
+        [backView addSubview:Name_textfield];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [backView addSubview:Pass_textfield];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [backView addSubview:login_btn];
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [backView addSubview:pass_btn];
+                });
+            });
+        });
+
+    }];
+
+}
+
+- (void)passwordClick:(UIButton *)sender{
+    NSLog(@"hhhhh....");
+}
+```
+
+不难看懂吧？主要就用到了一个改变frame的动画，x轴和y轴以及宽不变，改变它的高  
+ 下面晒下效果图
+
+![(https://allluckly.cn/)](<https://github.com/AllLuckly/LBPrinterPaper/blob/master/LBPrinterPaper.gif?raw=true>)
+
+> 哦，差点忘记把源码下载的地址给忘了，在此补上
+
+[下载地址—来戳我](<https://github.com/AllLuckly/LBPrinterPaper>)
+
+好文推荐：[Biosn收集的Git常见的错误解决方式](<https://allluckly.cn/sdk/git01>)
+
+原文地址：[https://allluckly.cn/](<https://allluckly.cn/>)
+{% endraw %}

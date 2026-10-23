@@ -1,0 +1,223 @@
+---
+layout: post
+title: JavaScript and Native iOS Interaction with JavaScriptCore
+description: Compares early UIWebView URL interception with JavaScriptCore. Using JSContext, it introduces executing
+  JavaScript from native code, registering native methods, and passing data between the two environments.
+category: Development notes
+imagefeature: null
+date: 2016-07-05 00:00:00 +0800
+technical_translation:
+  topic: web-notes
+  summary: Compares early UIWebView URL interception with JavaScriptCore. Using JSContext, it introduces executing
+    JavaScript from native code, registering native methods, and passing data between the two environments.
+  keywords:
+  - JavaScriptCore
+  - JSContext
+  - UIWebView
+  - native interoperability
+  - hybrid apps
+  provenance: contribution
+  author_name: Sindri
+  source_url: http://www.jianshu.com/p/b01d619c3cdd
+  credit: Originally credited to Sindri; edited and archived by Bison.
+  version_note: The article is organized around the introduction of JavaScriptCore in iOS 7 and uses the WebView
+    interaction approaches of that period.
+  title: JavaScript and Native iOS Interaction with JavaScriptCore
+  source_sha256: cb3affe681e09d5639199fc5d7b3b9823ecb8077a07cdce68d67f29068985e61
+lang: en
+source_path: _posts/2016-07-5-tuogao53.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao53
+permalink: /en/journal/2016-07-05-javascript-and-native-ios-interaction-with-javascriptcore/
+translation_method: machine-assisted
+translation_source_sha256: cb3affe681e09d5639199fc5d7b3b9823ecb8077a07cdce68d67f29068985e61
+excerpt: Compares early UIWebView URL interception with JavaScriptCore. Using JSContext, it introduces executing
+  JavaScript from native code, registering native methods, and passing data between the two environments.
+translation_date: '2026-10-23T02:45:04+00:00'
+---
+{% raw %}
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao53/1.jpeg"/><br/></p>
+<p>Hybrid development is growing at an unprecedented rate, with cross-platform development and hot updates establishing its importance. Although web interfaces still lag behind native apps in interaction, animation, and other areas, more companies will undoubtedly adopt hybrid development. On iOS, this history divides into the difficult period before iOS7 and the golden era afterward, marked by the <code class="language-plaintext highlighter-rouge">JavaScriptCore</code> framework.</p>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/b01d619c3cdd">Sindri’s Notes</a><br/></p>
+<h2 id="坑爹时代">The difficult era</h2>
+<p>I was fortunate to avoid pre-iOS7 versions, so I know those difficult years only through a senior developer's stories. The only way to interact with web interfaces then was <code class="language-plaintext highlighter-rouge">UIWebView</code>. Setting aside its own memory-leak problems, here is some code that developer wrote:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
+{
+    NSString * address = request.URL.absoluteString;
+    for (NSString * black in _blackList) {
+        if ([address containsString: black]) {
+            return NO;
+        }
+    }
+    for (NSString * event in _eventList) {
+        if ([address containsString: event]) {
+            SEL callback = NSSelectorFromString(_callbacks[event]);
+            [self performSelector: callback];
+            return [event containsString: @"shouldOpen=1"];
+        }
+    }
+    return YES;
+}
+</code></pre></div></div>
+<p>At the time, developers made frontend events trigger URL navigation and used special characters in the URL to choose an action. Several data collections were needed to store handlers for those characters. Exchanging data with the frontend meant concatenating every parameter into the request URL—quite a mess. Another interaction method was</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>stringByEvaluatingJavaScriptFromString
+</code></pre></div></div>
+<p>method to execute <code class="language-plaintext highlighter-rouge">js</code> code.</p>
+<h2 id="javascriptcore">JavaScriptCore</h2>
+<p><code class="language-plaintext highlighter-rouge">JavaScriptCore</code> is a set of tools for parsing <code class="language-plaintext highlighter-rouge">JS</code> code and supplies its execution environment: <a href="https://github.com/phoboslab/JavaScriptCore-iOS">open-source framework </a>greatly simplifies interaction. Next, I will explain the corresponding methods for calls from the project to <code class="language-plaintext highlighter-rouge">JS</code> code, and calls in the other direction.</p>
+<blockquote>
+<p>Calling JS code from the project</p>
+</blockquote>
+<ul>
+<li>
+<p><strong>JSContext</strong></p>
+<p>A <code class="language-plaintext highlighter-rouge">JSContext</code> object is the global execution environment for <code class="language-plaintext highlighter-rouge">JavaScript</code>, providing code execution and method-registration interfaces. The following creates a <code class="language-plaintext highlighter-rouge">JSContext</code> and adds some <code class="language-plaintext highlighter-rouge">JS</code> code to that environment.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let context = JSContext()
+context.evaluateScript(" var age = 22 ")
+context.evaluateScript(" var name = 'SindriLin' ")
+context.evaluateScript(" var birth = 1993-01-01 ")
+context.evaluateScript(" var createPerson = 
+    function(age, name, birth) 
+    { 
+        return {'age': age, 'name': name, 'birth': birth}
+    } ")
+context.evaluateScript(" var codeDescription = 'The code create three value and a function to create a dictionary stored person information' ")
+</code></pre></div> </div>
+<p>Errors such as syntax errors may occur while <code class="language-plaintext highlighter-rouge">JS</code> runs. The following code handles them:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>context?.exceptionHandler = { context, exception in 
+      print("Java Script Run Error: \(exception)")
+}
+</code></pre></div> </div>
+</li>
+<li>
+<p><strong>JSValue</strong></p>
+<p><code class="language-plaintext highlighter-rouge">JSValue</code> is the value returned by <code class="language-plaintext highlighter-rouge">JSContext</code> operations, wrapping almost every data type, including errors and <code class="language-plaintext highlighter-rouge">IMP</code> pointers. The <code class="language-plaintext highlighter-rouge">JSValue</code> class provides several <code class="language-plaintext highlighter-rouge">toXXXX</code> methods for conversion to <code class="language-plaintext highlighter-rouge">iOS</code> types, along with <code class="language-plaintext highlighter-rouge">call</code> methods for invoking functions. The following retrieves existing variables from a <code class="language-plaintext highlighter-rouge">JSContext</code> environment and creates a dictionary holding <code class="language-plaintext highlighter-rouge">person</code> information.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  let age = context?.objectForKeyedSubscript("age")
+  let name = context?.objectForKeyedSubscript("name")
+  let birth = context?.objectForKeyedSubscript("birth")
+  let createFunction = context?.objectForKeyedSubscript("createPerson")
+  let codeDescription = context?.objectForKeyedSubscript("codeDescription")
+  let person = createFunction.call(withArguments: [age.toInt32(), name.toString(), birth.toString()])
+    
+  let personInfo = "name: \(person["name"]) age: \(person["age"] and birth: \(person["birth"])"
+  print("The javaScript code description: \(codeDescription.toString())")
+  print("The created person \(personInfo) ")
+</code></pre></div> </div>
+<p>The example shows that once we know the function to call in the <code class="language-plaintext highlighter-rouge">JS</code> code, <code class="language-plaintext highlighter-rouge">JSContext + JSValue</code> lets us invoke web-interface methods easily from the project, without constructing long parameter strings and passing them through URL links.</p>
+<blockquote>
+<p>Calling project code from JS</p>
+</blockquote>
+<p><code class="language-plaintext highlighter-rouge">JavaScript</code> can access objects and methods in our code in two ways: <code class="language-plaintext highlighter-rouge">Blocks</code> and <code class="language-plaintext highlighter-rouge">JSExport</code>.</p>
+<ul>
+<li>
+<p><strong>Blocks</strong></p>
+<p>Custom <code class="language-plaintext highlighter-rouge">block</code> code can be exposed through <code class="language-plaintext highlighter-rouge">JSContext</code> as a callable function pointer in <code class="language-plaintext highlighter-rouge">JS</code>. A pitfall is that <code class="language-plaintext highlighter-rouge">Swift</code> closures cannot undergo that conversion directly. In <code class="language-plaintext highlighter-rouge">Swift</code>, the process is therefore <code class="language-plaintext highlighter-rouge">Closure</code> → <code class="language-plaintext highlighter-rouge">block</code> → <code class="language-plaintext highlighter-rouge">function pointer</code>. Converting a closure into a <code class="language-plaintext highlighter-rouge">block</code> requires the important annotation <code class="language-plaintext highlighter-rouge">@convention</code>.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let stringConvert: @convention(block) (String)-&gt;String = {
+    let pinyin = NSMutableString(string: $0) as CFMutableString
+    CFStringTransform(pinyin, nil, kCFStringTransformToLatin, false)
+    CFStringTransform(pinyin, nil, kCFStringTransformStripCombiningMarks, false)
+    return pinyin as String
+}      
+    
+let convertObjc = unsafeBitCast(stringConvert, to: AnyObject.self)
+context?.setObject(convertObjc, forKeyedSubscript: "convertFunc")
+let convertFunc = context?.objectForKeyedSubscript("convertFunc")
+print("林欣达的拼音是\(convertFunc.call(withArguments: ["林欣达"]).toString())")
+</code></pre></div> </div>
+<p>Now, when the web interface's <code class="language-plaintext highlighter-rouge">JS</code> button handler calls <code class="language-plaintext highlighter-rouge">convertFunc()</code>, the code in this <code class="language-plaintext highlighter-rouge">closure</code> executes. Be careful: closure capture can retain the <code class="language-plaintext highlighter-rouge">JSContext</code> and prevent its release. Use <code class="language-plaintext highlighter-rouge">JSContext.current()</code> to obtain the current context and address the reference issue.</p>
+</li>
+<li>
+<p><strong>JSExport</strong></p>
+<p>In <code class="language-plaintext highlighter-rouge">JS</code>, calls to <code class="language-plaintext highlighter-rouge">iOS</code> methods use methods of a protocol derived from <code class="language-plaintext highlighter-rouge">JSExport</code>. All methods in the derived protocol are automatically exposed to <code class="language-plaintext highlighter-rouge">JavaScript</code>, as demonstrated below.</p>
+</li>
+</ul>
+<h2 id="实战">Putting it into practice</h2>
+<p>I wrote some <code class="language-plaintext highlighter-rouge">JS</code> for this article's demo. Here are the code and its result. Note that the button's <code class="language-plaintext highlighter-rouge">onclik</code> specifies the click-response event:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;meta charset="UTF-8"&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div style="margin-top: 20px"&gt;
+            &lt;h2 align="center" style="color:#ff0000"&gt;JS与iOS交互&lt;/h2&gt;
+            &lt;input type="button" value="点击后切换控制器的背景颜色" onclick="sindrilin.call()"&gt;
+        &lt;/div&gt;
+        &lt;div style="color:#7BBDE5"&gt;
+            &lt;br /&gt;
+            &lt;br /&gt;
+            账户：
+            &lt;input id="account" type="text"&gt;
+            &lt;br /&gt;
+            密码：
+            &lt;input id="password" type="password"&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+            &lt;input type="button" value="登录" onclick="login()"&gt;
+        &lt;/div&gt;
+      
+        &lt;script&gt;
+          
+            var login = function()
+            {
+                account = document.getElementById("account")
+                password = document.getElementById("password")
+                var accountInfo = JSON.stringify({"account": account.value, "password": password.value});
+                sindrilin.login(accountInfo);
+            }
+      
+            var alertFromIOS = function(message)
+            {
+                    alert(message)
+            }
+      
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre></div> </div>
+</li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao53/2.jpeg"/><br/></p>
+<p>First load this <code class="language-plaintext highlighter-rouge">HTML</code> file and obtain the global execution environment. For nearly all <code class="language-plaintext highlighter-rouge">HTML</code> files, the <code class="language-plaintext highlighter-rouge">keyPath</code> used to obtain that environment is the same:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  let jsPath = Bundle.main().pathForResource("interaction", ofType: "html")
+  webView.loadRequest(URLRequest(url: URL(fileURLWithPath: jsPath!)))
+  interactionContext = webView.value(forKeyPath: "documentView.webView.mainFrame.javaScriptContext") as? JSContext
+  interactionContext?.exceptionHandler = {
+      print("Interaction Error: \($1?.toString())")
+  }
+</code></pre></div></div>
+<p>In the <code class="language-plaintext highlighter-rouge">HTML</code>, clicking the top button calls <code class="language-plaintext highlighter-rouge">sindrilin.call()</code>, which our view controller must ultimately handle. We can split this string into two parts like <code class="language-plaintext highlighter-rouge">Target-Action</code>: <code class="language-plaintext highlighter-rouge">sindrilin</code> identifies the responder, and <code class="language-plaintext highlighter-rouge">call()</code> the action. Set the <code class="language-plaintext highlighter-rouge">Target</code> as follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  interactionContext?.setObject(self, forKeyedSubscript: "sindrilin")   响应者已经有了，那么响应事件也要我们实现代码，这里就需要用到`JSExport`协议了。所有这种类似`Target-Action`的事件触发都会通过这个协议获取方法实现，因此我们需要自定义响应协议以及响应事件。对于有参数的方法我们需要用`@objc(name)`的方式给方法起`OC`式的方法名，才能保证能被正确调用响应：
+
+  @objc protocol LXDInteractionExport: JSExport {
+      func call()                                    ///响应sindrilin.call()
+      @objc(login:) func login(accountInfo: String)  ///响应sindrilin.login(accountInfo)
+  }
+  
+  extension ViewController: LXDInteractionExport {
+      func call() {
+          print("call from html button clicked")
+          view.backgroundColor = UIColor(red: CGFloat(arc4random() % 256) / 255, green: CGFloat(arc4random() % 256) / 255, blue: CGFloat(arc4random() % 256) / 255, alpha: 1)
+      }
+  
+      func login(accountInfo: String) {
+          do {
+              if let JSON: [String: String] = try JSONSerialization.jsonObject(with: accountInfo.data(using: String.Encoding.utf8)!, options: JSONSerialization.ReadingOptions()) as? [String: String] {
+                  print("JSON: \(JSON)")
+                  let alert = interactionContext?.objectForKeyedSubscript("alertFromIOS")
+                  let message = "The alert from javascript call\naccount: \(JSON["account"]) and password: \(JSON["password"])"
+                  _ = alert?.call(withArguments: [message])
+              }
+          } catch {
+              print("Error: \(error)")
+          }      
+      }
+  }
+</code></pre></div></div>
+<p>After entering a username and password in the frontend interface, clicking Log In calls <code class="language-plaintext highlighter-rouge">login(accountInfo: String)</code> method and assembles the username and password into a <code class="language-plaintext highlighter-rouge">JSON</code> string. In the response method, I parse the relevant user-information fields, assemble a new string, and call <code class="language-plaintext highlighter-rouge">JS</code>'s dialog function to display a response <a href="https://github.com/JustKeepRunning/LXDJavaScriptCoreDemo">Demo download</a></p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao53/3.gif"/><br/></p>
+<p>Follow <a href="http://www.jianshu.com/notebooks/2348850/latest">iOS development </a>collection for more articles</p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Adding a launch advertisement to an iOS app</a><br/></p>
+
+{% endraw %}

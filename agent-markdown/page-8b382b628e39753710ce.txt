@@ -1,0 +1,304 @@
+---
+layout: null
+permalink: /en/journal/2016-02-29-bison-s-guide-to-ios-multithreading-part-3/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Bison's guide to iOS multithreading, part 3
+agent_source_url: https://allluckly.cn/en/journal/2016-02-29-bison-s-guide-to-ios-multithreading-part-3/
+agent_source_sha256: d80a2a38b5400793a78df212e6a843d05db18d6909a7742b77500f8b70b0721e
+agent_generator_version: 1
+---
+{% raw %}# Bison's guide to iOS multithreading, part 3
+
+Language: en
+Canonical: [Bison's guide to iOS multithreading, part 3](<https://allluckly.cn/en/journal/2016-02-29-bison-s-guide-to-ios-multithreading-part-3/>)
+中文：[中文 HTML](<https://allluckly.cn/%E5%A4%9A%E7%BA%BF%E7%A8%8B/duoxiancheng03>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-02-29-bison-s-guide-to-ios-multithreading-part-3/>)
+Published: 2016-02-29T00:00:00+08:00
+Modified: 2026-10-23T10:34:13+08:00
+Author: [Bison](<https://allluckly.cn/about/>)
+
+Explores GCD tasks and queues, comparing the main queue, global queues and custom serial and concurrent queues. Image downloads, repeated execution and one-time initialisation illustrate common ways to submit work.
+
+Originally credited to Bison. Content is retained as published.
+
+English translation of the [Chinese original](<https://allluckly.cn/%E5%A4%9A%E7%BA%BF%E7%A8%8B/duoxiancheng03>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Published in 2016, using the Objective-C GCD interfaces. Some conceptual statements in the body need to be checked against the code.
+
+Correction: the section on submitting a task synchronously names dispatch\_async, but the correct function is dispatch\_sync. It returns after the task has completed and may execute the task on the current thread. dispatch\_once does not take a queue argument and does not switch execution to the main thread. For a given static or global token, its block executes once during the process's lifetime; concurrent calls wait for that first execution to finish. The comment describing the dispatch\_apply example as asynchronous is also inaccurate: dispatch\_apply returns only after all iterations have completed. The original code is retained for comparison and has not been rerun.
+
+- [Apple: Submitting a task synchronously](<https://developer.apple.com/documentation/dispatch/dispatchqueue/sync%28execute%3A%29-3segw?language=objc>)
+- [Apple: dispatch\_once](<https://developer.apple.com/documentation/dispatch/dispatch_once-c.func>)
+- [Apple: Dispatch Queues and dispatch\_apply](<https://developer.apple.com/library/archive/documentation/General/Conceptual/ConcurrencyProgrammingGuide/OperationQueues/OperationQueues.html>)
+
+Reading notes added on 2026-10-23
+
+Earlier, in “[Bison's guide to iOS multithreading, part 2](<https://allluckly.cn/en/journal/2016-01-18-bison-s-guide-to-ios-multithreading-part-2/>)”, we discussed multithreading with `NSThread`. This approach to multithreading is clearly complex. To simplify development, iOS provides GCD, which has two core concepts:
+
+> Queues: a queue manages tasks submitted by the developer. GCD queues always handle tasks in first-in, first-out order, but tasks take different amounts of time, so the first task handled need not finish first. Queues can be serial or concurrent. A serial queue processes one task at a time and starts the next only after the previous task finishes. A concurrent queue can process multiple tasks simultaneously. An underlying thread pool executes the submitted tasks managed by the queue. A serial queue needs only one thread in its underlying pool; a concurrent queue is the opposite.
+
+> Tasks: a task is a unit of work submitted to a queue. These tasks are passed to the queue's underlying thread pool, so they execute through multithreading.
+
+From this, we can see that using GCD requires only two steps.
+
+1. Create a queue.  
+ 2. Submit tasks to the queue.
+
+Next, let's explore GCD in more detail. 😄
+
+> First, create the queue.
+
+```
+//获取当前执行代码所在的队列（已废弃）
+dispatch_get_current_queue(void);
+
+/*根据制定优先级、额外的旗标来获取系统的全局并发队列，第一个参数指定dispatch queue的优先级，取值可以是DISPATCH_QUEUE_PRIORITY_HIGHT、DISPATCH_QUEUE_PRIORITY_DEFAULT、DISPATCH_QUEUE_PRIORITY_LOW或DISPATCH_QUEUE_PRIORITY_BACKGROUND（iOS 5.0加入的）; 第二个参数，目前只能为0或NULL
+*/
+dispatch_get_global_queue(long identifier, unsigned long flags);
+
+//获取主线程相关联的串行队列
+dispatch_get_main_queue(void)
+
+/*
+    根据指定字符串标签创建队列。第二个参数可控制创建串行队列还是并发队列，如果将第二个参数设置为“DISPATCH_QUEUE_SERIAL”,则为串行
+    设为“DISPATCH_QUEUE_CONCURRENT”为并发队列。在没有启动ARC机制的情况下，通常这种方式创建的队列需要调用dispatch_release()释放引用计数
+*/
+dispatch_queue_create(const char *label, dispatch_queue_attr_t attr);
+
+//获取指定队列的字符串标签，dispatch_queue_t代表一个队列
+dispatch_queue_get_label(dispatch_queue_t queue);
+
+```
+
+The methods above can create the following kinds of queues.
+
+1. Obtain the system's default global concurrent queue
+
+```
+dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+
+```
+
+2. Obtain the serial queue associated with the system's main thread
+
+```
+dispatch_queue_t queue = dispatch_get_main_queue();
+
+```
+
+3. Create a serial queue
+
+```
+dispatch_queue_t queue = dispatch_queue_create("Bison", DISPATCH_QUEUE_SERIAL);
+
+```
+
+4. Create a concurrent queue
+
+```
+dispatch_queue_t queue = dispatch_queue_create("Bison", DISPATCH_QUEUE_CONCURRENT);
+
+```
+
+### Submitting tasks asynchronously
+
+iOS provides the following functions for submitting tasks. Many come in two versions: one accepts a block, while the other accepts a function. The function-taking version generally adds an \_f suffix and an extra parameter for passing an application-defined context to the function.
+
+```
+//将代码块以异步方式提交给指定队列，该队列底层的线程池将负责执行该代码块
+dispatch_async(dispatch_queue_t queue, dispatch_block_t block);
+
+//将函数以异步方式提交给指定队列，该队列底层的线程池将负责执行该函数
+dispatch_async_f(dispatch_queue_t queue,void *context,dispatch_function_t work);
+
+//将代码块以同步方式提交给指定队列，该队列底层的线程池将负责执行该代码块
+dispatch_sync(dispatch_queue_t queue, dispatch_block_t block);
+
+//将函数以同步方式提交给指定队列，该队列底层的线程池将负责执行该函数
+dispatch_sync_f(dispatch_queue_t queue,void *context,dispatch_function_t work);
+
+//将代码块以异步方式提交给指定的队列，该队列底层的线程池将负责在when指定的时间点执行该代码块
+dispatch_after(dispatch_time_t when,dispatch_queue_t queue,dispatch_block_t block);
+
+//将函数以异步方式提交给指定的队列，该队列底层的线程池将负责在when指定的时间点执行该函数
+dispatch_after_f(dispatch_time_t when,dispatch_queue_t queue,void *context,dispatch_function_t work);
+
+//将代码块以异步方式提交给指定的队列，该队列底层的线程池将多次重复执行该代码块
+dispatch_apply(size_t iterations, dispatch_queue_t queue,void (^block)(size_t));
+
+//将函数以异步方式提交给指定的队列，该队列底层的线程池将多次重复执行该函数
+dispatch_apply_f(size_t iterations, dispatch_queue_t queue,void *context,void (*work)(void *, size_t));
+
+
+//将代码块提交给指定队列，该队列底层的线程池控制在应用的某个生命周期内仅执行一次。predicate 是指向dispatch_once_t变量的指针，判断是否已经执行过，runtime中很常用
+dispatch_once(dispatch_once_t *predicate, dispatch_block_t block);
+
+
+```
+
+Here are a few simple examples.
+
+```
+// 定义2个队列
+dispatch_queue_t serialQueue;
+dispatch_queue_t concurrentQueue;
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    // 创建串行队列
+    serialQueue = dispatch_queue_create("fkjava.queue", DISPATCH_QUEUE_SERIAL);
+    // 创建并发队列
+    concurrentQueue = dispatch_queue_create("fkjava.queue"
+    , DISPATCH_QUEUE_CONCURRENT);
+}
+- (IBAction)serial:(id)sender
+{
+    // 依次将2个代码块提交给串行队列
+    // 必须等到第1个代码块完成后，才能执行第2个代码块。
+    dispatch_async(serialQueue, ^(void)
+    {
+        for (int i = 0 ; i < 100; i ++)
+        {
+            NSLog(@"%@===……-……==%d"  , [NSThread currentThread] , i);
+        }
+    });
+    dispatch_async(serialQueue, ^(void)
+    {
+        for (int i = 0 ; i < 100; i ++)
+        {
+            NSLog(@"%@------%d" , [NSThread currentThread] , i);
+        }
+    });
+}
+
+- (IBAction)concurrent:(id)sender
+{
+    // 依次将2个代码块提交给并发队列
+    // 两个代码块可以并发执行
+    dispatch_async(concurrentQueue, ^(void)
+    {
+        for (int i = 0 ; i < 100; i ++)
+        {
+            NSLog(@"%@===……-……==%d"  , [NSThread currentThread] , i);
+        }
+    });
+    dispatch_async(concurrentQueue, ^(void)
+    {
+        for (int i = 0 ; i < 100; i ++)
+        {
+            NSLog(@"%@------%d" , [NSThread currentThread] , i);
+        }
+    });
+
+
+}
+```
+
+Compiling and running shows that the first is a serial queue and the second is a concurrent queue.
+
+Here is a simple example of downloading an image asynchronously.
+
+The code is as follows:
+
+```
+// 将代码块提交给系统的全局并发队列
+dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0),
+^(void){
+    NSString* url = @"http://allluckly.cn/images/blog/applepay/6.png";
+    // 从网络获取数据
+    NSData *data = [[NSData alloc]
+    initWithContentsOfURL:[NSURL URLWithString:url]];
+    // 将网络数据初始化为UIImage对象
+    UIImage *image = [[UIImage alloc]initWithData:data];
+    if(image != nil)
+    {
+        // 将代码块提交给主线程关联的队列，该代码块将会由主线程完成
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.iv.image = image;
+        }); // ①
+    }
+    else
+    {
+        NSLog(@"---下载图片出现错误---");
+    }
+});
+```
+
+Note that the image URL uses http. In xcode7 and later, network settings must be configured in info.plist or the request will fail. The example creates a global concurrent queue whose block downloads the image, then hands work to the main thread after downloading.
+
+### Submitting tasks synchronously
+
+dispatch\_async() submits a block synchronously and does not return until that block finishes. If the program submits two blocks in succession with this function to a concurrent queue, the second task still waits until the first finishes. Here is an example 🌰.
+
+```
+- (IBAction)clicked:(id)sender
+{
+    // 以同步方式先后提交2个代码块
+    dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+    , ^(void){
+        for (int i = 0 ; i < 100; i ++)
+        {
+            NSLog(@"%@=====%d"  , [NSThread currentThread] , i);
+            [NSThread sleepForTimeInterval:0.1];
+        }
+    });
+    // 必须等第一次提交的代码块执行完成后，dispatch_sync()函数才会返回，
+    // 程序才会执行到这里，才能提交第二个代码块。
+    dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+    , ^(void){
+        for (int i = 0 ; i < 100; i ++)
+        {
+            NSLog(@"%@-----%d"  , [NSThread currentThread] , i);
+            [NSThread sleepForTimeInterval:0.1];
+        }
+    });
+}
+```
+
+### Executing a task multiple times
+
+dispatch\_apply() executes a block repeatedly. When it is submitted to a concurrent queue, the system can use multiple threads to execute the same block concurrently. Here is a simple example 🌰.
+
+```
+- (IBAction)clicked:(id)sender
+{
+    // 控制代码块执行5次
+    dispatch_apply(5
+    , dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+    // time形参代表当前正在执行第几次
+    , ^(size_t time)
+    {
+        NSLog(@"===执行【%lu】次===%@" , time, [NSThread currentThread]);
+    });
+}
+```
+
+### Executing a task only once
+
+dispatch\_once() submits a block to a specified queue, whose underlying thread pool ensures that it executes only once during a particular application lifecycle. predicate points to a dispatch\_once\_t variable that determines whether execution has already occurred; it is commonly used in the runtime. The system executes the submitted block directly on the main thread. Here is a simple example 🌰.
+
+```
+- (IBAction)clicked:(id)sender
+{	
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSLog(@"==执行代码块==");
+        // 线程暂停3秒
+        [NSThread sleepForTimeInterval:3];
+    });
+}
+```
+
+That is all for today!  
+ Coming next: Part IV focuses on multithreading with NSOperationQueue!
+
+---
+
+> Original article: [https://allluckly.cn/](<https://allluckly.cn/en/>)
+
+Recommended reading: [Understanding and using Core Data for persistence](<https://allluckly.cn/en/journal/2016-01-10-understanding-and-using-core-data-for-persistence/>)
+
+Copyright © Bison. Please retain a hyperlink to the original article when reproducing it.
+{% endraw %}

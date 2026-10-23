@@ -1,0 +1,72 @@
+---
+layout: post
+published: true
+title: Disabling and dimming third-party sign-in buttons when the app is not installed
+category: Development notes
+date: 2015-05-18 00:00:00 +0800
+technical_translation:
+  topic: tooling-release
+  summary: Uses QQ and WeChat sign-in buttons to show how installation checks can determine whether a button is
+    hidden, disabled or dimmed. It records the interface treatment used when the corresponding third-party app was
+    unavailable.
+  keywords:
+  - third-party sign-in
+  - QQ
+  - WeChat
+  - installation detection
+  - button states
+  provenance: archive
+  credit: The original does not clearly identify an author. Retained as a historical article.
+  version_note: Published in 2015. Its App Review context and third-party SDK calls are retained as historical records.
+  title: Disabling and dimming third-party sign-in buttons when the app is not installed
+  source_sha256: 9224280f29382e70991dd32cdd1ef739c024d2ad5bd4baad1baefc6606bb9004
+description: Uses QQ and WeChat sign-in buttons to show how installation checks can determine whether a button is
+  hidden, disabled or dimmed. It records the interface treatment used when the corresponding third-party app was
+  unavailable.
+lang: en
+source_path: _posts/2015-5-18-第三方登录.md
+source_url: /%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E9%99%86/%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%BD%95
+permalink: /en/journal/2015-05-18-disabling-and-dimming-third-party-sign-in-buttons-when-the-app-is-not-installed/
+translation_method: machine-assisted
+translation_source_sha256: 9224280f29382e70991dd32cdd1ef739c024d2ad5bd4baad1baefc6606bb9004
+excerpt: Uses QQ and WeChat sign-in buttons to show how installation checks can determine whether a button is hidden,
+  disabled or dimmed. It records the interface treatment used when the corresponding third-party app was unavailable.
+translation_date: '2026-10-23T02:34:11+00:00'
+---
+{% raw %}
+<p>Apple recently introduced a review rule against directing users to install third-party software, so third-party login should not prompt users that the app is missing. The best approach is to hide the option or disable it and gray it out. Put the following code in the login view controller's <code class="language-plaintext highlighter-rouge">viewDidLoad</code> method. The commented-out section hides the icons. These examples mainly cover QQ and WeChat.</p>
+<p>// Check whether the app for third-party login is installed; if not, disable its icon and make it gray</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">isHidenThirdBtn</span>
+<span class="p">{</span>
+    <span class="err">BOOL</span> <span class="err">WXinstalled</span> <span class="err">=</span>  <span class="err">[WXApi</span> <span class="err">isWXAppInstalled];</span>
+    <span class="err">BOOL</span> <span class="err">QQinstalled</span> <span class="err">=</span> <span class="err">[TencentOAuth</span>  <span class="err">iphoneQQInstalled];</span>
+    <span class="err">//</span>  <span class="err">[WeiboSDK</span> <span class="err">isWeiboAppInstalled]</span>
+
+    <span class="err">if</span> <span class="err">(!WXinstalled</span> <span class="err">&amp;&amp;</span> <span class="err">!QQinstalled)</span> <span class="err">{</span>
+        <span class="err">//</span>        <span class="err">self.WeiBoBtn.center</span> <span class="err">=</span> <span class="err">self.WeiXinBtn.center;</span>
+        <span class="err">//</span>        <span class="err">self.WeiBoLa.center</span> <span class="err">=</span> <span class="err">self.WeiXinLa.center;</span>
+
+        <span class="err">self.WeiXinBtn.enabled</span> <span class="err">=</span> <span class="err">NO;</span>
+        <span class="err">//</span>        <span class="err">self.WeiXinLa.hidden</span> <span class="err">=</span> <span class="err">YES;</span>
+        <span class="err">self.QQBtn.enabled</span> <span class="err">=</span> <span class="err">NO;</span>
+        <span class="err">//</span>        <span class="err">self.QQLa.hidden</span> <span class="err">=</span> <span class="err">YES;</span>
+    <span class="p">}</span>
+
+    <span class="nt">if</span> <span class="o">(!</span><span class="nt">WXinstalled</span> <span class="o">&amp;&amp;</span> <span class="nt">QQinstalled</span><span class="o">)</span> <span class="p">{</span>
+        <span class="err">//</span>        <span class="err">self.WeiXinBtn.hidden</span> <span class="err">=</span> <span class="err">YES;</span>
+        <span class="err">self.WeiXinBtn.enabled</span> <span class="err">=</span> <span class="err">NO;</span>
+        <span class="err">//</span>        <span class="err">self.WeiXinLa.hidden</span> <span class="err">=</span> <span class="err">YES;</span>
+    <span class="p">}</span>
+
+
+    <span class="nt">if</span> <span class="o">(</span><span class="nt">WXinstalled</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nt">QQinstalled</span><span class="o">)</span> <span class="p">{</span>
+        <span class="err">//</span>        <span class="err">self.WeiXinBtn.center</span> <span class="err">=</span> <span class="err">self.QQBtn.center;</span>
+        <span class="err">//</span>        <span class="err">self.WeiXinLa.center</span> <span class="err">=</span> <span class="err">self.QQLa.center;</span>
+        <span class="err">self.QQBtn.enabled</span> <span class="err">=</span> <span class="err">NO;</span>
+        <span class="err">//</span>        <span class="err">self.QQLa.hidden</span> <span class="err">=</span> <span class="err">YES;</span>
+    <span class="p">}</span>
+
+<span class="err">}</span></code></pre></figure>
+<p><br/></p>
+
+{% endraw %}

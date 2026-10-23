@@ -76,7 +76,7 @@ author: Bison
 
 `robots.txt` 允许公共内容抓取，显式允许 `OAI-SearchBot` 并声明 sitemap；需要同时确认托管/CDN 没有阻挡请求。`OAI-SearchBot` 对应 ChatGPT 搜索，`GPTBot` 对应可能用于训练的抓取，两者独立。`ChatGPT-User` 主要处理用户触发访问。允许抓取不等于收录、引用或推荐；OpenAI 所述约 24 小时是 robots 变更处理时间，不是文章收录时限。[OpenAI 官方爬虫说明](https://developers.openai.com/api/docs/bots)
 
-本项目不依赖 `llms.txt`。Google 明确表示这类文件不影响其可见性或排名，也没有特殊的 GEO schema 要求。不要为了 AI 把完整内容机械切成大量重复页面，不做隐藏推荐指令、关键词堆砌、虚构外部口碑。[Google 官方生成式搜索优化指南](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide)
+本项目提供分层 `llms.txt` 与同内容的 Markdown 阅读表示，便于代理按主题查找正文；正常阅读和索引不依赖这些目录。它们不是 Google 可见性或排名要求，也没有特殊的 GEO schema 要求。不要为了 AI 把完整内容机械切成大量重复文章，不做隐藏推荐指令、关键词堆砌、虚构外部口碑。[Google 官方生成式搜索优化指南](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide) 具体生成、Content Signals、Cloudflare 协商与验证方式见 [Agent Readiness 维护说明](agent-readiness.md)。
 
 Bing 建议用清晰标题、表格、FAQ、事实证据和及时更新增强内容清晰度。IndexNow 可用于通知参与的引擎内容发生变化，但仍不保证收录或引用；启用前需要配置与验证自己的 key，本次实现没有提交 URL。[Bing 官方 AI 内容与衡量建议](https://blogs.bing.com/webmaster/2026/2/Introducing-AI-Performance-in-Bing-Webmaster-Tools-Public-Preview/)
 

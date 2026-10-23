@@ -1,0 +1,293 @@
+---
+layout: post
+title: 'iOS refactoring notes: Extract Method'
+description: Applies the Extract Method technique from Refactoring to split long stretches of code into functions
+  organised by intent. Parameters, local variables and return values are handled step by step, with examples showing
+  how to reduce repetition and improve readability.
+category: Development notes
+imagefeature: null
+date: 2016-03-01 00:00:00 +0800
+technical_translation:
+  topic: swift-runtime
+  summary: Applies the Extract Method technique from Refactoring to split long stretches of code into functions
+    organised by intent. Parameters, local variables and return values are handled step by step, with examples showing
+    how to reduce repetition and improve readability.
+  keywords:
+  - refactoring
+  - Extract Method
+  - function extraction
+  - local variables
+  - code organisation
+  provenance: contribution
+  author_name: SindriLin
+  source_url: http://www.jianshu.com/p/f8c363dded91
+  credit: Originally credited to SindriLin; edited and archived by Bison.
+  title: 'iOS refactoring notes: Extract Method'
+  source_sha256: ffced684f68dffd7517d423dd9250bf17ffa88bf0fab3bf193dba6f8e8c7ca43
+lang: en
+source_path: _posts/2016-03-01-tuogao26.md
+source_url: /%E6%8A%95%E7%A8%BF/tuogao26
+permalink: /en/journal/2016-03-01-ios-refactoring-notes-extract-method/
+translation_method: machine-assisted
+translation_source_sha256: ffced684f68dffd7517d423dd9250bf17ffa88bf0fab3bf193dba6f8e8c7ca43
+excerpt: Applies the Extract Method technique from Refactoring to split long stretches of code into functions organised
+  by intent. Parameters, local variables and return values are handled step by step, with examples showing how to
+  reduce repetition and improve readability.
+translation_date: '2026-10-23T02:34:13+00:00'
+---
+{% raw %}
+<p>Editor: <a href="/en/">Bison</a><br/>
+Contributor: <a href="http://www.jianshu.com/p/f8c363dded91">SindriLin</a><br/></p>
+<h3 id="前言">Introduction<br/></h3>
+<p>These are essentially my reading notes. Recently I have been reading <a href="http://baike.baidu.com/link?url=kUPRU72mr6gghQt-wVEdPYB2ySblcwg_QS0Et4BUVQo64ZE2fLnMfR--c1uRBhoLywABBDLv4480RJ69WkyNQq">Martin Fowler </a>Refactoring: Improving the Design of Existing Code, and decided to replace the book’s examples with familiar code. For the definition of refactoring, I quote the book directly:<br/></p>
+<blockquote>
+<p>Refactoring changes code to improve internal structure without changing externally observable behaviour. It is a disciplined, proven approach to restructuring that minimises the chance of introducing errors. Essentially, it improves the design of code after it has been written.<br/></p>
+</blockquote>
+<p><br/>
+Why learn refactoring? Primarily to deepen our understanding of software engineering and improve our skills.<br/></p>
+<h3 id="提炼函数">Extract Method<br/></h3>
+<p>Extract Method is a common refactoring technique. If code needs a comment explaining its purpose, extract it into an independent function. The steps are:<br/></p>
+<p>Create a new function and name it for its intent—what it does, rather than how. For example, for safe array access without an out-of-bounds index, I would choose func safeObjectAtIndex(index: Int), not func MakeIndexLessThanCountToGetObject(index: Int). It is a slightly silly example.<br/></p>
+<ul>
+<li>
+<p>Copy the extracted code from the original function into the new target function.<br/></p>
+</li>
+<li>
+<p>Inspect the extracted code for local variables or parameters from the original function.<br/></p>
+</li>
+<li>
+<p>Check whether the new function changes any local variable. If so, see whether the extracted code can become a query returning the changed value. If that is difficult, use a different refactoring approach.<br/></p>
+</li>
+<li>
+<p>Pass the original local variables or parameters needed by the extracted code into the new function.<br/></p>
+</li>
+<li>
+<p>After handling all local variables, compile and test.<br/></p>
+</li>
+</ul>
+<p>1. Initial code<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func printOwing() {
+    var outstanding: CGFloat = 0.0
+
+    // print banner
+    print("********************************")
+    print("******* Customer Owes ********")
+    print("********************************")
+
+    // calculate outstanding
+    for order in _orders {
+        outstanding += order.amount
+    }
+
+    // print details
+    print("name: \(name)")
+    print("amount: \(outstanding)")
+}
+</code></pre></div></div>
+<p><br/>
+2. Extract single-purpose blocks<br/></p>
+<p>This includes extracting single-purpose code, such as logging, and simple functions accepting original local variables as arguments. Rename those arguments inside the extracted functions where useful.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func printOwing() {
+    var outstanding: CGFloat = 0.0
+
+    printBanner()
+    // calculate outstanding
+    for order in _orders {
+        outstanding += order.amount
+    }
+    printDetails(outstanding)
+}
+
+func printBanner() {
+    print("********************************")
+    print("******* Customer Owes ********")
+    print("********************************")
+}
+
+func printDetails(amount: CGFloat) {
+    print("name: \(name)")
+    print("amount: \(amount)")
+}
+</code></pre></div></div>
+<p><br/>
+3. Reassign local variables<br/>
+For local variables involved in calculations, first check whether they change in both the original function and extracted code. If not, return the local value from the extracted function.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func printOwing() {
+    printBanner()
+    var outstanding: CGFloat = getOutstanding()
+    printDetails(outstanding)
+}
+
+func printBanner() {
+    print("********************************")
+    print("******* Customer Owes ********")
+    print("********************************")
+}
+
+func printDetails(amount: CGFloat) {
+    print("name: \(name)")
+    print("amount: \(amount)")
+}
+
+func getOutstanding() -&gt; CGFloat {
+    var result: CGFloat = 0.0
+    for order in _orders {
+        result+= order.amount
+    }
+    return result
+}
+</code></pre></div></div>
+<p><br/></p>
+<p>P.S. Swift has tuples, but avoid making a function return a tuple of many different values, since that reduces reusability.<br/></p>
+<h3 id="实战例子">A practical example<br/></h3>
+<p>Today, a custom tableView footer needed to resize when its data source changed, with a minimum height. It has a weak reference to tableView named belongView. Screen height is kScreenHeigth and total navigation-bar height is kNavigationBarHeight, which changes when Personal Hotspot is active. The minimum height depends on the bottom addButton position. Here are my refactoring steps:<br/></p>
+<p>1. Initial code<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func updateViewHeight() {
+    let tableView: UITableView! = belongView!
+    var headerHeight = tableView.tableViewHeaderView?.frame.height
+    headerHeight = (headerHeight == nil ? 0 : headerHeight)
+    let cellCount = tableView.dataSource.numberOfRowsInSection(tableView: tableView, section: 0)
+    var viewHeight: CGFloat = kScreenHeight - kNavigationBarHeight - CGFloat(cellCount) * tableView.rowHeight - headerHeight
+    let buttonBottomDistance: CGFloat = 15.0
+    let minHeight: CGFloat = CGRectGetMaxY(addButton) + buttonBottomDistance
+    self.frame.height = max(minHeight, viewHeight)
+}
+</code></pre></div></div>
+<p><br/>
+2. Extract functions to obtain local values<br/>
+First extract the cell count, header height and minimum height.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func updateViewHeight() {
+    let headerHeight: CGFloat = getTableViewHeaderViewHeight()
+    let cellCount: Int= getTableViewCellsCount()
+    var viewHeight: CGFloat = kScreenHeight - kNavigationBarHeight - CGFloat(cellCount) * belongView!.rowHeight - headerHeight
+    let minHeight: CGFloat = getViewMinHeight()
+    self.frame.height = max(minHeight, viewHeight)
+}
+
+func getTableViewHeaderViewHeight() -&gt; CGFloat {
+    var headerHeight = 0.0
+    if belongView!.tableViewHeaderView {
+        headerHeight = (belongView!.tableViewHeaderView?.height)!
+    }
+    return headerHeight
+}
+
+func getTableViewCellsCount() -&gt; Int {
+    return (belongView!.dataSource.tableView(tableView: belongView!, numberOfRowsInSection: 0))!
+}
+
+func getViewMinHeight() -&gt; CGFloat {
+    let buttonBottomDistance: CGFloat = 15.0
+    return CGRectGetMaxY(addButton) + buttonBottomDistance
+}
+</code></pre></div></div>
+<p><br/>
+3. Extract repeated functionality again<br/>
+The cell count is only needed to calculate the height of all cells, so extract getCellsTotalHeight to obtain that total.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func updateViewHeight() {
+    let headerHeight: CGFloat = getTableViewHeaderViewHeight()
+    var viewHeight: CGFloat = kScreenHeight - kNavigationBarHeight - getCellsTotalHeight() - headerHeight
+    let minHeight: CGFloat = getViewMinHeight()
+    self.frame.height = max(minHeight, viewHeight)
+}
+
+func getTableViewHeaderViewHeight() -&gt; CGFloat {
+    var headerHeight = 0.0
+    if belongView!.tableViewHeaderView {
+        headerHeight = (belongView!.tableViewHeaderView?.height)!
+    }
+    return headerHeight
+}
+
+func getCellsTotalHeight() -&gt; CGFloat {
+    let cellCount: Int= getTableViewCellsCount()
+    return CGFloat(cellCount) * belongView!.rowHeight
+}
+
+func getTableViewCellsCount() -&gt; Int {
+    return (belongView!.dataSource.tableView(tableView: belongView!, numberOfRowsInSection: 0))!
+}
+
+func getViewMinHeight() -&gt; CGFloat {
+    let buttonBottomDistance: CGFloat = 15.0
+    return CGRectGetMaxY(addButton) + buttonBottomDistance
+}
+</code></pre></div></div>
+<p><br/></p>
+<p>4. Extract related functionality into functions<br/>
+updateViewHeight updates the footer’s height, but still contains height calculations. Extract those final calculations into getAdjustHeight.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func updateViewHeight() {
+    self.frame.height = getAdjustHeight()
+}
+
+func getAdjustHeight() -&gt; CGFloat {
+    let headerHeight: CGFloat = getTableViewHeaderViewHeight()
+    var viewHeight: CGFloat = kScreenHeight - kNavigationBarHeight - getCellsTotalHeight() - headerHeight
+    let minHeight: CGFloat = getViewMinHeight()
+    return max(viewHeight, minHeight)
+}
+
+func getTableViewHeaderViewHeight() -&gt; CGFloat {
+    var headerHeight = 0.0
+    if belongView!.tableViewHeaderView {
+        headerHeight = (belongView!.tableViewHeaderView?.height)!
+    }
+    return headerHeight
+}
+
+func getCellsTotalHeight() -&gt; CGFloat {
+    let cellCount: Int= getTableViewCellsCount()
+    return CGFloat(cellCount) * belongView!.rowHeight
+}
+
+func getTableViewCellsCount() -&gt; Int {
+    return (belongView!.dataSource.tableView(tableView: belongView!, numberOfRowsInSection: 0))!
+}
+
+func getViewMinHeight() -&gt; CGFloat {
+    let buttonBottomDistance: CGFloat = 15.0
+    return CGRectGetMaxY(addButton) + buttonBottomDistance
+}
+</code></pre></div></div>
+<p><br/>
+5. Replace temporary variables with extracted functions<br/>
+Finally, turn the necessary local variables into functions and replace the temporary height-calculation variables with function calls. updateViewHeight still contains calculations beyond its purpose of updating the footer height; extract these into getAdjustHeight.<br/></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func updateViewHeight() {
+    self.frame.height = getAdjustHeight()
+}
+
+func getAdjustHeight() -&gt; CGFloat {
+    var viewHeight: CGFloat = kScreenHeight - kNavigationBarHeight - getCellsTotalHeight() - getTableViewHeaderViewHeight()
+    return max(viewHeight, getViewMinHeight())
+}
+
+func getTableViewHeaderViewHeight() -&gt; CGFloat {
+    var headerHeight = 0.0
+    if belongView!.tableViewHeaderView {
+        headerHeight = (belongView!.tableViewHeaderView?.height)!
+    }
+    return headerHeight
+}
+
+func getCellsTotalHeight() -&gt; CGFloat {
+    return CGFloat(getTableViewCellsCount()) * belongView!.rowHeight
+}
+
+func getTableViewCellsCount() -&gt; Int {
+    return (belongView!.dataSource.tableView(tableView: belongView!, numberOfRowsInSection: 0))!
+}
+
+func getViewMinHeight() -&gt; CGFloat {
+    return CGRectGetMaxY(addButton) + getButtonBottomDistance()
+}
+
+func getButtonBottomDistance() -&gt; CGFloat {
+    return 15.0
+}
+</code></pre></div></div>
+<p><br/></p>
+<p>Done!<br/></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-02-29-bison-s-guide-to-ios-multithreading-part-3/">Bison's guide to iOS multithreading, part 3</a><br/></p>
+
+{% endraw %}

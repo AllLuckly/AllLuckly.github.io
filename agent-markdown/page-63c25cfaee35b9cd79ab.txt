@@ -1,0 +1,183 @@
+---
+layout: null
+permalink: /en/journal/2016-01-29-building-a-wechat-style-ios-app-part-1/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Building a WeChat-style iOS app, part 1
+agent_source_url: https://allluckly.cn/en/journal/2016-01-29-building-a-wechat-style-ios-app-part-1/
+agent_source_sha256: fd65b00a0bc6d782074265960df9fa56bf855268c83067a52c97a824bb1c9205
+agent_generator_version: 1
+---
+{% raw %}# Building a WeChat-style iOS app, part 1
+
+Language: en
+Canonical: [Building a WeChat-style iOS app, part 1](<https://allluckly.cn/en/journal/2016-01-29-building-a-wechat-style-ios-app-part-1/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao12>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-01-29-building-a-wechat-style-ios-app-part-1/>)
+Published: 2016-01-29T00:00:00+08:00
+Modified: 2026-10-23T10:34:12+08:00
+Author: [WzxJiang](<http://www.jianshu.com/users/389c20d5a244/latest_articles>)
+
+The opening instalment organises the project and its MVC folders, introduces shared view controllers, and creates the feature pages and UITabBarController. It establishes the common navigation structure that later screens will use.
+
+Originally credited to WzxJiang; edited and archived by Bison.
+
+[Source listed in the original](<http://www.jianshu.com/users/389c20d5a244/latest_articles>)
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao12>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Read API, dependency and tool details in the context of the original publication date.
+
+Editor: [Bison](<https://allluckly.cn/en/>)  
+ Contributor: [WzxJiang](<http://www.jianshu.com/users/389c20d5a244/latest_articles>)
+
+> "Starting today (2016.1.28), I will build a WeChat-style app. I can only work on personal projects in the evenings, so progress may be slow. Thank you for understanding!:"
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao12/1.png>)
+
+Today's tasks:
+
+- Create the project.
+- Set up the structure.
+
+1. Create the project
+
+I will skip the basic creation steps and discuss only what to do after creating a project.
+
+- First, drag the things you do not need into Supporting Files.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao12/2.png>)/
+
+- Next, create folders through `Show In Finder`. Make one project folder for each feature, then create `Model`, `View``、ViewController` folders inside each.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao12/3.png>)
+
+- Add the folders to the project.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao12/4.png>)
+
+Drag the images into `Assets.xcassets`. I took these screenshots myself... If anyone has the originals and can send them to me, I would be very grateful!
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao12/5.png>)
+
+That completes project creation for now. Suggestions are welcome in the comments!
+
+2. Set up the structure
+
+Create a BaseViewController superclass to make changes across all VCs easier.  
+ For today, this superclass only needs to change the status-bar text color.
+
+```css
+/**
+*  修改状态栏字体颜色成白色
+*/
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+    return UIStatusBarStyleLightContent;
+}
+```
+
+- In each feature's ViewController folder, create a VC that inherits from BaseViewController.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao12/6.png>)
+
+- Create a UITabBarController.
+
+```css
+//导入VC头文件
+#import "AddressBookViewController.h"
+#import "FoundViewController.h"
+#import "ChatViewController.h"
+#import "MeViewController.h"
+```
+
+```css
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    ChatViewController * chatVC = [[ChatViewController alloc]init];
+    chatVC.title = @"微信";
+
+    AddressBookViewController * addbkVC = [[AddressBookViewController alloc]init];
+    addbkVC.title = @"通讯录";
+
+    FoundViewController * foundVC = [[FoundViewController alloc]init];
+    foundVC.title = @"发现";
+
+    MeViewController * meVC = [[MeViewController alloc]init];
+    meVC.title = @"我";
+
+    self.viewControllers = @[[self giveMeNavWithVC:chatVC andImgName:@"tabbar_chat_no" andSelectImgName:@"tabbar_chat_yes"],[self giveMeNavWithVC:addbkVC andImgName:@"tabbar_book_no" andSelectImgName:@"tabbar_book_yes"],[self giveMeNavWithVC:foundVC andImgName:@"tabbar_found_no"andSelectImgName:@"tabbar_found_yes"],[self giveMeNavWithVC:meVC andImgName:@"tabbar_me_no"andSelectImgName:@"tabbar_me_yes"]];
+
+    self.tabBar.tintColor = [UIColor colorWithRed:9/255.0 green:187/255.0 blue:7/255.0 alpha:1];
+}
+
+/**
+*  返回取消渲染的image
+*/
+- (UIImage *)removeRendering:(NSString *)imageName
+{
+    UIImage * image = [UIImage imageNamed:imageName];
+    return [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+}
+
+/**
+*  快速创建Nav
+*/
+- (UINavigationController *)giveMeNavWithVC:(UIViewController *)VC andImgName:(NSString *)imgName andSelectImgName:(NSString *)selectImgName
+{
+    UINavigationController * nav = [[UINavigationController alloc]initWithRootViewController:VC];
+    nav.tabBarItem = [[UITabBarItem alloc]initWithTitle:VC.title image:[self removeRendering:imgName] selectedImage:[self removeRendering:selectImgName]];
+    return nav;
+}
+```
+
+Creating suitable helper methods can save a lot of code.
+
+Add some code to AppDelegate.m.
+
+```css
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+
+    self.window.bounds = [UIScreen mainScreen].bounds;
+
+    self.window.backgroundColor = [UIColor whiteColor];
+
+    [self.window makeKeyAndVisible];
+
+    self.window.rootViewController = [[TabBarViewController alloc]init];
+
+    [self changeNav];
+
+    return YES;
+}
+
+/**
+*  全局改变Nav
+*/
+- (void)changeNav
+{
+    //设置NavigationBar背景颜色
+    [[UINavigationBar appearance] setBarTintColor:[UIColor colorWithRed:54/255.0 green:53/255.0 blue:58/255.0 alpha:1]];
+    //@{}代表Dictionary
+    [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
+    //不设置这个无法修改状态栏字体颜色
+    [[UINavigationBar appearance] setBarStyle:UIBarStyleBlack];
+}
+```
+
+Run it now.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao12/1.gif>)
+
+That is all for today! Tomorrow, I will create the basic UI.  
+ Current code, to be updated until the project is complete  
+ [GitHub:WzxJiang](<https://github.com/Wzxhaha/WWeChat>)
+
+If you have suggestions or questions, please leave a comment!
+
+---
+
+Recommended reading: [Integrating LianLian Pay into an iOS app](<https://allluckly.cn/en/journal/2016-01-20-integrating-lianlian-pay-into-an-ios-app/>)
+{% endraw %}

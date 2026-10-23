@@ -1,0 +1,317 @@
+---
+layout: post
+title: Detecting iOS Main-Thread Stalls
+description: Detects stalls by monitoring the main thread's RunLoop state and wait timeouts. It then introduces
+  retrieving thread stack frames, walking call stacks, and symbolication to capture useful diagnostic context while
+  an app is running.
+category: Development notes
+imagefeature: null
+date: 2017-03-27 00:00:00 +0800
+technical_translation:
+  topic: concurrency-performance
+  summary: Detects stalls by monitoring the main thread's RunLoop state and wait timeouts. It then introduces retrieving
+    thread stack frames, walking call stacks, and symbolication to capture useful diagnostic context while an app
+    is running.
+  keywords:
+  - RunLoop
+  - stall detection
+  - call stacks
+  - symbolication
+  - main thread
+  provenance: contribution
+  author_name: SindriLin
+  source_url: http://sindrilin.com/monitor/2017/03/24/卡顿检测#more
+  credit: Originally credited to SindriLin; edited and archived by Bison.
+  version_note: Published in 2017, the stack-reading and symbolication code reflects the operating systems and processor
+    architectures of that period.
+  title: Detecting iOS Main-Thread Stalls
+  source_sha256: c728d5ff7043bae8eebc74d13ecb2e5718d7e4817ddd0cc632b7491b79322adb
+lang: en
+source_path: _posts/2017-03-27-tougao73.md
+source_url: /%E6%8A%95%E7%A8%BF/tougao73
+permalink: /en/journal/2017-03-27-detecting-ios-main-thread-stalls/
+translation_method: machine-assisted
+translation_source_sha256: c728d5ff7043bae8eebc74d13ecb2e5718d7e4817ddd0cc632b7491b79322adb
+excerpt: Detects stalls by monitoring the main thread's RunLoop state and wait timeouts. It then introduces retrieving
+  thread stack frames, walking call stacks, and symbolication to capture useful diagnostic context while an app
+  is running.
+translation_date: '2026-10-23T02:52:09+00:00'
+---
+{% raw %}
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao73/1.png"/><br/></p>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Source: <a href="http://sindrilin.com/monitor/2017/03/24/卡顿检测#more">SindriLin's Nest</a><br/></p>
+<h2 id="前言">Introduction:</h2>
+<p>I had long considered building my own iOS monitoring system. First, however, <code class="language-plaintext highlighter-rouge">instrument</code> was excellent and supplied tools for nearly every monitoring task. Second, I lacked time—or was too lazy—and most projects already included third-party analytics SDKs, so I kept postponing it. Recently, design flaws in the code caused noticeable stuttering on devices older than iphone5s. Although <code class="language-plaintext highlighter-rouge">instrument</code> is excellent, I wanted immediate stall information while the program ran, so I began implementing my own detector.</p>
+<h2 id="获取栈上下文">Obtaining stack context</h2>
+<p>Any monitoring system needs the thread's call-stack context when the target event occurs. The challenge is suspending the thread and obtaining its information. Fortunately, other developers have shared enough material for me to build this part on their work.</p>
+<p>The demo's stack-capture code is adapted from <a href="https://github.com/bestswifter/BSBacktraceLogger">BSBacktraceLogger</a></p>
+<p>. Before using it, read the references below alongside the source so you understand both the behavior and its reasons. A stack is a last-in, first-out (LIFO) structure. A thread's call stack looks like this:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao73/2.png"/><br/></p>
+<p>Each unit of a call stack is a stack frame. A frame consists of <strong>Function arguments</strong>, <strong>Return address</strong> and <strong>Variables in a stack frame </strong>components, where <code class="language-plaintext highlighter-rouge">Frame Pointer</code> points to memory containing the previous frame's address. In other words, obtaining the top frame's <code class="language-plaintext highlighter-rouge">Frame Pointer</code> allows recursive traversal of every frame in the stack. The core traversal code is:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#define MAX_FRAME_NUMBER 30
+#define FAILED_UINT_PTR_ADDRESS 0
+
+NSString * _lxd_backtraceOfThread(thread_t thread) {
+    uintptr_t backtraceBuffer[MAX_FRAME_NUMBER];
+    int idx = 0;
+  
+    ......
+
+    LXDStackFrameEntry frame = { 0 };
+    const uintptr_t framePtr = lxd_mach_framePointer(&amp;machineContext);
+    if (framePtr == FAILED_UINT_PTR_ADDRESS ||
+        lxd_mach_copyMem((void *)framePtr, &amp;frame, sizeof(frame)) != KERN_SUCCESS) {
+        return @"failed to get frame pointer";
+    }
+    for (; idx &lt; MAX_FRAME_NUMBER; idx++) {
+        backtraceBuffer[idx] = frame.return_address;
+        if (backtraceBuffer[idx] == FAILED_UINT_PTR_ADDRESS ||
+            frame.previous == NULL ||
+            lxd_mach_copyMem(frame.previous, &amp;frame, sizeof(frame)) != KERN_SUCCESS) {
+            break;
+        }
+    }
+}
+</code></pre></div></div>
+<p>Stack frames give us only function addresses. To produce useful context, we must symbolize them: locate the memory image containing an address, find its symbol table, then match that address to its symbol for output.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao73/3.png"/><br/></p>
+<p>Symbolication involves data structures including, but not limited to, the following:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef struct dl_info {
+    const char   *dli_fname;
+    void         *dli_fbase;
+    const char   *dli_sname;
+    void         *dli_saddr;
+} Dl_info;
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">Dl_info</code> stores information including the pathname, image base address, symbol address, and symbol name.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct symtab_command {
+    uint32_t    cmd;
+    uint32_t    cmdsize;
+    uint32_t    symoff;
+    uint32_t    nsyms;
+    uint32_t    stroff;
+    uint32_t    strsize;
+};
+</code></pre></div></div>
+<p>It supplies the symbol-table offset and entry count, plus the string-table offset and length. The final three links at the end offer more stack information. The core symbolication function, <code class="language-plaintext highlighter-rouge">lxd_dladdr</code>, follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bool lxd_dladdr(const uintptr_t address, Dl_info * const info) {
+    info-&gt;dli_fname = NULL;
+    info-&gt;dli_fbase = NULL;
+    info-&gt;dli_sname = NULL;
+    info-&gt;dli_saddr = NULL;
+
+    const uint32_t idx = lxd_imageIndexContainingAddress(address);
+    if (idx == UINT_MAX) { return false; }
+
+    const struct mach_header * header = _dyld_get_image_header(idx);
+    const uintptr_t imageVMAddressSlide = (uintptr_t)_dyld_get_image_vmaddr_slide(idx);
+    const uintptr_t addressWithSlide = address - imageVMAddressSlide;
+    const uintptr_t segmentBase = lxd_segmentBaseOfImageIndex(idx) + imageVMAddressSlide;
+    if (segmentBase == FAILED_UINT_PTR_ADDRESS) { return false; }
+
+    info-&gt;dli_fbase = (void *)header;
+    info-&gt;dli_fname = _dyld_get_image_name(idx);
+
+    const LXD_NLIST * bestMatch = NULL;
+    uintptr_t bestDistance = ULONG_MAX;
+    uintptr_t cmdPtr = lxd_firstCmdAfterHeader(header);
+    if (cmdPtr == FAILED_UINT_PTR_ADDRESS) { return false; }
+
+    for (uint32_t iCmd = 0; iCmd &lt; header-&gt;ncmds; iCmd++) {
+        const struct load_command * loadCmd = (struct load_command *)cmdPtr;
+        if (loadCmd-&gt;cmd == LC_SYMTAB) {
+            const struct symtab_command * symtabCmd = (struct symtab_command *)cmdPtr;
+            const LXD_NLIST * symbolTable = (LXD_NLIST *)(segmentBase + symtabCmd-&gt;symoff);
+            const uintptr_t stringTable = segmentBase + symtabCmd-&gt;stroff;
+        
+            for (uint32_t iSym = 0; iSym &lt; symtabCmd-&gt;nsyms; iSym++) {
+                if (symbolTable[iSym].n_value == FAILED_UINT_PTR_ADDRESS) { continue; }
+                uintptr_t symbolBase = symbolTable[iSym].n_value;
+                uintptr_t currentDistance = addressWithSlide - symbolBase;
+                if ( (addressWithSlide &gt;= symbolBase &amp;&amp; currentDistance &lt;= bestDistance) ) {
+                    bestMatch = symbolTable + iSym;
+                    bestDistance = currentDistance;
+                }
+            }
+            if (bestMatch != NULL) {
+                info-&gt;dli_saddr = (void *)(bestMatch-&gt;n_value + imageVMAddressSlide);
+                info-&gt;dli_sname = (char *)((intptr_t)stringTable + (intptr_t)bestMatch-&gt;n_un.n_strx);
+                if (*info-&gt;dli_sname == '_') {
+                    info-&gt;dli_sname++;
+                }
+                if (info-&gt;dli_saddr == info-&gt;dli_fbase &amp;&amp; bestMatch-&gt;n_type == 3) {
+                    info-&gt;dli_sname = NULL;
+                }
+                break;
+            }
+        }
+        cmdPtr += loadCmd-&gt;cmdsize;
+    }
+    return true;
+}
+</code></pre></div></div>
+<p><del>The entire symbolication process can be illustrated as follows.</del>(*P.S. After <a href="http://www.jianshu.com/u/9c51a213b02e">joy__</a></p>
+<p>pointed out that the earlier diagram depicted fishhook. Although the operations are similar, it was not the right diagram, so I removed it.*)</p>
+<h2 id="关于runloop">About RunLoop</h2>
+<p>A <code class="language-plaintext highlighter-rouge">RunLoop</code> is an endless loop repeatedly receiving port signals and event sources, waking and sleeping. The main thread's <code class="language-plaintext highlighter-rouge">RunLoop</code> starts automatically when the app runs. The execution flow of <code class="language-plaintext highlighter-rouge">RunLoop</code> is illustrated below:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao73/4.png"/><br/></p>
+<p>in <a href="https://opensource.apple.com/source/CF/CF-1151.16/CFRunLoop.c">CFRunLoop.c</a>, we can see that <code class="language-plaintext highlighter-rouge">RunLoop</code> the implementation is approximately:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+    /// 1. 通知Observers，即将进入RunLoop
+    /// 此处有Observer会创建AutoreleasePool: _objc_autoreleasePoolPush();
+    __CFRUNLOOP_IS_CALLING_OUT_TO_AN_OBSERVER_CALLBACK_FUNCTION__(kCFRunLoopEntry);
+    do {
+ 
+        /// 2. 通知 Observers: 即将触发 Timer 回调。
+        __CFRUNLOOP_IS_CALLING_OUT_TO_AN_OBSERVER_CALLBACK_FUNCTION__(kCFRunLoopBeforeTimers);
+        /// 3. 通知 Observers: 即将触发 Source (非基于port的,Source0) 回调。
+        __CFRUNLOOP_IS_CALLING_OUT_TO_AN_OBSERVER_CALLBACK_FUNCTION__(kCFRunLoopBeforeSources);
+        __CFRUNLOOP_IS_CALLING_OUT_TO_A_BLOCK__(block);
+ 
+        /// 4. 触发 Source0 (非基于port的) 回调。
+        __CFRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE0_PERFORM_FUNCTION__(source0);
+        __CFRUNLOOP_IS_CALLING_OUT_TO_A_BLOCK__(block);
+ 
+        /// 6. 通知Observers，即将进入休眠
+        /// 此处有Observer释放并新建AutoreleasePool: _objc_autoreleasePoolPop(); _objc_autoreleasePoolPush();
+        __CFRUNLOOP_IS_CALLING_OUT_TO_AN_OBSERVER_CALLBACK_FUNCTION__(kCFRunLoopBeforeWaiting);
+ 
+        /// 7. sleep to wait msg.
+        mach_msg() -&gt; mach_msg_trap();
+    
+ 
+        /// 8. 通知Observers，线程被唤醒
+        __CFRUNLOOP_IS_CALLING_OUT_TO_AN_OBSERVER_CALLBACK_FUNCTION__(kCFRunLoopAfterWaiting);
+ 
+        /// 9. 如果是被Timer唤醒的，回调Timer
+        __CFRUNLOOP_IS_CALLING_OUT_TO_A_TIMER_CALLBACK_FUNCTION__(timer);
+ 
+        /// 9. 如果是被dispatch唤醒的，执行所有调用 dispatch_async 等方法放入main queue 的 block
+        __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__(dispatched_block);
+ 
+        /// 9. 如果如果Runloop是被 Source1 (基于port的) 的事件唤醒了，处理这个事件
+        __CFRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE1_PERFORM_FUNCTION__(source1);
+ 
+ 
+    } while (...);
+ 
+    /// 10. 通知Observers，即将退出RunLoop
+    /// 此处有Observer释放AutoreleasePool: _objc_autoreleasePoolPop();
+    __CFRUNLOOP_IS_CALLING_OUT_TO_AN_OBSERVER_CALLBACK_FUNCTION__(kCFRunLoopExit);
+}
+</code></pre></div></div>
+<p>The source shows that <code class="language-plaintext highlighter-rouge">RunLoop</code> mainly processes events during two stages:</p>
+<ul>
+<li>
+<p>Between <code class="language-plaintext highlighter-rouge">kCFRunLoopBeforeSources</code> and <code class="language-plaintext highlighter-rouge">kCFRunLoopBeforeWaiting</code></p>
+</li>
+<li>
+<p>After <code class="language-plaintext highlighter-rouge">kCFRunLoopAfterWaiting</code></p>
+</li>
+</ul>
+<h2 id="监控runloop状态检测超时">Detecting timeouts by monitoring RunLoop states</h2>
+<p>The <code class="language-plaintext highlighter-rouge">RunLoop</code> source tells us when the main thread processes events. How do we detect a stall? To find a reasonable approach, I first observed and logged <code class="language-plaintext highlighter-rouge">RunLoop</code> states:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>static void lxdRunLoopObserverCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void * info) {
+    SHAREDMONITOR.currentActivity = activity;
+    dispatch_semaphore_signal(SHAREDMONITOR.semphore);
+    switch (activity) {
+        case kCFRunLoopEntry:
+            NSLog(@"runloop entry");
+            break;
+        
+        case kCFRunLoopExit:
+            NSLog(@"runloop exit");
+            break;
+        
+        case kCFRunLoopAfterWaiting:
+            NSLog(@"runloop after waiting");
+            break;
+        
+        case kCFRunLoopBeforeTimers:
+            NSLog(@"runloop before timers");
+            break;
+        
+        case kCFRunLoopBeforeSources:
+            NSLog(@"runloop before sources");
+            break;
+        
+        case kCFRunLoopBeforeWaiting:
+            NSLog(@"runloop before waiting");
+            break;
+        
+        default:
+            break;
+    }
+};
+</code></pre></div></div>
+<p>The output showed that scrolling-related <code class="language-plaintext highlighter-rouge">Sources</code> events finished quickly before entering <code class="language-plaintext highlighter-rouge">kCFRunLoopBeforeWaiting</code>. If scrolling stalls, <code class="language-plaintext highlighter-rouge">RunLoop</code> must remain in either <code class="language-plaintext highlighter-rouge">kCFRunLoopAfterWaiting</code> or <code class="language-plaintext highlighter-rouge">kCFRunLoopBeforeSources</code>.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao73/5.gif"/><br/></p>
+<p>To detect stalls, first register a <code class="language-plaintext highlighter-rouge">RunLoop</code> observer callback and retain the <code class="language-plaintext highlighter-rouge">RunLoop</code> state. Then create a background thread that repeatedly observes the main thread's <code class="language-plaintext highlighter-rouge">RunLoop</code> state for prolonged activity: <code class="language-plaintext highlighter-rouge">收到Sources相关的事件时，将超时阙值时间内分割成多个时间片段，重复去获取当前RunLoop的状态。如果多次处在处理事件的状态下，那么可以视作发生了卡顿现象</code>. In other words, when a Sources-related event arrives, split the timeout threshold into several intervals and repeatedly sample the current RunLoop state. Remaining in event-processing states over several samples is treated as a stall.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#define SHAREDMONITOR [LXDAppFluecyMonitor sharedMonitor]
+
+@interface LXDAppFluecyMonitor : NSObject
+
+@property (nonatomic, assign) int timeOut;
+@property (nonatomic, assign) BOOL isMonitoring;
+@property (nonatomic, assign) CFRunLoopActivity currentActivity;
+
++ (instancetype)sharedMonitor;
+- (void)startMonitoring;
+- (void)stopMonitoring;
+
+@end
+
+- (void)startMonitoring {
+    dispatch_async(lxd_fluecy_monitor_queue(), ^{
+    while (SHAREDMONITOR.isMonitoring) {
+        long waitTime = dispatch_semaphore_wait(self.semphore, dispatch_time(DISPATCH_TIME_NOW, lxd_wait_interval));
+            if (waitTime != LXD_SEMPHORE_SUCCESS) {
+                if (SHAREDMONITOR.currentActivity == kCFRunLoopBeforeSources || 
+                   SHAREDMONITOR.currentActivity == kCFRunLoopAfterWaiting) {
+                    if (++SHAREDMONITOR.timeOut &lt; 5) {
+                        continue;
+                    }
+                    [LXDBacktraceLogger lxd_logMain];
+                    [NSThread sleepForTimeInterval: lxd_restore_interval];
+                }
+            }
+            SHAREDMONITOR.timeOut = 0;
+        }
+    });
+}
+</code></pre></div></div>
+<h2 id="标记位检测线程超时">Detecting thread timeouts with a flag</h2>
+<p>Unlike UI stuttering, event processing often starts from the <code class="language-plaintext highlighter-rouge">kCFRunLoopBeforeWaiting</code> state when a <code class="language-plaintext highlighter-rouge">Sources</code> event source arrives. I initially tried the same repeated sampling across several intervals. However, the idle main-thread <code class="language-plaintext highlighter-rouge">RunLoop</code> normally stays in <code class="language-plaintext highlighter-rouge">Before Waiting</code>, causing this detector to report a stall even when none occurred.</p>
+<p>At this point, Hanshen (<a href="http://www.jianshu.com/u/cc1e4faec5f7">南栀倾寒</a>) recommended a <code class="language-plaintext highlighter-rouge">Swift</code> third-party stall detector, <a href="https://github.com/zixun/ANREye">ANREye</a>. The approach is roughly this: create a background thread that checks repeatedly. On each check, set a flag to <code class="language-plaintext highlighter-rouge">YES</code>, then dispatch a task to the main thread that sets it to <code class="language-plaintext highlighter-rouge">NO</code>. The background thread then sleeps for the timeout threshold and checks whether the flag has been set to <code class="language-plaintext highlighter-rouge">NO</code>. If not, the main thread has stalled and cannot process the dispatched task:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao73/6.png"/><br/></p>
+<p>Later I found a situation where this approach fails: when the main thread is given <code class="language-plaintext highlighter-rouge">async</code> many tasks, each shorter than the stall threshold and therefore not disruptive on its own. The <code class="language-plaintext highlighter-rouge">async</code> task being too far back in the queue prevents the flag from being set before the checking thread wakes, producing a false stall report. (<em>P.S. In actual testing, this situation was virtually impossible to reproduce.</em>.) This approach resolves the problem of monitoring <code class="language-plaintext highlighter-rouge">RunLoop</code> shortcoming. Combining it with this approach, when the main thread is in <code class="language-plaintext highlighter-rouge">Before Waiting</code> state, dispatch a task to the main thread to set the flag and detect stalls during ordinary operation:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dispatch_async(lxd_event_monitor_queue(), ^{
+    while (SHAREDMONITOR.isMonitoring) {
+        if (SHAREDMONITOR.currentActivity == kCFRunLoopBeforeWaiting) {
+            __block BOOL timeOut = YES;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                timeOut = NO;
+                dispatch_semaphore_signal(SHAREDMONITOR.eventSemphore);
+            });
+            [NSThread sleepForTimeInterval: lxd_time_out_interval];
+            if (timeOut) {
+                [LXDBacktraceLogger lxd_logMain];
+            }
+            dispatch_wait(SHAREDMONITOR.eventSemphore, DISPATCH_TIME_FOREVER);
+        }
+    }
+});
+</code></pre></div></div>
+<h2 id="尾言">Closing notes</h2>
+<p>Many developers may never have used <code class="language-plaintext highlighter-rouge">RunLoop</code> in real app development, or may understand <code class="language-plaintext highlighter-rouge">RunLoop</code> only theoretically. The same applies to stack backtracing. By presenting my own stall-monitoring implementation, I hope to introduce more developers to these deeper techniques and their practical use.</p>
+<p>The two detection approaches can also be combined. The latter alone can even detect main-thread stalls. The demo is uploaded here: <a href="https://github.com/JustKeepRunning/LXDAppFluecyMonitor">LXDAppFluecyMonitor</a></p>
+<h2 id="参考资料">References</h2>
+<p><a href="http://blog.ibireme.com/2015/05/18/runloop/">Understanding RunLoop in depth</a>
+<a href="http://www.jianshu.com/p/8123fc17fe0e">Technical Principles of a Mobile Monitoring System</a>
+<a href="http://www.jianshu.com/p/9e1f4d771e35">Exploring Mach-O: An Analysis of FishHook</a>
+<a href="http://blog.csdn.net/jasonblog">Capturing and Parsing Thread Call Stacks in iOS, 1–2</a></p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

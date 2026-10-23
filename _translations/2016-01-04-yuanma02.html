@@ -1,0 +1,175 @@
+---
+layout: post
+title: 'GitHub source-code picks, January 4: Bluetooth, launch animations and a custom tab bar'
+description: Selects the BabyBluetooth framework, CLClipImageView launch animation and CYLTabBarController tab bar.
+  Project links and selected usage examples introduce the components, including the distinction between Bluetooth
+  central and peripheral modes.
+category: Development notes
+imagefeature: BG2.jpg
+date: 2016-01-04 00:00:00 +0800
+technical_translation:
+  topic: data-network
+  summary: Selects the BabyBluetooth framework, CLClipImageView launch animation and CYLTabBarController tab bar.
+    Project links and selected usage examples introduce the components, including the distinction between Bluetooth
+    central and peripheral modes.
+  keywords:
+  - BabyBluetooth
+  - CoreBluetooth
+  - CLClipImageView
+  - CYLTabBarController
+  provenance: collection
+  author_name: Bison
+  credit: Historical resources collected by Bison. The listed projects belong to their respective authors.
+  author_url: https://allluckly.cn/about/
+  title: 'GitHub source-code picks, January 4: Bluetooth, launch animations and a custom tab bar'
+  source_sha256: 8d7b6383a7cc78ec8f77fb1a687dc4d96c86ef83b463ac4d385311ff513bf29c
+lang: en
+source_path: _posts/2016-01-04-yuanma02.md
+source_url: /%E6%BA%90%E7%A0%81%E6%8E%A8%E8%8D%90/yuanma02
+permalink: /en/journal/2016-01-04-github-source-code-picks-january-4-bluetooth-launch-animations-and-a-custom-tab-bar/
+translation_method: machine-assisted
+translation_source_sha256: 8d7b6383a7cc78ec8f77fb1a687dc4d96c86ef83b463ac4d385311ff513bf29c
+excerpt: Selects the BabyBluetooth framework, CLClipImageView launch animation and CYLTabBarController tab bar.
+  Project links and selected usage examples introduce the components, including the distinction between Bluetooth
+  central and peripheral modes.
+translation_date: '2026-10-23T02:34:11+00:00'
+---
+{% raw %}
+<blockquote>
+<p>“An iOS Bluetooth framework, an eye-catching launch animation, and a loosely coupled custom TabBar.”</p>
+</blockquote>
+<p><br/></p>
+<ul>
+<li>NO.1 The most comprehensive iOS Bluetooth development framework in China ━━∝∞ ∝∞┅┉┉<a href="https://github.com/coolnameismy/BabyBluetooth">Download</a> <br/>
+<br/></li>
+</ul>
+<blockquote>
+<p>No preview image is available yet.<br/>
+Usage is as follows.<br/></p>
+</blockquote>
+<h3 id="中心模式-central-model">Central mode: central model</h3>
+<p><br/></p>
+<blockquote>
+<p>The app acts as a central device and connects to other BLE4.0 peripherals.<br/></p>
+</blockquote>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="nt">导入</span><span class="nc">.h文件和系统蓝牙库的头文件</span>
+<span class="nf">#import</span> <span class="s1">"BabyBluetooth.h"</span>
+<span class="o">//</span><span class="nt">定义变量</span>
+<span class="nt">BabyBluetooth</span> <span class="o">*</span><span class="nt">baby</span><span class="o">;</span>
+
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">viewDidLoad</span> <span class="p">{</span>
+    <span class="err">[super</span> <span class="err">viewDidLoad];</span>
+
+    <span class="err">//初始化BabyBluetooth</span> <span class="err">蓝牙库</span>
+    <span class="err">baby</span> <span class="err">=</span> <span class="err">[BabyBluetooth</span> <span class="err">shareBabyBluetooth];</span>
+    <span class="err">//设置蓝牙委托</span>
+    <span class="err">[self</span> <span class="err">babyDelegate];</span>
+    <span class="err">//设置委托后直接可以使用，无需等待CBCentralManagerStatePoweredOn状态</span>
+    <span class="err">baby.scanForPeripherals().begin();</span>
+<span class="p">}</span>
+
+<span class="o">//</span><span class="nt">设置蓝牙委托</span>
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">babyDelegate</span><span class="p">{</span>
+
+    <span class="err">//设置扫描到设备的委托</span>
+    <span class="err">[baby</span> <span class="py">setBlockOnDiscoverToPeripherals</span><span class="p">:</span><span class="err">^</span><span class="p">(</span><span class="n">CBCentralManager</span> <span class="err">*</span><span class="n">central</span><span class="p">,</span> <span class="n">CBPeripheral</span> <span class="err">*</span><span class="n">peripheral</span><span class="p">,</span> <span class="n">NSDictionary</span> <span class="err">*</span><span class="n">advertisementData</span><span class="p">,</span> <span class="n">NSNumber</span> <span class="err">*</span><span class="n">RSSI</span><span class="p">)</span> <span class="err">{</span>
+        <span class="n">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s1">"搜索到了设备:%@"</span><span class="p">,</span><span class="n">peripheral</span><span class="p">.</span><span class="n">name</span><span class="p">);</span>
+    <span class="p">}</span><span class="o">];</span>
+
+    <span class="o">//</span><span class="nt">过滤器</span>
+    <span class="o">//</span><span class="nt">设置查找设备的过滤器</span>
+    <span class="o">[</span><span class="nt">baby</span> <span class="nt">setFilterOnDiscoverPeripherals</span><span class="o">:^</span><span class="nt">BOOL</span><span class="o">(</span><span class="nt">NSString</span> <span class="o">*</span><span class="nt">peripheralName</span><span class="o">)</span> <span class="p">{</span>
+    <span class="err">//设置查找规则是名称大于1</span> <span class="err">，</span> <span class="err">the</span> <span class="err">search</span> <span class="err">rule</span> <span class="err">is</span> <span class="err">peripheral.name</span> <span class="err">length</span> <span class="err">&gt;</span> <span class="err">1</span>
+    <span class="err">if</span> <span class="err">(peripheralName.length</span> <span class="err">&gt;1)</span> <span class="err">{</span>
+        <span class="err">return</span> <span class="err">YES;</span>
+    <span class="p">}</span>
+        <span class="nt">return</span> <span class="nt">NO</span><span class="o">;</span>
+    <span class="err">}</span><span class="o">];</span>
+
+<span class="o">//.......</span>
+<span class="err">}</span></code></pre></figure>
+<p><br/></p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="o">//</span><span class="nt">导入</span><span class="nc">.h文件和系统蓝牙库的头文件</span>
+<span class="nf">#import</span> <span class="s1">"BabyBluetooth.h"</span>
+<span class="o">//</span><span class="nt">定义变量</span>
+<span class="nt">BabyBluetooth</span> <span class="o">*</span><span class="nt">baby</span><span class="o">;</span>
+
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">viewDidLoad</span> <span class="p">{</span>
+    <span class="err">[super</span> <span class="err">viewDidLoad];</span>
+
+    <span class="err">//配置第一个服务s1</span>
+    <span class="err">CBMutableService</span> <span class="err">*s1</span> <span class="err">=</span> <span class="err">makeCBService(@"FFF0");</span>
+    <span class="err">//配置s1的3个characteristic</span>
+    <span class="err">makeCharacteristicToService(s1,</span> <span class="err">@"FFF1",</span> <span class="err">@"r",</span> <span class="err">@"hello1");//读</span>
+    <span class="err">makeCharacteristicToService(s1,</span> <span class="err">@"FFF2",</span> <span class="err">@"w",</span> <span class="err">@"hello2");//写</span>
+    <span class="err">makeCharacteristicToService(s1,</span> <span class="err">genUUID(),</span> <span class="err">@"rw",</span> <span class="err">@"hello3");//可读写,uuid自动生成</span>
+    <span class="err">makeCharacteristicToService(s1,</span> <span class="err">@"FFF4",</span> <span class="err">nil,</span> <span class="err">@"hello4");//默认读写字段</span>
+    <span class="err">makeCharacteristicToService(s1,</span> <span class="err">@"FFF5",</span> <span class="err">@"n",</span> <span class="err">@"hello5");//notify字段</span>
+    <span class="err">//配置第一个服务s2</span>
+    <span class="err">CBMutableService</span> <span class="err">*s2</span> <span class="err">=</span> <span class="err">makeCBService(@"FFE0");</span>
+    <span class="err">makeStaticCharacteristicToService(s2,</span> <span class="err">genUUID(),</span> <span class="err">@"hello6",</span> <span class="err">[@"a"</span> <span class="py">dataUsingEncoding</span><span class="p">:</span><span class="n">NSUTF8StringEncoding</span><span class="p">]);</span><span class="err">//一个含初值的字段，该字段权限只能是只读</span>
+
+    <span class="err">//实例化baby</span>
+    <span class="err">baby</span> <span class="err">=</span> <span class="err">[BabyBluetooth</span> <span class="err">shareBabyBluetooth];</span>
+    <span class="err">//配置委托</span>
+    <span class="err">[self</span> <span class="err">babyDelegate];</span>
+    <span class="err">//启动外设</span>
+    <span class="err">baby.bePeripheral().addServices(@[s1,s2]).startAdvertising();</span>
+<span class="p">}</span>
+
+<span class="o">//</span><span class="nt">设置蓝牙外设模式的委托</span>
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">babyDelegate</span><span class="p">{</span>
+
+    <span class="err">//设置添加service委托</span> <span class="err">|</span> <span class="err">set</span> <span class="err">didAddService</span> <span class="err">block</span>
+    <span class="err">[baby</span> <span class="py">peripheralModelBlockOnPeripheralManagerDidUpdateState</span><span class="p">:</span><span class="err">^</span><span class="p">(</span><span class="n">CBPeripheralManager</span> <span class="err">*</span><span class="n">peripheral</span><span class="p">)</span> <span class="err">{</span>
+    <span class="n">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s1">"PeripheralManager trun status code: %ld"</span><span class="p">,(</span><span class="n">long</span><span class="p">)</span><span class="n">peripheral</span><span class="p">.</span><span class="n">state</span><span class="p">);</span>
+    <span class="p">}</span><span class="o">];</span>
+
+    <span class="o">//</span><span class="nt">设置添加service委托</span> <span class="o">|</span> <span class="nt">set</span> <span class="nt">didAddService</span> <span class="nt">block</span>
+    <span class="o">[</span><span class="nt">baby</span> <span class="nt">peripheralModelBlockOnDidStartAdvertising</span><span class="o">:^(</span><span class="nt">CBPeripheralManager</span> <span class="o">*</span><span class="nt">peripheral</span><span class="o">,</span> <span class="nt">NSError</span> <span class="o">*</span><span class="nt">error</span><span class="o">)</span> <span class="p">{</span>
+    <span class="err">NSLog(@"didStartAdvertising</span> <span class="err">!!!");</span>
+    <span class="p">}</span><span class="o">];</span>
+
+    <span class="o">//</span><span class="nt">设置添加service委托</span> <span class="o">|</span> <span class="nt">set</span> <span class="nt">didAddService</span> <span class="nt">block</span>
+    <span class="o">[</span><span class="nt">baby</span> <span class="nt">peripheralModelBlockOnDidAddService</span><span class="o">:^(</span><span class="nt">CBPeripheralManager</span> <span class="o">*</span><span class="nt">peripheral</span><span class="o">,</span> <span class="nt">CBService</span> <span class="o">*</span><span class="nt">service</span><span class="o">,</span> <span class="nt">NSError</span> <span class="o">*</span><span class="nt">error</span><span class="o">)</span> <span class="p">{</span>
+    <span class="err">NSLog(@"Did</span> <span class="err">Add</span> <span class="err">Service</span> <span class="py">uuid</span><span class="p">:</span> <span class="err">%@</span> <span class="err">"</span><span class="p">,</span><span class="n">service</span><span class="p">.</span><span class="n">UUID</span><span class="p">);</span>
+    <span class="p">}</span><span class="o">];</span>
+
+<span class="o">//.....</span>
+<span class="err">}</span></code></pre></figure>
+<h3 id="外设模式-peripheral-model">Peripheral mode: peripheral model<br/></h3>
+<blockquote>
+<p>The app simulates a BLE4.0 peripheral that other devices can connect to and use.<br/>
+Simulate a peripheral with 2 services and 6 characteristics.<br/></p>
+</blockquote>
+<p><br/></p>
+<ul>
+<li>NO.2 An eye-catching launch animation ━━∝∞ ∝∞┅┉┉ <a href="https://github.com/TheBlackApple/CLClipImageView">Download</a><br/>
+<br/>
+<img alt="(allluckly.cn)" src="https://github.com/TheBlackApple/CLClipImageView/blob/master/CLClipImageAnimation/2015-12-31%2017_20_56.gif?raw=true"/><br/></li>
+</ul>
+<blockquote>
+<p>Usage is as follows.<br/></p>
+</blockquote>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">viewDidLoad</span> <span class="p">{</span>
+    <span class="err">[super</span> <span class="err">viewDidLoad];</span>
+    <span class="err">self.view.backgroundColor</span> <span class="err">=</span> <span class="err">[UIColor</span> <span class="err">whiteColor];</span>
+    <span class="err">//重点在这里</span>
+    <span class="err">[CLClipImageView</span> <span class="py">addToCurrentView</span><span class="p">:</span><span class="n">self</span><span class="p">.</span><span class="n">view</span> <span class="n">clipImage</span><span class="p">:[</span><span class="n">UIImage</span> <span class="n">imageNamed</span><span class="p">:</span><span class="err">@</span><span class="s1">"Default_image"</span><span class="p">]</span> <span class="n">backgroundImage</span><span class="p">:</span><span class="err">@</span><span class="s1">""</span> <span class="n">animationComplete</span><span class="p">:</span><span class="err">^{</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">navigationController</span><span class="p">.</span><span class="n">navigationBarHidden</span> <span class="err">=</span> <span class="n">NO</span><span class="p">;</span>
+        <span class="err">[self</span> <span class="err">makeTopView];</span>
+    <span class="p">}</span><span class="o">];</span>
+<span class="err">}</span></code></pre></figure>
+<p><br/></p>
+<ul>
+<li>NO.3 A loosely coupled custom TabBar ━━∝∞ ∝∞┅┉┉<a href="https://github.com/ChenYilong/CYLTabBarController">Download</a><br/></li>
+</ul>
+<p><br/>
+<span class="technical-missing-image">This historical illustration is currently unavailable. <a href="https://camo.githubusercontent.com/10b009b8764a0a5eacfd7660fece6627249eb002/687474703a2f2f6935392e74696e797069632e636f6d2f7776787574762e6a7067">The original image URL is retained</a> for reference.</span><br/></p>
+<blockquote>
+<p>See the download page for detailed usage. The author explains it thoroughly, so I will not repeat it here.<br/></p>
+</blockquote>
+<p>Recommended reading: <a href="/en/journal/2015-12-26-integrating-a-baidu-mobile-ssp-launch-ad-in-one-minute/">Integrating a Baidu Mobile SSP launch ad in one minute</a><br/></p>
+<p>Original article: <a href="/en/">https://allluckly.cn/</a></p>
+
+{% endraw %}

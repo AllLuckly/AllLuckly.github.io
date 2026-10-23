@@ -1,0 +1,94 @@
+---
+layout: post
+title: Setting Up React Native for iOS Development on a Mac
+description: 'Records a React Native setup on macOS: installing Homebrew, Node.js, watchman, and flow, creating
+  a project, opening the iOS project, and refreshing code in the simulator.'
+category: Development notes
+imagefeature: null
+date: 2016-07-27 00:00:00 +0800
+technical_translation:
+  topic: web-notes
+  summary: 'Records a React Native setup on macOS: installing Homebrew, Node.js, watchman, and flow, creating a
+    project, opening the iOS project, and refreshing code in the simulator.'
+  keywords:
+  - React Native
+  - Node.js
+  - watchman
+  - flow
+  - iOS
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  version_note: Published in 2016, the article uses index.ios.js and the React Native project initialization workflow
+    available at the time.
+  author_url: https://allluckly.cn/about/
+  title: Setting Up React Native for iOS Development on a Mac
+  source_sha256: 934a4ec26d336c1a8c820a946c4e0f028f3a394246853e4f93e3a3d17051c809
+lang: en
+source_path: _posts/2016-07-27-React Native01.md
+source_url: /react%20native/React-Native01
+permalink: /en/journal/2016-07-27-setting-up-react-native-for-ios-development-on-a-mac/
+translation_method: machine-assisted
+translation_source_sha256: 934a4ec26d336c1a8c820a946c4e0f028f3a394246853e4f93e3a3d17051c809
+excerpt: 'Records a React Native setup on macOS: installing Homebrew, Node.js, watchman, and flow, creating a project,
+  opening the iOS project, and refreshing code in the simulator.'
+translation_date: '2026-10-23T02:34:15+00:00'
+---
+{% raw %}
+<p>1. If your Mac does not have <a href="http://brew.sh/">Homebrew </a>Install in this order:</p>
+<ul>
+<li>Open Terminal and enter:</li>
+</ul>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+</code></pre></div></div>
+<ul>
+<li>Update Ruby; older versions cannot install some components.</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">brew install ruby</code></p>
+<p>2. Install <a href="https://nodejs.org/">Node.js</a></p>
+<p>Here I download and install it directly.<a href="https://nodejs.org/">Node.js</a>:  <a href="https://nodejs.org/en/download/">https://nodejs.org/en/download/</a>
+Simple and convenient.</p>
+<p>3. Install <a href="https://facebook.github.io/watchman/docs/install.html">watchman</a>  and  <a href="http://www.flowtype.org/">flow </a>Execute these two commands separately:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew install watchman
+
+brew install flow
+</code></pre></div></div>
+<p>3. Install React-Native</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo  npm install -g react-native-cli
+</code></pre></div></div>
+<p>Then enter your login password. Success produces this message:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/React Native/1.png"/><br/></p>
+<p>The environment is configured. Create a test project with the following code:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>react-native init testProject
+</code></pre></div></div>
+<p>testProject is the project name and can be changed. Wait <strong>After a while,</strong>depending on network conditions, project initialisation completes. Success looks like this:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/React Native/2.png"/><br/></p>
+<p>4. Enter the project directory</p>
+<p><code class="language-plaintext highlighter-rouge">cd testProject </code></p>
+<p>The directory structure is:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>golddeMac-mini: testProject gold$ ls -l
+total 24
+drwxr-xr-x  10 gold  staff   340  7 27 10:46 android
+-rw-r--r--   1 gold  staff  1103  7 27 10:46 index.android.js
+-rw-r--r--   1 gold  staff  1069  7 27 10:46 index.ios.js
+drwxr-xr-x   5 gold  staff   170  7 27 10:46 ios
+drwxr-xr-x   5 gold  staff   170  7 27 10:46 node_modules
+-rw-r--r--   1 gold  staff   238  7 27 10:46 package.json
+
+</code></pre></div></div>
+<p><img alt="1" src="https://allluckly.cn/images/blog/React Native/3.png"/><br/></p>
+<p>android and ios contain the respective platform projects. index.android.js and index.ios.js are their corresponding JavaScript files.</p>
+<p>5. Run the project</p>
+<p>For iOS, open the project in Xcode and run it. Edit index.ios.js, then press ⌘ + R in the simulator to reload JavaScript and see the changes.</p>
+<p>Debugging on an iOS device is simple too: change the HTTP address.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>jsCodeLocation = [NSURL URLWithString:@"http://localhost:8081/index.ios.bundle"];
+
+</code></pre></div></div>
+<p>Successful execution looks like this:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/React Native/4.png"/><br/></p>
+<p>References: <a href="https://facebook.github.io/react-native/docs/getting-started.html#content">Official React Native documentation</a></p>
+<p>Questions are welcome in the comments. If helpful, give it a like. Time permitting, I will continue sharing what I learn about React Native.</p>
+
+{% endraw %}

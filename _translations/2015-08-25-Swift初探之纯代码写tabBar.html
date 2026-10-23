@@ -1,0 +1,80 @@
+---
+layout: post
+title: 'Exploring Swift: building a tab bar entirely in code'
+description: Builds a Zhe800-inspired tab bar using early Swift syntax. It creates child view controllers, assigns
+  titles and icons, and adds them to the system tab bar, illustrating how to organise a navigation structure programmatically.
+category: Development notes
+imagefeature: default_bg7.png
+date: 2015-08-25 00:00:00 +0800
+technical_translation:
+  topic: uikit-graphics
+  summary: Builds a Zhe800-inspired tab bar using early Swift syntax. It creates child view controllers, assigns
+    titles and icons, and adds them to the system tab bar, illustrating how to organise a navigation structure programmatically.
+  keywords:
+  - Swift
+  - UITabBarController
+  - child view controllers
+  - programmatic layout
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  author_url: https://allluckly.cn/about/
+  version_note: Published in 2015 and written using early Swift syntax.
+  title: 'Exploring Swift: building a tab bar entirely in code'
+  source_sha256: f79954d0baf6425c2585e29d855005abac0172762e7e2218c7036c9f2ebbe107
+lang: en
+source_path: _posts/2015-08-25-Swift初探之纯代码写tabBar.md
+source_url: /swift/Swift%E5%88%9D%E6%8E%A2%E4%B9%8B%E7%BA%AF%E4%BB%A3%E7%A0%81%E5%86%99tabBar
+permalink: /en/journal/2015-08-25-exploring-swift-building-a-tab-bar-entirely-in-code/
+translation_method: machine-assisted
+translation_source_sha256: f79954d0baf6425c2585e29d855005abac0172762e7e2218c7036c9f2ebbe107
+excerpt: Builds a Zhe800-inspired tab bar using early Swift syntax. It creates child view controllers, assigns titles
+  and icons, and adds them to the system tab bar, illustrating how to organise a navigation structure programmatically.
+translation_date: '2026-10-23T02:34:10+00:00'
+---
+{% raw %}
+<blockquote>
+<p>“Enrich yourself and increase your value by continuing to learn.”
+<small><cite title="Plato">Bison</cite></small></p>
+</blockquote>
+<p>The new version of my recent project is mostly finished, so I am using some spare time to learn the new Swift language. Swift is fairly easy to learn if you already know OC. Below is a Tabbar I wrote while teaching myself. Of<br/>
+course, this is not a custom implementation. It should still meet ordinary requirements.<br/>
+Below is a Tabbar I wrote to imitate “折800”. It has a few minor imperfections because of the images.<br/></p>
+<p>The code is as follows<br/></p>
+<p>Core code</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nt">class</span> <span class="nt">func</span> <span class="nt">CusTomTabBar</span><span class="o">()</span> <span class="nt">-</span><span class="o">&gt;</span><span class="nt">UITabBarController</span><span class="p">{</span>
+
+<span class="err">var</span> <span class="err">vc1</span> <span class="err">=</span> <span class="err">Home_VC()</span>
+<span class="err">var</span> <span class="err">vc2</span> <span class="err">=</span> <span class="err">Class_VC()</span>
+<span class="err">var</span> <span class="err">vc3</span> <span class="err">=</span> <span class="err">Brand_VC()</span>
+<span class="err">var</span> <span class="err">vc4</span> <span class="err">=</span> <span class="err">Shoping_VC()</span>
+<span class="err">var</span> <span class="err">vc5</span> <span class="err">=</span> <span class="err">Personal_VC()</span>
+<span class="err">var</span> <span class="py">nvc1</span><span class="p">:</span><span class="n">UINavigationController</span> <span class="err">=</span> <span class="n">LBNvc</span><span class="p">(</span><span class="n">rootViewController</span><span class="p">:</span> <span class="n">vc1</span><span class="p">)</span>
+<span class="n">var</span> <span class="n">nvc2</span><span class="p">:</span><span class="n">UINavigationController</span> <span class="err">=</span> <span class="n">LBNvc</span><span class="p">(</span><span class="n">rootViewController</span><span class="p">:</span> <span class="n">vc2</span><span class="p">)</span>
+<span class="n">var</span> <span class="n">nvc3</span><span class="p">:</span><span class="n">UINavigationController</span> <span class="err">=</span> <span class="n">LBNvc</span><span class="p">(</span><span class="n">rootViewController</span><span class="p">:</span> <span class="n">vc3</span><span class="p">)</span>
+<span class="n">var</span> <span class="n">nvc4</span><span class="p">:</span><span class="n">UINavigationController</span> <span class="err">=</span> <span class="n">LBNvc</span><span class="p">(</span><span class="n">rootViewController</span><span class="p">:</span> <span class="n">vc4</span><span class="p">)</span>
+<span class="n">var</span> <span class="n">nvc5</span><span class="p">:</span><span class="n">UINavigationController</span> <span class="err">=</span> <span class="n">LBNvc</span><span class="p">(</span><span class="n">rootViewController</span><span class="p">:</span> <span class="n">vc5</span><span class="p">)</span>
+<span class="n">let</span> <span class="n">tabbar1</span> <span class="err">=</span> <span class="n">UITabBarItem</span><span class="p">(</span><span class="n">title</span><span class="p">:</span> <span class="s1">"首页"</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="p">(</span><span class="n">Public</span> <span class="p">.</span><span class="n">getImgView</span><span class="p">(</span><span class="s1">"home_tab_home_btn@2x"</span><span class="p">))</span> <span class="p">,</span> <span class="n">selectedImage</span><span class="p">:</span> <span class="p">(</span><span class="n">Public</span> <span class="p">.</span><span class="n">getImgView</span><span class="p">(</span><span class="s1">"home_tab_home_selected_btn@2x"</span><span class="p">)))</span>
+<span class="n">let</span> <span class="n">tabbar2</span> <span class="err">=</span> <span class="n">UITabBarItem</span><span class="p">(</span><span class="n">title</span><span class="p">:</span> <span class="s1">"分类"</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="p">(</span><span class="n">Public</span> <span class="p">.</span><span class="n">getImgView</span><span class="p">(</span><span class="s1">"home_tab_saunter_btn@2x"</span><span class="p">)),</span> <span class="n">selectedImage</span><span class="p">:</span> <span class="p">(</span><span class="n">Public</span> <span class="p">.</span><span class="n">getImgView</span><span class="p">(</span><span class="s1">"home_tab_saunter_selected_btn@2x"</span><span class="p">)))</span>
+<span class="n">let</span> <span class="n">tabbar3</span> <span class="err">=</span> <span class="n">UITabBarItem</span><span class="p">(</span><span class="n">title</span><span class="p">:</span> <span class="s1">"品牌团"</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="p">(</span><span class="n">Public</span> <span class="p">.</span><span class="n">getImgView</span><span class="p">(</span><span class="s1">"home_tab_branc_btn@2x"</span><span class="p">)),</span> <span class="n">selectedImage</span><span class="p">:</span> <span class="p">(</span><span class="n">Public</span> <span class="p">.</span><span class="n">getImgView</span><span class="p">(</span><span class="s1">"home_tab_branc_selected_btn@2x"</span><span class="p">)))</span>
+<span class="n">let</span> <span class="n">tabbar4</span> <span class="err">=</span> <span class="n">UITabBarItem</span><span class="p">(</span><span class="n">title</span><span class="p">:</span> <span class="s1">"积分商城"</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="p">(</span><span class="n">Public</span> <span class="p">.</span><span class="n">getImgView</span><span class="p">(</span><span class="s1">"home_tab_point_btn@2x"</span><span class="p">)),</span> <span class="n">selectedImage</span><span class="p">:</span> <span class="p">(</span><span class="n">Public</span> <span class="p">.</span><span class="n">getImgView</span><span class="p">(</span><span class="s1">"home_tab_point_selected_btn@2x"</span><span class="p">)))</span>
+<span class="n">let</span> <span class="n">tabbar5</span> <span class="err">=</span> <span class="n">UITabBarItem</span><span class="p">(</span><span class="n">title</span><span class="p">:</span> <span class="s1">"个人中心"</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="p">(</span><span class="n">Public</span> <span class="p">.</span><span class="n">getImgView</span><span class="p">(</span><span class="s1">"home_tab_personal_btn@2x"</span><span class="p">)),</span> <span class="n">selectedImage</span><span class="p">:</span> <span class="p">(</span><span class="n">Public</span> <span class="p">.</span><span class="n">getImgView</span><span class="p">(</span><span class="s1">"home_tab_personal_selected_btn@2x"</span><span class="p">)))</span>
+<span class="n">nvc1</span><span class="p">.</span><span class="n">tabBarItem</span> <span class="err">=</span> <span class="n">tabbar1</span><span class="p">;</span>
+<span class="err">nvc2.tabBarItem</span> <span class="err">=</span> <span class="err">tabbar2;</span>
+<span class="err">nvc3.tabBarItem</span> <span class="err">=</span> <span class="err">tabbar3;</span>
+<span class="err">nvc4.tabBarItem</span> <span class="err">=</span> <span class="err">tabbar4;</span>
+<span class="err">nvc5.tabBarItem</span> <span class="err">=</span> <span class="err">tabbar5;</span>
+<span class="err">var</span> <span class="err">tc</span> <span class="err">=</span> <span class="err">UITabBarController()</span>
+
+<span class="err">tc.tabBar.tintColor</span> <span class="err">=</span> <span class="err">UIColor</span> <span class="err">.redColor()</span>
+<span class="err">//</span>        <span class="err">tc.tabBar.backgroundImage</span> <span class="err">=</span> <span class="err">Public.getImgView("3.png")</span>
+<span class="err">tc.viewControllers</span> <span class="err">=</span> <span class="err">[nvc1,nvc2,nvc3,nvc4,nvc5];</span>
+<span class="err">return</span> <span class="err">tc;</span>
+<span class="p">}</span>
+ </code></pre></figure>
+<blockquote>
+<p><a href="https://github.com/AllLuckly/LBSwift_TabBar">Click to download the demo</a> <br/></p>
+</blockquote>
+<p><img alt="(LBSwift_TabBar)" src="https://github.com/AllLuckly/LBSwift_TabBar/blob/master/123.gif?raw=true"/></p>
+
+{% endraw %}

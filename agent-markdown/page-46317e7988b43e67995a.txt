@@ -1,0 +1,81 @@
+---
+layout: null
+permalink: /en/guides/manyue-opds-pse-library/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'ManYue OPDS connections: why a catalogue may not support page streaming'
+agent_source_url: https://allluckly.cn/en/guides/manyue-opds-pse-library/
+agent_source_sha256: 73bcc27b76053cfcf891431dd0ea2ab41f8a4f26bbf542224bc7d4b410cb787d
+agent_generator_version: 1
+---
+{% raw %}# ManYue OPDS connections: why a catalogue may not support page streaming
+
+Language: en
+Canonical: [ManYue OPDS connections: why a catalogue may not support page streaming](<https://allluckly.cn/en/guides/manyue-opds-pse-library/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-opds-pse-library/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-opds-pse-library/>)
+Published: 2026-10-22T00:00:00+08:00
+Modified: 2026-10-23T10:34:07+08:00
+Author: Bison
+
+Distinguish OPDS catalogues, whole-file acquisition links and OPDS-PSE page streams, enter the correct catalogue URL and choose a reading or local-import route you can verify.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-opds-pse-library/>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+An OPDS catalog tells a reader which books are available, but a visible catalog does not mean every page can be requested directly. ManYue's public description distinguishes ordinary OPDS from OPDS-PSE: content supporting the page-streaming extension can be read page by page, while ordinary entries containing only whole-file acquisition links do not support direct page-by-page reading through this entry point. Understanding this avoids mistaking a protocol limitation for a password problem.
+
+## Prepare the catalog address, not the website homepage
+
+Ask the service provider for the OPDS catalog URL and confirm the required authentication method. The example `https://catalog.example.com/opds-comics/` is only a placeholder. The actual path depends on the server configuration and is not a universal path for every service. Do not copy an arbitrary search page, book detail page, or temporary download-button link from a browser and treat it as the catalog.
+
+Confirm that you have permission to access the catalog content and start with a small category. Catalogs can be large and have multiple navigation levels; you only need to find one or two known samples initially. Also check your current ManYue server-library entitlements before connecting. Account authentication, app entitlements, and protocol capabilities are three independent requirements.
+
+## Add OPDS in Server Libraries
+
+When adding the connection, choose OPDS and enter the catalog address and the username and password required by the service. Do not embed the password in the URL, where it may be copied into a clipboard, screenshot, or public record. After submitting, check whether the catalog lists successfully, then open a known category or book entry.
+
+If catalog parsing fails, first check whether the address returns OPDS content or an ordinary HTML login page. You do not need to edit the server's returned data manually; the administrator should confirm the correct address and access settings. Repeatedly changing the bookshelf name will not fix an incorrect catalog type. Changing service type is not necessarily useful either unless you are actually using that server.
+
+## Understand whole-file links versus page streams
+
+An ordinary acquisition link usually points to a complete file. A page stream requires the server to tell the client how to request a specific page. OPDS-PSE adds this page-level information so a client can begin reading without first obtaining the entire document.[OPDS-PSE project description](<https://anansi-project.github.io/docs/opds-pse/intro>)provides a concise definition.
+
+A record containing a title, author, cover, and whole-file download link may therefore still lack page-by-page reading. If the catalog and covers display correctly, authentication may already have succeeded. If opening a book reports a missing supported page stream, first check whether the server actually provides OPDS-PSE rather than repeatedly retrying a login that already worked.
+
+## Choose the next step according to the available capability
+
+For a sample with a compatible page stream, check the first, middle, and final pages to confirm that more than the cover displays. A server supporting an extension does not mean every file and entry has complete page information. Check problematic works individually. If only some entries fail, record their titles and category locations so the administrator can inspect the capabilities returned for those entries.
+
+For content with only whole-file links, do not treat ManYue's OPDS entry point as already supporting direct reading. Ask the administrator to enable a suitable page-streaming capability. If the service is Komga or Kavita, you can also use its dedicated connection. Another clear route is to obtain your comic file through a method permitted by the service and import it locally. That is a different outcome from reading the current OPDS entry directly.
+
+## Example: compare two samples in the same catalog
+
+Suppose one self-made comic offers a page stream while another document offers only a file-acquisition link. Inspect them separately. The first opens page by page, so record several actual pages. The second may report a missing page stream even though its cover appears. Record the two outcomes separately rather than labeling the entire service simply “readable” or “unavailable.”
+
+If you obtain the second book as a PDF through an authorized download method, you can import it into the local library and read offline. That success belongs to the local PDF route; it does not prove ordinary OPDS page-by-page reading has been fixed. Keeping the routes distinct helps you choose the right approach when similar entries appear later.
+
+Record results in a three-column checklist: entry name, whether it lists, and whether pages open individually. For books downloaded as whole files and imported locally, record their saved locations separately. When the catalog changes, you can recheck problematic entries and tell the administrator whether catalog information or a page stream is missing without describing the entire connection process again.
+
+## Final checks and update limitations
+
+Check that the correct catalog reopens, the target category is reachable, sample capabilities are distinguished, and actual pages of readable entries work. After catalog updates, book removals, or address changes, old records may no longer refer to the same objects. Refresh and check the server before deciding whether to recreate a connection. An identical title alone does not guarantee the same pages or bookmark positions.
+
+### If a server says it supports OPDS, can I always read directly?
+
+No. The server must also provide a page stream that ManYue can use for the relevant entry. Catalog discovery and page-by-page reading are separate capabilities, and a public format list does not replace checking the server's specific output.
+
+### If I can see covers, why is the connection not fully checked?
+
+Covers and reading pages may use different requests and capabilities. A complete check includes opening actual pages, testing several positions, and checking files when offline use is required. A cover proves only one stage worked, so it should not be the sole evidence that the entire reading path succeeds.
+
+## What to read next
+
+- [Using a dedicated Komga connection](<https://allluckly.cn/en/guides/manyue-komga-library/>).
+- [Using a dedicated Kavita connection](<https://allluckly.cn/en/guides/manyue-kavita-library/>).
+- [Import locally after obtaining the file](<https://allluckly.cn/en/guides/manyue-getting-started/>).
+
+## Sources and version
+
+Checked on October 22, 2026: ManYue 2.0.2 for iPhone / iPad. Based on [the public description on the China App Store](<https://apps.apple.com/cn/app/id6753895889>), [Apple release lookup](<https://itunes.apple.com/lookup?id=6753895889&country=cn>) and the corresponding feature entry points. Interface labels may change with the version. Feature access is determined by the app’s current purchase screen.
+{% endraw %}

@@ -1,0 +1,447 @@
+---
+layout: null
+permalink: /en/journal/2016-07-12-ios-game-development-with-uikit-hardest/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iOS game development with UIKit: Hardest'
+agent_source_url: https://allluckly.cn/en/journal/2016-07-12-ios-game-development-with-uikit-hardest/
+agent_source_sha256: 09f7d96d0383e1c060a907102fa7d84bee3a0826284bdee16be87f410f1d0b1f
+agent_generator_version: 1
+---
+{% raw %}# iOS game development with UIKit: Hardest
+
+Language: en
+Canonical: [iOS game development with UIKit: Hardest](<https://allluckly.cn/en/journal/2016-07-12-ios-game-development-with-uikit-hardest/>)
+中文：[中文 HTML](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao54>)
+English: [English HTML](<https://allluckly.cn/en/journal/2016-07-12-ios-game-development-with-uikit-hardest/>)
+Published: 2016-07-12T00:00:00+08:00
+Modified: 2026-10-23T10:34:15+08:00
+Author: 维尼的小熊
+
+Introduces the structure of the Hardest mini-game built with Objective-C and UIKit, including level selection, game state, score calculation, sound effects and saved data. It also distinguishes this exercise from work better suited to a dedicated game engine.
+
+Originally credited to 维尼的小熊; edited and archived by Bison.
+
+[Source listed in the original](<http://www.jianshu.com/p/5554abf34556>)
+
+English translation of the [Chinese original](<https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao54>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Specifies development in Xcode 7.1 and a build environment above Xcode 7.0. The project is a UIKit game-development exercise.
+
+## A little chat
+
+I have not published writing or code for a while and have not replied to many comments on earlier articles, although I read each one carefully. I have been feeling a little lost recently; thank you for understanding. I would genuinely like to chat with everyone—just not always about technology…
+
+Editor: [Bison](<https://allluckly.cn/en/>)  
+ Source: [维尼的小熊](<http://www.jianshu.com/p/5554abf34556>)
+
+## About the project: click the GitHub link at the end for the code download.
+
+Project note: For readers unfamiliar with Cocos2D-X or Swift, this project uses Objective-C and UIKit. In other words, if you can use UIView, you can try building a game!
+
+The original game was developed with Cocos2D-X, so some image animations in this version are less fluid, such as image slicing, deformation, and rapid image replacement. UIKit also cannot match Cocos2D-X's performance here; each tool has its specialty. For a game intended for release, use a dedicated engine such as Cocos-2D, Unity3D, or Sprite Kit.
+
+- Development language: Objective-C
+- Development tool: Xcode7.1
+- Build environment: later than Xcode7.0
+- Supporting tool: Photoshop CS6
+
+Project walkthrough: A complete written tour is not realistic. Instead, I list the overall structure, major logic, and interfaces exposed by the main objects. Read the code first, then use this article alongside it to understand the flow. For particular features, study their implementations in the .m files. If anything is unclear, leave a Jianshu or Weibo comment.
+
+Study tip: Run and debug on a physical device if possible. Some levels require accelerometer or gyroscope features unavailable in the simulator. If you cannot get past a level, tap the game-controller button on the home screen and choose Unlock Next Level, or manually write level-score information at startup in code.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao54/1.jpg>)
+
+## Overall architecture
+
+### Sound effects and background music
+
+Sound effects and background music use a WNXSoundToolManager singleton wrapped around AVFoundation. Background music uses AVAudioPlayer; sound effects use AudioServicesPlaySystemSound.
+
+The following methods and properties are available for global calls or changes. Adjust bgMusicType and soundType to control music and sound-effect volume. Use playSoundWithSoundName: to play a sound by name.
+
+```
+// 音效或背景音乐播放声音打大小枚举
+typedef NS_ENUM(NSInteger, SoundPlayType) {
+    SoundPlayTypeHight = 0,
+    SoundPlayTypeMiddle,
+    SoundPlayTypeLow,
+    SoundPlayTypeMute
+};
+
+@interface WNXSoundToolManager : NSObject
+
+// 背景音乐声音大小Type
+@property (nonatomic, assign) SoundPlayType bgMusicType;
+// 音效声音大小Type
+@property (nonatomic, assign) SoundPlayType soundType;
+
+// 暂停背景音乐
+- (void)pauseBgMusic;
+// 停止播放背景音乐
+- (void)stopBgMusic;
+// 重新播放背景音乐
+- (void)playBgMusicWihtPlayAgain:(BOOL)playAgain;
+// 播放音效:音效名称
+- (void)playSoundWithSoundName:(NSString *)soundName;
+// 设置背景音乐音量:音量大小0~1
+- (void)setBackgroundMusicVolume:(float)volume;
+
+// 获取SoundManager单利对象
++ (instancetype)sharedSoundToolManager;
+
+@end
+```
+
+## Saving and reading level records: WNXStageInfoManager
+
+How are level completion and score records persisted? This project uses archiving and unarchiving. Obtain the WNXStageInfoManager singleton and call Save or Read to store or retrieve level information. When a level reaches the score-results controller, decide whether the new record should be saved, and call the save interface if needed. See WNXStageInfoManager.m for the implementation.
+
+```
+// 单例方法
++ (instancetype)sharedStageInfoManager;
+
+// 保存关卡信息
+- (BOOL)saveStageInfo:(WNXStageInfo *)stageInfo;
+// 读取指定关卡编号的关卡信息
+- (WNXStageInfo *)stageInfoWithNumber:(int)number;
+
+// 这个接口是当游戏无法过关时,在RootViewController点击手柄按钮,解锁下一关卡使用(**秘籍~慎用**)
+- (BOOL)unlockNextStage;
+```
+
+## Launch-screen animation
+
+Launch animations are common in apps such as SF Best, Shunshou Pay, and SF Haitao. The effect is an illusion: in AppDelegate's didFinishLaunchingWithOptions(), add an AnimVC that looks exactly like the launch image and make it keyWindow's rootViewController. Run the animation in AnimVC's viewDidApper(), then use a Block to replace keyWindow's rootViewController with the home VC when it finishes.
+
+```
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+
+    [[UIApplication sharedApplication] setStatusBarHidden:YES];
+
+    [NSThread sleepForTimeInterval:1.0];
+
+    [self setKeyWindow];
+
+    return YES;
+}
+
+- (void)setKeyWindow {
+    __weak typeof(self) weakSelf = self;
+
+    WNXLaunchAnimationViewController *launchAnimationVC = [[WNXLaunchAnimationViewController alloc] init];
+    launchAnimationVC.animationFinish = ^{
+        UIStoryboard *sb = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        WNXBaseNavigationController *rootNav = (WNXBaseNavigationController *)[sb instantiateViewControllerWithIdentifier:@"RootNavigationController"];
+        weakSelf.window.rootViewController = rootNav;
+    };
+
+    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    self.window.rootViewController = launchAnimationVC;
+    [self.window makeKeyAndVisible];
+}
+```
+
+I will not explain the animations here. Interested readers can study the project code.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao54/2.gif>)
+
+## Home screen: WNXRootViewController
+
+The home screen is actually an image. Based on the device's screen size, it reads the corresponding button Plist and obtains the Frames of the 6 home-screen buttons. In touchesBegan(), CGRectContainsPoint checks whether the tap lies inside a specified Frame and triggers the corresponding action. Here is the code:
+
+```
+// 加载当前设备对应首页按钮Frame
+- (void)loadHomeButtonFrame {
+    NSString *framePath = [[NSBundle mainBundle] pathForResource:@"home.plist" ofType:nil];
+    NSDictionary *frameDic = [NSDictionary dictionaryWithContentsOfFile:framePath];
+
+    NSDictionary *dict;
+
+    if (iPhone5) {
+        dict = frameDic[@"iphone5"];
+    } else {
+        dict = frameDic[@"iphone4"];
+    }
+
+    _settingFrame = CGRectFromString(dict[@"btn_setting_frame"]);
+    _languageFrame = CGRectFromString(dict[@"btn_language_frame"]);
+    _moreFrame = CGRectFromString(dict[@"btn_more_frame"]);
+    _rankFrame = CGRectFromString(dict[@"btn_rank_frame"]);
+    _playFrame = CGRectFromString(dict[@"btn_play_frame"]);
+    _getFrame = CGRectFromString(dict[@"btn_get_frame"]);
+}
+
+// 判断点击点是否在对应的Frame内
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    UITouch *touch = [touches anyObject];
+
+    CGPoint touchPoint = [touch locationInView:touch.view];
+
+    [[WNXSoundToolManager sharedSoundToolManager] playSoundWithSoundName: kSoundCliclName];
+
+    if (CGRectContainsPoint(_settingFrame, touchPoint)) {
+
+        [self performSegueWithIdentifier:@"Setting" sender:nil];
+
+    } else if (CGRectContainsPoint(_languageFrame, touchPoint)) {
+
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:kBlogURL]];
+
+    } else if (CGRectContainsPoint(_moreFrame, touchPoint)) {
+
+        [self performSegueWithIdentifier:@"Rare" sender:nil];
+
+    } else if (CGRectContainsPoint(_rankFrame, touchPoint)) {
+
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:kWeiBoURL]];
+
+    } else if (CGRectContainsPoint(_playFrame, touchPoint)) {
+
+        [self performSegueWithIdentifier:@"PlayGame" sender:nil];
+
+    } else if (CGRectContainsPoint(_getFrame, touchPoint)) {
+
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:kGithubUrl]];
+
+    }
+}
+```
+
+## Level-selection controller: WNXSelectStageViewController
+
+The level-selection controller uses UIScrollView containing 24 WNXStageListViews. You could implement a reuse pool, but I did not think it necessary. Each view has a stageModel, loaded from project -\> Resources -\> Plist -\> stages.plist. Its fields supply the level image, unlock state, previous score, Rank marker, and other information.
+
+Each WNXStageListView receives a Tag based on its ID and a tap gesture. Its tap handler uses the navigation controller to push WNXPrepareViewController, passing the selected stageModel so the preparation screen can display the appropriate information. The level-selection result is shown below.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao54/3.gif>)
+
+## Pre-level preparation controller: WNXPrepareViewController
+
+Before each level starts, this controller animates the level name, completion rules, previous score, and related information. It displays data from the stageModel passed when a level is selected. When Play is tapped, the WNXGameControllerViewManager singleton returns the corresponding level ViewController for that stageModel, and the navigation controller pushes it. ![1](<https://allluckly.cn/images/blog/tuogao/tougao54/4.gif>)
+
+## Level controller
+
+The 24 levels repeat many features. We extract common superclass controllers according to level characteristics, and each level inherits the appropriate one. Initialize its distinctive properties in ViewDidLoad. The resulting categories are shown below.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao54/5.jpg>)
+
+## WNXBaseGameViewController –\> UIViewController
+
+WNXBaseGameViewController is the base controller for every level. It supplies common properties and encapsulates level initialization. Each level calls buildStageInfo() in ViewDidLoad, builds its own UI, and overrides superclass methods for level-specific behavior.
+
+### Public properties
+
+WNXGameGuideType guideType: gesture-hint style shown on the first visit to a level WNXGameGuideTypeNone: no hint WNXGameGuideTypeOneFingerClick: tap with one finger WNXGameGuideTypeReplaceClick: tap the left and right buttons alternately WNXGameGuideTypeMultiPointClick: tap with multiple fingers simultaneously
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao54/6.gif>)
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao54/7.gif>)
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao54/8.gif>)
+
+WNXStage \*stage: the model containing information for each level; see the model details.
+
+WNXScoreboardType: each level's scoreboard style
+
+WNXScoreboardTypeNone: no scoreboard WNXScoreboardTypeCountPTS
+
+WNXScoreboardTypeCountPTS WNXScoreboardTypeTimeMS
+
+WNXScoreboardTypeTimeMS WNXScoreboardTypeSecondAndMS
+
+WNXScoreboardTypeSecondAndMS
+
+WNXScoreboardTypeCountPTS scoreboard style
+
+WNXScoreboardTypeTimeMS scoreboard style
+
+WNXScoreboardTypeSecondAndMS scoreboard style UIView \*countScoreView: the scoreboard. UIView accommodates several styles; each level casts it to its own type when using it.
+
+WNXStateView \*stateView: the level's status-hint view
+
+UIButton \*playAgainButton: restart button UIButton \*pauseButton: pause button Public methods
+
+```
+- (void)beginGame; // 开始游戏
+- (void)endGame;   // 结束游戏
+- (void)beginRedayGoView; // 开始显示RedayGo动画
+- (void)readyGoAnimationFinish; // RedayGo动画显示结束
+- (void)pauseGame;    // 暂停游戏
+- (void)continueGame; // 继续游戏
+- (void)playAgainGame; // 重新开始游戏
+- (void)showGameFail; //  游戏失败(部分关卡有, 进入失败ViewController)
+
+// 显示关卡游戏结果
+- (void)showResultControllerWithNewScroe:(double)scroe // 玩家得分
+                                    unit:(NSString *)unil  // 本关计分器显示单位
+                                   stage:(WNXStage *)stage // 关卡信息
+                              isAddScore:(BOOL)isAddScroe; // 是否是添加分数(这里偷了个懒,只做了添加动画,应该有分数增长加动画或者减少动画)
+
+// 构建关卡信息
+- (void)buildStageInfo;
+
+// 将广告,重新开始,暂停按钮放到最上层
+- (void)bringPauseAndPlayAgainToFront;
+
+// 构建显示状态View
+- (void)buildStageView;
+```
+
+## WNXRYBViewController –\> WNXBaseGameViewController
+
+WNXRYBViewController inherits from WNXBaseGameViewController. It has three bottom buttons and three default red, yellow, and blue background strips with highlighted images. The buttons have Tags 0, 1, and 2. Most levels use this style.
+
+Public properties
+
+```
+@property (strong, nonatomic) UIImageView *redImageView;
+@property (strong, nonatomic) UIImageView *yellowImageView;
+@property (strong, nonatomic) UIImageView *blueImageView;
+
+@property (strong, nonatomic) UIButton    *redButton;
+@property (strong, nonatomic) UIButton    *yellowButton;
+@property (strong, nonatomic) UIButton    *blueButton;
+
+@property (nonatomic, strong) NSMutableArray *buttons;
+@property (nonatomic, strong) NSArray *buttonImageNames;
+```
+
+Public methods
+
+```
+- (void)setButtonsIsActivate:(BOOL)isActivate; // 设置全部按钮是否可以点击
+
+- (void)setButtonImage:(UIImage *)image // 当底部按钮图片相同时,设置底部按钮图片
+      contenEdgeInsets:(UIEdgeInsets)insets; // 图片的contenEdgeInsets
+
+- (void)removeAllImageView; // 有写关卡不需要红黄蓝背景图片时,删除三个UIImageView
+
+// 底部按钮Action
+- (void)addButtonsActionWithTarget:(id)target 
+                            action:(SEL)action
+                  forControlEvents:(UIControlEvents)forControlEvents;
+WNXTwoButtonViewController --> WNXBaseGameViewController
+WNXTwoButtonViewController,底部拥有俩个按钮关卡,并且默认带有背景ImageView.
+```
+
+Public properties
+
+```
+@property (nonatomic, strong) UIImageView *backgroundIV;
+
+@property (nonatomic, strong) UIButton *leftButton;
+@property (nonatomic, strong) UIButton *rightButton;
+```
+
+Public methods
+
+```
+// 统一设置按钮是否可以被点击,部分关卡按钮点击后,不允许再次点击
+- (void)setButtonActivate:(BOOL)isActivate;
+```
+
+## WNXBackgroundViewController –\> WNXBaseGameViewController
+
+Levels with only a background image. Some levels in the project use the gyroscope or accelerometer.
+
+I will not describe every level individually; there are too many, but none is particularly complicated. Implement 2–3 and you should understand the pattern. Only a few use the accelerometer or gyroscope. The code is explained clearly in the Stage folder; refer to it as needed.
+
+## Score-results controller: WNXResultViewController
+
+Every completed level enters the score-results controller. A method in WNXBaseGameViewController lets every level controller calculate its score directly. When a level ends, call the function below. I took a shortcut and only implemented addition, but subtraction should be easy to implement using it as a reference!
+
+```
+- (void)showResultControllerWithNewScroe:(double)scroe
+                                    unit:(NSString *)unil
+                                   stage:(WNXStage *)stage
+                              isAddScore:(BOOL)isAddScroe;
+```
+
+The purpose of isAddScore
+
+In some levels, a higher score is better. Their results animate upward from 0, so pass YES for isAddScore.
+
+In some levels, a lower score is better. Their results animate downward from a larger value, so pass NO for isAddScore.
+
+After score calculation, several outcomes are possible. Execute the appropriate logic for each score condition, as shown below.
+
+### State one: Game failure. A grade of F or below is not saved, and the following screen appears.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao54/9.gif>)
+
+State two: Game success If the level has no score record and the grade is above F, save the score, display the result normally, and unlock the next level.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao54/10.gif>)
+
+If the level already has a record but the new score does not exceed it, display the result normally without saving this score.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao54/11.gif>)
+
+If the current level already has a record and this score exceeds it, display the record-breaking animation and replace the previous score with the new one.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao54/12.gif>)
+
+## Failure: WNXFailViewController
+
+Some levels can fail during play, as shown below.
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao54/13.gif>)
+
+This also uses a method wrapped in WNXBaseGameViewController. When a level fails, call showGameFail() to push the failure controller.
+
+If failure needs additional actions, such as stopping a timer or animation, override showGameFail() in that level and execute the required code before calling the superclass method, as follows:
+
+```
+- (void)showGameFail {
+    // 需要在游戏失败时执行的相应代码
+    // do something
+
+    [super showGameFail];
+}
+```
+
+## Pause controller: WNXPauseViewController
+
+Every level supports pausing, so that behavior is encapsulated in WNXBaseGameViewController, which exposes two methods to subclasses:
+
+(void)pauseGame; Pause the game (void)continueGame; Resume the game
+
+Override the two methods above in each level. Tapping Pause invokes the pause method, and returning invokes the continue method. Here is the implementation:
+
+```
+// 玩家点击暂停按钮
+- (void)pauseGame {
+    // 关卡暂停,本关需要执行的相应操作,如暂停计时器,动画等.
+
+    [super pauseGame];
+}
+
+- (void)continueGame {
+    [super continueGame];
+
+    // 继续游戏,继续执行暂停前的操作
+}
+```
+
+![1](<https://allluckly.cn/images/blog/tuogao/tougao54/14.gif>)
+
+## Project summary
+
+I wrote the project rather hastily, usually a little each evening, and did not go back for CodeReview. Honestly, that is a very bad habit. Make a habit of reviewing your earlier code regularly. As I progressed, I noticed many earlier areas that could be improved, but I was lazy—so you know how that went…
+
+Explaining an entire project in words is difficult. I suggest reading the code and referring to this blog when something is unclear. Honestly, this game project is fairly simple; with careful study, you should be able to reproduce it. There are another 24 levels in the game. If interested, try implementing those remaining 24 yourself!
+
+It has been a while since I wrote a project in Objective-C. Suggestions are welcome through Jianshu comments, private messages, or Weibo. I read them all.
+
+After this project, I may not write another large open-source project for quite a while. I plan to develop a game for the AppStore, handling everything myself from overall design and UI design to implementation. That is a lot of work. P.S. I do not even know what the game will be yet…
+
+I will share more interesting small features and animations later. Please keep following 维尼的小熊.
+
+Download the code. If it helps, please click Star ★. [Code download—remember to Star ★ and Follow.](<https://github.com/ZhongTaoTian/Hardest>)
+
+---
+
+Recommended reading: [Adding a launch advertisement to an iOS app](<https://allluckly.cn/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/>)
+{% endraw %}

@@ -1,0 +1,18 @@
+# 并发与性能开发笔记
+
+> 汇集 iOS 多线程、RunLoop、线程保活、卡顿检测与 UIKit 性能调优历史文章，围绕执行顺序和测量方法给出阅读建议。
+
+## 历史版本说明
+
+这里保留 2015–2017 年的历史技术记录及原文归属。条目日期是本站原始发布日期，翻译或目录整理不表示示例已更新到当前版本。
+本次整理未重新运行验证旧示例。旧 Swift 语法、API、依赖、服务地址与审核规则可能过期，实际使用前须对照当前官方文档。
+
+## 按本站原始发布日期阅读
+
+- [Bison眼中的iOS开发多线程是这样的（一）](https://allluckly.cn/%E5%A4%9A%E7%BA%BF%E7%A8%8B/duoxiancheng01/index.md): 从进程与线程的区别引入 iOS 多线程，比较 NSThread、NSOperationQueue 与 GCD，再具体演示线程创建、执行、终止和优先级，结合日志观察调度现象。 本站原始发布：2016-01-13。 原文署名 Bison，保留原发布时的内容。
+- [Bison眼中的iOS开发多线程是这样的（二）](https://allluckly.cn/%E5%A4%9A%E7%BA%BF%E7%A8%8B/duoxiancheng02/index.md): 围绕共享数据被多个线程访问的情形，介绍 synchronized 同步代码块和 NSLock 的加解锁方式，再用 NSCondition 的等待、唤醒与广播解释线程之间的协调。 本站原始发布：2016-01-18。 原文署名 Bison，保留原发布时的内容。
+- [Bison眼中的iOS开发多线程是这样的（三）](https://allluckly.cn/%E5%A4%9A%E7%BA%BF%E7%A8%8B/duoxiancheng03/index.md): 围绕 GCD 的任务与队列展开，比较主队列、全局队列、自建串行和并发队列，并用图片下载、重复执行和一次性初始化示例说明常见任务提交方式。 本站原始发布：2016-02-29。 原文发表于 2016 年，使用 Objective-C GCD 接口；正文部分概念表述需结合代码核对。 原文署名 Bison，保留原发布时的内容。
+- [iOS开发之UIKit性能调优实战讲解](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao27/index.md): 以列表界面为实验对象，结合 Instruments 的 Core Animation 工具观察图层混合、图片尺寸、颜色格式和离屏渲染，解释常见滚动性能问题与针对性的调整思路。 本站原始发布：2016-03-02。 原文发表于 2016 年，调试界面、设备刷新率示例与渲染结论需按当时环境理解。 原文署名bestswifter，Bison 编辑收录。
+- [Swift之优化UITableViewCell高度计算](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao40/index.md): 围绕 UITableView 重复计算单元格高度的问题，结合 FDTemplateLayoutCell 的思路介绍模板测量与高度缓存，并用 Swift 封装接口来减少滚动过程中的重复工作。 本站原始发布：2016-04-25。 原文发表于 2016 年，Swift 实现基于当时的列表布局与缓存接口。 原文署名大石头布，Bison 编辑收录。
+- [iOS开发深入研究Runloop与线程保活](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao55/index.md): 结合 AFNetworking 2.x 的网络线程分析 RunLoop 保活方式，说明照搬循环运行代码可能造成的对象持有与线程退出问题，再用示例验证更可控的生命周期处理。 本站原始发布：2016-07-26。 原文明确分析 AFNetworking 2.x 的 NSURLConnection 网络线程实现。 原文署名bestswifter，Bison 编辑收录。
+- [iOS开发优化篇之卡顿检测](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao73/index.md): 通过监控主线程 RunLoop 状态和等待超时检测卡顿，并介绍获取线程栈帧、遍历调用栈与符号化的过程，说明如何在应用运行期间留下可排查的上下文。 本站原始发布：2017-03-27。 原文发表于 2017 年，堆栈读取与符号化代码基于当时的系统和处理器结构。 原文署名SindriLin，Bison 编辑收录。

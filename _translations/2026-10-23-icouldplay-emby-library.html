@@ -1,0 +1,51 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'Connect iCouldPlay to Emby: sign in and choose your media library'
+description: Use the Emby server address and account permissions to sign in, browse libraries and check movie details
+  and playback, distinguishing server accounts from file-share accounts.
+permalink: /en/guides/icouldplay-emby-library/
+date: 2026-10-23 00:00:00 +0800
+category: Tutorials
+level: Beginner
+series_order: 6
+topic: Servers and library setup
+reading_time: 11
+lang: en
+source_path: _posts/2026-10-23-icouldplay-emby-library.md
+source_url: /guides/icouldplay-emby-library/
+translation_method: machine-assisted
+translation_source_sha256: 75e5c902357df992427431608570436acca2d498768aeb7cd09841e3ff37d754
+excerpt: Use the Emby server address and account permissions to sign in, browse libraries and check movie details
+  and playback, distinguishing server accounts from file-share accounts.
+translation_date: '2026-10-23T02:34:08+00:00'
+---
+{% raw %}
+<p>When Emby already manages posters, movie information, and user permissions, iCouldPlay can connect as a viewing interface. This differs from SMB: you sign in as a media-server user and see libraries supplied by the server rather than browsing every NAS share directly. This article verifies an existing library first, then checks movie details, actual playback, and the user's visible scope.</p>
+<h2 id="从-emby-获取正确的连接信息">Get the correct connection details from Emby</h2>
+<p>First confirm in Emby's website or client that the server is running, using the same user intended for iCouldPlay. Record the server address, port, and protocol, not merely the NAS administration address. Emby's official guidance recommends obtaining the LAN address from the server dashboard. You can also verify reachability in a browser on another device on the same network.<a href="https://emby.media/support/articles/Connectivity.html">Connection documentation</a></p>
+<p>The tutorial example can use the host  <code class="language-plaintext highlighter-rouge">192.168.1.30</code>, port  <code class="language-plaintext highlighter-rouge">8096</code>, but these are not fixed values for every installation. Use the actual configuration if the administrator provides HTTPS or a custom port. Prepare a movie already displayed correctly and playable in Emby, preferably with an easily checked duration and file location. Avoid beginning with a large collection containing several mixed versions.</p>
+<h2 id="添加媒体服务器而不是文件源">Add a media server rather than a file source</h2>
+<p>Open Sources in iCouldPlay, choose to add a media server, and select Emby. A name such as Home Emby is suitable. Enter the prepared server address and port, with HTTPS matching the actual service. Do not put a movie file path, browser details page, or link full of query parameters in the host field. It needs the server entry point, not a particular film's webpage.</p>
+<p>Use the Emby user's username and password. These may differ from the NAS SMB account and need not be the administration account. Start with an ordinary viewing user. If someone else manages the service, confirm the assigned account and library access with the administrator rather than trying passwords from your other websites. The source name is only for local identification and does not rename the server.</p>
+<h2 id="登录后先核对用户能看到什么">Check what the user can see after login</h2>
+<p>After testing and saving successfully, open the server's library list and compare its names with Emby's own client. If the user should see Movies and Family Videos, verify those two first. Do not conclude that iCouldPlay has omitted a library merely because an administrator also sees Work Materials. Library visibility follows the current user's permissions; the client cannot automatically bypass them.</p>
+<p>Open a small library and check several posters and titles. Verify metadata supplied by the server on the server first instead of applying a file-source scan and matching everything again. If the library is completely empty, return to Emby's original entry point with the same account to distinguish lack of user permission from iCouldPlay failing to retrieve the list.</p>
+<h2 id="用详情页确认不是同名条目">Use the details page to rule out a same-title mismatch</h2>
+<p>Choose a movie and check its year, duration, synopsis, and version clues. Films with the same title, remakes, and different cuts may have similar covers; do not start playback based only on poster color. If the server's own details are wrong, correct them in Emby first. iCouldPlay may need a refresh before showing the update.</p>
+<p>Personal family videos may have no movie metadata. Keeping filenames or server-defined titles still allows normal browsing. Judge movie metadata separately from the actual file contents. For titles sharing a name and for year organization, see <a href="/en/guides/icouldplay-movie-naming/">Movie naming and matching</a>, but do not treat that article's file-source steps as server-management buttons.</p>
+<h2 id="播放时检查服务器与客户端两端">Check both server and client during playback</h2>
+<p>Open the verified movie, watch a short section, then jump to the middle and check sound and subtitles. A poster only confirms that the metadata interface works. The video may use a different data path and still needs a separate test. If the list works but playback fails, play the same item in Emby's own client first to confirm that the server can read the media file.</p>
+<p>If Emby's own client works but iCouldPlay does not, record the movie name, container, audio/video information, and exact failure stage. The server may provide different playback methods according to client capabilities, so one working client does not guarantee identical results elsewhere. Do not change transcoding, network, and subtitle settings all at once without understanding the cause. Keep the same file for comparison first.</p>
+<h2 id="区分家中连接与外出连接">Distinguish home and away connections</h2>
+<p>A LAN address working at home does not mean it is reachable over a mobile network. Before going out, use the remote entry point already configured by the administrator and confirm that the current user is allowed remote access. Give the two entry points different names to avoid using the home address externally. Do not open server ports or disable authentication just for a first test; this article covers connecting to an existing working service.</p>
+<p>If the remote address remains slow after returning home, compare the LAN source, first confirming that both connect to the same server and user. Verify matching progress by exiting and reopening instead of assuming unconditional instant synchronization across clients. To investigate waiting and buffering, see <a href="/en/guides/icouldplay-network-buffering/">Network buffering troubleshooting</a>.</p>
+<h2 id="常见失败与完成标准">Common failures and completion criteria</h2>
+<p><strong>Login succeeds but no libraries appear. Should I rescan the NAS?</strong> Not yet. Emby manages its own libraries. The signed-in user may lack access, or the server may not have finished organizing them. Checking through the original entry point with the same account is the most direct test. Continue investigating the client's list retrieval only after confirming that the library exists on the server.</p>
+<p><strong>Why does adding the server fail when the full URL opens?</strong> A full URL may contain a web-interface path, reverse-proxy subpath, or login-page parameters that the current form cannot process like a browser. Ask the administrator for a direct service address suitable for clients. If access uses a reverse proxy with a subpath, separately check whether the client can connect.</p>
+<p>When finished, the same account should show the expected libraries, provide details for one verified movie, play and seek successfully, and work again after returning to the server list and reopening it. Keep track of the server name and usable network so later additions do not blur file sources, media servers, and user permissions together.</p>
+<h2 id="资料来源与版本">Sources and version</h2>
+<p>Based on <a href="https://apps.apple.com/cn/app/id6755653178">Official iCouldPlay App Store page </a>Based on publicly described Emby support, the existing connection interface, and the official Emby connection documentation above. iCouldPlay's public version was verified as 1.1.0 on October 23, 2026. Server versions, proxy paths, and user permissions affect results, and the interface may change between versions.</p>
+
+{% endraw %}

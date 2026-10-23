@@ -1,0 +1,499 @@
+---
+layout: post
+title: An illustrated guide to implementing iOS in-app purchases
+description: An early end-to-end integration guide covering agreements, in-app purchase products, sandbox accounts
+  and client code. It follows StoreKit product requests, the payment queue, transaction-state handling and receipt
+  validation through the setup process.
+imagefeature: ''
+imagecredit: null
+imagecreditlink: ''
+published: true
+date: 2015-06-04 00:00:00 +0800
+technical_translation:
+  topic: tooling-release
+  summary: An early end-to-end integration guide covering agreements, in-app purchase products, sandbox accounts
+    and client code. It follows StoreKit product requests, the payment queue, transaction-state handling and receipt
+    validation through the setup process.
+  keywords:
+  - StoreKit
+  - IAP
+  - sandbox testing
+  - transaction queue
+  - receipt validation
+  provenance: original
+  author_name: Bison
+  credit: Originally credited to Bison. Content is retained as published.
+  version_note: Published in 2015. The implementation uses the older SKProductsRequest, SKPaymentQueue and verifyReceipt
+    workflow.
+  author_url: https://allluckly.cn/about/
+  title: An illustrated guide to implementing iOS in-app purchases
+  source_sha256: 0de14fc9cfdb01774960647255327de9aec3aceb144edafd4017a5e37f036769
+category: Development notes
+lang: en
+source_path: _posts/2015-06-04-iOS开发2015年最新内购教程.md
+source_url: /ios%E6%94%AF%E4%BB%98/iOS%E5%BC%80%E5%8F%912015%E5%B9%B4%E6%9C%80%E6%96%B0%E5%86%85%E8%B4%AD%E6%95%99%E7%A8%8B
+permalink: /en/journal/2015-06-04-an-illustrated-guide-to-implementing-ios-in-app-purchases/
+translation_method: machine-assisted
+translation_source_sha256: 0de14fc9cfdb01774960647255327de9aec3aceb144edafd4017a5e37f036769
+excerpt: An early end-to-end integration guide covering agreements, in-app purchase products, sandbox accounts and
+  client code. It follows StoreKit product requests, the payment queue, transaction-state handling and receipt validation
+  through the setup process.
+translation_date: '2026-10-23T02:44:58+00:00'
+---
+{% raw %}
+<blockquote>
+<p>"The beginning is the most important part of the work."
+<small><cite title="Plato">Plato</cite></small></p>
+</blockquote>
+<p>========== Part 1: agreements =======</p>
+<p><img alt="1" src="https://allluckly.cn/images/2015-06-04-内购/第一步.png"/><br/></p>
+<p><img alt="2" src="https://allluckly.cn/images/2015-06-04-内购/第二步.jpg"/><br/></p>
+<p><img alt="3" src="https://allluckly.cn/images/2015-06-04-内购/第三步.jpg"/><br/></p>
+<p><img alt="4" src="https://allluckly.cn/images/2015-06-04-内购/第四步.png"/><br/></p>
+<p><img alt="5" src="https://allluckly.cn/images/2015-06-04-内购/第五步.png"/><br/></p>
+<p><img alt="6" src="https://allluckly.cn/images/2015-06-04-内购/第六步.png"/><br/></p>
+<p><img alt="7" src="https://allluckly.cn/images/2015-06-04-内购/第七步.jpg"/><br/></p>
+<p><img alt="8" src="https://allluckly.cn/images/2015-06-04-内购/第八步.jpg"/><br/></p>
+<p><img alt="9" src="https://allluckly.cn/images/2015-06-04-内购/第九步.jpg"/><br/></p>
+<p><img alt="10" src="https://allluckly.cn/images/2015-06-04-内购/第十步.png"/><br/></p>
+<p>CNAPS CODE lookup URL
+https://e.czbank.com/CORPORBANK/query_unionBank_index.jsp</p>
+<p><img alt="11" src="https://allluckly.cn/images/2015-06-04-内购/十一步.jpg"/><br/></p>
+<p><img alt="12" src="https://allluckly.cn/images/2015-06-04-内购/十二步.jpg"/><br/></p>
+<p><img alt="13" src="https://allluckly.cn/images/2015-06-04-内购/十三步.png"/><br/></p>
+<p><img alt="14" src="https://allluckly.cn/images/2015-06-04-内购/十四步.png"/><br/></p>
+<p><img alt="15" src="https://allluckly.cn/images/2015-06-04-内购/十五步.jpg"/><br/></p>
+<p><img alt="16" src="https://allluckly.cn/images/2015-06-04-内购/十七步.jpg"/><br/></p>
+<p><img alt="17" src="https://allluckly.cn/images/2015-06-04-内购/十八步.jpg"/><br/></p>
+<p><img alt="18" src="https://allluckly.cn/images/2015-06-04-内购/十九步.png"/><br/></p>
+<p><img alt="19" src="https://allluckly.cn/images/2015-06-04-内购/二十步.png"/><br/></p>
+<p>============= Part 2: create in-app purchase products ============</p>
+<p><img alt="20" src="https://allluckly.cn/images/2015-06-04-内购/1.png"/><br/></p>
+<p><img alt="21" src="https://allluckly.cn/images/2015-06-04-内购/2.png"/><br/></p>
+<p><img alt="22" src="https://allluckly.cn/images/2015-06-04-内购/3.png"/><br/></p>
+<p><img alt="23" src="https://allluckly.cn/images/2015-06-04-内购/4.png"/><br/></p>
+<p><img alt="24" src="https://allluckly.cn/images/2015-06-04-内购/5.png"/><br/></p>
+<p><img alt="25" src="https://allluckly.cn/images/2015-06-04-内购/6.png"/><br/></p>
+<p><img alt="26" src="https://allluckly.cn/images/2015-06-04-内购/7.png"/><br/></p>
+<p>=========== Part 3: add in-app purchase test accounts ==========</p>
+<p><img alt="27" src="https://allluckly.cn/images/2015-06-04-内购/创建测试账号.png"/><br/></p>
+<p><img alt="28" src="https://allluckly.cn/images/2015-06-04-内购/沙盒测试员.png"/><br/></p>
+<p><img alt="29" src="https://allluckly.cn/images/2015-06-04-内购/账号信息.png"/><br/></p>
+<p>============= Part 4: main implementation code ==========</p>
+<p>First, add the <code class="language-plaintext highlighter-rouge">StoreKit.framework</code> framework.</p>
+<p>.h file</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nf">#define</span> <span class="nt">kSandboxVerifyURL</span> <span class="o">@</span><span class="s1">"https://sandbox.itunes.apple.com/verifyReceipt"</span> <span class="o">//</span><span class="nt">开发阶段沙盒验证URL</span>
+<span class="nf">#define</span> <span class="nt">kAppStoreVerifyURL</span> <span class="o">@</span><span class="s1">"https://buy.itunes.apple.com/verifyReceipt"</span> <span class="o">//</span><span class="nt">实际购买验证URL</span>
+<span class="nf">#import</span> <span class="o">&lt;</span><span class="nt">StoreKit</span><span class="o">/</span><span class="nt">StoreKit</span><span class="nc">.h</span><span class="o">&gt;</span>
+
+
+
+
+<span class="nt">enum</span><span class="p">{</span>
+<span class="err">IAP0p20=20,</span>
+<span class="err">IAP1p100,</span>
+<span class="err">IAP4p600,</span>
+<span class="err">IAP9p1000,</span>
+<span class="err">IAP24p6000,</span>
+<span class="p">}</span><span class="nt">buyCoinsTag</span><span class="o">;</span>
+
+
+
+
+
+<span class="o">//</span><span class="nt">代理</span>
+<span class="k">@interface</span> <span class="n">RechargeVC</span> <span class="p">:</span> <span class="n">UIViewController</span> <span class="err">&lt;</span><span class="n">SKPaymentTransactionObserver</span><span class="p">,</span><span class="n">SKProductsRequestDelegate</span> <span class="err">&gt;</span>
+
+
+
+<span class="p">{</span>
+<span class="nt">int</span> <span class="nt">buyType</span><span class="o">;</span>
+<span class="p">}</span>
+
+
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span> <span class="nt">requestProUpgradeProductData</span><span class="o">;</span>
+
+
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">RequestProductData</span><span class="o">;</span>
+
+
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">buy</span><span class="o">:(</span><span class="nt">int</span><span class="o">)</span><span class="nt">type</span><span class="o">;</span>
+
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">paymentQueue</span><span class="o">:(</span><span class="nt">SKPaymentQueue</span> <span class="o">*)</span><span class="nt">queue</span> <span class="nt">updatedTransactions</span><span class="o">:(</span><span class="nt">NSArray</span> <span class="o">*)</span><span class="nt">transactions</span><span class="o">;</span>
+
+
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span> <span class="nt">PurchasedTransaction</span><span class="o">:</span> <span class="o">(</span><span class="nt">SKPaymentTransaction</span> <span class="o">*)</span><span class="nt">transaction</span><span class="o">;</span>
+
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span> <span class="nt">completeTransaction</span><span class="o">:</span> <span class="o">(</span><span class="nt">SKPaymentTransaction</span> <span class="o">*)</span><span class="nt">transaction</span><span class="o">;</span>
+
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span> <span class="nt">failedTransaction</span><span class="o">:</span> <span class="o">(</span><span class="nt">SKPaymentTransaction</span> <span class="o">*)</span><span class="nt">transaction</span><span class="o">;</span>
+
+
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span> <span class="nt">paymentQueueRestoreCompletedTransactionsFinished</span><span class="o">:</span> <span class="o">(</span><span class="nt">SKPaymentTransaction</span> <span class="o">*)</span><span class="nt">transaction</span><span class="o">;</span>
+
+
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span> <span class="nt">paymentQueue</span><span class="o">:(</span><span class="nt">SKPaymentQueue</span> <span class="o">*)</span> <span class="nt">paymentQueue</span> <span class="nt">restoreCompletedTransactionsFailedWithError</span><span class="o">:(</span><span class="nt">NSError</span> <span class="o">*)</span><span class="nt">error</span><span class="o">;</span>
+
+
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span> <span class="nt">restoreTransaction</span><span class="o">:</span> <span class="o">(</span><span class="nt">SKPaymentTransaction</span> <span class="o">*)</span><span class="nt">transaction</span><span class="o">;</span>
+
+
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">provideContent</span><span class="o">:(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">product</span><span class="o">;</span>
+
+
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">recordTransaction</span><span class="o">:(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">product</span><span class="o">;</span>
+
+
+
+<span class="k">@end</span></code></pre></figure>
+<p>.m file</p>
+<figure class="highlight"><pre><code class="language-css" data-lang="css"><span class="nf">#import</span> <span class="s1">"RechargeVC.h"</span>
+
+
+<span class="o">//</span><span class="nt">在内购项目中创的商品单号</span>
+<span class="nf">#define</span> <span class="nt">ProductID_IAP0p20</span> <span class="o">@</span><span class="s1">"Nada.JPYF01"</span><span class="o">//</span><span class="err">20</span>
+<span class="nf">#define</span> <span class="nt">ProductID_IAP1p100</span> <span class="o">@</span><span class="s1">"Nada.JPYF02"</span> <span class="o">//</span><span class="err">100</span>
+<span class="nf">#define</span> <span class="nt">ProductID_IAP4p600</span> <span class="o">@</span><span class="s1">"Nada.JPYF03"</span> <span class="o">//</span><span class="err">600</span>
+<span class="nf">#define</span> <span class="nt">ProductID_IAP9p1000</span> <span class="o">@</span><span class="s1">"Nada.JPYF04"</span> <span class="o">//</span><span class="err">1000</span>
+<span class="nf">#define</span> <span class="nt">ProductID_IAP24p6000</span> <span class="o">@</span><span class="s1">"Nada.JPYF05"</span> <span class="o">//</span><span class="err">6000</span>
+
+
+
+<span class="k">@interface</span> <span class="n">RechargeVC</span> <span class="p">()</span>
+
+<span class="err">@</span><span class="n">end</span>
+
+
+<span class="err">@</span><span class="n">implementation</span> <span class="n">RechargeVC</span>
+
+
+<span class="n">-</span> <span class="p">(</span><span class="n">void</span><span class="p">)</span><span class="n">viewDidLoad</span> <span class="p">{</span>
+
+    <span class="o">[</span><span class="nt">super</span> <span class="nt">viewDidLoad</span><span class="o">];</span>
+
+    <span class="o">[[</span><span class="nt">SKPaymentQueue</span> <span class="nt">defaultQueue</span><span class="o">]</span> <span class="nt">addTransactionObserver</span><span class="nd">:self</span><span class="o">];</span>
+    <span class="o">[</span><span class="nt">self</span> <span class="nt">buy</span><span class="nd">:IAP0p20</span><span class="o">];</span>
+
+<span class="p">}</span>
+
+
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">buy</span><span class="o">:(</span><span class="nt">int</span><span class="o">)</span><span class="nt">type</span>
+<span class="p">{</span>
+    <span class="err">buyType</span> <span class="err">=</span> <span class="err">type;</span>
+    <span class="err">if</span> <span class="err">([SKPaymentQueue</span> <span class="err">canMakePayments])</span> <span class="err">{</span>
+    <span class="err">[self</span> <span class="err">RequestProductData];</span>
+    <span class="err">NSLog(@"允许程序内付费购买");</span>
+<span class="p">}</span>
+<span class="nt">else</span>
+<span class="p">{</span>
+    <span class="err">NSLog(@"不允许程序内付费购买");</span>
+    <span class="err">UIAlertView</span> <span class="err">*alerView</span> <span class="err">=</span>  <span class="err">[[UIAlertView</span> <span class="err">alloc]</span> <span class="py">initWithTitle</span><span class="p">:</span><span class="err">@</span><span class="s1">"提示"</span>
+    <span class="n">message</span><span class="p">:</span><span class="err">@</span><span class="s1">"您的手机没有打开程序内付费购买"</span>
+    <span class="n">delegate</span><span class="p">:</span><span class="n">nil</span> <span class="n">cancelButtonTitle</span><span class="p">:</span><span class="n">NSLocalizedString</span><span class="p">(</span><span class="err">@</span><span class="s1">"关闭"</span><span class="p">,</span><span class="n">nil</span><span class="p">)</span> <span class="n">otherButtonTitles</span><span class="p">:</span><span class="n">nil</span><span class="p">];</span>
+
+    <span class="err">[alerView</span> <span class="err">show];</span>
+
+
+    <span class="p">}</span>
+<span class="err">}</span>
+
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">RequestProductData</span>
+<span class="p">{</span>
+    <span class="err">NSLog(@"---------请求对应的产品信息------------");</span>
+    <span class="err">NSArray</span> <span class="err">*product</span> <span class="err">=</span> <span class="err">nil;</span>
+    <span class="err">switch</span> <span class="err">(buyType)</span> <span class="err">{</span>
+        <span class="err">case</span> <span class="py">IAP0p20</span><span class="p">:</span>
+        <span class="n">product</span><span class="err">=</span><span class="p">[[</span><span class="n">NSArray</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">initWithObjects</span><span class="p">:</span><span class="n">ProductID_IAP0p20</span><span class="p">,</span><span class="n">nil</span><span class="p">];</span>
+        <span class="err">break;</span>
+        <span class="err">case</span> <span class="py">IAP1p100</span><span class="p">:</span>
+        <span class="n">product</span><span class="err">=</span><span class="p">[[</span><span class="n">NSArray</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">initWithObjects</span><span class="p">:</span><span class="n">ProductID_IAP1p100</span><span class="p">,</span><span class="n">nil</span><span class="p">];</span>
+        <span class="err">break;</span>
+        <span class="err">case</span> <span class="py">IAP4p600</span><span class="p">:</span>
+        <span class="n">product</span><span class="err">=</span><span class="p">[[</span><span class="n">NSArray</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">initWithObjects</span><span class="p">:</span><span class="n">ProductID_IAP4p600</span><span class="p">,</span><span class="n">nil</span><span class="p">];</span>
+        <span class="err">break;</span>
+        <span class="err">case</span> <span class="py">IAP9p1000</span><span class="p">:</span>
+        <span class="n">product</span><span class="err">=</span><span class="p">[[</span><span class="n">NSArray</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">initWithObjects</span><span class="p">:</span><span class="n">ProductID_IAP9p1000</span><span class="p">,</span><span class="n">nil</span><span class="p">];</span>
+        <span class="err">break;</span>
+        <span class="err">case</span> <span class="py">IAP24p6000</span><span class="p">:</span>
+        <span class="n">product</span><span class="err">=</span><span class="p">[[</span><span class="n">NSArray</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">initWithObjects</span><span class="p">:</span><span class="n">ProductID_IAP24p6000</span><span class="p">,</span><span class="n">nil</span><span class="p">];</span>
+        <span class="err">break;</span>
+
+        <span class="py">default</span><span class="p">:</span>
+        <span class="n">break</span><span class="p">;</span>
+<span class="p">}</span>
+    <span class="nt">NSSet</span> <span class="o">*</span><span class="nt">nsset</span> <span class="o">=</span> <span class="o">[</span><span class="nt">NSSet</span> <span class="nt">setWithArray</span><span class="nd">:product</span><span class="o">];</span>
+    <span class="nt">SKProductsRequest</span> <span class="o">*</span><span class="nt">request</span><span class="o">=[[</span><span class="nt">SKProductsRequest</span> <span class="nt">alloc</span><span class="o">]</span> <span class="nt">initWithProductIdentifiers</span><span class="o">:</span> <span class="nt">nsset</span><span class="o">];</span>
+    <span class="nt">request</span><span class="nc">.delegate</span><span class="o">=</span><span class="nt">self</span><span class="o">;</span>
+    <span class="o">[</span><span class="nt">request</span> <span class="nt">start</span><span class="o">];</span>
+
+<span class="err">}</span>
+
+<span class="o">//&lt;</span><span class="nt">SKProductsRequestDelegate</span><span class="o">&gt;</span> <span class="nt">请求协议</span>
+<span class="o">//</span><span class="nt">收到的产品信息</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">productsRequest</span><span class="o">:(</span><span class="nt">SKProductsRequest</span> <span class="o">*)</span><span class="nt">request</span> <span class="nt">didReceiveResponse</span><span class="o">:(</span><span class="nt">SKProductsResponse</span> <span class="o">*)</span><span class="nt">response</span><span class="p">{</span>
+
+    <span class="err">NSLog(@"-----------收到产品反馈信息--------------");</span>
+    <span class="err">NSArray</span> <span class="err">*myProduct</span> <span class="err">=</span> <span class="err">response.products;</span>
+    <span class="err">NSLog(@"产品Product</span> <span class="py">ID</span><span class="p">:</span><span class="err">%@</span><span class="s1">",response.invalidProductIdentifiers);
+    NSLog(@"</span><span class="n">产品付费数量</span><span class="p">:</span> <span class="err">%</span><span class="n">d</span><span class="s1">", (int)[myProduct count]);
+    // populate UI
+    for(SKProduct *product in myProduct){
+    NSLog(@"</span><span class="n">product</span> <span class="n">info</span><span class="s1">");
+    NSLog(@"</span><span class="n">SKProduct</span> <span class="n">描述信息</span><span class="err">%@</span><span class="s1">", [product description]);
+    NSLog(@"</span><span class="n">产品标题</span> <span class="err">%@</span><span class="s1">" , product.localizedTitle);
+    NSLog(@"</span><span class="n">产品描述信息</span><span class="p">:</span> <span class="err">%@</span><span class="s1">" , product.localizedDescription);
+    NSLog(@"</span><span class="n">价格</span><span class="p">:</span> <span class="err">%@</span><span class="s1">" , product.price);
+    NSLog(@"</span><span class="n">Product</span> <span class="n">id</span><span class="p">:</span> <span class="err">%@</span><span class="s1">" , product.productIdentifier);
+}
+    SKPayment *payment = nil;
+    switch (buyType) {
+        case IAP0p20:
+        payment  = [SKPayment paymentWithProductIdentifier:ProductID_IAP0p20];    //支付25
+        break;
+        case IAP1p100:
+        payment  = [SKPayment paymentWithProductIdentifier:ProductID_IAP1p100];    //支付108
+        break;
+        case IAP4p600:
+        payment  = [SKPayment paymentWithProductIdentifier:ProductID_IAP4p600];    //支付618
+        break;
+        case IAP9p1000:
+        payment  = [SKPayment paymentWithProductIdentifier:ProductID_IAP9p1000];    //支付1048
+        break;
+        case IAP24p6000:
+        payment  = [SKPayment paymentWithProductIdentifier:ProductID_IAP24p6000];    //支付5898
+        break;
+        default:
+        break;
+}
+    NSLog(@"</span><span class="n">---------发送购买请求------------</span><span class="s1">");
+    [[SKPaymentQueue defaultQueue] addPayment:payment];
+
+}
+- (void)requestProUpgradeProductData
+{
+    NSLog(@"</span><span class="n">------请求升级数据---------</span><span class="s1">");
+    NSSet *productIdentifiers = [NSSet setWithObject:@"</span><span class="n">com</span><span class="p">.</span><span class="n">productid</span><span class="s1">"];
+    SKProductsRequest* productsRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:productIdentifiers];
+    productsRequest.delegate = self;
+    [productsRequest start];
+
+}
+//弹出错误信息
+- (void)request:(SKRequest *)request didFailWithError:(NSError *)error{
+    NSLog(@"</span><span class="n">-------弹出错误信息----------</span><span class="s1">");
+    UIAlertView *alerView =  [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"</span><span class="n">Alert</span><span class="s1">",NULL) message:[error localizedDescription]
+    delegate:nil cancelButtonTitle:NSLocalizedString(@"</span><span class="n">Close</span><span class="s1">",nil) otherButtonTitles:nil];
+    [alerView show];
+
+}
+
+-(void) requestDidFinish:(SKRequest *)request
+{
+    NSLog(@"</span><span class="n">----------反馈信息结束--------------</span><span class="s1">");
+
+}
+
+-(void) PurchasedTransaction: (SKPaymentTransaction *)transaction{
+    NSLog(@"</span><span class="n">-----PurchasedTransaction----</span><span class="s1">");
+    NSArray *transactions =[[NSArray alloc] initWithObjects:transaction, nil];
+    [self paymentQueue:[SKPaymentQueue defaultQueue] updatedTransactions:transactions];
+}
+
+//&lt;SKPaymentTransactionObserver&gt; 千万不要忘记绑定，代码如下：
+//----监听购买结果
+//[[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+
+- (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions//交易结果
+{
+    NSLog(@"</span><span class="n">-----paymentQueue--------</span><span class="s1">");
+    for (SKPaymentTransaction *transaction in transactions)
+    {
+        switch (transaction.transactionState)
+        {
+            case SKPaymentTransactionStatePurchased:{//交易完成
+            [self completeTransaction:transaction];
+            NSLog(@"</span><span class="n">-----交易完成</span> <span class="n">--------</span><span class="s1">");
+            //购买成功后进行验证
+            [self verifyPurchaseWithPaymentTransaction];
+
+        } break;
+        case SKPaymentTransactionStateFailed://交易失败
+            { [self failedTransaction:transaction];
+            NSLog(@"</span><span class="n">-----交易失败</span> <span class="n">--------</span><span class="s1">");
+            UIAlertView *alerView2 =  [[UIAlertView alloc] initWithTitle:@"</span><span class="n">提示</span><span class="s1">"
+            message:@"</span><span class="n">购买失败</span><span class="err">，</span><span class="n">请重新尝试购买</span><span class="s1">"
+            delegate:nil cancelButtonTitle:NSLocalizedString(@"</span><span class="n">关闭</span><span class="s1">",nil) otherButtonTitles:nil];
+
+            [alerView2 show];
+
+        }break;
+        case SKPaymentTransactionStateRestored://已经购买过该商品
+            [self restoreTransaction:transaction];
+            NSLog(@"</span><span class="n">-----已经购买过该商品</span> <span class="n">--------</span><span class="s1">");
+            case SKPaymentTransactionStatePurchasing:      //商品添加进列表
+            NSLog(@"</span><span class="n">-----商品添加进列表</span> <span class="n">--------</span><span class="s1">");
+            break;
+            default:
+            break;
+        }
+    }
+}
+
+/**
+*  验证购买，避免越狱软件模拟苹果请求达到非法购买问题
+*
+*/
+-(void)verifyPurchaseWithPaymentTransaction{
+    //从沙盒中获取交易凭证并且拼接成请求体数据
+    NSURL *receiptUrl=[[NSBundle mainBundle] appStoreReceiptURL];
+    NSData *receiptData=[NSData dataWithContentsOfURL:receiptUrl];
+
+    NSString *receiptString=[receiptData base64EncodedStringWithOptions:NSDataBase64EncodingEndLineWithLineFeed];//转化为base64字符串
+
+    NSString *bodyString = [NSString stringWithFormat:@"</span><span class="err">{\</span><span class="s1">"receipt-data\" : \"%@\"}"</span><span class="p">,</span> <span class="n">receiptString</span><span class="p">];</span><span class="err">//拼接请求数据</span>
+    <span class="err">NSData</span> <span class="err">*bodyData</span> <span class="err">=</span> <span class="err">[bodyString</span> <span class="py">dataUsingEncoding</span><span class="p">:</span><span class="n">NSUTF8StringEncoding</span><span class="p">];</span>
+
+    <span class="err">//创建请求到苹果官方进行购买验证</span>
+    <span class="err">NSURL</span> <span class="err">*url=[NSURL</span> <span class="py">URLWithString</span><span class="p">:</span><span class="n">kSandboxVerifyURL</span><span class="p">];</span>
+    <span class="err">NSMutableURLRequest</span> <span class="err">*requestM=[NSMutableURLRequest</span> <span class="py">requestWithURL</span><span class="p">:</span><span class="nb">url</span><span class="p">];</span>
+    <span class="err">requestM.HTTPBody=bodyData;</span>
+    <span class="err">requestM.HTTPMethod=@"POST";</span>
+    <span class="err">//创建连接并发送同步请求</span>
+    <span class="err">NSError</span> <span class="err">*error=nil;</span>
+    <span class="err">NSData</span> <span class="err">*responseData=[NSURLConnection</span> <span class="py">sendSynchronousRequest</span><span class="p">:</span><span class="n">requestM</span> <span class="n">returningResponse</span><span class="p">:</span><span class="n">nil</span> <span class="n">error</span><span class="p">:</span><span class="err">&amp;</span><span class="n">error</span><span class="p">];</span>
+    <span class="err">if</span> <span class="err">(error)</span> <span class="err">{</span>
+        <span class="err">NSLog(@"验证购买过程中发生错误，错误信息：%@",error.localizedDescription);</span>
+        <span class="err">return;</span>
+    <span class="p">}</span>
+    <span class="nt">NSDictionary</span> <span class="o">*</span><span class="nt">dic</span><span class="o">=[</span><span class="nt">NSJSONSerialization</span> <span class="nt">JSONObjectWithData</span><span class="nd">:responseData</span> <span class="nt">options</span><span class="nd">:NSJSONReadingAllowFragments</span> <span class="nt">error</span><span class="nd">:nil</span><span class="o">];</span>
+    <span class="nt">NSLog</span><span class="o">(@</span><span class="s1">"%@"</span><span class="o">,</span><span class="nt">dic</span><span class="o">);</span>
+    <span class="nt">if</span><span class="o">([</span><span class="nt">dic</span><span class="o">[@</span><span class="s1">"status"</span><span class="o">]</span> <span class="nt">intValue</span><span class="o">]==</span><span class="err">0</span><span class="o">)</span><span class="p">{</span>
+        <span class="err">NSLog(@"购买成功！");</span>
+        <span class="err">NSDictionary</span> <span class="err">*dicReceipt=</span> <span class="err">dic[@"receipt"];</span>
+        <span class="c">/*
+        PS.如果你的商品比较多的话，最好给dicReceipt[@"in_app"]按照最新时间做下排序再取firstObject，由于网络延迟难免出现延迟等现象导致当前firstObject可能并不是我们现在所买商品的凭证。
+        */</span>
+        <span class="err">NSDictionary</span> <span class="err">*dicInApp=[dicReceipt[@"in_app"]</span> <span class="err">firstObject];</span>
+    
+        <span class="err">NSString</span> <span class="err">*productIdentifier=</span> <span class="err">dicInApp[@"product_id"];//读取产品标识</span>
+        <span class="err">//如果是消耗品则记录购买数量，非消耗品则记录是否购买过</span>
+        <span class="err">NSUserDefaults</span> <span class="err">*defaults=[NSUserDefaults</span> <span class="err">standardUserDefaults];</span>
+        <span class="err">if</span> <span class="err">([productIdentifier</span> <span class="py">isEqualToString</span><span class="p">:</span><span class="n">kProductID3</span><span class="p">])</span> <span class="err">{</span>
+            <span class="n">int</span> <span class="n">purchasedCount</span><span class="err">=</span><span class="p">[</span><span class="n">defaults</span> <span class="n">integerForKey</span><span class="p">:</span><span class="n">productIdentifier</span><span class="p">];</span><span class="err">//已购买数量</span>
+            <span class="err">[[NSUserDefaults</span> <span class="err">standardUserDefaults]</span> <span class="py">setInteger</span><span class="p">:(</span><span class="n">purchasedCount</span><span class="err">+</span><span class="m">1</span><span class="p">)</span> <span class="n">forKey</span><span class="p">:</span><span class="n">productIdentifier</span><span class="p">];</span>
+        <span class="p">}</span><span class="nt">else</span><span class="p">{</span>
+            <span class="err">[defaults</span> <span class="py">setBool</span><span class="p">:</span><span class="n">YES</span> <span class="n">forKey</span><span class="p">:</span><span class="n">productIdentifier</span><span class="p">];</span>
+        <span class="p">}</span>
+        <span class="o">[</span><span class="nt">self</span><span class="nc">.tableView</span> <span class="nt">reloadData</span><span class="o">];</span>
+        <span class="o">//</span><span class="nt">在此处对购买记录进行存储</span><span class="err">，</span><span class="nt">可以存储到开发商的服务器端</span>
+    <span class="err">}</span><span class="nt">else</span><span class="p">{</span>
+        <span class="err">NSLog(@"购买失败，未通过验证！");</span>
+    <span class="p">}</span>
+<span class="err">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span> <span class="nt">completeTransaction</span><span class="o">:</span> <span class="o">(</span><span class="nt">SKPaymentTransaction</span> <span class="o">*)</span><span class="nt">transaction</span>
+
+<span class="p">{</span>
+    <span class="err">NSLog(@"-----completeTransaction--------");</span>
+    <span class="err">//</span> <span class="err">Your</span> <span class="err">application</span> <span class="err">should</span> <span class="err">implement</span> <span class="err">these</span> <span class="err">two</span> <span class="err">methods.</span>
+    <span class="err">NSString</span> <span class="err">*product</span> <span class="err">=</span> <span class="err">transaction.payment.productIdentifier;</span>
+    <span class="err">if</span> <span class="err">([product</span> <span class="err">length]</span> <span class="err">&gt;</span> <span class="err">0)</span> <span class="err">{</span>
+
+    <span class="err">NSArray</span> <span class="err">*tt</span> <span class="err">=</span> <span class="err">[product</span> <span class="py">componentsSeparatedByString</span><span class="p">:</span><span class="err">@</span><span class="s1">"."</span><span class="p">];</span>
+    <span class="err">NSString</span> <span class="err">*bookid</span> <span class="err">=</span> <span class="err">[tt</span> <span class="err">lastObject];</span>
+    <span class="err">if</span> <span class="err">([bookid</span> <span class="err">length]</span> <span class="err">&gt;</span> <span class="err">0)</span> <span class="err">{</span>
+    <span class="err">[self</span> <span class="py">recordTransaction</span><span class="p">:</span><span class="n">bookid</span><span class="p">];</span>
+    <span class="err">[self</span> <span class="py">provideContent</span><span class="p">:</span><span class="n">bookid</span><span class="p">];</span>
+<span class="p">}</span>
+<span class="err">}</span>
+
+    <span class="o">//</span> <span class="nt">Remove</span> <span class="nt">the</span> <span class="nt">transaction</span> <span class="nt">from</span> <span class="nt">the</span> <span class="nt">payment</span> <span class="nt">queue</span><span class="o">.</span>
+
+    <span class="o">[[</span><span class="nt">SKPaymentQueue</span> <span class="nt">defaultQueue</span><span class="o">]</span> <span class="nt">finishTransaction</span><span class="o">:</span> <span class="nt">transaction</span><span class="o">];</span>
+
+<span class="err">}</span>
+
+<span class="o">//</span><span class="nt">记录交易</span>
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">recordTransaction</span><span class="o">:(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">product</span><span class="p">{</span>
+    <span class="err">NSLog(@"-----记录交易--------");</span>
+<span class="p">}</span>
+
+<span class="o">//</span><span class="nt">处理下载内容</span>
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">provideContent</span><span class="o">:(</span><span class="nt">NSString</span> <span class="o">*)</span><span class="nt">product</span><span class="p">{</span>
+    <span class="err">NSLog(@"-----下载--------");</span>
+<span class="p">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span> <span class="nt">failedTransaction</span><span class="o">:</span> <span class="o">(</span><span class="nt">SKPaymentTransaction</span> <span class="o">*)</span><span class="nt">transaction</span><span class="p">{</span>
+    <span class="err">NSLog(@"失败");</span>
+    <span class="err">if</span> <span class="err">(transaction.error.code</span> <span class="err">!=</span> <span class="err">SKErrorPaymentCancelled)</span>
+    <span class="err">{</span>
+
+    <span class="p">}</span>
+    <span class="o">[[</span><span class="nt">SKPaymentQueue</span> <span class="nt">defaultQueue</span><span class="o">]</span> <span class="nt">finishTransaction</span><span class="o">:</span> <span class="nt">transaction</span><span class="o">];</span>
+
+<span class="err">}</span>
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span> <span class="nt">paymentQueueRestoreCompletedTransactionsFinished</span><span class="o">:</span> <span class="o">(</span><span class="nt">SKPaymentTransaction</span> <span class="o">*)</span><span class="nt">transaction</span><span class="p">{</span>
+
+<span class="p">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span> <span class="nt">restoreTransaction</span><span class="o">:</span> <span class="o">(</span><span class="nt">SKPaymentTransaction</span> <span class="o">*)</span><span class="nt">transaction</span>
+<span class="p">{</span>
+    <span class="err">NSLog(@"</span> <span class="err">交易恢复处理");</span>
+
+<span class="p">}</span>
+
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span> <span class="nt">paymentQueue</span><span class="o">:(</span><span class="nt">SKPaymentQueue</span> <span class="o">*)</span> <span class="nt">paymentQueue</span> <span class="nt">restoreCompletedTransactionsFailedWithError</span><span class="o">:(</span><span class="nt">NSError</span> <span class="o">*)</span><span class="nt">error</span><span class="p">{</span>
+    <span class="err">NSLog(@"-------paymentQueue----");</span>
+<span class="p">}</span>
+
+<span class="nf">#pragma</span> <span class="nt">mark</span> <span class="nt">connection</span> <span class="nt">delegate</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">connection</span><span class="o">:(</span><span class="nt">NSURLConnection</span> <span class="o">*)</span><span class="nt">connection</span> <span class="nt">didReceiveData</span><span class="o">:(</span><span class="nt">NSData</span> <span class="o">*)</span><span class="nt">data</span>
+<span class="p">{</span>
+    <span class="err">NSLog(@"%@",</span>  <span class="err">[[NSString</span> <span class="err">alloc]</span> <span class="py">initWithData</span><span class="p">:</span><span class="n">data</span> <span class="n">encoding</span><span class="p">:</span><span class="n">NSUTF8StringEncoding</span><span class="p">]);</span>
+<span class="p">}</span>
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">connectionDidFinishLoading</span><span class="o">:(</span><span class="nt">NSURLConnection</span> <span class="o">*)</span><span class="nt">connection</span><span class="p">{</span>
+
+<span class="p">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">connection</span><span class="o">:(</span><span class="nt">NSURLConnection</span> <span class="o">*)</span><span class="nt">connection</span> <span class="nt">didReceiveResponse</span><span class="o">:(</span><span class="nt">NSURLResponse</span> <span class="o">*)</span><span class="nt">response</span><span class="p">{</span>
+    <span class="err">switch([(NSHTTPURLResponse</span> <span class="err">*)response</span> <span class="err">statusCode])</span> <span class="err">{</span>
+        <span class="err">case</span> <span class="err">200:</span>
+        <span class="err">case</span> <span class="err">206:</span>
+        <span class="err">break;</span>
+        <span class="err">case</span> <span class="err">304:</span>
+        <span class="err">break;</span>
+        <span class="err">case</span> <span class="err">400:</span>
+        <span class="err">break;</span>
+        <span class="err">case</span> <span class="err">404:</span>
+        <span class="err">break;</span>
+        <span class="err">case</span> <span class="err">416:</span>
+        <span class="err">break;</span>
+        <span class="err">case</span> <span class="err">403:</span>
+        <span class="err">break;</span>
+        <span class="err">case</span> <span class="err">401:</span>
+        <span class="err">case</span> <span class="err">500:</span>
+        <span class="err">break;</span>
+        <span class="py">default</span><span class="p">:</span>
+        <span class="n">break</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="err">}</span>
+
+<span class="nt">-</span> <span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">connection</span><span class="o">:(</span><span class="nt">NSURLConnection</span> <span class="o">*)</span><span class="nt">connection</span> <span class="nt">didFailWithError</span><span class="o">:(</span><span class="nt">NSError</span> <span class="o">*)</span><span class="nt">error</span> <span class="p">{</span>
+    <span class="err">NSLog(@"test");</span>
+<span class="p">}</span>
+
+<span class="nt">-</span><span class="o">(</span><span class="nt">void</span><span class="o">)</span><span class="nt">dealloc</span>
+<span class="p">{</span>
+    <span class="err">[[SKPaymentQueue</span> <span class="err">defaultQueue]</span> <span class="py">removeTransactionObserver</span><span class="p">:</span><span class="n">self</span><span class="p">];</span><span class="err">//解除监听</span>
+
+<span class="p">}</span>
+
+<span class="k">@end</span></code></pre></figure>
+<p><br/></p>
+
+{% endraw %}

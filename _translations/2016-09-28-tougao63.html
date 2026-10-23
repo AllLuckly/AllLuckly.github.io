@@ -1,0 +1,231 @@
+---
+layout: post
+title: 'iOS 10 Notifications, Part 1: Requests, Triggers, and Attachments'
+description: Uses local notifications to explain the relationship between UNNotificationRequest, triggers, and the
+  notification center. It manages additions, updates, and deletions through identifiers and introduces valid file
+  paths and configuration for notification attachments.
+category: Development notes
+imagefeature: null
+date: 2016-09-28 00:00:00 +0800
+technical_translation:
+  topic: data-network
+  summary: Uses local notifications to explain the relationship between UNNotificationRequest, triggers, and the
+    notification center. It manages additions, updates, and deletions through identifiers and introduces valid file
+    paths and configuration for notification attachments.
+  keywords:
+  - UNNotificationRequest
+  - UNUserNotificationCenter
+  - local notifications
+  - notification attachments
+  provenance: contribution
+  author_name: 徐不同
+  source_url: http://www.jianshu.com/p/3d602a60ca4f
+  credit: Originally credited to 徐不同; edited and archived by Bison.
+  version_note: The article covers the UserNotifications APIs in iOS 10.
+  title: 'iOS 10 Notifications, Part 1: Requests, Triggers, and Attachments'
+  source_sha256: 1a7950fca2d3a0f75d3977b628766147ede3b409468b16760f7adf3ff5e44a38
+lang: en
+source_path: _posts/2016-09-28-tougao63.md
+source_url: /%E6%8A%95%E7%A8%BF/tougao63
+permalink: /en/journal/2016-09-28-ios-10-notifications-part-1-requests-triggers-and-attachments/
+translation_method: machine-assisted
+translation_source_sha256: 1a7950fca2d3a0f75d3977b628766147ede3b409468b16760f7adf3ff5e44a38
+excerpt: Uses local notifications to explain the relationship between UNNotificationRequest, triggers, and the notification
+  center. It manages additions, updates, and deletions through identifiers and introduces valid file paths and configuration
+  for notification attachments.
+translation_date: '2026-10-23T02:34:15+00:00'
+---
+{% raw %}
+<blockquote>
+<p>This is a long and sometimes difficult article, but consider bookmarking it for when you need the information. If you have the patience, read through it now too.</p>
+</blockquote>
+<p>Starting with this article, I will explain all the notification classes in Apple's newly released iOS10.</p>
+<p>Editor: <a href="/en/">Bison</a><br/>
+Source: <a href="http://www.jianshu.com/p/3d602a60ca4f">徐不同</a><br/></p>
+<h2 id="一创建本地通知事例详解">1. A detailed local-notification example</h2>
+<p>Remember, local notifications also require registering the notification center in appdelegate. Whether the notification switch is enabled is not important here, since this is a local notification, but Apple combines the notification-receipt and notification-tap delegates. Write these 2 methods in appdelegate, and do not forget to register in </p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+</code></pre></div></div>
+<p>registering the notification center. If you use JPush, please refer to the introductory article. Thank you for following along.</p>
+<p>Create a UNNotificationRequest instance and assign an identifier. This distinguishes the notification when finding, updating, or deleting it later.
+Add the request to UNUserNotificationCenter, configure a trigger, and wait for it to fire.
+A new request with the same identifier but different content updates the earlier notification.
+To create a local notification, first create a UNNotificationRequest and add it to UNUserNotificationCenter. Here is the code:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 1.创建一个UNNotificationRequest
+NSString *requestIdentifer = @"TestRequest";
+UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:requestIdentifer content:content trigger:trigger];
+
+// 2.将UNNotificationRequest类，添加进当前通知中心中
+[[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+
+}];
+</code></pre></div></div>
+<p>Apple's explanation of UNNotificationRequest says a request can notify the user at a scheduled time or location; see UNNotificationTrigger for trigger types. Calling this method replaces a notification request with the same identifier when the notification fires. The system also limits the number of notifications.</p>
+<p>That translation may be awkward. Simply put, assign an identifier to UNNotificationRequest so you can add, delete, update, and otherwise manage that notification through it.</p>
+<p>Here is the complete notification-creation code:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	    // 1.创建通知内容
+	    UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+	    content.title = @"徐不同测试通知";
+	    content.subtitle = @"测试通知";
+	    content.body = @"来自徐不同的简书";
+	    content.badge = @1;
+	    NSError *error = nil;
+	    NSString *path = [[NSBundle mainBundle] pathForResource:@"icon_certification_status1@2x" ofType:@"png"];
+	    // 2.设置通知附件内容
+	    UNNotificationAttachment *att = [UNNotificationAttachment attachmentWithIdentifier:@"att1" URL:[NSURL fileURLWithPath:path] options:nil error:&amp;error];
+	    if (error) {
+	        NSLog(@"attachment error %@", error);
+	    }
+	    content.attachments = @[att];
+	    content.launchImageName = @"icon_certification_status1@2x";
+	    // 2.设置声音
+	    UNNotificationSound *sound = [UNNotificationSound defaultSound];
+	    content.sound = sound;
+
+	    // 3.触发模式
+	    UNTimeIntervalNotificationTrigger *trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:5 repeats:NO];
+
+	    // 4.设置UNNotificationRequest
+	    NSString *requestIdentifer = @"TestRequest";
+	    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:requestIdentifer content:content trigger:trigger1];
+
+	    //5.把通知加到UNUserNotificationCenter, 到指定触发点会被触发
+	    [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+	    }];
+</code></pre></div></div>
+<p>The code above creates a local notification that fires after 5 seconds. Its appearance is shown below.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao63/1.png"/><br/></p>
+<p>The image shown when pulling down to expand is produced by content.launchImageName = @”icon_certification_status1@2x”; as illustrated below.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao63/2.png"/><br/></p>
+<p>As the example shows, creating a UNNotificationRequest requires UNMutableNotificationContent and UNTimeIntervalNotificationTrigger. I will explain the relevant classes and extensions below.</p>
+<p>1. UNNotificationContent and UNMutableNotificationContent: immutable and mutable notification content</p>
+<p>Notification content comes in mutable and immutable forms, much like arrays. Updating a notification later through a particular identifier uses mutable content.
+Both forms have the following properties:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	// 1.附件数组，存放UNNotificationAttachment类
+	@property (NS_NONATOMIC_IOSONLY, copy) NSArray &lt;UNNotificationAttachment *&gt; *attachments ;
+
+	// 2.应用程序角标，0或者不传，意味着角标消失
+	@property (NS_NONATOMIC_IOSONLY, copy, nullable) NSNumber *badge;
+
+	// 3.主体内容
+	@property (NS_NONATOMIC_IOSONLY, copy) NSString *body ;
+
+	// 4.app通知下拉预览时候展示的图
+	@property (NS_NONATOMIC_IOSONLY, copy) NSString *launchImageName;
+
+	// 5.UNNotificationSound类，可以设置默认声音，或者指定名称的声音
+	@property (NS_NONATOMIC_IOSONLY, copy, nullable) UNNotificationSound *sound ;
+
+	// 6.推送内容的子标题
+	@property (NS_NONATOMIC_IOSONLY, copy) NSString *subtitle ;
+
+	// 7.通知线程的标识
+	@property (NS_NONATOMIC_IOSONLY, copy) NSString *threadIdentifier;
+
+	// 8.推送内容的标题
+	@property (NS_NONATOMIC_IOSONLY, copy) NSString *title ;
+
+	// 9.远程通知推送内容
+	@property (NS_NONATOMIC_IOSONLY, copy) NSDictionary *userInfo;
+
+	// 10.category标识
+	@property (NS_NONATOMIC_IOSONLY, copy) NSString *categoryIdentifier;
+</code></pre></div></div>
+<p>I added explanations for the properties above. Refer to the comments when using them.</p>
+<p>2. UNNotificationAttachment: Notification attachments</p>
+<p>UNNotificationContent has an attachments array containing UNNotificationAttachment objects.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	@property (NS_NONATOMIC_IOSONLY, copy) NSArray &lt;UNNotificationAttachment *&gt; *attachments ;
+</code></pre></div></div>
+<p>Apple describes UNNotificationAttachment as an attachment containing audio, image, or video content that a notification can display. For local notifications, add the attachment when creating the notification. Remote notifications require a notification service extension using UNNotificationServiceExtension.</p>
+<p>Create an attachment with attachmentWithIdentifier:URL:options:error:. Specify the attachment file and ensure its format is supported. After creation, assign it to the content object's attachments property. For remote notifications, do this in the service extension.
+Supported attachment types are shown below:</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao63/3.png"/><br/></p>
+<p>Here is the method for creating a UNNotificationAttachment:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	+ (nullable instancetype)attachmentWithIdentifier:(NSString *)identifier URL:(NSURL *)URL options:(nullable NSDictionary *)options error:(NSError *__nullable *__nullable)error;
+</code></pre></div></div>
+<h3 id="注意url必须是一个有效的文件路径不然会报错">Note: URL must be a valid file path, or an error occurs.</h3>
+<p>There are 4 options properties to explain; researching these took considerable effort.</p>
+<ul>
+<li>1. UNNotificationAttachmentOptionsTypeHintKey takes an NSString containing the file's uniform type identifier, or UTI. If omitted, the attachment's extension determines its type. Common identifiers include kUTTypeImage, kUTTypeJPEG2000, kUTTypeTIFF, kUTTypePICT, kUTTypeGIF, kUTTypePNG, and kUTTypeQuickTimeImage. You may find these types cause import errors. Apple's documentation shows that the following framework is required; use the corresponding types as follows.</li>
+</ul>
+<p>Note:</p>
+<p>The framework import is #import&lt;MobileCoreServices/MobileCoreServices.h&gt;.</p>
+<p>Use it as follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	dict[UNNotificationAttachmentOptionsTypeHintKey] = (__bridge id _Nullable)(kUTTypeImage);
+</code></pre></div></div>
+<ul>
+<li>2. UNNotificationAttachmentOptionsThumbnailHiddenKey is a BOOL. YES hides the thumbnail; the default is YES. As shown:</li>
+</ul>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao63/4.png"/><br/></p>
+<p>Compare with the diagram above to see which part of the image disappears.</p>
+<p>Usage:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	dict[UNNotificationAttachmentOptionsThumbnailHiddenKey] =  @YES;
+</code></pre></div></div>
+<ul>
+<li>3. UNNotificationAttachmentOptionsThumbnailClippingRectKey crops the thumbnail. Its value is a dictionary containing a normalized CGRect: a unit rectangle with values between 1.0 and 0.0 representing the portion of the original image to display. For example, origin (0.25, 0.25) and size (0.5, 0.5) define a crop showing only the center. Use CGRectCreateDictionaryRepresentation to create the rectangle dictionary.</li>
+</ul>
+<p>The explanation above is translated from Apple and is rather convoluted. The following diagram makes it simpler.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao63/5.png"/><br/>B</p>
+<p>The entire image is treated as a normalized unit with a total scale of 1. To obtain the shaded region, use CGRect(0.5,0.5,0.25,0.25): an origin of (0.5,0.5) and dimensions of (0.25,0.25). In code, this means:</p>
+<p>Use it as follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	dict[UNNotificationAttachmentOptionsThumbnailClippingRectKey] = (__bridge id _Nullable)((CGRectCreateDictionaryRepresentation(CGRectMake(0.5, 0.5, 0.25 ,0.25))));;
+</code></pre></div></div>
+<p>The method above obtains the shaded part of the image for the notification thumbnail. You should be able to see the changed thumbnail in the following example.</p>
+<p><img alt="1" src="https://allluckly.cn/images/blog/tuogao/tougao63/6.png"/><br/></p>
+<p>For clarity, here are a few more coordinate examples:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	(0，0，0.25，0.25)左上角的最小正方形
+	(0，0，0.5，0.5) 四分之一的正方形，左上角
+	(0.5，0.5，0.5，0.5)四分之一的正方形，右下角
+	(0.5，0，0.5，0.5)四分之一的正方形，左下角
+	(0.25,0.25,0.5,0.5)最中心的正方形
+</code></pre></div></div>
+<h2 id="特别注意">Important:</h2>
+<p>During debugging, I suspected an Apple bug. Repeatedly changing the thumbnail's frame still displayed the first frame I had specified. Changing the UNNotificationRequest requestIdentifer allowed the property to change. Perhaps requests with the same requestIdentifer count as one notification and require the update method to change the thumbnail. It may not be a bug after all.</p>
+<ul>
+<li>4. UNNotificationAttachmentOptionsThumbnailTimeKey is generally used for movie attachments. It specifies which second of the movie supplies the thumbnail.</li>
+</ul>
+<p>Use it as follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	dict[UNNotificationAttachmentOptionsThumbnailTimeKey] =@10;
+</code></pre></div></div>
+<p>Pass an NSNumber directly. For example, to use the frame at 10s as the thumbnail, write it as shown above. The specified time must fall within the movie's duration, or an error occurs.</p>
+<p>3. UNTimeIntervalNotificationTrigger: Notification triggering modes</p>
+<p>I introduced this briefly in !(this article; I will now explain it in detail)[www.baidu.com]. Here is a more detailed explanation.</p>
+<p>1. UNPushNotificationTrigger: A remote-notification trigger, which we generally do not use directly.</p>
+<p>2. UNTimeIntervalNotificationTrigger: a local notification delivered after an interval, repeated or not. Set timeInterval and repeats.</p>
+<p>Usage:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	UNTimeIntervalNotificationTrigger *triggerOne = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:5 repeats:NO];
+</code></pre></div></div>
+<p>Explanation: the method above runs after 5 seconds. If repeats is enabled, TimeInterval must be greater than 60s, or the following error occurs: <code class="language-plaintext highlighter-rouge">* Terminating app due to uncaught exception 'NSInternalInconsistencyException', reason: 'time interval must be at least 60 if repeating'</code>!**</p>
+<p>3. UNCalendarNotificationTrigger: A local notification that fires at a date or time, with optional repetition. For example, to notify at 8 every day, set the appropriate dateComponents value to 8 and repeats to YES.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	// 周一早上 8：00 上班
+	NSDateComponents *components = [[NSDateComponents alloc] init];
+	// 注意，weekday是从周日开始的，如果想设置为从周一开始，大家可以自己想想~
+	components.weekday = 2;
+	components.hour = 8;
+	UNCalendarNotificationTrigger *trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:components repeats:YES];
+</code></pre></div></div>
+<p>4. UNLocationNotificationTrigger: A location-based local notification. To use it, import </p>
+<h2 id="importcorelocationcorelocationh这个系统类库示例代码如下">the system library with import&lt;CoreLocation/CoreLocation.h&gt;. Example code follows:</h2>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	//1、如果用户进入或者走出某个区域会调用下面两个方法
+	- (void)locationManager:(CLLocationManager *)manager
+	didEnterRegion:(CLRegion *)region
+	- (void)locationManager:(CLLocationManager *)manager
+	didExitRegion:(CLRegion *)region代理方法反馈相关信息
+
+	//2、一到某个经纬度就通知，判断包含某一点么
+	// 不建议使用！！！！！！CLRegion *region = [[CLRegion alloc] init];// 不建议使用！！！！！！
+
+
+	CLCircularRegion *circlarRegin = [[CLCircularRegion alloc] init];
+	[circlarRegin containsCoordinate:(CLLocationCoordinate2D)];
+
+	UNLocationNotificationTrigger *trigger4 = [UNLocationNotificationTrigger triggerWithRegion:circlarRegin repeats:NO];
+</code></pre></div></div>
+<p>I recommend CLCircularRegion, a subclass of CLRegion. Apple's point-containment method on CLRegion is deprecated, and Apple recommends CLCircularRegion instead.</p>
+<p>If you like the article, please follow me. Thank you!
+Please credit the source when republishing. I will keep writing useful articles in return.</p>
+<p>I will add more content later. Stay tuned!</p>
+<hr/>
+<p>Recommended reading: <a href="/en/journal/2016-06-12-adding-a-launch-advertisement-to-an-ios-app/">Implement an iOS launch-screen advertisement in minutes</a><br/></p>
+
+{% endraw %}

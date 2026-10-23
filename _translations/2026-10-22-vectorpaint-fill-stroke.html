@@ -1,0 +1,73 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint fills and strokes: clear colour areas and consistent lines'
+description: Compare fill, no fill, stroke width and opacity on three circles, and understand invisible objects,
+  overly thick lines and mistaken multi-object edits.
+permalink: /en/guides/vectorpaint-fill-stroke/
+date: 2026-10-22 00:00:00 +0800
+modified: '2026-10-22 00:00:00 +08:00'
+category: Tutorials
+level: Beginner
+series_order: 4
+topic: Getting started
+reading_time: 7
+lang: en
+source_path: _posts/2026-10-22-vectorpaint-fill-stroke.md
+source_url: /guides/vectorpaint-fill-stroke/
+translation_method: machine-assisted
+translation_source_sha256: 8102d4bd35b2315d7a94dbfdbcaa00099969b94457534fc47a2a903aad0b5c23
+excerpt: Compare fill, no fill, stroke width and opacity on three circles, and understand invisible objects, overly
+  thick lines and mistaken multi-object edits.
+translation_date: '2026-10-23T02:34:07+00:00'
+---
+{% raw %}
+<p>Compare fill, no fill, stroke width and opacity on three circles, and understand invisible objects, overly thick lines and mistaken multi-object edits.</p>
+<h2 id="先分清内部与轮廓">Distinguish the interior from the outline</h2>
+<p>Fill supplies an object's interior color or gradient; stroke draws a line along its outline. Both can coexist, or you can retain only one. Create a 480×320 px canvas and draw three similarly sized circles in a row. This exercise needs only basic shapes and the appearance panel, with no extra images or fonts. Equal circle sizes make appearance differences easier to compare.</p>
+<h2 id="做一个只有填充的圆">Make a fill-only circle</h2>
+<p>Select the left circle, choose a solid fill in dark blue or another color clearly distinct from the background, and turn off the stroke. The color boundary now forms the outline; absence of a stroke does not make that edge unclear. If the shape disappears, check whether you accidentally selected no fill while also disabling the stroke. The path may still exist with no visible painting attributes.</p>
+<h2 id="做一个只有描边的圆">Make a stroke-only circle</h2>
+<p>Select the middle circle, set its fill to none, enable a stroke, and start at 4 pt. The interior should reveal whatever is beneath. White fill and no fill are different: white covers underlying shapes, while no fill leaves the interior unpainted. Temporarily place a pale-gray rectangle underneath and check whether gray remains visible through the center. Delete or hide the test rectangle afterward.</p>
+<h2 id="观察线宽与图形大小的关系">Observe stroke width relative to shape size</h2>
+<p>Give the right circle both a pale fill and a 12 pt stroke, and compare it with the middle circle's 4 pt stroke. A thicker line changes the outline's visual weight and may close narrow gaps. Do not confuse canvas units with stroke units; read the pt value separately in the properties panel. Small icons usually need more care with thin lines than large illustrations, but no single stroke width is required for every situation.</p>
+<h2 id="用端点与连接判断线条气质">Use caps and joins to understand a line's character</h2>
+<p>Open-path endpoints and polyline corners affect the visual character. Draw a short polyline and compare round versus flat caps and round versus sharp joins. Return to the circle to see that a closed contour has no equivalent open endpoints. Change one property at a time so that cap, width, and color changes do not obscure the cause. If an option is unavailable, check whether the selected object is an applicable path type.</p>
+<h2 id="多选修改之前先确认目标">Confirm the targets before editing a multiple selection</h2>
+<p>To standardize the strokes of three objects, first confirm that those objects are selected rather than the background or an entire group. If their original properties differ, the panel may show mixed values; this does not mean they already share one style. Unify only the stroke width you intend to change, keep their fills, and inspect them individually. If every circle suddenly becomes the same color, undo immediately and check whether you changed fill color instead of stroke color.</p>
+<h2 id="一条线看不见时的排查顺序">Troubleshooting an invisible line</h2>
+<p>Select the target path and check that its stroke is enabled, then whether its width is too small and its color too close to the background. If those are reasonable, inspect object or layer opacity, visibility, and stacking order. This sequence avoids mistaking an object hidden behind another for a failed color setting. Check after each change rather than making the width huge, switching to red, and unlocking all layers at once.</p>
+<p>If a thick line produces spikes at corners, check its join style and the angle. A very acute angle can create a pronounced projection with some joins. A round join changes the appearance but also softens the style. Choose according to the design rather than rounding every corner automatically. The same applies to open-path caps: a short round-capped line can look slightly longer than a flat-capped one, so compare visible outer edges when arranging them.</p>
+<p>Finally, judge at normal display size. A delicate line when enlarged may become too faint when reduced, while a very thick line can consume internal whitespace. Record one main stroke width and check whether the group has a consistent rhythm rather than adjusting each line arbitrarily.</p>
+<h2 id="完成检查与透明度判断">Final checks and transparency</h2>
+<p>Place the result against light and dark backgrounds, then inspect its edges and interior whitespace at the final display size. Object opacity affects the whole appearance, while color opacity can also change it. Establish a clear baseline with fully opaque colors first. A white background in an exported PNG viewer does not prove the object's fill is wrong; it may be the viewer's background. Judge actual transparency and object overlap instead.</p>
+<h2 id="延伸练习建立一份线宽比较板">Further exercise: make a stroke-width comparison sheet</h2>
+<ol>
+<li>
+<p>Create three open lines of equal length with widths of 2, 4, and 8 pt. Compare them at normal display size and record the clearest option.</p>
+</li>
+<li>
+<p>Duplicate a polyline and change only its join style, comparing protruding outer edges at sharp corners. Keep the color unchanged.</p>
+</li>
+<li>
+<p>Place a hollow circle over a color block, then give it a white fill. Observe when the color beneath is covered to understand no fill.</p>
+</li>
+</ol>
+<h2 id="常见问题">Frequently asked questions</h2>
+<h3 id="无填充和透明白色有区别吗">Is no fill different from transparent white?</h3>
+<p>They serve different purposes. No fill explicitly means the interior is not painted; a color with transparency is still a color setting. Use no fill for hollow-shape exercises to avoid unexpectedly revealing a solid interior when opacity changes later.</p>
+<h3 id="线宽改了为什么选区大小看起来不同">Why does the selection appear to change size when I change stroke width?</h3>
+<p>Geometric contours and visible outer stroke edges do not always occupy the same bounds. Thick strokes increase the apparent size. Check actual outer edges for final margins and cropping, not just path positions.</p>
+<h3 id="导出-svg-后描边一定完全一致吗">Will a stroke always look identical after SVG export?</h3>
+<p>Basic strokes are easier to exchange, but complex styles still need checking in the receiving software. Save the original and test the target application rather than treating a format name as a guarantee of identical appearance.</p>
+<h2 id="接着读">Read next</h2>
+<ul>
+<li><a href="/en/guides/vectorpaint-basic-shapes/">VectorPaint shape practice: build a little house from rectangles and circles</a></li>
+<li><a href="/en/guides/vectorpaint-gradients/">VectorPaint gradients: give a circle a clear light direction</a></li>
+<li><a href="/en/guides/vectorpaint-transparent-png/">VectorPaint transparent PNG: remove the white background and check edges</a></li>
+</ul>
+<h2 id="来源与适用范围">Sources and scope</h2>
+<p>This article is based on  <a href="https://apps.apple.com/cn/app/id1587272880">VectorPaint App Store description</a>  and the available feature entry points; <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn">Apple’s public release information </a>Checked on  <strong>October 22, 2026</strong>, for version  <strong>1.0.7</strong>, requiring iOS / iPadOS 17.0 or later. The interface may vary by device and version. Dimensions, colours and wording are exercise suggestions; confirm the requirements for your actual use.</p>
+
+{% endraw %}

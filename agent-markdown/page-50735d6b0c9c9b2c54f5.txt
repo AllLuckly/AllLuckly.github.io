@@ -1,0 +1,66 @@
+---
+layout: null
+permalink: /en/journal/2015-05-18-disabling-and-dimming-third-party-sign-in-buttons-when-the-app-is-not-installed/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Disabling and dimming third-party sign-in buttons when the app is not installed
+agent_source_url: https://allluckly.cn/en/journal/2015-05-18-disabling-and-dimming-third-party-sign-in-buttons-when-the-app-is-not-installed/
+agent_source_sha256: 4be273ad6e124fa3181010eec63fba1d47109479f0f01d44f5ab667809accf0d
+agent_generator_version: 1
+---
+{% raw %}# Disabling and dimming third-party sign-in buttons when the app is not installed
+
+Language: en
+Canonical: [Disabling and dimming third-party sign-in buttons when the app is not installed](<https://allluckly.cn/en/journal/2015-05-18-disabling-and-dimming-third-party-sign-in-buttons-when-the-app-is-not-installed/>)
+中文：[中文 HTML](<https://allluckly.cn/%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E9%99%86/%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%BD%95>)
+English: [English HTML](<https://allluckly.cn/en/journal/2015-05-18-disabling-and-dimming-third-party-sign-in-buttons-when-the-app-is-not-installed/>)
+Published: 2015-05-18T00:00:00+08:00
+Modified: 2026-10-23T10:34:11+08:00
+
+Uses QQ and WeChat sign-in buttons to show how installation checks can determine whether a button is hidden, disabled or dimmed. It records the interface treatment used when the corresponding third-party app was unavailable.
+
+The original does not clearly identify an author. Retained as a historical article.
+
+English translation of the [Chinese original](<https://allluckly.cn/%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E9%99%86/%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%BD%95>), translated on 2026-10-23. The article body uses automated translation; app descriptions, historical reading notes and video subtitles receive separate editorial checks. Original publication dates, attribution, code and version notes are retained.
+
+**Before you read** This technical note dates from 2015–2017. The examples have not been rerun as part of this archive update. Published in 2015. Its App Review context and third-party SDK calls are retained as historical records.
+
+Apple recently introduced a review rule against directing users to install third-party software, so third-party login should not prompt users that the app is missing. The best approach is to hide the option or disable it and gray it out. Put the following code in the login view controller's `viewDidLoad` method. The commented-out section hides the icons. These examples mainly cover QQ and WeChat.
+
+// Check whether the app for third-party login is installed; if not, disable its icon and make it gray
+
+```css
+- (void)isHidenThirdBtn
+{
+    BOOL WXinstalled =  [WXApi isWXAppInstalled];
+    BOOL QQinstalled = [TencentOAuth  iphoneQQInstalled];
+    //  [WeiboSDK isWeiboAppInstalled]
+
+    if (!WXinstalled && !QQinstalled) {
+        //        self.WeiBoBtn.center = self.WeiXinBtn.center;
+        //        self.WeiBoLa.center = self.WeiXinLa.center;
+
+        self.WeiXinBtn.enabled = NO;
+        //        self.WeiXinLa.hidden = YES;
+        self.QQBtn.enabled = NO;
+        //        self.QQLa.hidden = YES;
+    }
+
+    if (!WXinstalled && QQinstalled) {
+        //        self.WeiXinBtn.hidden = YES;
+        self.WeiXinBtn.enabled = NO;
+        //        self.WeiXinLa.hidden = YES;
+    }
+
+
+    if (WXinstalled && !QQinstalled) {
+        //        self.WeiXinBtn.center = self.QQBtn.center;
+        //        self.WeiXinLa.center = self.QQLa.center;
+        self.QQBtn.enabled = NO;
+        //        self.QQLa.hidden = YES;
+    }
+
+}
+```
+{% endraw %}

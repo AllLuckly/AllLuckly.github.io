@@ -1,0 +1,26 @@
+# Swift 与运行时开发笔记
+
+> 查阅 Swift 2 与 Swift 3、Objective-C runtime、KVO、Block、协议代理和设计模式历史文章，按语言行为与代码职责梳理阅读顺序。
+
+## 历史版本说明
+
+这里保留 2015–2017 年的历史技术记录及原文归属。条目日期是本站原始发布日期，翻译或目录整理不表示示例已更新到当前版本。
+本次整理未重新运行验证旧示例。旧 Swift 语法、API、依赖、服务地址与审核规则可能过期，实际使用前须对照当前官方文档。
+
+## 按本站原始发布日期阅读
+
+- [黑魔法runtime基础之属性与变量](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao01/index.md): 区分 Objective-C 属性与成员变量，结合运行时结构、地址偏移和 synthesize 分析属性的生成方式，再通过示例说明动态检查与操作对象结构的用途。 本站原始发布：2016-01-10。 原文署名SindriLin，Bison 编辑收录。
+- [iOS开发黑魔法KVO的奥秘](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao05/index.md): 以监听列表滚动偏移为入口介绍 KVO，分析观察者注册后动态子类与 isa 指针的变化，并借助运行时函数尝试实现相似机制，串起使用方式和底层原理。 本站原始发布：2016-01-16。 原文署名SindriLin，Bison 编辑收录。
+- [详解Swift中的七个陷阱以及避免方法](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao21/index.md): 通过具体代码讨论 Swift 协议扩展、可选链赋值和函数式处理中的易错行为，比较值类型与引用类型的分派差异，并总结如何避免编译通过却不符合预期的结果。 本站原始发布：2016-02-16。 原文发表于 2016 年，语言行为与示例需结合当时的 Swift 版本理解。 原文署名bestswifter，Bison 编辑收录。
+- [iOS开发之重构笔记-Extra Method](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao26/index.md): 结合《重构》的提炼函数方法，把冗长代码按意图拆成独立函数，逐步处理参数、局部变量和返回值，并用实际示例讨论如何降低重复逻辑和提升可读性。 本站原始发布：2016-03-01。 原文署名SindriLin，Bison 编辑收录。
+- [iOS开发之学习block深入浅出](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao36/index.md): 从 block 的声明和调用方式讲起，讨论捕获外部变量与回调封装，再通过模仿 Swift 高阶函数的例子展示 block 在 Objective-C 数据处理中的用法。 本站原始发布：2016-04-06。 原文署名Sindri，Bison 编辑收录。
+- [runtime实战之一键改变字体](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao43/index.md): 从注册自定义字体和查找字体名称开始，利用 Objective-C 运行时方法处理界面字体替换，并讨论代码创建控件与 storyboard 控件在统一设置时的差别。 本站原始发布：2016-05-04。 原文署名HenryCheng，Bison 编辑收录。
+- [iOS开发之从源代码看OC的消息机制runtime](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao47/index.md): 从 unrecognized selector 错误切入 Objective-C 消息机制，结合源码讨论方法查找、缓存与消息转发，再通过运行时相关示例理解方法调用如何在执行阶段完成。 本站原始发布：2016-05-20。 原文发表于 2016 年，源码结构与实现细节对应当时的 Objective-C Runtime。 原文署名Sindri，Bison 编辑收录。
+- [iOS开发Swift实战之模板模式](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao51/index.md): 以商品数据和计算逻辑为例，分析代码对元组结构的依赖，再用类型与协议组织可复用的处理方式，讨论如何通过抽象减少参数形式和业务方法之间的耦合。 本站原始发布：2016-06-29。 原文署名Sindri，Bison 编辑收录。
+- [iOS开发之去model化开发](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao56/index.md): 面对字段不同但展示相近的多种票券数据，使用字典承载数据并通过协议暴露统一展示属性，让 Cell 与控制器减少对具体模型类型的依赖，讨论数据转换职责的放置。 本站原始发布：2016-07-28。 原文署名Sindri，Bison 编辑收录。
+- [菜鸟进化史之RunTime实战字典转模型](https://allluckly.cn/runtime/runtime/index.md): 从逐项赋值、KVC 和第三方模型库的使用经历出发，编写 NSObject 分类遍历运行时信息，把字典映射为模型，并说明示例对两层嵌套数据的处理范围。 本站原始发布：2016-08-16。 原文署名 Bison，保留原发布时的内容。
+- [iOS开发之协议代理](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao57/index.md): 以 UITableView 和自定义控件为例区分协议与委托，比较 delegate 和 block 回调的使用场景，再讨论数据源与协议抽象如何帮助对象之间减少耦合。 本站原始发布：2016-09-01。 原文署名Sindri，Bison 编辑收录。
+- [Swift3.0学习系列之Swift实战-享元模式](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao66/index.md): 以共享本地数据管理对象为例介绍享元模式，使用字典复用已加载的数据并记录使用次数，在无人使用时保存和释放，讨论它与始终保留单例对象的差别。 本站原始发布：2016-10-13。 标题明确面向 Swift 3.0 的设计模式学习。 原文署名Sindri，Bison 编辑收录。
+- [Swift3.0学习系列之Swift实战-单例模式](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao67/index.md): 介绍 Swift 单例的用途与代价，通过类内静态常量和全局常量两种形式创建共享实例，说明私有构造器、跨模块访问，以及共享可变状态仍需考虑线程安全。 本站原始发布：2016-10-13。 原文明确讨论 Swift 3.0 之后的单例写法与 dispatch_once 接口变化。 原文署名Sindri，Bison 编辑收录。
+- [iOS开发之均衡代码职责浅谈](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao68/index.md): 围绕 MVC 中控制器过于庞大的问题，用项目示例讨论视图、模型和控制器的职责分配，提取重复逻辑并调整功能归属，强调在更换架构名称之前先理清代码责任。 本站原始发布：2016-10-27。 原文署名Sindri，Bison 编辑收录。
+- [iOS开发之位运算](https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao69/index.md): 从按位与、或、异或和取反讲起，以 RGBA 颜色打包及状态标志为例展示位运算用途，再说明如何用枚举与掩码保存和查询多个状态。 本站原始发布：2016-11-07。 原文署名Sindri，Bison 编辑收录。
