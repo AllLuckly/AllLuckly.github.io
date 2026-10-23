@@ -48,8 +48,12 @@ function decorate(response, url, markdown, head, page) {
   if (markdown) {
     headers.set('Content-Type', 'text/markdown; charset=utf-8');
     headers.set('X-Robots-Tag', 'noindex, follow');
+    // Small Markdown documents are served whole. Cloudflare may decompress
+    // origin responses, so ranges over encoded bytes cannot be forwarded safely.
+    headers.set('Accept-Ranges', 'none');
+    headers.delete('Content-Range');
   }
-  if (/text\/html|text\/markdown/i.test(headers.get('Content-Type') || '')) {
+  if ((page && response.status === 304) || /text\/html|text\/markdown/i.test(headers.get('Content-Type') || '')) {
     addVary(headers, 'Accept');
     const links = ['</sitemap.xml>; rel="sitemap"; type="application/xml"', '</llms.txt>; rel="describedby"; type="text/plain"', '</.well-known/agent-skills/index.json>; rel="describedby"; type="application/json"'];
     if (page && response.status < 400) {
@@ -67,7 +71,7 @@ export async function handle(request, originFetch = fetch) {
   if (url.origin !== ORIGIN || !['GET', 'HEAD'].includes(request.method)) return originFetch(request);
   const head = request.method === 'HEAD';
   const page = pages.get(url.pathname.replace(/\/index\.html$/, '/'));
-  // Preserve assets, feeds, private resources and conditional/range semantics.
+  // Preserve assets, feeds, private resources and their range semantics.
   // Generated Markdown is public; never forward cookies or authorization to a
   // different resource, and never convert personalized or partial responses.
   const asset = /\.(?:xml|json|txt|md|vtt|mp4|webm|png|jpe?g|gif|webp|avif|svg|ico|css|js|mjs|woff2?|ttf|pdf|zip)$/i.test(url.pathname);
@@ -76,6 +80,11 @@ export async function handle(request, originFetch = fetch) {
   if (page && !asset && wantsMarkdown(request.headers.get('Accept') || '')) {
     const headers = new Headers(request.headers);
     headers.set('Accept', 'text/plain');
+    // Ignore byte ranges for small Markdown documents (RFC 9110 section 14.2).
+    // Encoded partial origin streams can decode to empty bodies in Workers.
+    headers.delete('Range');
+    headers.delete('If-Range');
+    headers.set('Accept-Encoding', 'identity');
     let converted;
     try {
       converted = await originFetch(new Request(page.markdown, {method: request.method, headers, redirect: 'manual'}));
@@ -85,14 +94,21 @@ export async function handle(request, originFetch = fetch) {
     }
     const type = converted?.headers.get('Content-Type') || '';
     // A missing resource or an HTML error fallback must never be advertised as Markdown.
-    if (converted && ((converted.status === 304) || ([200, 206].includes(converted.status) && /^(text\/(plain|markdown)|application\/octet-stream)(;|$)/i.test(type)))) {
-      // Bytes are the stored Markdown resource itself, so its own ETag,
-      // Last-Modified and range headers remain valid (unlike HTML conversion).
+    if (converted && ((converted.status === 304) || (converted.status === 200 && /^(text\/(plain|markdown)|application\/octet-stream)(;|$)/i.test(type)))) {
+      // Retain the Markdown resource's own validators for conditional reads.
       return decorate(converted, url, true, head, page);
     }
   }
-  const response = await originFetch(request);
-  const directMarkdown = page && asset && url.pathname.endsWith('/index.md') && response.status < 400 && /^(text\/(plain|markdown)|application\/octet-stream)(;|$)/i.test(response.headers.get('Content-Type') || '');
+  let originRequest = request;
+  if (page && url.pathname.endsWith('/index.md')) {
+    const headers = new Headers(request.headers);
+    headers.delete('Range');
+    headers.delete('If-Range');
+    headers.set('Accept-Encoding', 'identity');
+    originRequest = new Request(request, {headers});
+  }
+  const response = await originFetch(originRequest);
+  const directMarkdown = page && asset && url.pathname.endsWith('/index.md') && (response.status === 304 || (response.status === 200 && /^(text\/(plain|markdown)|application\/octet-stream)(;|$)/i.test(response.headers.get('Content-Type') || '')));
   return decorate(response, url, directMarkdown, head, page);
 }
 
