@@ -31,6 +31,7 @@ assert.match(result.headers.get('Content-Signal'), /ai-input=yes/);
 assert.match(await result.text(), /^# A real article/);
 assert.equal(requests.at(-1).url, 'https://allluckly.cn/en/guides/vectorpaint-getting-started/index.md');
 assert.equal(requests.at(-1).headers.has('Cookie'), false);
+assert.equal(requests.at(-1).headers.get('Accept-Encoding'), 'identity');
 
 result = await handle(req(article, {Accept: 'text/html'}), mockFetch);
 assert.match(await result.text(), /^<h1>/);
@@ -69,6 +70,25 @@ assert.doesNotMatch(result.headers.get('Link'), /rel="alternate"; type="text\/ma
 const old = '/cocoapods/CocoaPods%E5%AE%89%E8%A3%85%E5%8F%8A%E4%BD%BF%E7%94%A8';
 result = await handle(req(old + '/index.md'), mockFetch);
 assert.ok(result.headers.get('Link').includes(`<https://allluckly.cn${old}>; rel="canonical"`));
+assert.equal(requests.at(-1).headers.get('Accept-Encoding'), 'identity');
+
+// Real production caught gzip-byte ranges being automatically decoded to an
+// empty stream. Both access paths must ask for unencoded origin Markdown.
+const complete = new TextEncoder().encode('# Complete Markdown\n' + 'A source paragraph. '.repeat(20));
+const rangeOrigin = async request => {
+  assert.equal(request.headers.get('Accept-Encoding'), 'identity');
+  assert.equal(request.headers.get('Range'), 'bytes=0-63');
+  return new Response(complete.slice(0, 64), {status: 206, headers: {
+    'Content-Type': 'text/plain', 'Content-Range': `bytes 0-63/${complete.byteLength}`,
+    ETag: '"plain-markdown"', 'Accept-Ranges': 'bytes'
+  }});
+};
+for (const path of [article, article + 'index.md']) {
+  const partial = await handle(req(path, {Accept: 'text/markdown', Range: 'bytes=0-63'}), rangeOrigin);
+  assert.equal(partial.status, 206);
+  assert.equal(partial.headers.get('Content-Range'), `bytes 0-63/${complete.byteLength}`);
+  assert.deepEqual(new Uint8Array(await partial.arrayBuffer()), complete.slice(0, 64));
+}
 const before = requests.length;
 await handle(req('/en/', {}, 'POST'), mockFetch);
 assert.equal(requests.length, before + 1);

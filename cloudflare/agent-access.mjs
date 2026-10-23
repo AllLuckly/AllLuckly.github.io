@@ -76,6 +76,10 @@ export async function handle(request, originFetch = fetch) {
   if (page && !asset && wantsMarkdown(request.headers.get('Accept') || '')) {
     const headers = new Headers(request.headers);
     headers.set('Accept', 'text/plain');
+    // Workers otherwise requests a compressed origin representation, even when
+    // the client asks for identity. Ranges over a gzip stream can become empty
+    // after automatic decompression. Keep the stored Markdown bytes canonical.
+    headers.set('Accept-Encoding', 'identity');
     let converted;
     try {
       converted = await originFetch(new Request(page.markdown, {method: request.method, headers, redirect: 'manual'}));
@@ -91,7 +95,13 @@ export async function handle(request, originFetch = fetch) {
       return decorate(converted, url, true, head, page);
     }
   }
-  const response = await originFetch(request);
+  let originRequest = request;
+  if (page && url.pathname.endsWith('/index.md')) {
+    const headers = new Headers(request.headers);
+    headers.set('Accept-Encoding', 'identity');
+    originRequest = new Request(request, {headers});
+  }
+  const response = await originFetch(originRequest);
   const directMarkdown = page && asset && url.pathname.endsWith('/index.md') && response.status < 400 && /^(text\/(plain|markdown)|application\/octet-stream)(;|$)/i.test(response.headers.get('Content-Type') || '');
   return decorate(response, url, directMarkdown, head, page);
 }
