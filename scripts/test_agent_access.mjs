@@ -59,7 +59,8 @@ for (const headers of [{Accept:'text/markdown', Range:'bytes=0-10'}, {Accept:'te
   const value = await handle(req('/en/', headers), mockFetch);
   assert.equal(requests.length, before + 1);
   assert.equal(requests.at(-1).url, 'https://allluckly.cn/en/index.md');
-  for (const name of ['Range', 'If-None-Match']) if (headers[name]) assert.equal(requests.at(-1).headers.get(name), headers[name]);
+  assert.equal(requests.at(-1).headers.has('Range'), false);
+  if (headers['If-None-Match']) assert.equal(requests.at(-1).headers.get('If-None-Match'), headers['If-None-Match']);
   assert.match(value.headers.get('Content-Type'), /^text\/markdown/);
 }
 // Route membership keeps nonexistent Markdown URLs out of discovery headers.
@@ -73,22 +74,52 @@ assert.ok(result.headers.get('Link').includes(`<https://allluckly.cn${old}>; rel
 assert.equal(requests.at(-1).headers.get('Accept-Encoding'), 'identity');
 
 // Real production caught gzip-byte ranges being automatically decoded to an
-// empty stream. Both access paths must ask for unencoded origin Markdown.
+// empty stream. Markdown ignores Range and If-Range and returns the full body.
 const complete = new TextEncoder().encode('# Complete Markdown\n' + 'A source paragraph. '.repeat(20));
 const rangeOrigin = async request => {
   assert.equal(request.headers.get('Accept-Encoding'), 'identity');
-  assert.equal(request.headers.get('Range'), 'bytes=0-63');
-  return new Response(complete.slice(0, 64), {status: 206, headers: {
-    'Content-Type': 'text/plain', 'Content-Range': `bytes 0-63/${complete.byteLength}`,
-    ETag: '"plain-markdown"', 'Accept-Ranges': 'bytes'
+  assert.equal(request.headers.has('Range'), false);
+  assert.equal(request.headers.has('If-Range'), false);
+  return new Response(complete, {headers: {
+    'Content-Type': 'text/plain', ETag: '"plain-markdown"', 'Accept-Ranges': 'bytes'
   }});
 };
 for (const path of [article, article + 'index.md']) {
-  const partial = await handle(req(path, {Accept: 'text/markdown', Range: 'bytes=0-63'}), rangeOrigin);
+  const full = await handle(req(path, {Accept: 'text/markdown', Range: 'bytes=0-63', 'If-Range': '"plain-markdown"'}), rangeOrigin);
+  assert.equal(full.status, 200);
+  assert.equal(full.headers.get('Accept-Ranges'), 'none');
+  assert.equal(full.headers.has('Content-Range'), false);
+  assert.deepEqual(new Uint8Array(await full.arrayBuffer()), complete);
+  const conditional = await handle(req(path, {Accept: 'text/markdown', 'If-None-Match': '"plain-markdown"'}), async request => {
+    assert.equal(request.headers.get('If-None-Match'), '"plain-markdown"');
+    return new Response(null, {status: 304, headers: {ETag: '"plain-markdown"'}});
+  });
+  assert.equal(conditional.status, 304);
+  assert.match(conditional.headers.get('Content-Type'), /^text\/markdown/);
+  assert.match(conditional.headers.get('Vary'), /Accept/);
+  assert.equal(await conditional.text(), '');
+}
+// Asset and default HTML byte-range behavior still belongs to the origin.
+for (const path of [article, '/assets/videos/artwork.mp4']) {
+  const partial = await handle(req(path, {Accept: 'text/html', Range: 'bytes=0-63'}), async request => {
+    assert.equal(request.headers.get('Range'), 'bytes=0-63');
+    return new Response(complete.slice(0, 64), {status: 206, headers: {
+      'Content-Type': path.endsWith('.mp4') ? 'video/mp4' : 'text/html',
+      'Content-Range': `bytes 0-63/${complete.byteLength}`, 'Accept-Ranges': 'bytes'
+    }});
+  });
   assert.equal(partial.status, 206);
-  assert.equal(partial.headers.get('Content-Range'), `bytes 0-63/${complete.byteLength}`);
+  assert.equal(partial.headers.get('Accept-Ranges'), 'bytes');
   assert.deepEqual(new Uint8Array(await partial.arrayBuffer()), complete.slice(0, 64));
 }
+// A 304 must retain Vary even when the HTML origin omits Content-Type.
+result = await handle(req(article, {Accept: 'text/html', 'If-None-Match': '"html-v1"'}), async request => {
+  assert.equal(request.headers.get('If-None-Match'), '"html-v1"');
+  return new Response(null, {status: 304, headers: {ETag: '"html-v1"'}});
+});
+assert.equal(result.status, 304);
+assert.match(result.headers.get('Vary'), /Accept/);
+assert.equal(result.headers.has('Content-Type'), false);
 const before = requests.length;
 await handle(req('/en/', {}, 'POST'), mockFetch);
 assert.equal(requests.length, before + 1);

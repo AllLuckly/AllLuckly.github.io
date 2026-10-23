@@ -21,7 +21,7 @@ DNS-AID 对应代理服务发现草案，本站没有相应代理服务。不为
 
 ## 使用偏好
 
-robots 与准备部署的 Worker 均声明 `search=yes, ai-input=yes, ai-train=no`：允许搜索发现与回答依据，不额外授权模型训练。Content Signals 是用途偏好，不是强制访问控制，也不改变原文作者与转载内容的权利。爬虫可以抓取公开页面；不按伪装 User-Agent 绕过 WAF 或放宽网站安全规则。
+robots 与线上 Worker 均声明 `search=yes, ai-input=yes, ai-train=no`：允许搜索发现与回答依据，不额外授权模型训练。Content Signals 是用途偏好，不是强制访问控制，也不改变原文作者与转载内容的权利。爬虫可以抓取公开页面；不按伪装 User-Agent 绕过 WAF 或放宽网站安全规则。
 
 ## Cloudflare 边缘部署
 
@@ -29,7 +29,7 @@ Cloudflare Free 没有内建 Markdown for Agents；[官方功能](https://develo
 
 Worker 只对清单中的真实公开页面，在明确接受 Markdown 时获取已生成的静态文件。HTML 为默认；Cookie/Authorization 请求与非 GET/HEAD 请求保持原路径。未知路径、HTML 错误页和失败的 Markdown 获取回退 HTML。资源内容不依赖爬虫身份，查询词不外发。
 
-响应包括真实 HTTP `Link`（canonical、Markdown alternate、sitemap、阅读目录）、统一 Content Signals，以及 HTML/Markdown 的 `Vary: Accept`。Markdown 与 HTML 在源站使用不同缓存路径；Markdown 的 ETag、Last-Modified、Range 与长度属于它自己的字节，不复用 HTML 校验值。**只有 Worker 实际部署且 HTTP 核验通过，才能声称线上支持 Accept 内容协商和这些响应头。**
+响应包括真实 HTTP `Link`（canonical、Markdown alternate、sitemap、阅读目录）、统一 Content Signals，以及 HTML/Markdown 的 `Vary: Accept`。Markdown 与 HTML 在源站使用不同缓存路径；Markdown 保留自己的 ETag、Last-Modified，不复用 HTML 校验值。Markdown 忽略 Range 与 If-Range，返回完整的 200 正文并声明 `Accept-Ranges: none`；源站压缩字节的分段响应可能被边缘解压为空，不能照搬。普通 HTML 与视频继续保留源站的分段读取行为。条件请求仍可返回 304，直接 Markdown 的 304 同样包含类型与 `Vary: Accept`。
 
 发布顺序：先发布 GitHub Pages 静态正文，再在有权限的 Cloudflare 会话里部署该 Worker 并关联 `allluckly.cn/*`。可在官方 Wrangler 环境中执行：
 
@@ -74,12 +74,37 @@ node scripts/test_agent_search.mjs
 
 可运行 `python3 scripts/check_agent_http.py --require-edge --output output/agent-readiness/live-http.json` 记录实际 HTTP 检查；本地构建用 `--base-url http://127.0.0.1:4173/`，本地纯静态预览的边缘项会显示 `NOT LIVE`。该脚本没有把本地结果冒充 Cloudflare 官方分数，也不验证真实爬虫身份或原生 WebMCP。
 
+官方公开检测也可手动重复运行，无需账户密钥：
+
+```sh
+python3 scripts/scan_agent_readiness.py --profile content --output output/agent-readiness/content.json
+python3 scripts/scan_agent_readiness.py --checks robotsTxt,sitemap,linkHeaders,markdownNegotiation,robotsTxtAiRules,contentSignals,agentSkills,webMcp --output output/agent-readiness/selected.json
+```
+
+脚本保存实际请求、UTC 时间、JSON 结果与原始事件响应。比较前后状态时保持 URL、profile 与启用项相同；不同预设的总等级不能直接比较。
+
 实际效果继续在 Cloudflare AI Crawl Control、搜索站长工具的收录/引用数据和产品入口访问中分开观察；本项目没有伪造实时 GEO 分数。
 
-## 本次本地验收记录
+## 本次构建验收记录
 
 2026-10-23 完成全量 Jekyll 构建，674 份 Markdown 与语义源及最终输出逐字一致，36 个目录目标全部存在，SKILL.md 发布字节摘要正确。中英搜索共 624 条记录、674 个 HTML head/页脚 Markdown 链接核验通过。
 
 原有站点检查仍通过：744 组 JSON-LD、740 个 sitemap URL、180 篇中文教程、128 篇历史技术文章、312 篇完整英文文章、337 组中英互返页面及4个作品视频。Node 检查覆盖协商优先级/通配q值/HEAD/Range/条件请求/私有请求回退与WebMCP接口模拟。
 
-本地 HTTP 检查中 HTML、显式中英 Markdown、阅读目录、robots Content Signals、技能摘要及真实404均通过；纯静态预览的边缘协商/响应头显示 NOT LIVE，符合其尚未部署的状态。GitHub Pages 新版本与 Cloudflare Worker 尚待实际发布和线上复测，不能把本节当作线上成功记录。
+本地 HTTP 检查中 HTML、显式中英 Markdown、阅读目录、robots Content Signals、技能摘要及真实 404 均通过；纯静态预览的边缘协商/响应头显示 NOT LIVE，线上结果单独记录。
+
+
+## 线上发布记录
+
+2026-10-23，中英文与静态阅读资源通过 [PR #11](https://github.com/AllLuckly/AllLuckly.github.io/pull/11) 合并，Pages 提交 `40dd265d3d6d7f8ea3f79413f101b2abf70efadd` 的[构建和部署](https://github.com/AllLuckly/AllLuckly.github.io/actions/runs/39901499319)成功。线上英文正文、同篇中文切换、旧技术 URL、4 个英文字幕文件、740 项 sitemap 与中英搜索索引均已核验。
+
+Cloudflare Worker `allluckly-agent-access` 已部署版本 `5c8b5829`，仅关联 `allluckly.cn/*`，workers.dev 与预览地址关闭。它只调整公开内容表示，额度或运行错误时按 fail open 继续源站；现有 WAF 与登录规则不变。实际 HTTP 验收中 7 项静态内容与 4 项边缘协商检查均通过；英文教程、旧中文技术文章与对应英文文章的 35 项边界检查全部通过，包括两种 Markdown 入口的完整正文、HEAD、Accept 优先级和 304 元数据。带 Range/If-Range 的 Markdown 请求返回完整 200，正文逐字节一致。客户端接受 gzip 时也返回可完整解压的正文；Cloudflare 压缩层可能移除 `Accept-Ranges: none`，缺省仍未声明支持分段读取。
+
+
+### 官方复测：2026-10-23
+
+13:10:15–20（上海时间），同一 URL、同一 `profile: content` 的 `scan_site` 返回 **Level 5/5 — Agent-Native**，基线为 Level 1/5。纳入检查为 7 项，6 项通过：robots、sitemap、HTTP Link、Markdown 协商、AI bot 规则、Content Signals；DNS-AID 仍未通过。这个等级不是“所有协议全通过”，该预设排除了 API、登录、支付、Agent Skills 与 WebMCP。
+
+13:10:56–13:11:03，另一次显式选择 8 项的检测全部通过：上述 6 项，以及 Agent Skills、WebMCP。扫描器识别有效的技能目录与 `search_blog_articles` 原生搜索工具。扫描器还列出两个非本站源码注册的浏览器工具；本站只主张提供自己的搜索工具，不将检测环境里的其他能力计为本站实现。
+
+可提交的时间、参数、通过/失败项与限制保存在 [agent-readiness-production.json](agent-readiness-production.json)，完整原始 JSON、事件响应和 HTTP 头证据保存在本机忽略目录 `output/agent-readiness/production-*-scan.*`。两次官方扫描对应 `67364f45`；最终版本 `5c8b5829` 只补齐普通 HTML 304 的 `Vary: Accept`，正文与扫描项不变。这是一轮实际线上协议检测，不代表模型已经引用本站或必然推荐 App。
