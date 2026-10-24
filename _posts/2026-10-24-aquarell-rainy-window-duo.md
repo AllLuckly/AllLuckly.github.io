@@ -15,40 +15,56 @@ tags:
 - 冷暖配色
 - 雨夜插画
 video:
-  src: /assets/videos/aquarell-rainy-window-duo.mp4
+  src: /assets/videos/aquarell-rainy-window-duo-steps-v2.mp4
   poster: /assets/images/works/aquarell-rainy-window-duo.png
-  captions: /assets/videos/aquarell-rainy-window-duo.zh-CN.vtt
+  captions: /assets/videos/aquarell-rainy-window-duo-steps-v2.zh-CN.vtt
   captions_lang: zh-CN
-  captions_en: /assets/videos/aquarell-rainy-window-duo.en.vtt
+  captions_en: /assets/videos/aquarell-rainy-window-duo-steps-v2.en.vtt
   language: zh-CN
   name: Aquarell 雨夜窗景：13 层原生创作与 Duo 姿态对照
-  description: AI 辅助使用 Aquarell 原生选区、填色、画笔与图层，从城市灯火和玻璃雨痕画到木窗、吊灯、书杯与陶盆植物，再调整雨、雾与蒸汽的不透明度。电影运镜穿插真实创作片段，Duo 部分明确展示展开、半展开、合拢与恢复的窗口采样。
-  upload_date: '2026-10-24T11:31:27+08:00'
-  duration: PT2M51.563S
-  width: 1920
+  description: AI 辅助使用 Aquarell 原生选区、填色、画笔与图层，从已保存的夜色与楼群继续，依次加入城市灯火、玻璃雨痕、木窗、吊灯、书杯与陶盆植物，最后调整透明度和遮挡。视频按实际创作顺序展示完整应用界面；片尾为原生成图和
+    Duo 四姿态窗口采样。
+  upload_date: '2026-10-24T15:04:33+08:00'
+  duration: PT3M27.433S
+  width: 1536
   height: 1080
   chapters:
   - start: 0.0
-    title: Aquarell · AI 辅助原生创作
-  - start: 7.333
-    title: 夜色、雨痕与木窗
-  - start: 72.967
-    title: 灯、书、咖啡与植物
-  - start: 119.033
-    title: iPhone Duo 真实姿态采样
-  - start: 139.367
-    title: 明暗精修与原生成图
-  - start: 166.667
-    title: 成图回看
-recording_note: Aquarell 本地构建 1.0.5（1），iPhone Duo / iOS 27.1 模拟器，中文界面。AI 经应用正式 MCP 辅助原生绘画；部分创作片段为 1.5–4 倍速并剪去等待。Duo
-  展示为四姿态真实窗口采样，按步骤剪接。采用 Ink Press 模板运镜与音效，无背景音乐、无旁白；解说由播放器中英文外置字幕提供，片中保留中文标题卡。商店版本界面可能不同。
+    title: 雾与月光：从已有底景开始
+  - start: 8.8
+    title: 分层加入城市窗灯
+  - start: 34.8
+    title: 短雨丝、长水迹与雨珠
+  - start: 56.133
+    title: 木窗框与黄铜锁扣
+  - start: 82.133
+    title: 窗台厚度与木纹
+  - start: 101.467
+    title: 吊灯亮面、暗面与灯泡
+  - start: 110.467
+    title: 书影、纸面与红书签
+  - start: 126.267
+    title: 杯柄、咖啡与杯碟
+  - start: 148.767
+    title: 陶盆、枝条与叶片
+  - start: 168.1
+    title: 调整透明度与精修
+  - start: 181.433
+    title: 清理跨过静物的高光
+  - start: 184.433
+    title: 完成作品 PNG
+  - start: 187.433
+    title: iPhone Duo 展开与折叠
+recording_note: Aquarell 本地构建 1.0.5（1），iPhone Duo / iOS 27.1 模拟器，中文界面。AI 通过应用正式 MCP 辅助原生绘画。从已有底景继续，创作片段按顺序剪接，去除等待，以原速至
+  2 倍速播放；字幕注明各段速度。无音轨，附中英文字幕。片尾先展示原生 PNG，再用四张真实窗口截图分步对照 Duo 姿态；并非连续折叠录像。 商店版本界面可能不同。
+modified: '2026-10-24T15:04:33+08:00'
 ---
 
 窗外画冷蓝色的城市，窗内放一本翻开的书、一杯咖啡和一盏暖灯。雨丝和灯格比较密，书页和杯子则保留大块颜色，这样整幅画不会处处都在抢注意力。
 
 这次用 **Aquarell、1400 × 1000 px 横向画布、300 dpi、sRGB，保留 13 个原生图层**完成。主要操作是选区填色、真实画笔笔触、局部擦除和图层不透明度调整。
 
-**创作方式说明：本作品由 AI 通过 Aquarell 应用内的「AI 控制（MCP）」辅助完成。所有图像内容均由原生选区填色与真实画笔渲染产生，并保存为可编辑作品，没有导入外部合成图。录屏记录模拟器中的实际编辑过程，不作为逐笔人工手绘实录；电影运镜在后期加入。**本轮使用中文界面的本地构建。下面按实际完成顺序写出复刻方法。
+**创作方式说明：本作品由 AI 通过 Aquarell 应用内的「AI 控制（MCP）」辅助完成。所有图像内容均由原生选区填色与真实画笔渲染产生，并保存为可编辑作品，没有导入外部合成图。录屏记录模拟器中的实际编辑过程，不作为逐笔人工手绘实录。**视频按创作顺序剪去等待，保留实际应用界面；本轮使用中文界面的本地构建。下面按实际完成顺序写出复刻方法。
 
 ![Aquarell 原生导出的雨夜窗景：冷蓝城市和窗灯、玻璃雨痕、木框与黄铜锁扣，窗台上有暖灯、翻开的书、咖啡杯和陶盆绿植](/assets/images/works/aquarell-rainy-window-duo.png)
 
