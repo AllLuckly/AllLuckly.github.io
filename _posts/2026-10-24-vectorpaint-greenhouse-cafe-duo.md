@@ -16,40 +16,55 @@ tags:
 - 钢笔闭合路径
 - 收藏色板
 video:
-  src: /assets/videos/vectorpaint-greenhouse-cafe-duo.mp4
+  src: /assets/videos/vectorpaint-greenhouse-cafe-duo-steps-v2.mp4
   poster: /assets/images/works/vectorpaint-greenhouse-cafe-duo.png
-  captions: /assets/videos/vectorpaint-greenhouse-cafe-duo.zh-CN.vtt
+  captions: /assets/videos/vectorpaint-greenhouse-cafe-duo-steps-v2.zh-CN.vtt
   captions_lang: zh-CN
-  captions_en: /assets/videos/vectorpaint-greenhouse-cafe-duo.en.vtt
+  captions_en: /assets/videos/vectorpaint-greenhouse-cafe-duo-steps-v2.en.vtt
   language: zh-CN
   name: VectorPaint 温室咖啡馆：29 个闭合路径与几何修正
-  description: AI 辅助操作 VectorPaint 的真实编辑界面，从地基、墙顶和蓝玻璃画到陶红遮阳棚、花盆与六片三角叶；通过几何表单移动花盆、重建闭合玻璃、绘制四块铺石并原生导出 PNG。电影运镜穿插实际录屏，Duo
-    展示为四姿态稳定窗口采样。
-  upload_date: '2026-10-24T12:58:29+08:00'
-  duration: PT3M15.691S
-  width: 1920
-  height: 1080
+  description: AI 辅助操作 VectorPaint 的真实编辑界面，按步骤展示地基、墙顶、蓝玻璃、红棚、花盆和三角叶，再通过几何表单调整花盆、检查重建后的玻璃、添加铺石并原生导出 PNG。保留完整应用界面；片尾为原生成图和
+    Duo 四姿态窗口采样。
+  upload_date: '2026-10-24T15:04:33+08:00'
+  duration: PT4M12.333S
+  width: 1080
+  height: 1536
   chapters:
   - start: 0.0
-    title: VectorPaint · AI 辅助原生创作
-  - start: 7.333
-    title: 地基、屋顶与玻璃
-  - start: 59.633
-    title: 红棚、花盆与三角叶
-  - start: 102.967
-    title: iPhone Duo 真实姿态采样
-  - start: 122.3
-    title: 几何修正、铺石与原生导出
-  - start: 190.8
-    title: 成图回看
-recording_note: VectorPaint 本地构建 1.0.7（6），iPhone Duo / iOS 27.1 模拟器，中文界面。AI 辅助操作真实编辑界面；部分创作片段为 1.5、2、3 或 4 倍速并剪去等待。Duo
-  展示为四姿态真实窗口采样，按步骤剪接。采用 Ink Press 模板运镜与音效，无背景音乐、无旁白；解说由播放器中英文外置字幕提供，片中保留中文标题卡。商店版本界面可能不同。
+    title: 给闭合地基填紫色
+  - start: 6.0
+    title: 从地坪立墙并搭屋顶
+  - start: 25.333
+    title: 依次加入三片屋顶玻璃
+  - start: 39.333
+    title: 正窗、门玻璃与三片侧窗
+  - start: 72.667
+    title: 闭合红棚并切换填色
+  - start: 86.667
+    title: 花盆轮廓与门下板
+  - start: 103.333
+    title: 每侧三片大三角叶簇
+  - start: 133.333
+    title: 用几何面板让花盆归位
+  - start: 159.333
+    title: 重建后的玻璃填蓝并检查四角
+  - start: 167.333
+    title: 沿地坪方向补齐四块铺石
+  - start: 202.667
+    title: 通过原生界面导出 PNG
+  - start: 229.333
+    title: 完成作品 PNG
+  - start: 232.333
+    title: iPhone Duo 四态窗口采样
+recording_note: VectorPaint 本地构建 1.0.7（6），iPhone Duo / iOS 27.1 模拟器，中文界面。AI 辅助操作实际编辑界面。从已有地基轮廓的填色开始，创作片段按顺序剪接，去除等待，以原速至
+  1.5 倍速播放；字幕注明各段速度。无音轨，附中英文字幕。片尾先展示原生 PNG，再用四张真实窗口截图分步对照 Duo 姿态；并非连续折叠录像。 商店版本界面可能不同。
+modified: '2026-10-24T15:04:33+08:00'
 ---
 这间温室咖啡馆只用六种颜色。琥珀色地坪下面露一圈紫色地基，白色正墙接着绿色侧墙，三块蓝玻璃沿屋顶斜面排开。门前留四块白色铺石，两侧各放一盆尖叶植物，最后停在这个程度。
 
 作品在 **iPhone Duo / iOS 27.1 模拟器、VectorPaint 本地构建 1.0.7（6）**中完成，画布 **1080 × 1080 px**。最终原稿保留 **1 个图层、29 个闭合路径、109 个锚点**。
 
-**创作方式说明：本次由 AI 辅助操作 VectorPaint 的真实编辑界面，通过触控、键盘与辅助功能完成钢笔落点、对象选择、填色和几何调整。成图使用应用原生 PNG 导出，没有导入外部合成图，也没有把原稿数据直接写进应用。**视频呈现这次实际编辑过程，电影运镜在后期加入。
+**创作方式说明：本次由 AI 辅助操作 VectorPaint 的真实编辑界面，通过触控、键盘与辅助功能完成钢笔落点、对象选择、填色和几何调整。成图使用应用原生 PNG 导出，没有导入外部合成图，也没有把原稿数据直接写进应用。**视频按创作顺序剪去等待，保留实际应用界面，方便对照每一步操作。
 
 ![VectorPaint 原生导出的温室咖啡馆：紫色地基与琥珀地坪，白墙、绿色屋顶和侧墙、三块蓝色屋顶玻璃、陶红棚与花盆，六片三角绿叶和四块白色铺石](/assets/images/works/vectorpaint-greenhouse-cafe-duo.png)
 
