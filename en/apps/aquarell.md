@@ -2,10 +2,10 @@
 layout: app
 app_id: pastel
 title: 'Aquarell: drawing and watercolour-style illustration on iPhone and iPad'
-description: Explore Aquarell brushes, layers, palettes and export formats, with tutorials from your first canvas to a finished
-  drawing.
+description: Explore Aquarell brushes, layers, palettes and export formats. Watch MCP draw the 19-layer Cloud Mountains,
+  Evening Ferry and find setup details for MCP-enabled builds.
 permalink: /en/apps/aquarell/
-modified: 2026-10-23
+modified: '2026-10-26'
 lang: en
 source_url: /apps/aquarell/
 ---
@@ -31,6 +31,16 @@ Try a plant or a still life with three layers: a sketch, colour and final detail
 PNG and JPEG are useful for a blog, social post or message. To keep editing, save the native Aquarell project too. A PSD export preserves raster layers, but it is not a replacement for the native document: keep editable text and layer groups in the original project.
 
 Aquarell is suited to painting built around brush marks and pixel layers. For SVG paths or a scalable logo, see [VectorPaint]({{ '/en/apps/vectorpaint/' | relative_url }}).
+
+## Paint in layers through MCP
+
+Aquarell MCP (Model Context Protocol) lets an AI client read canvas and brush information, then call native brush, layer, selection, text, save and export tools. Strokes are rendered in the app, with painted content retained on raster layers. A composition brief can become a sequence of washes and detailed adjustments.
+
+[Cloud Mountains, Evening Ferry]({{ '/en/works/aquarell-cloud-mountains-evening-ferry-mcp/' | relative_url }}) follows an actual painting from pale distant mountains to a foreground pine, pavilion and small boat. The native project is 1600 × 1100 px with 19 layers, including native text inscriptions. Its project page provides a tutorial with the full app interface and a breakdown of the layers.
+
+Getting started requires **an Apple silicon Mac that can run iPad apps, an MCP-enabled Aquarell build, Python 3.9+ and a client supporting local stdio MCP**. Follow the [Aquarell MCP installation instructions](https://github.com/SoBison/Aquarell-mcp/blob/main/README.md) to install the bridge and generate a personal configuration. Then check connection and editing permissions under **AI Control (MCP)** in the **gallery folder menu or canvas layer-tools menu**.
+
+The [Aquarell MCP integration source and documentation](https://github.com/SoBison/Aquarell-mcp) are public. The integration is currently a preview; App Store and TestFlight release packages have not been validated. Check that your actual build provides the MCP entry point first.
 
 ## Common questions
 
