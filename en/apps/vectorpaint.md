@@ -2,9 +2,10 @@
 layout: app
 app_id: draw_illustration
 title: 'VectorPaint: vector drawing, logos and SVG editing'
-description: Explore VectorPaint shapes, paths, Bézier nodes, layers and SVG exports, starting with a small geometric icon.
+description: Explore VectorPaint vector drawing, Bézier nodes, layers and SVG exports. Watch MCP create the 14-layer
+  Midnight Orchid and find connection steps for MCP-enabled builds.
 permalink: /en/apps/vectorpaint/
-modified: 2026-10-23
+modified: '2026-10-26'
 lang: en
 source_url: /apps/vectorpaint/
 ---
@@ -30,6 +31,16 @@ SVG and PDF can contain both vector paths and raster elements. Describe the actu
 ## Keep your work organised
 
 Drawing and project management are based on local files and can be used offline. Groups, tags, favourites, undo, redo, versions, recently deleted items and backups help manage work in progress. Keep the editable original alongside the finished file you share.
+
+## Turn a scene plan into editable objects with MCP
+
+VectorPaint’s MCP (Model Context Protocol) interface lets an AI client use drawing tools to create and modify native app objects, including paths, shapes, text, layers and gradients. It is useful for breaking a composition brief into parts that remain adjustable, or for making precise changes to an existing project.
+
+[Midnight Orchid]({{ '/en/works/vectorpaint-midnight-orchid-mcp/' | relative_url }}) shows an actual creation: six orchids surround a glass conservatory at night, with stars, moon, reflections and foreground leaves across 14 layers. Petals and glass retain editable paths and gradients, and the app exports the finished PNG. The project page includes a real-canvas video and a breakdown of the layers.
+
+You need an **MCP-enabled VectorPaint build** with **Settings → AI Control** available. The public documentation describes local HTTP connections for the iPad version running on the same Apple silicon Mac, with configuration examples for Codex and VS Code. Enable the local connection, copy the personal client configuration, then allow artwork changes when needed.
+
+See the [VectorPaint MCP public source](https://github.com/AllLuckly/VectorPaint-mcp) and [getting-started documentation](https://github.com/AllLuckly/VectorPaint-mcp/blob/main/README.md) for connection and tool details. The MCP entry point has not been confirmed in the current App Store package; check your installed build first.
 
 ## Common questions
 

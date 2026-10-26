@@ -2,9 +2,9 @@
 layout: app
 app_id: draw_illustration
 title: VectorPaint：iPhone 与 iPad 矢量绘图、Logo 设计与 SVG 编辑
-description: 了解 VectorPaint 的形状、路径、贝塞尔节点、图层和 SVG 导出能力，从简单几何图标开始矢量创作。
+description: 了解 VectorPaint 的矢量绘图、贝塞尔节点、图层与 SVG 导出，观看 MCP 创建 14 层《午夜兰花》的实录，并查看已启用 MCP 构建的 AI 连接说明。
 permalink: /apps/vectorpaint/
-modified: 2026-10-23
+modified: '2026-10-26'
 ---
 
 VectorPaint 是用于 **iPhone 和 iPad 矢量绘图与 SVG 编辑**的应用。用钢笔、形状、可编辑路径、图层和文字制作 Logo、图标、插画与海报。商店名称是「VectorPaint-矢量绘图与Logo设计」。
@@ -28,6 +28,16 @@ SVG 和 PDF 也可以同时包含矢量路径与位图元素。交付时应按�
 ## 在设备上整理作品
 
 绘图与作品管理以本地文件为基础，可以离线进行。可以为作品添加分组、标签与收藏，使用撤销、重做、版本、最近删除和备份功能管理创作过程。用于继续修改的原稿，应与用于分享的成品文件一起保留。
+
+## 用 MCP 把场景计划变成可编辑对象
+
+VectorPaint 的 MCP（Model Context Protocol）接口让 AI 客户端通过绘图工具创建和修改应用原生对象，包括路径、形状、文字、图层和渐变。适合把一段构图说明拆成多个可以继续调整的部分，也适合在已有作品里精确修改对象。
+
+作品 [《午夜兰花》]({{ '/works/vectorpaint-midnight-orchid-mcp/' | relative_url }}) 展示了一次实际创作：六朵兰花围着夜色玻璃温室，背景星月、水面倒影和前景叶片分在 14 个图层中，花瓣与玻璃保留可编辑路径和渐变，并由应用导出 PNG。页面附真实画布视频与分层做法。
+
+入门需要**已启用 MCP 的 VectorPaint 构建**，并且能看到 **设置 → AI 控制**。公开文档提供同一台 Apple 芯片 Mac 上运行 iPad 版本时的本机 HTTP 连接流程，以及 Codex 和 VS Code 配置示例；先开启本机连接，复制个人客户端配置，再按需开启「允许修改作品」。
+
+连接与工具说明见 [VectorPaint MCP 公开源码](https://github.com/AllLuckly/VectorPaint-mcp)和[中文入门文档](https://github.com/AllLuckly/VectorPaint-mcp/blob/main/README.zh-CN.md)。当前 App Store 包是否包含 MCP 入口尚未确认，请先核对实际安装版本。
 
 ## 常见问题
 
