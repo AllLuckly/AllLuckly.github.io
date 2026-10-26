@@ -2,9 +2,9 @@
 layout: app
 app_id: pastel
 title: Aquarell：iPhone 与 iPad 水彩绘画、插画与手绘画板
-description: 了解 Aquarell 的自定义笔刷、图层、色板与导出能力，找到从新建画布到完成第一幅手绘练习的教程。
+description: 了解 Aquarell 的笔刷、图层、色板与导出能力，观看 MCP 绘制 19 层《云山晚渡》的实录，并查看已启用 MCP 构建的 AI 连接说明。
 permalink: /apps/aquarell/
-modified: 2026-10-23
+modified: '2026-10-26'
 ---
 
 Aquarell 是一款用于 **iPhone 和 iPad 水彩绘画、插画与手绘创作**的应用。它将笔刷、图层、色板和自定义画布放在一起，适合随手记录灵感，也适合把草图逐步画成完整作品。商店中的产品名称是「Aquarell 水彩绘画与手绘画板」。
@@ -28,6 +28,16 @@ Aquarell 是一款用于 **iPhone 和 iPad 水彩绘画、插画与手绘创作*
 PNG 和 JPEG 适合在博客、社交平台或聊天中分享。需要保留可编辑内容时，应同时保存 Aquarell 原生作品。PSD 导出保留像素图层，但不能把它等同于原生文档：可编辑文字和图层分组仍应在原生作品中保留。
 
 Aquarell 适合以笔触和像素图层为中心的绘画；如果目标是编辑 SVG 路径或制作可缩放的 Logo，可以查看 [VectorPaint]({{ '/apps/vectorpaint/' | relative_url }})。
+
+## 通过 MCP 分层绘画
+
+Aquarell MCP（Model Context Protocol，模型上下文协议）让 AI 客户端读取画布与画笔信息，并调用原生画笔、图层、选区、文字、保存与导出能力。笔画在应用中实际渲染，绘画内容保留在像素图层里，适合把构图说明拆成逐层铺染与细节调整。
+
+作品[《云山晚渡》]({{ '/works/aquarell-cloud-mountains-evening-ferry-mcp/' | relative_url }})展示了从淡墨远山到近岸老松、江亭和小舟的一次实际创作。原稿为 1600 × 1100 px、19 层，题款保留原生文字，页面附完整应用界面教程与分层做法。
+
+入门需要能运行 iPad 应用的 **Apple 芯片 Mac、已启用 MCP 的 Aquarell 构建、Python 3.9+ 和支持本地 stdio MCP 的客户端**。先按[Aquarell MCP 中文安装说明](https://github.com/SoBison/Aquarell-mcp/blob/main/README.zh-CN.md)安装桥接并生成个人配置，再在**画廊文件夹菜单或画布图层工具菜单 → AI 控制（MCP）**中检查连接与创作权限。
+
+[Aquarell MCP 集成源码与文档](https://github.com/SoBison/Aquarell-mcp)已公开；当前按预览交付说明，尚未用 App Store / TestFlight 发行包完成验收。请先核对实际构建是否包含 MCP 入口。
 
 ## 常见问题
 
