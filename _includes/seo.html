@@ -235,11 +235,34 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
       "publisher": { "@id": {{ seo_person_id | jsonify }} }
       {% if seo_app %}, "about": { "@id": {{ seo_app_id | jsonify }} }{% endif %}
       {% if page.video.captions %}, "caption": { "@type": "MediaObject", "contentUrl": {{ page.video.captions | absolute_url | jsonify }}, "encodingFormat": "text/vtt", "inLanguage": {{ page.video.captions_lang | default: 'zh-CN' | jsonify }} }{% endif %}
-      {% if page.video.chapters.size > 0 %}, "hasPart": [
+      {% if page.video.chapters.size > 0 %}
+      {%- comment -%}Clip offsets use whole seconds; playback retains the original precise chapter times.{%- endcomment -%}
+      {%- assign seo_duration_rest = page.video.duration | remove_first: 'PT' -%}
+      {%- assign seo_duration_hours = 0 -%}{%- assign seo_duration_minutes = 0 -%}
+      {%- if seo_duration_rest contains 'H' -%}
+        {%- assign seo_duration_parts = seo_duration_rest | split: 'H' -%}
+        {%- assign seo_duration_hours = seo_duration_parts[0] | plus: 0 -%}
+        {%- assign seo_duration_rest = seo_duration_parts[1] | default: '' -%}
+      {%- endif -%}
+      {%- if seo_duration_rest contains 'M' -%}
+        {%- assign seo_duration_parts = seo_duration_rest | split: 'M' -%}
+        {%- assign seo_duration_minutes = seo_duration_parts[0] | plus: 0 -%}
+        {%- assign seo_duration_rest = seo_duration_parts[1] | default: '' -%}
+      {%- endif -%}
+      {%- assign seo_duration_seconds = seo_duration_rest | remove: 'S' | plus: 0 | floor -%}
+      {%- assign seo_video_seconds = seo_duration_hours | times: 3600 | plus: seo_duration_seconds -%}
+      {%- assign seo_minute_seconds = seo_duration_minutes | times: 60 -%}
+      {%- assign seo_video_seconds = seo_video_seconds | plus: seo_minute_seconds -%}
+      , "hasPart": [
         {% for chapter in page.video.chapters %}
-          {% assign seo_chapter_url = seo_canonical | append: '?t=' | append: chapter.start | append: '#work-video' %}
+          {%- assign seo_chapter_start = chapter.start | ceil -%}
+          {%- assign seo_next_index = forloop.index -%}
+          {%- assign seo_next_chapter = page.video.chapters[seo_next_index] -%}
+          {%- assign seo_chapter_end = seo_video_seconds -%}
+          {%- if seo_next_chapter -%}{%- assign seo_chapter_end = seo_next_chapter.start | ceil -%}{%- endif -%}
+          {%- assign seo_chapter_url = seo_canonical | append: '?t=' | append: seo_chapter_start | append: '#work-video' -%}
           {% unless forloop.first %},{% endunless %}
-          { "@type": "Clip", "name": {{ chapter.title | jsonify | replace: '<', '\u003c' }}, "startOffset": {{ chapter.start | jsonify }}, "url": {{ seo_chapter_url | jsonify }} }
+          { "@type": "Clip", "name": {{ chapter.title | jsonify | replace: '<', '\u003c' }}, "startOffset": {{ seo_chapter_start | jsonify }}, "endOffset": {{ seo_chapter_end | jsonify }}, "url": {{ seo_chapter_url | jsonify }} }
         {% endfor %}
       ]{% endif %}
     }

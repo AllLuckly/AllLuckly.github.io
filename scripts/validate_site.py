@@ -212,7 +212,7 @@ for work in source_works:
     clips=entity.get('hasPart',[])
     assert isinstance(clips,list) and len(clips)==len(chapters)==len(page.chapter_links), f'chapter counts differ: {canonical}'
     previous_start=-1
-    for chapter,link,clip in zip(chapters,page.chapter_links,clips):
+    for index,(chapter,link,clip) in enumerate(zip(chapters,page.chapter_links,clips)):
         assert isinstance(chapter,dict), f'invalid chapter: {canonical}'
         start=chapter.get('start'); title=chapter.get('title')
         assert type(start) in [int,float] and math.isfinite(start) and previous_start<start<seconds, f'chapter starts must increase within the video: {canonical}'
@@ -222,8 +222,15 @@ for work in source_works:
         assert link.get('href')=='#t='+rendered_start and 't='+rendered_start in page.ids, f'chapter fragment differs: {canonical}'
         assert link.get('aria-controls')=='work-video', f'chapter must control this player: {canonical}'
         assert ' '.join(link['_text'].split()).endswith(' '.join(title.split())), f'chapter title must be visible: {canonical}'
-        assert clip.get('@type')=='Clip' and clip.get('name')==title and type(clip.get('startOffset')) in [int,float] and clip['startOffset']==start, f'Clip differs from visible chapter: {canonical}'
-        assert clip.get('url')==canonical+'?t='+rendered_start+'#work-video', f'Clip needs a playable time link: {canonical}'
+        # Preserve precise player controls while rounding key moments forward
+        # so the structured-data seek never lands before the actual chapter.
+        clip_start=math.ceil(start)
+        clip_end=math.ceil(chapters[index+1]['start']) if index+1<len(chapters) else math.floor(seconds)
+        assert clip.get('@type')=='Clip' and clip.get('name')==title, f'Clip differs from visible chapter: {canonical}'
+        assert type(clip.get('startOffset')) is int and clip['startOffset']==clip_start, f'Clip startOffset must be the whole-second chapter start: {canonical}'
+        assert type(clip.get('endOffset')) is int and clip['endOffset']==clip_end, f'Clip endOffset must be the next whole-second boundary: {canonical}'
+        assert 0<=clip_start<clip_end<=seconds, f'Clip boundaries must be distinct and within the video: {canonical}'
+        assert clip.get('url')==canonical+'?t='+str(clip_start)+'#work-video', f'Clip needs a playable whole-second time link: {canonical}'
         previous_start=start
     assert canonical in urls, f'work missing from sitemap: {canonical}'
     sitemap_entry=next(entry for entry in video_sitemap_entries if entry.findtext('sm:loc',namespaces=SITEMAP_NS)==canonical)

@@ -3,6 +3,7 @@
 import argparse
 import json
 import hashlib
+import math
 import re
 from collections import Counter
 from datetime import datetime
@@ -37,6 +38,15 @@ def route(url):
 def target(url):
     path = ROOT / route(url).lstrip('/')
     return next((p for p in (path, path / 'index.html', Path(str(path) + '.html')) if p.is_file()), None)
+
+
+def duration_seconds(value):
+    match = re.fullmatch(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?', value)
+    assert match and any(match.groups()), f'invalid video duration: {value}'
+    hours, minutes, seconds = (float(part or 0) for part in match.groups())
+    total = hours * 3600 + minutes * 60 + seconds
+    assert total > 0, f'empty video duration: {value}'
+    return total
 
 
 class Page(HTMLParser):
@@ -189,10 +199,24 @@ for path in (REPO / '_translations').rglob('*'):
         for field in ('contentUrl', 'thumbnailUrl', 'uploadDate', 'duration', 'inLanguage'):
             assert video[field] == original_video[field], f'underlying recording changed ({field}): {path}'
         chapters = fields['video'].get('chapters', [])
-        assert [c['start'] for c in chapters] == [c['startOffset'] for c in original_video.get('hasPart', [])], path
-        assert [c['name'] for c in video.get('hasPart', [])] == [c['title'] for c in chapters], path
-        for chapter, clip in zip(chapters, video.get('hasPart', [])):
-            assert clip['url'] == absolute(pair['en_url']) + '?t=' + str(chapter['start']) + '#work-video', path
+        source_chapters = sources[source_path]['video'].get('chapters', [])
+        assert [c['start'] for c in chapters] == [c['start'] for c in source_chapters], f'precise chapter timings changed: {path}'
+        original_clips, translated_clips = original_video.get('hasPart', []), video.get('hasPart', [])
+        assert len(chapters) == len(original_clips) == len(translated_clips), f'chapter count differs: {path}'
+        seconds = duration_seconds(video['duration'])
+        for index, (chapter, original_clip, translated_clip) in enumerate(zip(chapters, original_clips, translated_clips)):
+            start = chapter['start']
+            assert type(start) in (int, float) and math.isfinite(start), f'invalid precise chapter start: {path}'
+            clip_start = math.ceil(start)
+            clip_end = math.ceil(chapters[index + 1]['start']) if index + 1 < len(chapters) else math.floor(seconds)
+            assert 0 <= clip_start < clip_end <= seconds, f'chapter boundaries overlap or exceed the video: {path}'
+            for clip, target_url in ((original_clip, pair['zh_url']), (translated_clip, pair['en_url'])):
+                assert clip.get('@type') == 'Clip', path
+                assert type(clip.get('startOffset')) is int and clip['startOffset'] == clip_start, f'chapter start is not the expected whole second: {path}'
+                assert type(clip.get('endOffset')) is int and clip['endOffset'] == clip_end, f'chapter end is not the next whole-second boundary: {path}'
+                assert clip.get('url') == absolute(target_url) + '?t=' + str(clip_start) + '#work-video', f'chapter URL differs: {path}'
+            assert original_clip.get('name') == source_chapters[index]['title'], f'original chapter title differs: {path}'
+            assert translated_clip.get('name') == chapter['title'], f'translated chapter title differs: {path}'
         captions = fields['video'].get('captions')
         assert captions and fields['video'].get('captions_lang') == 'en', f'English subtitles missing: {path}'
         assert video['caption']['inLanguage'] == 'en' and video['caption']['contentUrl'] == absolute(captions), path
