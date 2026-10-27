@@ -5,7 +5,7 @@ title: 'VectorPaint: vector drawing, logos and SVG editing'
 description: Explore VectorPaint vector drawing, Bézier nodes, layers and SVG exports. Watch MCP create the 14-layer
   Midnight Orchid and find connection steps for MCP-enabled builds.
 permalink: /en/apps/vectorpaint/
-modified: '2026-10-26'
+modified: 2026-10-27
 lang: en
 source_url: /apps/vectorpaint/
 ---
@@ -62,4 +62,4 @@ Drawing and local project management work offline. Sending a result to an online
 
 ## Version and sources
 
-Checked on 22 October 2026: the China App Store listed **1.0.7**, requiring iOS or iPadOS 17.0 or later. This introduction uses the [VectorPaint App Store page](https://apps.apple.com/cn/app/id1587272880), [Apple’s public lookup API](https://itunes.apple.com/lookup?id=1587272880&country=cn) and feature entry points. It does not claim physical-device testing.
+Checked on 27 October 2026: the China App Store listed **1.0.8**, requiring iOS or iPadOS 17.0 or later. This introduction uses the [VectorPaint App Store page](https://apps.apple.com/cn/app/id1587272880), [Apple’s public lookup API](https://itunes.apple.com/lookup?id=1587272880&country=cn) and feature entry points. It does not claim physical-device testing.

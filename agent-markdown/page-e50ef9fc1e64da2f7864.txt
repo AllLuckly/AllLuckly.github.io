@@ -6,7 +6,7 @@ noindex: true
 lang: en
 title: DNS Hijacking and Request Handling in iOS
 agent_source_url: https://allluckly.cn/en/journal/2017-05-03-dns-hijacking-and-request-handling-in-ios/
-agent_source_sha256: f93f693558ffdab3845acc3e7093eabfd894f843b1785c1be8c0a647002cca60
+agent_source_sha256: 322ab1ada2dcfae8bf943957dacc9a241439e4e0147581d23e16bd4aa1e22591
 agent_generator_version: 1
 ---
 {% raw %}# DNS Hijacking and Request Handling in iOS
@@ -53,18 +53,12 @@ Converting a domain to an `ip` address is called DNS resolution, `DNS解析`. Be
 
 - Determine whether to handle the request. Webpages may contain dynamic links, so simply returning `YES` can create many `NSURLProtocol` objects. Ensure that each request receives `YES` only once.
 
-   
-
   - (BOOL)canInitWithRequest: (NSURLRequest \*)request;
   - (BOOL)canInitWithTask: (NSURLSessionTask \*)task;
 - Determine whether to redirect or change important details such as headers or domain. Return a new `NSURLRequest` to customize the behavior.
 
-   
-
   - (NSURLRequest \*)canonicalRequestForRequest: (NSURLRequest \*)request;
 - If request handling returns `YES`, the following callbacks correspond to the request's start and end. This is where we can mark it as already handled.
-
-   
 
   - (void)startLoading;
   - (void)stopLoading;

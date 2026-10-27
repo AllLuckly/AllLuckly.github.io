@@ -6,7 +6,7 @@ noindex: true
 lang: en
 title: Reading the Objective-C runtime source to understand messaging
 agent_source_url: https://allluckly.cn/en/journal/2016-05-20-reading-the-objective-c-runtime-source-to-understand-messaging/
-agent_source_sha256: df57d5a04c7566f4ffaf1f9abf79b1d84446d94700f672f08d66eac1be78de01
+agent_source_sha256: 5239f2e633a01b707036bf12142381fe2c74a9f14db893bf4f93cd68683040e8
 agent_generator_version: 1
 ---
 {% raw %}# Reading the Objective-C runtime source to understand messaging
@@ -227,8 +227,6 @@ That is the complete method-call process, divided into three main parts:
    For performance, the method cache uses a hash table, discussed in more detail next.
 - If the cache misses, search the class itself and then up its hierarchy for the implementation. The returned `method_t *` type is also named `Method`.
 
-   
-
   ```
   //非加锁状态下查找方法实现
   static method_t * getMethodNoSuper_nolock(Class cls, SEL sel)
@@ -332,11 +330,7 @@ If no implementation exists in the class, repeatedly obtain the superclass and s
 
 - If no implementation is found, message forwarding provides a final recovery mechanism.
 
-   
-
   Message forwarding has two stages here. In the first, we can add a method dynamically and let the lookup run again. The second is called `备援的接收者`: finding another object to handle the event.
-
-   
 
   ```
   void _class_resolveMethod(Class cls, SEL sel, id inst)

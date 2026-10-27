@@ -1,0 +1,51 @@
+---
+layout: guide
+author: Bison
+app_id: nas_book
+title: 'Book Isle after a Calibre library move: keep database and files together'
+description: Check metadata.db, directory structure and permissions after moving Calibre, then verify a sample before
+  restoring everyday access.
+permalink: /en/guides/nasbook-calibre-path-repair/
+date: 2026-10-26 00:00:00+08:00
+modified: 2026-10-26 00:00:00+08:00
+category: Tutorials
+level: Intermediate
+series_order: 38
+topic: Remote libraries and migration
+reading_time: 8
+lang: en
+source_path: _posts/2026-10-26-nasbook-calibre-path-repair.md
+source_url: /guides/nasbook-calibre-path-repair/
+translation_method: editorial
+translation_source_sha256: 913983c67379d7c84feddcbf8f702df7ce3418bb267f2917b01a83dd74eb8256
+translation_date: '2026-10-26T03:37:28+00:00'
+excerpt: Check metadata.db, directory structure and permissions after moving Calibre, then verify a sample before
+  restoring everyday access.
+---
+{% raw %}
+<p>A Calibre library consists of metadata and actual files; copying metadata.db alone does not copy all books. If you already connect Calibre to Book Isle, first distinguish Content Server access from database-directory access, then validate one book after a computer or NAS move. These are separate connection paths.</p>
+<h2 id="identify-your-current-connection-method">Identify your current connection method</h2>
+<p>Content Server exposes books through a running service; database access depends on metadata.db and its matching structure. Inspect the connection type you originally added and record its server address or library directory. A database filesystem path does not belong in a server URL field merely because both use Calibre.</p>
+<p>If the old method worked, focus on migration changes rather than changing methods too. Record one familiar title, author, format and quotation as a sample. Preserve important readable notes and original files before moving the only source and losing its relationship to existing records.</p>
+<h2 id="confirm-the-moved-library-through-calibre-itself">Confirm the moved library through Calibre itself</h2>
+<p>Open the moved library normally in Calibre and inspect books, covers and actual reading files. Prefer its supported library-management process rather than manually changing managed author folders or book IDs. Tidy-looking directories do not prove database paths changed consistently.</p>
+<p>Open both an EPUB and PDF from the management side to rule out metadata-only preservation. If Calibre itself cannot find them, repair the source before rebuilding Book Isle connections. A client cannot reconstruct missing text or covers from a catalogue record alone.</p>
+<h2 id="verify-database-and-files-moved-together">Verify database and files moved together</h2>
+<p>For database access, confirm metadata.db belongs to this moved library rather than a separate old backup. Check that its author and book folders came too. A copied database may show titles while files remain inaccessible; this is a metadata-file relationship problem, not necessarily a search query issue.</p>
+<p>When exposing the directory through existing WebDAV or SMB access, inspect the full structure from the shared root. The account needs read access to actual book subdirectories; readable top-level metadata does not establish that. Preserve real paths containing spaces or Chinese characters instead of guessing simplified replacements.</p>
+<h2 id="for-content-server-verify-the-running-endpoint">For Content Server, verify the running endpoint</h2>
+<p>Confirm the new machine's service is running, selects the right library and preserves intended account permissions. Use actual address, port, domain and proxy path rather than the computer's filesystem location. A sleeping computer or stopped service can make the catalogue temporarily unreachable and should be checked at the source.</p>
+<p>Browse with the same account in an external client before comparing Book Isle listing and retrieval. Login does not establish access to every library, and listing does not validate acquisition URLs. For a proxy subpath, verify both catalogue and download rather than relying on an accessible service homepage.</p>
+<h2 id="read-one-sample-in-book-isle">Read one sample in Book Isle</h2>
+<p>Use available connection editing or browsing to enter the new location and find the recorded sample. Check author and format, then download or open it and inspect beginning, middle and end. Reopen offline after downloading to distinguish a readable local copy from catalogue metadata or temporarily loaded pages.</p>
+<p>If metadata appears but retrieval fails, investigate shared paths and read permissions. If a retrieved file will not open, compare the same file with Calibre's copy. Recording the failure stage prevents unnecessary database-path edits from disrupting parts that already worked.</p>
+<h2 id="compare-old-records-and-companion-formats">Compare old records and companion formats</h2>
+<p>For matching titles after migration, compare edition, identity and format before merging or deleting. Existing local copies can still work while new-path copies need separate checks. Verify progress and notes through chapters and quotations, not titles or percentages alone, particularly when the source edition changed too.</p>
+<p>For multiple formats, choose the primary one and establish that companions really exist. An EPUB entry in the database does not prove the file reached its new location. Before cleaning old directories, trace important formats and preserve notes; unchanged shelf-card counts cannot justify removing originals.</p>
+<h2 id="keep-the-migration-inventory-for-future-use">Keep the migration inventory for future use</h2>
+<p>Record connection type, new endpoint or shared root, sample, checked formats and date, managing passwords elsewhere. Mark large files still being copied as outstanding rather than presenting limited sample success as individual verification of the whole collection.</p>
+<p>Reopen the app and check one earlier import and one newly retrieved book. Understanding source library, database, server endpoint and local-copy relationships is more useful than repeated scans. Follow the same order on a future move instead of guessing from a cover that opens no text.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p>Continue checking your files with <a href="/en/guides/nasbook-getting-started/">local ebook basics</a> and <a href="/en/guides/nasbook-multiple-formats/">Book Isle multiple-format management</a>. For reading records, see <a href="/en/guides/nasbook-reading-data-export/">notes and data export</a>.</p>
+<p>Checked on October 26, 2026 using <a href="https://itunes.apple.com/lookup?id=6766198898&amp;country=cn">Apple's public version information</a>: Book Isle 1.1.3 requires iOS / iPadOS 15.6 or later. Feature scope follows the <a href="https://apps.apple.com/cn/app/id6766198898">official App Store listing</a>. This article describes a workflow and checks; it does not claim step-by-step testing on a physical device or private server. Follow the controls in your installed version.</p>
+{% endraw %}

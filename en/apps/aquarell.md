@@ -5,7 +5,7 @@ title: 'Aquarell: drawing and watercolour-style illustration on iPhone and iPad'
 description: Explore Aquarell brushes, layers, palettes and export formats, with tutorials from your first canvas to a finished
   drawing.
 permalink: /en/apps/aquarell/
-modified: 2026-10-23
+modified: 2026-10-27
 lang: en
 source_url: /apps/aquarell/
 ---
@@ -40,7 +40,7 @@ Yes, with raster layers. This does not mean every text object, layer group or ed
 
 ### Can I draw on an iPhone?
 
-Yes. Aquarell is made for iPhone and iPad. The checked store version, 1.0.5, requires iOS or iPadOS 15.0 or later. Check the download page for current compatibility.
+Yes. Aquarell is made for iPhone and iPad. The checked store version, 1.0.6, requires iOS or iPadOS 15.0 or later. Check the download page for current compatibility.
 
 ### Are these hands-on device reviews?
 
@@ -48,4 +48,4 @@ This introduction and the getting-started guide are based on public release info
 
 ## Version and sources
 
-Checked on 22 October 2026: the China App Store listed version **1.0.5**. Feature information comes from the [Aquarell App Store page](https://apps.apple.com/cn/app/id1591340577); version and system requirements were checked with [Apple’s public lookup API](https://itunes.apple.com/lookup?id=1591340577&country=cn).
+Checked on 27 October 2026: the China App Store listed version **1.0.6**. Feature information comes from the [Aquarell App Store page](https://apps.apple.com/cn/app/id1591340577); version and system requirements were checked with [Apple’s public lookup API](https://itunes.apple.com/lookup?id=1591340577&country=cn).

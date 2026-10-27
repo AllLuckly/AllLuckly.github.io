@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'ManYue HTTPS and proxy subpaths: what to check after a browser opens'
+description: Check protocol, port, base path and redirects, then verify catalogue and image access in the app rather
+  than assuming any working webpage URL is a valid server endpoint.
+permalink: /en/guides/manyue-https-proxy-base-path/
+date: '2026-10-26 00:00:00 +08:00'
+modified: '2026-10-26 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 53
+topic: Server maintenance
+reading_time: 9
+lang: en
+source_path: _posts/2026-10-26-manyue-https-proxy-base-path.md
+source_url: /guides/manyue-https-proxy-base-path/
+translation_method: editorial
+translation_source_sha256: 86e6afd6082244ebd88720c91c09cab1badeffdac37e87b7a24c856abbb45f9e
+excerpt: Check protocol, port, base path and redirects, then verify catalogue and image access in the app rather
+  than assuming any working webpage URL is a valid server endpoint.
+translation_date: '2026-10-26T03:37:28+00:00'
+---
+{% raw %}
+<p>A browser login page is only one part of a proxied comic service. ManYue also needs the appropriate catalogue and image endpoints, whose paths and redirects may behave differently. Check the address in parts and test real app access; there is no universal proxy configuration for every service.</p>
+<h2 id="section-1">Identify the connection type first</h2>
+<p>Identify whether the connection is Komga, Kavita, OPDS or WebDAV. Their endpoint types differ. Obtain the intended application base address from the service maintainer and separate protocol, host, port and subpath. A browser’s current book-detail URL can contain web routes or temporary parameters and is not necessarily a suitable connection base.</p>
+<h2 id="section-2">Inspect the components of the address</h2>
+<p>Check scheme, hostname, any non-default port and trailing path separately. Changing the letters from HTTP to HTTPS does not create an encrypted endpoint, and another server’s example port may be irrelevant. Remove copied whitespace or punctuation. Use a placeholder domain when illustrating the structure publicly while retaining the known actual address for your own test.</p>
+<h2 id="section-3">Distinguish the public prefix from a web route</h2>
+<p>A public subpath must be handled consistently by proxy and backend. Observe whether browser navigation retains the prefix and where images load from. The required base depends on the selected service, not on an arbitrary web route. Avoid trying large numbers of guessed paths. Correct credentials cannot compensate for an endpoint that points to the wrong location.</p>
+<h2 id="section-4">Check whether browser access depends on redirects</h2>
+<p>Browsers may follow scheme or hostname redirects and extra authentication pages that an app connection does not reproduce. Use the maintainer-confirmed final service endpoint and check its supported authentication flow. Do not embed credentials in a URL or treat a temporary post-login link as permanent. Record redirects without sharing identifying or sensitive query parameters.</p>
+<h2 id="section-5">Check catalogue and pages in sequence</h2>
+<p>After saving a test connection, check authentication, a known catalogue item and actual chapter images. Catalogue success with image failure establishes only partial access. Investigate page requests, forwarding and account rights. Test downloading if the service permits it. Change one address component at a time and report the failing stage and message precisely.</p>
+<h2 id="section-6">Resolve certificate issues at the service boundary</h2>
+<p>For certificate-related failures, check device time, hostname and the server’s certificate deployment with its maintainer. Certificate validation and a wrong application subpath are separate issues. Support for a particular private certificate depends on the installed version and environment; do not assume a universal bypass switch. Correct the intended service setup before repeating the app test.</p>
+<h2 id="section-7">Compare a known direct route when available</h2>
+<p>If you manage the service and already have a working local route, compare it with the proxy using the same account and book. No new public exposure is needed. A direct success narrows the investigation to the proxy route; failure on both calls for service and permission checks. Clearly label test connections and retain the final verified endpoint with its check date.</p>
+<h2 id="section-8">Questions and completion criteria</h2>
+<p>Why can a login page work while API access fails? Their routing and authentication steps can differ. Should you always remove a subpath? No; the deployment determines the correct prefix. Completion means a known endpoint for the chosen service and verified authentication, catalogue and pages. Share redacted address structure and the failure stage rather than credentials or temporary tokens.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/manyue-server-connection-troubleshooting/">Troubleshoot ManYue servers: separate network, login, catalogue and page access</a>; <a href="/en/guides/manyue-webdav-library/">Connect ManYue to WebDAV: check the address, library and downloads</a>.</p>
+<p>Checked on October 26, 2026: ManYue public version 2.0.3, requiring iOS / iPadOS 15.0 or later. Based on the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store description</a> and <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn">Apple public version lookup</a>. This guide describes a checking workflow; controls and permissions depend on the installed version. It does not claim that every step was tested on a physical device.</p>
+{% endraw %}

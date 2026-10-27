@@ -6,7 +6,7 @@ noindex: true
 lang: zh-CN
 title: iOS开发之从源代码看OC的消息机制runtime
 agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao47
-agent_source_sha256: 0171756537cae4bc08474824a45aa73d3941eb95d656bb8beb86ef1c869cd6d0
+agent_source_sha256: 3da389b52749610256d6142b06d6ce40db48268c20390fe92bbf6a3fa9b642df
 agent_generator_version: 1
 ---
 {% raw %}# iOS开发之从源代码看OC的消息机制runtime
@@ -225,8 +225,6 @@ IMP lookUpImpOrForward(Class cls, SEL sel, id inst,
    为了优化性能，方法的缓存使用了散列表的方式，在下一部分会进行比较详细的讲述
 - 未找到缓存，到类本身或顺着类结构向上查找方法实现，返回的`method_t *`类型也被命名为`Method`
 
-   
-
   ```
   //非加锁状态下查找方法实现
   static method_t * getMethodNoSuper_nolock(Class cls, SEL sel)
@@ -330,11 +328,7 @@ IMP lookUpImpOrForward(Class cls, SEL sel, id inst,
 
 - 未找到任何方法实现，触发消息转发机制进行最后补救
 
-   
-
   其中消息转发分为两个阶段，第一个阶段我们可以通过动态添加方法之后让编译器再次执行查找方法实现的过程；第二个阶段称作`备援的接收者`，就是找到一个接盘侠来处理这个事件
-
-   
 
   ```
   void _class_resolveMethod(Class cls, SEL sel, id inst)

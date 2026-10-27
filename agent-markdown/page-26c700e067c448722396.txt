@@ -6,7 +6,7 @@ noindex: true
 lang: en
 title: An introduction to Core Animation on iOS
 agent_source_url: https://allluckly.cn/en/journal/2016-06-19-an-introduction-to-core-animation-on-ios/
-agent_source_sha256: c25c31501ca113601d996811a3a909b4eb06dad309b6eb3ea8cc228ca70e012c
+agent_source_sha256: 4e8a7380a028cba81bd3a3d45bb97ff246deb83e9358ee9c7c902cd83ef7e593
 agent_generator_version: 1
 ---
 {% raw %}# An introduction to Core Animation on iOS
@@ -187,26 +187,16 @@ Beyond the key properties above, I will only briefly introduce the following one
 
 - `position` and `anchorPoint`
 
-   
-
   ` anchorPoint  `is an `x` and `y` value ranges between `0~1` between `CGPoint` type. It determines the origin used for geometric affine transformations of the layer. The default is `0.5, 0.5`, performed by ` anchorPoint  ` and `frame` calculate the layer's `position` value. More information about these two properties is available in [Understanding position and anchorPoint thoroughly](<http://www.tuicool.com/articles/MvI7fu3>)
 - `mask` and `maskToBounds`
-
-   
 
   `maskToBounds` value to `true` means that all sublayers outside the layer's bounds are not rendered. When we set `UIView` of `clipsToBounds` actually modifies `maskToBounds` this property.`mask` This property specifies a mask layer. Content outside the mask is not rendered. In the previous animation article,[Fragment animation](<http://www.jianshu.com/p/e189696dd535>)used in `maskView` actually modifies this property too
 - `cornerRadius`, `borderWidth`, and `borderColor`
 
-   
-
   `borderWidth` and `borderColor` set the layer border's width and color. These are not often used at the `layer` level in ordinary cases. The `cornerRadius` property sets the corner radius, which also affects the border's shape.
 - `shadowColor`, `shadowOpacity`, `shadowOffset`, and `shadowRadius`
 
-   
-
   Together, these four properties create shadows. By default, `shadowOpacity` is `0`, so the shadow remains transparent unless that value changes, even if the other three are set. Also, do not dwell on why `shadowOffset`, which controls shadow displacement, uses `CGSize` rather than `CGPoint`. The following code produces this shadow:
-
-   
 
   ```
   layer.shadowColor = UIColor.grayColor().CGColor
@@ -217,8 +207,6 @@ Beyond the key properties above, I will only briefly introduce the following one
 ![1](<https://allluckly.cn/images/blog/tuogao/tougao49/4.jpg>)
 
 - Other properties
-
-   
 
   This includes the `transform` transform property. Unlike the same-named property on `UIView`, it can set values along the `z` axis for additional geometric effects. Other properties such as `bound` and `frame` affect the layer's display bounds; I will not elaborate further.
 
@@ -258,16 +246,10 @@ The structure of `CAAnimation` divides into properties and methods, with propert
 
 - `defaultValueForKey` and `shouldArchiveValueForKey`
 
-   
-
   Their names suggest a connection with `NSCoding`. The latter accepts a key, serializes the animation object for local storage, and returns whether it succeeded. The former retrieves that persisted animation object using the same key.
 - `timingFunction`
 
-   
-
   This interesting property determines the animation's visual behavior. In [Starting with UIView animations](<http://www.jianshu.com/p/6e326068edeb>), I discussed visual animation effects, including `淡入`, `淡出` and other effects, represented by strings:
-
-   
 
   ```
   public let kCAMediaTimingFunctionLinear: String
@@ -283,12 +265,8 @@ The structure of `CAAnimation` divides into properties and methods, with propert
 
 - `delegate`
 
-   
-
   `NSObject` implements the callbacks for `CAAnimation`, including `animationDidStart` and `animationDidStop`, among others. Thus any iOS object can serve as a `CAAnimation` delegate. The delegate lets us perform operations such as removing an animation when it ends.
 - ` removedOnCompletion  `
-
-   
 
   This determines whether the animation is removed from its layer afterward; the default is `true`. Layer animation is effectively a visual illusion: using `CAAnimaiton` does not actually change the corresponding property, so the layer returns to its original state afterward. Setting this value to `false`, together with other configuration, can prevent that.
 

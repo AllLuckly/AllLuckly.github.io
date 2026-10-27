@@ -248,7 +248,7 @@ class MarkdownRenderer:
         actual = [(piece.text, piece.block) for piece in self.codes]
         if expected != actual:
             raise ValueError(f"Code coverage mismatch in {self.canonical}")
-        value = re.sub(r"\n[ \t]+\n", "\n\n", value)
+        value = re.sub(r"(?m)^[ \t]+$", "", value)
         value = re.sub(r"\n{3,}", "\n\n", value).strip() + "\n"
         for piece in self.codes:
             if value.count(piece.token) != 1:

@@ -2,10 +2,10 @@
 layout: app
 app_id: nas_book
 title: 'Book Isle: ebooks, NAS and Calibre personal libraries'
-description: Learn about Book Isle local imports, WebDAV, SMB, OPDS, Calibre, notes and reading-data sync through a 20-tutorial
+description: Learn about Book Isle local imports, WebDAV, SMB, OPDS, Calibre, notes and reading-data sync through a 60-tutorial
   learning path.
 permalink: /en/apps/nasbook/
-modified: 2026-10-23
+modified: 2026-10-27
 lang: en
 source_url: /apps/nasbook/
 ---
@@ -32,10 +32,10 @@ WebDAV sync handles reading data. After syncing, check that the second device ha
 
 ## Learning path
 
-The [20 Book Isle tutorials]({{ '/en/guides/nasbook/' | relative_url }}) cover a first import, shelf organisation, reading different formats, NAS connections, Calibre and data sync. Each focuses on a task and includes a way to check the result.
+The [60 Book Isle tutorials]({{ '/en/guides/nasbook/' | relative_url }}) cover a first import, shelf organisation, reading different formats, NAS connections, Calibre and data sync. Each focuses on a task and includes a way to check the result.
 
 Book Isle centres on ebooks and reading records. For a collection mainly made of comics, also see [ManYue]({{ '/en/apps/manyue/' | relative_url }}) and choose according to your file types and library source.
 
 ## Version and sources
 
-Checked on 23 October 2026: the China App Store listed **1.1.3**, requiring iOS or iPadOS 15.6 or later. This introduction uses the [Book Isle App Store page](https://apps.apple.com/cn/app/id6766198898), [Apple’s lookup API](https://itunes.apple.com/lookup?id=6766198898&country=cn) and relevant feature entry points. You provide the book files and servers; Book Isle does not include an online bookstore.
+Checked on 27 October 2026: the China App Store listed **1.1.3**, requiring iOS or iPadOS 15.6 or later. This introduction uses the [Book Isle App Store page](https://apps.apple.com/cn/app/id6766198898), [Apple’s lookup API](https://itunes.apple.com/lookup?id=6766198898&country=cn) and relevant feature entry points. You provide the book files and servers; Book Isle does not include an online bookstore.

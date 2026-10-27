@@ -1,0 +1,65 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-svg-compatibility-check/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint SVG compatibility checks: isolate missing images, masks and gradients'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-svg-compatibility-check/
+agent_source_sha256: 009e6dd2d307869e60ca8767044550a9b5a9685f74b6fca0213a297ea40854b3
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint SVG compatibility checks: isolate missing images, masks and gradients
+
+Language: en
+Canonical: [VectorPaint SVG compatibility checks: isolate missing images, masks and gradients](<https://allluckly.cn/en/guides/vectorpaint-svg-compatibility-check/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-svg-compatibility-check/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-svg-compatibility-check/>)
+Published: 2026-10-26T00:00:00+08:00
+Modified: 2026-10-26T11:37:28+08:00
+Author: Bison
+
+Keep the original and isolate images, text, masks and gradients in small diagnostic copies to compare SVG rendering in the target environment.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-svg-compatibility-check/>), translated on 2026-10-26. Original publication dates, attribution, code and version notes are retained.
+
+Opening an SVG does not guarantee identical rendering everywhere. Use an owned test drawing to compare the editable original, exported SVG and target renderer. The workflow isolates differences without promising universal repair of arbitrary SVG files.
+
+## Freeze a reproducible original first
+
+Save the original and create an independent diagnostic copy. Record app version, export time, target software and the exact affected object or region. Replace private content with neutral test material where possible. Reopen the export to confirm reproducibility before deleting anything from a copy; never experiment on the sole original.
+
+## Separate renderer behaviour from document content
+
+Compare the identical export in two available renderers, avoiding stale copies. If only one fails, record that distinction rather than declaring the original corrupt. If both fail, inspect the source object. Use separate revision folders and export times. Prefer existing trusted viewers and note extra scaling, clipping or background changes.
+
+## Narrow the issue by hiding groups
+
+Hide half the major layers in a copy, export and continue narrowing the relevant half. Change one category at a time and record which combinations reproduce the issue. Hiding preserves recovery. For a masked-group issue, inspect paths, images and transparency without simultaneously outlining text and changing gradients. Keep a baseline export for comparison.
+
+## Check images, text and paths separately
+
+For missing images, confirm raster content in the original and target export; SVG may contain bitmaps. For changed text, check fonts and wrapping, then compare a separate outlined copy. For path issues, inspect closure, fills and strokes with complex effects removed. Keep distinct records for raster blur, font substitution and missing geometry.
+
+## Build minimal mask and gradient examples
+
+Test a single rectangular mask with one owned image, or one shape with a basic gradient, then add original complexity gradually. Results apply to that example and renderer, not every nested mask or gradient configuration. Keep notes outside the drawing so text does not add another font variable. Name tests clearly and retain the smallest reproducer.
+
+## Choose a delivery workaround for the actual use
+
+For display-only use, provide a sufficiently sized PNG while retaining the editable original and unresolved SVG. For path editing, agree on acceptable simplification and adjust a copy. Renaming extensions is not conversion, and a working alternate format does not prove the original issue fixed. Reopen the delivered file and label its use, revision and known differences.
+
+## Retain a known working control example
+
+Keep a simple rectangle/circle/solid-fill control exported with the same settings. If even it cannot open, inspect transfer and viewing conditions before blaming complex masks. Compare a working control with the minimal failing case from the same export round. Record observations rather than unverified defect claims. Retaining both controls helps distinguish behaviour changes from changed test conditions.
+
+## Keep a reproducible issue record
+
+Retain the source copy, minimal reproducer, observations and renderer version. Describe only observed results. Remove private material before sharing a report and give minimal reproduction steps. If unresolved, preserve the baseline and use a confirmed delivery workaround. Repeat the same minimal test after future changes to assess whether behaviour actually changed.
+
+## Related tutorials and sources
+
+[SVG import and editing](<https://allluckly.cn/en/guides/vectorpaint-svg-import-edit/>), [Export formats](<https://allluckly.cn/en/guides/vectorpaint-export-formats/>).
+
+Sources checked on October 26, 2026: the [official VectorPaint App Store description](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public version information](<https://itunes.apple.com/lookup?id=1587272880&country=cn>). The Chinese storefront lists version 1.0.7, requiring iOS / iPadOS 17. These are reproducible creative exercises, without a claim that every step was performed on a physical device. Dimensions, colours, numbers and content are examples. Check controls against the installed version and experiment in an independent copy after saving the original.
+{% endraw %}

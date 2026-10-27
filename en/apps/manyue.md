@@ -5,7 +5,7 @@ title: 'ManYue: local comics, offline reading and NAS libraries'
 description: Learn about ManYue comic imports, offline reading, WebDAV, SMB and personal comic servers, then choose a tutorial
   for your library.
 permalink: /en/apps/manyue/
-modified: 2026-10-23
+modified: 2026-10-26
 lang: en
 source_url: /apps/manyue/
 ---
@@ -58,4 +58,4 @@ Yes. Public information lists Komga, Kavita, Suwayomi / Tachidesk, LANraragi and
 
 ## Version and sources
 
-Checked on 22 October 2026: the China App Store listed **2.0.2**, requiring iOS or iPadOS 15.0 or later. This introduction uses the [ManYue App Store page](https://apps.apple.com/cn/app/id6753895889), [Apple’s public lookup API](https://itunes.apple.com/lookup?id=6753895889&country=cn) and feature entry points. It does not claim physical-device testing.
+Checked on 26 October 2026: the China App Store listed **2.0.3**, requiring iOS or iPadOS 15.0 or later. This introduction uses the [ManYue App Store page](https://apps.apple.com/cn/app/id6753895889), [Apple’s public lookup API](https://itunes.apple.com/lookup?id=6753895889&country=cn) and feature entry points. It does not claim physical-device testing.

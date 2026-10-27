@@ -6,7 +6,7 @@ noindex: true
 lang: en
 title: JavaScript and Native iOS Interaction with JavaScriptCore
 agent_source_url: https://allluckly.cn/en/journal/2016-07-05-javascript-and-native-ios-interaction-with-javascriptcore/
-agent_source_sha256: 9fd0646d245079c6549bb08a536ad74638f5a70f577adc58a4e34a36bfc421de
+agent_source_sha256: e9a09387288faaed344b08eb34e94b808dcf35daf1c1a1e6b28cf4a77286ff1b
 agent_generator_version: 1
 ---
 {% raw %}# JavaScript and Native iOS Interaction with JavaScriptCore
@@ -76,11 +76,7 @@ method to execute `js` code.
 
 - **JSContext**
 
-   
-
   A `JSContext` object is the global execution environment for `JavaScript`, providing code execution and method-registration interfaces. The following creates a `JSContext` and adds some `JS` code to that environment.
-
-   
 
   ```
   let context = JSContext()
@@ -95,11 +91,7 @@ method to execute `js` code.
   context.evaluateScript(" var codeDescription = 'The code create three value and a function to create a dictionary stored person information' ")
   ```
 
-   
-
   Errors such as syntax errors may occur while `JS` runs. The following code handles them:
-
-   
 
   ```
   context?.exceptionHandler = { context, exception in 
@@ -108,11 +100,7 @@ method to execute `js` code.
   ```
 - **JSValue**
 
-   
-
   `JSValue` is the value returned by `JSContext` operations, wrapping almost every data type, including errors and `IMP` pointers. The `JSValue` class provides several `toXXXX` methods for conversion to `iOS` types, along with `call` methods for invoking functions. The following retrieves existing variables from a `JSContext` environment and creates a dictionary holding `person` information.
-
-   
 
   ```
     let age = context?.objectForKeyedSubscript("age")
@@ -127,27 +115,15 @@ method to execute `js` code.
     print("The created person \(personInfo) ")
   ```
 
-   
-
   The example shows that once we know the function to call in the `JS` code, `JSContext + JSValue` lets us invoke web-interface methods easily from the project, without constructing long parameter strings and passing them through URL links.
-
-   
 
   > Calling project code from JS
 
-   
-
   `JavaScript` can access objects and methods in our code in two ways: `Blocks` and `JSExport`.
-
-   
 
   - **Blocks**
 
-     
-
     Custom `block` code can be exposed through `JSContext` as a callable function pointer in `JS`. A pitfall is that `Swift` closures cannot undergo that conversion directly. In `Swift`, the process is therefore `Closure` → `block` → `function pointer`. Converting a closure into a `block` requires the important annotation `@convention`.
-
-     
 
     ```
     let stringConvert: @convention(block) (String)->String = {
@@ -163,24 +139,14 @@ method to execute `js` code.
     print("林欣达的拼音是\(convertFunc.call(withArguments: ["林欣达"]).toString())")
     ```
 
-     
-
     Now, when the web interface's `JS` button handler calls `convertFunc()`, the code in this `closure` executes. Be careful: closure capture can retain the `JSContext` and prevent its release. Use `JSContext.current()` to obtain the current context and address the reference issue.
   - **JSExport**
 
-     
-
     In `JS`, calls to `iOS` methods use methods of a protocol derived from `JSExport`. All methods in the derived protocol are automatically exposed to `JavaScript`, as demonstrated below.
-
-   
 
   ## Putting it into practice
 
-   
-
   I wrote some `JS` for this article's demo. Here are the code and its result. Note that the button's `onclik` specifies the click-response event:
-
-   
 
   ```
   <!DOCTYPE html>

@@ -6,7 +6,7 @@ noindex: true
 lang: zh-CN
 title: iOS开发之DNS劫持
 agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao75
-agent_source_sha256: e1109b7cf366585330d56395351666df2a30550caba4d44da5a8e6d9675980c6
+agent_source_sha256: 9cb9176d89e60042a91115bc3ab441136f246930ad911907d5cb305d654f6883
 agent_generator_version: 1
 ---
 {% raw %}# iOS开发之DNS劫持
@@ -51,18 +51,12 @@ English: [English HTML](<https://allluckly.cn/en/journal/2017-05-03-dns-hijackin
 
 - 是否要处理对应的请求。由于网页存在动态链接的可能性，简单的返回`YES`可能会创建大量的`NSURLProtocol`对象，因此我们需要保证每个请求能且仅能被返回一次`YES`
 
-   
-
   - (BOOL)canInitWithRequest: (NSURLRequest \*)request;
   - (BOOL)canInitWithTask: (NSURLSessionTask \*)task;
 - 是否要对请求进行重定向，或者修改请求头、域名等关键信息。返回一个新的`NSURLRequest`对象来定制业务
 
-   
-
   - (NSURLRequest \*)canonicalRequestForRequest: (NSURLRequest \*)request;
 - 如果处理请求返回了`YES`，那么下面两个回调对应请求开始和结束阶段。在这里可以标记请求对象已经被处理过
-
-   
 
   - (void)startLoading;
   - (void)stopLoading;

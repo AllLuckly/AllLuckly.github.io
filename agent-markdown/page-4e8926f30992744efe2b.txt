@@ -6,7 +6,7 @@ noindex: true
 lang: en
 title: 'What''s new in iOS 10: SiriKit'
 agent_source_url: https://allluckly.cn/en/journal/2016-06-19-what-s-new-in-ios-10-sirikit/
-agent_source_sha256: aa18dcb98e4f65453730cb320070296e8df8ffb57520c92127458bf8a5d148f3
+agent_source_sha256: f18503581da6032ccb4afe56f518e35e6c463ab172e9282b12d2ede9bfb692f3
 agent_generator_version: 1
 ---
 {% raw %}# What's new in iOS 10: SiriKit
@@ -166,11 +166,7 @@ After identifying the `intent` as a send-message chat event, I create and return
 
 - Resolve stage
 
-   
-
   At this stage, identify the message recipients. Three outcomes are possible: `Exactly one match`, `Two or more matches`, and `No matches`. Handle them as follows:
-
-   
 
   ```
   func resolveRecipients(forSendMessage intent: INSendMessageIntent, with completion: ([INPersonResolutionResult]) -> Void) {
@@ -205,11 +201,7 @@ After identifying the `intent` as a send-message chat event, I create and return
     }
   ```
 
-   
-
   The code identifies who `我的家人们` refers to in the message, representing each contact as an `INPerson`. Next, match the message content:
-
-   
 
   ```
   func resolveContent(forSendMessage intent: INSendMessageIntent, with completion: (INStringResolutionResult) -> Void) {
@@ -222,16 +214,10 @@ After identifying the `intent` as a send-message chat event, I create and return
   }
   ```
 
-   
-
   After matching recipients and message content, handling of the `intent` enters its second stage, `Confirm`, to verify the values.
 - Confirm stage
 
-   
-
   At this stage, the `intent` information is expected to be populated. Inspect its values against our requirements. Meanwhile, `Siri` tries to wake the app to prepare the final handling step. As noted earlier, using `frameworks` to track whether the app has started helps communication between app and extension before the appropriate operation.
-
-   
 
   ```
   func confirm(sendMessage intent: INSendMessageIntent, completion: (INSendMessageIntentResponse) -> Void) {
@@ -246,16 +232,10 @@ After identifying the `intent` as a send-message chat event, I create and return
     }
   ```
 
-   
-
   The `Confirm` stage is the last chance to adjust values passed in the `intent`. Exact information is ideal, but making `Siri` ask too many detailed questions about parameters can frustrate users.
 - Handle stage
 
-   
-
   The `Handle` stage needs little additional work. Check whether recipients and message content exist; if so, perform an action such as `保存/发送` and finish. Otherwise, tell `Siri` that this `intent` failed. Configure an ` NSUserActivity  ` object to explain the failure to `Siri`.
-
-   
 
   ```
   func handle(sendMessage intent: INSendMessageIntent, completion: (INSendMessageIntentResponse) -> Void) {

@@ -6,7 +6,7 @@ noindex: true
 lang: zh-CN
 title: iOS动画CoreAnimation浅谈
 agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao49
-agent_source_sha256: aefe0b179430e497f266ed1d506485b8272a025c45dc55e4356adb546ed26045
+agent_source_sha256: d1f8d0a8e723fafd0ab711bd87c40deb64fdd1509c20a47167967c062ed8aab3
 agent_generator_version: 1
 ---
 {% raw %}# iOS动画CoreAnimation浅谈
@@ -185,26 +185,16 @@ presentationLayer: 	0.999998211860657
 
 - `position`和`anchorPoint`
 
-   
-
   ` anchorPoint  `是一个`x`和`y`值取值范围内在`0~1`之间`CGPoint`类型，它决定了当图层发生几何仿射变换时基于的坐标原点。默认情况下为`0.5, 0.5`，由` anchorPoint  `和`frame`经过计算获得图层的`position`这个值。更多介绍这两个属性的文章在[彻底理解position和anchorPoint](<http://www.tuicool.com/articles/MvI7fu3>)
 - `mask`和`maskToBounds`
-
-   
 
   `maskToBounds`值为`true`时表示超出图层范围外的所有子图层都不会进行渲染，当我们设置`UIView`的`clipsToBounds`时实际上就是在修改`maskToBounds`这个属性。`mask`这个属性表示一个遮罩图层，在这个遮罩之外的内容不予渲染显示，在上一篇动画[碎片动画](<http://www.jianshu.com/p/e189696dd535>)中使用的`maskView`实际上也是修改这个属性
 - `cornerRadius`、`borderWidth`和`borderColor`
 
-   
-
   `borderWidth`和`borderColor`设置了图层的边缘线条的颜色以及宽度，正常情况下这两个属性在`layer`的层次上不怎么使用。后者`cornerRadius`设置圆角半径，这个半径会影响边缘线条的形状
 - `shadowColor`、`shadowOpacity`、`shadowOffset`和`shadowRadius`
 
-   
-
   这四个属性结合起来可以制作阴影效果。`shadowOpacity`默认情况下值为`0`，这意味着即便你设置了其他三个属性，只要不修改这个值，你的阴影效果就是透明的。其次，不要纠结`shadowOffset`这个决定阴影效果位置偏移的属性为什么会是`CGSize`而不是`CGPoint`。我通过下面这段代码设置的阴影效果如下：
-
-   
 
   ```
   layer.shadowColor = UIColor.grayColor().CGColor
@@ -215,8 +205,6 @@ presentationLayer: 	0.999998211860657
 ![1](<https://allluckly.cn/images/blog/tuogao/tougao49/4.jpg>)
 
 - 其他属性
-
-   
 
   这里包括了`transform`的仿射变换属性，相比`UIView`的同名属性，它可以设置`z`轴上的值实现更多的几何变换效果。此外还有`bound`和`frame`这些影响图层显示范围的属性，就不再多说
 
@@ -256,16 +244,10 @@ public class CAAnimation : NSObject, NSCoding, NSCopying, CAMediaTiming, CAActio
 
 - `defaultValueForKey`和`shouldArchiveValueForKey`
 
-   
-
   这两个方法从名字上看就知道跟`NSCoding`协议脱不开干系，后者通过传入一个关键字对动画对象进行序列化本地存储，并且返回成功与否。然后使用相同的关键字调用前者来获取这个持久化的动画对象
 - `timingFunction`
 
-   
-
   这个是个有趣的属性，决定了动画的视觉效果。我在[从UIView动画说起](<http://www.jianshu.com/p/6e326068edeb>)中提到过动画的视觉效果，包括`淡入`、`淡出`等效果，这些效果用字符串表示：
-
-   
 
   ```
   public let kCAMediaTimingFunctionLinear: String
@@ -281,12 +263,8 @@ public class CAAnimation : NSObject, NSCoding, NSCopying, CAMediaTiming, CAActio
 
 - `delegate`
 
-   
-
   在`NSObject`中实现了`CAAnimation`的回调方法，包括不限于`animationDidStart`和`animationDidStop`等方法。因此在iOS中的任何一个对象都能成为`CAAnimation`的代理人。通过这个代理我们可以在动画结束时移除动画效果等操作
 - ` removedOnCompletion  `
-
-   
 
   决定了动画结束之后是否将动画从相应的图层上移除，默认是`true`。由于图层动画实际上相当于障眼法（使用`CAAnimaiton`实现动画效果的时候并不会真的修改对应的属性），即是在动画结束时图层会回到动画开始的状态。通过设置这个值为`false`以及其他配置，可以避免这种事情发生
 

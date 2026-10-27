@@ -6,7 +6,7 @@ noindex: true
 lang: en
 title: 'Reading CocoaAsyncSocket: Connection Setup'
 agent_source_url: https://allluckly.cn/en/journal/2017-02-17-reading-cocoaasyncsocket-connection-setup/
-agent_source_sha256: df5cce9645cd9a399581b7fa91cafe8943213738fc2781ee8e4bf348b8f724df
+agent_source_sha256: 0839150d77b497e06c1dc8587b93f9012288316360f51550e2608bc1932cb21f
 agent_generator_version: 1
 ---
 {% raw %}# Reading CocoaAsyncSocket: Connection Setup
@@ -518,8 +518,6 @@ GCDAsyncSocketLoggingEnabled defaults to 0, so the macro expands only to {}. Set
 
 - Returning to the main flow, we define a Block containing all connection operations and perform these checks:
 
-   
-
   ```
   //在socketQueue中执行这个Block
   if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
@@ -532,8 +530,6 @@ GCDAsyncSocketLoggingEnabled defaults to 0, so the macro expands only to {}. Set
 Ensure the connection operation runs synchronously and serially on socketQueue, avoiding thread-safety problems.
 
 - Then assign any connection error produced inside the Block and return the connection result.
-
-   
 
   //如果有错误，赋值错误 if (errPtr) \*errPtr = preConnectErr; //把连接是否成功的result返回 return result;
 
@@ -1306,8 +1302,6 @@ This method is also simple: it mainly checks for errors, such as:
 1. Check whether execution is on the socket queue.
 2. Check whether the passed aStateIndex equals the stateIndex property. This illustrates the framework author's meticulous error handling. aStateIndex was passed from that property earlier, so they should match. But the value might change during the call, meaning the socket configuration has changed entirely: addresses may have been cleared, the socket destroyed, or the connection closed. Later, we will examine when stateIndex changes.
 3. Determine the required config settings. Its values correspond to an enumeration:
-
-    
 
    enum GCDAsyncSocketConfig { kIPv4Disabled = 1 « 0, // If set, IPv4 is disabled kIPv6Disabled = 1 « 1, // If set, IPv6 is disabled kPreferIPv6 = 1 « 2, // If set, IPv6 is preferred over IPv4 kAllowHalfDuplexConnection = 1 « 3, // If set, the socket will stay open even if the read stream closes };
 

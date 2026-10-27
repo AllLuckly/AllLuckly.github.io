@@ -6,7 +6,7 @@ noindex: true
 lang: zh-CN
 title: iOS开发之javaScript交互(JS调用原生的方法)
 agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao53
-agent_source_sha256: 53ffd6949667974c6d670040d5746cad2469da76f5c7260af8ca0a9a2c8bf2f3
+agent_source_sha256: fad74fce70634290ffb564e46f13bae4663af6dd216542bfe2b137cc6187f4b4
 agent_generator_version: 1
 ---
 {% raw %}# iOS开发之javaScript交互(JS调用原生的方法)
@@ -74,11 +74,7 @@ stringByEvaluatingJavaScriptFromString
 
 - **JSContext**
 
-   
-
   一个`JSContext`对象是`JavaScript`运行的全局环境对象，它提供了代码运行和注册方法接口的服务。下面的代码就创建了一个`JSContext`对象，并且定义了一部分的`JS`代码加入到执行环境中
-
-   
 
   ```
   let context = JSContext()
@@ -93,11 +89,7 @@ stringByEvaluatingJavaScriptFromString
   context.evaluateScript(" var codeDescription = 'The code create three value and a function to create a dictionary stored person information' ")
   ```
 
-   
-
   此外，在`JS`代码执行过程中，可能会出现语法错误等多种错误，通过下面的代码可以对这些错误进行处理
-
-   
 
   ```
   context?.exceptionHandler = { context, exception in 
@@ -106,11 +98,7 @@ stringByEvaluatingJavaScriptFromString
   ```
 - **JSValue**
 
-   
-
   `JSValue`是所有`JSContext`操作后返回的值，包装了几乎所有的数据类型，包括错误和`IMP`指针等。在`JSValue`类结构中存在多个`toXXXX`命名的方法转换成`iOS`数据类型以及`call`方法来调用方法。下面的代码从`JSContext`环境中获取已存在的部分变量，并且执行创建一个存储`person`信息的字典
-
-   
 
   ```
     let age = context?.objectForKeyedSubscript("age")
@@ -125,27 +113,15 @@ stringByEvaluatingJavaScriptFromString
     print("The created person \(personInfo) ")
   ```
 
-   
-
   通过上面的例子，我们可以看到，只要了解到`JS`代码中我们需要调用的方法信息，通过`JSContext + JSValue`的方式我们就能轻松的在项目中调用前端界面的方法，而不再需要拼接长串参数字符通过链接地址传递给前端界面
-
-   
 
   > JS调用项目代码
 
-   
-
   `JavaScript`访问我们代码中的对象以及方法有两种方式：`Blocks`和`JSExport`。
-
-   
 
   - **Blocks**
 
-     
-
     自定义的`block`代码可以通过`JSContext`转换成`JS`代码中的函数指针调用，这里存在一个坑就是`Swift`中的闭包无法完成这样的类型转换，因此这种方式的操作流程在`Swift`中是这样的：`Closure` -\> `block` -\> `function pointer`。在闭包转成`block`的这一过程中，需要使用一个重要的关键符`@convention`
-
-     
 
     ```
     let stringConvert: @convention(block) (String)->String = {
@@ -161,24 +137,14 @@ stringByEvaluatingJavaScriptFromString
     print("林欣达的拼音是\(convertFunc.call(withArguments: ["林欣达"]).toString())")
     ```
 
-     
-
     这时候，只要前端在`JS`的按钮点击代码中调用`convertFunc()`这句代码就会执行这个`closure`中的代码。使用这种方式要注意由于闭包的捕获特性，有可能会导致你的`JSContext`对象被引用而无法被释放，使用`JSContext.current()`获取当前上下文来解决引用问题
   - **JSExport**
 
-     
-
     在`JS`中调用`iOS`方法的时候，通过调用`JSExport`的派生协议方法来实现。所有派生协议的方法会自动提供给`JavaScript`代码使用，这个在下面的demo中可以看到
-
-   
 
   ## 实战
 
-   
-
   在本文demo中我写了一段`JS`代码，下面放出这段代码以及运行效果。其中要注意的是按钮的`onclik`表示按钮点击的响应事件：
-
-   
 
   ```
   <!DOCTYPE html>

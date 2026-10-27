@@ -4,7 +4,7 @@ app_id: pastel
 title: Aquarell：iPhone 与 iPad 水彩绘画、插画与手绘画板
 description: 了解 Aquarell 的自定义笔刷、图层、色板与导出能力，找到从新建画布到完成第一幅手绘练习的教程。
 permalink: /apps/aquarell/
-modified: 2026-10-23
+modified: 2026-10-27
 ---
 
 Aquarell 是一款用于 **iPhone 和 iPad 水彩绘画、插画与手绘创作**的应用。它将笔刷、图层、色板和自定义画布放在一起，适合随手记录灵感，也适合把草图逐步画成完整作品。商店中的产品名称是「Aquarell 水彩绘画与手绘画板」。
@@ -37,7 +37,7 @@ Aquarell 适合以笔触和像素图层为中心的绘画；如果目标是编�
 
 ### 可以在 iPhone 上画画吗？
 
-可以。Aquarell 面向 iPhone 与 iPad，当前核对的商店版本 1.0.5 最低要求 iOS / iPadOS 15.0。具体兼容情况以下载页面为准。
+可以。Aquarell 面向 iPhone 与 iPad，当前核对的商店版本 1.0.6 最低要求 iOS / iPadOS 15.0。具体兼容情况以下载页面为准。
 
 ### 这里的教程是实际操作评测吗？
 
@@ -45,4 +45,4 @@ Aquarell 适合以笔触和像素图层为中心的绘画；如果目标是编�
 
 ## 版本与来源
 
-2026 年 10 月 22 日核对：中国区 App Store 版本为 **1.0.5**。功能介绍来自 [Aquarell 官方商店页面](https://apps.apple.com/cn/app/id1591340577)，版本与系统要求通过 [Apple 公共查询接口](https://itunes.apple.com/lookup?id=1591340577&country=cn)核对。
+2026 年 10 月 27 日核对：中国区 App Store 版本为 **1.0.6**。功能介绍来自 [Aquarell 官方商店页面](https://apps.apple.com/cn/app/id1591340577)，版本与系统要求通过 [Apple 公共查询接口](https://itunes.apple.com/lookup?id=1591340577&country=cn)核对。

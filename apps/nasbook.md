@@ -2,9 +2,9 @@
 layout: app
 app_id: nas_book
 title: 书屿：iPhone 与 iPad 电子书阅读器、NAS 与 Calibre 个人书库
-description: 了解书屿的本地导入、WebDAV、SMB、OPDS、Calibre、笔记与阅读数据同步，并按 20 篇中文教程建立自己的阅读流程。
+description: 了解书屿的本地导入、WebDAV、SMB、OPDS、Calibre、笔记与阅读数据同步，并按 60 篇中文教程建立自己的阅读流程。
 permalink: /apps/nasbook/
-modified: 2026-10-23
+modified: 2026-10-27
 ---
 
 书屿把本地电子书和个人 NAS 书库接到手机、平板的书架中，适合已经有一批书籍文件，希望自己整理、阅读和保存笔记的人。
@@ -29,10 +29,10 @@ WebDAV 同步负责阅读数据。同步之后，还应检查第二台设备是�
 
 ## 学习路线
 
-这里准备了[20 篇书屿教程]({{ '/guides/nasbook/' | relative_url }})，从导入第一本书、书架整理、不同格式的阅读，到 NAS 连接、Calibre 与数据同步。每篇围绕一个操作目标展开，也列出完成后的检查方法。
+这里准备了[60 篇书屿教程]({{ '/guides/nasbook/' | relative_url }})，从导入第一本书、书架整理、不同格式的阅读，到 NAS 连接、Calibre 与数据同步。每篇围绕一个操作目标展开，也列出完成后的检查方法。
 
 书屿主要处理电子书与阅读记录；以漫画为主，可以同时了解[漫阅+]({{ '/apps/manyue/' | relative_url }})，根据自己的文件类型和书库来源选择。
 
 ## 版本与来源
 
-2026 年 10 月 23 日核对，中国区公开版本为 **1.1.3**，最低要求 iOS / iPadOS 15.6。资料依据[书屿官方 App Store 页面](https://apps.apple.com/cn/app/id6766198898)、[Apple 版本查询](https://itunes.apple.com/lookup?id=6766198898&country=cn)与对应功能入口整理。书籍文件和服务器由用户自行准备，书屿不提供在线书城。
+2026 年 10 月 27 日核对，中国区公开版本为 **1.1.3**，最低要求 iOS / iPadOS 15.6。资料依据[书屿官方 App Store 页面](https://apps.apple.com/cn/app/id6766198898)、[Apple 版本查询](https://itunes.apple.com/lookup?id=6766198898&country=cn)与对应功能入口整理。书籍文件和服务器由用户自行准备，书屿不提供在线书城。

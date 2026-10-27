@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint SVG compatibility checks: isolate missing images, masks and gradients'
+description: Keep the original and isolate images, text, masks and gradients in small diagnostic copies to compare
+  SVG rendering in the target environment.
+permalink: /en/guides/vectorpaint-svg-compatibility-check/
+date: '2026-10-26 00:00:00 +08:00'
+modified: '2026-10-26 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 58
+topic: Adaptation & maintenance
+reading_time: 9
+lang: en
+source_path: _posts/2026-10-26-vectorpaint-svg-compatibility-check.md
+source_url: /guides/vectorpaint-svg-compatibility-check/
+translation_method: editorial
+translation_source_sha256: 74c51a1cf2be73a214262d61465a2ed7b30a6ddd6200acc20dd0643339e04e95
+excerpt: Keep the original and isolate images, text, masks and gradients in small diagnostic copies to compare SVG
+  rendering in the target environment.
+translation_date: '2026-10-26T03:37:28+00:00'
+---
+{% raw %}
+<p>Opening an SVG does not guarantee identical rendering everywhere. Use an owned test drawing to compare the editable original, exported SVG and target renderer. The workflow isolates differences without promising universal repair of arbitrary SVG files.</p>
+<h2 id="先冻结能够重现问题的原稿">Freeze a reproducible original first</h2>
+<p>Save the original and create an independent diagnostic copy. Record app version, export time, target software and the exact affected object or region. Replace private content with neutral test material where possible. Reopen the export to confirm reproducibility before deleting anything from a copy; never experiment on the sole original.</p>
+<h2 id="先区分显示环境和文件内容">Separate renderer behaviour from document content</h2>
+<p>Compare the identical export in two available renderers, avoiding stale copies. If only one fails, record that distinction rather than declaring the original corrupt. If both fail, inspect the source object. Use separate revision folders and export times. Prefer existing trusted viewers and note extra scaling, clipping or background changes.</p>
+<h2 id="用按组隐藏逐步缩小范围">Narrow the issue by hiding groups</h2>
+<p>Hide half the major layers in a copy, export and continue narrowing the relevant half. Change one category at a time and record which combinations reproduce the issue. Hiding preserves recovery. For a masked-group issue, inspect paths, images and transparency without simultaneously outlining text and changing gradients. Keep a baseline export for comparison.</p>
+<h2 id="把图片、文字和路径分开核对">Check images, text and paths separately</h2>
+<p>For missing images, confirm raster content in the original and target export; SVG may contain bitmaps. For changed text, check fonts and wrapping, then compare a separate outlined copy. For path issues, inspect closure, fills and strokes with complex effects removed. Keep distinct records for raster blur, font substitution and missing geometry.</p>
+<h2 id="针对蒙版和渐变建立最小样例">Build minimal mask and gradient examples</h2>
+<p>Test a single rectangular mask with one owned image, or one shape with a basic gradient, then add original complexity gradually. Results apply to that example and renderer, not every nested mask or gradient configuration. Keep notes outside the drawing so text does not add another font variable. Name tests clearly and retain the smallest reproducer.</p>
+<h2 id="根据用途选择临时交付方案">Choose a delivery workaround for the actual use</h2>
+<p>For display-only use, provide a sufficiently sized PNG while retaining the editable original and unresolved SVG. For path editing, agree on acceptable simplification and adjust a copy. Renaming extensions is not conversion, and a working alternate format does not prove the original issue fixed. Reopen the delivered file and label its use, revision and known differences.</p>
+<h2 id="用确认过的基础样例防止误判">Retain a known working control example</h2>
+<p>Keep a simple rectangle/circle/solid-fill control exported with the same settings. If even it cannot open, inspect transfer and viewing conditions before blaming complex masks. Compare a working control with the minimal failing case from the same export round. Record observations rather than unverified defect claims. Retaining both controls helps distinguish behaviour changes from changed test conditions.</p>
+<h2 id="整理可复核的问题记录">Keep a reproducible issue record</h2>
+<p>Retain the source copy, minimal reproducer, observations and renderer version. Describe only observed results. Remove private material before sharing a report and give minimal reproduction steps. If unresolved, preserve the baseline and use a confirmed delivery workaround. Repeat the same minimal test after future changes to assess whether behaviour actually changed.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-svg-import-edit/">SVG import and editing</a>, <a href="/en/guides/vectorpaint-export-formats/">Export formats</a>.</p>
+<p>Sources checked on October 26, 2026: the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint App Store description</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn">Apple public version information</a>. The Chinese storefront lists version 1.0.7, requiring iOS / iPadOS 17. These are reproducible creative exercises, without a claim that every step was performed on a physical device. Dimensions, colours, numbers and content are examples. Check controls against the installed version and experiment in an independent copy after saving the original.</p>
+{% endraw %}

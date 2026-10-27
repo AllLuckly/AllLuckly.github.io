@@ -1,0 +1,47 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'ManYue server permissions: test login, catalogue, pages and downloads separately'
+description: Test authentication, library visibility, page access and downloads with the intended reading account,
+  separating server permissions from app entitlements.
+permalink: /en/guides/manyue-server-permission-matrix/
+date: '2026-10-26 00:00:00 +08:00'
+modified: '2026-10-26 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 52
+topic: Server maintenance
+reading_time: 9
+lang: en
+source_path: _posts/2026-10-26-manyue-server-permission-matrix.md
+source_url: /guides/manyue-server-permission-matrix/
+translation_method: editorial
+translation_source_sha256: c603d9ad8842b14ad22b8d6cd67dc3ce07b369e03e898be9471430aa5c3253e0
+excerpt: Test authentication, library visibility, page access and downloads with the intended reading account, separating
+  server permissions from app entitlements.
+translation_date: '2026-10-26T03:37:28+00:00'
+---
+{% raw %}
+<p>A working login does not establish access to every library, and readable pages do not necessarily imply download permission. Build four small checks for an authorised library so you can describe the precise missing capability instead of treating every failure as an address problem.</p>
+<h2 id="section-1">Identify the exact account under test</h2>
+<p>Confirm the identity saved in ManYue and use that same account for any browser comparison. An administrator’s view can be much broader than a reader’s. Record the expected libraries without exposing passwords. For a server maintained by someone else, establish your intended scope and report a missing permission rather than requesting an administrator account as a shortcut.</p>
+<h2 id="section-2">Check authentication first</h2>
+<p>Open the connection and record whether authentication succeeds. Check address, account status and recent password changes before changing library sharing. A browser login may use a different path or extra web verification and does not prove that application APIs are reachable. Record the actual message and time, then proceed only when the authentication stage is understood.</p>
+<h2 id="section-3">Check the expected library scope</h2>
+<p>Find the designated sample in a library this reader is expected to access. Compare with the same reader’s web view, not an administrator’s collection. The server administrator can inspect sharing and applicable restrictions using the server’s current controls. Keep permissions aligned with the intended scope. Record the book and chapter for subsequent checks.</p>
+<h2 id="section-4">Check actual page access</h2>
+<p>Open the sample chapter and inspect early and middle pages rather than only its cover. Komga’s official account documentation distinguishes page streaming from file download permissions; other services may organise capabilities differently. If images fail, explicitly report that authentication and catalogue access worked so the administrator can investigate the page-access stage.</p>
+<h2 id="section-5">Check download permission and the result</h2>
+<p>Test downloading only when the service, item and installed app expose a supported flow. Missing controls can have several causes, including service capabilities, account limits or app entitlements. After completion, verify the local copy offline at several positions. Respect a server that permits streaming without file downloads, and distinguish absent controls from explicit denials or failed tasks.</p>
+<h2 id="section-6">Separate server rights from app entitlements</h2>
+<p>Server rights determine which content an account may access, while ManYue entitlements determine available application features. Purchasing an app entitlement does not grant access to a private server, and a fully authorised server account does not unlock every app feature. Check the current feature and purchase status, then repeat the same sample without unnecessary repurchasing.</p>
+<h2 id="section-7">Retest the affected stage after changes</h2>
+<p>After a permission change, reauthenticate or refresh as required by the server and repeat the failed stage. Keep addresses and data intact. Recheck the sequence briefly, documenting the account and before-and-after outcome. If you try another identity, label that result separately instead of combining successes from different accounts into one claimed complete test.</p>
+<h2 id="section-8">Questions and completion criteria</h2>
+<p>Does an administrator success and reader failure prove an app fault? Compare account scope first. Why might an entitled app user still lack downloads? Server restrictions and service formats remain independent. Finish with explicit outcomes for login, target catalogue, pages and downloads plus local verification. Every capability need not be enabled, but its boundary should be understood.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/manyue-komga-library/">Connect ManYue to Komga: permissions, series, books and offline checks</a>; <a href="/en/guides/manyue-server-connection-troubleshooting/">Troubleshoot ManYue servers: separate network, login, catalogue and page access</a>.</p>
+<p>Checked on October 26, 2026: ManYue public version 2.0.3, requiring iOS / iPadOS 15.0 or later. Based on the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store description</a> and <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn">Apple public version lookup</a>. This guide describes a checking workflow; controls and permissions depend on the installed version. It does not claim that every step was tested on a physical device.</p>
+<p>For server roles, also consult the <a href="https://komga.org/docs/guides/user-accounts/">official Komga user-account documentation</a>. Check the permission model of other servers separately.</p>
+{% endraw %}

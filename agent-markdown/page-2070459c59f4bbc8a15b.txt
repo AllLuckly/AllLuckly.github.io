@@ -1,0 +1,75 @@
+---
+layout: null
+permalink: /en/guides/nasbook-remote-download-diagnosis/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Book Isle remote download failures: catalogue, file and reader checks'
+agent_source_url: https://allluckly.cn/en/guides/nasbook-remote-download-diagnosis/
+agent_source_sha256: 1a0315c56dcc2d418192f46c150e564cb633ece33390a0ab32537ae0697a6d9c
+agent_generator_version: 1
+---
+{% raw %}# Book Isle remote download failures: catalogue, file and reader checks
+
+Language: en
+Canonical: [Book Isle remote download failures: catalogue, file and reader checks](<https://allluckly.cn/en/guides/nasbook-remote-download-diagnosis/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/nasbook-remote-download-diagnosis/>)
+English: [English HTML](<https://allluckly.cn/en/guides/nasbook-remote-download-diagnosis/>)
+Published: 2026-10-26T00:00:00+08:00
+Modified: 2026-10-26T11:37:28+08:00
+Author: Bison
+
+Use a small reference file to separate connectivity, permissions, download completion and format reading, and record the failing stage.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/nasbook-remote-download-diagnosis/>), translated on 2026-10-26. Original publication dates, attribution, code and version notes are retained.
+
+A visible remote title that will not download or open can reflect several different problems. Catalogue access, file permissions, transfer and reading format each need checking. Use a small known-good EPUB as a reference, preserving connections and reading records rather than deleting the whole library to investigate.
+
+## Identify the failing stage
+
+Classify the symptom: connection failure, a missing title in a readable catalogue, a visible file that will not download, or a completed download that will not open. Record service type, time and message without passwords. A working list proves only some requests succeeded, not file permission, download URL or content validity.
+
+Put a small EPUB that opens on your computer in the same controlled library location. Keep device, network and connection constant while testing it before the original problem book. Changing accounts, paths and files together makes later success difficult to explain.
+
+## Establish network and server reachability
+
+Check server access in an environment you understand, starting on the same home network for a NAS. Mobile access requires an already reachable deployment; entering a home address does not create a remote tunnel. Use your actual protocol, address and port rather than guessed universal defaults.
+
+If other clients fail too, inspect the server and existing network access first. If only Book Isle fails, compare the same address, account and path. Investigate certificate and proxy conditions in the deployment instead of casually disabling verification and treating a temporary bypass as a repair.
+
+## Inspect paths when directory browsing works
+
+Browse to the target and compare title with actual file location. Server indexes may retain old positions after external moves, so confirm the file on the server before using available browsing or refresh controls. A cached cover does not prove the file remains at its old path.
+
+WebDAV base paths, SMB share names and OPDS acquisition links represent different things. Record the interface actually used without borrowing path syntax across services. A visible parent directory does not prove that the same account can read subdirectories and book files.
+
+## Check read permissions and returned content
+
+Try reading the sample on the server with the same account, establishing more than list permission. App membership and server permissions are independent: remote-feature access in the app does not grant every server file, and a valid server account does not establish current app entitlement.
+
+For proxies and catalogue services, verify that acquisition returns a real book instead of a login page, error or partial response. An EPUB filename does not establish EPUB contents. Use service logs or another client under your control, retaining only necessary errors and hiding credentials in shared diagnostics.
+
+## Check storage and the completed local file
+
+Allow sufficient free space, start one deliberate download and wait for its outcome. Repeated taps can create confusing duplicate tasks, especially with large PDFs and audio. Reopen the completed file from an actual local entry rather than turning a few pages in the existing remote reader.
+
+Inspect beginning, middle and end, then leave the reader and reopen offline. A working sample establishes a usable path for further tests of the original file. If only the cover remains, inspect completion and source again: cover caches and book files are separate data.
+
+## Diagnose format after confirming file transfer
+
+If a complete file still fails, open the same copy in an appropriate external tool. Damage, missing content, access protection or a management-only format can explain it. Interpret Book Isle's stated format scope precisely; successful import does not promise native reading of every managed format.
+
+When conversion is needed, retain the original and choose a readable text, fixed-layout or image copy, repeating content checks. Renaming extensions or rebuilding connections cannot repair text structure. If the reference works and one file fails, record that file and location rather than declaring the whole server incompatible.
+
+## Keep a minimal diagnostic conclusion
+
+Record the last successful stage, first failing stage and reference result. A note such as a small EPUB downloads and reads offline while a large PDF fails midway is more useful than a vague NAS complaint. Change one condition at a time to separate network, size and format effects.
+
+After repair, repeat the original failure and check offline access and the ending. Opening the first page once is insufficient when the original issue occurred near download completion. Keep originals and important notes until the book is reliably readable; a successful connection indicator alone is not the goal.
+
+## Related tutorials and sources
+
+Continue checking your files with [local ebook basics](<https://allluckly.cn/en/guides/nasbook-getting-started/>) and [Book Isle multiple-format management](<https://allluckly.cn/en/guides/nasbook-multiple-formats/>). For reading records, see [notes and data export](<https://allluckly.cn/en/guides/nasbook-reading-data-export/>).
+
+Checked on October 26, 2026 using [Apple's public version information](<https://itunes.apple.com/lookup?id=6766198898&country=cn>): Book Isle 1.1.3 requires iOS / iPadOS 15.6 or later. Feature scope follows the [official App Store listing](<https://apps.apple.com/cn/app/id6766198898>). This article describes a workflow and checks; it does not claim step-by-step testing on a physical device or private server. Follow the controls in your installed version.
+{% endraw %}

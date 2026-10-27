@@ -6,7 +6,7 @@ noindex: true
 lang: zh-CN
 title: iOS即时通讯进阶 - CocoaAsyncSocket源码解析(Connect篇)
 agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tougao71
-agent_source_sha256: bde1c94504758a47afc7ac1c4abe28ef1c03f0a2d850a67ffe0241612c38aea6
+agent_source_sha256: 8ac0b1882222ef2bfd430d159ace42e22bc6f89dd43c72d37ec3938b2f83ea79
 agent_generator_version: 1
 ---
 {% raw %}# iOS即时通讯进阶 - CocoaAsyncSocket源码解析(Connect篇)
@@ -516,8 +516,6 @@ static const int logLevel = GCDAsyncSocketLogLevel;
 
 - 接着我们回到正题上，我们定义了一个Block，所有的连接操作都被包裹在这个Block中。我们做了如下判断:
 
-   
-
   ```
   //在socketQueue中执行这个Block
   if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
@@ -530,8 +528,6 @@ static const int logLevel = GCDAsyncSocketLogLevel;
 保证这个连接操作一定是在我们的socketQueue中，而且还是以串行同步的形式去执行，规避了线程安全的问题。
 
 - 接着把Block中连接过程产生的错误进行赋值，并且把连接的结果返回出去
-
-   
 
   //如果有错误，赋值错误 if (errPtr) \*errPtr = preConnectErr; //把连接是否成功的result返回 return result;
 
@@ -1304,8 +1300,6 @@ dispatch_async(strongSelf->socketQueue, ^{ @autoreleasepool {
 1. 判断在不在这个socket队列。
 2. 判断传过来的aStateIndex和属性stateIndex是不是同一个值。说到这个值，不得不提的是大神用的框架，在容错处理上，做的真不是一般的严谨。从这个stateIndex上就能略见一二。 这个aStateIndex是我们之前调用方法，用属性传过来的，所以按道理说，是肯定一样的。但是就怕在调用过程中，这个值发生了改变，这时候整个socket配置也就完全不一样了，有可能我们已经置空地址、销毁socket、断开连接等等…等我们后面再来看这个属性stateIndex在什么地方会发生改变。
 3. 判断config中是需要哪种配置，它的参数对应了一个枚举：
-
-    
 
    enum GCDAsyncSocketConfig { kIPv4Disabled = 1 « 0, // If set, IPv4 is disabled kIPv6Disabled = 1 « 1, // If set, IPv6 is disabled kPreferIPv6 = 1 « 2, // If set, IPv6 is preferred over IPv4 kAllowHalfDuplexConnection = 1 « 3, // If set, the socket will stay open even if the read stream closes };
 

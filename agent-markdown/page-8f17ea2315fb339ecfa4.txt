@@ -6,7 +6,7 @@ noindex: true
 lang: zh-CN
 title: iOS10新特性之SiriKit
 agent_source_url: https://allluckly.cn/%E6%8A%95%E7%A8%BF/tuogao50
-agent_source_sha256: be4c5a49fd85262fbdbe3edeff73c15fa1f3173c4ef228d39a27b66047b5cbe2
+agent_source_sha256: bae5f8ac2c4cdc2323d21752e91edd35368f350999897777ab1ee7e53fe68593
 agent_generator_version: 1
 ---
 {% raw %}# iOS10新特性之SiriKit
@@ -164,11 +164,7 @@ class LXDIntentHandler: INExtension {
 
 - Resolve阶段
 
-   
-
   这个阶段需要我们找到消息的具体接收者。在这个过程中，可能会出现三种情况：`Exactly one match`、`Two or more matches`以及`No matches`，对于这三种情况的处理分别如下：
-
-   
 
   ```
   func resolveRecipients(forSendMessage intent: INSendMessageIntent, with completion: ([INPersonResolutionResult]) -> Void) {
@@ -203,11 +199,7 @@ class LXDIntentHandler: INExtension {
     }
   ```
 
-   
-
   上面的代码用来确认出消息中的`我的家人们`指代的是哪些人，其中每个联系人最终用一个`INPerson`的对象来表示。接着我们需要匹配消息的内容：
-
-   
 
   ```
   func resolveContent(forSendMessage intent: INSendMessageIntent, with completion: (INStringResolutionResult) -> Void) {
@@ -220,16 +212,10 @@ class LXDIntentHandler: INExtension {
   }
   ```
 
-   
-
   在匹配完消息接收者跟消息内容之后，对于`intent`事件的处理就会进入第二阶段`Confirm`确认值是否正确
 - Confirm阶段
 
-   
-
   在这个阶段`intent`对象本身的信息预计是已经完成填充的，我们通过获取这些填充值来判断是否符合我们的要求。同时在这个阶段，`Siri`会尝试唤醒应用来准备完成最后的处理操作。前面说了为了保证在应用和应用拓展之间能够进行通信，最好使用`frameworks`的方式来标记应用是否被启动，再进行相应操作。
-
-   
 
   ```
   func confirm(sendMessage intent: INSendMessageIntent, completion: (INSendMessageIntentResponse) -> Void) {
@@ -244,16 +230,10 @@ class LXDIntentHandler: INExtension {
     }
   ```
 
-   
-
   `Confirm`阶段是我们最后可以尝试修改`intent`事件中传递的数值的时候。要记住一点，完全精确的内容固然是最好的答案，但是过多的让`Siri`询问用户参数的详细信息也会导致用户的抵触
 - Handle阶段
 
-   
-
   `Handle`阶段不需要做太多额外的工作，判断一下消息接收者或消息内容是否存在，如果存在，执行类似`保存/发送`的工作，然后完成。否则告诉`Siri`本次的`intent`事件处理处理失败，我们还可以通过配置` NSUserActivity  `对象来告诉`Siri`失败的原因
-
-   
 
   ```
   func handle(sendMessage intent: INSendMessageIntent, completion: (INSendMessageIntentResponse) -> Void) {
