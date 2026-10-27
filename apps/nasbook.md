@@ -13,6 +13,13 @@ modified: 2026-10-27
 
 第一次使用，先准备一本不带 DRM 的 TXT、EPUB 或 PDF，核对书名、目录和正文。确认阅读流程正常后，再添加远程来源。WebDAV、SMB、OPDS 与 Calibre 对应不同的服务方式，应该按服务器实际开启的接口选择，不必把所有入口都配置一遍。
 
+| 你的书籍在哪里 | 选择对应教程 |
+| --- | --- |
+| iPhone / iPad 的本地文件 | [导入第一本 EPUB 并继续阅读]({{ '/guides/nasbook-getting-started/' | relative_url }}) |
+| NAS 或私人网盘文件夹 | 按服务选择 [WebDAV]({{ '/guides/nasbook-webdav-library/' | relative_url }}) 或 [SMB]({{ '/guides/nasbook-smb-library/' | relative_url }}) |
+| 电子书目录服务 | [浏览 OPDS 书库并下载电子书]({{ '/guides/nasbook-opds-library/' | relative_url }}) |
+| 电脑上的 Calibre 书库 | [连接 Calibre 内容服务器]({{ '/guides/nasbook-calibre-server/' | relative_url }}) |
+
 远程列表能显示书名，和一本书已经完整下载，是两个不同状态。准备离线阅读时，应断开网络实际打开需要的章节；换设备时，也要分别处理阅读数据和书籍文件。
 
 ## 先分清文件格式的能力
@@ -25,7 +32,7 @@ modified: 2026-10-27
 
 书签适合标记准备回看的位置，笔记用来记录想法，标签和阅读状态则用于整理书库。先围绕一本测试书完成这些操作，再批量整理其他书籍，会更容易理解各类数据之间的关系。
 
-WebDAV 同步负责阅读数据。同步之后，还应检查第二台设备是否有同一本书、目录是否对应、进度能否定位；看到同步成功提示，并不代表所有书籍本体都已搬过去。
+[WebDAV 同步]({{ '/guides/nasbook-webdav-sync/' | relative_url }})负责阅读数据。同步之后，还应检查第二台设备是否有同一本书、目录是否对应、进度能否定位；看到同步成功提示，并不代表所有书籍本体都已搬过去。
 
 ## 学习路线
 

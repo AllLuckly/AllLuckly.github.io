@@ -11,10 +11,19 @@ const discoveryTypes = new Map([
   ['/api/openapi.json', 'application/vnd.oai.openapi+json'],
 ]);
 const pages = new Map();
+const missingHtmlAliases = new Map();
 for (const [canonical, markdown] of Object.entries(manifest.routes)) {
   const page = {canonical: new URL(canonical, ORIGIN).href, markdown: new URL(markdown, ORIGIN).href};
   pages.set(new URL(canonical, ORIGIN).pathname, page);
   pages.set(new URL(markdown, ORIGIN).pathname, page);
+}
+for (const canonical of Object.keys(manifest.routes)) {
+  const path = new URL(canonical, ORIGIN).pathname;
+  if (path === '/') continue;
+  const alias = path.endsWith('/') ? path.slice(0, -1) : path + '/';
+  // Only explicit HTML routes can supply a destination. Never override another
+  // known page or a Markdown route, or guess a destination from a URL prefix.
+  if (!pages.has(alias)) missingHtmlAliases.set(alias, new URL(canonical, ORIGIN).href);
 }
 
 export function wantsMarkdown(accept = '') {
@@ -42,6 +51,21 @@ function addVary(headers, name) {
   const values = (headers.get('Vary') || '').split(',').map(x => x.trim()).filter(Boolean);
   if (!values.some(value => value.toLowerCase() === name.toLowerCase()) && !values.includes('*')) values.push(name);
   headers.set('Vary', values.join(', '));
+}
+
+function secureOriginRedirect(response, url) {
+  if (![301, 302, 303, 307, 308].includes(response.status)) return response;
+  const location = response.headers.get('Location');
+  if (!location || !/^http:\/\//i.test(location)) return response;
+  let destination;
+  try { destination = new URL(location); } catch { return response; }
+  if (destination.host !== url.host || destination.username || destination.password) return response;
+  const headers = new Headers(response.headers);
+  // GitHub Pages may generate HTTP redirects behind a TLS-terminating proxy.
+  // Keep the target path/query/fragment while upgrading the default HTTP port.
+  destination.protocol = 'https:';
+  headers.set('Location', destination.href);
+  return new Response(response.body, {status: response.status, statusText: response.statusText, headers});
 }
 
 function decorate(response, url, markdown, head, page) {
@@ -76,6 +100,10 @@ function decorate(response, url, markdown, head, page) {
 
 export async function handle(request, originFetch = fetch) {
   const url = new URL(request.url);
+  if (url.origin === 'http://allluckly.cn' && ['GET', 'HEAD'].includes(request.method)) {
+    url.protocol = 'https:';
+    return new Response(null, {status: 301, headers: {Location: url.href}});
+  }
   if (url.origin !== ORIGIN || !['GET', 'HEAD'].includes(request.method)) return originFetch(request);
   const head = request.method === 'HEAD';
   const page = pages.get(url.pathname.replace(/\/index\.html$/, '/'));
@@ -84,7 +112,7 @@ export async function handle(request, originFetch = fetch) {
   // different resource, and never convert personalized or partial responses.
   const asset = /\.(?:xml|json|txt|md|vtt|mp4|webm|png|jpe?g|gif|webp|avif|svg|ico|css|js|mjs|woff2?|ttf|pdf|zip)$/i.test(url.pathname);
   const personal = request.headers.has('Authorization') || request.headers.has('Cookie');
-  if (personal) return originFetch(request);
+  if (personal) return secureOriginRedirect(await originFetch(request), url);
   if (page && !asset && wantsMarkdown(request.headers.get('Accept') || '')) {
     const headers = new Headers(request.headers);
     headers.set('Accept', 'text/plain');
@@ -116,7 +144,15 @@ export async function handle(request, originFetch = fetch) {
     headers.set('Accept-Encoding', 'identity');
     originRequest = new Request(request, {headers});
   }
-  const response = await originFetch(originRequest);
+  const response = secureOriginRedirect(await originFetch(originRequest), url);
+  const missingHtmlCanonical = !asset && response.status === 404 && !response.headers.has('Location') && missingHtmlAliases.get(url.pathname);
+  if (missingHtmlCanonical) {
+    // Old extensionless posts can 404 with an extra slash. Repair only that
+    // observed failure; successful pages and origin redirects retain behavior.
+    const destination = new URL(missingHtmlCanonical);
+    destination.search = url.search;
+    return new Response(null, {status: 301, headers: {Location: destination.href}});
+  }
   const directMarkdown = publicMarkdown && (response.status === 304 || (response.status === 200 && /^(text\/(plain|markdown)|application\/octet-stream)(;|$)/i.test(response.headers.get('Content-Type') || '')));
   return decorate(response, url, directMarkdown, head, page);
 }

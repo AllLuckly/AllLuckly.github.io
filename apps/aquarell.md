@@ -2,7 +2,7 @@
 layout: app
 app_id: pastel
 title: Aquarell：iPhone 与 iPad 水彩绘画、插画与手绘画板
-description: 了解 Aquarell 的笔刷、图层、色板与导出能力，观看 MCP 绘制 19 层《云山晚渡》的实录，并查看已启用 MCP 构建的 AI 连接说明。
+description: 了解 Aquarell 在 iPhone 与 iPad 上的水彩绘画、笔刷、图层与色板，从入门教程开始创作，并选择 PNG、JPEG、PSD 或原生作品保存方式。
 permalink: /apps/aquarell/
 modified: 2026-10-27
 ---

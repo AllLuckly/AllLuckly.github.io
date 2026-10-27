@@ -1,9 +1,8 @@
 ---
 layout: app
 app_id: draw_illustration
-title: 'VectorPaint: vector drawing, logos and SVG editing'
-description: Explore VectorPaint vector drawing, Bézier nodes, layers and SVG exports. Watch MCP create the 14-layer
-  Midnight Orchid and find connection steps for MCP-enabled builds.
+title: 'VectorPaint: SVG Editor for iPhone and iPad'
+description: Create vector drawings and logos on iPhone and iPad. Learn VectorPaint shapes, Bézier nodes, SVG editing and image tracing, then export SVG, PNG or PDF.
 permalink: /en/apps/vectorpaint/
 modified: 2026-10-27
 lang: en

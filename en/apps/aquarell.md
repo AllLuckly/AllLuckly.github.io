@@ -1,9 +1,8 @@
 ---
 layout: app
 app_id: pastel
-title: 'Aquarell: drawing and watercolour-style illustration on iPhone and iPad'
-description: Explore Aquarell brushes, layers, palettes and export formats. Watch MCP draw the 19-layer Cloud Mountains,
-  Evening Ferry and find setup details for MCP-enabled builds.
+title: 'Aquarell: Watercolour Drawing for iPhone and iPad'
+description: Draw on iPhone and iPad with Aquarell brushes, layers and palettes. Follow a beginner tutorial, then save a PNG, JPEG, layered PSD or native project.
 permalink: /en/apps/aquarell/
 modified: 2026-10-27
 lang: en

@@ -1,11 +1,11 @@
 ---
 layout: app
 app_id: man_yue
-title: 'ManYue: local comics, offline reading and NAS libraries'
+title: 'ManYue: Comic Reader for iPhone and iPad'
 description: Learn about ManYue comic imports, offline reading, WebDAV, SMB and personal comic servers, then choose a tutorial
   for your library.
 permalink: /en/apps/manyue/
-modified: 2026-10-26
+modified: 2026-10-27
 lang: en
 source_url: /apps/manyue/
 ---
@@ -18,11 +18,11 @@ ManYue is a **comic reader and personal library app for iPhone and iPad**. Read 
 
 | Where your content lives | A suitable starting point |
 | --- | --- |
-| The Files app on iPhone or iPad | Import CBZ, CBR, CB7, ZIP, RAR, 7z, PDF or another supported comic file |
-| Already imported or downloaded to the device | Read from the local library while offline |
-| A personal NAS or cloud drive | Connect through WebDAV or SMB |
-| Your own comic server | Connect Suwayomi / Tachidesk, Komga, Kavita, LANraragi or another supported service |
-| A source you have chosen | Import a JS / .ManYue source file or add a source URL |
+| The Files app on iPhone or iPad | [Import a local comic]({{ '/en/guides/manyue-getting-started/' | relative_url }}) in CBZ, CBR, CB7, ZIP, RAR, 7z, PDF or another supported format |
+| Already imported or downloaded to the device | [Check offline reading]({{ '/en/guides/manyue-offline-preflight/' | relative_url }}) before travelling |
+| A personal NAS or cloud drive | Follow the [WebDAV]({{ '/en/guides/manyue-webdav-library/' | relative_url }}) or [SMB]({{ '/en/guides/manyue-smb-library/' | relative_url }}) connection guide |
+| Your own comic server | Start with [Komga]({{ '/en/guides/manyue-komga-library/' | relative_url }}) or [Kavita]({{ '/en/guides/manyue-kavita-library/' | relative_url }}); Suwayomi / Tachidesk and LANraragi are also supported |
+| A source you have chosen | [Import your own comic source]({{ '/en/guides/manyue-source-import/' | relative_url }}) as a JS / .ManYue file or source URL |
 
 For a first test, use one local file you own or are authorised to read: [import a local comic and check offline reading]({{ '/en/guides/manyue-getting-started/' | relative_url }}).
 

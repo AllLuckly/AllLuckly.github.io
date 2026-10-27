@@ -2,7 +2,7 @@
 layout: app
 app_id: draw_illustration
 title: VectorPaint：iPhone 与 iPad 矢量绘图、Logo 设计与 SVG 编辑
-description: 了解 VectorPaint 的矢量绘图、贝塞尔节点、图层与 SVG 导出，观看 MCP 创建 14 层《午夜兰花》的实录，并查看已启用 MCP 构建的 AI 连接说明。
+description: 了解 VectorPaint 在 iPhone 与 iPad 上的矢量绘图、Logo 设计、SVG 编辑与图片矢量化，从形状和节点教程开始，按用途导出 SVG、PNG 或 PDF。
 permalink: /apps/vectorpaint/
 modified: 2026-10-27
 ---

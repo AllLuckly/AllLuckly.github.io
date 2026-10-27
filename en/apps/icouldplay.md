@@ -1,7 +1,7 @@
 ---
 layout: app
 app_id: icouldplay
-title: 'iCouldPlay: video playback, NAS and personal media libraries'
+title: 'iCouldPlay: Video Player for iPhone and iPad'
 description: Learn about iCouldPlay local videos, SMB, WebDAV, FTP, media servers, subtitles and playback engines through
   40 practical tutorials.
 permalink: /en/apps/icouldplay/

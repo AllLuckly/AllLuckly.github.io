@@ -47,6 +47,8 @@ class Page(HTMLParser):
         self.alternates = {}
         self.entities = []
         self.links = []
+        self.collection_links = None
+        self._collection_depth = 0
         self.tracks = []
         self.ids = set()
         self.body_text = []
@@ -66,7 +68,17 @@ class Page(HTMLParser):
         if tag == 'link' and a.get('rel') == 'alternate' and a.get('hreflang'):
             assert a['hreflang'] not in self.alternates, f'duplicate hreflang: {a}'
             self.alternates[a['hreflang']] = a['href']
-        if tag == 'a': self.links.append(a.get('href', ''))
+        # Learning paths include task shortcuts before the ordered directory.
+        # Compare ItemList order with that directory, not navigation shortcuts.
+        if 'series-lessons' in a.get('class', '').split():
+            assert self.collection_links is None, 'duplicate lesson directory'
+            self.collection_links = []
+            self._collection_depth = 1
+        elif self._collection_depth and tag not in ('area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'):
+            self._collection_depth += 1
+        if tag == 'a':
+            self.links.append(a.get('href', ''))
+            if self._collection_depth: self.collection_links.append(a.get('href', ''))
         if tag == 'track': self.tracks.append(a)
         if a.get('id'): self.ids.add(a['id'])
         if tag == 'script' and a.get('type') == 'application/ld+json': self._ld = True; self._buffer = ''
@@ -89,6 +101,7 @@ class Page(HTMLParser):
 
     def handle_endtag(self, tag):
         if tag in ('area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'): return
+        if self._collection_depth: self._collection_depth -= 1
         if tag == 'script' and self._ld:
             self.entities.extend(json.loads(self._buffer)['@graph']); self._ld = False
         if tag == 'code' and self._code_depth:
@@ -205,7 +218,8 @@ for path, page in pages.items():
             items = entity['mainEntity']['itemListElement']
             assert [i['position'] for i in items] == list(range(1, len(items) + 1)), path
             expected_routes = [route(item['url']) for item in items]
-            actual_routes = list(dict.fromkeys(route(link) for link in page.links if route(link) in set(expected_routes)))
+            directory_links = page.collection_links if page.collection_links is not None else page.links
+            actual_routes = list(dict.fromkeys(route(link) for link in directory_links if route(link) in set(expected_routes)))
             assert actual_routes == expected_routes, f'collection order differs from visible links: {path}'
             for item in items:
                 assert route(item['url']).startswith('/en/') and target(item['url']), f'cross-language collection: {path}'

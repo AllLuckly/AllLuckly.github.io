@@ -146,4 +146,67 @@ const before = requests.length;
 await handle(req('/en/', {}, 'POST'), mockFetch);
 assert.equal(requests.length, before + 1);
 assert.equal(requests.at(-1).method, 'POST');
-console.log('PASS: Markdown negotiation, HTML preference, q=0, missing-page fallback, headers, HEAD, private/conditional/range requests and non-GET passthrough');
+
+// The HTTP homepage was reported as an alternate canonical. Upgrade public
+// reads before fetching the origin, retaining encoded paths and query strings.
+for (const method of ['GET', 'HEAD']) {
+  const redirect = await handle(new Request('http://allluckly.cn/guides/%E4%B9%A6?ref=a%2Fb&x=1', {method}), () => {
+    assert.fail('HTTP reads must redirect without fetching the origin');
+  });
+  assert.equal(redirect.status, 301);
+  assert.equal(redirect.headers.get('Location'), 'https://allluckly.cn/guides/%E4%B9%A6?ref=a%2Fb&x=1');
+  assert.equal(await redirect.text(), '');
+}
+// Origin redirects must never downgrade HTTPS back to HTTP. Other response
+// properties survive the upgrade, including personalized passthrough headers.
+const originLocation = 'http://allluckly.cn/guides/%E4%B9%A6/?ref=a%2Fb&x=1#chapter-2';
+for (const status of [301, 302, 303, 307, 308]) {
+  for (const headers of [{}, {Cookie: 'session=private'}, {Authorization: 'Bearer private'}]) {
+    const redirect = await handle(req('/guides', headers), async request => {
+      assert.equal(request.url, 'https://allluckly.cn/guides');
+      for (const [name, value] of Object.entries(headers)) assert.equal(request.headers.get(name), value);
+      return new Response('Origin redirect body', {status, statusText: 'Origin redirect', headers: {
+        Location: originLocation, 'Content-Type': 'text/plain', 'Cache-Control': 'private', 'Set-Cookie': 'reader=1; Secure'
+      }});
+    });
+    assert.equal(redirect.status, status);
+    assert.equal(redirect.statusText, 'Origin redirect');
+    assert.equal(redirect.headers.get('Location'), originLocation.replace('http:', 'https:'));
+    assert.equal(redirect.headers.get('Cache-Control'), 'private');
+    assert.equal(redirect.headers.get('Set-Cookie'), 'reader=1; Secure');
+    assert.equal(await redirect.text(), 'Origin redirect body');
+    if (Object.keys(headers).length) {
+      assert.equal(redirect.headers.has('Content-Signal'), false);
+      assert.equal(redirect.headers.has('Link'), false);
+    }
+  }
+}
+for (const location of [
+  'http://example.org/guides/?x=1#chapter',
+  'http://allluckly.cn.example.org/',
+  'http://allluckly.cn:8080/',
+  'http://reader@allluckly.cn/',
+  'https://allluckly.cn/guides/',
+  '/guides/?x=1#chapter',
+  '//allluckly.cn/guides/',
+  'http://['
+]) {
+  const redirect = await handle(req('/guides'), async () => new Response('Redirect', {status: 301, headers: {Location: location}}));
+  assert.equal(redirect.headers.get('Location'), location);
+}
+for (const status of [200, 201, 304, 404]) {
+  const response = await handle(req('/guides'), async () => new Response(status === 304 ? null : 'Not a redirect', {status, headers: {Location: originLocation}}));
+  assert.equal(response.headers.get('Location'), originLocation);
+}
+result = await handle(req('/guides'), async () => new Response(null, {status: 301, headers: {Location: 'http://allluckly.cn:80/guides/'}}));
+assert.equal(result.headers.get('Location'), 'https://allluckly.cn/guides/');
+for (const url of ['http://allluckly.cn/', 'https://www.allluckly.cn/']) {
+  const request = new Request(url, {method: 'POST'});
+  const original = new Response('Passthrough');
+  const response = await handle(request, async received => {
+    assert.equal(received, request);
+    return original;
+  });
+  assert.equal(response, original);
+}
+console.log('PASS: Markdown negotiation, HTML preference, q=0, missing-page fallback, headers, HEAD, private/conditional/range requests, HTTPS redirects and non-GET passthrough');

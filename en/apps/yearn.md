@@ -1,7 +1,7 @@
 ---
 layout: app
 app_id: yearn
-title: 'Yearn retro game emulator: your games, controls and saves'
+title: 'Yearn: Retro Game Emulator for iPhone and iPad'
 description: Learn about Yearn game imports, touch and physical controllers, save states, sync checks, display layouts and
   launch troubleshooting.
 permalink: /en/apps/yearn/

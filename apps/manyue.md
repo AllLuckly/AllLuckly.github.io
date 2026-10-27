@@ -4,7 +4,7 @@ app_id: man_yue
 title: 漫阅+：本地漫画、离线阅读与 NAS 书库
 description: 了解漫阅+ 的本地漫画导入、离线阅读、WebDAV、SMB 与服务器书库支持，按自己的文件和阅读场景开始使用。
 permalink: /apps/manyue/
-modified: 2026-10-26
+modified: 2026-10-27
 ---
 
 漫阅+ 是一款用于 **iPhone 与 iPad 的漫画阅读器和个人书库管理工具**。可以阅读自己导入的漫画文件，添加漫画源，或连接个人 NAS 与漫画服务器。中国区商店名称是「漫阅+ 漫画阅读器」。
@@ -15,11 +15,11 @@ modified: 2026-10-26
 
 | 你的内容在哪里 | 适合的方式 |
 | --- | --- |
-| iPhone / iPad 的「文件」App | 导入 CBZ、CBR、CB7、ZIP、RAR、7z、PDF 等漫画文件 |
-| 已经导入或下载到设备 | 通过本地书库离线阅读 |
-| 自己的 NAS 或网盘 | 通过 WebDAV 或 SMB 连接 |
-| 已部署的漫画服务器 | 连接 Suwayomi / Tachidesk、Komga、Kavita、LANraragi 等书库 |
-| 自己选择的漫画源 | 导入 JS / .ManYue 源文件或添加源链接 |
+| iPhone / iPad 的「文件」App | [导入本地漫画]({{ '/guides/manyue-getting-started/' | relative_url }})，支持 CBZ、CBR、CB7、ZIP、RAR、7z、PDF 等格式 |
+| 已经导入或下载到设备 | 出发前[检查离线阅读]({{ '/guides/manyue-offline-preflight/' | relative_url }})是否完整可用 |
+| 自己的 NAS 或网盘 | 按服务类型阅读 [WebDAV]({{ '/guides/manyue-webdav-library/' | relative_url }}) 或 [SMB]({{ '/guides/manyue-smb-library/' | relative_url }}) 连接教程 |
+| 已部署的漫画服务器 | 从 [Komga]({{ '/guides/manyue-komga-library/' | relative_url }}) 或 [Kavita]({{ '/guides/manyue-kavita-library/' | relative_url }}) 开始，也支持 Suwayomi / Tachidesk、LANraragi 等书库 |
+| 自己选择的漫画源 | [导入自备漫画源]({{ '/guides/manyue-source-import/' | relative_url }})，使用 JS / .ManYue 文件或源链接 |
 
 第一次使用，建议从一个自己拥有或有权阅读的本地文件开始：[漫阅入门：导入本地漫画并离线阅读]({{ '/guides/manyue-getting-started/' | relative_url }})。
 

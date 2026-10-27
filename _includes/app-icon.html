@@ -1,0 +1,23 @@
+{%- comment -%}
+Display-only responsive app icon. Original app.icon remains the canonical image.
+Parameters: app, size (CSS pixels), sizes (optional), decorative, class, loading.
+{%- endcomment -%}
+{%- assign display_icon = include.app -%}
+{%- assign display_icon_size = include.size | default: 64 -%}
+{%- assign display_icon_sizes = include.sizes | default: display_icon_size | append: '' -%}
+{%- unless include.sizes -%}{%- assign display_icon_sizes = display_icon_sizes | append: 'px' -%}{%- endunless -%}
+{%- assign display_icon_alt = '' -%}
+{%- unless include.decorative -%}
+  {%- capture display_icon_alt -%}{{ display_icon.name }}{% if content_lang == 'en' %} icon{% else %} 图标{% endif %}{%- endcapture -%}
+{%- endunless -%}
+{%- if display_icon.icon_display -%}
+  {%- assign display_icon_base = display_icon.icon_display.base -%}
+  {%- assign display_icon_fallback = display_icon_base | append: '-128.png' -%}
+  {%- if display_icon_size > 64 -%}{%- assign display_icon_fallback = display_icon_base | append: '-256.png' -%}{%- endif -%}
+<picture class="app-icon">
+  <source type="image/webp" srcset="{{ display_icon_base | append: '-128.webp' | relative_url }} 128w, {{ display_icon_base | append: '-256.webp' | relative_url }} 256w{% if display_icon.icon_display.max_width >= 512 %}, {{ display_icon_base | append: '-512.webp' | relative_url }} 512w{% endif %}" sizes="{{ display_icon_sizes | escape }}">
+  <img src="{{ display_icon_fallback | relative_url }}" srcset="{{ display_icon_base | append: '-128.png' | relative_url }} 128w, {{ display_icon_base | append: '-256.png' | relative_url }} 256w{% if display_icon.icon_display.max_width >= 512 %}, {{ display_icon_base | append: '-512.png' | relative_url }} 512w{% endif %}" sizes="{{ display_icon_sizes | escape }}" width="{{ display_icon_size }}" height="{{ display_icon_size }}" alt="{{ display_icon_alt | escape }}"{% if include.class %} class="{{ include.class | escape }}"{% endif %}{% if include.loading %} loading="{{ include.loading | escape }}"{% endif %} decoding="async">
+</picture>
+{%- else -%}
+<img src="{{ display_icon.icon | relative_url }}" width="{{ display_icon_size }}" height="{{ display_icon_size }}" alt="{{ display_icon_alt | escape }}"{% if include.class %} class="{{ include.class | escape }}"{% endif %}{% if include.loading %} loading="{{ include.loading | escape }}"{% endif %} decoding="async">
+{%- endif -%}

@@ -90,7 +90,7 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
   {%- assign seo_app_id = canonical_app.url | absolute_url | append: '#app' -%}
 {%- endif -%}
 <meta charset="utf-8">
-<title>{{ seo_title | escape }}{% if seo_title != locale_title %} · {{ locale_title | escape }}{% endif %}</title>
+<title>{{ seo_title | escape }}{% if seo_title != locale_title and seo_title != seo_owner %} · {{ seo_owner | escape }}{% endif %}</title>
 <meta name="description" content="{{ seo_description | escape }}">
 <link rel="canonical" href="{{ seo_canonical | escape }}">
 {% if translation_pair %}{% assign agent_path = page.url | replace: '/index.html', '/' %}{% assign agent_last = agent_path | slice: -1, 1 %}{% if agent_last == '/' %}{% assign agent_path_length = agent_path.size | minus: 1 %}{% assign agent_path = agent_path | slice: 0, agent_path_length %}{% endif %}<link rel="alternate" type="text/markdown" href="{{ agent_path | append: '/index.md' | absolute_url | escape }}" title="{% if content_lang == 'en' %}Read as Markdown{% else %}Markdown 正文{% endif %}">{% endif %}
@@ -148,7 +148,7 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
       "@id": {{ seo_canonical | append: '#article' | jsonify }},
       "url": {{ seo_canonical | jsonify }},
       "mainEntityOfPage": { "@type": "WebPage", "@id": {{ seo_canonical | jsonify }} },
-      "headline": {{ seo_title | jsonify | replace: '<', '\u003c' }},
+      "headline": {{ page.title | default: seo_title | jsonify | replace: '<', '\u003c' }},
       "description": {{ seo_description | jsonify | replace: '<', '\u003c' }},
       "inLanguage": {{ seo_language | jsonify }},
       "isPartOf": { "@id": {{ seo_website_id | jsonify }} },
@@ -173,7 +173,7 @@ Keep product facts in _data/apps.yml and visible page content in agreement.
       "@type": "CollectionPage",
       "@id": {{ seo_canonical | append: '#collection' | jsonify }},
       "url": {{ seo_canonical | jsonify }},
-      "name": {{ seo_title | jsonify | replace: '<', '\u003c' }},
+      "name": {{ page.title | default: seo_title | jsonify | replace: '<', '\u003c' }},
       "description": {{ seo_description | jsonify | replace: '<', '\u003c' }},
       "inLanguage": {{ seo_language | jsonify }},
       "isPartOf": { "@id": {{ seo_website_id | jsonify }} },

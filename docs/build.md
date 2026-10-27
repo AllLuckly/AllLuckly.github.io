@@ -32,7 +32,7 @@ bundle exec jekyll serve --host 127.0.0.1 --port 4000
 
 预览地址：<http://127.0.0.1:4000/>。生成文件位于 `_site/`。预览时 URL 与正式域名不同是正常现象；canonical 和结构化数据应继续使用正式域名。
 
-发布前检查首页、六个 App 专题与学习路线、教程详情、`/page2/`、`/sitemap.xml`和 `/robots.txt`。分页由 `jekyll-paginate` 生成，主页必须使用 `index.html`，`paginate_path` 保留 `page:num` 以兼容历史文章列表地址。
+发布前检查首页、六个 App 专题与学习路线、教程详情、`/page2/`、`/sitemap.xml`和 `/robots.txt`。分页由 `jekyll-paginate` 生成，主页必须使用 `index.html`，`paginate_path` 使用 `page:num/`，使分页内链与 canonical 的尾斜线一致；历史 `/pageN` 地址继续由托管服务重定向至 `/pageN/`。
 
 ## 常见问题
 
@@ -48,3 +48,19 @@ bundle exec jekyll serve --host 127.0.0.1 --port 4000
 文章或翻译更新后，还需运行 [Agent Readiness 构建与验证流程](agent-readiness.md#更新与验证)，重新生成对应 Markdown、分层阅读目录与技能文件摘要，再进行最终构建。GitHub Pages 直接发布已提交的静态源；不会在服务端替你运行 Python 生成器。
 
 此工作副本采用 Git 稀疏检出，已包含旧文章的 `images/` 与新应用资源，部分历史静态目录仍未展开；它们仍在 Git 仓库中，没有删除。需要完整检出时，可运行 `git sparse-checkout disable`。
+
+## 规范网址与 HTTPS
+
+2026-10-26（Asia/Shanghai）检查 Search Console 时，HTTP 属性报告的「备用网页（有适当的规范标记）」仅涉及 `http://allluckly.cn/`；网址检查显示，用户声明与 Google 选择的规范网址均为 `https://allluckly.cn/`。这是 HTTP 别名被排除，HTTPS 首页仍是预期规范网址。当天已在原报告提交修复验证，界面显示 `Validation started`（Started: 26/10/2026）；最终结果仍由 Google 后续抓取决定。 原账户只有 HTTP 属性，已用现有 HTML 验证文件自动验证并添加 `https://allluckly.cn/` URL-prefix 属性，用于后续查看实际主站数据。已提交 `https://allluckly.cn/sitemap.xml`，Search Console 显示 `Sitemap processed successfully`，发现 750 个线上页面。 HTTPS 首页的 URL Inspection 同时显示 `URL is on Google`、`Page is indexed`，确认主站首页已收录。
+
+修复前，HTTP 首页返回 200，部分 HTTPS 路径补尾斜线时还会重定向至 HTTP。已在线上启用 Cloudflare **Always Use HTTPS**，并发布 Worker 版本 `882f607d`：根域名 HTTP 的 GET/HEAD 请求升级至 HTTPS，源站返回的同主机 HTTP `Location` 也升级为 HTTPS。Cloudflare Single Redirect 规则 **www to canonical HTTPS** 使用条件 `(http.host eq "www.allluckly.cn")`，目标为 `concat("https://allluckly.cn", http.request.uri.path)`，返回 301，并保留查询参数。
+
+Cloudflare SSL/TLS 模式仍为 Flexible：当前源站尚未提供匹配根域名的有效证书，取得并确认有效证书前不要切换至 Full (strict)。本地 `_config.yml` 的导航尾斜线与 `paginate_path: "page:num/"` 已对齐 canonical；这部分配置尚未发布，需要下一次 GitHub Pages 部署后才会在线上生效。
+
+修改后运行以下检查；部署后还需复查 HTTP→HTTPS、www→根域名及补尾斜线的重定向，确认查询参数保留、没有 HTTPS 降级或循环：
+
+```sh
+node scripts/test_agent_access.mjs
+bundle exec jekyll build --trace
+python3 scripts/validate_site.py
+```

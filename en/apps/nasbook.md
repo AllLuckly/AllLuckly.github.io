@@ -1,7 +1,7 @@
 ---
 layout: app
 app_id: nas_book
-title: 'Book Isle: ebooks, NAS and Calibre personal libraries'
+title: 'Book Isle: Ebook Reader for iPhone and iPad'
 description: Learn about Book Isle local imports, WebDAV, SMB, OPDS, Calibre, notes and reading-data sync through a 60-tutorial
   learning path.
 permalink: /en/apps/nasbook/
@@ -16,6 +16,13 @@ Book Isle brings local ebooks and personal NAS libraries onto an iPhone or iPad 
 
 For your first use, prepare one DRM-free TXT, EPUB or PDF and check its title, table of contents and text. Once reading works as expected, add a remote source. WebDAV, SMB, OPDS and Calibre expose different services; choose the interface your server actually enables rather than configuring every entry point.
 
+| Where your books are | Choose a tutorial |
+| --- | --- |
+| Local files on iPhone or iPad | [Import an EPUB and resume reading]({{ '/en/guides/nasbook-getting-started/' | relative_url }}) |
+| A NAS or private cloud folder | Connect through [WebDAV]({{ '/en/guides/nasbook-webdav-library/' | relative_url }}) or [SMB]({{ '/en/guides/nasbook-smb-library/' | relative_url }}) |
+| An ebook catalogue | [Browse an OPDS library and download a book]({{ '/en/guides/nasbook-opds-library/' | relative_url }}) |
+| A Calibre library on your computer | [Connect to Calibre Content Server]({{ '/en/guides/nasbook-calibre-server/' | relative_url }}) |
+
 Seeing a title in a remote list and having a complete download are different states. Before reading offline, disconnect the network and open the chapters you need. When changing devices, handle reading data and book files separately.
 
 ## Understand what each format supports
@@ -28,7 +35,7 @@ In the checked version, **MOBI, AZW, AZW3, CBR and DJVU mainly support managemen
 
 Bookmarks mark places to revisit, notes hold your thoughts, and tags or reading status help organise the library. Try each with one test book before organising a large collection so the different records are easy to understand.
 
-WebDAV sync handles reading data. After syncing, check that the second device has the same book, that its contents correspond and that progress opens in the right place. A success message does not mean all book files have moved across.
+[WebDAV sync]({{ '/en/guides/nasbook-webdav-sync/' | relative_url }}) handles reading data. After syncing, check that the second device has the same book, that its contents correspond and that progress opens in the right place. A success message does not mean all book files have moved across.
 
 ## Learning path
 

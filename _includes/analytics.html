@@ -1,0 +1,5 @@
+{%- assign analytics_id = site.data.analytics.ga4_measurement_id | default: '' | strip -%}
+{%- if jekyll.environment == 'production' and analytics_id != '' -%}
+<script id="site-analytics-config" type="application/json">{"measurementId":{{ analytics_id | jsonify | replace: '<', '\u003c' }},"origin":{{ site.url | jsonify | replace: '<', '\u003c' }},"apps":[{% for analytics_app in site.data.apps %}{% unless forloop.first %},{% endunless %}{"id":{{ analytics_app.id | jsonify }},"url":{{ analytics_app.store_url | jsonify | replace: '<', '\u003c' }}}{% endfor %}]}</script>
+<script src="{{ '/assets/js/analytics.js' | relative_url }}" defer></script>
+{%- endif -%}
