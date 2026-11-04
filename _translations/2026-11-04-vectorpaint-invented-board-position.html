@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint invented board diagrams: audit pieces through coordinates and states'
+description: Draw a fictional four-by-four board and two moves, checking coordinate orientation, piece counts and
+  endpoints without a game engine.
+permalink: /en/guides/vectorpaint-invented-board-position/
+date: '2026-11-04 00:00:00 +08:00'
+modified: '2026-11-04 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 99
+topic: Structure and component checks
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-04-vectorpaint-invented-board-position.md
+source_url: /guides/vectorpaint-invented-board-position/
+translation_method: editorial
+translation_source_sha256: c5feba9ffc3b70ffe24029fc29727d4e6e52b38cfc59427d4891f83bc5c19aab
+translation_date: '2026-11-04T01:36:55+00:00'
+excerpt: Draw a fictional four-by-four board and two moves, checking coordinate orientation, piece counts and endpoints
+  without a game engine.
+---
+{% raw %}
+<p>A position diagram needs clear piece identities and locations, not just squares. Invent a four-by-four board with four pieces and two simple moves to practise state maintenance. This is not instruction for an established game, does not claim official move legality and provides no automatic play or result calculation.</p>
+<h2 id="先约定坐标与本次自设规则">Define coordinates and the exercise rules</h2>
+<p>Create a 1200 by 800 pixel canvas with columns A–D left to right and rows 1–4 top to bottom, explicitly defining this diagram’s convention. Name four pieces 甲, 乙, 丙 and 丁. The only rules are a single orthogonal move into an adjacent empty cell, without leaving the board or overlapping. List 甲=A1, 乙=C2, 丙=B4 and 丁=D3 and verify each. Avoid real-game piece names that imply unstated rules. Reserve initial and later state space, defining coordinate direction before board and markers so superficially consistent drawings do not conceal reversed row numbering.</p>
+<h2 id="建立十六格与外侧坐标">Build sixteen cells with external coordinates</h2>
+<p>Copy one square into four columns and four rows with clear, consistent edges rather than heavy/light shared lines from duplicates. Align outside column letters and row numbers with cell centres and avoid corner labels resembling a fifth row. Leave piece padding. Alternating light/dark squares are optional but do not encode permitted/blocked cells without a rule. Hide pieces to count sixteen cells and identify all four corners by coordinate. Group board and coordinates appropriately and keep pieces separate so later state edits do not stretch the board or displace labels.</p>
+<h2 id="四颗棋子分别保留身份标识">Give every piece an explicit identity</h2>
+<p>Use equally sized circles or simple geometric pieces, each with its short 甲/乙/丙/丁 identifier rather than colour alone. Centre them at listed cells, read every coordinate and count four. Colour could indicate teams, but this exercise defines no team or winning rules, so do not introduce unexplained implications. Group text with each symbol so a move cannot leave its name behind. Save the initial source and make independent later-state copies rather than repeatedly overwriting the only original. This supports comparison of what moved and what should remain unchanged.</p>
+<h2 id="第一步只移动甲到相邻空格">Move only the first piece into its adjacent cell</h2>
+<p>Define move one as 甲 from A1 to B1. Verify B1 is empty and horizontally adjacent, then move the complete group in the first-state copy. The old cell becomes empty, three other pieces stay unchanged and total count remains four. Any explanatory arrow starts and ends at the relevant cell centres on a separate explanation layer and is not a fifth piece. Do not move only the name while leaving its circle. Preserve written coordinates and compare the drawing: static paths do not automatically validate occupancy or bounds. Cross-check every condition before proceeding to move two.</p>
+<h2 id="第二步基于第一状态继续">Build the second move from the first state</h2>
+<p>Define move two as 乙 from C2 to C3 and copy the result of move one rather than returning to the initial position. C3 is empty and vertically adjacent to C2; 丁 at D3 is not in that cell. After moving 乙, verify 甲 remains at B1 and 丙/丁 are unchanged. Clearly title initial, after move one and after move two in reading order. If space is insufficient, separate files are preferable to unequal compression. Keep the same coordinate convention in every state so position differences are explained without guessing rotations or mirrors.</p>
+<h2 id="用位置表核对每张局面">Audit every state against a position list</h2>
+<p>Write a four-row position list for each of the three states. Inspect changed positions, then unchanged ones, then total pieces; checking only the intended mover misses neighbours accidentally selected with it. Hide colour temporarily and read identities to confirm independent recognition. Hide arrows as well: each state should show its current arrangement without them. Arrows explain change but cannot replace a state. Select individual objects to detect overlapped duplicate pieces rather than merely counting labels. Remove extra test copies and retain the three states and explanations without claiming a playable game or rules checker.</p>
+<h2 id="导出时保持同一格距与方向">Preserve grid scale and orientation in exports</h2>
+<p>Save board sources, pieces and all three state originals. Compare exports side by side at the same displayed cell spacing. Coordinates and IDs must remain readable at small size; enlarge or reduce decoration rather than deleting essential labels. For transparent output, inspect light-cell fills against the background; white objects are not automatic holes. Include state number and revision in filenames and open each before sharing to exclude a second-move explanation paired with an initial image. New rules or pieces require a new list and legality conditions before graphics; the old two-move check does not validate a new game.</p>
+<h2 id="坐标或数量不符时定位具体对象">Locate the exact object behind a mismatch</h2>
+<p>If 乙 lands at C4, check whether a row boundary was mistaken for a centre or row numbers were reversed rather than flipping the entire board to hide it. A count of five suggests overlapping copies; three suggests hidden layers or deleted markers. For an arrow crossing an occupied cell, return to the rule and clarify single versus multiple moves instead of drawing vaguely. If graphics are correct but the written coordinates are wrong, repair the record and recheck all states. A useful position diagram explains each identity, each move’s endpoints and every state’s count rather than merely showing colourful circles on squares.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-grid-guides/">VectorPaint grids and guides: composition references for icons and posters</a>, <a href="/en/guides/vectorpaint-instruction-panels/">VectorPaint three-step diagram: explain a process through continuous action</a>.</p>
+<p>Sources checked on November 4, 2026: VectorPaint 1.0.8, requiring iOS / iPadOS 17 or later. Capability scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store description</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn">Apple public version lookup</a>. These are exercises and checks you can perform, without a claim of step-by-step physical-device testing or verification in every target environment. Example content is instructional; follow the controls in your installed version.</p>
+{% endraw %}

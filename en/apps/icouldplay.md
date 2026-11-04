@@ -3,9 +3,9 @@ layout: app
 app_id: icouldplay
 title: 'iCouldPlay: Video Player for iPhone and iPad'
 description: Learn about iCouldPlay local videos, SMB, WebDAV, FTP, media servers, subtitles and playback engines through
-  50 practical tutorials.
+  60 practical tutorials.
 permalink: /en/apps/icouldplay/
-modified: 2026-11-03
+modified: 2026-11-04
 lang: en
 source_url: /apps/icouldplay/
 ---
@@ -30,8 +30,8 @@ The tutorials address these tasks separately. Begin with [a local video]({{ '/en
 
 Use the same video to compare local and remote playback. If only the remote path fails, inspect the server and network. If local playback fails too, check the file and engine next. Change one condition at a time, keeping the original file and a record of server settings so you can see what helped.
 
-The [50-tutorial learning path]({{ '/en/guides/icouldplay/' | relative_url }}) runs from importing and library setup to subtitles and compatibility checks. You can also choose the article that matches your current problem.
+The [60-tutorial learning path]({{ '/en/guides/icouldplay/' | relative_url }}) runs from importing and library setup to subtitles and compatibility checks. You can also choose the article that matches your current problem.
 
 ## Version and sources
 
-Checked on 3 November 2026: the China App Store listed **1.1.1**, requiring iOS or iPadOS 15.0 or later. This introduction uses the [iCouldPlay App Store page](https://apps.apple.com/cn/app/id6755653178), [Apple’s lookup API](https://itunes.apple.com/lookup?id=6755653178&country=cn) and feature entry points. Check your own files and servers on your device to confirm their behaviour.
+Checked on 4 November 2026: the China App Store listed **1.1.1**, requiring iOS or iPadOS 15.0 or later. This introduction uses the [iCouldPlay App Store page](https://apps.apple.com/cn/app/id6755653178), [Apple’s lookup API](https://itunes.apple.com/lookup?id=6755653178&country=cn) and feature entry points. Check your own files and servers on your device to confirm their behaviour.

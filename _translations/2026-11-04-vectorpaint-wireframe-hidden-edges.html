@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint wireframe boxes: distinguish visible edges, hidden edges and shared vertices'
+description: Draw an eight-vertex, twelve-edge box manually, checking solid and broken edges under one defined view
+  without automatic 3D visibility.
+permalink: /en/guides/vectorpaint-wireframe-hidden-edges/
+date: '2026-11-04 00:00:00 +08:00'
+modified: '2026-11-04 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 97
+topic: Structure and component checks
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-04-vectorpaint-wireframe-hidden-edges.md
+source_url: /guides/vectorpaint-wireframe-hidden-edges/
+translation_method: editorial
+translation_source_sha256: 2006f8d5d9db801a6e87d0187f1d5cf73a341cfc9a5328a129065667545a4e23
+translation_date: '2026-11-04T01:36:55+00:00'
+excerpt: Draw an eight-vertex, twelve-edge box manually, checking solid and broken edges under one defined view
+  without automatic 3D visibility.
+---
+{% raw %}
+<p>A wireframe box has a different purpose from a three-filled-face illustration: it also locates rear edges. Draw eight vertices and twelve edges under one fixed view, auditing structure before visibility. You maintain the line conventions manually; the app is not reconstructing a 3D model or computing hidden edges.</p>
+<h2 id="先确定前面与向右上偏移的后面">Define the front and shifted rear faces</h2>
+<p>On a 1000 by 800 pixel canvas, draw a square front reference and a matching rear outline shifted up and right. This convention shows front, top and right faces; it is a spatial illustration rather than a guarantee of engineering projection dimensions. Label front corners A, B, C, D clockwise from upper left and corresponding rear corners A′, B′, C′, D′ on a draft layer. Two rectangles alone are incomplete: corresponding corners still need connections. Verify neither face was distorted by unequal scaling and establish their common direction before line styles.</p>
+<h2 id="按清单建立十二条边">Build all twelve edges from an inventory</h2>
+<p>The structure has four front edges, four rear edges and four front-to-rear connectors: twelve total. Draw them with one fine style first and check each against the list without double-counting overlapping strokes. Three edges meet at every vertex; inspect front vertices, then rear ones. Independent segments or maintainable open-path combinations are acceptable, but saving objects must not omit a rear edge. Establish connectivity before visibility. Moving a vertex requires checking all attached endpoints; ordinary lines do not know they represent one 3D corner, so moving one segment cannot repair the whole structure.</p>
+<h2 id="本视角把后三条边视为隐藏">Mark the three hidden edges for this view</h2>
+<p>Under this front/top/right-visible convention, hide the three edges meeting rear lower-left D′: D′–A′, D′–C′ and D′–D. Keep the others solid initially. Identify them individually using draft labels rather than deciding from which line looks more internal on screen. Hidden means occluded by a face, not physically absent or deleted. Another viewing direction requires reassessing this rule; mirroring the drawing does not authorise retaining the same named hidden edges. Preserve the view explanation so recipients understand the choices.</p>
+<h2 id="断线节奏清楚且不造成假缺口">Use legible broken-line conventions</h2>
+<p>Use an available dash-style control or manually drawn short segments in a copy, retaining full source edges as references. Give all three hidden edges the same rhythm and lighter weight rather than different styles. Near vertices, dashes must still imply connection rather than missing structure. Distinguish visible solid and hidden dashed lines even in monochrome; colour is supplementary. Do not add spatial diagonals, which are not among the twelve edges. Inspect without labels, then restore them and verify that sparse dashes do not imply three missing edges.</p>
+<h2 id="用局部重叠检查前后歧义">Inspect crossings and depth ambiguity</h2>
+<p>A rear edge projected through the front region uses dashes to explain occlusion; raising the entire edge as a solid line falsely suggests it passes through the face. A crossing is not necessarily a vertex: only the eight defined corners join three structural edges. Do not add dots at every intersection and imply extra corners. Wireframes can admit competing readings; restrained face labels or a view arrow may help, but are explanations rather than automatic 3D detection. Clarify weights and dashes before adding faint faces, whose fills must not conceal edges needed for verification.</p>
+<h2 id="改变高度时维护全部相关顶点">Maintain related vertices during a height change</h2>
+<p>In a copy, make the box taller and check lower edges and side connections on both front and rear faces, keeping their changes consistent. Lengthening only the front verticals leaves an incorrect rear height. Update the eight vertices, then recheck twelve edges and three hidden ones; geometry changes do not automatically repair visibility styles. To keep width unchanged, do not substitute uniform overall scaling for height editing. Compare original and taller versions at the same display scale, confirming a defined height change instead of view enlargement. This tests wireframe maintenance without claiming an editable parametric 3D model.</p>
+<h2 id="输出前按八角十二边复数">Recount vertices and edges before delivery</h2>
+<p>Save the complete wireframe source and dash representation. In the export, count eight structural vertices and verify twelve edges from the connectivity list. Inspect fine dashes and joins at actual size, ensuring background texture does not hide them. Retain a fixed-view, non-engineering purpose in the title so it is not used for dimensioned construction. Include view and revision in the filename and reopen the delivery image to exclude test corner markers or obsolete heights. For editable delivery, explain which objects make up hidden lines so recipients can maintain full sources instead of encountering unexplained short fragments.</p>
+<h2 id="隐藏边看错时先回观察方向">Recheck the view before changing hidden edges</h2>
+<p>For reversed depth, check whether the open file is a mirrored or alternate-view test and return to the three-visible-face convention. Inspect three endpoints at each corner for misaligned lines instead of concealing gaps with thicker strokes. Check colour, width and display size for missing dashes rather than deleting an edge. Remove meaningless dots and explain crossings that resemble extra vertices. Recheck eight corners, twelve edges and three hidden edges after repairs. A clear wireframe needs both correct counts and an explained viewpoint; a readable output does not establish verified real geometric dimensions.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-isometric-box/">VectorPaint box illustration: build consistent perspective from three planes</a>, <a href="/en/guides/vectorpaint-fill-stroke/">VectorPaint fills and strokes: clear colour areas and consistent lines</a>.</p>
+<p>Sources checked on November 4, 2026: VectorPaint 1.0.8, requiring iOS / iPadOS 17 or later. Capability scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store description</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn">Apple public version lookup</a>. These are exercises and checks you can perform, without a claim of step-by-step physical-device testing or verification in every target environment. Example content is instructional; follow the controls in your installed version.</p>
+{% endraw %}

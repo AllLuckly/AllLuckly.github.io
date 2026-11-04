@@ -4,7 +4,7 @@ app_id: draw_illustration
 title: 'VectorPaint: SVG Editor for iPhone and iPad'
 description: Create vector drawings and logos on iPhone and iPad. Learn VectorPaint shapes, Bézier nodes, SVG editing and image tracing, then export SVG, PNG or PDF.
 permalink: /en/apps/vectorpaint/
-modified: 2026-11-03
+modified: 2026-11-04
 lang: en
 source_url: /apps/vectorpaint/
 ---
@@ -61,4 +61,4 @@ Drawing and local project management work offline. Sending a result to an online
 
 ## Version and sources
 
-Checked on 3 November 2026: the China App Store listed **1.0.8**, requiring iOS or iPadOS 17.0 or later. This introduction uses the [VectorPaint App Store page](https://apps.apple.com/cn/app/id1587272880), [Apple’s public lookup API](https://itunes.apple.com/lookup?id=1587272880&country=cn) and feature entry points. It does not claim physical-device testing.
+Checked on 4 November 2026: the China App Store listed **1.0.8**, requiring iOS or iPadOS 17.0 or later. This introduction uses the [VectorPaint App Store page](https://apps.apple.com/cn/app/id1587272880), [Apple’s public lookup API](https://itunes.apple.com/lookup?id=1587272880&country=cn) and feature entry points. It does not claim physical-device testing.

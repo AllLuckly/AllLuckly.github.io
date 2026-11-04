@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint task-interval charts: verify duration and overlap through endpoints'
+description: Draw a static Gantt-style chart for three fictional tasks, checking boundaries, lengths and explicit
+  resource-overlap assumptions.
+permalink: /en/guides/vectorpaint-task-interval-gantt/
+date: '2026-11-04 00:00:00 +08:00'
+modified: '2026-11-04 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 93
+topic: Data and rule graphics
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-04-vectorpaint-task-interval-gantt.md
+source_url: /guides/vectorpaint-task-interval-gantt/
+translation_method: editorial
+translation_source_sha256: fef9e033b666c772e4543bdd831695645dab860913bd11a5197788051b5f16ca
+translation_date: '2026-11-04T01:36:55+00:00'
+excerpt: Draw a static Gantt-style chart for three fictional tasks, checking boundaries, lengths and explicit resource-overlap
+  assumptions.
+---
+{% raw %}
+<p>Events on a timeline and tasks occupying intervals need different representations. Draw A from 0–2, B from 1–4 and C from 4–5 as three bars, checking endpoints, duration and overlap. VectorPaint supplies static artwork rather than automatic scheduling, dependency calculation or a guarantee of resource availability.</p>
+<h2 id="先写起点终点与时间单位">Write start, finish and time unit first</h2>
+<p>Outside the app, list task A from 0 to 2, B from 1 to 4 and C from 4 to 5, in fictional exercise hours. Their durations are 2, 3 and 1; verify each by subtracting start from end. Interpret intervals as including their start and ending at the stated endpoint: B ending at 4 and C starting at 4 have no positive-duration overlap. On a 1200 by 700 pixel canvas, leave task-name space left and boundary labels 0–5 above. All times are fictional; real project names should not lend false credibility. Define meaning before drawing instead of filling an extra whole cell beyond an ending instant.</p>
+<h2 id="时间数字放在边界而非格中心">Place times on boundaries rather than cell centres</h2>
+<p>Draw six equally spaced vertical references for boundaries 0–5, with numbers on boundaries. The five gaps represent 0–1, 1–2 and so on. Five cells with six arbitrarily centred numbers make endpoints ambiguous. Use consistent row heights and align task names to row centres. Hand-drawn references remain artwork and may form a light grid; check actual output for native guides. Before bars, read the duration between each pair of adjacent boundaries and verify equal units. Real calendars with weekends or nonworking periods need separate scope rules; this exercise does not introduce unequal date intervals.</p>
+<h2 id="三条横条分别落到真实边界">Anchor every bar to its actual endpoints</h2>
+<p>Draw A from boundary 0 to 2, B from 1 to 4 and C from 4 to 5, with equal thickness and duration-proportional lengths. Inspect fill endpoints without strokes because heavy outlines can appear to extend them. Do not start every bar at zero for label alignment or draw B one cell long merely with a three-hour label. Keep each rectangle and label independently editable and do not change time units by scaling an entire group. Read each start/end, then compare length ratios 2:3:1. These separate checks establish position and duration; correct length alone does not establish a correct interval.</p>
+<h2 id="用重叠区间解释并行而非自动冲突">Explain overlap without automatically calling it a conflict</h2>
+<p>A and B overlap from 1 to 2, showing concurrent time. Whether that is a conflict depends on their need for the same non-shareable resource. State the resource assumption before using red to imply an error. B and C meet at 4; if a handover buffer is needed, it is absent here and must be marked for confirmation rather than assumed satisfied by touching boundaries. A light annotation may identify 1–2 without obscuring starts. The drawing helps inspect scheduling but cannot replace project tools or people confirming all execution requirements.</p>
+<h2 id="依赖关系与时间条分开记录">Keep dependencies separate from occupied time</h2>
+<p>If C must wait for B to finish, explicitly state that assumption. Text or a clear arrow can help, but an arrow does not automatically reposition bars. Tasks touching one vertical line do not inherently depend on each other. Point each arrow from near the predecessor’s end toward the successor’s start, not its middle. Check complex dependencies in a list before filling the page with crossings. Only one relationship is considered here; leave others unspecified. If B’s end changes, whether C must move follows the assumption, and this static drawing does not propagate updates for you.</p>
+<h2 id="改一个起点检查受影响对象">Test one start-time change</h2>
+<p>In a copy, shift B to 2–5 while preserving three hours. Update the list, bar and endpoint explanation first. A/B now only meet at 2, so remove or revise the old 1–2 overlap note. C still starting at 4 would overlap B; if it depends on B finishing, revise it separately and possibly extend the axis. Do not move every bar until the picture looks conflict-free without explaining changed rules. Restore the original or name a new schedule, keeping title, range and annotations at the same revision. A single-variable test reveals information that must be maintained manually in a static schedule.</p>
+<h2 id="输出后读边界并核对条长">Audit endpoints and lengths in output</h2>
+<p>Save and inspect the export, reading ticks 0–5 and then each task’s start, end and duration. The shortest one-hour bar must remain legible at small size, with grid lighter than tasks. Retain units, resource assumptions and fictional scope for print or reports instead of cropping away time labels. Include schedule revision and size in the filename and reopen the shared file to exclude rescheduling tests and obsolete conflict notes. Real projects need a new list based on actual dates, rest periods and handover constraints; this simple hourly exercise is not an already-valid universal plan.</p>
+<h2 id="时长错一格时先查端点含义">Check endpoint meaning for one-cell duration errors</h2>
+<p>If B appears four hours long, check whether the cell beyond endpoint 4 was counted or numbers were centred in cells. For correct length at a wrong start, inspect the start field rather than aligning only right edges. Add names or explanations for ambiguous overlap colours instead of redrawing different tasks at the same position. Correct arrow logic from the dependency list, not merely to reduce crossings. Repeat endpoint subtraction and overlap checks after repairs. A readable static interval diagram explains both occupied times and conditions that remain unknown.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-timeline/">VectorPaint timeline: arrange five stages with descriptions of different lengths</a>, <a href="/en/guides/vectorpaint-grid-guides/">VectorPaint grids and guides: composition references for icons and posters</a>.</p>
+<p>Sources checked on November 4, 2026: VectorPaint 1.0.8, requiring iOS / iPadOS 17 or later. Capability scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store description</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn">Apple public version lookup</a>. These are exercises and checks you can perform, without a claim of step-by-step physical-device testing or verification in every target environment. Example content is instructional; follow the controls in your installed version.</p>
+{% endraw %}
