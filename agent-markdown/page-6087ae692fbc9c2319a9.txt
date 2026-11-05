@@ -1,0 +1,65 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-openlist-source-setup/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Add an OpenList or AList source to iCouldPlay
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-openlist-source-setup/
+agent_source_sha256: 7aac7a797faf16e31e0251ca66bc8fb22a2025f7890f228af0494ab32100a3ff
+agent_generator_version: 1
+---
+{% raw %}# Add an OpenList or AList source to iCouldPlay
+
+Language: en
+Canonical: [Add an OpenList or AList source to iCouldPlay](<https://allluckly.cn/en/guides/icouldplay-openlist-source-setup/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-openlist-source-setup/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-openlist-source-setup/>)
+Published: 2026-11-05T00:00:00+08:00
+Modified: 2026-11-05T09:38:59+08:00
+Author: Bison
+
+Check the site base address, account and starting path with a small folder, then verify browsing and playback separately.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-openlist-source-setup/>), translated on 2026-11-05. Original publication dates, attribution, code and version notes are retained.
+
+OpenList and AList can expose multiple storage backends through one site, but the homepage, a folder path and a media link are different objects. iCouldPlay 1.1.1 publicly adds these sources. Start with one authorized small folder while retaining existing SMB or WebDAV sources. Use a trusted site and an authorized viewing account, rather than an administrator password. The result should identify the listing’s directory, the selected file and whether actual playback starts.
+
+## Verify a permitted sample on the site
+
+Open the site through your usual trusted route and use the same account intended for iCouldPlay. In the sample folder, record a permitted ordinary video’s name, size and opening content. Administrator visibility is insufficient because a viewing account may see a different scope. Resolve a missing mount, disconnected backend or unreadable sample on the server before adding a client. One or two files suffice; do not make private storage public or upload unauthorized films to a public test site for convenience.
+
+## Identify the service base address
+
+Choose OpenList / AList when adding a file source. Enter the service base location, such as the illustrative `https://media.example.com`, which is not a real server to use. If your deployment uses a subpath, use the complete service prefix supplied by its administrator and verify that the browser reaches that same deployment. Do not use a film page, signed download URL or long browser query. Similar-looking pages do not establish identical API prefixes: a proxy that forwards the homepage without the API can still fail connection testing.
+
+## Enter the authorized login method
+
+Use the site’s username and password, or an explicitly authorized site API token where the form supports it. Upstream cloud-drive tokens and Apple passwords are not OpenList credentials; do not copy another person’s browser session. Anonymous access is appropriate only for directories the administrator already permits, and does not guarantee downloads. Where multiple authentication fields exist, follow one administrator-approved method rather than mixing an expired token with fresh account credentials. Enter secrets only in their application fields; retain an account identifier in ordinary notes.
+
+## Set the starting file path
+
+Use the site’s file path for the starting directory, normally beginning with a slash. If the site displays `/Practice/Clips`, verify that path rather than entering an operating-system disk location or complete webpage URL. Match case, spaces and mount hierarchy. The source’s displayed root may already represent the selected start, so do not append the same path again. Put a separate directory password in its own field rather than changing the account password. Keep the initial scope small until both listing and playback pass.
+
+## Connect and save a small folder selection
+
+Run the offered connection check and select only the practice folder, verifying its name and expected children. If selection can be deferred, distinguish saving a connection from scheduling a scan; a source card does not establish complete indexing. For an empty list, compare the start path, account scope and current site content before rescanning a large library. Do not select both a parent and its same child merely to increase coverage. Check known files for duplicates after saving and record the selected scope for later maintenance.
+
+## Verify playback and seeking on the same item
+
+Locate the recorded video, compare its name and visible details, play briefly and seek to a familiar anchor. A successful listing API does not ensure that the upstream media URL is reachable on the phone’s network; it may still be local or temporarily signed. Preserve listing success when playback fails and test the same account and file on the site. Do not publish long media links or append account credentials to them. Success covers this source, folder and file, not every upstream cloud service.
+
+## Troubleshoot entry, access and media separately
+
+If folder selection never opens, inspect base address, proxy prefix and authentication. A single protected folder calls for checking path and directory password; normal listing with failed playback points to the upstream URL, network or file. Change one condition at a time and keep failure time and a short message. A working WebDAV source is a comparison through another route, not proof of correct native OpenList API configuration. Server versions and mounts differ; do not disable site-wide access checks or move private content into public folders to obtain a success.
+
+## Record source relationships rather than temporary URLs
+
+Keep the site identifier, start directory, selected scope, sample and separate browsing/playback results. Do not treat a temporary download URL as a permanent file identifier. The [official OpenList API entry](<https://docs.oplist.org/guide/api/>) provides interface context; your server version and account still determine behavior. Restore the sample’s viewing position and retain existing comparison sources. Recheck the small sample after backend remounts, domain changes or permission updates. A surviving poster establishes a stored record, not that its old media route remains valid.
+
+## Related tutorials and sources
+
+[Separate directory access layers](<https://allluckly.cn/en/guides/icouldplay-openlist-directory-access-layers/>), [Choose scan roots](<https://allluckly.cn/en/guides/icouldplay-scan-root-overlap-check/>).
+
+Checked on November 5, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

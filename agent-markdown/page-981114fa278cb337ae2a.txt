@@ -1,0 +1,65 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-s3-path-style-endpoint-check/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Compare S3 path-style and virtual-hosted addressing in iCouldPlay
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-s3-path-style-endpoint-check/
+agent_source_sha256: 1e6bd0959ac9085af72da38ba737958821e1bd0110e0a6fe1207b64446fbf8a2
+agent_generator_version: 1
+---
+{% raw %}# Compare S3 path-style and virtual-hosted addressing in iCouldPlay
+
+Language: en
+Canonical: [Compare S3 path-style and virtual-hosted addressing in iCouldPlay](<https://allluckly.cn/en/guides/icouldplay-s3-path-style-endpoint-check/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-s3-path-style-endpoint-check/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-s3-path-style-endpoint-check/>)
+Published: 2026-11-05T00:00:00+08:00
+Modified: 2026-11-05T09:38:59+08:00
+Author: Bison
+
+Map a bucket and sample key to two address structures, then verify the supported mode without changing unrelated fields.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-s3-path-style-endpoint-check/>), translated on 2026-11-05. Original publication dates, attribution, code and version notes are retained.
+
+A correct S3 endpoint can still be paired with the wrong access style. Path-style places the bucket in the URL path; virtual-hosted-style places it in the hostname. These are not video formats. Map one authorized bucket and object to their address structures, then check the iCouldPlay form. Example domains explain structure rather than providing test servers. Do not put real keys in URLs or disable certificate verification to let an incorrect hostname pass.
+
+## Identify the service-supported mode
+
+Check service documentation or ask the administrator which style the endpoint supports, especially for self-hosted, port-based local or reverse-proxied deployments. A public-cloud virtual-host example does not establish corresponding DNS and certificate configuration on your compatible service. Record the real endpoint, bucket, region and a known key while retaining one complete authorized credential set. Without any known working configuration, establish a setup baseline first rather than comparing several hosts, buckets and modes simultaneously.
+
+## Map the path-style structure with a reserved domain
+
+With illustrative endpoint `https://objects.example.com`, bucket `demo-media` and key `practice/clip.mp4`, the path-style structure is `https://objects.example.com/demo-media/practice/clip.mp4`. This shows the bucket’s position without asking you to construct authenticated playback URLs. Where the form separates endpoint and bucket, retain the base service endpoint and enter the bucket separately. Do not use the entire object address as an endpoint and duplicate the bucket. The current S3 form accepts only scheme, host and any required port, without an extra service subpath. If the deployment requires one, ask its administrator for a compatible endpoint; the object-prefix field cannot bypass this restriction.
+
+## Map the virtual-hosted structure
+
+For the same example, virtual-hosted-style is `https://demo-media.objects.example.com/practice/clip.mp4`: the bucket moves into the hostname and is not repeated in the path. The [AWS virtual-hosting guide](<https://docs.aws.amazon.com/AmazonS3/latest/userguide/VirtualHosting.html>) explains the distinction; the actual compatible deployment determines acceptance. The new hostname must resolve, reach the right service and meet HTTPS requirements. A working base hostname does not establish that its bucket-prefixed variant works. Neither illustrative address needs to be opened with keys in a browser to prove the structure.
+
+## Change only the access-style condition
+
+Locate path-style access in a test source and choose the administrator-supported mode. Hold endpoint, bucket, region, prefix and credentials fixed, recording old and current switch states. If a mode is explicitly unsupported, record that boundary without repeated forced requests. If the installed interface lacks the switch, confirm version and fields rather than simulating it with an altered bucket name or dots. Renaming a bucket or moving objects would also change identity and prevent attributing the result to address style.
+
+## Keep hostname and certificate failures at the address layer
+
+For immediate failure after switching, first verify that the service supports the resulting hostname structure rather than blaming the secret key. Numeric-address deployments particularly need administrator guidance about path-style access; adding a bucket before an IP address does not establish a configured host. HTTPS must match the accessed hostname, and dotted bucket names can add deployment differences. Consult the service documentation without disabling verification or using an untrusted entry. A browser check establishes only the host it actually contacted, not the alternative structure.
+
+## Check listing and object playback separately
+
+After connection testing, enter the same sample prefix, confirm the target and play known beginning and middle anchors. Normal listing with failed reading is a pair of results to preserve, not a reason to toggle repeatedly. Object access can also depend on scope, signing and delivery, which need separate checks with identity fixed. Conversely, a surviving old media link does not establish current listing success. Distinguish new requests from cached display, and mark untested layers instead of using artwork to fill the evidence gap.
+
+## Retain the recommended verified configuration
+
+If the administrator confirms both styles and both work, keep the service-recommended one without claiming clearer pictures or greater speed from either label. Addressing style does not determine image quality, codecs or network conditions. If only one passes, record that configuration and sample result; leave the other unsupported or unresolved instead of inventing a performance explanation. Restore a previously working configuration if the exercise affected a real source, and replay the sample so the everyday entry is not left unverified.
+
+## Document the structure without exposing secrets
+
+Keep a sanitized endpoint/bucket/path diagram with the supported mode, date, versions and listing/playback results. For shared reports, replace private hosts and object names with explicit identifiers; keys, session tokens and signed queries are unnecessary. After a domain migration or proxy change, recheck addressing and certificates before retesting the same file. The useful result explains where the bucket appears and why this deployment uses that mode, rather than assuming one switch should always be on for every service.
+
+## Related tutorials and sources
+
+[Connect to S3](<https://allluckly.cn/en/guides/icouldplay-s3-compatible-source-setup/>), [Check temporary sessions](<https://allluckly.cn/en/guides/icouldplay-s3-temporary-session-expiry/>).
+
+Checked on November 5, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

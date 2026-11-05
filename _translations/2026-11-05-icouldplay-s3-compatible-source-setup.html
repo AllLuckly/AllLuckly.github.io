@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: Connect iCouldPlay to S3-compatible storage
+description: Verify an S3 endpoint, bucket, region, access style and credentials with an authorized sample before
+  checking listing and playback.
+permalink: /en/guides/icouldplay-s3-compatible-source-setup/
+date: '2026-11-05 00:00:00 +08:00'
+modified: '2026-11-05 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 65
+topic: New sources and media paths
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-05-icouldplay-s3-compatible-source-setup.md
+source_url: /guides/icouldplay-s3-compatible-source-setup/
+translation_method: editorial
+translation_source_sha256: a6ef8e1c3f83b86e891a20e144ca738c894e25b195935fa1cadb2a32fb5d09c2
+translation_date: '2026-11-05T01:38:59+00:00'
+excerpt: Verify an S3 endpoint, bucket, region, access style and credentials with an authorized sample before checking
+  listing and playback.
+---
+{% raw %}
+<p>A storage management console and an S3 object endpoint are usually different addresses, and a website password is not an API credential. iCouldPlay 1.1.1 publicly adds S3-compatible storage. Begin with limited reading from an existing service rather than purchasing one, creating long-term keys or migrating a library. Ask its administrator for authorized read configuration and one working video sample. Without them, prepare the required field list instead of testing random online endpoints or somebody else’s keys.</p>
+<h2 id="section-1">Obtain the complete authorized configuration</h2>
+<p>Collect the endpoint, bucket, region, access-key identifier, secret access key, temporary-session status and permitted object prefix. The administrator should also identify path-style or virtual-hosted-style access and the sample’s complete object key. Viewing does not require obtaining a service-wide administrator account for troubleshooting. Transfer secrets through the existing trusted method; the checklist needs only field completeness and an identity identifier. If supplied only a temporary download URL, clarify that this exercise needs source configuration rather than guessing credentials from that URL.</p>
+<h2 id="section-2">Distinguish the endpoint from the management console</h2>
+<p>Choose S3 when adding a source and enter the supplied HTTP or HTTPS API base endpoint. The illustrative <code>https://objects.example.com</code> must be replaced with your trusted service. A console login page, a particular film URL or an <code>s3://</code> object identifier is not that field. The current S3 form accepts an origin consisting of scheme, host and any required port, without a service subpath, bucket or object key. A deployment requiring a subpath may not fit this entry; ask its administrator for a compatible endpoint rather than substituting the object-prefix field for a service prefix. Recheck scheme, host and necessary port. For HTTPS failure, verify the address and certificate rather than disabling validation.</p>
+<h2 id="section-3">Match bucket and region independently</h2>
+<p>Enter only the actual bucket name, without scheme, slash or film name. Use the service’s documented signing region rather than assuming a default fits every compatible provider. The region participates in request signing, and a geographical label on a website may differ from the accepted configuration string. Compare bucket and region exactly without changing region and account together. Record a fixed-region requirement as specific to this source, not universal to S3. A generic test failure does not establish whether the bucket actually exists.</p>
+<h2 id="section-4">Enter one complete credential set</h2>
+<p>Put the access-key identifier and secret in their respective fields; they are not a username and website password. Temporary credentials also require the session token from the same set. Do not combine yesterday’s token with today’s keys. Check for surrounding spaces, truncation and keyboard substitutions without exposing values in recordings or public screenshots. Do not invent a token for long-term credentials. For incomplete temporary credentials, obtain the full authorized set rather than bypassing it. This exercise checks existing read access, without generating new keys or broadening permissions.</p>
+<h2 id="section-5">Set the access style and sample prefix</h2>
+<p>Set path-style access to the service-supported mode rather than simultaneously changing scheme and bucket by trial and error. The <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/VirtualHosting.html">AWS virtual-hosting guide</a> explains address structures; a compatible deployment’s requirements still govern. Narrow browsing to an existing sample prefix such as <code>practice/clips/</code>, without repeating the bucket name there. A browsing prefix is not an authorization policy: narrowing the interface does not restrict the credential itself. Use only an already authorized scope and verify actual object visibility afterward.</p>
+<h2 id="section-6">Verify both listing and one file</h2>
+<p>Use the current connection and folder-selection flow to locate the administrator-confirmed sample before scanning a whole bucket. Compare its name, visible size and hierarchy, then play beginning and middle anchors. Listing and reading media are different requests: seeing an object does not ensure access to its contents. Conversely, one working download link does not establish bucket-list permission. Record normal listing and failed playback separately and ask about the sample’s read scope. A listed filename does not mean a complete offline copy exists on the phone.</p>
+<h2 id="section-7">Change one configuration category at a time</h2>
+<p>For complete listing failure, check endpoint/access style, bucket/region, credential completeness and validity, then permitted prefix. Changing all categories together makes even a success unexplained. For one failing file, hold the connection configuration fixed and verify that object and its readability on the service. Compatible implementations, encryption requirements and object types can differ; an S3 label does not guarantee universal direct use. For help, provide field categories, service name and failure stage while concealing keys, tokens, signed URLs and private object names.</p>
+<h2 id="section-8">Keep a maintainable source description</h2>
+<p>Record a service identifier, sanitized bucket/prefix description, region, access style, sample results and date, while managing credentials separately. Restore the test position and preserve objects without moving or deleting them during setup. After credential rotation, configuration changes or migration, rerun connection, listing and playback on the same sample before normal use. Distinguish saved configuration, visible items and actual playback, rather than treating one source card as acceptance of every file and device.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-s3-object-prefix-identity/">Check prefixes and keys</a>, <a href="/en/guides/icouldplay-s3-path-style-endpoint-check/">Compare S3 access styles</a>.</p>
+<p>Checked on November 5, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

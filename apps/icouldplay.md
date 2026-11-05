@@ -2,18 +2,20 @@
 layout: app
 app_id: icouldplay
 title: 云映 iCouldPlay：iPhone 与 iPad 视频播放器、NAS 与个人媒体库
-description: 了解云映的本地视频、SMB、WebDAV、FTP、媒体服务器、字幕和双引擎播放功能，从 60 篇中文教程中选择自己的使用路线。
+description: 了解云映的本地视频、SMB、WebDAV、FTP、媒体服务器、字幕和双引擎播放功能，从 70 篇中文教程中选择自己的使用路线。
 permalink: /apps/icouldplay/
-modified: 2026-11-04
+modified: 2026-11-05
 ---
 
-云映的英文名是 **iCouldPlay**。它用来播放和整理自己已有的视频：文件可以保存在手机、相册、NAS，也可以由 Emby、Jellyfin、Plex 或绿联云视频提供。先接好内容来源，再整理海报和字幕，会比一开始就扫描整个硬盘更容易排查问题。
+云映的英文名是 **iCouldPlay**。它用来播放和整理自己已有的视频：文件可以保存在手机、相册、NAS，也可以由 Emby、Jellyfin、Plex、Kodi 或绿联云视频提供。先接好内容来源，再整理海报和字幕，会比一开始就扫描整个硬盘更容易排查问题。
 
 ## 从哪一种内容开始
 
 - **手机里的一段视频**：先验证导入、画面方向、声音和续播，熟悉最基本的流程。
 - **NAS 中的文件夹**：按服务器实际提供的协议选择 SMB、WebDAV 或 FTP，确认目录可见后再播放一个小文件。
-- **已经整理好的媒体服务器**：连接自己的 Emby、Jellyfin、Plex 或绿联云视频，核对账户能访问哪些媒体库。
+- **已经整理好的媒体服务器**：连接自己的 Emby、Jellyfin、Plex、Kodi 或绿联云视频，核对账户能访问哪些媒体库。
+
+- **聚合站点与对象存储**：按已授权配置接入 OpenList / AList 或 S3 兼容存储，分别核对目录、权限与实际媒体读取。
 
 这些入口需要的视频和服务器由你自己准备。云映的媒体库是在整理这些内容，并不附带影视资源。
 
@@ -23,12 +25,14 @@ modified: 2026-11-04
 
 教程把这些工作分开：先读[本地视频入门]({{ '/guides/icouldplay-getting-started/' | relative_url }})，有 NAS 的可以继续看 [SMB 连接]({{ '/guides/icouldplay-smb-nas/' | relative_url }})；画面正常之后，再处理[外挂字幕]({{ '/guides/icouldplay-external-subtitles/' | relative_url }})。
 
+新增来源可按 [Kodi 连接]({{ '/guides/icouldplay-kodi-http-library-setup/' | relative_url }})、[OpenList / AList 接入]({{ '/guides/icouldplay-openlist-source-setup/' | relative_url }})和 [S3 兼容存储]({{ '/guides/icouldplay-s3-compatible-source-setup/' | relative_url }})分别建立小样本对照。
+
 ## 遇到卡顿或黑屏，先留下对照
 
 保留同一份视频，分别观察本地播放与远程播放的结果。只有远程路径出问题时，检查服务器与网络；本地也失败时，再核对文件和播放引擎。每次只改变一个条件，保留原文件和服务器设置记录，便于判断哪一步起了作用。
 
-[60 篇完整教程]({{ '/guides/icouldplay/' | relative_url }})从导入、建库一直写到字幕与兼容排查，可以直接按手头的问题查找。
+[70 篇完整教程]({{ '/guides/icouldplay/' | relative_url }})从导入、建库一直写到字幕与兼容排查，可以直接按手头的问题查找。
 
 ## 版本与来源
 
-2026 年 11 月 4 日核对，中国区公开版本为 **1.1.1**，最低要求 iOS / iPadOS 15.0。资料依据[云映官方 App Store 页面](https://apps.apple.com/cn/app/id6755653178)、[Apple 版本查询](https://itunes.apple.com/lookup?id=6755653178&country=cn)及对应功能入口整理。不同文件与服务器的实际表现仍需在自己的设备上检查。
+2026 年 11 月 5 日核对，中国区公开版本为 **1.1.1**，最低要求 iOS / iPadOS 15.0。资料依据[云映官方 App Store 页面](https://apps.apple.com/cn/app/id6755653178)、[Apple 版本查询](https://itunes.apple.com/lookup?id=6755653178&country=cn)及对应功能入口整理。不同文件与服务器的实际表现仍需在自己的设备上检查。

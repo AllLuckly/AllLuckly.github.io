@@ -1,0 +1,65 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-openlist-directory-access-layers/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Separate account, directory and media access in iCouldPlay OpenList sources
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-openlist-directory-access-layers/
+agent_source_sha256: 288010f8fd42f0ab238b2ceb3e20b369132c260b8117bb6c68ff1334969b47fe
+agent_generator_version: 1
+---
+{% raw %}# Separate account, directory and media access in iCouldPlay OpenList sources
+
+Language: en
+Canonical: [Separate account, directory and media access in iCouldPlay OpenList sources](<https://allluckly.cn/en/guides/icouldplay-openlist-directory-access-layers/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-openlist-directory-access-layers/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-openlist-directory-access-layers/>)
+Published: 2026-11-05T00:00:00+08:00
+Modified: 2026-11-05T09:38:59+08:00
+Author: Bison
+
+Use two authorized small folders to distinguish login, directory access, file delivery and temporary-link failures.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-openlist-directory-access-layers/>), translated on 2026-11-05. Original publication dates, attribution, code and version notes are retained.
+
+An OpenList / AList login can succeed while a folder remains inaccessible, and listing a folder can succeed while video delivery fails. These conditions need not share one password solution. After connecting a site, compare an ordinary practice folder with a protected folder you are explicitly permitted to access. Record account identity, directory password and media delivery separately. This is not an access-bypass exercise: without permission, use sample folders you manage rather than guessing another person’s password.
+
+## Establish two known folder conditions
+
+On a site you manage, or with its administrator, establish ordinary folder A and protected folder B with distinguishable disposable self-made videos. The letters are test identifiers, not required directory names. Use the same viewing account on the site to establish listing permissions and any folder-password requirement. If the account is not authorized for B, stop that branch: a directory password is not a substitute for account permission. Keep files and mounts unchanged so differences can be attributed to access conditions rather than moving content.
+
+## Keep one account authentication method
+
+Connect to A using one already verified account/password or authorized site token, keeping the identity fixed. Record the method without recording the secret. A site token differs from an upstream drive token, and a folder password is not another name for the login password. If a connection mixes methods, follow the administrator’s explicit method in a test source and retest A. Avoid experimenting with an active production source or collecting someone else’s browser session to fill fields.
+
+## Check that the starting path is not duplicated
+
+Compare iCouldPlay’s starting path with the site path from ordinary folder A. With `/Practice` as the start, a displayed child `A` already represents `/Practice/A`; do not append `/Practice` again. This checks navigation without renaming real server folders. Select B by its actual site path, preserving case and spaces. A nonexistent start can fail under every credential combination. Establish the path before interpreting access layers, so a repeated prefix does not cause a reset of otherwise correct credentials.
+
+## Use the password for the authorized folder
+
+Where the form provides a directory-password field, enter B’s authorized password there while keeping the same account as A. Do not put it in a path, filename or URL query, where it can enter screenshots or history and may not be interpreted as directory authentication. If a source stores only one folder password, constrain the test to a small scope with consistent rules rather than assuming every subfolder inherits all passwords. Record a denied child folder and ask the administrator about its rule instead of traversing restricted content in bulk.
+
+## Record listing and actual file reading separately
+
+For both A and B, record listing and playback separately. A filename and size establish returned directory information; correct picture and sound establish that this delivery reached playback. Permission or signing checks may also occur when obtaining the media URL, so listing is not equivalent to file access. If B lists but will not play, test that video on the site with the same identity before asking about delivery configuration. Do not repeatedly replace passwords because thumbnails appear: artwork may use another request or an earlier cache.
+
+## Re-enter the source after a temporary link expires
+
+If a previously playable file fails later, select it again through the saved iCouldPlay source and folder instead of permanently retaining an old external URL. Delivery can involve a temporary direct link or proxy route; see the [official common storage settings](<https://docs.oplist.org/guide/drivers/common>) and the current server configuration. If re-entry still fails, compare account session and upstream availability rather than assuming one click renews access. Do not publish signed URLs. A source identifier and failure stage suffice when asking for help.
+
+## Use the comparison to identify the failing layer
+
+If neither A nor B connects, inspect the shared site entry and account. If A works but B fails, check B’s path, account scope and directory password. If both list but neither plays, inspect upstream delivery and network. A single failing file among working neighbors remains a file-specific observation rather than evidence of site-wide authentication failure. Change one condition and record the retest. Disabling all folder protection would change the exercise’s conditions and destroy the access-layer comparison you intended to make.
+
+## Keep scope records and restore the test state
+
+Keep each folder’s visible scope, authentication-method identifier, password requirement, listing/playback results and check date. Retain secrets through the existing trusted method rather than in this checklist. Remove an unnecessary test connection without deleting mounts or original media. Retest both A and B after permission or backend changes before expanding use. State what a particular identity can do in a particular folder, instead of declaring that OpenList is universally supported or universally unusable.
+
+## Related tutorials and sources
+
+[Add OpenList](<https://allluckly.cn/en/guides/icouldplay-openlist-source-setup/>), [Check account scope](<https://allluckly.cn/en/guides/icouldplay-server-account-content-scope/>).
+
+Checked on November 5, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

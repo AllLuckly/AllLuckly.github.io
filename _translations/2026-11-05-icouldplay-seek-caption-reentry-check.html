@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: Check caption re-entry after forward and backward seeking in iCouldPlay
+description: Use three known cues to compare continuous playback and seeking, separating missing text, stale cues
+  and recovery without frame-accurate assumptions.
+permalink: /en/guides/icouldplay-seek-caption-reentry-check/
+date: '2026-11-05 00:00:00 +08:00'
+modified: '2026-11-05 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 70
+topic: Object storage and playback state
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-05-icouldplay-seek-caption-reentry-check.md
+source_url: /guides/icouldplay-seek-caption-reentry-check/
+translation_method: editorial
+translation_source_sha256: 74f8003f4739fcf8f8aebbd4c3618e15d87567f8ef7b66a26aab77173824031d
+translation_date: '2026-11-05T01:38:59+00:00'
+excerpt: Use three known cues to compare continuous playback and seeking, separating missing text, stale cues and
+  recovery without frame-accurate assumptions.
+---
+{% raw %}
+<p>Captions can work during continuous playback yet disappear temporarily or retain an old line after seeking. That calls for checking cue entry and exit, rather than assuming the whole file’s timing is wrong. The public iCouldPlay 1.1.1 release mentions caption display after jumps. Use a self-made clip and three simple cues for a repeatable comparison. Establish that captions match the video and edit only copies. No frame-by-frame acceptance on your device or identical behavior across engines is claimed.</p>
+<h2 id="section-1">Prepare three clearly timed cues</h2>
+<p>Choose a permitted clip of about thirty seconds with a recognizable beginning. Following the existing VTT guide, make a UTF-8 plain-text copy starting with WEBVTT, a blank line, then cue timings/text with blank lines between cues. Use self-written labels A, B and C at <code>00:04.000 --&gt; 00:07.000</code>, <code>00:12.000 --&gt; 00:15.000</code> and <code>00:22.000 --&gt; 00:25.000</code>. These times belong only to the sample. Check structure through an available method, then load the copy through iCouldPlay’s current external-caption route without another duplicate caption file.</p>
+<h2 id="section-2">Establish continuous-playback behavior first</h2>
+<p>Play from beginning to end at normal speed, noting entry and exit of A, B and C and empty gaps. Do not seek, alter offset or switch engine during this baseline. If continuous playback is consistently early or late, check source identity and timing first; resolve structural or edition mismatches too. An integer-second player display does not establish millisecond accuracy. Verify the broad ranges and order. Without reliable continuous behavior, a later difference cannot be attributed specifically to seeking.</p>
+<h2 id="section-3">Seek forward from before the first cue</h2>
+<p>Return to the beginning, play and pause before A, then use the progress control to seek to about thirteen seconds inside B’s range. Observe the actual time and picture, resume for several seconds, and record whether B appears, when, and whether it clears after roughly fifteen seconds. Seeking can land near a keyframe rather than an exact requested frame. Record the actual landing point instead of assuming thirteen seconds means 13.000 exactly. If it lands before B, play through its start before treating blank text as missing.</p>
+<h2 id="section-4">Seek backward into an earlier cue</h2>
+<p>Continue beyond C’s ending, then seek backward to about five seconds inside A. Observe whether stale C clears and A returns. Keep captions and settings unchanged rather than repeatedly disabling/enabling them, which introduces another condition. Interpret a landing outside A by its actual time instead of ignoring it to manufacture a failure. Distinguish paused behavior from behavior after resuming: entry only when playback continues differs from persistently showing the wrong cue. Repeat the same sequence for a meaningful comparison.</p>
+<h2 id="section-5">Seek into a deliberately empty gap</h2>
+<p>While A or B is visible, seek to about eighteen seconds, between B’s end and C’s start. Verify that the picture reaches the gap, observe stale text, then play into C. No text in the gap is expected rather than evidence of loss; if old text remains after a stable landing in the gap, record its actual duration and whether playback is paused or resumed. Describe a brief transition separately from persistent stale text, without waiting for the gap to end before recording it. Check end times against the actual caption copy, not remembered intentions. <a href="https://www.w3.org/TR/webvtt1/">W3C WebVTT</a> explains timed cues, but correct file structure does not replace observing the current playback route.</p>
+<h2 id="section-6">Compare another playback path only after a difference</h2>
+<p>If the same sequence reliably produces missing or stale text, save the result before comparing another engine or route where the interface offers one. Hold media, caption copy, speed, offset and jump order fixed; do not change engine and caption edition together. A working alternative establishes a difference under these conditions, not universal failure of the other path. Without an alternative, retain the minimal reproduction instead of installing unfamiliar tools. Note network rebuffering so blank text before picture recovery is not misclassified as established caption failure.</p>
+<h2 id="section-7">Separate rendering, timing and loading problems</h2>
+<p>If no cues return, first confirm the selected test copy and that playback actually resumed. A missing character points toward character or glyph checks; consistent global offset points to timing; stale text only after a backward jump retains the seek sequence as evidence. Do not apply a global timing shift to every symptom. To continue viewing, use a verified continuous route or available reload control, recording the action. Successful manual recovery is not an automatic repair requiring no intervention.</p>
+<h2 id="section-8">Keep the reproduction table and restore settings</h2>
+<p>Keep a table for continuous playback, forward into B, backward into A and the empty gap, with actual landing point, expected cue, observation and app version. Mark untested routes. A private full film is unnecessary; share this self-made sample and your three cues where permitted. Restore caption choice, speed and position without editing real originals. Retest the same sequence after an update to compare coverage of your conditions. One normal run does not certify every caption format, network or seeking method.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-make-webvtt-practice/">Make three VTT cues</a>, <a href="/en/guides/icouldplay-subtitle-offset-drift/">Check caption timing</a>.</p>
+<p>Checked on November 5, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

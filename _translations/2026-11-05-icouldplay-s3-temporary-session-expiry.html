@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: Check temporary S3 credential sets and expiry in iCouldPlay
+description: Track a complete temporary credential set and distinguish connection, listing refresh and new playback
+  from cached results.
+permalink: /en/guides/icouldplay-s3-temporary-session-expiry/
+date: '2026-11-05 00:00:00 +08:00'
+modified: '2026-11-05 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 67
+topic: Object storage and playback state
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-05-icouldplay-s3-temporary-session-expiry.md
+source_url: /guides/icouldplay-s3-temporary-session-expiry/
+translation_method: editorial
+translation_source_sha256: 4f4448d6769574c48fa86931c2eb1fae646833719326589484a5dbb3536f1d17
+translation_date: '2026-11-05T01:38:59+00:00'
+excerpt: Track a complete temporary credential set and distinguish connection, listing refresh and new playback
+  from cached results.
+---
+{% raw %}
+<p>A temporary S3 configuration may work and later fail because of expiry, network changes or file conditions. An old visible listing does not establish current credential validity. Use an already authorized temporary session to verify matching fields during its lifetime, then repeat a few checks after normal rotation. There is no need to interrupt real activity deliberately, and automatic credential acquisition by iCouldPlay is not assumed. Make changes only within existing authorization and trusted delivery methods.</p>
+<h2 id="section-1">Identify a temporary session, not a download URL</h2>
+<p>Ask the authorized administrator whether the material is temporary credentials and how expiry is expressed. A complete set normally includes access-key identifier, secret access key and session token, with an administrator-provided expiration time. A signed media URL is a different object, not a source-form credential set. Do not infer type from string length or a few leading characters. If access is limited to a particular download link, honor that scope rather than seeking higher access for the exercise. Establish the type before interpreting changing lifetimes.</p>
+<h2 id="section-2">Record expiry with its timezone</h2>
+<p>In a secret-free record, note a session identifier, acquisition time, expiry and timezone. Check for obvious device clock errors. Do not read a UTC timestamp as local time or move the device clock forward to simulate expiration. Ask the administrator when remaining validity is unclear; old visible files are not evidence. Recording timezone supports review rather than changing authorization duration. The <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html">AWS temporary-credential guide</a> explains that editing a local expiry note cannot extend expired credentials.</p>
+<h2 id="section-3">Keep all three fields from the same session</h2>
+<p>Using the available configuration flow or a separate test source, enter the identifier, secret and session token from one complete set. Do not replace only the token while retaining an old secret, or combine fields from different users. Check copied long tokens for truncation, line wrapping and surrounding spaces without using public online tools. If the installed interface lacks the field, record that version and limitation instead of appending a token to the endpoint query. Establish completeness before network tests rather than obscuring a missing field through repeated failed requests.</p>
+<h2 id="section-4">Establish three checks during validity</h2>
+<p>While credentials are valid, check connection, a fresh folder listing and new playback of a short authorized video. Verify a content anchor rather than old artwork. Perform the three near one another to avoid crossing an expiry boundary and mistaking it for different list/read permissions. If the identity intentionally lacks listing rights, record that scope rather than covering it with new authorization. Resolve an unsuccessful baseline check before attributing subsequent failures to expiry.</p>
+<h2 id="section-5">Replace the complete set after normal rotation</h2>
+<p>After the administrator supplies a new temporary session through the established process, retain old results without storing old secrets in ordinary notes. Pause playback and replace all three fields through a supported edit flow. If this version requires adding a source, create a clearly named test connection and preserve its relationship to the old one before deletion. Hold endpoint, bucket, region and sample fixed. Writing a new expiry date beside old keys does not renew them: authorization is server state, not a date in a note.</p>
+<h2 id="section-6">Verify new requests rather than cached displays</h2>
+<p>Re-enter the source after replacement, use its available refresh or folder-opening flow to inspect the known sample, and start playback from that source again. A few seconds of continuing old playback do not prove new credentials work: buffering or earlier delivery can influence the observation. Clearing the entire app cache is unnecessary. If refresh status is unclear, record the actual leave/re-enter/open sequence and mark unproven points unknown. Compare the same three checks under the new session.</p>
+<h2 id="section-7">Separate expiry from other failures</h2>
+<p>Old-set failure and new-set success with unchanged network and object support an authorization-lifetime or rotation explanation, alongside administrator records. If both fail, inspect endpoint, network, prefix and service availability rather than requesting endless new credentials. One failing object calls for its read scope and file conditions. A signed media link has its own lifetime and is not identical to account-session expiry; re-entering a source cannot bypass an expired session. Report times, set identifiers and failure stages without signatures or secrets.</p>
+<h2 id="section-8">Finish within the original authorization process</h2>
+<p>Keep field-completeness checks, time references, baselines and post-rotation results, then return maintenance to the established authorization process without converting temporary access to permanent access. Remove an unnecessary test connection while preserving original objects and real viewing records. Manage sensitive material through the existing trusted method, not a public ticket. The completed record identifies the session, request times and remaining unknowns. It does not guarantee automatic renewal or unlimited playback duration across all compatible services.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-s3-compatible-source-setup/">Set up an S3 source</a>, <a href="/en/guides/icouldplay-expired-link-versus-buffering/">Distinguish link failures</a>.</p>
+<p>Checked on November 5, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

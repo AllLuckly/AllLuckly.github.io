@@ -1,0 +1,65 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-s3-object-prefix-identity/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Check S3 prefixes and object-key identity in iCouldPlay
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-s3-object-prefix-identity/
+agent_source_sha256: cb78e49794a7a0a291962fbbd61c8d612f3c38eea7ae3508b6d0e4d235856a7a
+agent_generator_version: 1
+---
+{% raw %}# Check S3 prefixes and object-key identity in iCouldPlay
+
+Language: en
+Canonical: [Check S3 prefixes and object-key identity in iCouldPlay](<https://allluckly.cn/en/guides/icouldplay-s3-object-prefix-identity/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-s3-object-prefix-identity/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-s3-object-prefix-identity/>)
+Published: 2026-11-05T00:00:00+08:00
+Modified: 2026-11-05T09:38:59+08:00
+Author: Bison
+
+Compare bucket, prefix and relative path with three self-made objects while preserving key names and characters.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-s3-object-prefix-identity/>), translated on 2026-11-05. Original publication dates, attribution, code and version notes are retained.
+
+S3 folder-like hierarchy commonly comes from object-key prefixes rather than real filesystem directories. Starting from a working source, use three permitted samples to check bucket, prefix and relative path. Learn the displayed scope and why identical basenames can represent different objects, without renaming real media or assuming every service-valid special key works in the app. Preserve the identity of an unsupported name instead of silently rewriting it to another file and declaring success.
+
+## Prepare three distinguishable objects
+
+Within an authorized small scope, use illustrative keys such as `practice/red/clip.mp4`, `practice/blue/clip.mp4` and `practice/blue/Clip.mp4` for three self-made videos. Creation and case preservation depend on your service; record an unavailable third sample rather than renaming real films to force one. Give the videos distinct picture content to avoid basename confusion. Existing permitted samples also work if the administrator confirms complete keys and bucket. Keep that reference list private instead of publishing sensitive paths.
+
+## Separate bucket and object key
+
+Write bucket and complete object key in separate columns rather than repeating the bucket as the key’s first segment. Both identify an object; a final basename such as `clip.mp4` alone is insufficient. The [AWS prefix guide](<https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-prefixes.html>) explains a prefix as initial key characters used for organization, not a synonym for a physical directory entity. Begin with ordinary slash-separated samples instead of introducing every complex service-valid name before distinguishing the basic compatibility boundaries.
+
+## Interpret the browsing root after setting a prefix
+
+With an object prefix of `practice/`, displayed `red` and `blue` are already inside that scope. Selecting `blue/clip.mp4` corresponds to `practice/blue/clip.mp4`, without repeating `practice`. Do not enter a console URL or `s3://bucket/` as the prefix, or add a leading slash merely to resemble an absolute filesystem path. Follow the current field guidance and verified service configuration, then map each sample. If hierarchy differs, pause scanning and correct the starting scope first.
+
+## Identify same-name objects by their full relationship
+
+Open the red-folder sample and then the lowercase blue-folder sample, comparing picture content with the reference list. Record source, bucket, prefix, relative path and content rather than merely “played clip twice”. If metadata presents similar posters, return to file/source identity before bulk matching changes. A remembered position may start in the middle, so deliberately verify the opening. Once the two objects are distinguished, compare viewing state without assuming a shared title means progress should merge automatically.
+
+## Preserve case and ordinary key characters
+
+Compare lowercase `clip.mp4` and capitalized `Clip.mp4` in the blue scope, verifying that the service treats them as distinct and whether the app displays and plays both. Do not infer remote case behavior from the phone’s file manager. Establish original spaces, Chinese characters and punctuation without manually replacing spaces with plus signs or entering percent-encoded names; the request layer may already encode them. If a name is missing, retain its exact identity and failure stage rather than declaring the object lost from the bucket.
+
+## Do not normalize unusual keys into other objects
+
+A service may allow repeated slashes, standalone dot segments or backslashes, while iCouldPlay organizes this source using representable relative hierarchies. Do not assume all such keys work. The [AWS object-key guide](<https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html>) helps distinguish service rules from client compatibility. Preserve an unsupported real object; if authorized, test a separately named ordinary copy. Do not normalize `a/../b` to `b` and call it the original. A changed key changes the object identifier and must be recorded as such.
+
+## Check scope before interpreting an incomplete list
+
+For a missing sample, compare bucket, prefix, case and actual account scope before checking that the object still exists on the service. One absent page entry is not a reason to recreate the source. Retry the verified small folder and note whether the same object is missing each time. Expanding to the entire bucket introduces more conditions rather than locating a known key cleanly. Report specific sanitized missing and working keys for review, without presenting a guessed pagination cause as established fact.
+
+## Keep the path map and originals
+
+Keep each sample’s bucket, complete key, configured prefix, displayed relative path and playback result, without secrets. Restore progress and clean only disposable copies after confirming their status; retain originals. After changing a prefix, remap the display root to complete keys rather than reusing relative paths without their changed starting scope. The completed check identifies one unambiguous bucket/key from a displayed item and locates any unsupported original, instead of inferring file identity from similar folder appearance.
+
+## Related tutorials and sources
+
+[Connect to S3](<https://allluckly.cn/en/guides/icouldplay-s3-compatible-source-setup/>), [Distinguish names and URLs](<https://allluckly.cn/en/guides/icouldplay-filename-url-character-check/>).
+
+Checked on November 5, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}
