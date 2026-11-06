@@ -2,10 +2,10 @@
 layout: app
 app_id: nas_book
 title: 'Book Isle: Ebook Reader for iPhone and iPad'
-description: Learn about Book Isle local imports, WebDAV, SMB, OPDS, Calibre, notes and reading-data sync through a 90-tutorial
+description: Learn about Book Isle local imports, WebDAV, SMB, OPDS, Calibre, notes and reading-data sync through a 100-tutorial
   learning path.
 permalink: /en/apps/nasbook/
-modified: 2026-11-05
+modified: 2026-11-06
 lang: en
 source_url: /apps/nasbook/
 ---
@@ -39,10 +39,14 @@ Bookmarks mark places to revisit, notes hold your thoughts, and tags or reading 
 
 ## Learning path
 
-The [90 Book Isle tutorials]({{ '/en/guides/nasbook/' | relative_url }}) cover a first import, shelf organisation, reading different formats, NAS connections, Calibre and data sync. Each focuses on a task and includes a way to check the result.
+The [100 Book Isle tutorials]({{ '/en/guides/nasbook/' | relative_url }}) cover a first import, shelf organisation, reading different formats, NAS connections, Calibre and data sync. Each focuses on a task and includes a way to check the result.
 
 Book Isle centres on ebooks and reading records. For a collection mainly made of comics, also see [ManYue]({{ '/en/apps/manyue/' | relative_url }}) and choose according to your file types and library source.
 
 ## Version and sources
 
-Checked on 5 November 2026: the China App Store listed **1.1.3**, requiring iOS or iPadOS 15.6 or later. This introduction uses the [Book Isle App Store page](https://apps.apple.com/cn/app/id6766198898), [Apple’s lookup API](https://itunes.apple.com/lookup?id=6766198898&country=cn) and relevant feature entry points. You provide the book files and servers; Book Isle does not include an online bookstore.
+Checked on 6 November 2026: the China App Store listed **1.1.4**, requiring iOS or iPadOS 15.6 or later. This introduction uses the [Book Isle App Store page](https://apps.apple.com/cn/app/id6766198898), [Apple’s lookup API](https://itunes.apple.com/lookup?id=6766198898&country=cn) and relevant feature entry points. You provide the book files and servers; Book Isle does not include an online bookstore.
+
+## Checks for version 1.1.4
+
+The public update covers reader menus and return interactions, smart-shelf groups and filters, note-result counts and export selection, individual failed-import retries and readable-version identification. Check interface state, actual results and completion separately. Requeued does not mean successfully imported, and a managed format is not necessarily directly readable.

@@ -1,0 +1,65 @@
+---
+layout: null
+permalink: /en/guides/nasbook-import-retry-status-boundaries/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Book Isle import states: distinguish requeued, processed and manual handling'
+agent_source_url: https://allluckly.cn/en/guides/nasbook-import-retry-status-boundaries/
+agent_source_sha256: 7d969cc4af08f1705db94d5459e8a887610b96e1d9071d6e94b59b4e1fffc243
+agent_generator_version: 1
+---
+{% raw %}# Book Isle import states: distinguish requeued, processed and manual handling
+
+Language: en
+Canonical: [Book Isle import states: distinguish requeued, processed and manual handling](<https://allluckly.cn/en/guides/nasbook-import-retry-status-boundaries/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/nasbook-import-retry-status-boundaries/>)
+English: [English HTML](<https://allluckly.cn/en/guides/nasbook-import-retry-status-boundaries/>)
+Published: 2026-11-06T00:00:00+08:00
+Modified: 2026-11-06T12:13:22+08:00
+Author: Bison
+
+Use 1.1.4 messages to distinguish local resolution, shared requeueing and ineligible retry items, retaining evidence and checking the bookshelf rather than equating acceptance with completion.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/nasbook-import-retry-status-boundaries/>), translated on 2026-11-06. Original publication dates, attribution, code and version notes are retained.
+
+After retrying an import, the important question is which state resulted, not simply whether the button responded. Book Isle 1.1.4 publicly distinguishes requeueing and manual handling. Build a state log from existing authorised records without editing private queue files. Sources can behave differently, and acceptance or queueing alone never independently establishes successful book-content import.
+
+## Create a state record for one item
+
+Choose an existing failure in Import Queue and log title, source, record time, error, current message and retry availability. Record actual display; do not manufacture a failure. Use an ordinary external document rather than assuming these custom fields exist in-app. Retain necessary nonprivate evidence before retrying instead of interpreting from memory. Record filter scope separately from the overview: an absent row may be filtered, not successful. Establish identical item identity before comparing states over time.
+
+## Distinguish local, shared and migration sources
+
+Distinguish displayed local, shared, migration or other sources instead of merging matching titles. Current implementation can process eligible local failures and requeue available shared content; migration may require selecting an original manifest again, following this version’s message. Source names guide handling without guaranteeing every row is retryable. Missing source files or repeated failure can require manual handling too. Record source, available action and outcome separately rather than assuming every retry follows one pipeline.
+
+## Understand the limited meaning of requeued
+
+Requeueing a shared failure resubmits available content for later work; it does not establish a readable book. Record message time, wait for actual processing and then inspect queue and bookshelf. A displayed one may count one resubmitted task, not one successful book. Network, content-availability or parsing problems can still follow. Retain later errors rather than treating initial feedback as final, and do not repeatedly tap to hurry work: repeated requests obscure which action produced which result.
+
+## Verify existing-copy resolution in processed results
+
+A processed local item can be newly completed or an old failure resolved because a same-format copy already exists. Check bookshelf name, source, format and text rather than judging solely by additions. Do not duplicate a readable existing book to prove retry; an unopenable entry still lacks reading verification. Processing counts and content verification are separate. Log newly added, readable and still-listed failure independently rather than letting one processed label answer all three.
+
+## Return to the relevant source for manual handling
+
+When manual handling is shown, read its explanation instead of seeking an automatic-retry switch. For an unavailable local source, verify the original and reselect through normal import. For lost shared files/links, reshare authorised content from the originating app. For migration requiring a manifest, verify manifest/file correspondence. Do only the applicable route, not all three. Do not edit databases, borrow credentials or clear successful books. Manual handling requires material or action; it is neither permanent format rejection nor permission to delete originals.
+
+## Accept requests and content verification separately
+
+For one target, record action and message time, then open the book and inspect opening and later text; for shared web content, check its actual body, not title alone. Covers or summaries do not establish complete acquisition. Without readable results, retain pending or failed rather than renaming accepted request as successful import. Keep the version fixed and log source changes separately. Preserve originals and evidence before cleanup: removing a record does not repair content, and unverified items should not be deleted merely to make the table look resolved.
+
+## Leave and return to inspect later state
+
+Leave queue and bookshelf, then re-enter the same source and item to inspect later changes. Keep initial message and current result in separate timed fields without combining different items’ counts. For a missing failure and missing book, inspect filters, namesakes and source rather than immediately reimporting the full batch. For continued failure, preserve the latest error and choose source repair, reshare or waiting instead of repeating an unchanged action. Report an authorised sample and precise steps without private files, URL tokens or directory inventories.
+
+## Finish a source- and time-specific state conclusion
+
+Finish by distinguishing accepted request, requeued work, manual requirements and verified body content. Queueing leaves completion unestablished; processing may resolve an existing copy; manual handling means source work rather than clearing records. Unknown and pending outcomes are valid. Preserve source, action, message, content result and next step so a later reader knows the verification boundary rather than seeing an unsupported success tick.
+
+## Related guides and sources
+
+[Book Isle single-item import retry: retain successes and verify one sample](<https://allluckly.cn/en/guides/nasbook-failed-import-single-item-retry/>); [Book Isle batch import: move an old collection with a clear audit trail](<https://allluckly.cn/en/guides/nasbook-batch-import-audit/>).
+
+Checked on November 6, 2026: [Apple public version information](<https://itunes.apple.com/lookup?id=6766198898&country=cn>) lists Book Isle 1.1.4, requiring iOS / iPadOS 15.6 or later. Feature scope follows the [official App Store description](<https://apps.apple.com/cn/app/id6766198898>) and the installed version. This article provides reading and checking methods you can perform; it does not claim step-by-step physical-device or private-server testing. Manual records, external tools and actually visible controls are identified separately, and personal analysis or code observations are not presented as verified automatic capabilities.
+{% endraw %}

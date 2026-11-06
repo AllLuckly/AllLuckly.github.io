@@ -1,0 +1,65 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-webvtt-overlapping-cue-intervals/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Check overlapping WebVTT cue intervals in iCouldPlay
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-webvtt-overlapping-cue-intervals/
+agent_source_sha256: 1ef2f8b241f03d83f3fa23171602b16ed843042c23d61646e0f02aadc0105bab
+agent_generator_version: 1
+---
+{% raw %}# Check overlapping WebVTT cue intervals in iCouldPlay
+
+Language: en
+Canonical: [Check overlapping WebVTT cue intervals in iCouldPlay](<https://allluckly.cn/en/guides/icouldplay-webvtt-overlapping-cue-intervals/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-webvtt-overlapping-cue-intervals/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-webvtt-overlapping-cue-intervals/>)
+Published: 2026-11-06T00:00:00+08:00
+Modified: 2026-11-06T12:13:22+08:00
+Author: Bison
+
+Create two intersecting cue intervals, calculate exclusive and overlap ranges, then observe the current playback route.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-webvtt-overlapping-cue-intervals/>), translated on 2026-11-06. Original publication dates, attribution, code and version notes are retained.
+
+Two simultaneous lines can come from intersecting cues in one file rather than two loaded tracks. This exercise differs from switching burned-in versus external captions: create one two-cue WebVTT sample, check its intervals and observe iCouldPlay. Use your own text and permitted video. Standard-permitted overlap is not a guarantee of full layout compatibility in every engine, and one result does not certify the whole parser.
+
+## Prepare one copy containing only two cues
+
+Use a self-made clip of about fifteen seconds and save a UTF-8 plain-text caption copy following the existing VTT guide. Start with WEBVTT and a blank line. Set A to `00:04.000 --> 00:08.000` followed by your label, then a blank line and B at `00:06.000 --> 00:10.000` followed by its label. Omit colour, positioning and speaker tags initially. Name the overlap test separately and retain media and draft rather than globally editing real captions. Check arrows, blank lines and increasing start/end times before loading.
+
+## Map exclusive and overlap ranges first
+
+Divide time into before four, four-to-six, six-to-eight, eight-to-ten and after ten seconds. Each cue lasts four seconds; their two-second intersection is six-to-eight. Adding durations does not produce eight seconds of continuous coverage: their union spans four-to-ten, six seconds. These ranges explain the sample without millisecond claims from integer player time. Log A only, overlap, B only and no cue, and observe against that map without extrapolating film dialogue rhythm.
+
+## Confirm that only the test file is selected
+
+Open the matching video and select this copy through the available caption route. Check other language tracks or previously loaded files. A clean self-made clip is easier than confusing burned-in text with VTT. Record route, selected captions and speed, initially normal. Mark unavailable loading controls honestly rather than assuming every network source supports identical steps. Isolate intervals inside one file instead of changing two inputs together.
+
+## Play continuously through all five ranges
+
+Play from the start and record A entering, B joining, A ending, B ending and the final gap. The current route may display both cues or only part of the overlap; record observation rather than ticking the expected table. Note position changes without styling edits. Resolve a global offset or media mismatch before testing overlap, rather than adjusting timing simultaneously. Repeat the same sequence at least twice to distinguish stable behavior from loading delays instead of relying on one paused screenshot.
+
+## Compare seeking into the overlap separately
+
+After the continuous baseline, seek to about seven seconds, verify the actual landing is inside six-to-eight, then play beyond eight and ten. Direct entry and continuous entry can differ; retain both. A seek-only omission calls for the existing re-entry checks with the jump sequence preserved. Repeated caption toggles or rapid dragging would introduce new conditions rather than establish simultaneous display. Record approximate ranges where landing precision is unclear, not an exact frame at seven seconds.
+
+## Create a non-overlapping control
+
+Keep the overlap version and make a separately named control with B at eight-to-twelve and A still four-to-eight, retaining text and video. Check the revised interval and load it for another continuous pass. Both cues working separately but only one during overlap describes a route limit rather than automatic file corruption. If the control also fails, inspect structure, selection and characters before blaming overlap. Keep both results rather than overwriting the first and reconstructing it from memory.
+
+## Separate specification from implementation observations
+
+[W3C WebVTT](<https://www.w3.org/TR/webvtt1/>) permits intersecting subtitle-cue intervals; this differs from universal layout compatibility in a particular app. The sample is a subtitle track, not chapter navigation, so do not mechanically transfer rules to all text-track types. Record specification source and installed version. Compare another offered engine with the same copy, without changing files. Your two original cues and permitted short clip suffice for support rather than publishing a private film or complete restricted captions.
+
+## Finish with the interval map and restore settings
+
+Keep both timing tables, continuous/seek results, route and unverified scope. Restore original caption choice and speed while organizing test copies without affecting media. For real editing, decide whether simultaneous information is needed before arranging timing and layout; do not remove necessary text merely for uniformity. Recheck small samples after changing media or caption format. The goal is to explain when cues are simultaneously active and what this route actually displays, not certify complex captions universally.
+
+## Related tutorials and sources
+
+[Make a minimal VTT file](<https://allluckly.cn/en/guides/icouldplay-make-webvtt-practice/>), [Check caption re-entry](<https://allluckly.cn/en/guides/icouldplay-seek-caption-reentry-check/>).
+
+Checked on November 6, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

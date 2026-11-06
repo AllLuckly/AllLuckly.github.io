@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint order-four Latin squares: check one to four in every row and column'
+description: Place sixteen numbers manually, verify 1–4 in each row/column and use a swap test to show why one-row
+  checks are insufficient.
+permalink: /en/guides/vectorpaint-four-order-latin-square/
+date: '2026-11-06 00:00:00 +08:00'
+modified: '2026-11-06 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 120
+topic: Quantity and spatial rules
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-06-vectorpaint-four-order-latin-square.md
+source_url: /guides/vectorpaint-four-order-latin-square/
+translation_method: editorial
+translation_source_sha256: 73745b786eb798be207cd1769f39673152bf94f272173d752b6697295d2bbc5f
+translation_date: '2026-11-06T04:13:22+00:00'
+excerpt: Place sixteen numbers manually, verify 1–4 in each row/column and use a swap test to show why one-row checks
+  are insufficient.
+---
+{% raw %}
+<p>An order-four Latin square has 1–4 once per row and column. Use only that rule, without Sudoku subgrid restrictions. Build one complete static answer, then deliberately alter a row to inspect column conflicts. The app supplies text/grid layout, not unique-solution generation, hints or a solving program.</p>
+<h2 id="先写行列规则而非借用数独名称">State the row/column rule without importing Sudoku</h2>
+<p>Create an 800 by 800 pixel canvas with sixteen cells, rows A–D top to bottom and columns 1–4 left to right. Each row/column contains 1–4 exactly once. Do not check 2×2 boxes or call a filled grid uniquely solvable. Put the rule beside an evenly weighted grid without bold middle lines suggesting Sudoku boxes. Distinguish headers from entries. Count sixteen empty cells and exclude a duplicate outer row before adding text.</p>
+<h2 id="保存一份可逐行核对的完整来源">Save a complete row-checkable source</h2>
+<p>Use rows 1234,2341,3412,4123 and save them externally rather than guessing missing numbers from a screenshot. Each row contains one set in shifted order; inspect rows and then columns. Row 2/column 2 is 3, not 2 because its indices match. Keep one text size/bounds and black-on-light appearance, without colour encoding correctness. Save the full answer before making blanks so the only source cannot be lost through deletion.</p>
+<h2 id="文字对格中心不改数字身份">Centre text without changing numerical identity</h2>
+<p>Use one text object per cell, centred against references without dragging headers inside. Change copied content before positional checks so aligned copies do not retain one number. Optical adjustment for narrow 1 must not alter spacing. Hide headers to read sixteen entries, then restore coordinate identification. Row grouping may aid selection, but exclude neighbouring lines when moving. Text does not update numerically from changed coordinates; every rearrangement needs the master list.</p>
+<h2 id="行与列做两轮独立集合检查">Check row and column sets independently</h2>
+<p>Check complete nonrepeating 1–4 sets in four rows, then independently in four columns: 1234,2341,3412,4123. Row success is not column success. A sum of 10 is insufficient: 1144 also sums to 10 but lacks 2/3. Track seen-value sets manually without assuming a Latin-square validator. Only rows/columns matter; repeated 2 in the top-left 2×2 is not an error here. Do not add a subgrid condition afterward and reject the source.</p>
+<h2 id="交换同一行两数观察列错误">Swap two values within one row to reveal column failures</h2>
+<p>In a copy, swap the first two entries of row one to 2134. The row remains complete, but column one becomes 2234 and column two 1341, repeating 2 and 1 respectively. Record both conflicts; unchanged row sum does not mean unchanged validity. Columns three/four and other rows remain fixed, isolating effects. Restore or separately name the error example. This motivates two-direction audits, not unique-solution or automatic-error-detection claims.</p>
+<h2 id="留空练习与答案版本清楚分开">Separate blank exercises from answer versions</h2>
+<p>For practice, save a copy and hide a few entries with their coordinates recorded. Blank is not zero or a fifth symbol. Without uniqueness analysis, call the full grid a reference completion, not the only solution. Match exercise/answer IDs rather than pairing a different arrangement as uniquely correct. Colour hints are manual annotations, not software advice. Retrieve the original from the exercise before sharing; Sudoku-like appearance does not impose unwritten box/diagonal rules.</p>
+<h2 id="导出后检查十六格与规则文字">Inspect sixteen cells and rule text after export</h2>
+<p>Save blank exercise, full completion and swap test. Read actual-size exported numbers with strokes clear of text. Check monochrome and changed backgrounds; white cell fills are not holes. Name order-four Latin square, exercise/answer and revision and confirm row one is restored. Retain row/column lists for editable delivery and recheck glyphs/positions after font changes. This static page has no input fields or marking engine. Keep the no-subgrid condition even with cropped sharing.</p>
+<h2 id="数字看似齐全时仍逐列回查">Still inspect columns when the grid looks complete</h2>
+<p>For repeated row values, check unchanged copied text before colour edits. Correct rows with two wrong columns suggest an in-row swap. If sixteen objects include headers, hide outside labels and recount entries. Mismatched blanks/answers need coordinates/revisions, not guessed filler. Recheck sixteen cells, four rows, four columns and explicit rules against the list. Neat numerical layout alone does not establish constraints; the exercise should explain them.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-word-square-grid/">VectorPaint small word squares: check row words, column words and blanks</a>, <a href="/en/guides/vectorpaint-invented-two-flag-code/">VectorPaint invented two-flag cards: audit sixteen combinations through rows and columns</a>.</p>
+<p>Sources checked on November 6, 2026: VectorPaint 1.0.8, requiring iOS / iPadOS 17.0 or later. Capability scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store description</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn">Apple public version lookup</a>. These are exercises and checks you can perform, without a claim of step-by-step physical-device testing or verification in every target environment. Example content is instructional; follow the controls in your installed version.</p>
+{% endraw %}

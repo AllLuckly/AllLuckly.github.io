@@ -10,7 +10,7 @@ DNS-AID 对应代理服务发现草案，本站没有相应代理服务。不为
 
 ## 已实现的内容表示
 
-- 中英文 337 组页面对应 674 份 Markdown：624 篇文章表示与 50 个入口页表示，路由由 `_data/translations.yml` 中的完整配对决定。
+- 2026-11-06 维护批次：中英文 721 组页面对应 1,442 份 Markdown：1,392 篇文章表示与 50 个入口页表示，路由由 `_data/translations.yml` 中的完整配对决定。
 - 每个页面增加 `index.md` 路径。旧技术文章没有尾斜线时，同样在原路径后追加 `/index.md`，不更改 HTML canonical。
 - Markdown 来自真实构建的正文，包含署名、原始发表和修改日期、转载出处、历史适用说明、翻译声明、表格、代码、图片、视频入口、章节和字幕；移除重复导航与筛选控件。
 - 36 个分层 `llms.txt` 将入口、App、学习路线、技术主题和作品分开。顶层指向小目录，叶目录附标题、摘要、版本基线或历史日期，直接链接正文 Markdown。没有把全站全文挤进一个文件。
@@ -31,7 +31,7 @@ Worker 只对清单中的真实公开页面，在明确接受 Markdown 时获取
 
 响应包括真实 HTTP `Link`（canonical、Markdown alternate、sitemap、阅读目录）、统一 Content Signals，以及 HTML/Markdown 的 `Vary: Accept`。Markdown 与 HTML 在源站使用不同缓存路径；Markdown 保留自己的 ETag、Last-Modified，不复用 HTML 校验值。Markdown 忽略 Range 与 If-Range，返回完整的 200 正文并声明 `Accept-Ranges: none`；源站压缩字节的分段响应可能被边缘解压为空，不能照搬。普通 HTML 与视频继续保留源站的分段读取行为。条件请求仍可返回 304，直接 Markdown 的 304 同样包含类型与 `Vary: Accept`。
 
-发布顺序：先发布 GitHub Pages 静态正文，再在有权限的 Cloudflare 会话里部署该 Worker 并关联 `allluckly.cn/*`。可在官方 Wrangler 环境中执行：
+发布顺序：先发布 GitHub Pages 静态正文，再在有权限的 Cloudflare 会话里部署该 Worker 并关联 `allluckly.cn/*`。页面路由清单会编译进 Worker；新增教程后必须重新打包当前 manifest，并在 Pages 成功后更新现有 Worker。仅提交和推送 GitHub 不会自动更新已部署的清单。同步目录时保留现有代码逻辑、路由和安全设置，部署后抽查新增中英文 URL 的 Markdown 协商。可在官方 Wrangler 环境中执行：
 
 ```sh
 wrangler deploy --config cloudflare/wrangler.toml
