@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint five-node weighted routes: sum edge weights before comparing paths'
+description: Draw an invented undirected five-node/seven-edge graph, enumerate simple routes and check minimum total
+  weight without reading distance from line length.
+permalink: /en/guides/vectorpaint-five-node-weighted-routes/
+date: '2026-11-07 00:00:00 +08:00'
+modified: '2026-11-07 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 130
+topic: Quantity, logic and paths
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-07-vectorpaint-five-node-weighted-routes.md
+source_url: /guides/vectorpaint-five-node-weighted-routes/
+translation_method: editorial
+translation_source_sha256: c72b3c3f38b75a3b642e567f4f2c1e7c30b7a4046e45d782386767939ee0a267
+translation_date: '2026-11-07T01:41:37+00:00'
+excerpt: Draw an invented undirected five-node/seven-edge graph, enumerate simple routes and check minimum total
+  weight without reading distance from line length.
+---
+{% raw %}
+<p>Define shortest as total edge weight, not drawn line length. Compare routes manually in a five-node, seven-edge undirected graph with positive invented costs. The app draws nodes/edges/text without shortest-path search or real navigation, and highlighting a route is not algorithm validation.</p>
+<h2 id="先固定五节点和七条无向边">Fix five nodes and seven undirected edges</h2>
+<p>Create a 1200 by 800 pixel canvas with A–E, start A/end E. Edges are AB=2, AC=5, BC=1, BD=4, CD=1, CE=6, DE=2, all bidirectional with no implicit links. Weights are invented costs, not minutes/kilometres; drawn length encodes none. Save the unique-edge list externally and do not treat a crossing as a sixth node. Layout may change for readability without changing weights. No real traffic interpretation is included.</p>
+<h2 id="先画节点再按清单逐边连接">Draw nodes first, then connect from the list</h2>
+<p>Use equal node circles with clear names and label/weight space. Audit endpoints per edge, then neighbours: A:B,C; B:A,C,D; C:A,B,D,E; D:B,C,E; E:C,D. Mutual lists must agree. State that arrowless edges are bidirectional rather than guessing from stroke ends. Reposition for fewer crossings without deleting listed edges. Ordinary paths do not reconnect automatically after node movement; inspect every attachment.</p>
+<h2 id="边权放在对应边旁不共享模糊标签">Place each weight beside its own edge</h2>
+<p>Place 2,5,1,4,1,6,2 beside their respective edges, distinct from node names. Two 1s are separate edge labels, not one floating shared value. Trace endpoints without decoration before reading weights. Keep labels off crossings; any leader must not imply another connection. Positive weights later explain why cycles cannot reduce cost, so do not silently insert zero/negative values. Keep list and image aligned rather than editing only external costs.</p>
+<h2 id="逐段相加比较七条简单路线">Sum seven simple routes edge by edge</h2>
+<p>The seven nonrepeating A→E routes are ABCDE=2+1+1+2=6; ABCE=9; ABDCE=13; ABDE=8; ACBDE=12; ACDE=8; ACE=11. Verify every consecutive edge exists before summing; node IDs/drawn lengths are not costs. Six is lowest, selecting ABCDE under these exact rules/weights. Comparing only two candidates would not establish the global minimum; retain any unexamined scope explicitly.</p>
+<h2 id="解释不重复节点和正权前提">Explain simple routes and positive weights</h2>
+<p>All edges are positive, so a cycle adds cost and removing it cannot make a route dearer; a minimum can be sought among nonrepeating routes. Do not transfer this to negative, time-varying or otherwise constrained problems. No algorithm ran: you enumerated/rechecked seven routes. Larger graphs may require another method rather than a few short-looking highlights. State positivity and simple-route reasoning so readers understand cycle exclusion instead of assuming the app prohibits cycles.</p>
+<h2 id="改一条边后重新比较而非保留旧高亮">Recompare after changing an edge instead of keeping an old highlight</h2>
+<p>Change BD 4→1 in a copy, holding six other weights fixed. ABDE becomes 2+1+2=5, beating the old choice’s 6. Update source list, edge label and every route using BD before comparing all seven again. New highlighting alone leaves obsolete conclusions. Change cost without geometry/edges to isolate the cause. Name versions and avoid accidentally altering the two other edges already labelled 1. Objects do not update route results automatically.</p>
+<h2 id="输出同时保留边权与比较依据">Deliver weights together with the comparison basis</h2>
+<p>Save nodes, seven edges, route list and highlighted view. In export, read weights before summing the chosen route. Keep small labels attributable and strokes clear of names. Test backgrounds; white node fills remain objects. Name fictional five-node cost graph, weight revision and size and exclude tests. Even a standalone highlight needs start/end, bidirectionality and positive-weight scope, not a real-map implication. Retain comparison evidence for editable changes; the image contains no executable shortest-path solver.</p>
+<h2 id="最小路线有争议先查边和漏项">Check edges and omissions when the minimum is disputed</h2>
+<p>For an unexpected 5, inspect copied weights stepwise rather than drawn shortness. Remove candidates using absent edges and re-enumerate. Only five named circles are nodes, not crossings. An old choice after BD editing suggests mismatched totals/highlights. Recheck graph, seven candidates, sums and output explanations so the minimum rests on examined routes rather than a bright-line illusion of navigation.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-route-map/">VectorPaint route diagram: explain directions with paths, stops and a legend</a>, <a href="/en/guides/vectorpaint-decision-flowchart/">VectorPaint decision flowcharts: keep conditions and arrows consistent</a>.</p>
+<p>Sources checked on November 7, 2026: VectorPaint 1.0.8, requiring iOS / iPadOS 17.0 or later. Capability scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store description</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn">Apple public version lookup</a>. These are exercises and checks you can perform, without a claim of step-by-step physical-device testing or verification in every target environment. Example content is instructional; follow the controls in your installed version.</p>
+{% endraw %}

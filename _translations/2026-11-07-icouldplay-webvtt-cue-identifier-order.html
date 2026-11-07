@@ -1,0 +1,62 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay VTT cue identifiers: labels are neither timing nor displayed text'
+description: Label three self-made VTT cues, preserve timing order and check actual display without assuming identifier-based
+  navigation.
+permalink: /en/guides/icouldplay-webvtt-cue-identifier-order/
+date: '2026-11-07 00:00:00 +08:00'
+modified: '2026-11-07 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 82
+topic: Time coordinates and caption syntax
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-07-icouldplay-webvtt-cue-identifier-order.md
+source_url: /guides/icouldplay-webvtt-cue-identifier-order/
+translation_method: editorial
+translation_source_sha256: 8f86a74ae824d95a5488abe2478847a7ca5f274fbc9f1371ba26ed3fbb4376b7
+translation_date: '2026-11-07T01:41:37+00:00'
+excerpt: Label three self-made VTT cues, preserve timing order and check actual display without assuming identifier-based
+  navigation.
+---
+{% raw %}
+<p>Text above a cue timing line can be an identifier rather than dialogue. Use a small self-authored file to keep labels and times separate. First establish that the installed version can load this VTT sample; otherwise record file-level findings without claiming complete player support.</p>
+<h2 id="section-1">Keep the reference clip and original captions</h2>
+<p>Use a self-made clip at least twelve seconds long and create a separate UTF-8 VTT in an external plain-text editor. Preserve original captions and record the matching clip duration. Edit externally and inspect playback in iCouldPlay. Establish ordinary video and subtitle loading with the introductory sample first; if plain cues fail, resolve path and format before testing labels.</p>
+<h2 id="section-2">Create three labelled cues</h2>
+<p>Use this original sample with distinct English labels. Deliberately put <code>cue-B</code> before <code>cue-A</code> while start times remain increasing; do not swap timing lines to achieve alphabetical order. Separate cues with blank lines and put each label and timing on its own line. Keep the arrow unchanged. Simple English payloads let both tutorial languages use identical sample bytes.</p>
+<pre><code>WEBVTT
+
+cue-B
+00:01.000 --&gt; 00:03.000
+First card
+
+cue-A
+00:04.000 --&gt; 00:06.000
+Second card
+
+cue-C
+00:08.000 --&gt; 00:10.000
+Third card
+</code></pre>
+<h2 id="section-3">Record labels separately from visible payloads</h2>
+<p>In an external note, record identifier, start, end and expected payload. The first cue is First card from one to three seconds, not cue-B or the second alphabetically. W3C WebVTT defines optional cue labels; a label does not replace timing or require a player search interface. Keep that distinction before opening iCouldPlay, and do not generalise one file’s naming convention to other subtitle formats.</p>
+<h2 id="section-4">Check order with continuous playback</h2>
+<p>Load and select the practice file, then play from before one second. Record words and approximate intervals across all three cues rather than relying on one paused screenshot. If a label appears onscreen, inspect whether it was mistakenly placed below the timing line or separated incorrectly. Record engine-specific parsing without inferring that alphabetic labels are forbidden from a single failure.</p>
+<h2 id="section-5">Change only a label in a second copy</h2>
+<p>Save a second copy changing only cue-B to opening-card. Leave timing and payload untouched, select the new copy and replay from the same position. Record filenames and observations separately; do not change media and font settings simultaneously. If the old file remains selected, correct selection before deleting media or directories. Unchanged visible output is the comparison target, subject to the installed version’s actual result.</p>
+<h2 id="section-6">Inspect duplicate labels and misplaced lines</h2>
+<p>The cited current W3C specification requires cue identifiers to be unique within one VTT file. A player tolerating duplicate labels does not establish conformance. Unique labels also make manual references unambiguous. Correct duplicate identifiers alone without reordering original timing or payloads. Inspect misplaced timestamps, altered arrows and payload lines accidentally split into new cues. Correct one issue per saved copy and revisit the same interval instead of treating renumbering as a universal fix or reordering the entire file.</p>
+<h2 id="section-7">Keep results traceable to the file</h2>
+<p>Use labels to find cues in the external editor, times to revisit the media and payloads to verify the visible prompt. Reopen the original practice file and check selection and all three cues, avoiding an experimental default for normal viewing. Identifier search is unnecessary and is not claimed as an app feature. <a href="https://www.w3.org/TR/webvtt1/">W3C WebVTT</a> supports the distinction among labels, timing and payload; this is not exhaustive parser testing.</p>
+<h2 id="section-8">Keep each identifier on one line</h2>
+<p>Use short letters and hyphens for labels without line breaks or timing arrows. Avoid complex characters and hidden table separators for this manual check. Labels are optional, but adding one does not remove the need for a timing line. For an unlabelled control, make a third copy removing only the three labels. Keep this separate from renaming rather than deleting labels and changing times in one comparison.</p>
+<h2 id="section-9">Reference both label and payload when handing off</h2>
+<p>For review, name the file version, cue-A, four-to-six seconds and Second card rather than “change cue two”. That distinguishes file order from alphabetic order. Labels may remain stable after insertion while timing or text changes, so version old notes. If a label is absent, check for the unlabelled control before expecting player text search. This is an editing index, not a clickable video chapter.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-playback-reference-clip/">Reference clip</a>, <a href="/en/guides/icouldplay-subtitle-offset-drift/">Caption timing</a>.</p>
+<p>Checked on November 7, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

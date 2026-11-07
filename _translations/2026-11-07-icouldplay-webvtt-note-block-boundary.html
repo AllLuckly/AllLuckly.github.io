@@ -1,0 +1,59 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay VTT NOTE blocks: separate editing comments from visible cues'
+description: Check NOTE boundaries in a self-made caption file and compare a comment-free copy without treating
+  editing notes as dialogue.
+permalink: /en/guides/icouldplay-webvtt-note-block-boundary/
+date: '2026-11-07 00:00:00 +08:00'
+modified: '2026-11-07 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 83
+topic: Time coordinates and caption syntax
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-07-icouldplay-webvtt-note-block-boundary.md
+source_url: /guides/icouldplay-webvtt-note-block-boundary/
+translation_method: editorial
+translation_source_sha256: c733b2428788e6d82ca5ef7395b7f5225d7f1add5bdf7eb2ae744150f3bb0f29
+translation_date: '2026-11-07T01:41:37+00:00'
+excerpt: Check NOTE boundaries in a self-made caption file and compare a comment-free copy without treating editing
+  notes as dialogue.
+---
+{% raw %}
+<p>WebVTT NOTE blocks can hold editing comments, but boundaries and actual parsing need checking. Edit a self-made sample externally and observe it in iCouldPlay. This does not claim in-app comment editing, collaboration or automatic hiding of arbitrary text.</p>
+<h2 id="section-1">Use comments without private information</h2>
+<p>Copy a working VTT or create a practice file for a self-made clip at least ten seconds long. Use neutral text such as practice checked rather than names, private server addresses or accounts. A comment is file text, not a confidential container: sharing the file shares the comment. Keep the original and a comment-free baseline; change comments alone, not media or timing.</p>
+<h2 id="section-2">Build a minimal file with blank boundaries</h2>
+<p>The NOTE block below ends at a blank line before the first cue. Save plain text without the Markdown fence markers, and do not join NOTE and the timing line into one block. Non-overlapping cues keep boundary errors separate from simultaneous display.</p>
+<pre><code>WEBVTT
+
+NOTE practice checked
+This comment is not a caption.
+
+00:01.000 --&gt; 00:03.000
+Open the notebook
+
+00:05.000 --&gt; 00:07.000
+Keep the original
+</code></pre>
+<h2 id="section-3">Identify three roles in the source</h2>
+<p>Identify the header, NOTE comment and two timed cues in the external editor. NOTE introduces a comment block rather than naming an ordinary cue; timing lines swallowed into that block should not be expected to remain active cues. List two expected captions and the text that should not be dialogue. These format expectations still require playback; saving a file does not establish player success.</p>
+<h2 id="section-4">Check captions and the gap by playback</h2>
+<p>Load the practice captions and play from the start through eight seconds. Record the one-to-three and five-to-seven second intervals and any comment residue between them. One correct cue at six seconds is insufficient. If the installed version rejects the VTT, record that outcome and return to a known-working sample rather than claiming support. Use visible subtitle controls without unfamiliar parsing plugins.</p>
+<h2 id="section-5">Compare a comment-free copy</h2>
+<p>Make a differently named copy removing only NOTE, its comment text and surplus blank lines. Keep the header and timed cues, select it and replay the same intervals. If only the copy works, inspect boundaries and selection before attributing everything to missing comment support. Do not convert formats for this comparison: that changes too many variables and obscures the boundary being examined.</p>
+<h2 id="section-6">Find cues swallowed into a comment</h2>
+<p>If the first cue disappears, inspect a missing blank after NOTE that may absorb its timing and payload. If comment text appears, inspect whether it was pasted beneath a cue’s timing line. Keep a labelled erroneous copy and replay a corrected copy rather than repeatedly editing the only production captions. Confirm the second cue survived too. Record the exact moved line or inserted blank instead of merely saying resaving fixed it.</p>
+<h2 id="section-7">Inspect the file before sharing</h2>
+<p>Keep the corrected source, comment-free control, observed output and installed version. Before sharing, inspect every comment externally: invisible onscreen does not mean unreadable to recipients. Restore the normal viewing captions and separate practice filenames. <a href="https://www.w3.org/TR/webvtt1/">W3C WebVTT</a> supplies NOTE and blank-boundary rules; this is neither a privacy-erasure guarantee nor acceptance testing of every engine.</p>
+<h2 id="section-8">Distinguish the block introducer from an ordinary word</h2>
+<p>Use uppercase NOTE at the beginning of a new block followed by a space and comment. Do not assume lowercase note or NOTES has identical syntax, or that “take a note” in dialogue becomes a comment. Preserve case and line position without input-method symbol substitution. A second comment could be a separate NOTE block, but complete this one-block baseline before adding complexity.</p>
+<h2 id="section-9">Inspect the actual saved text</h2>
+<p>An editor may save rich text or append TXT to a visible VTT name. Close and reopen the saved file from its location to inspect the header, blanks and arrows as plain text before loading. A window title does not prove the right file reached disk. If a share sheet only previews content, inspect the final exported file rather than a draft screenshot. Check both copies so two names do not refer to one unsaved document.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-playback-reference-clip/">Reference clip</a>, <a href="/en/guides/icouldplay-subtitle-offset-drift/">Caption timing</a>.</p>
+<p>Checked on November 7, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

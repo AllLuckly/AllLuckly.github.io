@@ -1,0 +1,48 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay frame counts and time notes: keep average rate separate from frame position'
+description: Use file times and content anchors to separate a constant-rate arithmetic example, average frame rate
+  and playback seek precision.
+permalink: /en/guides/icouldplay-frame-count-file-time-boundary/
+date: '2026-11-07 00:00:00 +08:00'
+modified: '2026-11-07 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 81
+topic: Time coordinates and caption syntax
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-07-icouldplay-frame-count-file-time-boundary.md
+source_url: /guides/icouldplay-frame-count-file-time-boundary/
+translation_method: editorial
+translation_source_sha256: 48fc10153c772f7e9e60135e03b905bfafe62fb81eb6dc71201f39416a2362da
+translation_date: '2026-11-07T01:41:37+00:00'
+excerpt: Use file times and content anchors to separate a constant-rate arithmetic example, average frame rate and
+  playback seek precision.
+---
+{% raw %}
+<p>A note such as “frame 120 means four seconds” requires a known frame rate and counting convention. Use ordinary playback, pause and time seeking in iCouldPlay to make reproducible notes. No frame-step control is required, and a file’s average rate is not a timing map for every image.</p>
+<h2 id="section-1">Choose a recognisable self-made action</h2>
+<p>Keep an original self-recorded clip, for example moving three differently coloured cards onto a table. Record name, duration and action order, then verify that iCouldPlay opens that file. Do not change its rate or trim the opening first: that creates another timing baseline. A clearly changing object in an existing course also works, without redistributing it. Produce a location note, not a re-encoded video or a measurement of camera exposure times.</p>
+<h2 id="section-2">State the constant-rate example completely</h2>
+<p>Write a separate model: with image zero at time zero and a constant 30 frames per second, image index 120 has nominal time four seconds. If the first image is called frame one, the 120th image is 119 intervals after zero, about 3.967 seconds. Keep the counting conventions separate. This uniform-interval model neither proves the phone clip uses that rate nor guarantees frame-exact pausing.</p>
+<h2 id="section-3">Distinguish declared and average rates</h2>
+<p>With an existing trusted metadata tool, record the exact rate field and whether it is explicitly constant or average; otherwise mark it unknown rather than installing an unfamiliar decoder. An average over a window does not establish equal spacing between individual images. Even a displayed 30 does not justify dividing every image count by 30. Keep the tool name and file identity so compressed-copy metadata is not assigned to the original.</p>
+<h2 id="section-4">Find content by forward playback</h2>
+<p>Play normally from before the first card moves. Pause after the second settles and record both the displayed time and a state such as “second card flat, third still unmoved”. Preserve whole-second precision if that is all the UI shows; do not invent milliseconds. Replay from earlier to confirm the same event rather than a similar repetition. Use content as the primary anchor and time to reach its neighbourhood.</p>
+<h2 id="section-5">Compare seeks without claiming frame accuracy</h2>
+<p>Seek back from farther away, note the initial state, then play forward to the anchor. Two attempts are enough to record whether landing states agree and whether forward playback is needed. Compression, keyframes and control precision can affect the result; one paused image does not prove missing frames. Without fine seeking, retain visible time and action text rather than inventing shortcuts. Do not repeatedly drag until chance produces the expected image.</p>
+<h2 id="section-6">Keep changed-speed and new-copy records separate</h2>
+<p>Playback speed changes viewing time without necessarily changing file coordinates; an externally slowed and re-exported file is separate media. Record duration, version and anchors for each instead of merging both meanings of “slower”. For another person’s frame number, establish original versus export and zero- versus one-based counting. Until clarified, preserve it as unverified rather than reporting a calculated time as something iCouldPlay displayed.</p>
+<h2 id="section-7">Finish a verifiable location note</h2>
+<p>Finish with identity, metadata field, counting assumptions, displayed time, action state and two revisit results. A reader should reach the neighbourhood and find the event by playback while distinguishing arithmetic from observation. If unsuccessful, check edition, opening and same-name copies before refining a vague description. Ordinary pause does not establish frame accuracy, and this editorial workflow is not a device measurement. Preserve the original and append later corrections.</p>
+<h2 id="section-8">Allow multiple images within one displayed second</h2>
+<p>A whole-second display can cover several different images. Treat four seconds as a location neighbourhood and describe lifting, moving or settled cards rather than equating equal digits with an identical image. If two pauses differ but forward playback finds the event, record that control granularity before changing media or resetting the player. Finer analysis requires explicit image timestamps and is outside this task.</p>
+<h2 id="section-9">Separate this task from audiovisual sync diagnosis</h2>
+<p>If an impact sound seems early or late, record a separate audiovisual question instead of adjusting audio from an average-rate calculation. Note headphones versus speakers, file and location, then use the clap-sync guide. Counting conventions, seek landings and audio delay are distinct issues. The completion condition remains finding an explicit action, not explaining every playback anomaly.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-playback-reference-clip/">Reference clip</a>, <a href="/en/guides/icouldplay-subtitle-offset-drift/">Caption timing</a>.</p>
+<p>Checked on November 7, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

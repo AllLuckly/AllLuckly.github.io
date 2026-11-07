@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-webvtt-literal-character-escapes/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay VTT literal characters: check less-than signs and ampersands'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-webvtt-literal-character-escapes/
+agent_source_sha256: 1ffc9abbcf1f1c21c459b3a673d2f5ea77efa6f99db11cdb7010cd4ebbf0d746
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay VTT literal characters: check less-than signs and ampersands
+
+Language: en
+Canonical: [iCouldPlay VTT literal characters: check less-than signs and ampersands](<https://allluckly.cn/en/guides/icouldplay-webvtt-literal-character-escapes/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-webvtt-literal-character-escapes/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-webvtt-literal-character-escapes/>)
+Published: 2026-11-07T00:00:00+08:00
+Modified: 2026-11-07T09:41:37+08:00
+Author: Bison
+
+Compare source and displayed text for self-made comparison expressions and ampersands, checking escapes and double encoding.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-webvtt-literal-character-escapes/>), translated on 2026-11-07. Original publication dates, attribution, code and version notes are retained.
+
+Missing symbols in captions may be a text-syntax issue rather than a font problem. Use an external plain-text file and iCouldPlay playback to inspect a few literal characters under WebVTT rules. The sample is self-authored and does not treat caption parsing as an arbitrary HTML execution environment. These examples test character display, not whether a course comparison holds for real data.
+
+## Define the intended visible text
+
+Write two target strings in an external note: `2 < 5` and `A & B`. These are literal comparison and joining characters, not tags or network instructions. Keep an original self-made clip of at least ten seconds and its captions, then create a practice file. An explicit target lets you recognise missing symbols or extra amp text instead of guessing the intent of an already damaged subtitle.
+
+## Create a two-cue sample
+
+The sample uses `&lt;` for a literal less-than sign and `&amp;` for a literal ampersand. Preserve ASCII punctuation, semicolons and timing arrows in a plain-text editor. Avoid full-width substitutions introduced through rich-text chat copying. Do not include the Markdown fence boundaries in the subtitle file.
+
+```
+WEBVTT
+
+00:01.000 --> 00:04.000
+2 &lt; 5
+
+00:05.000 --> 00:08.000
+A &amp; B
+```
+
+## Record source and intended characters separately
+
+Record `&lt;` in source versus `<` onscreen, and `&amp;` versus `&`. The comparison checks one decoding step rather than byte equality between source and screenshot. W3C WebVTT defines these representations, but loading still depends on app support. Do not generalise to every HTML named entity or add scripts, styles or external links to this test.
+
+## Select the intended captions and play forward
+
+Open the matching clip, select the saved practice file and play normally through both intervals. Transcribe each whole visible string rather than “looks fine”. If symbols appear, recheck the selected filename to exclude another corrected file. If loading fails, establish the entry and extension with a working minimal VTT and retain the failure rather than counting absent text as success.
+
+## Use a double-encoded control
+
+Save a second copy changing only the first source payload to `2 &amp;lt; 5`. One decoding step should leave literal `&lt;`, not decode again to a less-than sign; transcribe the actual result. This illustrates double encoding rather than recommending it for normal captions. Use distinct filenames, verify selection and do not leave the control as a course default before reporting a recurrence.
+
+## Separate literal characters from supported markup
+
+For angle-bracketed source text, decide whether it is intended literally or as supported WebVTT markup. Do not paste every raw bracket and blame fonts for disappearing content. Test literal representation in a minimal copy while preserving the sentence and meaning. Style such as italics needs a separate comparison; glyphs, parsing and styling are different layers.
+
+## Inspect saved files for rich-text conversion
+
+If amp text, semicolons or boxes appear, reopen the saved VTT rather than its web preview. Inspect whether `&lt;` was escaped again, whether lookalike full-width punctuation was used, and whether screenshot OCR introduced errors. Change one item in a saved copy while keeping video, caption size and location fixed. Investigate fonts or engines through the character guide only after establishing correct source text.
+
+## Check legibility under normal viewing conditions
+
+After correctness, read both operands and spaces at normal viewing size. Record the original visible font setting before changes; size cannot repair encoding. If matching text is burned into the video, temporarily disable selectable captions to distinguish layers, then restore the desired state. Two sample strings do not certify a whole programming course or character repertoire as accessible.
+
+## Keep a reproducible character record
+
+Keep both files, target and source strings, displayed results and installed version. Hand off the verified single-escaped file and label the control clearly, restoring normal viewing captions. [W3C WebVTT](<https://www.w3.org/TR/webvtt1/>) provides the character rules. No external captions are copied or exhaustive device testing claimed. Record differing engine conditions and unknowns rather than a universal app-support promise.
+
+## Related tutorials and sources
+
+[Minimal VTT](<https://allluckly.cn/en/guides/icouldplay-make-webvtt-practice/>), [Caption characters](<https://allluckly.cn/en/guides/icouldplay-caption-character-reference/>).
+
+Checked on November 7, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

@@ -1,0 +1,53 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay VTT timestamp units: check minute carry and decimal places'
+description: Read an original cue across a minute boundary, preserving milliseconds and distinguishing positions
+  from durations.
+permalink: /en/guides/icouldplay-webvtt-timestamp-unit-carry/
+date: '2026-11-07 00:00:00 +08:00'
+modified: '2026-11-07 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 85
+topic: Time coordinates and caption syntax
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-07-icouldplay-webvtt-timestamp-unit-carry.md
+source_url: /guides/icouldplay-webvtt-timestamp-unit-carry/
+translation_method: editorial
+translation_source_sha256: a79cba3973659942130fdd454af632d7530bbbfa92b2cf7268519da581663f54
+translation_date: '2026-11-07T01:41:37+00:00'
+excerpt: Read an original cue across a minute boundary, preserving milliseconds and distinguishing positions from
+  durations.
+---
+{% raw %}
+<p>A caption can be mistimed because its units were written incorrectly. Instead of adjusting a global offset, inspect minutes, seconds and decimals in one cue crossing a minute boundary. Do arithmetic externally, then play it in iCouldPlay; a coarse display cannot establish millisecond-accurate device measurements. Keep normal playback speed so elapsed viewing time does not introduce a separate quantity into the comparison.</p>
+<h2 id="section-1">Choose media covering the interval</h2>
+<p>Use permitted ordinary media at least seventy seconds long and confirm sufficient duration in iCouldPlay. Record video and practice subtitle names, preserving original content and progress. Do not overwrite production media to reach a minute. With only a short clip, complete the paper calculation and defer playback: a cue beyond the end cannot test syntax. The sample need not contain real course material.</p>
+<h2 id="section-2">Write a cue across a minute boundary</h2>
+<p>Create this original VTT. It starts at 59 seconds and 250 milliseconds and ends at 61 seconds and 500 milliseconds. Preserve the header, blank line and ASCII arrow. Its text is a practice prompt, not a claim that the player performs a precision timing test.</p>
+<pre><code>WEBVTT
+
+00:59.250 --&gt; 01:01.500
+Check the minute boundary
+</code></pre>
+<h2 id="section-3">Convert positions to seconds before subtracting</h2>
+<p>Convert start to 59.250 seconds and end to 60 plus 1.500, or 61.500 seconds. The interval is 2.250 seconds, not 2.5 or a negative result from subtracting colon-separated fields. Write each step and distinguish positions from duration. A whole-second app display does not remove fractional positions in the source file.</p>
+<h2 id="section-4">Check the millisecond field</h2>
+<p>Keep three fractional digits: <code>.250</code> is 250 milliseconds, <code>.025</code> is 25 and <code>.500</code> is 500. The dot does not introduce a frame number, and SRT comma syntax should not be copied unexamined. Use the demonstrated WebVTT form without relying on permissive correction. Disable automatic number formatting or use plain text so saved characters match the inspected source.</p>
+<h2 id="section-5">Include the optional hour field consistently</h2>
+<p>Do not read a two-field VTT time as hours and minutes just because an app uses an hour/minute/second display. <code>01:01.500</code> means one minute, one second and 500 milliseconds; <code>00:01:01.500</code> denotes the same position with hours. Record field count and units first, playing only media that covers the position. Preserve the full notation in handoff notes to prevent hour/minute confusion.</p>
+<h2 id="section-6">Play continuously across one minute</h2>
+<p>Select the practice file and play normally from around 56 to beyond 63 seconds. Record appearance and disappearance near the boundary without expecting one seek to hit 59.250 exactly. With whole-second digits, state the approximate neighbourhood and precision; arithmetic is not a measured playback error. Finish the first continuous observation before one repeat, avoiding repeated seeks that could confuse subtitle state.</p>
+<h2 id="section-7">Compare a copy shifted by one second</h2>
+<p>Save a control starting <code>01:00.250</code> and ending <code>01:02.500</code>; duration remains 2.250 seconds. Both endpoints move one second, not one minute. Keep media and settings fixed and play from the same earlier point. If results seem identical, inspect selection and coarse display before concluding that fractional values or timing fields are ignored.</p>
+<h2 id="section-8">Inspect range and syntax before playback faults</h2>
+<p>For absent text, inspect clip length, selection, endpoint order, seconds range, arrow and blank lines. For partial display, check whether playback began within the interval. Do not hide a mistaken minute field with a global shift or rename a library to fix one line. Preserve the faulty copy and exact correction so the result is attributable.</p>
+<h2 id="section-9">Report positions separately from duration</h2>
+<p>Record source positions, converted seconds, 2.250-second duration, one-second-shift control and actual display precision. <a href="https://www.w3.org/TR/webvtt1/">W3C WebVTT</a> supplies syntax; the example is original and no device calibration was performed. Restore normal captions and viewing position while keeping the practice separate. Convert units before subtraction, and verify edited media identity before applying even correct arithmetic.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-make-webvtt-practice/">Minimal VTT</a>, <a href="/en/guides/icouldplay-caption-character-reference/">Caption characters</a>.</p>
+<p>Checked on November 7, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

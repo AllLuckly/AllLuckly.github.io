@@ -1,0 +1,65 @@
+---
+layout: null
+permalink: /en/guides/manyue-pdf-reopen-wait-or-missing-page/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'ManYue: Distinguish PDF reopening delays from missing pages'
+agent_source_url: https://allluckly.cn/en/guides/manyue-pdf-reopen-wait-or-missing-page/
+agent_source_sha256: 059ff61c6740d609ab3a20b159a83fe6815762717dd39f3bd38f8fea7bbdf9c3
+agent_generator_version: 1
+---
+{% raw %}# ManYue: Distinguish PDF reopening delays from missing pages
+
+Language: en
+Canonical: [ManYue: Distinguish PDF reopening delays from missing pages](<https://allluckly.cn/en/guides/manyue-pdf-reopen-wait-or-missing-page/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-pdf-reopen-wait-or-missing-page/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-pdf-reopen-wait-or-missing-page/>)
+Published: 2026-11-07T00:00:00+08:00
+Modified: 2026-11-07T09:41:37+08:00
+Author: Bison
+
+Use a small PDF and fixed page anchors to separate loading, rendering, cache rebuilding and source omissions.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-pdf-reopen-wait-or-missing-page/>), translated on 2026-11-07. Original publication dates, attribution, code and version notes are retained.
+
+When a PDF reopens, a transient blank view, a page still rendering and an actual omission in the source can look similar, but they require different responses. ManYue’s current release notes describe improved PDF-cache management. Instead of promising an opening time, this lesson observes layers using a sample that can be imported again. Do not guess through repeated clearing or importing, or call a file damaged after one wait.
+
+## Prepare a short file with visible page numbers
+
+Create a twelve-page PDF with a different large page number and short sentence on each page, retaining an original outside the app. Do not rely solely on reader progress numbers: covers or blank pages can offset printed numbers from file positions. In an external note, create six fields: filename, size, total pages, device version, app version and observation time. If you only have a real comic, use a short sample you may handle and anchor it with its first image, last image or specific content. First confirm the first, middle and last pages in an independent viewer, excluding omissions already present in the source.
+
+## Separate entry opening from completed page display
+
+After normal import, open the entry and separately record whether the reader opens, whether a total page count appears and whether page content appears. Entering the reader does not mean the target page has finished displaying, and a loading state does not establish a missing page. Stay on that page until visible loading finishes or a definite error appears, then record the outcome. No universal number of seconds is prescribed. If the wait substantially exceeds your previous experience with this sample, stop and record duration and state instead of waiting indefinitely. Do not jump through many pages during this observation, which would combine multiple requests with a single-page issue.
+
+## Check three fixed anchors
+
+At file positions one, six and twelve, verify both the large page number and the short sentence, rather than merely observing a moving progress bar. Record each as complete content, still waiting, explicit error or unexplained blankness. If position six displays page-seven content, describe a position/content mismatch rather than generic slowness. For one blank page, check the same file and position in the independent viewer so an intentional blank is not treated as missing. These three anchors are a quick screen only. One normal page does not prove the whole book is normal; inspect neighbouring pages after finding an anomaly.
+
+## Reopen the same entry and compare
+
+Leave the reader for the local shelf, reopen the same entry and check the same three positions in order. Record differences between the second and first rounds. Make sure you did not select a remote namesake or another revision. A faster second opening establishes only that this opening was faster, not a particular caching algorithm. If it is slower, first check other device activity and whether the source remains available in its original location. Keep both rounds rather than only the best. Focus on content consistency and whether an anomaly stays on the same page, without inventing a technical explanation for a single timing change.
+
+## Use normal cache clearing once if a comparison is needed
+
+Only consider one comparison using the app’s normal Clear Cache entry when originals are safely retained, the sample is recoverable and no important transfers are running. Leave the reader first, record the state, read the confirmation wording and follow the normal workflow. Reopen the same PDF and check the three anchors. Regenerating pages after clearing may require waiting and need not match the speed of an existing cache. Do not delete private-directory files, clear app data or uninstall. You may skip this comparison if you do not want to affect current caches; its absence does not invalidate the earlier opening and missing-page observations.
+
+## Separate persistent issues into three paths
+
+If the independent viewer lacks the same content, inspect or re-export the source PDF first. If only ManYue consistently fails at a fixed position, preserve a shareable sample, position and screenshot for reporting. If the problem occurs only through a particular remote entry, first obtain the complete identical file where you are authorized to retain it, then separate incomplete transfer from local reading. An unfinished remote transfer does not establish a local rendering defect. Record known passwords, unusual encoding or complex content, but do not diagnose a particular internal decoder without evidence. Perform only checks permitted by your access rights on each path.
+
+## Avoid destructive attempts to force immediate success
+
+Repeated imports create namesake entries, while repeated clearing removes comparable cache conditions; neither should serve as a refresh button. Once the small sample reproduces a problem consistently, stop expanding the experiment. Preserve errors or interface messages you can normally access without searching private directories containing personal information. If a large file will not open, do not delete its sole original to make room. Check the basic path with a smaller self-made sample and record the large file’s page count, size and failure stage separately. An unknown cause may remain unknown; a temporary workaround is not a completed repair.
+
+## Close with a leave-and-return check
+
+For each anchor, the final table should show first opening, reopening and the optional post-clearing opening, including content correctness rather than timing alone. Leave the app and return, confirming that the same entry and affected page can still be found, and record whether the previous position is restored. Record a progress issue separately if it resumes elsewhere. Identify comparisons you did not perform and conditions you could not confirm. Completion means you can distinguish evidence of waiting, position mismatch, intentional source blankness and persistent omission, not claim that clearing caches solves every PDF problem.
+
+## Related guides and sources
+
+[Read PDF comics in ManYue: covers, wide pages and reading position](<https://allluckly.cn/en/guides/manyue-pdf-reading/>); [ManYue: Check PDF page colours with a self-made reference sheet](<https://allluckly.cn/en/guides/manyue-pdf-colour-reference-check/>).
+
+Checked on November 7, 2026: [Apple public version information](<https://itunes.apple.com/lookup?id=6753895889&country=cn>) lists ManYue 2.0.4, requiring iOS / iPadOS 15.0 or later. Feature scope follows the [official App Store description](<https://apps.apple.com/cn/app/id6753895889>) and the installed version. This article provides reading and checking methods you can perform; it does not claim step-by-step physical-device or private-server testing. Manual records, external tools and actually visible controls are identified separately, and personal analysis or code observations are not presented as verified automatic capabilities.
+{% endraw %}
