@@ -1,0 +1,48 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay HLS address worksheet: resolve relative segment references individually'
+description: Map a permitted VOD playlist base and three reference forms, checking relocation effects without downloading
+  others’ resources or handling keys.
+permalink: /en/guides/icouldplay-hls-relative-uri-resolution-sheet/
+date: '2026-11-08 00:00:00 +08:00'
+modified: '2026-11-08 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 95
+topic: Media information and access checks
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-08-icouldplay-hls-relative-uri-resolution-sheet.md
+source_url: /guides/icouldplay-hls-relative-uri-resolution-sheet/
+translation_method: editorial
+translation_source_sha256: 27d114287a6824b3fb33bbf251c39bdd907d202fd257130d563fe3f7514eda2e
+translation_date: '2026-11-08T01:34:15+00:00'
+excerpt: Map a permitted VOD playlist base and three reference forms, checking relocation effects without downloading
+  others’ resources or handling keys.
+---
+{% raw %}
+<p>An M3U8 is not a complete video archive; diagnosis also needs the targets of relative references. Build a reproducible address worksheet with a fictional domain, then inspect only an authorised playlist. iCouldPlay verifies playback through an existing entry, without assumed URL rewriting, playlist editing or complete segment archiving.</p>
+<h2 id="section-1">Start with a known VOD sample</h2>
+<p>Choose an authorised, previously working short VOD playlist, recording type, duration and anchors while preserving entry and read-only text. Exclude moving live windows and key/payment handling. Without your own playlist, complete the fictional worksheet and mark playback unperformed. Example addresses are not public media, and paper resolution is not a private-service test.</p>
+<h2 id="section-2">Record the playlist base including its filename</h2>
+<p>Use fictional base <code>https://media.example.com/course/a/list.m3u8</code>, with directory <code>/course/a/</code> and final playlist filename. Preserve both levels rather than treating the whole URL as a directory. Alias sensitive real addresses and never publish signatures. If redirects affect retrieval, record only confirmed resource context; leave an unknown base unresolved instead of deleting parameters or probing changes.</p>
+<h2 id="section-3">Resolve a same-directory reference</h2>
+<p>Reference <code>seg01.ts</code> resolves to <code>https://media.example.com/course/a/seg01.ts</code>, not a path appended beneath list.m3u8. Replace the base filename, inspect each component and record the result. No segment exists here to download. Real references may use other extensions or child playlists; TS does not mean the whole film. Preserve the original line rather than edit a sole playlist to a guessed URL.</p>
+<h2 id="section-4">Separate parent-directory and root paths</h2>
+<p>Resolve <code>../shared/seg02.ts</code> to <code>https://media.example.com/course/shared/seg02.ts</code>, moving from a to course before entering shared. A leading-root <code>/assets/seg03.ts</code> resolves to <code>https://media.example.com/assets/seg03.ts</code>, dropping course/a. Keep separate rows. These are URL-resolution components, not instructions to browse parent device directories or guess nearby unauthorised files.</p>
+<h2 id="section-5">Keep absolute references distinct</h2>
+<p>For a complete HTTPS reference, retain its own host/path rather than applying the playlist directory. A listed target does not grant access. Do not force every absolute URL onto one host or discard query fields as if they were filenames. This worksheet avoids key/ad/tracking-purpose inference and lists confirmed media or child-playlist references, leaving unknown lines for documented type checks.</p>
+<h2 id="section-6">Use relocation as a paper countercheck</h2>
+<p>Move the fictional base on paper to <code>https://media.example.com/archive/list.m3u8</code>: seg01.ts now targets <code>https://media.example.com/archive/seg01.ts</code>, not course/a. Do not move production files. Root-path references on the same host and complete absolute URLs retain their own targets. This separates identical playlist text from identical segment retrieval.</p>
+<h2 id="section-7">Check reachability only for controlled resources</h2>
+<p>For real owned resources, use existing administration or playback evidence to check one or two targets’ existence and account scope. Do not bulk-fetch or guess indices. Listing, playlist retrieval and media reads differ. Mark unavailable logs unexamined instead of exporting credentials. For absent targets, check the playlist revision and base rather than repeatedly changing players to force a result. Correct resolution alone does not prove existence or playable coding.</p>
+<h2 id="section-8">Verify continuous playback through the original entry</h2>
+<p>Keep normal configuration and observe opening, a later content transition and near-end playback through the known entry. Do not enter the fictional domain or assume a universal paste-URL control. If only a relocated copy fails, record its changed context; if the original also fails, inspect account, expiry and service state separately. Correct worksheet arithmetic cannot fill a successful playback result.</p>
+<h2 id="section-9">Retain source-to-target correspondence</h2>
+<p>Each row retains playlist identity, base, original reference, resolved-target alias, checked result and unknown conditions. <a href="https://www.rfc-editor.org/rfc/rfc8216">RFC 8216</a> and <a href="https://www.rfc-editor.org/rfc/rfc3986.html">RFC 3986</a> inform playlist references and relative resolution; example paths are original. Preserve originals and restore viewing without claiming an offline package or encrypted-content handling. No device/private-server segment experiment was performed; the result is a traceable worksheet.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-hls-playlist-offline-boundary/">HLS offline boundaries</a>, <a href="/en/guides/icouldplay-source-switch-playback-state/">Source identity</a>.</p>
+<p>Checked on November 8, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

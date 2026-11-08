@@ -1,0 +1,56 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay VTT voice annotations: separate speaker tags from visible names'
+description: Compare voice annotations and plain-text speaker prefixes for two fictional speakers without assuming
+  automatic speech or visible-name rendering.
+permalink: /en/guides/icouldplay-webvtt-voice-annotation-visible-name/
+date: '2026-11-08 00:00:00 +08:00'
+modified: '2026-11-08 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 96
+topic: Caption meaning and content reading
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-08-icouldplay-webvtt-voice-annotation-visible-name.md
+source_url: /guides/icouldplay-webvtt-voice-annotation-visible-name/
+translation_method: editorial
+translation_source_sha256: 76a269f7d04f6cc490b2c71f0186eb21adaeb1486dd17b71bafd86d6958d8db7
+translation_date: '2026-11-08T01:34:15+00:00'
+excerpt: Compare voice annotations and plain-text speaker prefixes for two fictional speakers without assuming automatic
+  speech or visible-name rendering.
+---
+{% raw %}
+<p>A VTT speaker annotation need not display the name or generate that person’s voice. Use two original prompts and fictional names to distinguish source roles before observing iCouldPlay playback. Edit in an external plain-text tool and select captions through visible controls, without assuming speech synthesis, recognition or automatic speaker colours.</p>
+<h2 id="section-1">Define the speakers and prompts</h2>
+<p>Use a self-made clip at least twelve seconds long, perhaps just red and blue cards without dialogue. Assign fictional Lin to Move the red card and Bo to Keep the blue card in external notes. These are practice prompts, not dialogue translations, and can be checked on silent footage. Preserve originals and use distinct filenames without real names/private conversations. Establish attribution before judging its display.</p>
+<h2 id="section-2">Create a minimal voice-annotated file</h2>
+<p>Save this original sample as UTF-8 plain-text VTT, preserving brackets, spaces and closing tags. Lin and Bo annotate voices; timing lines still define intervals and cannot be replaced by names. Omit Markdown fences and additional style blocks to keep the comparison small.</p>
+<pre><code>WEBVTT
+
+00:01.000 --&gt; 00:04.000
+&lt;v Lin&gt;Move the red card.&lt;/v&gt;
+
+00:06.000 --&gt; 00:09.000
+&lt;v Bo&gt;Keep the blue card.&lt;/v&gt;
+</code></pre>
+<h2 id="section-3">Separate annotation from payload expectations</h2>
+<p>Under current <a href="https://www.w3.org/TR/webvtt1/">W3C WebVTT</a>, a voice span’s annotation names the voice and its internal text is payload. This differs from a cue identifier and does not require every player to prepend the name. Create annotation, payload and observed-screen columns, leaving the last pending. Styling semantics do not establish an app editing interface or automatic effects.</p>
+<h2 id="section-4">Transcribe the actual display</h2>
+<p>Select the file and play from before one through beyond ten seconds. Record payload, names, raw tags or absence separately. A missing name is not automatically faulty because it is not a plain-text prefix. For raw tags, inspect syntax/support first. Silence is not a failure: no reading aloud is requested. If loading fails, preserve that outcome and check a known minimal VTT rather than report expected output as observed.</p>
+<h2 id="section-5">Save an explicit-name control</h2>
+<p>Make a separately named copy with plain payloads Lin: Move the red card. and Bo: Keep the blue card., removing voice tags but keeping times. Replay it from the same position. Names are now explicit payload text rather than dependent on annotation rendering, subject to actual observation. Keep size, media and timing fixed. Similar-looking output does not make these source structures identical.</p>
+<h2 id="section-6">Check whether attribution is understandable</h2>
+<p>At normal viewing size without consulting answers, check attribution to Lin and Bo rather than colour alone. Do not assume a later cue continues the previous speaker across a gap; keep each prefix with its payload. Colour alone may be unclear or theme-dependent. This assesses the self-made text, not recognition of real voices or universal audience comprehension.</p>
+<h2 id="section-7">Inspect syntax and selection mistakes</h2>
+<p>For broken tags or misplaced names, inspect each source line for full-width brackets, missing spaces or rich-text formatting. Reopen the saved file before selecting the right copy; do not rename video to refresh captions. Identical outputs may mean unchanged selection or payload-only parsing, not equivalent files. Record the result and correct one error per preserved copy.</p>
+<h2 id="section-8">Recheck selection and origin on reopening</h2>
+<p>Reopen the same video and identify annotation versus prefix copy before replaying both cues. Use loaded file and payload evidence when list labels are ambiguous. Restore production captions and archive experiments separately without a universal persistence promise. Record lost sidecar-path conditions as such, not vanished source annotations, and do not delete other production captions to simplify selection.</p>
+<h2 id="section-9">Finish the source/display mapping</h2>
+<p>Keep both files, the three-column map, version and unsupported/untested cases. State source roles separately from actual rendering. The specification explains syntax without guaranteeing every WebVTT feature in every engine. No voice model, speaker recognition or exhaustive device test was used. Attribution should be traceable, with renewed checks after engine/media changes instead of a universal rendering rule.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-non-dialogue-caption-cues/">Sound-information captions</a>, <a href="/en/guides/icouldplay-webvtt-literal-character-escapes/">VTT literal characters</a>.</p>
+<p>Checked on November 8, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

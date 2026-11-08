@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint suspension-bridge diagrams: connect cables, hangers and deck'
+description: Build component relationships with manual curves and verticals, checking endpoints and occlusion without
+  treating an illustration as structural calculation.
+permalink: /en/guides/vectorpaint-suspension-bridge-cable-hangers/
+date: '2026-11-08 00:00:00 +08:00'
+modified: '2026-11-08 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 132
+topic: Object connections and unfolding
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-08-vectorpaint-suspension-bridge-cable-hangers.md
+source_url: /guides/vectorpaint-suspension-bridge-cable-hangers/
+translation_method: editorial
+translation_source_sha256: 1c057d32c574d07a6206a7b2b7fe174a82f5aa1eb0f2b5d2a654f25d069d713a
+translation_date: '2026-11-08T01:34:15+00:00'
+excerpt: Build component relationships with manual curves and verticals, checking endpoints and occlusion without
+  treating an illustration as structural calculation.
+---
+{% raw %}
+<p>A suspension-bridge silhouette can become two towers and a wave, with no readable connection between cable hangers and deck. Make a simplified elevation using component groups and endpoint checks. All heights and spans are original drawing choices, not construction dimensions, load estimates or engineering approval.</p>
+<h2 id="先定桥面塔位与锚点">Fix deck, towers and anchor locations</h2>
+<p>Create a 1200 by 900 pixel canvas. Begin the deck as a horizontal band from (100,600) to (1100,600). Tower axes are x=360 and x=840, extending approximately from y=200 to y=680. Cable anchors are near (120,600) and (1080,600). Record positions with fine pale references and label the drawing “simplified elevation connection diagram”. Keep towers, deck and cable separate initially to avoid moving shared references in an all-object selection. Do not convert these pixels to physical metres or infer carrying capacity from their distances.</p>
+<h2 id="主缆经过塔上位置再下垂">Run the cable over the towers before sagging</h2>
+<p>Take the main cable from the left anchor to near (360,250) on the left tower, down toward (600,450), up to the corresponding right-tower point and finally to the right anchor. Use a small number of Bézier nodes for a continuous curve, avoiding sudden spikes or loops near tower tops. Keep the central span above the deck; its low point must not cut into the deck band. This represents a cable trend, not a claim of an exact catenary or parabola. After handle edits, inspect the entire span for overshoot past another tower, not just local smoothness.</p>
+<h2 id="吊杆一端接曲线另一端接桥面">Connect each hanger from cable to deck</h2>
+<p>Place seven vertical hangers at x=420,480,540,600,660,720,780 in the central span. Individually set each upper endpoint on the current cable and each lower endpoint on the deck’s top edge; do not duplicate one fixed length seven times. Start centrally and work outward, enlarging each connection to find floating endpoints. These are ordinary path segments and will not automatically resize with the curve. Number them left to right in an endpoint checklist, checking both count and attachments before unifying their colour.</p>
+<h2 id="桥塔与桥面交叉处先决定遮挡">Decide occlusion at tower and deck crossings</h2>
+<p>Give towers visible width and the deck distinct upper and lower edges. Use a consistent elevation convention for whether the cable is visible in front of a tower: do not show it in front on one side but silently break it behind the other. Split visible segments if needed to preserve readable continuation rather than covering half a tower with a thick white patch. Optional supports below the deck may remain illustrative, without labels that imply structural parameters. Remove colour temporarily and verify that shapes and attachment positions still distinguish the components.</p>
+<h2 id="下垂变化后逐根重接吊杆">Reconnect every hanger after changing cable sag</h2>
+<p>Duplicate the source and move the central cable low point from about y=450 to y=500 while retaining tower passage points and deck. The comparison should show deeper central sag without shortened towers. Recheck and adjust all seven upper hanger endpoints, retaining the same lower attachments. The central hanger becomes shorter, not longer, as the vertical gap above the deck decreases. If an upper endpoint stayed behind, identify the missed object rather than raising the entire deck for tidiness. These illustrative states do not explain why a real bridge might change.</p>
+<h2 id="标签只指向一个明确构件">Point each label to a specific component</h2>
+<p>Place four labels outside the bridge: main cable, hanger, tower and deck, with short leaders to representative positions. Do not aim the cable label at a vertical hanger or the hanger label at a tower edge. Distinguish leaders through weight or explicit wording so they do not resemble extra hangers. Begin with these four terms rather than filling the drawing with terminology. If leaders cross at small size, reposition labels or choose other representative points instead of requiring colour memory to guess their targets. Retain “connection diagram, not to physical scale” in the legend.</p>
+<h2 id="输出后核对七根线和四个标签">Inspect seven hangers and four labels after export</h2>
+<p>Save the editable source and export a PNG for normal screen viewing. Open it and count seven hangers left to right, tracing both ends of each to the correct component. Inspect unintended cable disappearance near towers and deck edges obscured by hanger strokes. Hide or remove manually drawn references for export: they are artwork objects and cannot be assumed to disappear automatically. Verify grid and native-guide behaviour in actual output rather than treating the canvas display as an export guarantee.</p>
+<h2 id="连接错误与曲线风格分开修">Separate connection faults from curve styling</h2>
+<p>For an uneven cable, adjust nodes and handles; for floating hangers, repair endpoints rather than adding nodes indiscriminately. If the central hanger lengthens in the deeper-sag state, check the downward-increasing y convention and unintended deck movement. At tower breaks, inspect stacking and segments before claiming unsupported bridge graphics. Preserve the component list, seven endpoint pairs and state differences as a reproducible check record. Attractive styling does not replace connection checks, and a coherent illustration establishes nothing about a real bridge’s safety.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-bezier-nodes/">Edit Bézier nodes in VectorPaint: smooth curves without adding anchors</a>, <a href="/en/guides/vectorpaint-exploded-diagram/">VectorPaint exploded diagrams: explain three layers with alignment and leaders</a>.</p>
+<p>Sources checked on November 8, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Capability scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store description</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn">Apple public version lookup</a>. This original exercise can be performed independently; use the controls in your installed version. It does not claim completed physical-device, private-file or all-export-environment testing. Manual checks and external records are not newly promised automatic analysis features.</p>
+{% endraw %}

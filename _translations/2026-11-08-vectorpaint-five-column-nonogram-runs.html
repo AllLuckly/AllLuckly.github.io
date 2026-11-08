@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint five-column nonograms: match run-length clues to filled cells'
+description: Check runs, blanks and row/column clues in an original four-by-five puzzle, manually verifying its
+  unique result without an automatic solver.
+permalink: /en/guides/vectorpaint-five-column-nonogram-runs/
+date: '2026-11-08 00:00:00 +08:00'
+modified: '2026-11-08 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 138
+topic: Number encodings and constrained graphics
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-08-vectorpaint-five-column-nonogram-runs.md
+source_url: /guides/vectorpaint-five-column-nonogram-runs/
+translation_method: editorial
+translation_source_sha256: d39593136bfec4bc4832592536786259e5681904afad12085871168c0e15fcc3
+translation_date: '2026-11-08T01:34:15+00:00'
+excerpt: Check runs, blanks and row/column clues in an original four-by-five puzzle, manually verifying its unique
+  result without an automatic solver.
+---
+{% raw %}
+<p>Nonogram clues specify consecutive filled runs, not arbitrary totals of black cells. Build a tiny original pattern and recover it from clues to check question and answer consistency. Use manual grids, text and filled shapes without assuming a nonogram template, clue generator or solver. Preserve the pattern separately from the question.</p>
+<h2 id="先固定四行五列的坐标与符号">Fix four rows, five columns and cell states</h2>
+<p>Create twenty equal cells in four rows and five columns, numbering rows top to bottom one through four and columns left to right one through five. Reserve row clues on the left and column clues above, outside the cells. Define filled versus blank; an inspection cross merely marks confirmed blank, not a third answer state. Keep grid lines separate from fill blocks so duplication does not thicken overlapping lines. Verify row/column counts before instructions: five rows and four columns is not the same presentation, because transposition also changes clue placement.</p>
+<h2 id="先保存原创图案再生成题面">Preserve the original pattern before making the question</h2>
+<p>Set answer rows to ..#.., .###., #####, ..#.., using hashes for filled cells and dots for blanks in the external record; use clear filled shapes in the artwork. Keep five positions per row, including leading/trailing dots. There are ten filled cells: one plus three plus five plus one. Save the answer source, then duplicate a blank question rather than clearing the only answer. The shape may suggest an arrow, but its name is not solving evidence. Clues must remain sufficient to check cells even without naming the image.</p>
+<h2 id="逐行逐列计算连续段提示">Derive consecutive-run clues for rows and columns</h2>
+<p>Row clues are 1,3,5,1 top to bottom; column clues are 1,2,4,2,1 left to right. Trace actual cells down each column rather than merely summing filled cells, since other puzzles can have separated runs. Use a separate five-cell example #.#.. to show clues 1,1, requiring at least one intervening blank rather than clue 2. This illustrates the rule and is not a row of the current answer. Space multiple clue numbers clearly so 1,1 does not read as eleven. Keep pattern and clue lists, with each number pointing to one consecutive run.</p>
+<h2 id="从整行整列开始回填">Begin reconstruction with a full row and column</h2>
+<p>Conceal the answer. Row three has clue five, so all five cells must fill. Column three has clue four, so all four cells must fill. Their crossing counts once: do not report five plus four as nine distinct filled cells. Record five plus four minus one equals eight established filled cells and count eight in the artwork before continuing. This reconstruction order is chosen manually, not an app recommendation of the next move.</p>
+<h2 id="利用已占满的外列排除多余格">Use completed outer-column clues to rule out cells</h2>
+<p>Columns one and five each have clue one, already occupied by row three, so their other cells are blank. Row two has clue three, its central cell filled and both ends blank; its run must therefore occupy columns two through four. Columns two and four each require two, now filled consecutively in rows two and three, leaving their row-one/four cells blank. The first and fourth rows retain only their central filled cell, satisfying clue one. Record these eliminations rather than colouring an arrow by intuition and appending “looks correct”.</p>
+<h2 id="核对唯一性时限定为这组提示">Limit uniqueness claims to these exact clues</h2>
+<p>Every cell in the reconstruction is forced by full-row/column and run conditions, so these exact four-by-five clues yield this one pattern. Preserve forced-cell reasoning externally; finding one answer does not establish uniqueness for arbitrary nonograms. In a separate wrong copy, change row two to #.#.#. It still has three filled cells, but its runs become 1,1,1 and violate the original clue three. Equal filled-cell totals are therefore insufficient. Preserve the correct answer rather than overwriting it with the counterexample.</p>
+<h2 id="导出题面与答案时保持相同坐标">Keep question and answer coordinates aligned in output</h2>
+<p>Use matching presentation areas, cell sizes and clue positions for question and answer, explicitly labelling the latter. Save the source and export a viewing-size PNG. Check that row three still has five distinguishable cells rather than one unsegmented black stroke, and that clue four sits above column three. Expand margins for small clues instead of shrinking text beyond legibility. A printed proof checks readability/boundaries, not compliance with puzzle-competition rules. Distinguish the rule counterexample from the answer so the wrong version cannot be mistaken for a second valid solution.</p>
+<h2 id="先查提示方向再查连续与总数">Check clue direction, continuity and totals in order</h2>
+<p>For disagreement, check swapped row/column clues first, then runs split by blanks, then twenty cells and ten filled cells. A one-cell discrepancy requires checking its row and column clues rather than altering clues to fit the wrong drawing. For another self-made puzzle with multiple answers, revise and reverify it separately instead of claiming universal uniqueness. Preserve original pattern, blank question, reconstruction steps and counterexample with distinct identities. This checks static clue expression and manual reasoning, without invoking or promising automatic image recognition, generation or solving.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-static-maze/">VectorPaint static mazes: verify routes before refining walls and exits</a>, <a href="/en/guides/vectorpaint-four-order-latin-square/">VectorPaint order-four Latin squares: check one to four in every row and column</a>.</p>
+<p>Sources checked on November 8, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Capability scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store description</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn">Apple public version lookup</a>. This original exercise can be performed independently; use the controls in your installed version. It does not claim completed physical-device, private-file or all-export-environment testing. Manual checks and external records are not newly promised automatic analysis features.</p>
+{% endraw %}

@@ -1,0 +1,67 @@
+---
+layout: null
+permalink: /en/guides/manyue-cbz-zip-readonly-integrity-test/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'ManYue: Test CBZ archive integrity separately from readable pages'
+agent_source_url: https://allluckly.cn/en/guides/manyue-cbz-zip-readonly-integrity-test/
+agent_source_sha256: 9ee5f1a6712d83ad99eaf12e1655460b475e25fa6aba29bbda62017aec5d3d94
+agent_generator_version: 1
+---
+{% raw %}# ManYue: Test CBZ archive integrity separately from readable pages
+
+Language: en
+Canonical: [ManYue: Test CBZ archive integrity separately from readable pages](<https://allluckly.cn/en/guides/manyue-cbz-zip-readonly-integrity-test/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-cbz-zip-readonly-integrity-test/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-cbz-zip-readonly-integrity-test/>)
+Published: 2026-11-08T00:00:00+08:00
+Modified: 2026-11-08T09:34:15+08:00
+Author: Bison
+
+Run a read-only ZIP check on a trusted small sample while separating CRC failures, unsupported parameters and missing content.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-cbz-zip-readonly-integrity-test/>), translated on 2026-11-08. Original publication dates, attribution, code and version notes are retained.
+
+A CBZ normally uses a ZIP container. Listing a cover does not establish that every entry can be read completely; passing an archive test does not establish complete comic pages or safe content either. Check a small sample in an existing trusted tool, then read it in ManYue. Testing is external, not an in-app repair feature. No new installation or speculative extraction of unknown large archives is required.
+
+## Use a small sample with a known source
+
+Choose a small CBZ you created or obtained reliably and may handle. Copy it and retain the original separately. Record source, filename, size, acquisition date, expected image count and tool version. Obtain the complete cloud file rather than testing a placeholder. Stop if provenance is unknown or entry count or expanded size is unexpectedly large; do not force a pass result. Integrity tests read decompressed data and can consume time and resources even without writing files. This lesson therefore limits the task to trusted small archives rather than promising that read-only means cost-free.
+
+## Inspect the listing before extraction or repair
+
+Use an existing trusted archive tool to inspect paths, entry counts, compressed/expanded sizes and password or split-volume notices read-only. Separate body-image count from total entries, which can include directories and text. Without a separate test function, record listing checked, integrity untested rather than downloading an unfamiliar repair program. Do not repair, repack or batch-delete first: those operations change the evidence. Preserve listing scope and notices, without opening unknown scripts, apps or attachments for this check.
+
+## Use an existing test entry to read complete entries
+
+If the tool supplies an archive test, run it once according to its documentation and retain the result. If Python 3 is already installed on a computer, you may instead run `python3 -m zipfile -t sample.cbz` in the sample directory, explicitly naming the copy sample.cbz. Skip that route without Python. This external read-only test neither executes archive scripts nor extracts your comic. Reconfirm a small, known ZIP sample first. Preserve any exception message instead of repeatedly retrying a large file. Distinguish password requirements, unsupported compression and damaged reads according to the tool, rather than calling every failure a CRC error.
+
+## Interpret a pass or the first reported failure
+
+Python’s ZIP test reads entries and checks CRCs and file headers. Record the full path and stage for a reported bad entry. A first bad entry does not establish that all others are sound; if testing stops, identify untested scope. A pass means this tool/version found no error within its checks. CRC is not an author signature, does not establish trusted provenance and cannot detect a page never included. Do not describe a passing screenshot as comic-completeness certification or a safety conclusion permitting unknown attachments to be run.
+
+## Separate a failure from obtaining another original
+
+If the same known source permits another download, save it separately with date and size rather than overwriting the failed copy. Test it with the same tool and compare the affected entry. Different content or editions cannot be treated as a repaired transfer. Even a trusted source may supply a damaged archive; a completed download does not establish integrity. Without another obtainable copy, retain the failure and original. Deleting a bad page and repacking does not restore completeness; such a copy is at most temporary reading material with an explicitly omitted scope.
+
+## Return to ManYue to check actual comic content
+
+Only continue when the sample is appropriate to read. Import normally, record recognized chapters and page count, and inspect first, middle, final and tool-flagged positions. A decodable entry need not contain a clear image or the right story sequence. Keep archive-test result, image display and missing content in separate columns. If a passing archive lacks the ending, compare the expected-page list rather than blaming CRC for not reporting it. If a tool fails but the reader shows some pages, that does not repair the affected entry. Retain the actual scope of each result.
+
+## Keep a minimal reproduction for differing results
+
+If a trusted tool passes but ManYue import fails, record version, format, size, failure stage and original message. Check the basic path with another small self-made CBZ. Do not repeatedly change extensions to force agreement or edit the app database. If only a large original fails, preserve both results without claiming all ZIP files are unsupported. Report a self-made minimal sample instead of restricted works or private paths. If no test ran, say listing only; this tutorial or source-code knowledge is not a test result for your file.
+
+## Leave and return before recording layered conclusions
+
+Leave the reader and return to the same sample and first/middle/final anchors, confirming entry identity and retrievability of suspicious pages. Keep six parts: provenance, tool/version, listing scope, test-completion state, failure or pass statement, and actual reading result. Retain original and failed copy. Completion does not require every file to pass; it requires knowing which layer found a problem and which remains unchecked. ZIP testing does not replace page-completeness checks, and complete pages do not establish authorization or provenance. Preserve these boundaries with the result.
+
+## Related guides and sources
+
+[ManYue file formats: choose CBZ, CBR, CB7 or PDF and check page order](<https://allluckly.cn/en/guides/manyue-formats-and-page-order/>); [Troubleshoot ManYue imports: file access, formats and folder levels](<https://allluckly.cn/en/guides/manyue-import-troubleshooting/>).
+
+Checked on November 8, 2026: [Apple public version information](<https://itunes.apple.com/lookup?id=6753895889&country=cn>) lists ManYue 2.0.4, requiring iOS / iPadOS 15.0 or later. Feature scope follows the [official App Store description](<https://apps.apple.com/cn/app/id6753895889>) and the installed version. This article provides reading and checking methods you can perform; it does not claim step-by-step physical-device or private-server testing. Manual records, external tools and actually visible controls are identified separately, and personal analysis or code observations are not presented as verified automatic capabilities.
+
+For ZIP test scope, see the [Python standard-library zipfile documentation](<https://docs.python.org/3/library/zipfile.html>). The command is optional only with an existing Python installation and trusted small sample. No reader file is described as already tested.
+{% endraw %}

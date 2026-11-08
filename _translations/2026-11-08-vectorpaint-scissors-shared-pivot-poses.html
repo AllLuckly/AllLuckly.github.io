@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint three scissors poses: relate blades and handles around one pivot'
+description: Construct opening states from two separate components, checking a shared pivot, handle/blade ownership
+  and outlines without assuming a hidden rotation-centre command.
+permalink: /en/guides/vectorpaint-scissors-shared-pivot-poses/
+date: '2026-11-08 00:00:00 +08:00'
+modified: '2026-11-08 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 135
+topic: Object connections and unfolding
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-08-vectorpaint-scissors-shared-pivot-poses.md
+source_url: /guides/vectorpaint-scissors-shared-pivot-poses/
+translation_method: editorial
+translation_source_sha256: 979107467ba7a771599169a0dce8d5b49edd8d9ca18a84219028331a07647379
+translation_date: '2026-11-08T01:34:15+00:00'
+excerpt: Construct opening states from two separate components, checking a shared pivot, handle/blade ownership
+  and outlines without assuming a hidden rotation-centre command.
+---
+{% raw %}
+<p>Open scissors do not consist of four independently floating handles and blades. Each component extends from one handle through the pivot toward its blade tip on the other side. Make open, narrower and closed schematic states, checking component ownership and a shared axis without simulating cutting, material strength or real-tool safety.</p>
+<h2 id="先给两片部件分别命名">Name the two components separately</h2>
+<p>Create a 1200 by 900 pixel canvas with pivot (600,450). Component A runs from the lower-left handle through the pivot to the upper-right tip; B runs from the upper-left handle to the lower-right tip. Draw two pale centre references and label ownership before making four decorative shapes. Tip references may be (900,300) and (900,600), giving displacements of 300 horizontally and minus/plus 150 vertically. These coordinates support this drawing comparison, not real scissors manufacture.</p>
+<h2 id="沿每条参照建立柄到刃的连续轮廓">Build continuous handle-to-blade components</h2>
+<p>Build A first, tapering the right-side blade to its tip and connecting the left side to the handle loop through an arm. Offset the loop beside the centre reference instead of forcing every feature onto one straight line, so both loops can remain distinguishable when closed. Build B with corresponding structural roles. A background-coloured loop opening is only a visual representation, not a transparent hole, and needs rechecking on a changed background; actual cut-outs also require output inspection. Identify each handle and blade as one component when selecting, without swapping A’s handle into B merely because their paths cross at the pivot.</p>
+<h2 id="轴点上的小圆只表示共同连接">Use the pivot circle only as a shared connection</h2>
+<p>Add a small pivot circle centred at (600,450), without using an oversized disc to conceal disconnected blade sections. Hide it first to verify that both component outlines actually pass through the shared location, then restore it. You may draw A above B, but use the same stacking convention in all three states. The circle does not bind motion constraints, and grouping does not create a mechanical hinge. Preserve a pale A/B checking version so ownership remains traceable after applying a unified final colour.</p>
+<h2 id="第二状态沿同半径参照缩小开口">Reduce the opening against equal-radius references</h2>
+<p>Duplicate the first state without moving the pivot. New tip references can be (930,390) and (930,510), with displacement (330, minus/plus 60). Because 300 squared plus 150 squared equals 330 squared plus 60 squared, both states have the same pivot-to-tip distance. Retain a pivot-centred reference circle and check tips and handle arms along the new radial directions. If available rotation controls cannot ensure this axis, reconstruct an explicitly approximate illustration against the references rather than claiming rigid-rotation precision. Do not assume a hidden arbitrary-pivot command.</p>
+<h2 id="闭合示意保留两片身份">Retain both component identities in the closed view</h2>
+<p>For the third state, bring both tip directions near one horizontal ray and retain the same pivot-centred radius instead of shortening blades to appear closed. Blade edges may approach or overlap under the stated layering convention, while each handle loop remains traceable to its own component. If the schematic outline cannot preserve two readable loops when closed, adjust loop offsets in the first state and update all states rather than moving a handle arbitrarily only in the third. This depicts appearance, not acceptable physical cutting contact, clearance or edge angles.</p>
+<h2 id="并排比较时先对齐轴再比开口">Align pivots before comparing openings</h2>
+<p>Place all three states in equal presentation areas, aligning their pivots rather than substituting bounding-box centres. Extending handles change bounds, so centring solely on them can displace pivots and suggest a jumping whole tool. Label the states open, narrower and schematic closed. Optional arrows indicate this diagram’s state change, not an app-generated animation. Even without labels, blade angles should show a decreasing opening. If only handles move while tips remain fixed, check whether blade objects were omitted from the edit.</p>
+<h2 id="用分色与单色两种观看检查">Inspect both component-coloured and monochrome views</h2>
+<p>In the A/B-coloured view, trace A from handle through arm to tip, then trace B without switching identity at the pivot. Duplicate a monochrome view, preserving readable opening through outlines and minimal divisions. Save the editable source and export a PNG, inspecting merged blade strokes, blocked loop openings and a pivot circle displaced from the crossing at actual viewing size. Actively hide or remove manually drawn reference circles for final output; calling them references does not stop their export. Verify grid/native-guide output from actual results.</p>
+<h2 id="按轴位长度和归属顺序排查">Troubleshoot pivot, length and ownership in order</h2>
+<p>If blades seem to telescope, check pivot-to-tip distances first. For a translated whole tool, inspect pivot positions. For disconnected handle/blade movements, inspect component grouping. For white-block loop openings, inspect background and opening construction rather than thickening every outline. Record which points were coordinate-checked and which were approximately reconstructed; artistic inspection is not physical simulation. Retain all states, the component-coloured check and actual output so readers can trace each part through the shared pivot without appearing or disappearing blade components.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-articulated-desk-lamp/">VectorPaint articulated desk lamps: connect arms through pivots to the shade</a>, <a href="/en/guides/vectorpaint-hinged-box-three-poses/">VectorPaint hinged boxes in three poses: keep the hinge fixed as the lid changes direction</a>.</p>
+<p>Sources checked on November 8, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Capability scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store description</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn">Apple public version lookup</a>. This original exercise can be performed independently; use the controls in your installed version. It does not claim completed physical-device, private-file or all-export-environment testing. Manual checks and external records are not newly promised automatic analysis features.</p>
+{% endraw %}
