@@ -1,0 +1,70 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-audio-sample-rate-bit-rate-size/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay audio calculations: distinguish sample rate, bit depth and encoded
+  bitrate'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-audio-sample-rate-bit-rate-size/
+agent_source_sha256: ff95ac2dd5c7aed9e65f4ca891537bddfd2f5fce97c5be3fa8cde233245a69f5
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay audio calculations: distinguish sample rate, bit depth and encoded bitrate
+
+Language: en
+Canonical: [iCouldPlay audio calculations: distinguish sample rate, bit depth and encoded bitrate](<https://allluckly.cn/en/guides/icouldplay-audio-sample-rate-bit-rate-size/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-audio-sample-rate-bit-rate-size/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-audio-sample-rate-bit-rate-size/>)
+Published: 2026-11-09T00:00:00+08:00
+Modified: 2026-11-09T09:37:10+08:00
+Author: Bison
+
+Calculate original one-minute stereo examples for uncompressed data and encoded bitrate, then avoid inferring quality or whole-file size from 48 kHz.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-audio-sample-rate-bit-rate-size/>), translated on 2026-11-09. Original publication dates, attribution, code and version notes are retained.
+
+48 kHz, 16 bit, stereo and 128 kb/s describe different audio properties. Confusing them can turn sample rate into file bitrate or one audio stream’s data quantity into the size of an entire video. Use paper calculations and read-only information from your own file. iCouldPlay supplies ordinary playback and any actual track-selection controls, not an assumed transcoder or arbitrary audio-stream exporter.
+
+## Identify one audio stream before recording parameters
+
+Choose your own clip, record its identity and use an existing media-information tool to list the target audio stream’s index, language, codec, sample rate, channel count and available bitrate. Mark absent bit-depth information unavailable rather than inferring 16 bit from a codec name. If iCouldPlay exposes a track list, identify the selection by listening. Otherwise observe the single available path without claiming that every reported stream is selectable.
+
+## Read the units before the one-minute example
+
+Define an original example as uncompressed PCM with 48000 samples per second per channel, 16 bits per sample, two channels and 60 seconds. Lowercase b denotes bits, with eight bits per byte. kHz is thousands of cycles or samples per second here, not kilobytes per second. Write sample rate, bits per sample, channel count and duration in separate unit-bearing fields before multiplying. These are teaching conditions, not measured properties of your file or fields exposed by every codec.
+
+## Calculate the uncompressed sample payload
+
+48000 times 16 times 2 gives 1536000 bits per second. Divide by eight for 192000 bytes per second, then multiply by sixty for 11520000 bytes. In decimal units this is about 11.52 MB of sample payload, excluding headers, container overhead and other streams. Recalculate as 48000 samples per second per channel times two bytes per sample, times two channels and sixty seconds. Matching results help catch an omitted channel factor or a minute mistaken for an hour.
+
+## Calculate an encoded stream separately
+
+For a separate example, use constant encoded audio at 128000 bits per second for sixty seconds. Multiplying by sixty and dividing by eight gives 960000 bytes, about 0.96 MB in decimal units before container overhead. Do not reuse 48000 times 16 to infer compressed data: encoding differs from raw sample representation. With variable bitrate or an average value, label the result an estimate and retain its assumptions. 960000 is not the exact disk length of every one-minute track.
+
+## Check the definitions of reported fields
+
+Consult the [ffprobe read-only reporting documentation](<https://ffmpeg.org/ffprobe.html>) and [FFmpeg format documentation](<https://ffmpeg.org/ffmpeg-formats.html>) for relevant stream and format definitions; conversion commands are not steps in this task. Keep whole-file bitrate, individual-stream bitrate and raw PCM arithmetic in separate rows. An unreported field is not zero and does not establish corruption. A sample-format description can concern decoded representation, so do not automatically interpret it as bits stored per sample in the encoded file.
+
+## Listen without treating metadata as a quality score
+
+Play your own section at a normal level and note audible sound, dialogue intelligibility and the actual output device. 48 kHz is not automatically audibly better than 44.1 kHz, and bitrate alone cannot rank quality across codecs and sources. If distortion is heard, check source and output path instead of using arithmetic as a diagnosis. Keep content and volume fixed; do not suddenly raise volume to compensate for selecting a commentary track. This is not a professional hearing or equipment assessment.
+
+## Separate audio estimates from video storage
+
+For offline capacity, use the actual complete media-file size, including video, other audio streams and the container. The 0.96 MB example is not a one-minute video’s size and does not predict application cache usage. Account for extra copies and temporary processing space separately instead of declaring sufficient capacity because one audio stream is small. Recalculate with actual duration when it differs from sixty seconds and identify the source. An average total bitrate does not guarantee instantaneous network throughput requirements.
+
+## Check what channel count cannot establish
+
+As a controlled change, replace stereo with mono in the same 48000 Hz, 16-bit PCM example. With all other conditions fixed, sample payload halves. That arithmetic does not prove a real stereo file contains distinct left and right content: the channels may match or carry different material. Channel count and listening evidence serve different purposes; count does not identify language or purpose. Encoded size also depends on compression strategy, so the PCM halving rule cannot be applied unconditionally to every compressed copy.
+
+## Keep provenance and unknown fields after recalculation
+
+Retain both calculations, unit conversions, target stream identity, genuinely available fields and listening observations. Completion means explaining the distinct assumptions behind 1536000 and 128000 bits per second. Leave missing bit depth, variable-bitrate distribution or output-processing details unknown instead of supplying defaults. Restore normal track selection without exporting or overwriting media. This guide performs no transcoding or full-format device validation and derives no maximum device capability from one playback.
+
+## Related tutorials and sources
+
+[Check multichannel output](<https://allluckly.cn/en/guides/icouldplay-multichannel-dialogue-output-check/>), [Estimate offline storage](<https://allluckly.cn/en/guides/icouldplay-media-storage-budget/>).
+
+Checked on November 9, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

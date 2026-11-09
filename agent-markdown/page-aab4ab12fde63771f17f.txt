@@ -1,0 +1,67 @@
+---
+layout: null
+permalink: /en/guides/manyue-zip-same-path-entry-audit/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'ManYue: Audit repeated ZIP entry paths before extracting or changing files'
+agent_source_url: https://allluckly.cn/en/guides/manyue-zip-same-path-entry-audit/
+agent_source_sha256: c8929540239813d5e258b5c98e843c91a298e74d846674eacc32f92af0318466
+agent_generator_version: 1
+---
+{% raw %}# ManYue: Audit repeated ZIP entry paths before extracting or changing files
+
+Language: en
+Canonical: [ManYue: Audit repeated ZIP entry paths before extracting or changing files](<https://allluckly.cn/en/guides/manyue-zip-same-path-entry-audit/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-zip-same-path-entry-audit/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-zip-same-path-entry-audit/>)
+Published: 2026-11-09T00:00:00+08:00
+Modified: 2026-11-09T09:37:10+08:00
+Author: Bison
+
+Distinguish archive entries, paths and reader pages before extraction overwrites namesakes.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-zip-same-path-entry-audit/>), translated on 2026-11-09. Original publication dates, attribution, code and version notes are retained.
+
+A ZIP may contain multiple entries with the same stored path, which ordinary folder extraction may not preserve together. This addresses archive ambiguity, unlike deduplicating similar pages at different paths. List entries read-only, then record actual display in ManYue without assuming automatic correct-version selection or repair.
+
+## Fix a small recoverable archive
+
+Use a small ZIP or CBZ you created or obtained reliably and may handle, retaining original and working copy. Record source, full name, size, archive tool and version, confirming complete cloud download first. Do not investigate unknown large archives or extract into a real comic directory. Label suspicion as suspicion. The issue is repeated complete stored paths; page one in two different subdirectories is different. Comparing basenames alone cannot establish the same problem.
+
+## Inspect each directory record read-only
+
+In an existing trusted tool, retain each entry’s full path, size and displayed order without merging names. A deduplicated file view cannot establish absence of duplicate entries; mark the tool’s limitation. With Python already available, zipfile.infolist provides individual ZipInfo records, externally rather than in ManYue, with no new installation required. Record the method actually used and its scope. Documentation of an interface is not evidence you ran it on this file. Leave unknown structure pending.
+
+## Assign separate observation IDs to namesakes
+
+If a full path occurs twice, label records A/B and preserve entry position, size, compression method and readability separately. Equal sizes do not prove equal bytes; differing sizes identify neither newer nor complete content. File timestamps are not publication dates, and later listing order does not establish a latest edition. These are external audit IDs, not changed paths or app page numbers. Establish traceability to both directory entries before comparing contents, so extraction cannot collapse them into one untraceable file.
+
+## Establish overwrite handling before extraction
+
+Extract known images separately only when the tool lets you select an individual entry and save under different names. Use an empty working directory, audit IDs and a path mapping. If the tool cannot distinguish namesake records, stop extraction and retain the listing. Python documents ZipInfo-based access for duplicate members, but that requires familiar use on your own small sample, not an unfamiliar script. Overwrite-all leaves a processed result, not evidence representing both original entries.
+
+## Compare content without deciding deletion first
+
+For mapped images, compare dialogue, page numbers, corner marks and story context at comparable scale, optionally using an existing fingerprint tool. Preserve at least three specific observations. Different encodings with no visible difference remain different files; changed dialogue warrants retaining both, not overwriting by preference. Intentional repetition versus organization error needs context or reliable provenance. Duplicate paths alone do not select correct body content. Mark independently inaccessible entries’ content unknown.
+
+## Record only actual presentation in ManYue
+
+Import the working copy normally and record version, result, chapters and actual page count, then inspect relevant and neighbouring pages. Record one displayed version, both or an error without assuming last-entry selection. Total archive entries are not readable page counts because directories and text can also appear. An undisplayed entry is not automatically deleted; inspect the original. Do not edit app internals to force expected counts. Preserve display and archive identity as separate evidence.
+
+## Save a clearly identified copy for any organization
+
+Only for your own material with confirmed scope should you create an unambiguous reading copy, giving distinct content distinct names and maintaining order. Label manual revision, not automatic app recovery. Retain archive and extracted content, documenting renamed paths and reasons. After import, check cover, target neighbours and ending, not completion alone. Without a justified choice, continue comparison or consult the trusted source. Do not batch-delete namesakes across a library; another archive needs its own evidence.
+
+## Check entry-to-page mapping after returning
+
+Leave the reader and return to target and neighbours, confirming original versus revised entry identity. Preserve original path, audit ID, content state, app presentation and change scope, leaving unextracted or unread records unknown. Share only an authorized small sample without restricted works or private directories. Completion retains namesake traceability, avoids silent overwrite and locates reading results; it does not promise identical duplicate-name handling in every ZIP reader.
+
+## Related guides and sources
+
+[ManYue: Distinguish identical files, similar images and intentional repeated pages](<https://allluckly.cn/en/guides/manyue-suspected-duplicate-page-identity/>); [ManYue: Test CBZ archive integrity separately from readable pages](<https://allluckly.cn/en/guides/manyue-cbz-zip-readonly-integrity-test/>).
+
+Checked on November 9, 2026: [Apple public version information](<https://itunes.apple.com/lookup?id=6753895889&country=cn>) lists ManYue 2.0.4, requiring iOS / iPadOS 15.0 or later. Feature scope follows the [official App Store description](<https://apps.apple.com/cn/app/id6753895889>) and the installed version. This article provides reading and checking methods you can perform; it does not claim step-by-step physical-device or private-server testing. Manual records, external tools and actually visible controls are identified separately, and personal analysis or code observations are not presented as verified automatic capabilities.
+
+For the concept or external-tool scope, see [Python standard library: zipfile](<https://docs.python.org/3/library/zipfile.html>). Samples, checking sequences and observation records here are original reading exercises. External references establish no new automatic recognition, editing or inference in the app and do not replace checking the actual file or passage.
+{% endraw %}

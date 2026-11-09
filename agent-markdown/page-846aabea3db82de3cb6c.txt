@@ -1,0 +1,77 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-webvtt-internal-timestamp-text-boundary/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay inline WebVTT timing: separate cue intervals from text activation
+  points'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-webvtt-internal-timestamp-text-boundary/
+agent_source_sha256: b52882bcca1e1e74f7cbbfa7aa1506fb4af40b9d2435f1513d843fc649bff1c5
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay inline WebVTT timing: separate cue intervals from text activation points
+
+Language: en
+Canonical: [iCouldPlay inline WebVTT timing: separate cue intervals from text activation points](<https://allluckly.cn/en/guides/icouldplay-webvtt-internal-timestamp-text-boundary/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-webvtt-internal-timestamp-text-boundary/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-webvtt-internal-timestamp-text-boundary/>)
+Published: 2026-11-09T00:00:00+08:00
+Modified: 2026-11-09T09:37:10+08:00
+Author: Bison
+
+Check internal timestamp tags and strict ordering with an original cue, then observe rendering without assuming word highlighting.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-webvtt-internal-timestamp-text-boundary/>), translated on 2026-11-09. Original publication dates, attribution, code and version notes are retained.
+
+Some VTT cues contain timestamps inside a sentence to identify when a point in the text becomes active. They are not the start of another cue and do not automatically guarantee karaoke highlighting. Prepare a minimal external file, then record what the current iCouldPlay engine renders. Use your own prompts without editing production dialogue or requiring an in-app subtitle editor or styling-script control.
+
+## Set the complete cue interval first
+
+Prepare a self-made clip at least ten seconds long; a red paper card is enough. Assign the original sentence Move the red card. to seconds one through eight. Draw a timeline separating its start, two internal points and end. Keep the video, orientation and playback speed unchanged. The task compares text structure and does not require moving the card. Preserve normal captions and give the practice file a distinct name. This English prompt is neither recognition nor translation of real speech.
+
+## Place two timestamps strictly inside the cue
+
+Save this original example as UTF-8 plain text, excluding the code fences. Timestamp tags sit inside the payload; there is still only one outer timing line. Retain spaces so the full sentence does not join words. Seconds three and five are strictly after second one, before second eight and increasing.
+
+```
+WEBVTT
+
+00:01.000 --> 00:08.000
+Move <00:03.000>the red <00:05.000>card.
+```
+
+## Check syntax boundaries rather than guessing styles
+
+Under [W3C WebVTT cue-text timing syntax](<https://www.w3.org/TR/webvtt1/>), an internal timestamp must be later than the cue start, earlier than its end and later than earlier internal timestamps in that cue. Copy seconds one, three, five and eight in order and check that five does not precede three. These constraints describe valid marker positions. They do not prove a player will reveal words progressively, recolor them or hide future text. Specification styling mechanisms and application controls require separate assessment.
+
+## Play normally from before the cue begins
+
+Select the practice file in iCouldPlay and play from before second one until after second eight. Record visible text in the early, middle and late portions. You may see the full sentence, time-dependent styling or exposed raw tags; transcribe the actual result, including unexpected outcomes. Do not change unknown engines or system settings repeatedly to force a word-by-word effect. If loading fails, record the entry point and error, then use a known readable plain VTT to check file selection.
+
+## Save a plain-text control with the same interval
+
+Duplicate the file under a new name and remove only the two angle-bracketed timestamps. Keep the sentence, spaces and one-to-eight-second interval. Select the control and play from the same earlier point without changing size, caption offset or video. Identical appearance may mean the current path exposes no visible timing difference; it does not make the source files semantically identical. If only the control displays text, preserve that distinction and check support scope without claiming a universal VTT fix.
+
+## Check an equal-to-start counterexample on paper
+
+On paper, change the first internal marker to second one as an invalid candidate. Equality with the cue start fails the cited strict constraint. A marker at second nine is another invalid candidate because it exceeds the end. These are paper checks; there is no need to import broken files. Restore seconds three and five rather than extending the outer interval to conceal the mistake. This locates a boundary problem instead of attributing every rendering issue to the player.
+
+## Write the visible-message requirement separately
+
+If a real use requires the latter words to remain unseen before second three, adding inline tags alone cannot promise that result. State the requirement and verify the actual playback path. Without reliable behavior, use separately timed cues that you verify afresh, or retain an unsupported outcome. Splitting changes text organization and reading load, so it is not a fully equivalent conversion. Speech synthesis, automatic word segmentation and injected webpage CSS are outside this exercise and are not required steps.
+
+## Identify the selected file after reopening
+
+Reopen the same video and identify the current caption source before playing through the sentence. Similar list names do not prove that the tagged version was restored. Selection persistence can differ by playback path; record what happens. If angle brackets appear, inspect characters, encoding and extension in the external file rather than transcribing exposed tags as dialogue. Preserve both original practice files with dated observations, then restore normal captions.
+
+## Finish separate syntax and rendering records
+
+Explain the distinct roles of the outer one-to-eight-second interval and internal seconds three and five, then record whether the current version shows a visible difference. Valid syntax, successful loading and verified styling are separate outcomes. Leave unobserved engines or devices untested rather than labeling them unsupported or fully working. This is a minimal executable verification workflow, not a claim that word highlighting was reproduced on a physical device or promised for every iCouldPlay subtitle path.
+
+## Related tutorials and sources
+
+[Check VTT timestamp units](<https://allluckly.cn/en/guides/icouldplay-webvtt-timestamp-unit-carry/>), [Check captions after seeking](<https://allluckly.cn/en/guides/icouldplay-seek-caption-reentry-check/>).
+
+Checked on November 9, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

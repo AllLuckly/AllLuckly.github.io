@@ -1,0 +1,54 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay HLS variants: map the master playlist, variants and media segments'
+description: Map bandwidth, resolution and child media playlists in an original two-variant HLS example, then record
+  playback without treating the master playlist as a complete video.
+permalink: /en/guides/icouldplay-hls-master-variant-media-map/
+date: '2026-11-09 00:00:00 +08:00'
+modified: '2026-11-09 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 102
+topic: Media representations and transfer boundaries
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-09-icouldplay-hls-master-variant-media-map.md
+source_url: /guides/icouldplay-hls-master-variant-media-map/
+translation_method: editorial
+translation_source_sha256: 310756f308354fe3c088c6f8256596138f7fe27a22c4999b377be00e0c75d3b8
+translation_date: '2026-11-09T01:37:10+00:00'
+excerpt: Map bandwidth, resolution and child media playlists in an original two-variant HLS example, then record
+  playback without treating the master playlist as a complete video.
+---
+{% raw %}
+<p>An M3U8 entry point can list alternative variants or directly list media segments. Calling both layers a video file makes it difficult to determine what was saved and what the player read. First map a playlist hierarchy in external text, then watch your own legitimate source in iCouldPlay. This task does not require a bitrate menu or claim that visual sharpness reveals the selected variant.</p>
+<h2 id="section-1">Identify the playlist layer before playback</h2>
+<p>Open a playlist copy you are authorized to inspect as read-only plain text and note its source and retrieval time. STREAM-INF followed by another M3U8 expresses a different relationship from EXTINF followed by a media segment. Do not merge these layers because they share an extension, or treat a webpage’s play entry point as an independent media file. For real playlists with temporary parameters, retain only necessary identity information in controlled notes and do not publish full authorized links.</p>
+<h2 id="section-2">Build an original two-variant example</h2>
+<p>This example teaches structure only. No real media accompanies its paths, so it is not a playable package. Pair each STREAM-INF line with its following URI. The first points into the low directory and the second into high; do not attach both tags to the final line.</p>
+<pre><code>#EXTM3U
+#EXT-X-STREAM-INF:BANDWIDTH=900000,RESOLUTION=640x360
+low/index.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=2400000,RESOLUTION=1280x720
+high/index.m3u8
+</code></pre>
+<h2 id="section-3">Keep bandwidth and resolution separate</h2>
+<p>Under <a href="https://www.rfc-editor.org/rfc/rfc8216.html#section-4.3.4.2">RFC 8216 variant stream definitions</a>, BANDWIDTH is in bits per second. The example’s 900000 is not a file size of 900000 bytes. RESOLUTION provides display resolution information for the video variant. Copy original values before interpreting them; “high” and “low” are not substitutes for data. Greater bandwidth or resolution alone cannot prove better image quality because encoding, content and delivery can differ. The table records only what the playlist declares.</p>
+<h2 id="section-4">Follow one variant to its media segments</h2>
+<p>From your own source, choose one readable child playlist and map its EXTINF entries to segment URIs, recording durations separately. Initialization sections, separate audio, keys or other requirements are additional dependencies; do not delete them and call the result complete. This exercise requires no encrypted-content downloads or permission changes. Stop at the relationship inventory if dependencies are unclear. Two variants do not mean “play low, then high” as consecutive scenes. Read temporal order from the selected media playlist.</p>
+<h2 id="section-5">Record only controls actually visible in iCouldPlay</h2>
+<p>Open a real entry point through a currently supported source and play to a section of your own clip containing text or detail. Record playback and any visible quality controls. If no bitrate selector is present, mark it unavailable instead of searching for a hidden button required by the teaching example. If options exist, copy their displayed values and observation times without inferring the corresponding network requests. One working selection does not prove every candidate works; leave unchecked paths untested.</p>
+<h2 id="section-6">Separate perceived changes from variant identity</h2>
+<p>If a section looks sharper or softer, note its content position, whether a seek just occurred and the network conditions; do not immediately assert an automatic bitrate switch. Scaling, motion, blur already in the source and post-buffering display can affect perception. Associate a specific variant only with trustworthy service records or explicit UI evidence; otherwise leave it undecided. Keep orientation and display mode fixed during comparison, and avoid changing source, captions and device simultaneously.</p>
+<h2 id="section-7">Preserve hierarchy evidence when one variant fails</h2>
+<p>If the master loads but a child path fails, record master access, child status, segment availability and playback separately. A working alternative does not erase the failed result, and a directory permission issue does not establish that HLS as a whole is unsupported. Resolve addresses against their real base using the earlier URI guide, then let the source maintainer check expiry, redirects and dependencies. Do not submit credential-bearing child URLs to public tools or edit a production playlist to force a selection.</p>
+<h2 id="section-8">Add audio-group relationships when present</h2>
+<p>If the real master also has MEDIA tags, check whether TYPE is AUDIO, then match GROUP-ID to the variant’s AUDIO attribute. External audio entries are not additional video quality levels. An audio declaration without an external URI is not automatically missing: check whether the playlist indicates carriage within the video variant. Names can be display labels, so confirm language and purpose by listening. Mark unavailable audio unconfirmed rather than labeling a commentary track as the main dialogue.</p>
+<h2 id="section-9">Keep a traceable variant map</h2>
+<p>Draw the master entry branching to two candidate variants, then to their media playlists and dependencies. Mark only inspected nodes confirmed. Saving a playlist is not saving all media segments and does not prove offline playback. Attach the iCouldPlay observations separately, distinguishing text evidence from UI evidence. If the source updates or addresses expire, inspect a newly dated copy. Preserve old screenshots and playlists with their original dates instead of relabeling them as current evidence.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-hls-relative-uri-resolution-sheet/">Resolve relative HLS addresses</a>, <a href="/en/guides/icouldplay-hls-playlist-offline-boundary/">Distinguish M3U8 from offline media</a>.</p>
+<p>Checked on November 9, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

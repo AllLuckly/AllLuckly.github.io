@@ -1,0 +1,70 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-sample-display-aspect-ratio-check/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay aspect ratios: separate pixel dimensions, sample ratio and display
+  ratio'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-sample-display-aspect-ratio-check/
+agent_source_sha256: 7d623f20ada11eed93579a92be3a9a73af5ed3b2cbb46b81b089fc58c66045ad
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay aspect ratios: separate pixel dimensions, sample ratio and display ratio
+
+Language: en
+Canonical: [iCouldPlay aspect ratios: separate pixel dimensions, sample ratio and display ratio](<https://allluckly.cn/en/guides/icouldplay-sample-display-aspect-ratio-check/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-sample-display-aspect-ratio-check/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-sample-display-aspect-ratio-check/>)
+Published: 2026-11-09T00:00:00+08:00
+Modified: 2026-11-09T09:37:10+08:00
+Author: Bison
+
+Calculate two original 720×576 metadata examples, then check visible shape with a self-made circle without treating black bars as proof of distortion.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-sample-display-aspect-ratio-check/>), translated on 2026-11-09. Original publication dates, attribution, code and version notes are retained.
+
+A file labeled 720×576 does not necessarily have a display ratio of 720 divided by 576. Some media declares non-square samples, which must also be considered. Work through two paper calculations, then observe your own reference clip in iCouldPlay. Do not edit metadata or diagnose the source solely from window dimensions, black bars or one apparently flattened frame.
+
+## Prepare your own circular reference
+
+Prepare a self-made clip whose central circular and square references can be confirmed in a trusted tool. Add four corner marks and record its authored dimensions, export method and filename. Verify that the shapes were not distorted during creation. Without a reference clip, complete the paper calculations and leave playback untested; do not judge arbitrary downloaded films by facial shape. Preserve the original and work read-only without searching for an unverified sample-ratio repair button.
+
+## Read dimension and aspect-ratio fields without inventing missing data
+
+In an existing trusted media-information tool, record width, height, sample\_aspect\_ratio and display\_aspect\_ratio. The [ffprobe documentation](<https://ffmpeg.org/ffprobe.html>) describes read-only stream reporting; you need not install it for this exercise. Preserve unknown, zero or absent fields instead of substituting one-to-one. Record rotation, cropping or additional display transforms separately. The following simple calculations assume a flat example without those additional transforms.
+
+## Calculate the square-sample baseline
+
+Write 720:576 and reduce it to five-to-four. This is the ratio of the pixel rectangle. It directly becomes that rectangle’s display ratio only with square samples and no other transforms. Write that condition beside the calculation rather than generalizing it to every video. Draw a five-by-four box on grid paper as a calculation baseline, not an assertion about the original’s intended image. The physical screen dimensions do not enter this reduction.
+
+## Apply sixteen-to-fifteen to the first example
+
+Set the first original metadata example to 720×576 with SAR sixteen-to-fifteen. Under the stated assumptions, display ratio is 720 divided by 576, multiplied by sixteen divided by fifteen: four-to-three. Keep the dimension ratio and sample ratio separate before giving the result, so SAR is not mistaken for the final display ratio. These are reproducible teaching values, not a claim about your clip. Retain different actual values and calculate them separately instead of changing readings to fit four-to-three.
+
+## Change the sample ratio while retaining dimensions
+
+Keep 720×576 for the second example but use SAR sixty-four-to-forty-five. The same multiplication gives sixteen-to-nine: a different display shape with identical pixel dimensions. Check the relationship in the [FFmpeg aspect-ratio definitions](<https://ffmpeg.org/ffmpeg-filters.html#setsar_002c-setdar>). This guide reads the concept and does not run metadata-changing filters. The examples show why resolution alone cannot diagnose stretching; they do not imply that one file has two contradictory valid declarations simultaneously.
+
+## Observe iCouldPlay with a fixed display mode
+
+Open your reference clip and, with a fixed fit mode, check whether the circle remains round, the square has equal sides and all corner marks remain visible. Note device orientation and actual display controls without changing orientation and source together. Black bars can simply reflect a mismatch between content and window ratios; they are not proof of stretching. Distinguish bars encoded in the file from outer player space. If their boundary is unclear, say so rather than cropping bars and claiming the ratio is fixed.
+
+## Change one visible display option for comparison
+
+If fit or fill controls actually exist, switch once and examine the corner marks and circle. Filling a window can crop edges without stretching them. An unchanged circle with missing corner marks indicates a changed visible extent. Without such controls, retain the single-mode observation rather than inventing a numeric ratio menu. Restore the original setting and revisit the same image to check repeatability. Screenshot measurements are not automatically geometrically precise, particularly after a messaging tool rescales the image.
+
+## Check whether the source has already been transformed
+
+If the local reference looks correct but a same-named remote item does not, first determine whether the remote item is the same file or a processed representation. Compare their actual metadata. A server may already have converted non-square samples to square ones or applied different cropping, so original parameters cannot simply be assigned to its output. Compare only documented representations rather than blaming an engine because names match. Do not combine remuxing, transcoding and setting changes. Any repair belongs in a separate production copy, preserving the sole original.
+
+## Conclude calculations, metadata and observation separately
+
+Keep the two original calculations, real reference metadata, display mode, shape and corner observations, and any missing transform information. Label the origins of five-to-four, four-to-three and sixteen-to-nine rather than presenting them as three player buttons. Without tool data, deliver calculations and observations only; do not fabricate measured SAR values. The guide does not claim iCouldPlay edits sample ratios or has been tested on every device. Re-establish the reference and identity for a different export.
+
+## Related tutorials and sources
+
+[Use an edge reference card](<https://allluckly.cn/en/guides/icouldplay-display-edge-test-card/>), [Inventory media stream information](<https://allluckly.cn/en/guides/icouldplay-container-codec-stream-inventory/>).
+
+Checked on November 9, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

@@ -1,0 +1,65 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-boxplot-quartile-whisker-convention/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint box plots: declare quartile and whisker conventions first'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-boxplot-quartile-whisker-convention/
+agent_source_sha256: 7c18719ed7c4023323c661e1982c15cf2388b28c280792e1540d8972baabaf10
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint box plots: declare quartile and whisker conventions first
+
+Language: en
+Canonical: [VectorPaint box plots: declare quartile and whisker conventions first](<https://allluckly.cn/en/guides/vectorpaint-boxplot-quartile-whisker-convention/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-boxplot-quartile-whisker-convention/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-boxplot-quartile-whisker-convention/>)
+Published: 2026-11-09T00:00:00+08:00
+Modified: 2026-11-09T09:37:10+08:00
+Author: Bison
+
+Calculate a five-number summary for eight invented values, plot box and whiskers on one axis, and distinguish extreme-value whiskers from outlier conventions.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-boxplot-quartile-whisker-convention/>), translated on 2026-11-09. Original publication dates, attribution, code and version notes are retained.
+
+A box plot’s rectangle is not arbitrary decoration. Define all five positions and whisker rules. Here quartiles are medians of lower/upper halves and whiskers reach actual extrema, calculated before manual drawing. Values are invented, not real scores or risk reports, with no assumed automatic statistics, outlier recognition or significance inference.
+
+## Preserve eight original values and their order
+
+Record2,4,6,8,10,12,14,16 in fictional observation units, preserving all eight sorted values. Do not design an attractive box first and choose fitting data. Label n=8 and axis units; box height does not encode count. [NIST’s box-plot explanation](<https://www.itl.nist.gov/div898/handbook/eda/section3/boxplot.htm>) distinguishes basic extreme-value whiskers from fenced variants. Choose the former without asserting universal software conventions or copying its real case data.
+
+## Calculate the five-number summary
+
+Minimum2, maximum16; median is the mean of fourth/fifth values8 and10, giving9. Lower-half2,4,6,8 has median5; upper-half10,12,14,16 has median13. Thus the summary is2,5,9,13,16. Quartiles need not be observed values, so do not replace5/13 merely because absent from the data. State the algorithm beside Q1/Q3. This explicitly handles eight values without asserting one universal odd-sample splitting method. Median9 is also unobserved, lying between8 and10 rather than representing a missing record; n remains8.
+
+## Locate five positions on one scaled axis
+
+Use x=100+40×value and centre y450: positions180,300,460,620,740 for minimum,Q1,median,Q3,maximum. A0–30 axis leaves space for a later control with equal unit spacing. Mark points before drawing the box; do not move median x460 merely to centre it. Data determine the two internal spans. Separate value labels from ticks so text origins are not mistaken for data positions.
+
+## Draw box, whiskers and median distinctly
+
+Draw the box fromQ1 x300 toQ3 x620, choosing height80. A median line atx460 crosses its height; whiskers connect box edges to extrema with short end caps. Median is not mean and box height is not frequency. Record IQR13−5=8 separately from range16−2=14. Defer gradients/3D shadows that suggest area encoding. These manual objects do not automatically understand statistical roles.
+
+## Update dependent quantities after changing the maximum
+
+Duplicate the list changing only16 to28, retaining eight values. The same half-median rule keepsQ1=5,median9,Q3=13,minimum2; maximum28 makes range26. Under the stated extreme-whisker convention, the right endpoint becomesx1220, not740. Keep the box unchanged, distinguishing an extreme change from middle-interval change. Preserve and label both datasets rather than overlaying unexplained whiskers.
+
+## Keep outlier rules in a separate convention
+
+For a1.5-IQR-fence variant, explicitly redefine and recalculate whiskers/points instead of adding a dot at28 while retaining a whisker to28. Q1=5,Q3=13 gives fences−7 and25, placing28 beyond the upper fence. Separate display under that variant does not establish error or justify deletion. Retain extreme whiskers in the original and make no anomaly diagnosis. Check conventions before comparison rather than calling another statistical algorithm a drawing fault.
+
+## Read axis before box in exported output
+
+Save and open a PNG, checking all five positions, common scale,n and whisker convention. If28 exceeds the canvas, expand it or scale uniformly rather than compressing only the right whisker. For a missing median inspect strokes/stacking instead of changing its value. Hide unwanted manual check marks while preserving data/algorithm records. Do not stretch each comparison to equal width and invite length judgements. Individually scaled thumbnails cannot replace a common-axis comparison.
+
+## Troubleshoot data, algorithm and position separately
+
+For a wrong box inspect sorting/halves, then scale if values are correct but positions wrong. For differing whisker endpoints compare extrema/fence rules first. Do not delete28 to fit expectations or call box width population reliability. Retain data, five-number calculations, both versions and variant notes, tracing every graphic to a definition. This is reproducible information design, not automatic statistics acceptance or evidence for significance, causality or real operational decisions.
+
+## Related tutorials and sources
+
+[VectorPaint stem-and-leaf displays: preserve tens, units and repeated values](<https://allluckly.cn/en/guides/vectorpaint-stem-leaf-repeated-values/>), [VectorPaint scatterplots: map every point to two values](<https://allluckly.cn/en/guides/vectorpaint-paired-value-scatterplot/>).
+
+Checked on November 9, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Capability scope follows the [official App Store listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public version lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn>). This is an original exercise to perform independently; use controls in your installed version. Manual construction and external records do not imply new automatic analysis features. No step-by-step physical-device, private-file or all-output-environment testing is claimed.
+{% endraw %}

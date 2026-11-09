@@ -1,0 +1,66 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-each-edge-once-trail/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint each-edge-once trails: distinguish revisited vertices from repeated
+  edges'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-each-edge-once-trail/
+agent_source_sha256: fa1829ddd3c3067fd31ebf119d15c2b7b493a266caaa6a55d2b11b015d161dd3
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint each-edge-once trails: distinguish revisited vertices from repeated edges
+
+Language: en
+Canonical: [VectorPaint each-edge-once trails: distinguish revisited vertices from repeated edges](<https://allluckly.cn/en/guides/vectorpaint-each-edge-once-trail/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-each-edge-once-trail/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-each-edge-once-trail/>)
+Published: 2026-11-09T00:00:00+08:00
+Modified: 2026-11-09T09:37:10+08:00
+Author: Bison
+
+Check a complete trail on a five-edge undirected graph against an edge list, distinguishing repeated vertices from repeated edges.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-each-edge-once-trail/>), translated on 2026-11-09. Original publication dates, attribution, code and version notes are retained.
+
+Shortest routes minimise weights; this task instead uses every edge exactly once. Vertices may recur while edges cannot be omitted or repeated. Draw an invented five-edge graph and verify a sequence explicitly, without real navigation or an assumed graph-theory solver/route validator.
+
+## Define four vertices and five undirected edges
+
+Place A(200,200),B(600,200),C(600,600),D(200,600). List undirected,unweighted edgesAB,BC,CD,DA,AC—five total. Draw the square and AC only; a decorative second diagonal changes the task. Give each edge an identity for external checking and attach endpoints consistently to centres or node boundaries, without floating gaps. Weight/length do not encode cost; state that traversal count is the objective.
+
+## Use incident counts as endpoint clues
+
+Incident counts are A3,B2,C3,D2. Entering and leaving an intermediate vertex consumes paired edges, making odd-count A/C endpoint candidates here. A nearby3 is neither three stops nor an edge weight. Counts guide starting choice but a route still needs explicit verification; parity alone is not a drawn solution. Retain the same connected graph rather than deleting an edge and reusing old counts. A separate B-start trial cannot satisfy this graph’s edge-once requirement; do not silently add a return edge to finish it.
+
+## Trace A,B,C,D,A,C step by step
+
+Start A and follow A→B→C→D→A→C. EdgesAB,BC,CD,DA,AC each occur once, ending C. Copy the five-edge checklist and mark one entry per step, finishing with five single marks. Six listed vertex occurrences represent five connections, not six edges. Optional step numbers1–5 belong near edge middles rather than vertices where they might read as station numbers.
+
+## Allow repeated A/C without repeating edges
+
+A and C each appear twice without violating edge-once use: revisiting a vertex differs from reusing an edge. Separate vertex sequence from edge identities. A vertex-once problem is a different constraint and cannot invalidate this trail. Verify without step-number graphics using the edge list alone. Route arrows show this traversal direction, not directed original edges; reversing an undirected edge does not create a new one.
+
+## Expose an omitted edge through a repeated-first-edge example
+
+A wrong A→B→C→D→A→B sequence still has five steps but repeatsAB, omitsAC and endsB. Step count equalling edge count is insufficient without identities. Keep the correct trail and a separate wrong view/table, avoiding mixed arrows. Replace the last step withAC and recheck earlier steps. BA cannot evade repetition: it is the same undirected edge asAB. Recolouring or renaming does not remove the fault.
+
+## Verify an alternative trail independently
+
+An alternative A→D→C→B→A→C usesAD,DC,CB,BA,AC once each. Both startA/endC, so the graph has multiple answers. A different order is not inherently wrong. An edge-once closed tour back toA cannot pair all arrivals/departures at odd-degree A/C in this graph. This explains the given case rather than claiming automatic analysis of arbitrary graphs. Changed edges require new counts and route checks.
+
+## Preserve edge identity and attachment in output
+
+Save and open a PNG. Count four nodes/five edges without decoration, then follow steps1–5. Reposition labels obscuring AC rather than interpreting its hidden middle as two edges. Distinguish undirected graph from traversal arrows, with no hidden meaning in node colours. Hide unwanted manual marks while retaining the external checklist. Enlarge a crowded composition rather than silently removing nodes/edges for tidiness.
+
+## Determine completion from identities rather than appearance
+
+For correct total steps but failure inspect repeats/omissions. For another endpoint check a changed start or missed diagonal. Explain vertex versus edge revisits when misunderstood. Recheck all five edges after repairs, not only the final stroke. Retain unarrowed graph, two valid sequences,counterexample and output with identifiable steps. This is a manually verifiable trail, not shortest distance, fastest traffic or automatic solving of every one-stroke problem.
+
+## Related tutorials and sources
+
+[VectorPaint five-node weighted routes: sum edge weights before comparing paths](<https://allluckly.cn/en/guides/vectorpaint-five-node-weighted-routes/>), [VectorPaint route diagram: explain directions with paths, stops and a legend](<https://allluckly.cn/en/guides/vectorpaint-route-map/>).
+
+Checked on November 9, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Capability scope follows the [official App Store listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public version lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn>). This is an original exercise to perform independently; use controls in your installed version. Manual construction and external records do not imply new automatic analysis features. No step-by-step physical-device, private-file or all-output-environment testing is claimed.
+{% endraw %}

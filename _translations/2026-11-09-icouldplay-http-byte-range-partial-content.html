@@ -1,0 +1,52 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay byte-range checks: distinguish a partial response from a complete copy'
+description: Calculate byte intervals and representation length from an original response example, then separate
+  playback observations from evidence of a complete offline copy.
+permalink: /en/guides/icouldplay-http-byte-range-partial-content/
+date: '2026-11-09 00:00:00 +08:00'
+modified: '2026-11-09 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 101
+topic: Media representations and transfer boundaries
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-09-icouldplay-http-byte-range-partial-content.md
+source_url: /guides/icouldplay-http-byte-range-partial-content/
+translation_method: editorial
+translation_source_sha256: 6333105609455d77bde5dddc6bed57b72c4d63fd2ecc023183b9dea603b73434
+translation_date: '2026-11-09T01:37:10+00:00'
+excerpt: Calculate byte intervals and representation length from an original response example, then separate playback
+  observations from evidence of a complete offline copy.
+---
+{% raw %}
+<p>A remote video starting successfully only shows that enough data for the current playback has arrived. It does not prove that the entire video has been downloaded. Use an original HTTP response example to understand byte intervals, then observe normal playback of your own authorized source in iCouldPlay. Do not intercept another person’s traffic or interpret the playback bar as a downloaded file. Without trustworthy server records, leave the network details unconfirmed.</p>
+<h2 id="section-1">Fix the resource and the observation scope</h2>
+<p>Choose your own short clip and record its source name, directory, filename, size and check date. Confirm that iCouldPlay opens that item. If the server may transcode, record whether this is a processed representation: the original file size is not automatically the transcoded response length. Limit the task to starting playback and one forward seek. Do not test offline playback or clear normal caches. Existing server logs may be read, but do not publish logs, expand account permissions or copy full signed URLs into notes.</p>
+<h2 id="section-2">Calculate the byte count in an original example</h2>
+<p>Copy this teaching example into an external note without presenting it as an observed response from your server. The interval starts at zero and includes its last byte, so its length is 1023 minus 0 plus 1: 1024 bytes. The 8192 after the slash is the representation length, not this response body length. This example contains no real address or credentials and is not playable media.</p>
+<pre><code>HTTP/1.1 206 Partial Content
+Content-Range: bytes 0-1023/8192
+Content-Length: 1024
+</code></pre>
+<h2 id="section-3">Separate the requested and returned intervals</h2>
+<p>Under <a href="https://www.rfc-editor.org/rfc/rfc9110.html#name-range-requests">RFC 9110 range requests</a>, a client can request part of a representation; a server can also ignore a range and return a complete 200 response. Keep separate fields for request headers, response status, returned interval and response length. A Range request alone does not prove success. If the request is unavailable, record only observed response fields. A multipart range response requires its own structure to be checked; its outer length is not the length of each part.</p>
+<h2 id="section-4">Record visible results during normal playback</h2>
+<p>Play a short section normally from the beginning and record startup delay, continued progress and whether sound and picture both appear. The position indicates where you watched to. Treat any buffering display as a UI observation, not a measure of a complete download. If playback pauses briefly, note its position and recovery without immediately blaming range support: network conditions, decoding and server processing can all matter. The observation table can be completed without logs, but response fields must remain unknown.</p>
+<h2 id="section-5">Match records around a seek to the same resource</h2>
+<p>Choose a later content landmark, seek to it in iCouldPlay and resume normal playback. Record the target and the scene that actually appears. If you have logs from your own server, match them using date, resource identity and request order; nearby clock times alone do not establish which request belongs to the seek. A media index can require reading near a file’s end, so byte position need not map linearly to playback time. Do not multiply total bytes by playback percentage to invent a range, or claim that seeking to the end retrieved all intermediate data.</p>
+<h2 id="section-6">Check missing content with a second interval</h2>
+<p>Add a second interval, 1024 through 2047, on paper. It also contains 1024 bytes. Together the intervals cover only 0 through 2047: 2048 bytes, one quarter of the example’s 8192. Even with two successful responses, 6144 later bytes remain absent. Deduplicate overlapping intervals instead of summing transfer lengths as unique bytes possessed. This calculation concerns one fixed representation. Independent playback of real media additionally depends on its container and complete-file validation; the arithmetic cannot guarantee it.</p>
+<h2 id="section-7">Handle 416 and an unavailable total length</h2>
+<p>If trustworthy existing records show 416, first check the requested start against the current representation length and whether the link now identifies a different object. Do not repeatedly enlarge the range. If the total length is unknown, do not fill it with the disk original’s size; record only confirmed information. Accept-Ranges does not guarantee every request behaves as expected, and its absence alone does not prove that partial retrieval is impossible. Preserve the original response and conditions for the source administrator when investigating a real failure.</p>
+<h2 id="section-8">Verify an offline copy as a separate outcome</h2>
+<p>For offline viewing, use a supported saving method actually present in your installed version. After an explicit completion result, check the copy’s identity and readable extent. If no such control exists, do not invent a download button. Store complete-copy evidence separately from the 206 record and, where a file is accessible, use the checksum guide to check it. A successful offline test of one clip applies only to that copy and environment, not every remote library item. Restore the original viewing position afterwards without deleting normal media as a cleanup test.</p>
+<h2 id="section-9">Give each kind of evidence its own conclusion</h2>
+<p>Finish with the fixed resource identity, the original calculation, real playback and seek observations, any available response records and unresolved fields. Keep “a partial response was observed,” “playback currently works” and “a complete copy needs separate verification” as distinct conclusions. This guide explains HTTP semantics and a manual investigation method. It does not claim to have captured iCouldPlay internals, established every engine’s behavior or tested a private server. Rebuild the correspondence when the source or file changes; old intervals do not automatically apply.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-remote-success-html-not-media/">Check a successful remote response</a>, <a href="/en/guides/icouldplay-media-copy-checksum/">Verify a media copy checksum</a>.</p>
+<p>Checked on November 9, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}
