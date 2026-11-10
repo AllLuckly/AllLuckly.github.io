@@ -4,7 +4,7 @@ app_id: man_yue
 title: 漫阅+：本地漫画、离线阅读与 NAS 书库
 description: 了解漫阅+ 的本地漫画导入、离线阅读、WebDAV、SMB 与服务器书库支持，按自己的文件和阅读场景开始使用。
 permalink: /apps/manyue/
-modified: 2026-11-09
+modified: 2026-11-10
 ---
 
 漫阅+ 是一款用于 **iPhone 与 iPad 的漫画阅读器和个人书库管理工具**。可以阅读自己导入的漫画文件，添加漫画源，或连接个人 NAS 与漫画服务器。中国区商店名称是「漫阅+ 漫画阅读器」。
@@ -55,4 +55,8 @@ OPDS-PSE 支持逐页阅读。普通 OPDS 条目如果只提供整包下载链�
 
 ## 版本与来源
 
-2026 年 11 月 9 日核对：中国区 App Store 版本为 **2.0.4**，最低要求 iOS / iPadOS 15.0。本文根据 [漫阅官方商店页面](https://apps.apple.com/cn/app/id6753895889)、[Apple 公共查询接口](https://itunes.apple.com/lookup?id=6753895889&country=cn)与项目功能入口整理，未作真机实测声明。
+2026 年 11 月 10 日核对：中国区 App Store 版本为 **2.0.5**，最低要求 iOS / iPadOS 15.0。本文根据 [漫阅官方商店页面](https://apps.apple.com/cn/app/id6753895889)、[Apple 公共查询接口](https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261110)与项目功能入口整理，未作真机实测声明。
+
+## 2.0.5 的公开更新
+
+本地与 WiFi 漫画导入改进大文件处理，WiFi 单文件上限提高至 2 GB；这项上限不表示所有来源或格式都以同样方式导入。更新还改善 EPUB 图片页序与漫画排序、渲染与连续预加载、后台阅读记录同步，以及 iPad 窗口缩放、弹窗定位和旋转后的点击响应。这里记录公开更新范围，具体结果仍需用自己的小文件及安装版本检查，不把更新说明写成已完成逐项真机验收。

@@ -1,0 +1,81 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-ass-karaoke-centisecond-duration-check/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay ASS karaoke durations: separate centiseconds, starts and visible
+  effects'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-ass-karaoke-centisecond-duration-check/
+agent_source_sha256: 48a34ddc39ab593388b47a30cac4f8aa5a3713639ea39b6b0aa00494f0dba52e
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay ASS karaoke durations: separate centiseconds, starts and visible effects
+
+Language: en
+Canonical: [iCouldPlay ASS karaoke durations: separate centiseconds, starts and visible effects](<https://allluckly.cn/en/guides/icouldplay-ass-karaoke-centisecond-duration-check/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-karaoke-centisecond-duration-check/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-karaoke-centisecond-duration-check/>)
+Published: 2026-11-10T00:00:00+08:00
+Modified: 2026-11-10T09:39:21+08:00
+Author: Bison
+
+Check a three-second interval with original One/Two syllables and distinguish valid tags from observed effects.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-ass-karaoke-centisecond-duration-check/>), translated on 2026-11-10. Original publication dates, attribution, code and version notes are retained.
+
+ASS k100 is a duration in centiseconds, not absolute second 100. Treating it as an absolute timestamp misaligns syllables with the event interval. Use a complete original ASS, calculate cumulative durations and inspect iCouldPlay rendering without song lyrics, an in-app karaoke editor or a word-highlighting switch.
+
+## Prepare two text units and an event interval
+
+Use your own stationary clip at least six seconds long. The original words One and Two require no singing or copied lyrics. Plan one event from second one to four: One for one second and Two for two. Preserve originals and create a separate .ass file. Without playback access, complete units and source checks while leaving effects untested rather than reporting a sweep observed on a device. Use an existing trusted font without downloading unfamiliar font packs.
+
+## Save a complete header, style and event
+
+Save this original complete practice file as UTF-8 plain text, excluding fences. The style supplies a baseline, not identical rendering across iCouldPlay paths; Arial may be substituted. Braces in event text are ASS override markup, not webpage tags. Preserve backslashes through saving and reopening. Copying the Dialogue line alone does not create this complete standalone caption file.
+
+```
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,28,&H00FFFFFF,&H0000FFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,2,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:04.00,Default,,0,0,0,,{\k100}One {\k200}Two
+```
+
+## Convert centiseconds before adding durations
+
+Under the [official Aegisub override-tag documentation](<https://aegisub.org/docs/latest/ass_tags/#karaoke-effect>), each k duration belongs to the following syllable unit; 100 centiseconds equals one second. Values 100+200 total 300 centiseconds, matching this three-second event. They are neither milliseconds nor an instruction to begin at zero. Record original value, unit and seconds separately. These two word units are manually authored, not automatic segmentation of real speech.
+
+## Add the event start to cumulative offsets
+
+Without additional timing overrides, One starts at event-relative zero and Two at the preceding one-second duration. Their file-time starts are therefore seconds one and two, ending at four. k200 is not second 200. Mark one, two and four on a timeline and label the one- and two-second spans. This calculates authored timing, not device latency; rounded progress displays and manual pausing are not centisecond measurement tools.
+
+## Play from before the interval and record rendering
+
+Select this caption in iCouldPlay and play from before second one until after four. Record both words, any colour change and exposed markup. Retain a static sentence as observed instead of changing unknown settings to force animation. Fix video, caption source, orientation and speed and verify file selection. The documented lowercase-k behavior is not an app guarantee; do not mix uppercase K or kf into the first comparison.
+
+## Use a plain control and a separate time-shift experiment
+
+First save a plain control deleting only the two k override groups, preserving header, style and one-to-four timing. Separately copy the tagged original and shift start/end to two/five, leaving k100/k200 unchanged; expected internal starts shift to two/three. Do not combine tag deletion and time shifting. Shifting only the start would create a different two-second event. Keep filenames and calculations; control success does not establish tagged-version success.
+
+## Check units and event scope when values disagree
+
+A mistaken 300 seconds calls for unit correction, not extreme playback speed. If event length is two seconds but durations total three, consult the authored plan instead of randomly compressing all units. For exposed tags, inspect backslashes, braces and plain-text format. Record font/colour differences separately from timing. Preserve originals and revise copies. Source arithmetic is possible without precision tools; do not invent measured millisecond error or engine latency.
+
+## Separate three outcomes after reopening
+
+Reopen the video, identify the selected file and play from before the interval. Separately record arithmetic consistency, successful loading and observed colour effect. Unobserved outcomes remain untested, neither universal support nor unsupported status. Preserve tagged, plain and shifted files and restore regular captions and speed. Completion explains how 100+200 centiseconds maps to seconds one–four and records rendering, without automatic lyric alignment or physical-device certification from a website build.
+
+## Related tutorials and sources
+
+[Inspect ASS style fidelity](<https://allluckly.cn/en/guides/icouldplay-ass-style-fidelity-check/>), [Inspect inline VTT timestamps](<https://allluckly.cn/en/guides/icouldplay-webvtt-internal-timestamp-text-boundary/>).
+
+Checked on November 10, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

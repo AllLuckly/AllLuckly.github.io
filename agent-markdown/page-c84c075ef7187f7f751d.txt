@@ -1,0 +1,65 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-dependency-arrows-feasible-order/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint dependency diagrams: match arrows to feasible orders'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-dependency-arrows-feasible-order/
+agent_source_sha256: 2c3c3ae6b1eef647727198aba37e0ed01c954f45105bcca1a0dea44bb217b8d0
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint dependency diagrams: match arrows to feasible orders
+
+Language: en
+Canonical: [VectorPaint dependency diagrams: match arrows to feasible orders](<https://allluckly.cn/en/guides/vectorpaint-dependency-arrows-feasible-order/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-dependency-arrows-feasible-order/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-dependency-arrows-feasible-order/>)
+Published: 2026-11-10T00:00:00+08:00
+Modified: 2026-11-10T09:39:21+08:00
+Author: Bison
+
+Record direct prerequisites for five fictional tasks,checking two feasible orders and a cycle counterexample without assuming automatic scheduling.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-dependency-arrows-feasible-order/>), translated on 2026-11-10. Original publication dates, attribution, code and version notes are retained.
+
+Dependency arrows are not shortest routes or edge-once trails. Define arrows from prerequisite to later task and test lists against every condition. With no durations/resources,the diagram implies no fastest schedule. Build nodes,arrows and checks manually without project scheduling or automatic topological sorting.
+
+## Define five tasks and four direct dependencies
+
+Use five nodes A–E, corresponding to 甲乙丙丁戊. Externally list four arrows: A→C, B→C, C→D and B→E. Optional task names are prepare materials, prepare a palette, lay out a draft, produce a schematic and record a colour table. These belong to an invented exercise, not automatic app actions. C directly waits for A and B, D for C, and E for B. Initially omit durations, staff and completion percentages so positions do not imply a schedule. List each relation separately: five nodes and four dependencies count different things, and node count is not a count of arrow relations.
+
+## Aim arrowheads at the dependent task
+
+Place A and B on the left, C centrally, D on the right and E perhaps lower-right of B. Prioritise four readable arrows over symmetry. A→C means A precedes C, not that C supplies A. Put the head at the dependent node and tail at its prerequisite; a double-headed line cannot retain a one-way interpretation. Crossing lines do not create tasks: only the five explicitly marked nodes count. Read every arrow in words against the list rather than guessing from colours. Four relations do not become eight merely because each path was drawn in two segments.
+
+## Check the first order against every edge
+
+The order A, B, C, D, E satisfies all four relations: A and B precede C, C precedes D, and B precedes E. Externally assign positions 1–5, then check source position \< target position for every arrow. Reading the layout left-to-right alone does not establish a valid list. Both prerequisites of C must pass; checking A→C while omitting B→C fails. Precedence does not require adjacency: C and D may stand between B and E. This ordering check makes no claim that the tasks have actually been completed. [MIT’s topological-order notes](<https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/d9265b3b33d238ff914b0223ac8e7628_MIT6_006S20_r10.pdf>) support placing each edge’s source before its target. This small graph is checked manually rather than executing the notes’ algorithm.
+
+## Use another order to show nonuniqueness
+
+Another valid order is B, E, A, C, D. B permits E; A then finishes; C waits until both A and B precede it; D comes last. This satisfies the same four relations despite differing from the first order. The exercise gives no direct A-versus-B requirement or restriction between E and C/D; do not invent edges from personal habit. Retain the identical relation list for both orders rather than treating them as different projects. Without durations or resources, a more compact-looking order is not demonstrably faster or optimal. Conclude only that these constraints allow it.
+
+## Locate one violation with C before B
+
+The incorrect list A, C, B, D, E includes each task once but violates B→C: C is second and B third. Satisfying the other edges does not cancel that failure. Identify the specific violated arrow instead of merely saying “wrong order,” and do not reverse it to accommodate the list. After repairing to A, B, C, D, E, recheck all four relations so moving one task does not break another. If E is absent or A repeated, first restore task membership. Complete membership and satisfied precedence are independent requirements; neither alone permits delivery.
+
+## Recognise that an added cycle invalidates the orders
+
+In a separate version add only D→A. This creates A→C→D→A, demanding A before C, C before D and D before A, so no linear list satisfies every relation. Preserve the original acyclic version instead of mixing them. Check for a recorded-relation error or a task-definition problem; this exercise does not automatically delete an edge to decide project policy. Marking A completed does not erase the graph’s logical cycle unless you explicitly redefine the remaining-task scope. This control checks dependency meaning and does not pretend the app performed automatic cycle detection.
+
+## Inspect arrows and lists after export
+
+Save the source and open a PNG. Read all four arrows, then compare both valid lists and the incorrect one. If a node hides an arrowhead, adjust spacing or layering rather than expecting readers to guess from a headless line. Distinguish direct and implied dependencies: A precedes D through C without requiring a fifth drawn edge. If you add that redundant edge, identify its role and update the edge count. Hide unwanted checking marks without accidentally hiding node labels. Monochrome output must retain readable heads and labels rather than depending exclusively on red/green precedence cues.
+
+## Finish with membership and all four relations
+
+For missing nodes return to membership; for reversed relationships inspect arrowheads; for a failed list locate its violated edge; for a cycle check which version is open. Do not delete inconvenient edges as decoration or waive a condition because the list looks attractive. Retain five tasks, four direct relations, two feasible orders, one incorrect order and a cyclic version, all recheckable by positions. The diagram explains which orders constraints permit. It is not an automatic schedule, shortest completion time, guarantee of available resources or record of actual execution.
+
+## Related tutorials and sources
+
+[VectorPaint decision flowcharts: keep conditions and arrows consistent](<https://allluckly.cn/en/guides/vectorpaint-decision-flowchart/>), [VectorPaint each-edge-once trails: distinguish revisited vertices from repeated edges](<https://allluckly.cn/en/guides/vectorpaint-each-edge-once-trail/>).
+
+Checked on November 10, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Capability scope follows the [official App Store listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public version lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn>). This is an original exercise to perform independently; use controls in your installed version. Manual construction and external records do not imply new automatic analysis features. No step-by-step physical-device, private-file or all-output-environment testing is claimed.
+{% endraw %}

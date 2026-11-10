@@ -1,0 +1,66 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-empirical-cdf-duplicate-jumps/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint empirical cumulative steps: preserve duplicate jumps and endpoint
+  inclusion'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-empirical-cdf-duplicate-jumps/
+agent_source_sha256: ae86a07c9f90c154f23696becdd764bb3a518056382102db268d3c082e37a613
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint empirical cumulative steps: preserve duplicate jumps and endpoint inclusion
+
+Language: en
+Canonical: [VectorPaint empirical cumulative steps: preserve duplicate jumps and endpoint inclusion](<https://allluckly.cn/en/guides/vectorpaint-empirical-cdf-duplicate-jumps/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-empirical-cdf-duplicate-jumps/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-empirical-cdf-duplicate-jumps/>)
+Published: 2026-11-10T00:00:00+08:00
+Modified: 2026-11-10T09:39:21+08:00
+Author: Bison
+
+Define the fraction of five observations no greater than x,checking right-continuous steps and a repeated-two jump without interpolation or automatic statistics.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-empirical-cdf-duplicate-jumps/>), translated on 2026-11-10. Original publication dates, attribution, code and version notes are retained.
+
+An empirical cumulative distribution is not diagonal interpolation among cumulative points. Define y as the sample fraction no greater than x and hand-calculate a five-observation step function,including a larger duplicate-value jump. This differs from cumulative totals or video increments;VectorPaint supplies paths/labels while you verify order,counts and definition.
+
+## State five observations and the function definition
+
+Use invented observations 1, 2, 2, 4, 5 in an arbitrary observation unit: five entries, with each repeated 2 counted separately. Define F(x) as the number of observations less than or equal to x divided by 5, not the sum of qualifying values divided by a total. [R’s empirical-distribution documentation](<https://stat.ethz.ch/R-manual/R-devel/library/stats/html/ecdf.html>) supplies step-function and right-continuity concepts. Do not install or call R for this exercise; calculate the invented example by hand. Preserve the raw list rather than deduplicating 2 to force equal jumps. Sample count, number of distinct values and sum of values are different quantities.
+
+## Calculate intervals before drawing
+
+F(x) is 0 for x \< 1; 1/5 for 1 ≤ x \< 2; 3/5 for 2 ≤ x \< 4; 4/5 for 4 ≤ x \< 5; and 1 for x ≥ 5. Each finite plateau includes its left endpoint and excludes its right; the far-left continuation remains 0. At x = 2 both twos already count, giving three qualifying entries and 3/5, not 1/5. At x = 3 the value remains 3/5, with no new observation there. List intervals externally before drawing. Five observations do not imply five equal-width steps; numeric differences determine horizontal spacing.
+
+## Use values on x and proportions on y
+
+Draw x from 0 to 6 and y from 0 to 1, optionally marking 1/2. If using percentages, label 1/5 as 20% and 3/5 as 60%, consistently throughout: 0.6 is not 0.6%. Give equal x units equal spacing, making the 2–4 plateau twice as wide as one-unit intervals. Do not label y cumulative headcount: the numerator is a count, but the plotted result is a proportion. Title it a five-sample empirical distribution rather than an ambiguous cumulative chart that suggests total quantity. Group axes separately so later layout edits do not accidentally change observations.
+
+## Make one larger jump at the repeated value
+
+Jump from 0 to 1/5 at 1, then from 1/5 to 3/5 at 2, a jump of 2/5. At 4 and 5 add 1/5 each. The two observations at 2 share one x value; do not move them to invented 2.1 and 2.2 positions to create separate jumps. Four distinct values give four jumps, while all five observations give a total jump of 1. Record increment counts 1, 2, 1, 1, sum to 5 and divide by 5. If every jump adds only 1/5, the result stops at 4/5: inspect duplicates instead of stretching the final plateau to conceal a missing count.
+
+## Mark the included upper value at each jump
+
+At each jump use a filled circle for the new function value and an open circle for the excluded old value. At 2 the filled circle is at 3/5 and the open one at 1/5. Any vertical connector is only a jump guide; explain that F(2) does not simultaneously take all intermediate proportions. Right-continuity means taking the right plateau’s value immediately at 2, not shifting a line a small distance rightward. Marker size serves readability, not data width. Externally evaluate x = 2 and a value just below 2 before checking that open and filled markers are correctly assigned.
+
+## Test a diagonally interpolated counterexample
+
+Save an incorrect copy connecting (1, 1/5) to (2, 3/5) diagonally. It increases gradually between 1 and 2 despite no observation occurring there. At 1.5 only one entry is no greater than x, so the correct value is 1/5, not the diagonal’s 2/5. Retain the proper steps and do not use this incorrect control to describe a real continuous population distribution: this empirical function comes only from five observations. Beyond 5, F remains 1. A frame ending at x = 6 does not make the function undefined afterward; state its continuation without infinitely enlarging the canvas.
+
+## Inspect four jumps, five observations and endpoints
+
+Save the source and open a PNG to check four jump locations, the larger jump at 2, final value 1 and open/filled endpoints. If an open marker appears filled, inspect fill and stroke on light and dark backgrounds; a white circle is not automatically transparent. Move text obscuring the marker at 2 rather than moving that jump. Hide unwanted manually drawn checking guides without deleting axes or official endpoints. At small sizes reduce decoration while preserving plateaus rather than smoothing the steps into a curve. Deliver the raw observations and definition with readable output; either missing item prevents adequate reconstruction.
+
+## Troubleshoot counts, denominator and inclusion
+
+If the ending is not 1, inspect the five entries and duplicates. For misplaced jumps return to sample values; for the old value at 2 check \< versus ≤; for values above 1 check whether observations were summed instead of counted. After each repair evaluate 1, 2, 3 and 5, not merely the last cap. Retain five observations, four jump increments, intervals, open/filled markers and the interpolation control, distinguishing proportions from counts. This hand-reconstructible empirical distribution is not an automatic statistical tool, a guarantee about population probability or a real trend/causal conclusion from five invented values.
+
+## Related tutorials and sources
+
+[VectorPaint manual line charts: plot coordinates before connecting one dataset](<https://allluckly.cn/en/guides/vectorpaint-coordinate-line-chart/>), [VectorPaint box plots: declare quartile and whisker conventions first](<https://allluckly.cn/en/guides/vectorpaint-boxplot-quartile-whisker-convention/>).
+
+Checked on November 10, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Capability scope follows the [official App Store listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public version lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn>). This is an original exercise to perform independently; use controls in your installed version. Manual construction and external records do not imply new automatic analysis features. No step-by-step physical-device, private-file or all-output-environment testing is claimed.
+{% endraw %}

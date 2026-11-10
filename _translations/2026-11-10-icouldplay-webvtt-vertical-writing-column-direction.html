@@ -1,0 +1,52 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay vertical WebVTT: separate writing direction, column order and video rotation'
+description: Use two original text lines to compare vertical rl/lr, horizontal controls and actual rendering limits.
+permalink: /en/guides/icouldplay-webvtt-vertical-writing-column-direction/
+date: '2026-11-10 00:00:00 +08:00'
+modified: '2026-11-10 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 115
+topic: Caption structure and media transport
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-10-icouldplay-webvtt-vertical-writing-column-direction.md
+source_url: /guides/icouldplay-webvtt-vertical-writing-column-direction/
+translation_method: editorial
+translation_source_sha256: fe32ba19d73d64238051fa3eff41dd4388ab66876be04546e440b9f0cec20897
+translation_date: '2026-11-10T01:39:21+00:00'
+excerpt: Use two original text lines to compare vertical rl/lr, horizontal controls and actual rendering limits.
+---
+{% raw %}
+<p>A landscape video can contain vertical captions, while vertical writing does not rotate the picture. WebVTT has a writing-direction setting whose actual rendering needs observation. Prepare two original text lines externally and inspect direction and column order without an in-app vertical editor or rotating the screen as substitute evidence.</p>
+<h2 id="section-1">Fix the image and two text units</h2>
+<p>Prepare a self-made clip at least ten seconds long with distinct corner markers to reveal rotation or cropping. Use the original lines 红色示例 (red example) and 蓝色示例 (blue example) as text labels, not a requirement for red/blue rendering. Label lines A/B externally and preserve originals. Without a clip, inspect source structure while leaving rendering untested. A specification diagram is not an iCouldPlay observation. Use readable characters without unfamiliar scripts or external styling files.</p>
+<h2 id="section-2">Place direction settings after the timing line</h2>
+<p>Save this complete original VTT as UTF-8 plain text with .vtt extension and header blank line, excluding fences. Put vertical:rl after the timing on that same line, not inside payload text. Separate the two text lines with one newline; a blank line terminates the cue. Its seconds one–six interval lasts five seconds independently of video orientation. Reopen the saved source and verify colon, lowercase rl and real line order rather than editor wrapping.</p>
+<pre><code>WEBVTT
+
+00:01.000 --&gt; 00:06.000 vertical:rl
+红色示例
+蓝色示例
+</code></pre>
+<h2 id="section-3">Record character flow and column progression separately</h2>
+<p>Use <a href="https://www.w3.org/TR/webvtt1/">W3C WebVTT writing-direction definitions</a> to separate vertical layout from the horizontal default and rl/lr column progression. rl neither rotates the video 90 degrees to the right nor reverses 红色示例 into 例示色红. Sketch how the two text lines would map to columns, then verify actual rendering. A single column or reflow does not establish ordering. Keep character orientation and column progression as separate findings.</p>
+<h2 id="section-4">Play the original and check all corner markers</h2>
+<p>Select the vertical practice caption through actual controls and play from before second one until after six. Record text, character flow and inter-column relationships, then check all video corner markers. Record horizontal, vertical, wrapped or ignored-setting behavior without rotating the device to mimic success. Keep file, fit mode and speed fixed; retain loading errors. The setting is in the file, not an assumed app layout menu.</p>
+<h2 id="section-5">Remove only direction for a horizontal control</h2>
+<p>Save a copy deleting only vertical:rl, retaining payload newlines, timing, encoding and video. Select it and play from before the interval, verifying filename rather than assuming any visible caption confirms switching. Do not also merge lines or change fonts. If both remain horizontal, record no observed direction difference on this path, not identical files or universal lack of support. If only the control displays text, preserve that distinction and recheck selection and source.</p>
+<h2 id="section-6">Use a separate lr copy to check column order</h2>
+<p>Copy the original vertical version and change only rl to lr. Compare A/B left-right relationships only when distinguishable multiple columns actually render. One column leaves progression unverified. Do not swap the red/blue text labels to manufacture movement. Column progression differs from overall cue location; sharing one screen side does not prove equal order. Name all three files separately to avoid comparing one overwritten latest version with itself.</p>
+<h2 id="section-7">Distinguish cropping, missing glyphs and reflow</h2>
+<p>Record edge clipping, glyph boxes and merged columns separately, checking source before restoring the full video view. An available fit control can inspect visible extent without proving all positioning support. Do not crop the video or change system orientation lock to force a result. Compare missing glyphs with the same horizontal text and repair source newline errors in a copy. Rescaled screenshots are not precise font/spacing measurements; retain unresolved causes.</p>
+<h2 id="section-8">Test an explicit horizontal alternative for stable labels</h2>
+<p>If the task only requires two readable labels, retain a verified horizontal alternative and recheck completeness and occlusion, noting that vertical layout was dropped. It meets this exercise’s reading goal without full layout equivalence or a general license to flatten meaningful vertical writing. Respect authorial versions and requirements rather than calling altered real captions faithful. Keep the original vertical file for later checks on other known paths.</p>
+<h2 id="section-9">Verify the setting’s source after reopening</h2>
+<p>Reopen the video, identify rl, lr or no-setting source, and replay from before the interval. Record source lines A/B, setting location, observed character flow, column progression, video orientation and unknowns with file and date. Restore regular captions and playback mode and preserve all files separately. Completion distinguishes text structure from video orientation and recognizes insufficient single-column evidence, without a new editor claim or device testing inferred from displayed code.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-webvtt-ruby-base-annotation-check/">Inspect ruby annotations</a>, <a href="/en/guides/icouldplay-portrait-video-framing/">Compare video orientation and cropping</a>.</p>
+<p>Checked on November 10, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

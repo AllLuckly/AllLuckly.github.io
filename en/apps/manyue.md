@@ -5,7 +5,7 @@ title: 'ManYue: Comic Reader for iPhone and iPad'
 description: Learn about ManYue comic imports, offline reading, WebDAV, SMB and personal comic servers, then choose a tutorial
   for your library.
 permalink: /en/apps/manyue/
-modified: 2026-11-09
+modified: 2026-11-10
 lang: en
 source_url: /apps/manyue/
 ---
@@ -58,4 +58,8 @@ Yes. Public information lists Komga, Kavita, Suwayomi / Tachidesk, LANraragi and
 
 ## Version and sources
 
-Checked on 9 November 2026: the China App Store listed **2.0.4**, requiring iOS or iPadOS 15.0 or later. This introduction uses the [ManYue App Store page](https://apps.apple.com/cn/app/id6753895889), [Apple’s public lookup API](https://itunes.apple.com/lookup?id=6753895889&country=cn) and feature entry points. It does not claim physical-device testing.
+Checked on 10 November 2026: the China App Store listed **2.0.5**, requiring iOS or iPadOS 15.0 or later. This introduction uses the [ManYue App Store page](https://apps.apple.com/cn/app/id6753895889), [Apple’s public lookup API](https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261110) and feature entry points. It does not claim physical-device testing.
+
+## Public changes in 2.0.5
+
+Local and WiFi importing improve large-file handling, with a 2 GB per-file limit for WiFi imports. This limit does not describe every source or format. The update also improves EPUB image order and comic sorting, rendering and continuous preloading, background reading-record sync, and iPad window resizing, popover placement and taps after rotation. These are public release notes; check your own small files and installed version rather than treating the notes as completed physical-device acceptance tests.

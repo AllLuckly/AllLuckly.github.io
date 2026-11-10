@@ -1,0 +1,65 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-archimedean-spiral-angle-radius/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint Archimedean spirals: increase angle and radius under one rule'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-archimedean-spiral-angle-radius/
+agent_source_sha256: a65452b403b2e72512d5edafd4a7fcf698278fce8310760789e1e38c964de776
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint Archimedean spirals: increase angle and radius under one rule
+
+Language: en
+Canonical: [VectorPaint Archimedean spirals: increase angle and radius under one rule](<https://allluckly.cn/en/guides/vectorpaint-archimedean-spiral-angle-radius/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-archimedean-spiral-angle-radius/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-archimedean-spiral-angle-radius/>)
+Published: 2026-11-10T00:00:00+08:00
+Modified: 2026-11-10T09:39:21+08:00
+Author: Bison
+
+Draw two turns from nine specified samples,checking radial increase per turn and open endpoints without claiming an exact analytic path from smoothing.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-archimedean-spiral-angle-radius/>), translated on 2026-11-10. Original publication dates, attribution, code and version notes are retained.
+
+An Archimedean spiral is neither connected concentric circles nor a universal natural-shell template. Define radius increasing 10 per 90 degrees, calculate samples and connect them manually. This expresses a specified mathematical model, not automatic formula plotting, spiral generation or infinite-precision fitting. Check samples separately from smoothness.
+
+## State angle units and the radial rule
+
+Use centre(600, 450), mathematical angles increasing counterclockwise from rightward while canvas y increases downward. Define r=20+angle/9 with degrees over 0–720. Radius starts 20 rather than at the centre and ends 100. These endpoints do not mean 720 samples. Units are drawing choices, not physical coil dimensions. Changing to radians requires a new coefficient rather than reusing division by 9. [The University of St Andrews Archimedean-spiral reference](<https://mathshistory.st-andrews.ac.uk/Curves/Spiral/curvesapplet/>) supports linear radial growth with angle; this exercise separately specifies an initial radius and a limited angle interval.
+
+## Calculate all nine samples
+
+Sample 0, 90, 180, 270, 360, 450, 540, 630, 720 degrees—nine points with radii 20, 30, 40, 50, 60, 70, 80, 90, 100. Eight intervals require nine endpoints, including the final radius 100 point. List angle/radius externally before placement rather than deriving them from drag feel. Equal directions on different turns retain identity: 0 and 360 both point right but have different radii and are not duplicates to remove.
+
+## Map mathematical upward into screen coordinates
+
+Canvas samples are(620, 450), (600, 420), (560, 450), (600, 500), (660, 450), (600, 380), (520, 450), (600, 540), (700, 450). At 90 degrees y decreases 30, not increases 30. Verify cardinal directions before the farther second turn. Labels sit beside rather than replacing sample positions. Convert document units consistently instead of substituting display pixels.
+
+## Connect in order and keep both ends open
+
+Connect 0 through 720 in angle order, not by nearest-point jumps between turns. Check a fine polyline first, then make a smoothed copy with a few handles. Correct samples do not make every intermediate point analytic. Keep the path open: matching endpoint direction does not justify closing different radii with an extra radial line. Resolve unexpected path endings through visible controls or a new copy, not a claim that disconnected pieces form two continuous turns. Preserve samples/polyline and recheck after smoothing.
+
+## Check forty radial units between successive turns
+
+Compare 0/360, 90/450, 180/540, 270/630: each radius difference is 40, as is 360/720. Here constant spacing means radial spacing of successive turns on one ray, not equal travelled arc length or equal distance between arbitrary points. A rightward reference marks 20, 60, 100 and two 40 gaps. Use path centrelines rather than thick stroke edges; stroke width changes visible gaps, not the sampling rule.
+
+## Apply the same rule to added intermediate samples
+
+For a rough quarter-turn add a calculated 45-degree sample: radius 25, approximately(617.678, 432.322). It differs from the simple endpoint midpoint(610, 435). Compute other added angles independently rather than assuming visually regular arcs are an exact fit. More samples aid inspection without making manual handles satisfy the formula automatically. Preserve approximation labels.
+
+## Inspect more than spiral resemblance in output
+
+Save and open a PNG, checking two turns, nine reference positions, open ends and upward 90 degrees. Hide unwanted samples/rays actively because ordinary references export. For merged turns reduce stroke or enlarge the whole view rather than compressing one turn. Compare another format against samples/polyline in a copy instead of calling every smooth curve a circular arc. Label manual sampled construction and its precision difference from the analytic rule.
+
+## Troubleshoot angle, radius and sequence separately
+
+For reversed winding inspect y sign; for a non-expanding second turn inspect accumulated radius; for an extra radial joining segment inspect closure. Count both endpoints before deleting inconvenient samples. Retain formula, degrees, nine positions, 40-unit spacing and approximation notes for reconstruction. This does not establish a universal natural-coil rule, automatic arc-length computation, coil manufacture or full continuous numerical verification.
+
+## Related tutorials and sources
+
+[VectorPaint nautilus sections: distinguish partitions, chambers and the outer opening](<https://allluckly.cn/en/guides/vectorpaint-nautilus-section-chamber-open-end/>), [VectorPaint translation and reflection: check each vertex coordinate and orientation](<https://allluckly.cn/en/guides/vectorpaint-coordinate-translation-reflection/>).
+
+Checked on November 10, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Capability scope follows the [official App Store listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public version lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn>). This is an original exercise to perform independently; use controls in your installed version. Manual construction and external records do not imply new automatic analysis features. No step-by-step physical-device, private-file or all-output-environment testing is claimed.
+{% endraw %}

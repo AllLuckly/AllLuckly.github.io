@@ -1,0 +1,68 @@
+---
+layout: null
+permalink: /en/guides/manyue-opds-relative-link-base-resolution/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'ManYue relative OPDS links: identify the base before resolving an acquisition
+  address'
+agent_source_url: https://allluckly.cn/en/guides/manyue-opds-relative-link-base-resolution/
+agent_source_sha256: 72fcb758df6b9fec00b80a04f6d5d2984c71d5c3da8a2d09a5a300b01e543b30
+agent_generator_version: 1
+---
+{% raw %}# ManYue relative OPDS links: identify the base before resolving an acquisition address
+
+Language: en
+Canonical: [ManYue relative OPDS links: identify the base before resolving an acquisition address](<https://allluckly.cn/en/guides/manyue-opds-relative-link-base-resolution/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-opds-relative-link-base-resolution/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-opds-relative-link-base-resolution/>)
+Published: 2026-11-10T00:00:00+08:00
+Modified: 2026-11-10T09:39:21+08:00
+Author: Bison
+
+Resolve same-directory, parent and root-relative examples while retaining xml:base and redirect conditions, separating link role from destination.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-opds-relative-link-base-resolution/>), translated on 2026-11-10. Original publication dates, attribution, code and version notes are retained.
+
+An OPDS entry may label a content-acquisition link without supplying a complete URL. Check the base and resolved destination in a permitted small library, complementing the distinction between cover, sample and acquisition roles. This is manual address evidence, not a promised ManYue link debugger or a claim that specification examples are real paths on your server.
+
+## Fix the actual address that supplied the feed
+
+Record library alias, account role, query time and the address that supplied the current feed. When sharing, substitute a structurally faithful example for private domains. Do not copy only the initially added homepage: navigation or redirects may put the document containing the entry at another path level. If an existing trusted tool shows the raw feed, retain its final document address; otherwise mark base evidence incomplete. A browser page title is not address evidence, and an app’s displayed book title does not locate the server’s file directory. Leave unknowns explicit from the beginning.
+
+## Copy the complete link and identify its role
+
+For the target entry, record identifier, title, and the link’s href, rel, type; leave unseen fields marked unavailable. Determine whether it is acquisition, sample or image before assuming a CBZ-looking suffix means full content. Relative resolution answers where a link points, not whether its role authorises a full-book download. Retain query and fragment components as given, redacting credentials before sharing and marking that redaction. Identical final filenames across entries do not establish one file: the full address and entry context determine the current candidate identity.
+
+## Check explicitly declared bases first
+
+OPDS uses Atom-related rules. If an applicable xml:base appears, retain it with its scope rather than always joining a path to the server root. Without an explicit base, resolution still follows the retrieved document address and specification rules, not a remembered original subscription path. Nested bases may themselves be relative and require contextual resolution, not only copying the nearest text. If the tool does not expose this information, mark the base undetermined rather than declaring a server error. The three examples below explicitly assume no additional xml:base; do not silently apply that simplification to every library.
+
+## A same-directory reference replaces the document filename
+
+For an original example, use document address https://library.example/catalog/series/feed.xml and href chapter.cbz. The result is https://library.example/catalog/series/chapter.cbz, not feed.xml followed by a new slash directory and not a file at the website root. Separate the last document segment from its containing directory before checking the result. These reserved example domains offer no downloadable works. If the real base ends with a directory slash, its final segment has a different role; calculate from that actual address instead of adding or removing slashes to obtain a preferred target.
+
+## Calculate parent and root-relative paths separately
+
+With the same base, href ../files/chapter.cbz resolves to https://library.example/catalog/files/chapter.cbz; href /files/chapter.cbz resolves to https://library.example/files/chapter.cbz. The first moves above series before finding files; the second begins at this site’s root. They are not equivalent abbreviations. Record segment resolution instead of deleting every ../ and concatenating strings. If a complete link names a different host, check its identity and access context separately rather than copying the original site’s credentials to it.
+
+## Verify the target in the app, not only the resolved string
+
+Open the same entry in ManYue and use the actual available control to obtain a known small sample. Record title, source, file type and first-page mark, then check the ending. A syntactically resolved address does not prove that a resource exists, and an HTTP success may return explanatory or login content; inspect the actual file. Do not download another person’s work into a public directory or modify production-server files for this check. Retain actual app error text, time and entry identifier. External acquisition and app reading are separate results; neither certifies the other.
+
+## Troubleshoot redirects and changed hierarchy
+
+If a previously working entry fails, compare the current final document address, xml:base and href before checking whether the content target still belongs to that entry. A root-relative link may bypass a new reverse-proxy subpath, so the account is not the only explanation. With administrator-supplied redacted evidence, compare expected address and actual destination rather than editing the original feed to conceal configuration. Test changes only in an owned test copy; authorised people handle production updates. Query-based access may have separate expiry conditions. Without evidence, mark them unresolved instead of generalising one failure to lack of relative-link support.
+
+## Exit and return to check the entry-to-file chain
+
+Exit the reader and return to the target entry and acquired sample. Recheck source, edition, first-page mark and ending anchor. Save six fields: document address, base conditions, original href, link role, resolved target and actual result, distinguishing example calculations from your own server observations. Completion means a destination can be traced to its feed and link, not that a standards-compliant link remains valid forever. Preserve structure but remove private credentials when sharing. Any part lacking original base evidence stays unknown; a guessed complete URL is not an official repair.
+
+## Related guides and sources
+
+[ManYue: Distinguish OPDS artwork, sample and acquisition links](<https://allluckly.cn/en/guides/manyue-opds-cover-sample-acquisition-links/>); [ManYue: Check WebDAV filenames separately from encoded URI components](<https://allluckly.cn/en/guides/manyue-webdav-filename-uri-component/>).
+
+Checked on November 10, 2026: [Apple public version information](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261110>) lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the [official App Store](<https://apps.apple.com/cn/app/id6753895889>) for feature descriptions; specific controls must still be checked in the installed version.
+
+Method reference: [OPDS1.2: links and relative-reference bases](<https://specs.opds.io/opds-1.2>). Numbers, short passages and controls are original exercises. Sources explain concepts rather than prove automatic recognition or grading in the app. Manual notes may be kept externally. This article does not claim step-by-step testing on a physical device or private server; unresolved content should remain marked for review.
+{% endraw %}

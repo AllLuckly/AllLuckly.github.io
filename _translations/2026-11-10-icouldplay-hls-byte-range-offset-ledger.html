@@ -1,0 +1,58 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay HLS byte ranges: map different segments sharing one URI'
+description: Audit original lengths and offsets to distinguish HLS segments, shared resources and unreferenced bytes.
+permalink: /en/guides/icouldplay-hls-byte-range-offset-ledger/
+date: '2026-11-10 00:00:00 +08:00'
+modified: '2026-11-10 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 113
+topic: Caption structure and media transport
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-10-icouldplay-hls-byte-range-offset-ledger.md
+source_url: /guides/icouldplay-hls-byte-range-offset-ledger/
+translation_method: editorial
+translation_source_sha256: 103ca04b521add69d013489f777d576b95662e81f2379042be5c8bf7b0d73966
+translation_date: '2026-11-10T01:39:21+00:00'
+excerpt: Audit original lengths and offsets to distinguish HLS segments, shared resources and unreferenced bytes.
+---
+{% raw %}
+<p>Repeated HLS filenames need not mean duplicate segments: a playlist can reference distinct byte ranges of one resource. Calculate offsets externally and record iCouldPlay playback separately. A byte range in an HTTP response is not a whole film. This exercise does not require an in-app playlist parser or segment-download ledger.</p>
+<h2 id="section-1">Identify a text copy of a media playlist</h2>
+<p>Use an authorized small media-playlist copy with acquisition time, original base and file identity, keeping real URLs private. If you only have a master playlist, follow the existing hierarchy lesson first. Otherwise complete the paper example without importing missing media into the app. Preserve the original and separate notes. Date live updates independently instead of combining different lists into a supposedly unchanged sequence.</p>
+<h2 id="section-2">Bind each range to its next URI line</h2>
+<p>The original calculation example supplies no real media.ts and is not a playable package. Under <a href="https://www.rfc-editor.org/rfc/rfc8216.html#section-4.3.2.2">RFC 8216 byte-range rules</a>, bind the tag to the following URI and record length and optional offset separately. Version four meets this tag’s minimum. Identical URIs have distinct ranges. Three-second EXTINF values are supplied timing information, not proof that media timestamps are correct.</p>
+<pre><code>#EXTM3U
+#EXT-X-VERSION:4
+#EXT-X-TARGETDURATION:3
+#EXTINF:3.0,
+#EXT-X-BYTERANGE:128@0
+media.ts
+#EXTINF:3.0,
+#EXT-X-BYTERANGE:256
+media.ts
+#EXTINF:3.0,
+#EXT-X-BYTERANGE:128@512
+media.ts
+#EXT-X-ENDLIST
+</code></pre>
+<h2 id="section-3">Calculate the first explicit offset</h2>
+<p>For length 128 at offset zero, inclusive byte numbers are zero through 127: start plus length minus one. Record segment order, full resource identity, length, start and end, keeping duration separate. Offsets count bytes from the resource beginning, not playback position or elapsed viewing time. Recheck length as end minus start plus one. Fix this convention before investigating off-by-one errors.</p>
+<h2 id="section-4">Check predecessor and resource before inferring an offset</h2>
+<p>The second segment omits its offset. Because the preceding media segment is a range of the same resource, it starts at 128 and ends at 383. Omission means neither zero nor segment index. With no predecessor or a different preceding resource, this inference is invalid and the segment is undefined under the specification. Resolve relative URIs against the original base before comparing identities; equal basenames alone are insufficient.</p>
+<h2 id="section-5">Retain explicit gaps without inventing missing scenes</h2>
+<p>The third range starts at 512, has length 128 and ends at 639. Bytes 384–511 are unreferenced by these entries, not 128 missing seconds. Selected lengths total 512 bytes. A highest referenced byte of 639 does not establish a 640-byte resource; a tail may remain. Here URI plus range identifies segments. Removing the tags and merging entries into a whole-file address changes the described media.</p>
+<h2 id="section-6">Verify playlist ranges separately from HTTP responses</h2>
+<p>With trusted service records, separately record requested resource, Range, response status and returned range. Playlist text does not prove server behavior. A service may return a whole representation, reject the request or serve login content; do not call every failure a format error. Without logs, retain only calculations and playback observations, not invented iCouldPlay headers. The earlier HTTP lesson concerns response evidence; this one concerns playlist selection. Neither replaces the other or requires production reconfiguration.</p>
+<h2 id="section-7">Record playback and offline scope independently</h2>
+<p>Play an already working authorized resource from before a segment boundary and record concrete pause, seek or repeated-content anchors. Missing-media teaching text cannot establish compatibility. Saving a playlist does not save all referenced bytes; a same-named resource still needs copy and path verification. Check a small authorized offline sample at beginning, middle and end and inspect captions separately, or leave it untested. Change one condition rather than combining ranges, transcoding and server changes then assigning one cause.</p>
+<h2 id="section-8">Recompute all three segment identities after reopening</h2>
+<p>Reopen the real video at the same content anchor, versioning any updated playlist separately. Reproduce ranges 0–127, 128–383 and 512–639, explaining the 128-byte gap and 512 selected bytes. Preserve original playlist, media copy and manual table separately and use invented paths publicly. Completion makes ranges recalculable and playback locatable; it neither justifies deleting repeated filenames nor guarantees complete offline playback.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-http-byte-range-partial-content/">Check HTTP range responses</a>, <a href="/en/guides/icouldplay-hls-relative-uri-resolution-sheet/">Resolve HLS relative URIs</a>.</p>
+<p>Checked on November 10, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

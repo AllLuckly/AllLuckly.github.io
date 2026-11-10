@@ -1,0 +1,65 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-unit-circle-sine-projection/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint unit-circle projections: distinguish sine height from screen y'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-unit-circle-sine-projection/
+agent_source_sha256: 4db0866c688a4e1b59aab05382754a31a319f6f9e67e5c9a03233cecb5990c13
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint unit-circle projections: distinguish sine height from screen y
+
+Language: en
+Canonical: [VectorPaint unit-circle projections: distinguish sine height from screen y](<https://allluckly.cn/en/guides/vectorpaint-unit-circle-sine-projection/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-unit-circle-sine-projection/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-unit-circle-sine-projection/>)
+Published: 2026-11-10T00:00:00+08:00
+Modified: 2026-11-10T09:39:21+08:00
+Author: Bison
+
+Check six angle samples,vertical-axis projections and signs under one unit scale without treating projected height as a changed radius.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-unit-circle-sine-projection/>), translated on 2026-11-10. Original publication dates, attribution, code and version notes are retained.
+
+A point moving upward on a circle can have decreasing screen y. Separate mathematical up from canvas down and use six unit-circle samples to explain sine as a vertical component. This is not automatic trig plotting or motion simulation;retain exact relationships separately from manually placed decimal approximations.
+
+## Set two hundred pixels per unit
+
+Set the centre at (600, 450), with a canvas radius of 200 representing mathematical radius 1. Draw both axes, labelling right as positive x and up as positive y. The diameter is 400 canvas units, not 400 mathematical units. Select the origin label separately so aligning text does not move the circle. Read angles counterclockwise from right while retaining downward-increasing canvas y. If document units differ, establish and record the scale; view zoom does not enlarge the mathematical unit circle. Build only the axes and circle at this stage, without elaborate waves or animation.
+
+## Write mathematical coordinates for six angles
+
+Use angles 0°, 30°, 60°, 90°, 180° and 270°. Their mathematical points are (1, 0), (√3/2, 1/2), (1/2, √3/2), (0, 1), (−1, 0) and (0, −1). Every point has radius 1, and sine is the second coordinate, not the angle divided by 90. The sine of 30° is 1/2; that of 60° is approximately 0.866, not also 1/2. Retain exact fractions and radicals before giving decimals; extra decimal places do not exceed the definition’s accuracy. These samples are defined for the exercise rather than measured from photographs of circular objects. [OpenStax’s unit-circle explanation](<https://openstax.org/books/precalculus-2e/pages/5-2-unit-circle-sine-and-cosine-functions>) supports the second-coordinate definition of sine; the canvas transform and chosen scale are checked separately here.
+
+## Use subtraction for canvas y
+
+Canvas x = 600 + 200 × mathematical x, and canvas y = 450 − 200 × mathematical y. The six points become (800, 450), approximately (773.205, 350), approximately (700, 276.795), (600, 250), (400, 450) and (600, 650). Check that 90° lies above the centre and 270° below it before checking the other points. Write x and y in separate fields rather than concatenating them into one large integer. If manually placed points are approximate, label the illustration accordingly; do not claim native snapping has found theoretical trigonometric coordinates.
+
+## Project horizontally onto the vertical axis
+
+Draw a thin horizontal guide from each circle point to the vertical axis at canvas x = 600, keeping the same y. The signed vertical component from the centre to that projection represents sine; the sloping segment to the circle point is still radius 1. Do not draw a diagonal to the origin and call that sine. At 30° the height is 100 canvas units, representing 1/2; at 60° it is approximately 173.205, representing √3/2. The projected point may coincide with the circle point: the horizontal guide at 90° has zero length, so do not invent a visible segment merely to display six guides.
+
+## Distinguish negative component from positive distance
+
+At 270° the projection is 200 canvas units below the centre, giving mathematical sine −1; canvas y = 650 does not mean sine 650. Separate signed components from unsigned distances: the distance is one mathematical unit, but downward direction makes the component negative. Angles 0° and 180° both have sine 0 at different circle points, so sine alone does not identify a unique angle. Likewise 30° and 150° both have sine 1/2. This comparison does not automatically solve every inverse-trigonometric case. Retain the minus sign and angle labels together.
+
+## Keep mathematical values fixed under display scaling
+
+Uniformly reducing the whole display by half gives a screen radius of 100 pixels and a 30° projection height of 50, while the mathematical sine remains 1/2. Update the display-scale explanation rather than interpreting halved pixel height as a halved function value. Compressing only the vertical direction produces an ellipse and cannot retain the old circular and unit labels. Label the original and thumbnail scales separately and compare mathematical coordinates, not heights from differently zoomed screenshots. Also distinguish scaling document objects from zooming the app view; view zoom does not change source coordinates or export settings.
+
+## Inspect axes and line roles in output
+
+Save the source and open an actual PNG to inspect the radius, horizontal projections and vertical components point by point, beyond the smoothness of the outer circle. Keep 90° above and the −1 component below. Radicals and minus signs must remain legible; replace unavailable glyphs with explicit wording instead of deleting conditions. Hide unwanted manually drawn checking marks or frames, and inspect actual output for the native grid. In monochrome distinguish radii, projection guides and axes through styles or words rather than remembered colours. Move obstructing labels rather than moving the mathematical points.
+
+## Check coordinates, signs and projection separately
+
+If points run in the wrong direction, inspect the subtraction in canvas y; if every sine is positive, inspect signed components; if radii vary, return to circle-point coordinates. A missing 90° guide may be correct because its length is zero. Retain all six exact coordinates, six canvas positions, projection roles and scaling comparison, explicitly marking approximations. The result is a hand-reconstructible unit-circle explanation, not an automatic trigonometric curve, angle detector or mathematical proof. Screen lengths do not establish physical measurement accuracy.
+
+## Related tutorials and sources
+
+[VectorPaint Archimedean spirals: increase angle and radius under one rule](<https://allluckly.cn/en/guides/vectorpaint-archimedean-spiral-angle-radius/>), [VectorPaint translation and reflection: check each vertex coordinate and orientation](<https://allluckly.cn/en/guides/vectorpaint-coordinate-translation-reflection/>).
+
+Checked on November 10, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Capability scope follows the [official App Store listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public version lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn>). This is an original exercise to perform independently; use controls in your installed version. Manual construction and external records do not imply new automatic analysis features. No step-by-step physical-device, private-file or all-output-environment testing is claimed.
+{% endraw %}

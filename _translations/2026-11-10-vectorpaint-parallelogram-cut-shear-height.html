@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint parallelogram dissections: fix base and perpendicular height before area'
+description: Translate a left triangle to fill the right gap,checking area24 while distinguishing slant side,perpendicular
+  height and bounding box.
+permalink: /en/guides/vectorpaint-parallelogram-cut-shear-height/
+date: '2026-11-10 00:00:00 +08:00'
+modified: '2026-11-10 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 155
+topic: Arcs and dissection constructions
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-10-vectorpaint-parallelogram-cut-shear-height.md
+source_url: /guides/vectorpaint-parallelogram-cut-shear-height/
+translation_method: editorial
+translation_source_sha256: e3250947b2707a630d9ba3c6deefae3390370eec497f064c86d89dae494527e6
+translation_date: '2026-11-10T01:39:21+00:00'
+excerpt: Translate a left triangle to fill the right gap,checking area24 while distinguishing slant side,perpendicular
+  height and bounding box.
+---
+{% raw %}
+<p>Greater slant does not necessarily mean greater area. Fix base 6, perpendicular height 4, draw coordinates and translate one triangular piece into a rectangle. This checks dissection and equal-base/height conditions, distinct from equal-perimeter comparison, without automatic cutting, area measurement or animation.</p>
+<h2 id="先记录四角与向下的练习坐标">Record four corners and the coordinate convention</h2>
+<p>Use vertices(0, 0), (6, 0), (8, 4), (2, 4) under downward-increasing exercise y. Both horizontal bases are 6, separated perpendicularly by 4; slant displacement is(2, 4). Scale/translate uniformly without retaining units after nonuniform stretching. Preserve pale references and labels, explicitly restricting this example to offset 2 less than base 6. These are geometry units, not material dimensions, and coordinates remain externally traceable.</p>
+<h2 id="垂高不沿着斜边测">Measure height perpendicular to the bases</h2>
+<p>Mark height 4 on a perpendicular to both bases. Slant length√20≈4.472 is not height, and 6×4.472 is not the area. The 8×4 bounding rectangle has area 32, also different. Label base, height, slant and bounds explicitly, with colour supplementary. An exterior height reference is acceptable with clear perpendicular direction and corresponding bases; not every oblique top-to-bottom line is a height. Stroke width does not enter ideal lengths.</p>
+<h2 id="沿横坐标二切出左侧三角">Cut the left triangle at x 2</h2>
+<p>Divide vertically from(2, 0) to(2, 4), isolating triangleA with vertices(0, 0), (2, 0), (2, 4), legs 2/4, area 4. Preserve the remainder and distinguish the cut from the outer boundary. Construct separate closed paths in a copy, checking gap-free assembly without assuming a knife/difference command. Hiding A should reveal a coherent remainder. A background-colour patch need not create an independently movable piece; identify the chosen method.</p>
+<h2 id="甲片只向右平移六单位">Translate the triangle six units right</h2>
+<p>Add 6 to each x coordinate of A, producing(6, 0), (8, 0), (8, 4), with unchanged y, no rotation/scaling. It fills the upper-right gap and forms a rectangle spanningx 2–8, y 0–4, width 6, height 4. Check the same vector at all vertices before outline; dragging one point near the gap while deforming others is invalid. A remains area 4, remainder 20, total 24. Preserve before/after separately rather than counting both triangle copies.</p>
+<h2 id="同底同高但横移三另做对照">Compare a separate offset 3 with the same base and height</h2>
+<p>For a separate offset 3 use(0, 0), (6, 0), (9, 4), (3, 4), retaining base 6/height 4. Cut atx 3 and translate by 6 to a 6×4 rectangle spanning 3–9, area 24; the cut triangle now has area 6, not 4. These two shears share area under equal base/height, not arbitrary vertex changes. Offsets exceeding the base require a different dissection rather than unchanged application here. Preserve offset 2 and list changed versus fixed quantities.</p>
+<h2 id="图形变斜不靠透视缩放解释">Keep geometric shear distinct from perspective scaling</h2>
+<p>Compare on one unit grid with equal bases/heights. Do not stretch one view to equal outer bounds and attribute the result to geometry. Slant, perimeter and bounds may change while area remains 24; label quantities rather than saying only “size”. Cut lines/arrows do not add area. Transparent before/after overlays need position labels so overlap does not imply extra material. Static comparisons are not claimed app animations.</p>
+<h2 id="输出检查接缝与比例说明">Inspect seams and scale statements in output</h2>
+<p>Save and inspect PNG positions, especially width 6 acrossx 2–8 rather than 8. For white seams inspect shared endpoints; for darker overlap inspect an unhidden original triangle before changing area labels. Hide unwanted manual grids/references actively. Individually scaled thumbnails require scale labels and cannot compare area visually. Preserve geometry records separately from output; apparent fit does not replace pointwise translation checks.</p>
+<h2 id="先核垂高再核剪片与移动">Check height, piece and movement in order</h2>
+<p>For 32 inspect bounding-box use; for base times slant inspect height definition; for a skewed reconstruction inspect translation-only movement. Check scaling before compensating through remainder edits. Retain both offsets, coordinates, area pairs 4+20 and 6+18, and shared 24, traceable to graphics/calculations. This is a clear dissection, not automatic area verification, physical cutting design or a claim that every shape uses this same one-piece move.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-equal-perimeter-different-areas/">VectorPaint equal-perimeter rectangles: check boundary length separately from area</a>, <a href="/en/guides/vectorpaint-coordinate-translation-reflection/">VectorPaint translation and reflection: check each vertex coordinate and orientation</a>.</p>
+<p>Checked on November 10, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Capability scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn">Apple public version lookup</a>. This is an original exercise to perform independently; use controls in your installed version. Manual construction and external records do not imply new automatic analysis features. No step-by-step physical-device, private-file or all-output-environment testing is claimed.</p>
+{% endraw %}

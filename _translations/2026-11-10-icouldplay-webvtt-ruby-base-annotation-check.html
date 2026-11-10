@@ -1,0 +1,49 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay WebVTT ruby: distinguish base text, annotations and rendering'
+description: Use an original character cue to inspect ruby/rt nesting and record base text and annotation separately.
+permalink: /en/guides/icouldplay-webvtt-ruby-base-annotation-check/
+date: '2026-11-10 00:00:00 +08:00'
+modified: '2026-11-10 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 111
+topic: Caption structure and media transport
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-10-icouldplay-webvtt-ruby-base-annotation-check.md
+source_url: /guides/icouldplay-webvtt-ruby-base-annotation-check/
+translation_method: editorial
+translation_source_sha256: ef0ba7ee2f32607e2b6ea6331b7ccac3edbddd6c7462a551c84b1a29ac40d992
+translation_date: '2026-11-10T01:39:21+00:00'
+excerpt: Use an original character cue to inspect ruby/rt nesting and record base text and annotation separately.
+---
+{% raw %}
+<p>A small pronunciation annotation can be attached to a character or flattened into ordinary text. Visible pinyin alone does not establish ruby rendering. Prepare a minimal external VTT and compare annotated and plain versions in iCouldPlay. Use your own text without automatic pronunciation generation or a promise of identical support across engines.</p>
+<h2 id="section-1">Define the character and exercise scope</h2>
+<p>Prepare a self-made clip at least ten seconds long, using a stationary paper card if desired. Record that 行 has the row/line reading háng in this exercise. You supply the reading; the player neither disambiguates it nor establishes real speech. Preserve the original and regular captions under separate names. Without recording facilities, finish the paper structure and control files while leaving playback untested. Reading this code is not observing ruby on a phone. Check the character in a trusted text tool.</p>
+<h2 id="section-2">Nest base and annotation inside one cue</h2>
+<p>Save this original example as UTF-8 plain text with a .vtt extension, excluding fences. One cue lasts from second one to six. Put the base inside ruby and the annotation inside its nested rt, closing inner then outer tags. Retain the accented pinyin. This adds neither another cue nor an audio track or timing interval. Reopen the saved text and check brackets, closing tags and the blank line rather than trusting apparent editor completion.</p>
+<pre><code>WEBVTT
+
+00:01.000 --&gt; 00:06.000
+&lt;ruby&gt;行&lt;rt&gt;háng&lt;/rt&gt;&lt;/ruby&gt;
+</code></pre>
+<h2 id="section-3">Check structure without assuming a screen position</h2>
+<p>Use the <a href="https://www.w3.org/TR/webvtt1/">W3C WebVTT ruby-span definition</a> to distinguish base and annotation roles. Moving rt outside ruby changes the structure. Add no webpage CSS or script and do not treat a browser style as a guarantee for iCouldPlay. Sketch parent/child relationships externally without learning the full parser algorithm. Record normative structure separately from device rendering, leaving unobserved position, size and colour blank rather than assuming one placement for every language.</p>
+<h2 id="section-4">Play from before the cue and record separate outcomes</h2>
+<p>Select the practice caption through the actual iCouldPlay entry and play from before second one until after six. First record whether the base appears, then annotation presence and relative placement. Record a base alone, flattened text, layered display or exposed tags as observed. Keep video, orientation and speed fixed instead of changing sources to force expectations. For missing controls or loading errors, retain entry and message without immediately blaming ruby or inventing a manual engine menu.</p>
+<h2 id="section-5">Make a base-only control with unchanged timing</h2>
+<p>Save a copy replacing the entire markup with 行 alone while retaining header, interval, encoding and extension. Select and play each separately; similar list names do not prove switching. If the control lacks the base too, check selection and character rendering first. If only the annotated version differs, limit the finding to these files and this path. Removing pronunciation loses information, so the control is not semantically equivalent. Keep the sole original intact.</p>
+<h2 id="section-6">Separate character and markup problems</h2>
+<p>A missing-glyph box and exposed rt tags are different observations. For the former, inspect saved characters, a known readable character and font path; for the latter inspect nesting and caption handling. One screenshot does not diagnose the cause. Do not delete the characters and keep only pinyin to claim a repair, and do not download or install unknown fonts. For lost accents, inspect the saved source first. Correct a source error in a copy while retaining the old value rather than calling editing damage a playback translation error.</p>
+<h2 id="section-7">Verify an explicit-text alternative if pronunciation must be visible</h2>
+<p>If visible pinyin is required, separately test explicit text such as 行（háng） on the same video for completeness and reading load. This is parenthetical text, not ruby layout or a universal device guarantee. Do not apply this alternative directly to production captions whose author supplied no reading. Interpreting polyphonic characters also requires reliable context. Give the alternative a new name and record changed structure, retained information and untested devices. A successful exercise does not imply automatic annotation of arbitrary films.</p>
+<h2 id="section-8">Reopen and verify all three file identities</h2>
+<p>Reopen the video, identify annotated, base-only or parenthetical selection, and play again from before the interval. Retain source character, supplied reading, structure, observed rendering, control differences and unknowns with filename and date. Restore regular captions and keep the three files and original separately. Completion separates authored information from actual rendering, without universal character disambiguation or a claim that publishing this lesson constitutes physical-device testing.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-webvtt-literal-character-escapes/">Check literal VTT characters</a>, <a href="/en/guides/icouldplay-webvtt-voice-annotation-visible-name/">Inspect voice annotations</a>.</p>
+<p>Checked on November 10, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

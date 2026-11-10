@@ -1,0 +1,68 @@
+---
+layout: null
+permalink: /en/guides/manyue-webdav-multistatus-resource-property/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'ManYue WebDAV Multi-Status: read resource and property results inside a 207
+  response'
+agent_source_url: https://allluckly.cn/en/guides/manyue-webdav-multistatus-resource-property/
+agent_source_sha256: 6c805afde942f4a4ac215b0cbb04b7e9a885084385e750f7da313cea6f1ed4ca
+agent_generator_version: 1
+---
+{% raw %}# ManYue WebDAV Multi-Status: read resource and property results inside a 207 response
+
+Language: en
+Canonical: [ManYue WebDAV Multi-Status: read resource and property results inside a 207 response](<https://allluckly.cn/en/guides/manyue-webdav-multistatus-resource-property/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-webdav-multistatus-resource-property/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-webdav-multistatus-resource-property/>)
+Published: 2026-11-10T00:00:00+08:00
+Modified: 2026-11-10T09:39:21+08:00
+Author: Bison
+
+Separate the outer response, resource paths and property statuses, distinguishing a missing property from an inaccessible file before checking app results.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-webdav-multistatus-resource-property/>), translated on 2026-11-10. Original publication dates, attribution, code and version notes are retained.
+
+A 207 response to a WebDAV listing does not mean every property of every file succeeded. Use server results you may inspect or a redacted fragment supplied by its administrator, read the Multi-Status structure manually, then compare ManYue’s directory and page results. The app need not expose raw XML, and server logs are not device-level verification.
+
+## Fix request scope and log provenance
+
+Record server alias, relative directory, query time, account role and tool, without plaintext passwords or credential-bearing full URLs. Identify whether evidence comes from existing management logs, a trusted tool or the administrator; opening a normal browser page is not the same property-listing request. If PROPFIND and its Depth value are known, retain them exactly. Otherwise mark them unknown rather than inferring full recursive scope from many entries. This is read-only inspection: do not write, delete or rebuild directories, or change production-library permissions to obtain logs.
+
+## Read the outer response before individual resources
+
+Identify the outer HTTP status and Multi-Status body, then distinguish resources by href within each response. Status 207 indicates further status information in the body; it does not prove all files downloaded. Number the collection itself separately from child files. Interpret returned addresses under their applicable rules rather than treating an XML display label as a local filename. A truncated fragment covers only its retained scope, not the whole library. If a tool shows one success line without the body, record detailed results unchecked and ask an authorised administrator for a corresponding small-scope result when needed.
+
+## One resource can have different property statuses
+
+In an original illustrative record, file A has a size-property propstat of 200 and a separate custom-description-property propstat of 404. The property groups differ; the latter does not directly establish that the whole file is absent. Keep property names, namespaces and their status together on each row. Finding 404 anywhere in a body does not label every file failed. The example does not promise that a server offers this custom property. If an actual result supplies size but no description, record the omission rather than inventing success because the app displays a normal title.
+
+## Distinguish property failure from resource-level failure
+
+If resource B has a resource-level 403 status in its response, record it separately from A’s custom-property 404 rather than summarising “two failures.” Permission-related results do not prove corruption or a need to reupload; first check account role and request scope. Other results may place failures inside propstat, so inspect which properties that group contains rather than assuming every response has an identical structure. Retain hierarchy and original statuses, marking uncertain scope unresolved. Do not test by deleting and readding resources: that changes identity and may damage other members that were already working.
+
+## Listing properties do not guarantee content reading
+
+Successful name and size properties for A do not guarantee that images open completely: property queries and content retrieval are different operations. In ManYue, use the same account to open A’s directory, locate the correct item, then open a known small image or comic chapter. Record waiting, errors and actual appearance separately. A cover does not establish every page’s readability; check target neighbours and an ending anchor at minimum. Preserve a general app error as shown instead of replacing its wording with a server-side status. Align timestamps from both evidence sources.
+
+## Use a small control with the same permission context
+
+Choose one normally readable control in the same directory under the same account, keeping endpoint and time as close as practical. Compare A, B and the control’s paths, property scope and actual reading; an administrator’s success cannot be assigned to an ordinary account. If permissions changed, old logs do not directly explain a new result: record the time and obtain new evidence you may access. Do not probe arbitrary public servers or place credentials in shareable links. Investigate one anomalous item at a time instead of losing the initial reproducible scope through a whole-library rescan.
+
+## State conclusions at the specific failing layer
+
+An issue record might state: A’s description property was unavailable while a content sample was readable; B had a resource-level permission response and did not open in the app. Keep conditions for each. Do not call 207 a false success or declare the whole server broken: Multi-Status is designed to carry details. If XML and the record disagree, first check directory, account and time. Without the original body, leave details unresolved rather than filling other resources from a cropped screenshot. Recommendations follow proven scope; a missing property does not automatically require comic reupload, and authorised administrators decide any production permission changes under actual rules.
+
+## Exit and return to check paths and status times
+
+Exit the reader and return to the anomalous item and working control. Record current opening results and whether the log still describes the same time. Retain six fields: outer status, resource path, property group, detailed status, app result and evidence time. Add a new row if reading later recovers rather than erasing the earlier failure conditions. Completion means someone can identify the unresolved layer and the reading actually observed, instead of treating 207 as universal success or failure. This explains protocol semantics and manual checks; it does not claim ManYue exposes every server field in its interface.
+
+## Related guides and sources
+
+[Connect ManYue to WebDAV: check the address, library and downloads](<https://allluckly.cn/en/guides/manyue-webdav-library/>); [ManYue server permissions: test login, catalogue, pages and downloads separately](<https://allluckly.cn/en/guides/manyue-server-permission-matrix/>).
+
+Checked on November 10, 2026: [Apple public version information](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261110>) lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the [official App Store](<https://apps.apple.com/cn/app/id6753895889>) for feature descriptions; specific controls must still be checked in the installed version.
+
+Method reference: [RFC4918: WebDAV Multi-Status and property status](<https://www.rfc-editor.org/rfc/rfc4918.html>). Numbers, short passages and controls are original exercises. Sources explain concepts rather than prove automatic recognition or grading in the app. Manual notes may be kept externally. This article does not claim step-by-step testing on a physical device or private server; unresolved content should remain marked for review.
+{% endraw %}

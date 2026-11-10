@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint three-bit Gray-code cycles: check one-bit neighbours and closure'
+description: Arrange eight fixed-width codewords in a cycle,checking changed positions edge by edge and distinguishing
+  indices,labels and ordinary binary counting.
+permalink: /en/guides/vectorpaint-three-bit-gray-cycle/
+date: '2026-11-10 00:00:00 +08:00'
+modified: '2026-11-10 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 159
+topic: Projections, networks and steps
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-10-vectorpaint-three-bit-gray-cycle.md
+source_url: /guides/vectorpaint-three-bit-gray-cycle/
+translation_method: editorial
+translation_source_sha256: b78ae91ec610a33c4a4f87dcdfb6aea6fc51492844b81553634c8e107af0fcac
+translation_date: '2026-11-10T01:39:21+00:00'
+excerpt: Arrange eight fixed-width codewords in a cycle,checking changed positions edge by edge and distinguishing
+  indices,labels and ordinary binary counting.
+---
+{% raw %}
+<p>Binary-looking labels do not guarantee one-bit steps under ordinary numerical order. Manually arrange a three-bit Gray cycle,checking eight unique labels and eight adjacency relations. This static code diagram simulates no sensor,guarantees no noise performance and assumes no code generator or bit-operation engine.</p>
+<h2 id="先固定三位宽度与八个标签">Fix three-bit width and eight labels</h2>
+<p>Externally list 000, 001, 011, 010, 110, 111, 101, 100, then return to 000. Each codeword has exactly three bits. Preserve leading zeroes: 001 cannot be displayed as 1, nor 010 as 10. <a href="https://patents.google.com/patent/US2632058A/en">Gray’s original patent</a> supplies reflected-binary-code background; this exercise uses only neighbouring-codeword changes, without copying patent drawings or inferring hardware capabilities. Number list positions 1–8 separately from the codewords’ binary numerical values. Enter all text yourself, resolving unequal glyph widths through layout rather than confusing the two columns.</p>
+<h2 id="环上节点与位序都用固定参照">Use fixed node and bit-position references</h2>
+<p>Place eight nodes around a ring or rounded-rectangle route in the listed order, clearly identifying 000 as the start. Define bit positions first, second and third from left to right inside every word; bottom nodes do not reverse the reading direction. Nodes may have equal sizes, and path length does not encode value. Keep words upright and readable rather than rotating them awkwardly around a circle. Hide connections first and match all eight nodes to the external list, excluding omissions or repeated 011. The closing connection specifically joins 100 to 000, not some other interpretation of returning to a minimum.</p>
+<h2 id="逐边比较八次而不是七次">Check eight transitions rather than seven</h2>
+<p>The changed positions are third, second, third, first, third, second, third, first. Check seven consecutive list pairs and the closing 100→000 pair, where only the left bit changes. Eight nodes in a closed cycle require eight relations, not seven. Temporarily annotate each edge with the changed position, comparing all three characters to confirm exactly one difference. Numerical difference 1 is not the test. Although 011→010 happens to differ numerically by 1, 010→110 also changes one bit without being consecutive ordinary integers. Compare positions rather than decimal differences.</p>
+<h2 id="八组唯一也要独立检查">Check uniqueness independently</h2>
+<p>Three bits allow eight zero/one combinations, each occurring once here. As a membership checklist only, separately sort them into ordinary binary order: 000, 001, 010, 011, 100, 101, 110, 111. Do not replace the ring order with that list. One-bit adjacency and unique membership are separate conditions: alternately repeating 000 and 001 changes one bit every time but does not produce a complete eight-word cycle. Check the set before the order; eight drawn nodes do not prove eight different labels. Writing the start again at closure marks a return, not a ninth kind of codeword.</p>
+<h2 id="与普通计数作明确反例">Compare ordinary counting as a counterexample</h2>
+<p>Ordinary binary counting changes two bits from 001 to 010 and three from 011 to 100, so it fails this exercise’s one-bit-per-edge cycle condition. Save that control separately and mark the actual changed positions instead of merely colouring both words red. Do not delete carried zeroes to fake success: three-bit width remains fixed. The comparison does not call ordinary binary incorrect; its objective differs. Neither should Gray labels be used as though each position number had the same ordinary binary value. Encoding and decoding mappings need separate definitions, and this cycle promises no arithmetic operations.</p>
+<h2 id="旋转排列时保留邻接关系">Preserve adjacency when reorienting layout</h2>
+<p>To move the start to the upper-right for layout, cyclically shift positions while preserving neighbouring pairs. Text orientation may change, but do not reverse the characters. Traversing the same ring backward also changes one bit per edge; explicitly state the reading direction instead of shuffling nodes and retaining old instructions. Keep the original-order version before moving nodes in a copy, then check every endpoint and arrow. A ring implies neither app execution nor device control, and edge lengths do not indicate transition time. Track edits by codeword identity, not screen sides. Even if only the start marker changes, rewrite the reading list from that new start.</p>
+<h2 id="导出要看前导零与最后一条边">Inspect leading zeroes and the final edge in output</h2>
+<p>Save the source and open a PNG, reading every three-bit word, especially the leading zeroes in 001 and 010 and the closing 100→000 edge. Distinguish digit 0 from letter O rather than substituting a similar-looking character. For unreadable small output enlarge nodes or remove decoration; never delete the first bit to shorten a label. Hide temporary changed-position annotations if unwanted while retaining official codewords and the start. Monochrome paths must remain checkable without colour-only guesses. Open other output formats separately: editable source text does not guarantee identical digits in every rendering.</p>
+<h2 id="从位宽全集相邻闭合复核">Check width, membership, adjacency and closure</h2>
+<p>For missing words check membership; for an edge changing two bits check order; for failed closure check 100 joining 000 rather than repairing only the first seven edges. Repeat all eight comparisons whenever nodes move. This attractive ring is not a universal layout for every Gray code. Retain the three-bit convention, eight labels, changed-position list, ordinary-counting control and actual output. The diagram explains a specific code-cycle property. It proves no hardware reliability or communication security, promises no automatic bit operations, and must not be presented as a real sensor passing tests.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-invented-two-flag-code/">VectorPaint invented two-flag cards: audit sixteen combinations through rows and columns</a>, <a href="/en/guides/vectorpaint-seven-segment-digit-cards/">VectorPaint seven-segment cards: audit lit segments for digits zero to nine</a>.</p>
+<p>Checked on November 10, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Capability scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn">Apple public version lookup</a>. This is an original exercise to perform independently; use controls in your installed version. Manual construction and external records do not imply new automatic analysis features. No step-by-step physical-device, private-file or all-output-environment testing is claimed.</p>
+{% endraw %}
