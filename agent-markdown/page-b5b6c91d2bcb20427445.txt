@@ -1,0 +1,75 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-vtt-class-label-visible-text-check/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay VTT classes: separate labels, visible text and color effects'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-vtt-class-label-visible-text-check/
+agent_source_sha256: 2d8f425cad62125cc428b4c4faaa23479b723f40206d5551ba47e1b3ccad79c1
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay VTT classes: separate labels, visible text and color effects
+
+Language: en
+Canonical: [iCouldPlay VTT classes: separate labels, visible text and color effects](<https://allluckly.cn/en/guides/icouldplay-vtt-class-label-visible-text-check/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-vtt-class-label-visible-text-check/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-vtt-class-label-visible-text-check/>)
+Published: 2026-11-11T00:00:00+08:00
+Modified: 2026-11-11T09:40:26+08:00
+Author: Bison
+
+Use two original cues to distinguish a class label from visible wording and observed styling.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-vtt-class-label-visible-text-check/>), translated on 2026-11-11. Original publication dates, attribution, code and version notes are retained.
+
+Seeing red in subtitle source does not establish that red will appear as text or that every renderer will color the span red. This exercise brings two cues with identical wording and different class labels into iCouldPlay. Check the wording first and record styling separately. The deliverable is a source-to-playback record, without replacing subtitles belonging to an existing film.
+
+## 1. Prepare an isolated copy and a wording baseline
+
+Choose an authorized clip lasting at least eight seconds whose picture remains understandable without captions. Save a separate exercise copy. Play it in iCouldPlay and confirm that it remains playable beyond six seconds. Record its name, source location and duration. Create a UTF-8 subtitle in a plain-text editor and keep an unmarked fallback. This is external file preparation, not programming inside iCouldPlay. Use a subtitle loading or selection control available in the installed version. If none is available, stop at source inspection and do not report successful rendering.
+
+## 2. Change only the class label
+
+Enter the following original cues. Only the class label differs; review is an arbitrary exercise label, not an iCouldPlay command. Save a real .vtt file rather than .vtt.txt, preserve blank lines and use the literal timing arrow. Write the expected readable wording for both cues as Check the blue cup. Do not predict a color or weight before testing.
+
+```
+WEBVTT
+
+00:00:01.000 --> 00:00:03.000
+Check the <c.red>blue cup</c>.
+
+00:00:04.000 --> 00:00:06.000
+Check the <c.review>blue cup</c>.
+```
+
+## 3. Play into each cue and record wording separately
+
+Load the paired files and play from zero through the first cue. Transcribe the visible sentence before describing its appearance. Note any literal brackets, class labels or missing words. Continue through the second cue using the same order. Replay if necessary, without changing text size, audio track and source simultaneously. Keep four columns: cue interval, actual wording, appearance and uncertainty. An observation such as “blue cup has the same color as the rest” is more reproducible than a claim that the class failed. Separate what was visible from an explanation of why.
+
+## 4. Interpret the markup without promising styling
+
+The class markup described in the [W3C WebVTT specification](<https://www.w3.org/TR/webvtt1/>) groups a text span; the label is not ordinary audience-facing wording. The specification also defines red as a default foreground color class; review is our arbitrary custom group. Keep that normative expectation separate from renderer observations. This does not promise identical CSS or default color handling in iCouldPlay. If the two cues look the same, report that no styling difference was observed under the current conditions. If they differ, limit the conclusion to this sample and setup. Keep blue in the sentence even when the class is red: the deliberate mismatch prevents confusing a word’s meaning with a styling label.
+
+## 5. Compare an unmarked fallback
+
+Save an additional subtitle containing only the plain sentence at the same intervals. Record the selected subtitle filename before switching. Replay from zero and verify that the fallback really replaced the previous track. If plain text is intact but the marked version exposes tags or loses words, limit the finding to handling of this marked sample and preserve both files. If neither version appears, first check subtitle selection, the one-to-six-second intervals and video identity. Do not overwrite the only marked original, since that removes the evidence needed to locate the difference.
+
+## 6. Check a second background without changing the text
+
+If wording is present but color judgments vary, inspect the background behind each cue. Keep the original and save a variant that moves the same sentence to another stable background. Change timing without changing class labels. Check whether the text edge disappears into the picture; assess readability without claiming exact color measurements. Pause within a cue to read it, then resume to verify its interval. This isolates a possible background effect. It does not establish that the app has a color sampler or test display calibration. State that color values were not measured.
+
+## 7. Troubleshoot tags, duplicate text and selection
+
+If literal c.red brackets appear, check whether the source intentionally escaped them or whether a rich-text editor inserted extra characters. For duplicated wording, check for burned-in captions or another active embedded track before blaming class markup. If one word disappears, compare opening and closing tags and confirm that the wording is between them. If selecting a new file changes nothing, verify the selected subtitle identity and, if needed, reopen the playback page and select the copy again. Do not repeatedly clear the library. Change one identified problem at a time and preserve before-and-after evidence.
+
+## 8. Finish with a reproducible record
+
+Keep the clip identity, marked and plain subtitle files, observed wording for each cue, styling observations and unresolved points. Check word order, punctuation and intervals. Do not turn “same color here” into “the format cannot express color,” or one red rendering into a universal compatibility claim. Reuse the record after a source or display change, identifying the new conditions. The result is a reproducible subtitle check, not a screenshot-based claim of complete compatibility. Confirm that the original film and subtitles remain intact and play the plain fallback once more to confirm it remains readable.
+
+## Related tutorials and sources
+
+[VTT literal character checks](<https://allluckly.cn/en/guides/icouldplay-webvtt-literal-character-escapes/>), [VTT voice annotations](<https://allluckly.cn/en/guides/icouldplay-webvtt-voice-annotation-visible-name/>).
+
+Checked on November 11, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

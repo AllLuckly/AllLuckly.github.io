@@ -1,0 +1,60 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay HLS states: distinguish EVENT, VOD and end-of-list markers'
+description: Compare timestamped playlist snapshots and separate appendability, end declarations and observed playback
+  range.
+permalink: /en/guides/icouldplay-hls-playlist-type-endlist-snapshot-check/
+date: '2026-11-11 00:00:00 +08:00'
+modified: '2026-11-11 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 126
+topic: Stream states and viewing evidence
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-11-icouldplay-hls-playlist-type-endlist-snapshot-check.md
+source_url: /guides/icouldplay-hls-playlist-type-endlist-snapshot-check/
+translation_method: editorial
+translation_source_sha256: 08f3ebcbc2864e0870f294f2cd86ec1322a3c99e0b0675e5f46c72798124b5ca
+translation_date: '2026-11-11T01:40:26+00:00'
+excerpt: Compare timestamped playlist snapshots and separate appendability, end declarations and observed playback
+  range.
+---
+{% raw %}
+<p>A filename containing live or a playlist containing EVENT does not tell you how much more content your viewing session will gain. Capture two snapshots of a source you manage and separate declared state from the playback range actually observed in iCouldPlay. The paper classification exercise remains possible without a server, but it is not an online test.</p>
+<h2 id="section-1">1. Confirm that you are reading a media playlist</h2>
+<p>Choose an authorized HLS source whose playlist text you can obtain and record acquisition time. Check for media segments and EXTINF durations. If the file only lists variants and child playlists, locate the actual media playlist first. Save an untouched timestamped snapshot A. Open the source through an existing iCouldPlay entry and record its identity and observable beginning, ending or range. If playlist text is unavailable, state that only the player was observed. Do not infer missing fields from the filename.</p>
+<h2 id="section-2">2. Classify three teaching cards</h2>
+<p>These teaching excerpts are not complete playable playlists or hosted media resources. A and B have the same type, but B adds an end marker; C has another type. Use separate columns for type and end-marker presence. Keep the actual-playback column unperformed for these paper cards rather than turning a declaration into an observation.</p>
+<pre><code>Card A
+#EXT-X-PLAYLIST-TYPE:EVENT
+(segment entries omitted)
+
+Card B
+#EXT-X-PLAYLIST-TYPE:EVENT
+(segment entries omitted)
+#EXT-X-ENDLIST
+
+Card C
+#EXT-X-PLAYLIST-TYPE:VOD
+(segment entries omitted)
+#EXT-X-ENDLIST
+</code></pre>
+<h2 id="section-3">3. State what each field answers</h2>
+<p><a href="https://www.rfc-editor.org/rfc/rfc8216.html#section-4.3.3.4">RFC 8216’s playlist declarations</a> use ENDLIST to declare no further segments, EVENT to permit only appending without changing or deleting existing parts, and VOD for an unchanging playlist. An omitted type is not automatically VOD. Annotate the cards briefly without expanding this into “EVENT must be live now” or “ENDLIST proves a complete local download.” B illustrates an event playlist with an end declaration. Availability and successful retrieval of every media resource remain separate checks.</p>
+<h2 id="section-4">4. Capture a second snapshot and compare changes</h2>
+<p>Obtain the same real media playlist again at a recorded later time and save snapshot B without overwriting A. Confirm the path and selected variant. Compare type, end marker, sequence start, first and last segment identities, additions and removals. Identical snapshots mean no textual change was found at those times, not that the future is fixed. If an EVENT declaration appears alongside disappearing earlier entries, first check source identity and snapshot completeness, then retain the discrepancy for investigation. Do not edit the evidence to make it fit expectations.</p>
+<h2 id="section-5">5. Record the current playback range in iCouldPlay</h2>
+<p>Return to iCouldPlay and record the position and approximate reachable range. Play continuously, then use the available timeline to revisit a known content point if possible. Record whether its actual picture and sound play, not just whether a slider moves. Timestamp any newly observed content. Lack of new content during a wait does not establish that the server has ended. Interface duration, current segment window and the complete event can differ, so retain the actual visible labels rather than renaming them a permanent total program length. If no timeline is available, keep the continuous-play observation without inventing a rewind control.</p>
+<h2 id="section-6">6. Separate playlist completion, downloading and viewing</h2>
+<p>Keep three independent statuses: end declaration present, required files completely obtained, and target ending actually watched. Teaching cards B and C address only the first. Even after ENDLIST, segment URIs may fail or viewing may remain unfinished. Finishing the current playable portion does not prove that no content will be appended. Offline viewing requires its own complete-file checks rather than merely saving playlist text. Attach evidence to each status, such as a tag in snapshot B, retrieval records or an observed original end card. Do not compress these different outcomes into one vague “done.”</p>
+<h2 id="section-7">7. Troubleshoot old snapshots, changing windows and source switches</h2>
+<p>If snapshots and player range differ, first check capture times, source identity, variant and similarly named playlists. An old snapshot can list resources that are no longer reachable; that is not proof that iCouldPlay lost local files. Record failed seeking separately from successful continuous playback. Do not clear the library or delete original media as the first response. If the retrieved text is an error page, fix retrieval rather than classifying an incidental EVENT word. For a source you manage, preserve both texts and observations for server investigation. Use original public exercise material when sharing examples rather than requiring private access URLs.</p>
+<h2 id="section-8">8. Finish with a clear next observation</h2>
+<p>Finish the three paper classifications and, for a working source, keep two timestamped originals with itemized differences. Mark unperformed stages explicitly. An absent end marker is not a promise of endless live content, an end marker is not a complete-download receipt, and unchanged snapshots are not a future guarantee. Add snapshot C and new viewing observations after later updates while preserving A and B. The record should explain what was seen, what was declared and which layer remains to check. Confirm that the exercise did not modify the production playlist.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-hls-playlist-offline-boundary/">HLS offline boundaries</a>, <a href="/en/guides/icouldplay-hls-discontinuity-segment-boundary-map/">HLS discontinuity boundaries</a>.</p>
+<p>Checked on November 11, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

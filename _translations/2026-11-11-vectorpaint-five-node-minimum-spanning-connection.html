@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint minimum spanning connections: cover five nodes before comparing four-edge totals'
+description: Draw an undirected weighted graph, separating all-node connection from a shortest route and checking
+  candidate totals ten and thirteen.
+permalink: /en/guides/vectorpaint-five-node-minimum-spanning-connection/
+date: '2026-11-11 00:00:00 +08:00'
+modified: '2026-11-11 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 169
+topic: Discrete counting and geometric rules
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-11-vectorpaint-five-node-minimum-spanning-connection.md
+source_url: /guides/vectorpaint-five-node-minimum-spanning-connection/
+translation_method: editorial
+translation_source_sha256: 69210dcbf7ae9792f7690f43f0d898e0df78b4eac9635145dbd1d538ce9ed663
+translation_date: '2026-11-11T01:40:26+00:00'
+excerpt: Draw an undirected weighted graph, separating all-node connection from a shortest route and checking candidate
+  totals ten and thirteen.
+---
+{% raw %}
+<p>A shortest A-to-E route need not be the least-cost network connecting every site. Use an original five-node undirected graph, checking coverage/connectivity and absence of cycles before total edge weight. Weights are fictional costs, not real distances or quotes. VectorPaint supplies a static diagram, with calculations and minimality checked manually rather than by an assumed graph algorithm.</p>
+<h2 id="先列五点八边与无向约定">List five vertices and eight undirected edges</h2>
+<p>Use A–E for 甲乙丙丁戊 and eight edges: AB=1, BC=2, CD=3, DE=4, AC=5, BD=6, CE=7, AE=9. Undirected AB/BA is one edge, without arrows. List edges externally before layout, placing each weight clearly on its own edge. Unmarked crossings create no sixth vertex. Geometric lengths encode no costs; use the table’s values only. Title it fictional, without inferring real roads or terrain.</p>
+<h2 id="选四条链边确认覆盖全部">Check coverage with the four chain edges</h2>
+<p>Candidate one selects AB, BC, CD, DE: all five vertices connect along a four-edge chain without a cycle. Trace A through B/C/D to E, not just the endpoints. A spanning tree here connects all five without cycles; AE alone omits three vertices and is not a candidate. Emphasise selected edges while retaining pale unselected source edges with a legend, or use patterns/numbers. Four edges alone is not sufficient; connectivity and acyclicity still require checks.</p>
+<h2 id="总权十的最小性只在本图成立">Establish minimality for this graph</h2>
+<p>1+2+3+4=10. A five-vertex spanning tree has four edges, and this graph’s four smallest weights are 1,2,3,4. Every four-edge selection therefore costs at least 10. Since these four also form a spanning tree, they attain that bound. State both lower bound and feasibility: simply choosing four cheapest edges does not work universally, because another graph may yield a cycle or omit vertices. Distinct weights do not license a visual uniqueness claim, and no software enumeration is claimed. Sum each selected edge once, not separate A-to-every-vertex routes, which would repeatedly charge shared chain edges.</p>
+<h2 id="十三候选同样可行却更贵">Compare a feasible thirteen-cost tree</h2>
+<p>Candidate two uses AB, BC, CD, CE, costing 1+2+3+7=13. It still connects every vertex without a cycle: E joins through C and D remains reachable. It is feasible but more expensive, not structurally invalid. Hold the edge table/layout fixed, including CE=7. Separate feasibility from optimality; higher cost does not mean disconnected. Restore selections by edge identities rather than colour memory. One connected example alone cannot establish minimality without a bound or another reliable comparison.</p>
+<h2 id="两端短路与全节点目标分开">Separate shortest-route and spanning objectives</h2>
+<p>For A-to-E alone, direct AE costs 9, less than chain cost 10, but omits B/C/D and cannot replace the spanning tree. Conversely, the tree’s A-to-E path of 10 does not make 10 the original graph’s shortest-route answer. State each objective explicitly. The earlier shortest-route exercise is a comparison, while covering every node is the new requirement. Use only listed nonnegative edges, without invented shortcuts. Real capacity, reliability and geographic constraints are absent from this small graph.</p>
+<h2 id="廉价成环错例先查漏点">Test a cheap cyclic selection</h2>
+<p>The incorrect AB, BC, AC selection costs 8 but cycles within ABC and omits D/E. Adding DE gives four edges and cost 12, yet leaves two components and the cycle. Record cost, edge count, coverage and connectivity separately: four edges do not pass. Repair edge selection rather than moving omitted labels inside a circle and pretending they connect. Check both failure reasons manually without automatic cycle detection. Preserve the valid 10 and 13 versions as separate evidence.</p>
+<h2 id="图例和输出跟边表一起核">Inspect output against the edge table</h2>
+<p>Save and inspect PNG all eight weights, four selected edges and five labels, retaining any no-node-at-crossing legend. Move misattached labels rather than altering costs. If pale unselected edges disappear small, include the edge table so the original is not mistaken for a four-edge graph. Distinguish selection in monochrome and hide unwanted checking arrows/numbers. Open other formats separately; inspect endpoints/occlusion for gaps. An image export is no network-connectivity test. Keep source table and editable drawing retrievable.</p>
+<h2 id="最后按覆盖无环总权复核">Review coverage, cycles and total weight</h2>
+<p>For omitted vertices revisit the full set; for cheap invalid selections inspect cycles/connectivity; for 13 called minimum revisit the bound of 10; for endpoint-objective confusion revisit titles. After repair trace reachability as well as adding weights. Retain edge table, 10/13 trees, 9-route comparison, 8/12 controls and lower-bound argument. <a href="https://algs4.cs.princeton.edu/43mst/">Princeton’s minimum-spanning-tree text</a> supplies terminology/objective only; no program is run. This is no automatic planning, quote or optimum under every real constraint. Actual systems require separate data and professional validation.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-five-node-weighted-routes/">VectorPaint five-node weighted routes: sum edge weights before comparing paths</a>, <a href="/en/guides/vectorpaint-dependency-arrows-feasible-order/">VectorPaint dependency diagrams: match arrows to feasible orders</a>.</p>
+<p>Checked on November 11, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Capability scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261111">Apple public lookup</a>. This is an original manual exercise; use controls available in your installed version and actual file state. External calculations, records and diagrams do not imply new automatic analysis. No step-by-step physical-device, private-file or all-export-environment testing is claimed.</p>
+{% endraw %}

@@ -1,0 +1,76 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-http-validator-file-hash-identity/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay remote copies: distinguish ETags, modification dates and file hashes'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-http-validator-file-hash-identity/
+agent_source_sha256: 0ee792249b43f7dde73173a3a0678d2e5d961764a76a9d17527671be0a9745cd
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay remote copies: distinguish ETags, modification dates and file hashes
+
+Language: en
+Canonical: [iCouldPlay remote copies: distinguish ETags, modification dates and file hashes](<https://allluckly.cn/en/guides/icouldplay-http-validator-file-hash-identity/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-http-validator-file-hash-identity/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-http-validator-file-hash-identity/>)
+Published: 2026-11-11T00:00:00+08:00
+Modified: 2026-11-11T09:40:26+08:00
+Author: Bison
+
+Build a response identity record for an owned clip without treating a server validator as a file digest.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-http-validator-file-hash-identity/>), translated on 2026-11-11. Original publication dates, attribution, code and version notes are retained.
+
+A repeated video URL may carry the same ETag or a new modification date. Neither observation is the same question as whether two complete local files contain identical bytes. Preserve response information on a computer, compare complete copies and inspect their visible identity in iCouldPlay. The deliverable links the address, response record, file digest and viewed content; no in-app HTTP debugging panel is assumed.
+
+## 1. Identify the two copies being compared
+
+Choose an owned or authorized clip with a clear sample identifier near its opening. Label the existing complete computer file A and a complete copy obtained from a source you manage B. Record acquisition date, source path and size. Partial playback cache is not a complete B, and a transcoded copy should not be treated as the same byte representation as the original. Open available local or remote sources in iCouldPlay and compare opening identifiers and endings. If one cannot open, record that failure stage rather than making a content identity claim from an unavailable picture.
+
+## 2. Preserve a response and mark absent fields
+
+If your computer download tool can show the response for your own clip, record the status, final response URL, ETag, Last-Modified, Content-Encoding and acquisition time. Write “not supplied” for absent fields; do not invent a tag from the filename. Distinguish redirect responses from the final media response and do not assign login-page headers to the video. Use an existing download tool if possible. No proxy installation or system certificate change is needed. External response evidence is separate from the player’s title, artwork and resume position, so keep it in separate columns.
+
+## 3. Read validators within their actual scope
+
+[RFC 9110’s validator definitions](<https://www.rfc-editor.org/rfc/rfc9110.html#section-8.8>) describe an ETag as an opaque server-assigned validator. W/ marks a weak form. An ETag need not use a particular hash algorithm, and a modification date is not a locally computed file digest. These are invented teaching cards, not an observed download result. Preserve case, quotes and W/ and label the fields accurately, without guessing an implementation from their appearance. Label them as a server validator and server-declared modification date, not MD5 or device capture time.
+
+```
+ETag: "sample-a"
+ETag: W/"sample-a"
+Last-Modified: Tue, 10 Nov 2026 00:00:00 GMT
+```
+
+## 4. Compute the same digest for complete files
+
+Once A and B are fully downloaded, locally available and no longer being written, compute SHA-256 for each on the computer. These macOS commands use exercise filenames: first copy or rename the files into your own exercise directory and ensure that they identify your actual copies and keep quotes around paths containing spaces. Record the full output and time. Matching digests support byte identity for these complete copies. A mismatch establishes a byte difference, not necessarily a visible content difference or a quality ranking. Container metadata, transcoding or other file rewriting can change a digest.
+
+```
+shasum -a 256 "sample-A.mp4"
+shasum -a 256 "sample-B.mp4"
+```
+
+## 5. Return to iCouldPlay for visible identity checks
+
+Open A and B as separate exercise files. Check the opening identifier, one clear action in the middle and an ending marker. Confirm the source name after every switch and play into each checkpoint rather than relying on thumbnails or a resume position. Record separate findings, such as matching opening and action but a different ending. If hashes differ while these checkpoints match, say only that no content difference was found at the observed points. Do not claim frame-by-frame equality. A remote URL that changes over time also requires an observation time; a later player request may not retrieve the same representation as B.
+
+## 6. Keep different conclusions in different columns
+
+Add separate columns for response validators, complete file bytes and viewed content. Identical tag text from different servers or representation conditions is not a cross-server file identity proof. Different hashes with matching openings should remain “different bytes” and “matching observed opening” in separate columns. An absent modification date does not make an otherwise complete playable file corrupt. Conversely, an attractive title and update date do not establish a complete download. Try the invented field cards as classification practice, then enter the actual A/B findings. Mark comparisons you did not perform as unchecked.
+
+## 7. Troubleshoot incomplete or different representations
+
+If a digest changes between runs, check whether downloading, synchronization or another program is still modifying the file. Retry after it stabilizes rather than attributing remote changes to the player. If delivery involves content coding or another quality representation, identify exactly which saved bytes are being compared; an HTTP coding label is not a video codec. A file of only a few kilobytes or a login response calls for download identity checks, not renaming it MP4. Preserve the response status and retrieve the clip through its normal authorized entry. For stale content, preserve source, time and validators for investigation. Clearing app data is not required, and do not assume the cache is necessarily on the device.
+
+## 8. Complete the record and preserve update history
+
+Keep both complete file identities and sizes, supplied or absent response fields, full digests using the same algorithm, three viewing checkpoints and the times of the operations. Another reader should be able to identify which layer of sameness was checked and which remains unknown. Add a row for later source updates instead of replacing this result. Missing historical responses should remain missing. Confirm that original material survives and that exercise copies are not mistaken for the only backup. The outcome is traceable version checking, not hash guessing from an ETag’s shape or a universal integrity guarantee from one successful playback.
+
+## Related tutorials and sources
+
+[HTTP content coding](<https://allluckly.cn/en/guides/icouldplay-http-content-encoding-media-codec-layers/>), [206 byte ranges](<https://allluckly.cn/en/guides/icouldplay-http-byte-range-partial-content/>).
+
+Checked on November 11, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

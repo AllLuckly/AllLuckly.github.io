@@ -1,0 +1,78 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-webvtt-language-span-label-wording-check/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay VTT language spans: separate annotations, wording and track names'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-webvtt-language-span-label-wording-check/
+agent_source_sha256: b2332d4e106d36c72b217b758da56356b5e229d708d190dc1a5d5f9c24cd99cc
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay VTT language spans: separate annotations, wording and track names
+
+Language: en
+Canonical: [iCouldPlay VTT language spans: separate annotations, wording and track names](<https://allluckly.cn/en/guides/icouldplay-webvtt-language-span-label-wording-check/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-webvtt-language-span-label-wording-check/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-webvtt-language-span-label-wording-check/>)
+Published: 2026-11-11T00:00:00+08:00
+Modified: 2026-11-11T09:40:26+08:00
+Author: Bison
+
+Compare correct, incorrect and absent language annotations without treating metadata as translation or automatic detection.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-webvtt-language-span-label-wording-check/>), translated on 2026-11-11. Original publication dates, attribution, code and version notes are retained.
+
+A lang annotation inside a subtitle, a language label in a subtitle list and the language of the actual words are separate pieces of evidence. Use the same original sentence in three cues, inspect its visible wording in iCouldPlay and manually review the annotation. The deliverable separates wording from metadata; it does not assume automatic correction or translation.
+
+## 1. Prepare a clip and three layers of evidence
+
+Choose an owned clip lasting at least twelve seconds and confirm that it does not already contain the exercise text. Create a UTF-8 plain-text subtitle and a plain fallback. Use three evidence columns: internal annotation, visible subtitle-list label and actually read wording. Allow “not supplied” and “not observed” rather than guessing languages to fill blanks. Load through a subtitle control available in the installed version. Without one, complete source review and mark device display unperformed. Preserve clip identity, filename and date for later track checks.
+
+## 2. Create correct, deliberately wrong and unmarked cues
+
+Copy this original file with identical readable wording in all three cues. Cue one labels Bonjour as fr, cue two deliberately labels it en, and cue three leaves it unannotated. Bonjour is the French greeting in this exercise; cue two is a deliberate metadata error. Do not silently fix it before comparison. The latter sentence remains English in every cue, and the three time intervals do not overlap. Check opening and closing tags. No matching French audio or language badge in the app is required.
+
+```
+WEBVTT
+
+00:00:01.000 --> 00:00:03.000
+<lang fr>Bonjour.</lang> We are ready.
+
+00:00:04.000 --> 00:00:06.000
+<lang en>Bonjour.</lang> We are ready.
+
+00:00:07.000 --> 00:00:09.000
+Bonjour. We are ready.
+```
+
+## 3. Read the annotation scope without treating it as translation
+
+The [W3C WebVTT language-span description](<https://www.w3.org/TR/webvtt1/>) annotates a span’s language; it does not translate the words. Circle the first annotation’s scope: only Bonjour., not the following English sentence. The deliberately wrong en label does not turn Bonjour into Hello. Missing annotation in cue three does not make its wording language-free. Enter these findings as source review without promising screen-reader pronunciation, automatic track selection or an error notification in iCouldPlay.
+
+## 4. Check visible wording before inspecting tag exposure
+
+Play from zero and transcribe each cue. Check Bonjour, We, are and ready before noting any exposed lang, fr or en text. A deliberately wrong annotation does not require an error message, and silence from the app does not establish that it classified the phrase as English. If all three display identically, record matching visible wording while retaining the manual metadata findings. For missing words, note the word and time before inspecting source syntax. Avoid changing audio, network source or the whole app language during this comparison.
+
+## 5. Record the subtitle-list label independently
+
+Inspect the available subtitle-selection UI and copy the actual name or language label, noting whether it is merely a filename. If no language is shown, write that rather than predicting French from lang fr. One file can contain mixed-language spans; a track-level label has a different scope from a word-level annotation. Return to playback, confirm the same file and play into cue three. This gathers visible information without changing system language or assuming word-by-word track switching.
+
+## 6. Correct a copy while preserving the reason
+
+After the deliberate-error comparison, save a reviewed copy changing only cue two’s en to fr. Preserve wording and timing. Explain that the correction came from manual review, not automatic app detection. Verify the corrected file’s identity and complete wording. Unchanged text is reasonable because metadata, not translation, changed. Keep the original wrong-label sample clearly named as a teaching error so it is not later mistaken for production subtitles. Preserve enough history to recover the prior condition.
+
+## 7. Troubleshoot labels, missing words and translation expectations
+
+If Chinese translation is expected but Bonjour remains visible, changing lang values is not the remedy: translated wording is a different resource. Literal tags call for checks of brackets, escaping and the text-processing path. Unchanged appearance after switching files is not proof that the selection failed; verify identity and timing. For a wrong label, retain the source and manual reason before editing a copy. Do not label unfamiliar wording with a familiar language merely to fill a field. Use a reliable dictionary or author confirmation where needed and retain uncertainty when unresolved.
+
+## 8. Finish with clear metadata boundaries
+
+Keep the three source conditions, observed wording, actual selection-list name, manual review and corrected-copy difference. Do not turn one French greeting into a test of every language, or a language annotation into a font command or translation button. Claim only performed playback; source review alone remains source review. For a completed viewing task, preserve clip, subtitle and display conditions. Reuse the layered check for mixed-language captions instead of allowing a plausible track label to substitute for all evidence. Confirm the plain fallback remains available and original material is intact.
+
+## Related tutorials and sources
+
+[VTT voice annotations](<https://allluckly.cn/en/guides/icouldplay-webvtt-voice-annotation-visible-name/>), [VTT classes and wording](<https://allluckly.cn/en/guides/icouldplay-vtt-class-label-visible-text-check/>).
+
+Checked on November 11, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

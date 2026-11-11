@@ -1,0 +1,81 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-hls-discontinuity-segment-boundary-map/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay HLS discontinuities: map segment order, boundaries and playback
+  observations'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-hls-discontinuity-segment-boundary-map/
+agent_source_sha256: d685156edea9e7c3cd0b4998714c5eda13a8b26418a7010c403fc23e922d24a2
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay HLS discontinuities: map segment order, boundaries and playback observations
+
+Language: en
+Canonical: [iCouldPlay HLS discontinuities: map segment order, boundaries and playback observations](<https://allluckly.cn/en/guides/icouldplay-hls-discontinuity-segment-boundary-map/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-hls-discontinuity-segment-boundary-map/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-hls-discontinuity-segment-boundary-map/>)
+Published: 2026-11-11T00:00:00+08:00
+Modified: 2026-11-11T09:40:26+08:00
+Author: Bison
+
+Annotate a three-segment example without treating a discontinuity marker as a missing segment or fixed pause.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-hls-discontinuity-segment-boundary-map/>), translated on 2026-11-11. Original publication dates, attribution, code and version notes are retained.
+
+DISCONTINUITY in an HLS playlist does not by itself establish a network outage or a missing segment. First map a clearly labeled teaching playlist, then observe boundaries in an authorized working HLS source if available. The result separates sequence numbers, declared durations, marker placement and visible playback behavior. No server editor inside iCouldPlay or mandatory pause at the marker is assumed.
+
+## 1. Separate the teaching sheet from working media
+
+Prepare a plain-text note and an authorized HLS source if you have one. Without a working source, complete the paper exercise and mark playback as unperformed. Names such as segment-a.ts below are structural examples, not video URLs hosted by this site. Saving the example does not create playable media. For actual material, open it normally in iCouldPlay, record the source, title and playlist capture time, and confirm initial continuous playback. Preserve the original playlist rather than inserting or removing markers on a production source.
+
+## 2. Identify three segments and one boundary
+
+Copy this teaching playlist, box the three segment URIs and draw an arrow from the discontinuity marker to segment-c.ts, which follows it. The marker is not a fourth media file. Pair each EXTINF with the next URI. Use separate markings for the sequence start, declared durations and the boundary. For a real source, locate the selected media playlist rather than applying this segment worksheet directly to a multivariant playlist.
+
+```
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:4
+#EXT-X-MEDIA-SEQUENCE:100
+#EXTINF:4.000,
+segment-a.ts
+#EXTINF:4.000,
+segment-b.ts
+#EXT-X-DISCONTINUITY
+#EXTINF:4.000,
+segment-c.ts
+#EXT-X-ENDLIST
+```
+
+## 3. Number sequence positions and declared time separately
+
+Write three rows for the teaching example: A has sequence 100 and a declared cumulative interval of zero to four seconds; B is 101 and four to eight; C is 102 and eight to twelve. The intervals are sums of the listed durations, not measurements of timestamps inside media files. The marker adds neither a four-second blank nor an extra segment number. Keep sequence positions and declared seconds in separate columns. Recalculate four plus four plus four as twelve. This detects an accidental fourth-segment count but does not establish that real files are complete.
+
+## 4. Read the boundary without diagnosing a network
+
+[RFC 8216’s discontinuity definition](<https://www.rfc-editor.org/rfc/rfc8216.html#section-4.3.2.3>) places a media discontinuity between the following segment and its predecessor; timestamp sequences or media format can be involved. Use the marker to locate a boundary, not to conclude corruption, a network outage or an inevitable black screen. A nearby playback stall also does not establish causation. Keep observation and possible cause in different columns. Do not remove the marker as a universal repair: it may communicate a genuine media change.
+
+## 5. Play into an actual boundary from before it
+
+For an authorized working source with its actual media playlist, estimate a candidate boundary using that playlist’s declared durations. Label the location approximate. Play from before it and record sound continuity, picture changes, any pause and whether playback continues afterward. Do not reuse eight seconds from the teaching example for another clip, or change the source and caption settings simultaneously. Repeat under the same conditions if needed. If the timeline cannot reliably match the playlist boundary, report that limitation instead of assigning an arbitrary cut to fill the playback column.
+
+## 6. Distinguish media boundaries from narrative cuts
+
+Find a visible shot change in the actual clip and record whether it corresponds to a known playlist boundary. Narrative cuts can occur within a segment, and segment boundaries can have no obvious narrative change. Do not merge the two records merely because their times look close. In the teaching playlist, nothing tells you what A, B or C depicts, so leave story content unknown. If a provider separately describes a program or encoding switch, retain that as provider information rather than a fact you independently proved from the picture.
+
+## 7. Troubleshoot playlist level, changing windows and seeking
+
+If counts do not match, verify that you are reading a media playlist, not a multivariant playlist, and check whether older segments have left a moving window. Preserve capture times when comparing playlist snapshots. Do not force old sequence positions onto a new window. If continuous playback works but seeking does not, record the two paths separately instead of declaring the content corrupt. Missing segments or access failures require their own source evidence. The word DISCONTINUITY alone is not a diagnosis. Confirm basic playback with a known local clip, preserve originals and avoid renaming playlists to conceal an unresolved URI issue.
+
+## 8. Finish the map and handoff record
+
+The teaching map should show three segments, media sequence numbers 100–102, twelve seconds of declared duration and an arrow to the boundary before C. If playback was performed, include the actual source, playlist capture time, approximate boundary, continuous-play observations and uncertainties. Otherwise retain an explicit structural-exercise status. Check that no marker became a fixed four-second pause and no teaching URI became a claimed working resource. Keep original, annotated copy and observations together. Recalculate other sequence starts and durations rather than copying these numbers into a different source.
+
+## Related tutorials and sources
+
+[HLS multivariant mapping](<https://allluckly.cn/en/guides/icouldplay-hls-master-variant-media-map/>), [HLS byte ranges](<https://allluckly.cn/en/guides/icouldplay-hls-byte-range-offset-ledger/>).
+
+Checked on November 11, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

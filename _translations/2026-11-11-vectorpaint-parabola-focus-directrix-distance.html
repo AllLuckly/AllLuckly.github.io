@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint parabola diagrams: compare focus distance and perpendicular directrix distance'
+description: Check the focus/directrix definition with five samples and a wrong point, retaining canvas mapping
+  and manual-curve precision limits.
+permalink: /en/guides/vectorpaint-parabola-focus-directrix-distance/
+date: '2026-11-11 00:00:00 +08:00'
+modified: '2026-11-11 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 168
+topic: Discrete counting and geometric rules
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-11-vectorpaint-parabola-focus-directrix-distance.md
+source_url: /guides/vectorpaint-parabola-focus-directrix-distance/
+translation_method: editorial
+translation_source_sha256: 038d1f71ea85641f651e79dcc6d79236dc1679c52f8ffa380e1be25335ea896c
+translation_date: '2026-11-11T01:40:26+00:00'
+excerpt: Check the focus/directrix definition with five samples and a wrong point, retaining canvas mapping and
+  manual-curve precision limits.
+---
+{% raw %}
+<p>A U-shaped curve is not automatically the specified parabola. Define a focus and directrix, calculate five samples and draw an approximate curve. Equality concerns distance to a point and perpendicular distance to a line, not equal-radius circles. Assume no automatic locus solving, equation snapping or optical reflection simulation in VectorPaint.</p>
+<h2 id="先定焦点与准线而不是椭圆中心">Define focus and directrix first</h2>
+<p>Set mathematical focus F=(0,1), directrix y=−1 and vertex (0,0). The <a href="https://openstax.org/books/precalculus-2e/pages/10-3-the-parabola">OpenStax parabola definition</a> uses equal distances to focus and directrix. Here x²=4y, hence y=x²/4. List focus, line and vertex separately; the focus is no circle centre. The definition covers theoretical points, while finite samples cannot prove an arbitrary smooth curve satisfies it. Keep mathematical units separate from later pixels and view zoom.</p>
+<h2 id="五点先算精确坐标">Calculate five exact samples</h2>
+<p>Use x=−4,−2,0,2,4 with y=4,1,0,1,4. Symmetry about the vertical axis does not excuse omitting one side’s checks. Record all five coordinate pairs and separate labels from positions. At x=2, y=2 would violate the equation despite a smooth-looking curve. These are original samples, not measurements of antennas or bridges. For an added point x=1 use y=1/4, not a guessed average between neighbouring samples.</p>
+<h2 id="到准线必须作垂直距离">Use perpendicular distance to the directrix</h2>
+<p>At (2,1), distance to F is 2 and perpendicular distance to y=−1 is also 2. At (4,4), focus distance √(16+9)=5 equals line distance 4+1=5. The vertex gives 1 each; negative-x partners match likewise. Write both distances per point rather than diagonally connecting to an arbitrary location on the line. The directrix is infinite: its drawn segment is only a display extent, so visible endpoint caps do not define distance. Preserve signs, radicals and squared terms; resolve uncertain notation before proceeding. Also distinguish focus-to-directrix distance 2 from vertex-to-focus distance 1; do not combine them under one ambiguous focal-distance label.</p>
+<h2 id="同一比例变成画布坐标">Map through one canvas scale</h2>
+<p>Map the mathematical origin to canvas (600,800) at 100 units per mathematical unit: X=600+100x, Y=800−100y. Samples are (200,400),(400,700),(600,800),(800,700),(1000,400); F is (600,700) and the directrix Y=900. The vertex lies below F, with the directrix still lower and the curve opening upward on screen. Vertical-only compression invalidates equal-distance measurement under one unchanged scale. Label approximate placement and distinguish view zoom from object deformation, without an assumed equation-plotting control.</p>
+<h2 id="连线近似不冒充全轨迹精确">Keep the curve’s approximate status</h2>
+<p>Join samples in x order, first checking a polyline, then smoothing a copy approximately with a few handles. Avoid a sharp vertex without replacing the whole curve by a semicircle. Correct samples do not make every Bézier point equidistant; retain the approximation caption. An added x=1 sample has y=1/4, not the midpoint (1,1/2) of (0,0)/(2,1). Check added distances independently. Keep the polyline reference. Display limits do not terminate the mathematical domain; extensions indicate continuation only.</p>
+<h2 id="错点用两距离直接否决">Reject a wrong point with both distances</h2>
+<p>Test (2,2) separately: focus distance √5≈2.236 differs from perpendicular line distance 3. Record both rather than only calling it too high, preserving correct (2,1). Restoring the sample also requires checking stray handles that distort neighbouring curve segments. This rejects one candidate, not every off-curve point. √5 is not 5, and the focus’s vertical difference is 2−1. These are external hand checks, not automatic distance validation or rejected-point behaviour by the app.</p>
+<h2 id="输出保留焦点准线与区别线">Retain readable references in output</h2>
+<p>Save and inspect PNG five points, F and directrix labels. Any retained distance guides need their own explanation and line style distinct from the curve. Hide temporary numbers without deleting definitions. Replace unreadable radicals/signs with explicit words rather than omitting y=−1. If a small curve looks circular, preserve samples/definition instead of making it rounder. Inspect other formats separately and move labels rather than mathematical points. Manual grids export as objects; inspect native grids directly instead of treating one screenshot as every export test.</p>
+<h2 id="从公式映射距离近似排查">Review equation, mapping, distances and approximation</h2>
+<p>For asymmetry inspect x signs; for downward opening inspect canvas subtraction; for unequal distances inspect y/focus; for a wrong curve through right samples inspect handles and approximation. Recalculate each point after repairs rather than changing labels to fit errors. Retain definition, coordinates, paired distances, mapping, control and approximate status. This explains focus/directrix relationships without all-point numerical proof, automatic analytic geometry or optical simulation, and guarantees no antenna, mirror or structural performance from a static U shape.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-ellipse-focus-diagram/">VectorPaint ellipse-focus diagrams: distinguish semiaxes and the two focal distances</a>, <a href="/en/guides/vectorpaint-coordinate-translation-reflection/">VectorPaint translation and reflection: check each vertex coordinate and orientation</a>.</p>
+<p>Checked on November 11, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Capability scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261111">Apple public lookup</a>. This is an original manual exercise; use controls available in your installed version and actual file state. External calculations, records and diagrams do not imply new automatic analysis. No step-by-step physical-device, private-file or all-export-environment testing is claimed.</p>
+{% endraw %}
