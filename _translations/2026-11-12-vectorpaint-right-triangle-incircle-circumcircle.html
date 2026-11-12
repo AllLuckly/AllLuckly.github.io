@@ -1,0 +1,44 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint 3–4–5 triangles: check circumcircle vertices and incircle sides separately'
+description: Draw both centres for one triangle, checking circumradius 2.5, inradius 1 and tangency locations.
+permalink: /en/guides/vectorpaint-right-triangle-incircle-circumcircle/
+date: '2026-11-12 00:00:00 +08:00'
+modified: '2026-11-12 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 177
+topic: Distance, tilings and cycles
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-12-vectorpaint-right-triangle-incircle-circumcircle.md
+source_url: /guides/vectorpaint-right-triangle-incircle-circumcircle/
+translation_method: editorial
+translation_source_sha256: 96b3d1ebdff8982d9a820c020e8cc0f16a4e61bdcb7ea4535d1d932cb7ce0359
+translation_date: '2026-11-12T01:43:29+00:00'
+excerpt: Draw both centres for one triangle, checking circumradius 2.5, inradius 1 and tangency locations.
+---
+{% raw %}
+<p>Triangle centres need not coincide. Copy a 3–4–5 right triangle into two views: one circumcircle through its vertices and one incircle tangent to its sides. Check the different conditions separately, without an automatic triangle-centre tool or treating visual proximity as exact tangency.</p>
+<h2 id="先固定三角形再复制比较">Fix the triangle before copying it</h2>
+<p>Use A=(0,0), B=(4,0), C=(0,3), right angle at A, side lengths 4,3,5 and area 6. Draw once at a fixed scale, then translate a copy rather than making a more balanced second triangle. At 100 pixels per unit, subtract mathematical y for downward screen coordinates. <a href="https://education.ti.com/en/activity/detail/circumcenter-and-incenter">TI’s centre lesson</a> supplies perpendicular-bisector versus angle-bisector definitions, not calculator-installation steps for VectorPaint. Do not rely on its sentences that confuse circle and triangle locations.</p>
+<h2 id="外心取斜边中点">Use the hypotenuse midpoint for the circumcentre</h2>
+<p>The midpoint of BC is O=(2,1.5); its distance to B is √(2²+1.5²)=2.5. OA, OB and OC all equal 2.5, so this circle passes through all vertices. O lies on BC, not inside this triangle; do not move it inward for label space. The perpendicular bisectors of the legs, x=2 and y=1.5, independently locate O. Hide ordinary drawn reference lines after checking. Move text for readability without moving its point.</p>
+<h2 id="外接圆先对顶点而非三边">Check vertices rather than sides for the circumcircle</h2>
+<p>Create an equal-width/height circle positioned by centre and diameter 5, explicitly approximate if dragged visually. Check A,B,C lie on it; tangency to all sides is not required. Much of the circle legitimately lies outside the triangle. A mask leaving only its interior arc is not a complete circumcircle. If B/C fit but A does not, inspect centre or accidental ellipticity rather than dragging A onto the circle and changing the 3–4–5 triangle.</p>
+<h2 id="内心用到三边的垂距检验">Check incenter by perpendicular distances to sides</h2>
+<p>In the second view set I=(1,1), radius 1. Its distances to horizontal AB and vertical AC are both 1. BC has equation 3x+4y=12, giving distance (12−3−4)/5=1. Equal side distances, not visual centrality, establish the condition. Area 6 divided by semiperimeter 6 independently gives inradius 1. I and O are different objects; relabelling the first circle is insufficient. Coordinates refer to each view’s own origin, unaffected by layout translation.</p>
+<h2 id="切点与三个顶点逐一分开">Distinguish tangency points from vertices</h2>
+<p>Incircle contact points are (1,0) on AB, (0,1) on AC and (1.6,1.8) on BC. The last satisfies 3×1.6+4×1.8=12 and lies distance 1 from I. A radius to a contact point is perpendicular to its side; a line to a vertex is not that radius. IA=√2, not 1, so the incircle does not pass through A and need not pass through B/C. Reduced output may retain contact dots and one right-angle cue, while the complete checking copy preserves all correspondences. The incircle spans 0–2 on both axes; the circumcircle spans x=−0.5 to 4.5 and y=−1 to 4. Allow that space rather than flattening it into the triangle’s bounding box. White margins may differ while mathematical scale stays equal.</p>
+<h2 id="把两种条件交换作为错例">Swap conditions in an erroneous copy</h2>
+<p>In a wrong second-view copy, enlarge the I-centred circle to pass through A, making radius √2 and losing tangency to AB/AC. This swaps conditions rather than improving the incircle. Another error labels O as (1,1), whose distances to vertices are unequal. Keep separate copies and calculate distances without moving both triangle and circle, which would destroy the control. Restore centre/radius before rechecking contacts or vertices, not merely legend names. Colour proves neither circle type; monochrome labels and contacts must identify them.</p>
+<h2 id="双图输出保持共同参照">Preserve common references in two-view output</h2>
+<p>Save and open a PNG, first checking identical side lengths, right-angle location and letters across both views, then circumcircle vertices and incircle sides separately. Move labels away from contacts without moving points. A distorted circle requires width/height or display checks, not altered mathematical radius. Hide ordinary drawn bisectors/radii as appropriate and inspect native references in actual output. Open SVG/PDF separately for line/text placement, while retaining numerical checks; one display establishes neither absolute precision nor identical rendering everywhere.</p>
+<h2 id="验收分别回答三点与三边">Accept separate three-vertex and three-side tests</h2>
+<p>Acceptance requires O=(2,1.5), R=2.5 with equal vertex distances; I=(1,1), r=1 with equal side distances; and all three contact points. If both circles are forced inside, revisit definitions. Mixed radii require distance checks; a misplaced sloping-side contact requires its equation. Retain area 6 and semiperimeter 6 without calling 6 the perimeter, which is 12. Other triangles require recalculation: circumcentres are not always on an edge. This is manual geometry, with no automatic centre-solving or physical calibration claim.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-ellipse-focus-diagram/">VectorPaint ellipse-focus diagrams: distinguish semiaxes and the two focal distances</a>, <a href="/en/guides/vectorpaint-perpendicular-bisector-equal-arcs/">VectorPaint perpendicular bisectors: check equal-radius intersections and midpoint</a>.</p>
+<p>Checked on November 12, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261112">Apple public lookup</a>. Manual exercises use controls actually available in your installed version; external calculations, written records and diagrams imply no built-in automatic analysis. No step-by-step physical-device, private-file or all-export-environment testing is claimed.</p>
+{% endraw %}

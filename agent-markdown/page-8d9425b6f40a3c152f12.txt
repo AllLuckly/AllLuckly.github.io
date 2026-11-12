@@ -1,0 +1,68 @@
+---
+layout: null
+permalink: /en/guides/manyue-epub-unique-identifier-target-display-title/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Check EPUB identity in ManYue: unique-identifier points to an identifier element,
+  not a title'
+agent_source_url: https://allluckly.cn/en/guides/manyue-epub-unique-identifier-target-display-title/
+agent_source_sha256: c1e39616d46a04d7a5864fd4b4d80b990146e8769b25d469c2eadc0f5edaf4a2
+agent_generator_version: 1
+---
+{% raw %}# Check EPUB identity in ManYue: unique-identifier points to an identifier element, not a title
+
+Language: en
+Canonical: [Check EPUB identity in ManYue: unique-identifier points to an identifier element, not a title](<https://allluckly.cn/en/guides/manyue-epub-unique-identifier-target-display-title/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-epub-unique-identifier-target-display-title/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-epub-unique-identifier-target-display-title/>)
+Published: 2026-11-12T00:00:00+08:00
+Modified: 2026-11-12T09:43:29+08:00
+Author: Bison
+
+Follow the package attribute to its dc:identifier, compare title and revision controls, and retain file hashes rather than merging copies solely by matching identifiers.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-epub-unique-identifier-target-display-title/>), translated on 2026-11-12. Original publication dates, attribution, code and version notes are retained.
+
+Matching EPUB titles do not prove identical files, and matching identifiers do not prove identical bytes or content. Keep an external identity ledger while reading an image EPUB in ManYue, following the package’s unique-identifier target. This is not spine-order checking or automatic metadata repair and does not guarantee that publishers never duplicate metadata.
+
+## Keep file identity and package-document provenance
+
+Choose an original or authorised image EPUB, preserve it and record path, byte size and a whole-file hash calculated with an available external tool, not an assumed reader field. Follow the container’s rootfile reference to the package document instead of choosing any similarly named XML. Keep that internal path with the record so one edition’s OPF is not assigned to another file. If inspection is unavailable, obtain a metadata extract from the creator and identify its source without pretending to unpack the file or treating an illustrative extract as an importable EPUB.
+
+## The attribute is an element reference, not the identifier value
+
+In an original illustration, the package unique-identifier value is `pub-id`; a `dc:identifier` element has id `pub-id` and text `urn:example:comic:alpha`. The attribute identifies which element to find; that element’s text supplies the primary publication identifier. The local element ID is not a globally unique publication number, and its text is not a download or login address. Record attribute reference, target element and value separately. If spelling differs or the target is missing, mark an unresolved reference rather than selecting the first number-looking string.
+
+## Use the reference to select among identifiers
+
+A package may contain multiple dc:identifier elements, such as a primary custom identifier and another publication number. The first, longest or nearest-to-title line is not automatically primary. Follow the package reference to its matching id, then copy the text, checking namespace and element name. The word identifier in ordinary commentary is not that metadata field. You need not validate every EPUB rule, but this reference chain should be clear. An extract omitting the package attribute cannot determine the primary value from identifier lines alone.
+
+## A title correction need not change the identifier
+
+Save B as an original minor metadata revision correcting one title typo while retaining the primary identifier and content. The specification favours persistence and discourages issuing new identifiers for minor metadata or errata changes. Matching identifiers therefore do not imply byte identity. A whole-file hash will ordinarily differ when package bytes change, but calculate rather than invent the result. After import, check displayed title and content marker separately. Do not prescribe ManYue’s deduplication policy or assume a title update automatically migrated progress.
+
+## Separate major revisions from erroneous reuse
+
+Let C instead substantially alter or abridge the content. The specification requires a new unique identifier for significant revisions, but an actual file may erroneously retain the old value. Matching values cannot prove unchanged content. Separate normative requirements, actual metadata and observed content. If two matching identifiers accompany different pages, keep both copies and exact difference locations. Do not merge or delete one immediately or declare piracy. This ledger records evidence, not a ruling on provenance rights or authorial intent.
+
+## Check displayed names alongside page anchors
+
+Check A, B and an authorised C separately, choosing the intended path before comparing displayed title, cover and an original content marker. Observe whether the library creates or associates entries without generalising one result to every import path. Display metadata can reflect file data, cached values or personal edits; a visible title is not direct proof of the package field. Record position using a page anchor rather than title alone. A changed edition needs renewed bookmark checks; matching primary identifiers do not prove lossless automatic continuity.
+
+## Check broken references and same-name confusion
+
+For an apparent identity conflict, check same-name file selection, extract provenance and whether unique-identifier resolves to an existing element, then compare identifier text and file hashes. A local XML id, publication identifier, library-internal ID and filename are not interchangeable universal numbers. If package data is unavailable, mark it unchecked while retaining observable content differences. Do not change extensions or invent identifiers to force matching. Provide a minimal original sample and reference chain when seeking help, without private books, accounts or complete remote paths.
+
+## Leave and return to deliver a layered identity ledger
+
+Leave the reader and return to the selected copy, rechecking title and content marker. Then trace the package reference to identifier text in your external record. Retain file path and hash, package location, primary identifier, displayed title, content differences and observed import result. Explain the different evidence needed for matching titles, identifiers, bytes and content instead of merging everything after finding one number. Keep unverified revision conditions explicit; format identity rules are not promises of automatic conflict repair or progress migration in the reader.
+
+## Related guides and sources
+
+[ManYue EPUB image order: separate the manifest, spine and image occurrences](<https://allluckly.cn/en/guides/manyue-epub-manifest-spine-image-occurrence/>); [ManYue edition comparison: distinguish monochrome, colour and revised copies](<https://allluckly.cn/en/guides/manyue-edition-comparison/>).
+
+Checked on November 12, 2026: [Apple public information](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261112>) lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the [official App Store](<https://apps.apple.com/cn/app/id6753895889>) for published capabilities; verify specific controls in the installed version.
+
+Method reference: [W3C: EPUB unique identifiers and revisions](<https://www.w3.org/TR/epub-33/#sec-opf-package-unique-identifier>). Samples, passages and controls are original exercises. Sources establish definitions and checking methods rather than new automatic analysis in the app. Manual records may be kept externally, and unknown fields should remain explicit. This article does not claim step-by-step testing on a physical device, private server or every output environment.
+{% endraw %}

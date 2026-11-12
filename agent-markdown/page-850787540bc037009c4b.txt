@@ -1,0 +1,67 @@
+---
+layout: null
+permalink: /en/guides/manyue-cbz-zip64-count-size-record-boundary/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Check ZIP64 records for ManYue: extended counts do not mean extra comic pages'
+agent_source_url: https://allluckly.cn/en/guides/manyue-cbz-zip64-count-size-record-boundary/
+agent_source_sha256: 533bb1deef9fbbb240b108c024c6d90fa4c5f999d26a3f1d290f7be07ed58375
+agent_generator_version: 1
+---
+{% raw %}# Check ZIP64 records for ManYue: extended counts do not mean extra comic pages
+
+Language: en
+Canonical: [Check ZIP64 records for ManYue: extended counts do not mean extra comic pages](<https://allluckly.cn/en/guides/manyue-cbz-zip64-count-size-record-boundary/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-cbz-zip64-count-size-record-boundary/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-cbz-zip64-count-size-record-boundary/>)
+Published: 2026-11-12T00:00:00+08:00
+Modified: 2026-11-12T09:43:29+08:00
+Author: Bison
+
+Distinguish 16-bit entry counts, 32-bit sizes and ZIP64 values using archive reports, with small original reading samples rather than giant test archives.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-cbz-zip64-count-size-record-boundary/>), translated on 2026-11-12. Original publication dates, attribution, code and version notes are retained.
+
+A ZIP64 label does not by itself mean corruption or guarantee that ManYue handles every large archive. Separate format-field evidence, archive contents and actual import. This is distinct from CRC or compression-method checking and does not require tens of thousands of pages or exhausting device storage to reach a boundary.
+
+## Record a read-only report and copy identity
+
+Preserve an original three-page CBZ and its archive-tool report, recording name, byte size, entries, creator and date. Use a clearly sourced ZIP64 copy if already available; otherwise perform only record interpretation without claiming creation or import. Determine whether the label concerns extended end records for the archive or extended sizes for a particular entry. Those are different levels. Do not edit headers in place or force expected numbers into a hex editor.
+
+## Distinguish entry counts from byte sizes
+
+The ordinary end record’s total-entry field is sixteen bits, with maximum unsigned value sixty-five thousand five hundred thirty-five. Conventional size or offset fields are commonly thirty-two bits, whose maximum is four billion two hundred ninety-four million nine hundred sixty-seven thousand two hundred ninety-five. Counts and bytes differ: many entries do not mean four gigabytes. Directories and notes can count as entries, and compressed and uncompressed sizes differ. Name the reported field before interpreting its value. These are representation boundaries, not an installed app’s file-size limits.
+
+## Interpret all-ones values with extension records
+
+Where extension is needed, `0xFFFF` or `0xFFFFFFFF` can serve as placeholders; read the corresponding ZIP64 record or extra field for the value. Neither automatically means damage nor independently establishes an actual count. Match extended entry counts and an image’s extended size to their proper locations. Searching the whole file for a byte pattern can hit compressed data by chance; a trustworthy report parses structure. If it does not explain where a value came from, leave that unresolved instead of inventing a plausible page count.
+
+## ZIP64 information can appear in small archives
+
+ZIP64 does not necessarily mean an obviously huge total file: a writer may use extensions for small entries. A sample with three images can therefore contain relevant records. Conversely, no ZIP64 label does not establish readability; methods, encryption, paths and integrity remain separate. Record use of extensions, tool interpretation and comic display in separate columns. This lesson does not force low-level generation or promise that one archive option produces identical records. Do not manufacture a sample when the available writer’s behaviour is uncertain.
+
+## List actual images before checking the reader
+
+For the three-page original, the external list identifies images marked A, B and C, all ordinary readable images. If there are four entries, check for a directory or note instead of inventing page four. Record imported cover, content count, A-to-C order and any failure notice separately. A visible cover does not prove all images decoded. Without a ZIP64 sample, perform this only on the ordinary control and mark extension compatibility untested. Correctly explaining a format is not completed import acceptance.
+
+## Keep field ranges separate from device constraints
+
+A report’s ability to represent a large value says nothing by itself about memory, storage, previews, Wi-Fi entry limits or the reader engine. An applicable two-gigabyte import limit is a product-layer condition, distinct from a roughly four-gigabyte field range. A small archive may expand into large images. Record the entry path and available storage without generating huge boundary files or filling the disk. One small success does not prove support for all ZIP64 archives, encryption forms or split packages.
+
+## Keep structural evidence and a minimal reading sample
+
+If import fails, keep the report and failure stage: selection, archive parsing, image decoding and partial display differ. Do not immediately label all of them unsupported ZIP64. If an existing tool can read the three original images, save an ordinary CBZ control while preserving the ZIP64 copy. A successful control narrows differences but may also change directories or compression settings, which must be recorded. Share no private comics or credentials, and do not clear a library to repair one package. State candidate explanations rather than fabricating certainty.
+
+## Leave and return to check the three evidence layers
+
+Leave the reader and return to the imported small sample, reopening A, B and C rather than just its cover. Compare the external entry list and extension report. Retain original identity, field names, source of extended values, actual image count, import path and observed display. A valid outcome may be that extension compatibility remains untested while the records are understood. Unlike CRC checking, this concerns representation of counts and sizes, not safety, losslessness, complete comic pages or huge-book support on every device.
+
+## Related guides and sources
+
+[ManYue CBZ compression methods: listing an archive does not prove every image can be read](<https://allluckly.cn/en/guides/manyue-cbz-per-entry-compression-method/>); [ManYue: Test CBZ archive integrity separately from readable pages](<https://allluckly.cn/en/guides/manyue-cbz-zip-readonly-integrity-test/>).
+
+Checked on November 12, 2026: [Apple public information](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261112>) lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the [official App Store](<https://apps.apple.com/cn/app/id6753895889>) for published capabilities; verify specific controls in the installed version.
+
+Method reference: [PKWARE: ZIP format and ZIP64 extension records](<https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT>). Samples, passages and controls are original exercises. Sources establish definitions and checking methods rather than new automatic analysis in the app. Manual records may be kept externally, and unknown fields should remain explicit. This article does not claim step-by-step testing on a physical device, private server or every output environment.
+{% endraw %}

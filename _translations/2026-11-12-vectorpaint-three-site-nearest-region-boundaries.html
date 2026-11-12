@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint nearest-site regions: retain only genuine shared equidistance boundaries'
+description: Manually draw Euclidean nearest-site regions, checking valid bisector rays, the triple-equidistance
+  point and ties.
+permalink: /en/guides/vectorpaint-three-site-nearest-region-boundaries/
+date: '2026-11-12 00:00:00 +08:00'
+modified: '2026-11-12 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 178
+topic: Distance, tilings and cycles
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-12-vectorpaint-three-site-nearest-region-boundaries.md
+source_url: /guides/vectorpaint-three-site-nearest-region-boundaries/
+translation_method: editorial
+translation_source_sha256: 0399588a6a498469271329bc22525f0d3a5dac6523f2ca152b4688fff4ede5b4
+translation_date: '2026-11-12T01:43:29+00:00'
+excerpt: Manually draw Euclidean nearest-site regions, checking valid bisector rays, the triple-equidistance point
+  and ties.
+---
+{% raw %}
+<p>Drawing three complete perpendicular bisectors does not automatically give nearest-site regions. Compare distances from three invented sites inside a finite frame, retaining only boundaries between nearest sites. This is planar geometry, not a mapping service, real walking catchment or automatic Voronoi-generation feature.</p>
+<h2 id="限定三站点和直线距离">Define sites and straight-line distance</h2>
+<p>Use A=(0,0), B=(6,0), C=(0,6), with both frame axes ranging from −2 to 8. Distance is planar Euclidean distance, without roads, obstacles, speeds or site weights. <a href="https://doc.cgal.org/latest/Voronoi_diagram_2/index.html">CGAL’s official Voronoi explanation</a> supports nearest-region and site concepts; this task neither runs that library nor claims VectorPaint uses it. List sites separately and place them at one scale. The frame crops the view; it is neither a fourth site nor a real administrative boundary.</p>
+<h2 id="先画三组两点等距候选">Draw three pairwise equidistance candidates</h2>
+<p>AB’s bisector is x=3 through midpoint (3,0); AC’s is y=3 through (0,3); BC’s is y=x through (3,3). They meet at (3,3), distance √18 from every site. Draw full pale candidates initially, labelled pairwise-equidistant but not yet checked against the third site. Do not move the intersection to the sites’ average (2,2), which is not equidistant. Mathematical coordinates remain authoritative when placement is approximate; blurred pixels determine no exact intersection.</p>
+<h2 id="ab边界只保留交点下方">Retain only the lower AB boundary</h2>
+<p>On x=3, equal A/B distances are insufficient: neither may be farther than C. At (3,1), squared A/B distances are 10 and C distance squared is 34, so A/B tie for nearest. At (3,5), A/B squared distances are 34 but C’s is 10. Retain only y≤3, from (3,−2) to (3,3) inside the frame. The upper candidate may remain pale in a checking layer, but not as a full-status division in delivery. Pairwise equality and globally nearest ties are different tests.</p>
+<h2 id="另外两边按同一规则裁取">Trim the other two boundaries by the same rule</h2>
+<p>AC’s true boundary is y=3 with x≤3, from (−2,3) to (3,3). BC’s is y=x with x≥3, continuing to (8,8). At (4,4), squared B/C distances are 20 versus A’s 32. At (2,2), B/C tie but A’s squared distance 8 is smaller, so that diagonal portion is not a boundary. Three valid segments meet at (3,3), with no fourth diagonal toward lower left. Frame endpoints crop rays; they do not terminate the full-plane regions.</p>
+<h2 id="填区前用不等式核归属">Check membership before filling regions</h2>
+<p>A’s region has x≤3 and y≤3; B’s has x≥3 and y≤x; C’s has y≥3 and y≥x, all clipped to the frame. Boundaries may be shared; do not create a wide unassigned stripe. At (4,2), squared distances to A/B/C are 20/8/32, so B wins. At (0,5), distances to C/A/B are 1/5/√61. This second example uses distances, not squared distances. Label table quantities so ordinary and squared values are not mixed. Inside this frame, A is a side-five square of area 25; B and C each have area 37.5, totalling the 10×10 frame’s 100. This checks clipping without gaps/overlaps. Mathematical boundaries have zero area: do not add thick-stroke pixels or infer real service coverage.</p>
+<h2 id="配色不能替代同距说明">Colour does not replace tie rules</h2>
+<p>Use pale fills with A/B/C labels and boundary strokes above them, marking one small junction dot. An oversized dot can hide all joins; crossing lines do not create more sites. State that a shared edge ties two nearest sites and (3,3) ties all three, without silently assigning ties to the darker fill. A unique allocation would require an explicit extra tie rule. This exercise adds none, so drawing order cannot decide mathematical membership.</p>
+<h2 id="全线错例逐点定位原因">Locate errors in the full-line copy</h2>
+<p>In an erroneous copy, thicken all three full candidate bisectors. Test (3,5) and (2,2) to demonstrate excess boundaries. Trim portions beaten by the third site rather than moving C away to rescue the wrong diagram. Preserve valid source and error copy, then inspect exported junction, three true edges and site locations. Hide unwanted ordinary candidate lines and check native grids in actual output. Adjust lost thin strokes without changing mathematical regions. Keep letters/tie explanations in monochrome rather than relying on colour for nearest membership.</p>
+<h2 id="验收保留范围而非地图承诺">Accept the stated geometry rather than map promises</h2>
+<p>Acceptance retraces sites, pairwise candidates, third-site tests and the three retained edges. Wrong membership requires checking the distance definition; a (2,2) junction fails equality; excess diagonals fail the third-site test. Label no roads/weights, deriving no population, trip or delivery time from region area. Undrawn exterior regions still exist, and equidistance lines are not physical walls. The result is a checkable static distance diagram, not live positioning, automatic planning or guaranteed real-world site optimisation, which need independent data.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-perpendicular-bisector-equal-arcs/">VectorPaint perpendicular bisectors: check equal-radius intersections and midpoint</a>, <a href="/en/guides/vectorpaint-paired-value-scatterplot/">VectorPaint scatterplots: map every point to two values</a>.</p>
+<p>Checked on November 12, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261112">Apple public lookup</a>. Manual exercises use controls actually available in your installed version; external calculations, written records and diagrams imply no built-in automatic analysis. No step-by-step physical-device, private-file or all-export-environment testing is claimed.</p>
+{% endraw %}

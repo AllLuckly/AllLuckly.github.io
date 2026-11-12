@@ -1,0 +1,67 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Check EPUB identity in ManYue: unique-identifier points to an identifier element, not a title'
+description: Follow the package attribute to its dc:identifier, compare title and revision controls, and retain
+  file hashes rather than merging copies solely by matching identifiers.
+permalink: /en/guides/manyue-epub-unique-identifier-target-display-title/
+date: '2026-11-12 00:00:00 +08:00'
+modified: '2026-11-12 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 174
+topic: Container fields and catalogue boundaries
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-12-manyue-epub-unique-identifier-target-display-title.md
+source_url: /guides/manyue-epub-unique-identifier-target-display-title/
+translation_method: editorial
+translation_source_sha256: 6664fd0136b126d650b4b5465d35a47e807a55c3707e3e6cb93a54a506d50317
+translation_date: '2026-11-12T01:43:29+00:00'
+excerpt: Follow the package attribute to its dc:identifier, compare title and revision controls, and retain file
+  hashes rather than merging copies solely by matching identifiers.
+---
+{% raw %}
+<p>Matching EPUB titles do not prove identical files, and matching identifiers do not prove identical bytes or content. Keep an external identity ledger while reading an image EPUB in ManYue, following the package’s unique-identifier target. This is not spine-order checking or automatic metadata repair and does not guarantee that publishers never duplicate metadata.</p>
+
+<h2 id="保留文件身份和包文档来源">Keep file identity and package-document provenance</h2>
+
+<p>Choose an original or authorised image EPUB, preserve it and record path, byte size and a whole-file hash calculated with an available external tool, not an assumed reader field. Follow the container’s rootfile reference to the package document instead of choosing any similarly named XML. Keep that internal path with the record so one edition’s OPF is not assigned to another file. If inspection is unavailable, obtain a metadata extract from the creator and identify its source without pretending to unpack the file or treating an illustrative extract as an importable EPUB.</p>
+
+<h2 id="属性值是元素id引用不是出版标识本身">The attribute is an element reference, not the identifier value</h2>
+
+<p>In an original illustration, the package unique-identifier value is <code>pub-id</code>; a <code>dc:identifier</code> element has id <code>pub-id</code> and text <code>urn:example:comic:alpha</code>. The attribute identifies which element to find; that element’s text supplies the primary publication identifier. The local element ID is not a globally unique publication number, and its text is not a download or login address. Record attribute reference, target element and value separately. If spelling differs or the target is missing, mark an unresolved reference rather than selecting the first number-looking string.</p>
+
+<h2 id="多个标识要按引用挑主要一项">Use the reference to select among identifiers</h2>
+
+<p>A package may contain multiple dc:identifier elements, such as a primary custom identifier and another publication number. The first, longest or nearest-to-title line is not automatically primary. Follow the package reference to its matching id, then copy the text, checking namespace and element name. The word identifier in ordinary commentary is not that metadata field. You need not validate every EPUB rule, but this reference chain should be clear. An extract omitting the package attribute cannot determine the primary value from identifier lines alone.</p>
+
+<h2 id="标题改写不必改变主要出版标识">A title correction need not change the identifier</h2>
+
+<p>Save B as an original minor metadata revision correcting one title typo while retaining the primary identifier and content. The specification favours persistence and discourages issuing new identifiers for minor metadata or errata changes. Matching identifiers therefore do not imply byte identity. A whole-file hash will ordinarily differ when package bytes change, but calculate rather than invent the result. After import, check displayed title and content marker separately. Do not prescribe ManYue’s deduplication policy or assume a title update automatically migrated progress.</p>
+
+<h2 id="重大内容修订与误复用标识分开">Separate major revisions from erroneous reuse</h2>
+
+<p>Let C instead substantially alter or abridge the content. The specification requires a new unique identifier for significant revisions, but an actual file may erroneously retain the old value. Matching values cannot prove unchanged content. Separate normative requirements, actual metadata and observed content. If two matching identifiers accompany different pages, keep both copies and exact difference locations. Do not merge or delete one immediately or declare piracy. This ledger records evidence, not a ruling on provenance rights or authorial intent.</p>
+
+<h2 id="导入后同时核显示名与原页锚点">Check displayed names alongside page anchors</h2>
+
+<p>Check A, B and an authorised C separately, choosing the intended path before comparing displayed title, cover and an original content marker. Observe whether the library creates or associates entries without generalising one result to every import path. Display metadata can reflect file data, cached values or personal edits; a visible title is not direct proof of the package field. Record position using a page anchor rather than title alone. A changed edition needs renewed bookmark checks; matching primary identifiers do not prove lossless automatic continuity.</p>
+
+<h2 id="排查引用断裂和同名副本混淆">Check broken references and same-name confusion</h2>
+
+<p>For an apparent identity conflict, check same-name file selection, extract provenance and whether unique-identifier resolves to an existing element, then compare identifier text and file hashes. A local XML id, publication identifier, library-internal ID and filename are not interchangeable universal numbers. If package data is unavailable, mark it unchecked while retaining observable content differences. Do not change extensions or invent identifiers to force matching. Provide a minimal original sample and reference chain when seeking help, without private books, accounts or complete remote paths.</p>
+
+<h2 id="退出返回后交付四层身份账本">Leave and return to deliver a layered identity ledger</h2>
+
+<p>Leave the reader and return to the selected copy, rechecking title and content marker. Then trace the package reference to identifier text in your external record. Retain file path and hash, package location, primary identifier, displayed title, content differences and observed import result. Explain the different evidence needed for matching titles, identifiers, bytes and content instead of merging everything after finding one number. Keep unverified revision conditions explicit; format identity rules are not promises of automatic conflict repair or progress migration in the reader.</p>
+
+<h2 id="相关教程与资料">Related guides and sources</h2>
+
+<p><a href="/en/guides/manyue-epub-manifest-spine-image-occurrence/">ManYue EPUB image order: separate the manifest, spine and image occurrences</a>; <a href="/en/guides/manyue-edition-comparison/">ManYue edition comparison: distinguish monochrome, colour and revised copies</a>.</p>
+
+<p>Checked on November 12, 2026: <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261112">Apple public information</a> lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities; verify specific controls in the installed version.</p>
+
+<p>Method reference: <a href="https://www.w3.org/TR/epub-33/#sec-opf-package-unique-identifier">W3C: EPUB unique identifiers and revisions</a>. Samples, passages and controls are original exercises. Sources establish definitions and checking methods rather than new automatic analysis in the app. Manual records may be kept externally, and unknown fields should remain explicit. This article does not claim step-by-step testing on a physical device, private server or every output environment.</p>
+{% endraw %}

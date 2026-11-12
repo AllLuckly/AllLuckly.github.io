@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint right trapezoids: distinguish a length-five midsegment from areas nine and eleven'
+description: Construct a trapezoid from vertices and leg midpoints, checking area twenty and why the midsegment
+  does not bisect its area.
+permalink: /en/guides/vectorpaint-right-trapezoid-midsegment-area/
+date: '2026-11-12 00:00:00 +08:00'
+modified: '2026-11-12 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 176
+topic: Distance, tilings and cycles
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-12-vectorpaint-right-trapezoid-midsegment-area.md
+source_url: /guides/vectorpaint-right-trapezoid-midsegment-area/
+translation_method: editorial
+translation_source_sha256: 3d4563dca048bdda3ff87743d9e4f7398e921805aad309e3211e928b99c88f13
+translation_date: '2026-11-12T01:43:29+00:00'
+excerpt: Construct a trapezoid from vertices and leg midpoints, checking area twenty and why the midsegment does
+  not bisect its area.
+---
+{% raw %}
+<p>A trapezoid’s midsegment bisects its legs but need not bisect its area. Draw a right trapezoid, its midsegment and the resulting regions, checking lengths and areas separately. VectorPaint supplies paths, colours and labels; averages, perpendicular height and area are calculated externally, without assuming built-in geometric proof.</p>
+<h2 id="先列四顶点与同一单位">List vertices in one coordinate system</h2>
+<p>In mathematical coordinates use A=(0,0), B=(6,0), C=(4,4), D=(0,4), joined ABCDA. The horizontal parallel bases have lengths 6 and 4; left leg AD is vertical with length 4, while BC slopes. Label invented drawing units, not unmeasured centimetres. <a href="https://openstax.org/books/prealgebra-2e/pages/9-4-use-properties-of-rectangles-triangles-and-trapezoids">OpenStax’s trapezoid material</a> supports bases and area formula. Independently calculate this example rather than presenting its textbook figure as your own.</p>
+<h2 id="屏幕换向不改变数学顶点">Map to screen without changing vertices</h2>
+<p>Place the origin at screen (300,900) with 100 pixels per unit: screen x=300+100x and screen y=900−100y. Vertices become (300,900), (900,900), (700,500), (300,500). Downward screen increase does not reverse mathematical y. Close the four-point path in order; joining A to B to D to C would cross it. If placement is approximate, retain the coordinate table and label that limitation, rather than using imperfect pixels to challenge the mathematical formula.</p>
+<h2 id="中位线连接两腰中点">Join the leg midpoints</h2>
+<p>The left-leg midpoint M=(0,2) and right-leg midpoint N=(5,2), averaging B and C coordinatewise. MN is horizontal with length 5=(6+4)/2. It joins leg midpoints, not base midpoints, and need not pass through diagonal intersections. Small endpoint marks identify midpoints without making MN a third outer boundary. Check N lies on BC before checking parallelism. A length-five line placed near the centre without joining the legs does not complete the construction. At heights 1 and 3, cross-sections end at x=5.5 and 4.5 with left endpoints x=0. These check that the sloping leg is straight. Neither is the midsegment; hide them after checking rather than labelling all three cross-sections midsegments.</p>
+<h2 id="总面积用垂高而非斜腰">Use perpendicular height for total area</h2>
+<p>The bases are 4 apart, giving area (6+4)×4/2=20 square units. A perpendicular from C to (4,0) splits off a 4×4 rectangle of area 16 and a base-2, height-4 right triangle of area 4, again totalling 20. The sloping leg has squared length 20, not perpendicular height 4. Keep both calculations to detect substituting the wrong quantity. Length 5 and area 20 have different units and cannot be compared as the same kind of measure.</p>
+<h2 id="上下区域不因高度相同就等面积">Equal heights do not imply equal region areas</h2>
+<p>Above MN, bases 4 and 5 with height 2 give area 9; below it, bases 5 and 6 with height 2 give 11, totalling 20. Equal heights do not compensate for different average widths, so neither is 10. Use pale region fills labelled 9 and 11, retaining one outer boundary and avoiding overlapping darker false regions. Appearance alone does not establish 9: write the calculation. If rotating the figure, preserve the original base-side identities rather than treating screen-top as automatically the original upper region.</p>
+<h2 id="错例把斜长代高单独保留">Keep a sloping-height error separate</h2>
+<p>In one erroneous copy, substitute BC=√20 for height, obtaining 5√20≈22.36, labelled wrong sloping-leg substitution rather than 20. Another copy changing both region labels to 10 wrongly asserts area bisection; that is a different failure. Change one condition at a time, restoring height 4 and regions 9/11 without moving vertices to accommodate wrong numbers. A base-perpendicular should identify the error. No area plug-in is invoked; explicit arithmetic, not automatic marking, checks both errors.</p>
+<h2 id="文字与参考线交付前分清">Separate labels and checking references for delivery</h2>
+<p>Retain vertex/midpoint names and parallel/right-angle cues without covering M or N. Hide ordinary drawn grids, perpendiculars or error labels when outside delivery scope; inspect native-grid behaviour in actual exports. Open a PNG to check bases 4/6, height 4, midsegment 5 and regions 9/11. Monochrome labels must distinguish regions: faint colour loss is not lost area. Open vector output separately to inspect nodes and labels. Scaling or font substitution changes no values in the coordinate table.</p>
+<h2 id="验收同时核长度和面积条件">Accept length and area conditions separately</h2>
+<p>Retain coordinates, both total-area decompositions, midpoint evidence, regions 9/11 and both errors. Nonparallel MN requires midpoint repair; 22.36 requires checking perpendicular height; two tens require checking each region’s bases. Recalculate after repair rather than recolouring alone. This particular trapezoid has midsegment 5, total area 20 and unequal split; do not claim every midsegment fails to bisect area or treat raster pixel counts as proof. No part is fabricated or geometry automatically solved: coordinates and manual calculations support the result.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-parallelogram-cut-shear-height/">VectorPaint parallelogram dissections: fix base and perpendicular height before area</a>, <a href="/en/guides/vectorpaint-triangle-median-centroid/">VectorPaint triangle medians: check midpoints and the two-thirds centroid position</a>.</p>
+<p>Checked on November 12, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261112">Apple public lookup</a>. Manual exercises use controls actually available in your installed version; external calculations, written records and diagrams imply no built-in automatic analysis. No step-by-step physical-device, private-file or all-export-environment testing is claimed.</p>
+{% endraw %}

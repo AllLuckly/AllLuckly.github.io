@@ -1,0 +1,60 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay VTT style blocks: separate STYLE, cue text and observed appearance'
+description: Save a style block and two wording controls to inspect boundaries and rendering without promising full
+  CSS support.
+permalink: /en/guides/icouldplay-webvtt-style-block-cue-text-boundary/
+date: '2026-11-12 00:00:00 +08:00'
+modified: '2026-11-12 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 133
+topic: Caption placement and stream time
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-12-icouldplay-webvtt-style-block-cue-text-boundary.md
+source_url: /guides/icouldplay-webvtt-style-block-cue-text-boundary/
+translation_method: editorial
+translation_source_sha256: 729d98c4cb788d4fc7690797d445819a778c97d13aa11279ebd559c5e3f9f41e
+translation_date: '2026-11-12T01:43:29+00:00'
+excerpt: Save a style block and two wording controls to inspect boundaries and rendering without promising full
+  CSS support.
+---
+{% raw %}
+<p>CSS inside a subtitle file does not promise web-equivalent styling in every player, and treating STYLE as cue text loses the block boundary. Create an original small file, inspect structure and check wording separately from appearance in iCouldPlay. Edit externally, use existing playback controls and preserve a readable fallback with conditional compatibility observations.</p>
+<h2 id="section-1">1. Prepare a wording baseline independent of styling</h2>
+<p>Choose an owned clip of at least ten seconds with a stable background and no burned-in exercise sentence. Confirm basic playback and record identity, source and subtitle conditions. Create UTF-8 plain text externally and retain a plain-sentence fallback. This tests one simple block, not all CSS or an in-app style-programming interface. Without a loading control, complete source inspection and mark playback unperformed rather than using a file-list screenshot as rendering evidence.</p>
+<h2 id="section-2">2. Save one style block and two cues</h2>
+<p>Copy this original file. STYLE precedes the first cue, has no internal blank lines and ends before a blank separator. review is a custom class used only in the first cue; readable wording is identical. Do not move declarations into cue text or insert a timing arrow as a comment. Preserve punctuation and save an actual .vtt, keeping text size, orientation and video file fixed.</p>
+<pre><code>WEBVTT
+
+STYLE
+::cue(.review) {
+  color: yellow;
+  background-color: black;
+}
+
+00:00:01.000 --&gt; 00:00:04.000
+&lt;c.review&gt;Read the complete sentence.&lt;/c&gt;
+
+00:00:05.000 --&gt; 00:00:08.000
+Read the complete sentence.
+</code></pre>
+<h2 id="section-3">3. Separate structure, expectation and observation</h2>
+<p>The public <a href="https://www.w3.org/TR/webvtt1/">W3C WebVTT draft’s style-block description</a> distinguishes style blocks from timed cues. This block targets review. Mark its boundaries and cue intervals before stating styling intent, leaving observed appearance blank until playback. yellow in source is not an observation. No visible difference does not erase the format concept. Keep file structure separate from compatibility in the current player path.</p>
+<h2 id="section-4">4. Read the sentence before describing appearance</h2>
+<p>Play from zero and check full words and punctuation before recording text color, background and readability. Report identical appearance honestly instead of switching films to force a result. For a difference, identify the cue and attribute without generalizing to all properties or devices. Pause to read if needed, then resume to check intervals; a paused frame does not establish a style-induced persistence error. Intact wording with unchanged color differs from missing text.</p>
+<h2 id="section-5">5. Use the plain fallback to isolate the layer</h2>
+<p>Switch to a fallback without STYLE or class markup while preserving wording, timing and clip. Verify its filename and replay from the beginning. If only the styled file loses words or exposes tags, retain both and identify the exact cue. If neither appears, check loading, selection and intervals before blaming CSS. Record real app appearance settings if present, without inventing an “enable web styling” switch. A setting change creates another comparison round.</p>
+<h2 id="section-6">6. Inspect a misplaced-block control without overwriting</h2>
+<p>Save a clearly named teaching error with STYLE after the first cue and compare ordering in the editor only. It need not enter routine playback. This shows that block placement matters, not merely its letters. Preserve original timing and wording instead of treating misplaced declarations as new dialogue. For complex real files, retain the original and inspect boundaries before claiming that a cleaned copy represents what the author originally wrote.</p>
+<h2 id="section-7">7. Troubleshoot blank lines, escaping and duplicate captions</h2>
+<p>Literal STYLE on screen calls for checking cue-text placement, escaping and block separation. Duplicate sentences call for checking burned-in text or another embedded track before color properties. Verify selection; if switching seems ineffective, leave the playback page, reopen it, reselect the copy and play from before the cue. Do not invent unseen app logs or clear the library. Preserve reasons and versions, changing one condition at a time rather than attributing a multi-change recovery to one cause.</p>
+<h2 id="section-8">8. Finish and preserve a readable fallback</h2>
+<p>Keep block placement, class references, intervals, complete wording, observed appearance and unknowns. Reopen the plain fallback and play beyond eight seconds while retaining originals. Source validity is not universal device styling support, and successful playback is not support for arbitrary web rules. Report performed actions only and start another record after changing engine path, source or display settings. Identify file organization, wording and appearance as separate layers rather than a vague “styles work.”</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-vtt-class-label-visible-text-check/">VTT class labels</a>, <a href="/en/guides/icouldplay-webvtt-note-block-boundary/">VTT comment boundaries</a>.</p>
+<p>Checked on November 12, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

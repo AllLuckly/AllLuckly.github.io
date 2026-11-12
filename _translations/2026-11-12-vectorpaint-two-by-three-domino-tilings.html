@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint 2×3 domino tilings: fix six cells and enumerate three layouts'
+description: Draw three two-cell dominoes on fixed equal cells, using the upper-left cell to enumerate three complete
+  nonoverlapping tilings.
+permalink: /en/guides/vectorpaint-two-by-three-domino-tilings/
+date: '2026-11-12 00:00:00 +08:00'
+modified: '2026-11-12 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 179
+topic: Distance, tilings and cycles
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-12-vectorpaint-two-by-three-domino-tilings.md
+source_url: /guides/vectorpaint-two-by-three-domino-tilings/
+translation_method: editorial
+translation_source_sha256: 14ff9ab14dcff332201ace1a7f3deefdcfbcd9dc830adcd063744e75c993c94b
+translation_date: '2026-11-12T01:43:29+00:00'
+excerpt: Draw three two-cell dominoes on fixed equal cells, using the upper-left cell to enumerate three complete
+  nonoverlapping tilings.
+---
+{% raw %}
+<p>Six cells have the area of three two-cell dominoes, but equal area does not make every arrangement a tiling. Draw three layouts on a fixed two-row, three-column board, checking coverage and completeness. Tiles have no dots or face identities; this is not a matching game or an automatic puzzle solver.</p>
+<h2 id="先定板与等同规则">Define board and equivalence rules</h2>
+<p>Label top cells A1,A2,A3 and lower cells B1,B2,B3, all equal squares. A domino covers two edge-adjacent cells horizontally or vertically, never diagonally or outside the board. Tiles have no colour identity, so recolouring is not a new tiling. Board orientation is fixed: reflected layouts with different occupied pairs count separately. <a href="https://www.maths.ox.ac.uk/outreach/oxford-online-maths-club/season-2-episode-12">Oxford’s domino discussion</a> supplies case-based context; this 2×3 enumeration is independent of its larger-board answers.</p>
+<h2 id="画固定六格与骨牌边界">Draw fixed cells and tile boundaries</h2>
+<p>At 200 drawing units per cell, the board is 600×400. Separate outer frame from its grid. Tile dimensions are 200×400 or 400×200, placed on cells rather than stretched arbitrarily. Pale grid lines show cells; stronger borders identify tiles, so a faint internal cell line does not split a domino. Translate copies of the same board for all views rather than silently switching one to three rows/two columns. If alignment is approximate, retain the mathematical cell-pair table.</p>
+<h2 id="第一布局三列全竖直">Make the all-vertical layout</h2>
+<p>In the first view use pairs A1/B1, A2/B2 and A3/B3, one vertical domino per column. Tick each of the six cells exactly once, never zero or twice. Colour distinguishes three tiles rather than six independent squares. A strong transverse line inside a tile can imply separate pieces; lighten or remove it. Three dominoes and area six are useful checks, but each pair must still be edge-adjacent: separated cells are not a domino.</p>
+<h2 id="第二第三布局保留左右区别">Keep left and right mixed layouts distinct</h2>
+<p>In the second view, pair A1/B1 vertically and A2/A3 plus B2/B3 horizontally. In the third, pair A3/B3 vertically and A1/A2 plus B1/B2 horizontally. They are mirror images but distinct under fixed column labels. Conversely, swapping red and blue in one view adds no tiling because tiles have no identities. Write all three cell pairs beside each layout; “horizontal, horizontal, vertical” omits the positions distinguishing the second and third. Using equal digits for one tile, the three views have row pairs 123/123, 122/133 and 112/332. Every digit occupies exactly two edge-adjacent cells. Digits identify tiles within each view, not persistent physical identities across views; relabelling creates no new tiling.</p>
+<h2 id="从左上格证明没有第四种">Prove completeness from the upper-left cell</h2>
+<p>A1 can pair only vertically with B1 or horizontally with A2, exhausting its edge neighbours. A vertical pairing leaves a 2×2 board with two possibilities, two vertical or two horizontal tiles: layouts one and two. A horizontal pairing forces B1/B2 horizontally, leaving the right column vertical: layout three. Thus there are three, rather than merely three found by trial. Record why other branches fail; B1 cannot skip B2 to reach B3. The proof depends on no outside, folded or half-tile coverage.</p>
+<h2 id="面积正确的错误布局仍会失败">Equal area can still hide an invalid layout</h2>
+<p>In a wrong copy place horizontal tiles on A1/A2, A2/A3 and B1/B2. Three tiles still total area six, yet A2 is covered twice and B3 not at all. A cell checklist detects this despite attractive transparent overlaps. Re-pair cells rather than exempting B3 without changing the task. Another invalid copy pairs diagonal A1/B2: corner contact is not shared-edge adjacency. Keep errors separate and recheck exact-once coverage plus adjacency, not tile count alone.</p>
+<h2 id="输出把格线与牌缝分层核">Check grid lines versus tile seams in output</h2>
+<p>Save and open a PNG. Ignoring colour, count three tiles by strong seams, then six cells by the pale grid. If equal line weights confuse them, repair hierarchy rather than shifting cells to rescue labels. Hide unwanted ticks/error copies and separate the three boards so frames do not merge into a larger tiling. Monochrome cell-pair labels must identify layouts. Keep A/B aligned with Chinese top/bottom rows rather than swapping them during layout. Open vector output for joins; exporting proves neither automatic enumeration nor optimisation.</p>
+<h2 id="验收三布局与两分支同时保留">Accept three layouts and the two-branch proof</h2>
+<p>Retain rules, six labels, three valid layouts, A1’s two-branch proof and an equal-area invalid example. Six results may count colours; two may silently identify reflections; unsupported completeness requires revisiting the A1 branches. A different rule identifying whole-board reflections yields two classes, but changes the task rather than refuting three fixed-board layouts. This finite manual proof does not generalise to arbitrary boards, promise automatic generation or provide a real-material cutting plan.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-seven-piece-puzzle/">VectorPaint seven-piece puzzles: fix the pieces before checking a silhouette</a>, <a href="/en/guides/vectorpaint-four-order-latin-square/">VectorPaint order-four Latin squares: check one to four in every row and column</a>.</p>
+<p>Checked on November 12, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261112">Apple public lookup</a>. Manual exercises use controls actually available in your installed version; external calculations, written records and diagrams imply no built-in automatic analysis. No step-by-step physical-device, private-file or all-export-environment testing is claimed.</p>
+{% endraw %}

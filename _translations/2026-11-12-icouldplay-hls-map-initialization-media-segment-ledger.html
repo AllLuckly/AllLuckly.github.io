@@ -1,0 +1,54 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay HLS initialization: separate EXT-X-MAP from timed media segments'
+description: Map an initialization resource and two segments without treating three URLs as three timed clips.
+permalink: /en/guides/icouldplay-hls-map-initialization-media-segment-ledger/
+date: '2026-11-12 00:00:00 +08:00'
+modified: '2026-11-12 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 132
+topic: Caption placement and stream time
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-12-icouldplay-hls-map-initialization-media-segment-ledger.md
+source_url: /guides/icouldplay-hls-map-initialization-media-segment-ledger/
+translation_method: editorial
+translation_source_sha256: 244fd97f58b5134f312761534a5f3e38cf7c1a28e41707ba7b4c947f1ca34f94
+translation_date: '2026-11-12T01:43:29+00:00'
+excerpt: Map an initialization resource and two segments without treating three URLs as three timed clips.
+---
+{% raw %}
+<p>Three HLS resource addresses need not represent three timed video segments. Build a role ledger from an original teaching playlist, then investigate an authorized working source separately. Use ordinary iCouldPlay playback and external read-only inspection. No internal request viewer or format conversion by renaming is assumed.</p>
+<h2 id="section-1">1. Separate teaching text from a working source</h2>
+<p>Prepare plain-text notes and, if available, a timestamped media playlist from a source you manage. Without one, complete the structural exercise and mark playback unperformed. The example names init.mp4, a.m4s and b.m4s do not identify hosted resources; saving text creates no media. Confirm ordinary playback of real material and record its title, source identity and playable range before inspecting its media playlist. Do not edit a production server or count multivariant options as media segments; locate the playlist containing EXTINF entries.</p>
+<h2 id="section-2">2. Mark one initialization declaration and two timed entries</h2>
+<p>Copy this original example and pair each EXTINF with the URI following it. Give MAP a separate resource box. Version seven is a playlist compatibility value, not the app version. Do not call init a zero-numbered film or add four seconds merely because its suffix is .mp4. No four-second duration is attached to initialization. Do not rename fragments and assume independent playback. The text example does not supply media bytes, compatible encoding or server availability.</p>
+<pre><code>#EXTM3U
+#EXT-X-VERSION:7
+#EXT-X-TARGETDURATION:4
+#EXT-X-MAP:URI=&quot;init.mp4&quot;
+#EXTINF:4.000,
+a.m4s
+#EXTINF:4.000,
+b.m4s
+#EXT-X-ENDLIST
+</code></pre>
+<h2 id="section-3">3. Read roles rather than guessing from extensions</h2>
+<p><a href="https://www.rfc-editor.org/rfc/rfc8216.html#section-4.3.2.5">RFC 8216’s initialization-section definition</a> makes EXT-X-MAP identify initialization applicable to subsequent segments until superseded. Record that role rather than adding a third timed segment. Two four-second entries total eight declared seconds. Count three resources separately from two media-duration entries. Names locate resources but prove neither format nor successful decoding. MAP does not establish that initialization is artwork, a trailer or a screenshot.</p>
+<h2 id="section-4">4. Map addresses in an actual playlist</h2>
+<p>For real material, retain the final media-playlist URL and map initialization and segment references against it. Record resource identities and retrieval status. Relative references use the playlist location, not an arbitrary home page. Preserve query information privately without publishing credentials. Playlist visibility does not prove resource bytes were retrieved. Attribute administrator-provided logs accurately rather than inventing an app request panel. Do not request the teaching filenames from an unrelated public server.</p>
+<h2 id="section-5">5. Play from the beginning before checking a later point</h2>
+<p>Open the real source, play from the beginning into later content and record picture, sound and action. Then use an available timeline to revisit a known point, keeping continuous-play and seek results separate. MAP presence does not prove initialization retrieval, and failure at one point does not diagnose initialization alone. Retain source and observation time and exclude a switched variant or edition. Without working media, list planned checkpoints but keep execution unperformed; eight declared example seconds are not a device playback record.</p>
+<h2 id="section-6">6. Separate missing dependencies from standalone playback</h2>
+<p>A retrieved fragment may depend on external initialization; failure to open it alone does not establish a corrupt program. Downloadable initialization likewise does not establish a complete film. This exercise requires no binary concatenation and offers no repair by mixing arbitrary initialization and fragments. They must have an identified common source and playlist relationship. Use the complete-file workflow for offline needs. Keep resource presence, dependency completeness and successful playback as separate statuses rather than one download icon, and preserve originals.</p>
+<h2 id="section-7">7. Troubleshoot playlist level and wrong responses</h2>
+<p>If MAP is absent, check actual format and playlist type rather than requiring every HLS source to match this fragment example. Login or error responses are access-identity issues, not extension problems. Keep timestamped snapshots after updates so new segments are not paired with old initialization. Preserve continuous-play versus seek differences while isolating source, retrieval and media conditions; one black screen has no uniquely established cause. Mark unavailable logs unknown and do not erase app data or production directories as a diagnostic substitute.</p>
+<h2 id="section-8">8. Finish the dependency and timing ledger</h2>
+<p>The paper result should show three resource roles, two timed media entries and eight declared seconds, without assigning duration to initialization. For actual inspection retain capture time, address mapping, resource states, continuous-play/return results and unknowns. Reopen the same source and recheck a content point if execution was possible; planned checks remain planned otherwise. Preserve originals and rebuild relationships for a new source. The ledger identifies unresolved dependencies, not universal fragment playback or conversion into a complete MP4 by renaming.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-hls-relative-uri-resolution-sheet/">HLS relative references</a>, <a href="/en/guides/icouldplay-hls-playlist-offline-boundary/">HLS offline boundaries</a>.</p>
+<p>Checked on November 12, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

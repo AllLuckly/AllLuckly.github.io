@@ -1,0 +1,78 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-hls-program-date-time-playback-clock-map/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay HLS dates: distinguish program timestamps, time zones and playback
+  position'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-hls-program-date-time-playback-clock-map/
+agent_source_sha256: f03287f6696b8eafa29e46ca9152cf778cf021fc4f1ef46648f2cabd4b720faf
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay HLS dates: distinguish program timestamps, time zones and playback position
+
+Language: en
+Canonical: [iCouldPlay HLS dates: distinguish program timestamps, time zones and playback position](<https://allluckly.cn/en/guides/icouldplay-hls-program-date-time-playback-clock-map/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-hls-program-date-time-playback-clock-map/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-hls-program-date-time-playback-clock-map/>)
+Published: 2026-11-12T00:00:00+08:00
+Modified: 2026-11-12T09:43:29+08:00
+Author: Bison
+
+Map two segments to absolute timestamps and relative durations without filling media dates from the device clock.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-hls-program-date-time-playback-clock-map/>), translated on 2026-11-12. Original publication dates, attribution, code and version notes are retained.
+
+Nine o’clock in a playlist does not require opening it at nine or mean playback position nine seconds. Use an original timestamp sample to separate program time, relative playback position and this viewing session’s time. Inspect only authorized evidence and use ordinary iCouldPlay controls without assuming a program-date panel or external clock synchronization.
+
+## 1. Preserve a snapshot and its acquisition time
+
+Prepare notes and, for a source you manage, retain the original media playlist, final URL and capture time. Without real media, complete the paper mapping and mark playback unperformed. Capture time is not automatically recording or program-start time. Confirm source identity and ordinary playback in iCouldPlay to avoid pairing a similarly named replay with a different live-playlist window. Keep private access information private. Teaching filenames below are not hosted video requests.
+
+## 2. Mark the segment following the date tag
+
+This original playlist places its date tag before a.ts. Draw an arrow to the following segment and circle the time-zone offset separately from the two four-second durations. Saving the text supplies no media. The date is a stipulated exercise value, not a claim that filming occurred then. Preserve the original date, durations and order instead of changing hours to match the current device clock.
+
+```
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:4
+#EXT-X-PROGRAM-DATE-TIME:2026-11-12T09:00:00+08:00
+#EXTINF:4.000,
+a.ts
+#EXTINF:4.000,
+b.ts
+#EXT-X-ENDLIST
+```
+
+## 3. Map absolute time to a relative starting point
+
+[RFC 8216’s program-date-time tag](<https://www.rfc-editor.org/rfc/rfc8216.html#section-4.3.2.6>) associates an absolute date/time with the following segment’s first sample. Under this example’s additional continuous, exactly-four-second assumptions, a begins at relative zero and 09:00:00; b begins at four seconds and 09:00:04; total declared duration is eight seconds. This follows stipulated mapping, not the play-button time. Real discontinuities or incomplete mappings need their own limits, and the tag alone does not authenticate real recording time.
+
+## 4. Convert zones while preserving the instant
+
+Here 09:00 with offset +08:00 corresponds to 01:00 UTC on the same date. Replacing the offset with Z while retaining nine changes the instant. Keep original and converted values with dates; other hours may cross midnight. Four elapsed seconds remain four seconds in either zone, not four hours. Do not fill missing time-zone evidence from device location. This is manual conversion, not server-clock calibration by the app or proof that a filmed wall clock matches the declaration.
+
+## 5. Locate playback through content anchors
+
+For working media, play into a clear action and record its displayed position before checking whether evidence maps it to a segment. Whole-second observations are approximate, not frame-accurate first-sample identification. Record viewing date separately; watching a replay later does not edit its declared program time. If the app shows duration only, retain that scope rather than inventing an absolute-time button. Unmapped content remains an observed action with an unknown playlist mapping, not an arbitrary cut relabeled as a boundary.
+
+## 6. Keep a paper control changing only the date
+
+Save a paper control shifting only the absolute timestamp one hour later, leaving segment names and durations unchanged. Declared relative duration stays eight seconds while the mapping shifts. This creates neither a newly filmed event nor faster playback. Do not edit production playlists or publish a changed declaration as recording proof. Preserve original, correction evidence and new snapshots after a provider’s date correction. Content identity, declared date and provenance require separate evidence.
+
+## 7. Troubleshoot mixed dates, sequence numbers and positions
+
+If the result seems to require viewing in the past, check whether program time became a viewing appointment. Sequence 100 is not position 100 seconds. An eight-hour zone difference is not an eight-second subtitle offset, so caption delay does not repair date conversion. Absent tags remain absent rather than inferred from file modification dates. Reidentify changed snapshots or variants. Do not clear the library, change system time or infer deception from an inconsistent filmed clock.
+
+## 8. Finish with three clearly scoped time fields
+
+Keep playlist identity/capture time, original date/zone, relative starts/durations, observed anchors and unresolved mappings. The paper result explains zero and four seconds under its stipulated times; actual results include only obtained and viewed evidence. Leave playback, then reopen the same source and recheck an anchor where possible, preserving originals. Rebuild the ledger when continuous mapping is absent. This explains declared program time, media position and viewing time without promising recovery of arbitrary footage’s true recording date.
+
+## Related tutorials and sources
+
+[HLS discontinuities](<https://allluckly.cn/en/guides/icouldplay-hls-discontinuity-segment-boundary-map/>), [HLS playlist states](<https://allluckly.cn/en/guides/icouldplay-hls-playlist-type-endlist-snapshot-check/>).
+
+Checked on November 12, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

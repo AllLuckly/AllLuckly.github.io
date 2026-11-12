@@ -1,0 +1,67 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Check PNG dimensions in ManYue: separate pixel counts and pHYs density'
+description: Compare original 1200-by-800-pixel pages with different density records, separating intended physical
+  size, pixel aspect ratio and actual fitted display.
+permalink: /en/guides/manyue-png-ihdr-pixels-phys-density/
+date: '2026-11-12 00:00:00 +08:00'
+modified: '2026-11-12 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 173
+topic: Container fields and catalogue boundaries
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-12-manyue-png-ihdr-pixels-phys-density.md
+source_url: /guides/manyue-png-ihdr-pixels-phys-density/
+translation_method: editorial
+translation_source_sha256: 3dec1e31cf8d5a0c65d19fe92d231d714454b38b31b692c0eeb040caff4edf23
+translation_date: '2026-11-12T01:43:29+00:00'
+excerpt: Compare original 1200-by-800-pixel pages with different density records, separating intended physical size,
+  pixel aspect ratio and actual fitted display.
+---
+{% raw %}
+<p>A three-hundred-dpi label does not add detail over a seventy-two-dpi image with the same pixel dimensions. Compare two original PNG pages in ManYue, recording IHDR and pHYs externally before observing display. The app need not inspect chunks, measure print size or invent detail. Keep metadata, decoded pixels and screen appearance separate.</p>
+
+<h2 id="准备像素内容相同的两张原创页">Prepare two original pages with identical pixels</h2>
+
+<p>Create a 1200-by-800-pixel page in an available image tool, with sample text and distinct corner shapes, retaining the native source. Save PNG copies A and B that differ only in density records, without resizing or sharpening. Confirm this using an available read-only inspector or the creator’s report. Record paths and export options; a resampled copy is not a density-only control. Use original words and shapes and small import samples, not memory-filling images.</p>
+
+<h2 id="先读ihdr的宽高与像素总数">Read IHDR width, height and pixel count first</h2>
+
+<p>Both IHDR records should give width 1200 and height 800, or 960,000 pixel positions each. That is not 960,000 bytes: colour type, bit depth and compression also affect bytes. Dimensions are counts, not millimetres. Record width times height separately from file size. A few extra bytes may be an ancillary chunk rather than higher resolution. If dimensions differ, return to export and check resampling; the equal-pixel condition has not been met, so pHYs cannot be assigned every observed difference.</p>
+
+<h2 id="密度的数值必须带单位说明">Keep the density unit with its values</h2>
+
+<p>For A, pHYs gives 11,811 pixels per unit on both axes with metre units. Multiplying by 0.0254 metres per inch yields approximately 300 pixels per inch. B gives 2,835 on both axes with metre units, approximately 72.009 per inch. Do not call 11,811 itself dpi. A zero unit flag means unspecified units, not zero pixels per metre; ratios can still be meaningful but an inch density cannot be assumed. Absence of this chunk does not remove the image’s pixel dimensions.</p>
+
+<h2 id="估计物理宽度不等于屏幕宽度">Intended physical width is not screen width</h2>
+
+<p>Interpreting A at roughly 300 pixels per inch suggests about four by 2.667 inches; interpreting B at roughly 72 suggests about 16.67 by 11.11 inches. These are density-based estimates. This exercise neither prints nor measures the phone and does not promise those physical display sizes. Fit-to-screen, device density and scaling can make the images appear equally large. Metadata tools may loosely say dpi; specify that this record concerns image pixels per inch, not printer dot capability or visible detail quality.</p>
+
+<h2 id="导入后用同一文字角标核实际显示">Use the same text and markers after import</h2>
+
+<p>Import A and B under distinct names, confirm central text and four corner shapes, then view each whole page in identical orientation and layout and enlarge the same character. Record fitted extent, distortion and detail without requiring a difference. Equal display size does not prove pHYs was absent; unequal size still requires checking pixels and copy identity. Greater zoom does not add source detail. Return to original-pixel comparison instead of treating differently zoomed screenshots as equivalent observations.</p>
+
+<h2 id="横纵密度不等时另核像素比例">Check aspect ratio when axis densities differ</h2>
+
+<p>For a conceptual control keep dimensions 1200 by 800 but make horizontal pHYs density twice vertical density with unspecified units. This conveys a non-square-pixel intent rather than doubling pixel count, and supplies no basis for 300 pixels per inch. The specification permits viewers to present square pixels, so an unstretched ManYue display does not by itself violate all PNG rules. If a figure looks flattened, check unequal densities, altered source pixels and intentional drawing separately. This is a field explanation, not a claim of testing the variant on every device.</p>
+
+<h2 id="排查导出设置与错误密度标签">Check export settings and misleading density labels</h2>
+
+<p>If small text differs, check resampling, sharpening, colour and transparency changes before treating 300 versus 72 as the only cause. If an export dialog has a single resolution setting, determine whether it also changes dimensions. Retain the report when uncertain rather than batch-fixing every image. For help, provide the two original pages, IHDR dimensions, both pHYs values and unit, import path and matched observations. Share no whole comic, and do not turn uncertainty into a claim that the reader necessarily ignores a chunk. Presence and presentation are different evidence.</p>
+
+<h2 id="退出返回后把三个量分别复述">Leave and return to distinguish the three quantities</h2>
+
+<p>Leave the reader and return to A and B, checking central text and markers to confirm the same copies. Keep pixel dimensions, intended physical density and actual screen display in separate columns, with conversions and uncertainties. Explain why 960,000 pixels are not 960,000 bytes, why density changes add no detail automatically, and why unspecified units do not determine dpi. Success keeps the quantities distinct rather than declaring one label always best. A new or resampled file needs new dimension checks instead of old screenshots and conclusions.</p>
+
+<h2 id="相关教程与资料">Related guides and sources</h2>
+
+<p><a href="/en/guides/manyue-large-image-diagnostics/">ManYue large-image diagnostics: separate file size, dimensions and loading</a>; <a href="/en/guides/manyue-small-lettering-check/">ManYue small lettering: separate zoom level, source detail and display processing</a>.</p>
+
+<p>Checked on November 12, 2026: <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261112">Apple public information</a> lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities; verify specific controls in the installed version.</p>
+
+<p>Method reference: <a href="https://www.w3.org/TR/png-3/#pHYs">W3C: PNG physical pixel dimensions and display conditions</a>. Samples, passages and controls are original exercises. Sources establish definitions and checking methods rather than new automatic analysis in the app. Manual records may be kept externally, and unknown fields should remain explicit. This article does not claim step-by-step testing on a physical device, private server or every output environment.</p>
+{% endraw %}

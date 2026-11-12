@@ -1,0 +1,68 @@
+---
+layout: null
+permalink: /en/guides/manyue-pdf-mediabox-cropbox-visible-page-boundary/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Check PDF page boxes in ManYue: MediaBox and CropBox are not two copies of
+  the artwork'
+agent_source_url: https://allluckly.cn/en/guides/manyue-pdf-mediabox-cropbox-visible-page-boundary/
+agent_source_sha256: ad0545ed17b81b1adb314172210c7fa2375513294f30cda10d5cc9e5ca9469cb
+agent_generator_version: 1
+---
+{% raw %}# Check PDF page boxes in ManYue: MediaBox and CropBox are not two copies of the artwork
+
+Language: en
+Canonical: [Check PDF page boxes in ManYue: MediaBox and CropBox are not two copies of the artwork](<https://allluckly.cn/en/guides/manyue-pdf-mediabox-cropbox-visible-page-boundary/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-pdf-mediabox-cropbox-visible-page-boundary/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-pdf-mediabox-cropbox-visible-page-boundary/>)
+Published: 2026-11-12T00:00:00+08:00
+Modified: 2026-11-12T09:43:29+08:00
+Author: Bison
+
+Compare original PDFs with identical artwork and different visible boxes, distinguishing page coordinates, clipping and deletion while preserving the originals.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-pdf-mediabox-cropbox-visible-page-boundary/>), translated on 2026-11-12. Original publication dates, attribution, code and version notes are retained.
+
+A missing edge marker in a PDF need not mean that the image was permanently cut away: a page box may restrict the default visible region. Record two original samples in ManYue and interpret them using external page-box information. The reader need not edit PDF boxes, and a box record does not guarantee complete recoverable content outside it.
+
+## Choose two original samples with known boundaries
+
+Create one simple page in an existing desktop PDF tool, with central artwork and different markers on its left and right. Use no restricted works or private data. Obtain both page-box records from the creator, or list them with an available read-only inspector. A and B have identical page content; only B’s visible box is narrower. Label the filenames A and B. Record tool, time, page position and output path, preserving the originals. Confirm that the tool changed boxes rather than rasterising or deleting artwork while presenting a single-variable control.
+
+## Read four coordinates as a rectangle
+
+Here MediaBox is `[0 0 600 800]`; A has the same CropBox, while B uses `[50 0 550 800]`. Read the values as lower-left and upper-right coordinates. This example has no rotation or special UserUnit. B’s visible width is five hundred and height eight hundred, not a width of fifty or five hundred fifty. Subtract left from right and bottom from top, retaining the coordinate assumptions. These user-space numbers are not character measurements in centimetres or values inferred from the phone’s screen. Rotation or a nonzero origin requires its own record.
+
+## Separate media extent from display clipping
+
+MediaBox describes the media extent; CropBox specifies the clipping region for display or printing. B is inset fifty on each side while its central artwork remains inside. A missing explicit CropBox may inherit through the page tree or default to MediaBox; absence from one dictionary does not mean no visible boundary. Use the creator’s effective box record instead of hand-editing objects. Different boxes neither double the page count nor create another cover: they are geometric properties of one page and must not be added as content pages.
+
+## Compare markers after import rather than fitted size
+
+Import A and B separately, confirm identities and page position, then compare left marker, centre and right marker in the same orientation and single-page conditions. Record visible, partly visible or not visible, rather than only saying B enlarged. Fit-to-screen may fill the screen with a narrower region without changing artwork dimensions. Keep a full-page record or positional note before enlarging details. If actual clipping differs, record version and reading path honestly; a format concept is not proof that every PDF engine renders it identically.
+
+## Keep changing a box separate from deleting content
+
+Save C externally by restoring only the visible box to A’s extent, then check whether both markers return. Their return supports that the content remained in that copy. Failure to return does not prove ManYue lost it: check deletion, an already cropped image or another clipping operation. C is a newly generated external file, not an in-reader one-click recovery. Shrinking CropBox is also not a privacy-removal method: it generally hides display rather than deleting content. This exercise uses only original non-sensitive material.
+
+## A page box cannot recreate missing image pixels
+
+Create a separate control D in which the left marker was actually removed externally. Restoring a six-hundred-wide box cannot recreate that marker. Comparing B and D shows why identical absence may have different causes: content can lie outside a box or be absent altogether. A reading screenshot alone cannot distinguish them; combine originals, creation records and external inspection. Content-stream clipping can also matter. This lesson does not require dissecting every PDF object or infer whole-book completeness from one marker.
+
+## Check inheritance, rotation and copy mismatches
+
+When results disagree, verify actual paths and page positions for A, B and C, then effective boxes, rotation and any export changes to content. Do not attach an old same-name file’s observation to a new copy or clear all app data to investigate one page box. If an inspector shows raw dictionaries without inheritance, request effective values from the creator instead of guessing. Separate reader version, marker observations and geometric evidence. Provide a minimal original sample and steps when seeking help, not a private library or an unsupported single-cause diagnosis.
+
+## Leave and return to document geometry and appearance
+
+Leave the reader and return to A and B. Confirm the central artwork first, then recheck both markers. Inspect C and D separately instead of predicting results from names. Retain file identity, four effective box coordinates, page position, display conditions, three marker observations and any separate content modification. Success explains what geometry and actual appearance each establish, not guaranteed recovery of every cropped work. This adds PDF page geometry to ordinary edge checking without replacing source quality, rights or whole-book checks.
+
+## Related guides and sources
+
+[ManYue page-edge cropping checks: distinguish missing source content from the visible viewport](<https://allluckly.cn/en/guides/manyue-page-edge-cropping-evidence/>); [ManYue PDF page labels: separate printed numbers, logical labels and physical positions](<https://allluckly.cn/en/guides/manyue-pdf-page-label-physical-index-map/>).
+
+Checked on November 12, 2026: [Apple public information](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261112>) lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the [official App Store](<https://apps.apple.com/cn/app/id6753895889>) for published capabilities; verify specific controls in the installed version.
+
+Method reference: [Adobe: PDF cropping and page boxes](<https://helpx.adobe.com/ca/acrobat/desktop/edit-documents/organize-pages/crop-pages.html>). Samples, passages and controls are original exercises. Sources establish definitions and checking methods rather than new automatic analysis in the app. Manual records may be kept externally, and unknown fields should remain explicit. This article does not claim step-by-step testing on a physical device, private server or every output environment.
+{% endraw %}

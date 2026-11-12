@@ -1,0 +1,78 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-webvtt-line-number-percentage-placement/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay VTT line placement: distinguish line numbers, percentages and pixels'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-webvtt-line-number-percentage-placement/
+agent_source_sha256: f8de70da7d95d7c95f962eb6c97042903dba4cdb5c07842eee4914fb4a5128e7
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay VTT line placement: distinguish line numbers, percentages and pixels
+
+Language: en
+Canonical: [iCouldPlay VTT line placement: distinguish line numbers, percentages and pixels](<https://allluckly.cn/en/guides/icouldplay-webvtt-line-number-percentage-placement/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-webvtt-line-number-percentage-placement/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-webvtt-line-number-percentage-placement/>)
+Published: 2026-11-12T00:00:00+08:00
+Modified: 2026-11-12T09:43:29+08:00
+Author: Bison
+
+Compare three identically worded cues while keeping source conditions, observed placement and readability separate.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-webvtt-line-number-percentage-placement/>), translated on 2026-11-12. Original publication dates, attribution, code and version notes are retained.
+
+A VTT line:1 is neither second one nor one pixel below the screen top. Compare integer and percentage placement on one clip with three original cues. Prepare the file externally and use available subtitle-selection and playback controls in iCouldPlay. The deliverable records source conditions and screen observations, without assuming an in-app numeric placement editor.
+
+## 1. Fix the clip and reference area
+
+Choose an owned clip lasting at least fourteen seconds without matching burned-in captions. Confirm ordinary picture and sound playback. Record identity, source, duration and orientation, using the visible video area as the reference rather than silently mixing whole-screen and barred areas. Save UTF-8 plain text and a fallback without placement settings. If loading is unavailable, finish source review and mark playback unperformed. Fix text size and display mode before comparing positions instead of simultaneously changing orientation, zoom and source.
+
+## 2. Save three cues with distinct placement conditions
+
+All three cues have the same wording and duration and do not overlap. The first two line settings are integers; the third has a percent sign. Copy arrows, spacing, blank lines and that percent sign exactly, saving a real .vtt file. Record the three settings and identical expected wording before observing appearance. No vertical setting is used, so do not generalize horizontal observations to every writing direction.
+
+```
+WEBVTT
+
+00:00:01.000 --> 00:00:04.000 line:0
+Keep this line separate.
+
+00:00:05.000 --> 00:00:08.000 line:1
+Keep this line separate.
+
+00:00:09.000 --> 00:00:12.000 line:90%
+Keep this line separate.
+```
+
+## 3. Identify units before sketching placement
+
+The integer and percentage forms in the [W3C WebVTT line-setting definition](<https://www.w3.org/TR/webvtt1/>) express different placement conditions, not a shared pixel coordinate. Sketch relative positions beside the exact settings as explanatory diagrams, not device measurements. line:1 does not determine when a cue appears, and 90% does not mean ninety percent of its words. Keep format expectations separate from renderer observations, which also depend on text, environment and implementation. No pixel-identical result across devices is promised.
+
+## 4. Play through all cues and verify wording
+
+Load the paired subtitle and play from zero beyond twelve seconds. Read the complete sentence before recording approximate location, line count and clipping. Keep control-bar visibility comparable. Replay if needed before editing source. If a cue is absent, record its time and file identity and investigate loading/timing; absence is not proof of successful off-screen placement. Complete wording and observed placement behavior are separate checks.
+
+## 5. Separate an absent difference from a unit error
+
+If cues appear similarly placed, report no clear difference under these conditions rather than denying that the format defines the settings. For a visible move, record direction without guessing an exact pixel displacement. Retain the third cue’s percent sign and unchanged wording instead of shortening it to force a sketch match. The plain fallback can verify basic readability, but does not certify every layout feature. An honest no-difference record is more reusable than an outcome forced through changing settings.
+
+## 6. Treat a text-size change as another round
+
+If the installed version exposes subtitle size, record its real control and value, change only that setting and replay. Without it, retain the initial round instead of inventing a button. Different line height can alter visible layout, so equal line values do not establish equal pixels across rounds. This change does not edit source timing or wording. Preserve orientation and display mode in each round, then restore the original setting and verify the fallback remains readable.
+
+## 7. Troubleshoot setting location and stale selection
+
+Visible setting text may have been placed on the text line; it belongs after the end timestamp on the timing line. Unchanged appearance after switching files calls for verifying track identity, not assuming the new file loaded. If needed, leave the playback page, reopen it, reselect the copy and play from before the cue. Missing words also require encoding, font and source checks rather than arbitrary line changes. Change one identified issue at a time, retain before/after files and avoid clearing the library as a substitute for diagnosis. Leave unresolved compatibility unverified.
+
+## 8. Finish the source-to-screen record
+
+Keep clip/subtitle identities, exact settings, observed sentences, positions/line counts, display conditions and uncertainties. Exit, return and replay from zero, checking that percentages never became integers or line indices became times. Play the fallback once more and preserve originals. Completion is a repeatable comparison distinguishing definitions from observations, not a screenshot proving universal WebVTT support. Add a new round after changing source or orientation.
+
+## Related tutorials and sources
+
+[Horizontal cue boxes](<https://allluckly.cn/en/guides/icouldplay-webvtt-position-size-cue-box-check/>), [Basic VTT files](<https://allluckly.cn/en/guides/icouldplay-make-webvtt-practice/>).
+
+Checked on November 12, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

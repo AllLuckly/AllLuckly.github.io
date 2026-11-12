@@ -1,0 +1,52 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay timecode reading: separate drop-frame labels, picture frames and elapsed seconds'
+description: Compare consecutive picture identities with minute-boundary labels without calling skipped timecode
+  numbers missing footage.
+permalink: /en/guides/icouldplay-drop-frame-timecode-label-picture-frame-check/
+date: '2026-11-12 00:00:00 +08:00'
+modified: '2026-11-12 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 136
+topic: Timecode, caching and shot evidence
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-12-icouldplay-drop-frame-timecode-label-picture-frame-check.md
+source_url: /guides/icouldplay-drop-frame-timecode-label-picture-frame-check/
+translation_method: editorial
+translation_source_sha256: 4e8cdd733a3eb26fdd2e590d32c202ef1c116f4b65463986b72c241dffbc142c
+translation_date: '2026-11-12T01:43:29+00:00'
+excerpt: Compare consecutive picture identities with minute-boundary labels without calling skipped timecode numbers
+  missing footage.
+---
+{% raw %}
+<p>A timecode jump across a minute boundary does not by itself establish two missing pictures. Read an original ledger separating timecode labels, actual picture identities and iCouldPlay’s elapsed display. The example explicitly stipulates rate and numbering. Ordinary playback is used without assuming frame editing, a SMPTE panel or automatic missing-frame detection.</p>
+<h2 id="section-1">1. Record rate and numbering conventions first</h2>
+<p>Choose authorized footage with documented production details, or begin on paper. Record source, edition and timecode convention. This example stipulates the common 30000/1001-fps, nominal-thirty-label drop-frame scheme, DF; it is not a rule for arbitrary rates. A rounded 29.97 rate without timecode information leaves numbering unknown. Keep clip duration, device refresh and media rate separate. Paper or planned samples remain unperformed rather than becoming a device-test report.</p>
+<h2 id="section-2">2. Give picture identity and labels separate columns</h2>
+<p>This original ledger has consecutive picture identities 100–103 and DF labels across a minute boundary. It is neither supplied footage nor an app export. Check the identity sequence before the skipped label numbers. Do not delete pictures to fit the literal phrase drop frame. An optional owned video can carry large externally prepared labels with production notes; that is not an iCouldPlay burn-in feature.</p>
+<pre><code>Picture ID | Stipulated DF label
+100        | 00:00:59;28
+101        | 00:00:59;29
+102        | 00:01:00;02
+103        | 00:01:00;03
+</code></pre>
+<h2 id="section-3">3. Explain skipped values through the numbering rule</h2>
+<p>The <a href="https://help.adobe.com/archive/en/premiere-pro/cs6/premiere_pro_reference.pdf">official Adobe timecode reference</a> describes this DF scheme skipping two label numbers at minute starts except each tenth minute. Skipped labels do not delete pictures. Our semicolon declares DF for this sample, but punctuation alone cannot establish an unknown file’s convention. Write the tenth-minute transition from 00:09:59;29 to 00:10:00;00 separately. The reference explains numbering, not a software purchase recommendation or a promise that iCouldPlay displays this format.</p>
+<h2 id="section-4">4. Relabel a non-drop control without deleting pictures</h2>
+<p>Create an NDF label control for the same pictures, using nominal 00, 01, 02 across the minute boundary. Retain picture identities. Different labels do not establish different actions or change 30000/1001 into exactly thirty fps. The last two timecode digits are not hundredths of a second or subtitle milliseconds. If an external editor exposes display choices, identify them as external rather than copying its buttons into iCouldPlay instructions. Preserve source and production conventions throughout.</p>
+<h2 id="section-5">5. Limit playback findings to what is observable</h2>
+<p>For an actually produced control, play into the boundary and record action continuity, readable labels and elapsed display. Failure to read four fast labels is not missing-frame evidence. Do not invent frame-step shortcuts. Pause or replay with available controls, reporting insufficient precision when a single picture cannot be located. The ledger establishes a numbering relationship; viewing has its own limits. Smooth action alone does not prove every frame exists. Frame-level claims require suitable external evidence or production records.</p>
+<h2 id="section-6">6. Keep player position separate from source timecode</h2>
+<p>Source timecode may start at one hour while the player starts at zero elapsed seconds. Preserve source start, content anchor and player position rather than calling one wrong. Without a start mapping, avoid exact subtraction. Relabeling does not repair audiovisual sync, and caption delay does not remove numbering differences. A recut or speed-changed file is another version, not a labels-only control. Burned-in labels, embedded metadata and player readouts require separate evidence; no embedded-timecode editing is required.</p>
+<h2 id="section-7">7. Troubleshoot units and genuine playback symptoms</h2>
+<p>Check whether a jump follows DF, a mistaken burn-in or an unknown convention before labeling footage corrupt. Record real sound interruptions or stalls independently; a numbering explanation does not dismiss playback symptoms. Consult production evidence for unreadable labels instead of assigning a generic rate to the current file. Keep provenance and unknowns explicit. Do not clear the library or re-encode the sole original to investigate labels. Any separately encoded copy may change pictures and must not remain labeled unchanged evidence.</p>
+<h2 id="section-8">8. Recheck ordinary and tenth-minute boundaries</h2>
+<p>Leave viewing, then return to the record and explain ordinary-minute skipped 00/01 labels, the tenth-minute exception and all four consecutive picture identities. Keep rate convention, numbering scheme, identities, labels, viewing observations and unknowns. Paper completion is paper completion, and viewing reports only observed content, not automatic validation of all frames. Preserve originals and recheck conventions for new media. Distinguish numbering, elapsed seconds and picture integrity rather than treating the name drop frame as proof of missing footage.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-frame-count-file-time-boundary/">Frames and file time</a>, <a href="/en/guides/icouldplay-clap-audiovisual-sync/">Clap sync checks</a>.</p>
+<p>Checked on November 12, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

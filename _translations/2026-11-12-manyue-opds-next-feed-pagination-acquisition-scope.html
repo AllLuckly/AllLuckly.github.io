@@ -1,0 +1,67 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Check OPDS pagination in ManYue: a feed next link is not the next comic image'
+description: Use a two-page original catalogue ledger to check feed links, entry IDs and repeated entries, separating
+  catalogue coverage from content acquisition.
+permalink: /en/guides/manyue-opds-next-feed-pagination-acquisition-scope/
+date: '2026-11-12 00:00:00 +08:00'
+modified: '2026-11-12 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 175
+topic: Container fields and catalogue boundaries
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-12-manyue-opds-next-feed-pagination-acquisition-scope.md
+source_url: /guides/manyue-opds-next-feed-pagination-acquisition-scope/
+translation_method: editorial
+translation_source_sha256: 95ac58838ea43f82f903f1b488c6d38b8aa772a90381e4dc28cc902d7e0e3449
+translation_date: '2026-11-12T01:43:29+00:00'
+excerpt: Use a two-page original catalogue ledger to check feed links, entry IDs and repeated entries, separating
+  catalogue coverage from content acquisition.
+---
+{% raw %}
+<p>The second catalogue page is not the second comic page, and four entry occurrences need not mean four books. Check an OPDS feed-level next link and visible catalogue entries in ManYue before examining publication acquisition links. Record external feed information separately from refresh observations. Browsable entries do not establish direct page reading from ordinary CBZ or PDF acquisition links.</p>
+
+<h2 id="先记录目录身份与当前查询条件">Record catalogue identity and query conditions</h2>
+
+<p>Choose a read-only test catalogue on your server, or two original non-private feed exports from its maintainer. Record entry point, permission scope, filters, order and export time. Without a server, perform a document-ledger exercise without claiming app access. Both pages must share query conditions; do not join page one of recent updates to page two of all works. Retain each document address or base without publishing credentials or full private paths. Permissions and changing contents may affect later pages; use a fixed small sample rather than crawling a site.</p>
+
+<h2 id="把feed级next指向的资源写清">Identify the feed-level next resource</h2>
+
+<p>The original first feed lists entry IDs Jia and Yi and has a feed-level <code>next</code> link to <code>catalog.xml?page=2</code>. It denotes a later part of the ordered catalogue, not an image of the current book. Check link level and resolve the relative address against the document base instead of guessing from the word next. Acquisition and cover links have other roles. This concerns Atom-based OPDS feeds, not direct reuse of their XML structure in OPDS 2 JSON, and does not require a raw-link field in ManYue’s interface.</p>
+
+<h2 id="逐页列出现次数与唯一身份">List occurrences and distinct identities</h2>
+
+<p>Page two lists Yi and Bing, giving four entry occurrences but three distinct identities under the example’s explicitly matching IDs: Jia, Yi and Bing. Titles alone are insufficient for deduplication, and matching IDs with conflicting metadata should not cause immediate deletion. Preserve both locations and differences. Repeated Yi is neither a second book nor a duplicated comic page. Use columns for catalogue page, ID, displayed name, acquisition role and observation status. Label catalogue-page numbers so they cannot be mistaken for content-page positions.</p>
+
+<h2 id="获取链接不能替代目录续页">An acquisition link cannot substitute for next</h2>
+
+<p>An ordinary CBZ acquisition link in Yi’s entry addresses a publication resource, not a feed listing Bing. Opening artwork, previews or content does not complete catalogue pagination. Ordinary full-package links and OPDS-PSE streams have different reading conditions; three catalogue identities do not prove all three stream page by page. You may separately check an authorised original publication’s identity and pages, recording it in another column. Pagination coverage does not depend on possessing an offline full copy, and neither task replaces the other.</p>
+
+<h2 id="对照应用结果而不规定分页按钮">Compare app results without inventing a page button</h2>
+
+<p>With a test server, open the same catalogue in ManYue and use the actual visible refresh or browsing controls, checking Jia, Yi and Bing by ID-assisted identity. Later feeds may be merged without a button named page two, so record real controls and waiting state rather than inventing one. If only Jia and Yi appear, retain a partial result and check refresh completion, query consistency and permissions. Successful connection validation establishes access to an entry document, not exhaustive traversal or usable acquisition resources.</p>
+
+<h2 id="循环与缺失next要设置停止条件">Stop on loops and distinguish a missing next</h2>
+
+<p>If page two links back to the recorded first page, mark a loop and stop following it rather than repeatedly requesting resources. If it has no next link, the response declares no continuation; it does not prove the server has no other categories, filters or permission scopes. If the maintainer’s fixed expected list is exactly Jia, Yi and Bing, check those three within that scope. Changing catalogues need not provide a consistent cross-page snapshot; duplicates or omissions may involve update timing, so keep timestamps rather than concluding deletion from one round.</p>
+
+<h2 id="排查基址账号和缓存范围">Check bases, accounts and cache scope</h2>
+
+<p>For an inaccessible later page, check relative base, authorised host scope, login-page responses and retained query parameters. HTML returned over HTTP is not automatically a valid Atom feed. If old entries persist, retry a safe refresh and verify the connection rather than deleting server books or clearing the library. Provide two minimal original feeds, next location, three expected identities and actual visibility, using account aliases. When later-page retrieval is unconfirmed, say so instead of claiming complete request capture or inevitable standards failure.</p>
+
+<h2 id="退出返回后分目录与正文验收">Leave and return to validate feed and content separately</h2>
+
+<p>Leave the catalogue and return to the same query, rechecking Jia, Yi, Bing and repeated occurrences. If you also tested content, return to its page separately. Keep catalogue identity, both bases, next chain, occurrences and distinct identities, app observations, stopping rules and permissions. Explain why four occurrences correspond to three sample identities and why catalogue page two is not content page two. A document-only exercise remains explicitly document-only; a server test remains bounded to that fixed catalogue, not permanent whole-library completeness.</p>
+
+<h2 id="相关教程与资料">Related guides and sources</h2>
+
+<p><a href="/en/guides/manyue-catalog-page-completeness/">ManYue large-catalogue checks: verify beyond the first batch</a>; <a href="/en/guides/manyue-opds-cover-sample-acquisition-links/">ManYue: Distinguish OPDS artwork, sample and acquisition links</a>.</p>
+
+<p>Checked on November 12, 2026: <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261112">Apple public information</a> lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities; verify specific controls in the installed version.</p>
+
+<p>Method reference: <a href="https://registry.opds.io/rel.html">OPDS: registered feed-pagination link relations</a>. Samples, passages and controls are original exercises. Sources establish definitions and checking methods rather than new automatic analysis in the app. Manual records may be kept externally, and unknown fields should remain explicit. This article does not claim step-by-step testing on a physical device, private server or every output environment.</p>
+{% endraw %}
