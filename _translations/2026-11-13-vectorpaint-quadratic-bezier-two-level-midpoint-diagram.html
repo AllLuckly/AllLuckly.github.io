@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint quadratic Bézier diagrams: two midpoint levels locate a curve point'
+description: Use three control points to calculate quarter, half and three-quarter parameter positions, separating
+  exact points from an approximate drawn curve.
+permalink: /en/guides/vectorpaint-quadratic-bezier-two-level-midpoint-diagram/
+date: '2026-11-13 00:00:00 +08:00'
+modified: '2026-11-13 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 188
+topic: Circular regions, curves and coding
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-13-vectorpaint-quadratic-bezier-two-level-midpoint-diagram.md
+source_url: /guides/vectorpaint-quadratic-bezier-two-level-midpoint-diagram/
+translation_method: editorial
+translation_source_sha256: d95e9a497b627c834dfb4d5b656fc5df692b7181103d2c4beb268aabdc90ef9c
+translation_date: '2026-11-13T01:43:51+00:00'
+excerpt: Use three control points to calculate quarter, half and three-quarter parameter positions, separating exact
+  points from an approximate drawn curve.
+---
+{% raw %}
+<p>A Bézier control point usually differs from a point on the curve. Build a quadratic construction diagram in VectorPaint using segments, markers and a manually drawn curve. Verify two interpolation levels before presentation, without assuming a dedicated quadratic-curve button or automatic midpoint proof tool.</p>
+<h2 id="先把控制点和曲线点分组">Separate controls from points on the curve</h2>
+<p>Use local mathematical P0=(0,0), P1=(4,8), P2=(8,0), x right and y up, at 70 pixels per unit. Separate control polygon, first-level points, second-level points, curve illustration and labels. The <a href="https://cs184.eecs.berkeley.edu/assets/sp19/sp19exam2solutions.pdf">Berkeley quadratic Bézier teaching material</a> explains successive interpolation; these controls are original rather than a copied figure. Reverse screen y mapping if necessary so P1 is above the baseline rather than contradicting the labels.</p>
+<h2 id="控制折线不直接当成曲线">Keep the control polygon distinct from the curve</h2>
+<p>Draw P0–P1–P2 as two thin grey segments with distinct control markers; the P0–P2 baseline is not a third control edge. P1’s height 8 is a control location, not a required curve point. Before a smooth arc, check point order so P1 and P2 are not exchanged. Without precise placement, retain a coordinate reference and label the image approximate. An attractive dragged curve cannot verify arbitrary Bézier parameters.</p>
+<h2 id="参数二分之一先各取一层中点">Take the two first-level midpoints at half parameter</h2>
+<p>At t=1/2 take Q0=(2,4) on P0P1 and Q1=(6,4) on P1P2. Verify that each divides its own segment equally, then connect Q0 and Q1 horizontally. This completes only level one; neither is the desired curve point. Taking the midpoint of P0P2 gives (4,0), a baseline point rather than the two-level result. Mark that wrong construction separately and explain its source instead of overwriting the correct points.</p>
+<h2 id="第二层中点得到四四">Take the second-level midpoint to get four four</h2>
+<p>The midpoint R of Q0Q1 is (4,4), the curve point at t=1/2. P1=(4,8) shares x but is four units higher; do not move R onto it. Label separate leaders as curve point and control point. This is a parameter midpoint, not a general proof of equal half arc lengths. The symmetry of this example cannot establish the claim for asymmetric curves. State which intermediate values were used rather than applying “midpoint” indiscriminately to different objects.</p>
+<h2 id="四分之一和四分之三复算成对点">Calculate quarter and three-quarter points</h2>
+<p>At t=1/4, interpolation from P0 toward P1 gives (1,2), and from P1 toward P2 gives (5,6). Interpolating one quarter from the former toward the latter gives (2,3). At t=3/4, first-level points (3,6) and (7,2) yield (6,3). Audit those with (4,4) and both endpoints. Equal parameter increments are not equal arc-length increments. Calculate before placement, retaining heights 3 versus 4 rather than flattening them for layout.</p>
+<h2 id="曲线绘制精度与数学点分别报告">Report drawing precision separately from point calculations</h2>
+<p>Use available pen or curve controls to draw a smooth illustration near the five audit points, not a pointed copy of the control polygon. Without precise control/type entry, label it manually approximate. A smooth line through five points alone does not prove the entire specified quadratic. Keep interpolation lines and values as the checkable construction; the arc aids reading. P1 is not a required on-curve anchor, and handles in another Bézier representation cannot all be identified with these three controls. Parameters zero and one should return P0 and P2, an additional endpoint check. If the drawn arc misses an endpoint, repair it before judging intermediate smoothness; a plausible peak alone cannot validate the whole diagram.</p>
+<h2 id="排查一层停止和截图读数错误">Troubleshoot stopping after one level and screenshot estimates</h2>
+<p>If notes end at (2,4), check for stopping after level one. For (4,0), check endpoint averaging; for (4,8), check substitution of P1. Retain the source of each error instead of blaming software from a blurred screenshot. After export inspect R and labels: a misplaced (4,4) leader requires label repair, not moving points. Use words as well as colour to distinguish control polygon and curve in grayscale. Never invent unseen software coordinates; preserve exact calculations and approximate placement separately.</p>
+<h2 id="重开按两层过程与五点验收">Reopen and audit both levels and five points</h2>
+<p>Save, leave and reopen. Hide the smooth arc and recompute both half-parameter levels from the three controls before auditing quarter/three-quarter points. Restore the illustration and inspect endpoints, peak height and approximation label. Hide unwanted guides in delivery but keep an audit copy. Open output to verify coordinates and retain an editable source. Another reader should reconstruct (2,3), (4,4), (6,3) and explain why P1 is off the curve, rather than treating a smooth-looking arc as exact evaluation of every parameter.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-bezier-nodes/">Edit Bézier nodes in VectorPaint: smooth curves without adding anchors</a>, <a href="/en/guides/vectorpaint-parabola-focus-directrix-distance/">VectorPaint parabola diagrams: compare focus distance and perpendicular directrix distance</a>.</p>
+<p>Checked on November 13, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261113">Apple public lookup</a>. Manual exercises use controls actually available in your installed version; external calculations, written records and diagrams imply no built-in automatic analysis. No step-by-step physical-device, private-file or all-export-environment testing is claimed.</p>
+{% endraw %}

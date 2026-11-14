@@ -1,0 +1,69 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Check PDF orientation in ManYue: separate page rotation metadata from the current view'
+description: Compare zero- and ninety-degree copies of the same page using corner markers, boxes and reopening results
+  without inferring file modification from landscape display.
+permalink: /en/guides/manyue-pdf-page-rotate-metadata-view-orientation/
+date: '2026-11-13 00:00:00 +08:00'
+modified: '2026-11-13 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 181
+topic: File representations and entry addresses
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-13-manyue-pdf-page-rotate-metadata-view-orientation.md
+source_url: /guides/manyue-pdf-page-rotate-metadata-view-orientation/
+translation_method: editorial
+translation_source_sha256: 591e6f35c6ee1547415871daff87fc6518b2b8a4c82bee92e740318cae5aef07
+translation_date: '2026-11-13T01:43:51+00:00'
+excerpt: Compare zero- and ninety-degree copies of the same page using corner markers, boxes and reopening results
+  without inferring file modification from landscape display.
+---
+{% raw %}
+<p>A sideways PDF can involve page-rotation metadata, the content’s own orientation or the current view. Read two self-made single-page PDFs in ManYue and separate these layers. Prepare files and metadata reports with existing external tools and observe actual pages in the app. Automatic PDF editing is not required, and a page becoming upright after device rotation does not prove permanent file repair.</p>
+
+<h2 id="制作能认四角的单页基线">Make a baseline with identifiable corners</h2>
+
+<p>Draw an original portrait page with an upward arrow, four distinct corner labels Jia (甲), Yi (乙), Bing (丙) and Ding (丁) and an orientation sentence in an existing document tool. Export A, retain the original and record one page, identity and dimensions. Use no private scanned book. Draw markers into the page itself rather than use reader controls as references. Verify A externally so that the original top edge is known; otherwise later observations establish differences without identifying their orientation.</p>
+
+<h2 id="另存只改页旋转的对照">Save a page-rotation-only control</h2>
+
+<p>With an existing PDF tool that preserves content, save B with effective page rotation changed from zero to ninety degrees clockwise while retaining content and boxes. Obtain a rotation/box report; credit a supplied report rather than claim personal parsing. <code>/Rotate</code> can be inherited, so absence in the immediate page dictionary does not establish an effective zero. Do not edit arbitrary binary bytes or overwrite the only A original.</p>
+
+<h2 id="读角度时先认绝对值与增量">Distinguish an absolute rotation from an increment</h2>
+
+<p>QPDF distinguishes specifying a rotation from adding to an existing angle. Here A is confirmed at effective zero and B at ninety. Adding ninety to an already ninety-degree A produces one hundred eighty, not this B result. The four quarter-turn values in this exercise are not arbitrary deskew corrections. Record the tool’s actual operation rather than copy an unfamiliar command and infer its action solely from appearance.</p>
+
+<h2 id="页面框尺寸不等于可见横竖">Keep box dimensions separate from displayed orientation</h2>
+
+<p>A paper example may retain a box width of six hundred and height of eight hundred default user units while its visible extent swaps after a quarter turn. That does not mean the box numbers themselves became eight hundred by six hundred. Keep MediaBox, CropBox and effective rotation separately. A redrawn or re-exported page is a different control. Box units are not source-image pixels, so six hundred units neither proves six hundred pixels nor inevitable detail loss.</p>
+
+<p>To separate rotation and cropping, check both example boxes from zero-zero to six hundred-eight hundred. If B lacks its bottom-right marker, inspect crop bounds and source content rather than explain the loss with the ninety-degree field. Rotation does not guarantee every object lies inside the current crop. Keep both the box report and observed markers as different evidence layers.</p>
+
+<h2 id="在漫阅按同样条件核四角">Inspect corners under matching reader conditions</h2>
+
+<p>Import your own A and B with the same device orientation, layout and fitting mode. Record the central arrow and all corner positions. Do not compare portrait for one copy against landscape for the other. If fitting makes both readable, report that without inferring identical rotation metadata. Keep the first comparison about orientation; examine legibility separately rather than mix spread mode, cropping and device rotation into one unexplained change.</p>
+
+<h2 id="临时转视图另起一轮">Give temporary view rotation a separate round</h2>
+
+<p>If a visible control changes viewing orientation, record its real name, prior state and resulting corners; otherwise skip without inventing a button. <a href="https://helpx.adobe.com/acrobat/using/adjusting-pdf-views.html">Adobe’s documentation</a> distinguishes temporary viewing changes from saved page rotation; this is a conceptual distinction, not a claim about ManYue menus. Recheck file identity and metadata externally. Only add a new file record if a new file was actually saved. A persisted appearance may be a saved preference, so reopening alone does not prove modified PDF bytes.</p>
+
+<h2 id="排查内容预转与重复导入身份">Check pre-rotated content and mistaken copies</h2>
+
+<p>For unexpected direction, check pre-rotated source content, inherited effective rotation and a same-name old copy. A cropped corner marker is not evidence of mirroring. Associate originals, reports and observations with A or B, keeping unknowns instead of rewriting library-wide orientation. A single original page and steps suffice for support. Metadata inspection and one rendering observation do not constitute unperformed testing of every physical-device path.</p>
+
+<h2 id="退出返回后交付三层方向记录">Leave and return with three orientation layers</h2>
+
+<p>Leave the reader and return to A and B, checking centre, corners and identity. Preserve original content orientation, effective page rotation, view conditions, boxes, observed marker positions and unknowns. Explain why landscape appearance does not imply changed box numbers and why device rotation does not prove a saved PDF. Success is reproducible comparison with the same copies; a new export method or pre-rotated content requires a new record.</p>
+
+<h2 id="相关教程与资料">Related guides and sources</h2>
+
+<p><a href="/en/guides/manyue-pdf-mediabox-cropbox-visible-page-boundary/">Check PDF page boxes in ManYue: MediaBox and CropBox are not two copies of the artwork</a>; <a href="/en/guides/manyue-scan-orientation-reference/">ManYue scan orientation checks: distinguish stored pixels from displayed rotation</a>.</p>
+
+<p>Checked on November 13, 2026: <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261113">Apple public information</a> lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities; verify specific controls in the installed version.</p>
+
+<p>Method reference: <a href="https://qpdf.readthedocs.io/en/stable/cli.html#option-rotate">QPDF: page rotation and rotation metadata</a>. Samples, passages and controls are original exercises. Sources establish definitions and checking methods rather than new automatic analysis in the app. Manual records may be kept externally, and unknown fields should remain explicit. This article does not claim step-by-step testing on a physical device, private server or every output environment.</p>
+{% endraw %}

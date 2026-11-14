@@ -1,0 +1,60 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay HLS start offsets: count positive values from the beginning and negative values from the end'
+description: Locate positive and negative three-second offsets in a fixed twenty-second playlist, separate from
+  segment boundaries and actual resume behavior.
+permalink: /en/guides/icouldplay-hls-start-signed-offset-playlist-scope/
+date: '2026-11-13 00:00:00 +08:00'
+modified: '2026-11-13 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 145
+topic: File markers and time boundaries
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-13-icouldplay-hls-start-signed-offset-playlist-scope.md
+source_url: /guides/icouldplay-hls-start-signed-offset-playlist-scope/
+translation_method: editorial
+translation_source_sha256: 2ab651689a214fdf34d6b9d469f60f2f7759a14296ab111b45dd31516776cfa3
+translation_date: '2026-11-13T01:43:50+00:00'
+excerpt: Locate positive and negative three-second offsets in a fixed twenty-second playlist, separate from segment
+  boundaries and actual resume behavior.
+---
+{% raw %}
+<p>Negative three seconds is not reverse playback, and a preferred start is not three seconds already watched. Locate two offsets in an ended twenty-second teaching playlist, then separately record actual iCouldPlay startup. The example supplies no segments. Keep resume behavior, user seeks and playlist metadata distinct.</p>
+<h2 id="section-1">1. Fix an ended playlist’s scope</h2>
+<p>Use paper and an identifiable playlist copy, fixing four five-second segments and an explicit end rather than a rolling live window. Use only owned/authorized real samples and record acquisition time/scope; without a real playlist, complete the paper task only. A progress bar does not establish segment boundaries, and an old window’s end need not match today’s. Preserve files/configuration and record actual startup separately from everyday resume state.</p>
+<h2 id="section-2">2. Build a four-segment twenty-second scale</h2>
+<p>The original teaching playlist supplies no media. Draw boundaries at zero, five, ten, fifteen and twenty seconds from the declarations. Preserve negative three initially: offsets are seconds, not segment indices. A session’s resume history is not part of this paper scale. Digits in filenames identify URIs without adding time or overriding EXTINF.</p>
+<pre><code>#EXTM3U
+#EXT-X-VERSION:6
+#EXT-X-TARGETDURATION:5
+#EXT-X-START:TIME-OFFSET=-3.0,PRECISE=YES
+#EXTINF:5.0,
+s1.ts
+#EXTINF:5.0,
+s2.ts
+#EXTINF:5.0,
+s3.ts
+#EXTINF:5.0,
+s4.ts
+#EXT-X-ENDLIST
+</code></pre>
+<h2 id="section-3">3. Count a negative offset back from the end</h2>
+<p><a href="https://www.rfc-editor.org/rfc/rfc8216.html#section-4.3.5.2">RFC 8216’s start-tag description</a> counts negative TIME-OFFSET from the end of the last media segment. Twenty minus three is seventeen, within segment four’s 15–20 range. This is neither reverse playback nor the beginning of segment three. Mark direction and reference before the result. Seventeen is a declared coordinate, not a claim that iCouldPlay has landed on an exact physical frame.</p>
+<h2 id="section-4">4. Change only the sign for a positive control</h2>
+<p>Save a control changing only negative three to positive three, preserving durations, ENDLIST and PRECISE. Count from the beginning to obtain three seconds in segment one, not twenty-three. Each copy has one start tag; do not place both alternatives in one playlist as menu options. Name copies separately and preserve their expectations/observations rather than rewriting an earlier result after selecting the other copy.</p>
+<h2 id="section-5">5. Separate the precise preference from segment starts</h2>
+<p>With PRECISE=YES, the specified preference suppresses presentation of samples before the offset within the containing segment; it does not create an encoded frame that does not exist. For a separate NO control, the specification says clients SHOULD try to render every sample in that segment, so segment start and offset remain different coordinates. This describes metadata intent, not guaranteed behavior on every iCouldPlay path. Do not label a startup difference a violation from this alone. Check the specified default for an omitted attribute rather than guessing from its name.</p>
+<h2 id="section-6">6. Keep actual startup distinct from resume state</h2>
+<p>For an actual playable sample, record previous resume state and any manual seek before noting the first visible anchor. Use a real restart control if present; do not invent one. Retain playlist acquisition time, source and session conditions when startup differs instead of clearing history to hide causes. The teaching list has no resources, so it cannot be reported as played to seventeen seconds. Actual observations belong only to an existing identified sample.</p>
+<h2 id="section-7">7. Troubleshoot sign, scope and live conditions</h2>
+<p>A negative screen coordinate suggests a missing end reference; a third-segment result suggests confusing seconds with indices. Without ENDLIST, additional near-end conditions apply, so this ended-playlist calculation does not transfer directly to live windows. Out-of-duration offsets need separate specification review rather than universal subtraction. Do not change servers or delete the library; unknown source/scope remains unresolved, and successful playback does not certify all metadata semantics.</p>
+<h2 id="section-8">8. Reopen and deliver reference and observation columns</h2>
+<p>Leave playback, reopen the real source, verify identity/opening anchor and append the session conditions. Deliver the twenty-second scale, references/results for positive and negative three, containing segments, PRECISE, observations and unknowns. Another reader should reproduce three and seventeen without ambiguous “three seconds forward” wording. Preserve originals/resume data and re-establish the end after updates; seventeen is not permanent across playlists. Verification establishes traceability, not universal startup behavior.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-hls-program-date-time-playback-clock-map/">HLS program timestamps</a>, <a href="/en/guides/icouldplay-hls-playlist-type-endlist-snapshot-check/">HLS playlist state</a>.</p>
+<p>Checked on November 13, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

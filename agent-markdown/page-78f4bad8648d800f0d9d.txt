@@ -1,0 +1,81 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-ass-fad-milliseconds-line-interval/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay ASS fades: separate millisecond effects from cue intervals'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-ass-fad-milliseconds-line-interval/
+agent_source_sha256: 4f05342785ffcca12ce314778b9bd8fa1b285627dd27b05a35b8ad9f9bf9e9c3
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay ASS fades: separate millisecond effects from cue intervals
+
+Language: en
+Canonical: [iCouldPlay ASS fades: separate millisecond effects from cue intervals](<https://allluckly.cn/en/guides/icouldplay-ass-fad-milliseconds-line-interval/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-fad-milliseconds-line-interval/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-fad-milliseconds-line-interval/>)
+Published: 2026-11-13T00:00:00+08:00
+Modified: 2026-11-13T09:43:50+08:00
+Author: Bison
+
+Inspect fades within a four-second line and keep a plain fallback without extending the interval.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-ass-fad-milliseconds-line-interval/>), translated on 2026-11-13. Original publication dates, attribution, code and version notes are retained.
+
+A caption fading in is not a brighter video, and a one-second fade-out does not add a second after its interval. Compare one ASS fade with a plain control, convert units externally, then check actual wording and appearance in iCouldPlay. Report only observed playback behavior.
+
+## 1. Fix a clip and appearance baseline
+
+Choose an owned playable clip of at least eleven seconds without the test sentence burned in. Record source, orientation, display mode and existing caption settings, keeping them fixed. Save copies in an external plain-text editor and retain originals. Without an available loading control, inspect the file/timeline and mark playback unperformed. Changing screen brightness affects video as well as text and cannot isolate the ASS effect.
+
+## 2. Save the complete sample, not just an override
+
+The first line requests a fade and the second is plain, with identical wording/style and four-second intervals. They do not overlap. Preserve braces and backslashes: the override belongs in Events Text, not a new format field. Font names are requests, not universal availability guarantees. Check style/event fields and save an actual complete ASS file rather than treating one pasted command as a finished subtitle.
+
+```
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,24,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,2,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:05.00,Default,,0,0,0,,{\fad(500,1000)}Keep this sentence complete.
+Dialogue: 0,0:00:06.00,0:00:10.00,Default,,0,0,0,,Keep this sentence complete.
+```
+
+## 3. Convert milliseconds and centiseconds separately
+
+The [Aegisub fade documentation](<https://aegisub.org/docs/latest/ass_tags/#fade>) gives fad parameters in milliseconds: 500 is half a second and 1000 is one second. Dialogue’s final two timing digits represent centiseconds; inserting 1000 there is not one second. Write four seconds as 4000 ms and the combined fades as 1500 ms, below the interval length. Label units separately. The more complex fade tag is not used, so its additional parameter roles do not apply.
+
+## 4. Place the effects inside the original interval
+
+Draw the first interval from file time one to five seconds. The requested fade-in occupies its first half-second and fade-out its last second, leaving 1.5–4 seconds between them. Fade-out does not begin at five and extend to six: the effect does not add duration. These are intended timeline boundaries, not measurements. Rendering/settings can affect appearance, so do not prefill observations from expectations or certify continuous transitions from a paused screenshot.
+
+## 5. Check wording and changing opacity separately
+
+Play from zero beyond ten seconds. Check each complete sentence and ending before describing a gradual appearance/disappearance. Distinguish a control overlay covering text from fading, replaying with comparable control visibility if needed. Intact wording without visible fading is a valid conditional observation, not a reason to switch films to force expectations. Resume after pausing: a screenshot preserves one instant, not the whole transition.
+
+## 6. Remove only the effect for a readable fallback
+
+Save a fallback removing only the first line’s fade override, preserving wording, style, placement and timing. Verify selection and replay to separate effects from loading/timing/font issues. If the plain file also lacks text, fading is not established as the sole cause. Keep comparisons without overwriting the original. Record actual settings separately, never inventing an “enable all ASS animations” switch. A result on one playback path does not certify every path.
+
+## 7. Troubleshoot scale and combined duration
+
+A near-instant appearance calls for checking 50 instead of 500: 0.05 rather than 0.5 seconds. Before lengthening effects in a copy, keep their combined duration at most 4000 ms; do not change line ending and both parameters together. For exposed tags, check file type/braces/escaping rather than deleting captions. Without measurement tools, report visible impressions rather than exact millisecond measurements. Preserve fields and reasons, separating wrong selection, paused persistence and effect compatibility.
+
+## 8. Reopen and retain a complete verification card
+
+Leave playback, reopen the same clip, reselect the exercise and watch both cues from the beginning; also confirm the fallback remains readable. Retain interval, fade parameters, wording, observations, path conditions and unknowns. Intended effects are not physical-device certification, altered video brightness or extended film duration. Append records after version/source changes and preserve originals so another reader can reproduce the unit checks rather than relying on one attractive screenshot.
+
+## Related tutorials and sources
+
+[ASS alignment](<https://allluckly.cn/en/guides/icouldplay-ass-numpad-alignment-anchor-grid/>), [ASS centiseconds](<https://allluckly.cn/en/guides/icouldplay-ass-karaoke-centisecond-duration-check/>).
+
+Checked on November 13, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

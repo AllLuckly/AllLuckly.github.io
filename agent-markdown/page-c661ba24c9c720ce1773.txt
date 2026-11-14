@@ -1,0 +1,75 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-http-redirect-location-base-chain/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay redirect evidence: resolve each Location against its own request
+  URL'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-http-redirect-location-base-chain/
+agent_source_sha256: befd44048a1264d3d1077a972bb2c991abdc70f1e924ac644c97ea837d1a3d15
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay redirect evidence: resolve each Location against its own request URL
+
+Language: en
+Canonical: [iCouldPlay redirect evidence: resolve each Location against its own request URL](<https://allluckly.cn/en/guides/icouldplay-http-redirect-location-base-chain/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-http-redirect-location-base-chain/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-http-redirect-location-base-chain/>)
+Published: 2026-11-13T00:00:00+08:00
+Modified: 2026-11-13T09:43:50+08:00
+Author: Bison
+
+Resolve two relative redirect steps while distinguishing an entry address, final response and playable media.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-http-redirect-location-base-chain/>), translated on 2026-11-13. Original publication dates, attribution, code and version notes are retained.
+
+An entry redirect does not prove a different film, and a successful status does not prove video content. Resolve two invented relative Location values, then separately inspect authorized real-source playback in iCouldPlay. No in-app network inspector, public private-token sample or server-rule change is required.
+
+## 1. Record the entry and evidence provenance
+
+Choose a small source you manage or may inspect and record entry identity, date and evidence provenance. With only a player UI, record visible playback and mark response fields unavailable instead of guessing statuses from speed. Attribute existing administrator records and separate requests/responses; do not copy credentials into shared notes. Preserve configuration/connections. Reserved example domains below are paper examples, not servers to contact.
+
+## 2. Pair each request with its response
+
+Write three steps: entry A returns a relative location, target B redirects again, and C is the final target. This teaching chain contains no response body. Pair each Location with the request that produced it; do not reorder detached fields. Keep status, location and media type separate. Preserve literal query text during resolution rather than dropping it because the path resembles a filename.
+
+```
+A request: https://media.example/a/entry
+A response: 302; Location: ../b/watch?edition=demo
+B request: https://media.example/b/watch?edition=demo
+B response: 307; Location: final.mp4?edition=demo
+C request: https://media.example/b/final.mp4?edition=demo
+C response: 200; Content-Type: video/mp4
+```
+
+## 3. Resolve the first relative path
+
+Use [RFC 9110 Location](<https://www.rfc-editor.org/rfc/rfc9110.html#section-10.2.2>) and [RFC 3986 relative resolution](<https://www.rfc-editor.org/rfc/rfc3986.html#section-5>). Resolve each relative value against its corresponding request target. A’s directory is /a/; merging ../b/ removes a, retaining host and HTTPS. Do not append the entire value after entry. Mark the removed directory and retain edition’s name/value. Address arithmetic does not establish server existence or permission.
+
+## 4. Use B as the second base
+
+B is already under /b/, so final.mp4 resolves there rather than under the original /a/. Using A again yields a different address despite the same basename. The second reference explicitly supplies edition; no guessed query inheritance is needed. Check scheme, host, path and query independently and write the complete C address. Field-string length is not hop count, and one app click need not equal one network request.
+
+## 5. Check content and identity after success
+
+C’s 200/video type is still stipulated teaching data without media bytes. Real content, readable scope and edition identity require separate checks; extension or one field is insufficient. Record login HTML, errors or artwork as such rather than renaming them into films. For playable iCouldPlay material, check opening, middle and ending anchors. A short successful segment does not prove full local storage or permanent validity of later redirects.
+
+## 6. Record scheme and access changes independently
+
+Record real host/scheme changes independently rather than imposing this example’s same-host HTTPS conditions. Retain security/access failures and use established administration instead of disabling certificate checks or exposing accounts. Expired temporary URLs differ from incorrect resolution; changing usernames cannot repair path arithmetic. Without an app-exposed chain, attribute external records and leave internal causes unknown, without promising arbitrary login-session forwarding.
+
+## 7. Troubleshoot directory bases and trailing slashes
+
+For wrong directories, identify the base at each hop. watch and watch/ can resolve relative references into different directories, so do not add a slash merely to make an address look folder-like and claim equivalence. Check query punctuation, dot segments, case and request provenance. Change one identified condition and preserve the original chain instead of deleting the library. Without real responses, report paper resolution only, not a repaired network source.
+
+## 8. Reopen and verify selection and scope
+
+Leave playback, reopen the real sample and verify source/anchors. Keep requests, Location values, resolved addresses, evidence dates, observations and unknowns. Another reader should reproduce B/C from A and explain why A is not the second base. Teaching statuses must not become physical-device results. Preserve configuration/files and create a fresh record after entry/parameter changes rather than treating an old chain as permanent across services and dates.
+
+## Related tutorials and sources
+
+[Responses versus media](<https://allluckly.cn/en/guides/icouldplay-remote-success-html-not-media/>), [Relative segment addresses](<https://allluckly.cn/en/guides/icouldplay-hls-relative-uri-resolution-sheet/>).
+
+Checked on November 13, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

@@ -4,7 +4,7 @@ app_id: pastel
 title: 'Aquarell: Watercolour Drawing for iPhone and iPad'
 description: Draw on iPhone and iPad with Aquarell brushes, layers and palettes. Follow a beginner tutorial, then save a PNG, JPEG, layered PSD or native project.
 permalink: /en/apps/aquarell/
-modified: 2026-11-12
+modified: 2026-11-13
 lang: en
 source_url: /apps/aquarell/
 ---

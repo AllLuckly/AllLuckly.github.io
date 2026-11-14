@@ -1,0 +1,69 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Check compression layers in ManYue: Content-Encoding is not a CBZ entry method'
+description: Use original response records to separate media type, representation content coding and ZIP entry methods
+  rather than treating gzip as a comic suffix.
+permalink: /en/guides/manyue-http-content-encoding-container-compression-layers/
+date: '2026-11-13 00:00:00 +08:00'
+modified: '2026-11-13 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 185
+topic: File representations and entry addresses
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-13-manyue-http-content-encoding-container-compression-layers.md
+source_url: /guides/manyue-http-content-encoding-container-compression-layers/
+translation_method: editorial
+translation_source_sha256: 7e2627753b52f9fd95fa585a57b701f84f760d933647a0dd0a29bc8fe1529a29
+translation_date: '2026-11-13T01:43:51+00:00'
+excerpt: Use original response records to separate media type, representation content coding and ZIP entry methods
+  rather than treating gzip as a comic suffix.
+---
+{% raw %}
+<p>A gzip response label does not mean that the comic itself is a gz file, nor identify the ZIP method for every CBZ image. Keep an external transport ledger before and after ManYue import, separating three compression layers. Headers and file inspections come from existing tools or provider reports, with app results recorded independently. No server reconfiguration, private-token capture or invented low-level reader setting is required.</p>
+
+<h2 id="固定一个很小的原创归档">Fix one small original archive</h2>
+
+<p>Make a CBZ from three original numbered pages, verify local readability and record hash, byte size and entries. Without an available test source, perform only the paper audit below and claim no remote download. Name original and received copies distinctly to avoid an old file masquerading as fresh data. Remove accounts, cookies and signed private URLs: this exercise needs type, coding and identity, not secret headers.</p>
+
+<h2 id="给响应头的两项各留一栏">Give two response fields separate columns</h2>
+
+<p>The original teaching record gives media type <code>application/zip</code> plus <code>Content-Encoding: gzip</code>. Type identifies the media after decoding; coding identifies an additional applied content coding. They are not competing suffixes. In a control, ZIP type with no Content-Encoding declares no additional coding in that field, not absence of ZIP’s internal compression. These records describe no live service and do not claim that a particular source necessarily uses gzip.</p>
+
+<p>This paper audit merely separates the fields and decoding order; it sends no request or configures a server. Add your own timestamp, status and automatic-decoding behaviour only for a real available test. Otherwise mark those cells unperformed. No Content-Length or raw bytes are supplied, so do not invent a network size as captured-response evidence.</p>
+
+<h2 id="按编码层取得实际交付文件">Identify the bytes actually handed to the user</h2>
+
+<p>RFC semantics require decoding content coding to obtain the data identified by Content-Type. A downloader may already do that, yielding a ZIP, or may deliver still-coded bytes. Inspect its documented behaviour and report instead of decoding blindly twice. Separate the received coded representation, tool decoding and final archive. A size measured after automatic processing is not a measurement of unrecorded raw gzip response bytes.</p>
+
+<h2 id="进入zip后才核每个条目方法">Inspect entry methods only inside the ZIP</h2>
+
+<p>After obtaining a parsable archive, inspect each entry’s storage or compression method. Outer gzip does not establish inner Deflate or identical methods across entries. A stored JPEG can still have compressed image encoding. Give content coding, ZIP method and image format their own evidence columns. Do not reuse one compression ratio across layers or equate removing outer gzip with decoding images into screen pixels.</p>
+
+<h2 id="比文件摘要先确认比较同一层">Match byte layers before comparing hashes</h2>
+
+<p>Compare a provider’s final-CBZ hash with the final archive, not a still-gzip-coded body. Different byte layers naturally differ, so unequal hashes alone do not establish corruption. Matching same-layer hashes supports byte identity but not complete in-app readability. Record tool, layer and full result, retaining both representations when needed. No hash display or transport-coding analysis by the app is assumed.</p>
+
+<h2 id="导入后逐页核编号与内容">Check numbered pages after import</h2>
+
+<p>Import the final readable archive through an existing ManYue path and inspect all three centres, markers, positions and return paths. A listed directory does not prove image decoding, so actually open every page or mark it unperformed. If only a remote source fails, retain source and final-file identity before investigating transport instead of first renaming the suffix. Success is limited to this copy and path, not every Content-Encoding combination.</p>
+
+<h2 id="排查重复解码和误命名副本">Check double decoding and misleading names</h2>
+
+<p>If a tool says not gzip, first determine whether automatic decoding already occurred. Do not force library-wide processing. A ZIP signature with unreadable entries calls for entry-method and integrity checks, not automatic blame on the outer coding. A gz or zip filename alone is insufficient. Share only the original small sample and redacted fields; keep unseen server logs unknown and avoid account disclosure or security-setting changes.</p>
+
+<h2 id="退出返回后复述三层压缩链">Leave and return to reconstruct the compression chain</h2>
+
+<p>Leave and return to all three pages, then reconstruct content coding, archive-entry method and image coding in order. Preserve identities, tools, performed steps, page checks and unknowns. Explain why gzip is not a ZIP entry method and acknowledge missing raw-body evidence. Success keeps compression layers separate from app observations and retains recoverable originals, rather than calling every layer simply decompression successful.</p>
+
+<h2 id="相关教程与资料">Related guides and sources</h2>
+
+<p><a href="/en/guides/manyue-cbz-per-entry-compression-method/">ManYue CBZ compression methods: listing an archive does not prove every image can be read</a>; <a href="/en/guides/manyue-extension-container-identity-check/">ManYue: Diagnose extension mismatches from container evidence</a>.</p>
+
+<p>Checked on November 13, 2026: <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261113">Apple public information</a> lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities; verify specific controls in the installed version.</p>
+
+<p>Method reference: <a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-8.4">RFC 9110: media types and content coding</a>. Samples, passages and controls are original exercises. Sources establish definitions and checking methods rather than new automatic analysis in the app. Manual records may be kept externally, and unknown fields should remain explicit. This article does not claim step-by-step testing on a physical device, private server or every output environment.</p>
+{% endraw %}

@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint prefix-code trees: put four symbols at leaves and decode bit by bit'
+description: Audit the codewords zero, one-zero, one-one-zero and one-one-one, retaining a separate zero/zero-one
+  prefix-conflict control.
+permalink: /en/guides/vectorpaint-prefix-code-four-leaf-tree-boundary/
+date: '2026-11-13 00:00:00 +08:00'
+modified: '2026-11-13 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 190
+topic: Circular regions, curves and coding
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-13-vectorpaint-prefix-code-four-leaf-tree-boundary.md
+source_url: /guides/vectorpaint-prefix-code-four-leaf-tree-boundary/
+translation_method: editorial
+translation_source_sha256: 54b7b5831803731ca71fb8cbbbee76299c0d8698242543703862d767ed2c23eb
+translation_date: '2026-11-13T01:43:51+00:00'
+excerpt: Audit the codewords zero, one-zero, one-one-zero and one-one-one, retaining a separate zero/zero-one prefix-conflict
+  control.
+---
+{% raw %}
+<p>Draw a binary coding tree for four symbols, matching edge labels, leaf symbols and root-to-leaf paths. This explains prefix coding without making VectorPaint a compressor or claiming an invented code is optimal for arbitrary data. Check coding, decoding and layout separately.</p>
+<h2 id="先定四个符号及四条码字">Declare four symbols and their codewords</h2>
+<p>On a 1200×1600 portrait canvas first declare A=0, B=10, C=110 and D=111 on paper. The <a href="https://xlinux.nist.gov/dads/HTML/prefixcode.html">NIST prefix-code definition</a> requires that no complete codeword prefix another. Bits label edges; A–D are symbols, not a binary value attached to the root. Separate nodes, edges, bits, symbols and audit paths. Fix the full codebook before reading any message rather than silently changing it during decoding.</p>
+<h2 id="根节点先分出零叶与一支">Split the root into a zero leaf and one branch</h2>
+<p>Place root R above a left edge labelled 0 ending at leaf A, and a right edge labelled 1 ending at internal node I. Leave label space and attach bits to their own edge midpoints. A has no descendants because 0 already completes its codeword; placing B below A would alter prefix relations. Use available path controls; arrows are optional if top-to-bottom traversal is declared. Decorative root circles must not create extra levels or bits.</p>
+<h2 id="一支再分出b和最后双叶">Continue the one branch to B and the final pair</h2>
+<p>From I draw 0 left to B and 1 right to internal J. From J draw 0 left to C and 1 right to D. Root paths are 10, 110 and 111, not just the final nearby edge. Count four leaves A–D, three internal nodes R/I/J and six edges: seven nodes are not seven codewords. The <a href="https://xlinux.nist.gov/dads/HTML/codingTree.html">NIST coding-tree entry</a> explains root-to-leaf code paths; a tree-like drawing does not authorise symbol output at every internal node.</p>
+<h2 id="前缀检查按完整路径逐对比">Check prefixes using complete codewords</h2>
+<p>Only A begins with 0, while the others begin with 1, so A prefixes none of them. B’s 10 differs from C/D’s 11 at the second bit, and 110 versus 111 differ at the third. Check pairs explicitly; unequal lengths alone prove neither conflict nor validity. Coloured audit paths may help, but colour is not part of a codeword. A grayscale image must still reproduce the codebook from bits. Repair missing or duplicated edge bits rather than renaming symbols to evade an error.</p>
+<h2 id="九位消息按到叶再回根译读">Decode the nine-bit message by returning to root</h2>
+<p>Use the original nine-bit string 010110111. Read 0 to A and return to root; then 10 to B, return; 110 to C, return; finally 111 to D, giving ABCD. The explanatory grouping is 0, 10, 110, 111; commas are not transmitted bits. A remaining 11 stops at internal J and is incomplete, not grounds to guess C or D. Walk the tree manually in notes if no decoder exists; do not invent an in-app success message.</p>
+<h2 id="错误前缀表另做双解对照">Keep a conflicting codebook as a separate control</h2>
+<p>Use a separate bad table A=0, B=01, C=10, D=11. A’s 0 prefixes B’s 01, and 010 has two explicit readings: 0|10 gives AC, while 01|0 gives BA. Keep codebooks separate rather than recolouring and mixing them. This demonstrates ambiguity for this string and table, not a claim that every message in every non-prefix code must have multiple readings. Label both groupings and codebook status; the control is not a second equally valid instant-decoding rule. Root-to-leaf edge counts are one for A, two for B and three for C/D, matching lengths 1,2,3,3. Vertical spacing may change for layout, but adding an unlabelled node to align heights breaks edge-count/code-length correspondence. Short-code leaves need not share a horizontal row with long-code leaves; alignment must not change tree structure.</p>
+<h2 id="排查把自设码冒称最优压缩">Check unjustified optimal-compression claims</h2>
+<p>This code uses nine bits for ABCD. With four equally frequent symbols, a fixed two-bit code uses eight for the same four-symbol sequence, so the invented variable code is not automatically smaller. Suitability depends on conditions such as symbol frequencies; no private-file compression test is performed. Inspect exported bits and symbols. If font substitution makes 1 resemble a divider, repair typography or legend rather than the codebook. Hide auxiliary links that could look traversable, retaining mathematical and layout evidence separately.</p>
+<h2 id="重开按叶路径和返回规则验收">Reopen and audit leaf paths and reset rules</h2>
+<p>Save, leave and reopen. Recover each root-to-leaf path, count four leaves/three internals/six edges, then decode nine bits without consulting the old answer. Output at leaves and reset; stopping internally remains incomplete regardless of geometric spacing. Open final delivery and inspect bit labels, bad-table ambiguity and the equal-frequency eight-bit comparison. Leave untested formats unverified. Another reader should reconstruct the codebook, ABCD and both bad-table groupings, not infer in-app compression, decompression or optimality for arbitrary frequencies.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-dependency-arrows-feasible-order/">VectorPaint dependency diagrams: match arrows to feasible orders</a>, <a href="/en/guides/vectorpaint-three-bit-gray-cycle/">VectorPaint three-bit Gray-code cycles: check one-bit neighbours and closure</a>.</p>
+<p>Checked on November 13, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261113">Apple public lookup</a>. Manual exercises use controls actually available in your installed version; external calculations, written records and diagrams imply no built-in automatic analysis. No step-by-step physical-device, private-file or all-export-environment testing is claimed.</p>
+{% endraw %}

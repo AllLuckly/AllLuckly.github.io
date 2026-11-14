@@ -1,0 +1,72 @@
+---
+layout: null
+permalink: /guides/icouldplay-http-redirect-location-base-chain/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映重定向资料核对：每一步都用自己的地址还原Location
+agent_source_url: https://allluckly.cn/guides/icouldplay-http-redirect-location-base-chain/
+agent_source_sha256: f043d95a855dccfe1443e7257052e44492f1248b2dd426b324b96899a019cf31
+agent_generator_version: 1
+---
+{% raw %}# 云映重定向资料核对：每一步都用自己的地址还原Location
+
+语言：zh-CN
+原文：[云映重定向资料核对：每一步都用自己的地址还原Location](<https://allluckly.cn/guides/icouldplay-http-redirect-location-base-chain/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-http-redirect-location-base-chain/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-http-redirect-location-base-chain/>)
+发布于: 2026-11-13T00:00:00+08:00
+内容更新于: 2026-11-13T00:00:00+08:00
+署名：Bison
+
+手工还原两跳相对地址，分开分享入口、最终响应与实际媒体内容。
+
+分享入口跳到另一个地址，不等于影片已经换了一份；返回成功状态也不证明响应正文就是视频。本课用两个原创相对 Location 字段画跳转链，再把自己取得的真实来源记录放回云映核播放。练习不要求应用提供网络调试面板，不使用私人令牌作为公开样本，也不改服务器规则。
+
+## 一、先登记原入口与证据来源
+
+选择一个自己管理或获准核对的小视频来源，保存入口名称、取得日期和已有资料出处。只有播放器界面时，记录可见播放状态，把响应字段写未取得，不能从跳转速度猜 HTTP 状态。若管理员提供现有请求记录，区分每次请求与响应，保留必要的公开结构，敏感凭据不抄进教程或共享笔记。原始配置不改，日常连接也不删除。本课的纸面地址采用保留示例域，不是待访问的真实媒体服务器。
+
+## 二、给每一步请求响应成对编号
+
+把下方三步分别写在三行：甲入口返回相对位置，乙目标再次返回相对位置，丙为最后目标。箭头只是教学链，不含真实响应正文。每个 Location 必须和产生它的那次请求地址放在一起，不能把两行字段拆开后随意排序。状态、位置与内容类型各留一列；没有正文的示例不能冒充已经下载影片。先保留问号后的字面参数，再做路径还原，不因为它像文件名就擅自去掉查询部分。
+
+```
+A request: https://media.example/a/entry
+A response: 302; Location: ../b/watch?edition=demo
+B request: https://media.example/b/watch?edition=demo
+B response: 307; Location: final.mp4?edition=demo
+C request: https://media.example/b/final.mp4?edition=demo
+C response: 200; Content-Type: video/mp4
+```
+
+## 三、第一跳先合并路径再消去上级段
+
+依据[RFC 9110 的 Location 字段](<https://www.rfc-editor.org/rfc/rfc9110.html#section-10.2.2>)与[RFC 3986 的相对引用解析](<https://www.rfc-editor.org/rfc/rfc3986.html#section-5>)，相对位置要使用对应请求的目标地址还原。甲地址的目录部分为斜线 a 斜线，与上级段再到 b 合并后，乙位于根下的 b 目录，主机和 HTTPS 方案保持。本例不是把 entry 后面直接再粘整段文本。纸上划掉被上级段消去的 a，保留 edition 参数的名和值；这是地址演算，不证明服务器真实存在或允许访问。
+
+## 四、第二跳以乙为基准而非回到甲
+
+乙请求已经在 b 目录，所以 final.mp4 还原在 b 下，不是最初 a 目录。若误把第二跳仍交给甲，就会得到另一条地址，文件名相同也不代表可互换。查询字符串属于各自引用的条件，本例第二跳显式给了 edition，不需要靠猜测继承第一跳参数。逐项核方案、主机、路径、查询四部分，再把丙地址写全；不要把位置字段的字符串长度当跳数，也不要把应用里一次点击直接当作一次网络请求。
+
+## 五、最终成功仍要核正文与身份
+
+纸面丙写二百与视频类型，仍只是声明的教学条件，没有任何媒体字节。真实来源还应核实际内容、可读范围和与预期版本的关系，不能凭扩展名或单个响应字段就通过。返回登录 HTML、错误提示或封面图时，应记录取得的对象，不把它们改名为影片继续导入。云映可播时核开头、中间锚点与结尾来源身份；只有一小段成功，不代表完整文件已本地保存，更不证明后续跳转永远有效。
+
+## 六、把协议变化与权限问题另列
+
+真实链若改变主机或方案，单独登记，不机械把本例同主机 HTTPS 条件套过去。遇到安全提示或权限不足，保留状态并按现有管理流程处理，不要求关闭证书检查或公开账号。临时地址过期与相对路径算错是不同故障，不能反复改用户名掩盖地址问题。应用没有给出跳转链时，当前原因仍未确认，最多说外部记录显示某步结果；不要编造播放器内部请求或宣称它自动支持任意登录会话的转发。
+
+## 七、排查目录基准与尾斜线
+
+若得到错误目录，先逐跳检查是哪次请求作为基准，特别比较 watch 与 watch 后有斜线这两种地址：后者可能使相对目标落进不同目录。不要为了“看起来像文件夹”自行加斜线再说与原地址等价。核问号、上级段和大小写的抄录，也检查证据是否来自同一次请求。排查只改已发现的一项，保留原链与结果，不删除媒体库。没有真实响应时，止于纸面解析完成，不能写真实网络问题已修复。
+
+## 八、重开后核最终选择与证据边界
+
+退出云映播放页再返回同一真实小样本，确认选中来源与观看锚点仍对应。最终保存逐跳请求、各 Location、完整还原结果、证据日期和真实播放栏，未知项保留。让另一个人从甲出发独立得到乙和丙，且能指出第二跳不能再用甲；再确认没有把教学成功状态写成真机实测。原配置与文件保留，换入口或临时参数后重新登记，不把旧跳转图当对所有服务器和所有时间都有效的永久路线。
+
+## 相关教程与资料
+
+[响应不是媒体](<https://allluckly.cn/guides/icouldplay-remote-success-html-not-media/>)、[相对分片地址](<https://allluckly.cn/guides/icouldplay-hls-relative-uri-resolution-sheet/>)。
+
+资料核对：2026 年 11 月 13 日，依据 [云映官方 App Store 说明](<https://apps.apple.com/cn/app/id6755653178>)与 [Apple 公开版本查询](<https://itunes.apple.com/lookup?id=6755653178&country=cn>)，当前版本 1.1.1，最低要求 iOS / iPadOS 15.0。1.1.1 的公开更新列出 Kodi、OpenList / AList 与 S3 兼容存储，并改进来源切换及跳转后的字幕显示；本文按这些公开范围与现有播放能力组织任务，具体入口以安装版本为准。自制样本、手工记录与外部文件整理不是应用新增自动功能；未声称已完成真机或私人服务器实测。
+{% endraw %}

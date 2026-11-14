@@ -1,0 +1,71 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Check EPUB root paths in ManYue: container full-path starts at the container root'
+description: Follow META-INF/container.xml to the package document, separating root-relative paths from package-relative
+  resource addresses without trial-and-error folder moves.
+permalink: /en/guides/manyue-epub-container-rootfile-root-relative-path/
+date: '2026-11-13 00:00:00 +08:00'
+modified: '2026-11-13 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 184
+topic: File representations and entry addresses
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-13-manyue-epub-container-rootfile-root-relative-path.md
+source_url: /guides/manyue-epub-container-rootfile-root-relative-path/
+translation_method: editorial
+translation_source_sha256: e6caba38a6da95cd57bd5bbb6dfbe81e7c91e070fd4e82626d6cccedc0726e24
+translation_date: '2026-11-13T01:43:51+00:00'
+excerpt: Follow META-INF/container.xml to the package document, separating root-relative paths from package-relative
+  resource addresses without trial-and-error folder moves.
+---
+{% raw %}
+<p>The mere presence of an OPF does not establish it as an EPUB entry point. Inspect how an image EPUB container identifies a package document, separating file review from actual ManYue import. Use your own or authorised local image publication. This does not infer server-book compatibility or full ebook typesetting support, and external unpacking is not an added app feature.</p>
+
+<h2 id="保存完整容器身份与目录清单">Keep container identity and a directory list</h2>
+
+<p>Choose a self-made three-page image EPUB with distinct labels Jia (甲), Yi (乙) and Bing (丙) and retain original, hash and byte size. List paths read-only with an existing archive viewer, including directories instead of filenames alone. Credit a supplied creator list when tools are unavailable. This locates the entry point without decryption or modification of purchased works. An XML fragment alone is not a complete readable EPUB.</p>
+
+<h2 id="先找到固定位置的容器文件">Locate the container file at its fixed path</h2>
+
+<p>Find <code>META-INF/container.xml</code> from the container root, not a same-name file in an arbitrary subfolder. Record the rootfile under rootfiles, using <code>EPUB/package.opf</code> as this example’s full-path and application/oebps-package+xml as its media type. Preserve case and hierarchy; a screenshot of package.opf alone is insufficient. Missing or unreadable data leaves the audit incomplete, not repaired by changing extensions or folder names.</p>
+
+<h2 id="从根目录解析而非meta-inf旁边">Resolve from the root rather than beside META-INF</h2>
+
+<p>Under the W3C rule, full-path is relative to the container root, not the META-INF location of container.xml. The target is package.opf under root-level EPUB, not META-INF followed by EPUB. Draw the two root branches and follow the link to the actual target, checking each directory. Do not include the operating system’s extraction directory: a desktop folder name is not part of the EPUB’s internal full-path.</p>
+
+<p>For a paper error, write META-INF/EPUB/package.opf when the listing contains only root-level EPUB/package.opf. A matching filename suffix does not establish the same target. Multiple same-name OPFs also need full-path identities, not proof that some OPF exists. Establish the creator’s intended resource set before revising any copy.</p>
+
+<h2 id="进入包文档后重新确定资源基址">Re-establish the resource base inside the package</h2>
+
+<p>If package.opf lists <code>images/page1.png</code>, its normal package-relative target here is <code>EPUB/images/page1.png</code>. This is a different address layer: root-relative full-path does not make every other relative link root-relative. Draw separate container-to-OPF and OPF-to-image links. Check paths and existence without substituting ZIP directory order for spine reading order or renumbering all images.</p>
+
+<p>Count this example’s one container file, one targeted package document and three labelled images separately; summing them does not yield five pages. Additional cover or style resources do not automatically add reading occurrences. Even without redoing spine-order analysis, independently record the three pages actually read.</p>
+
+<h2 id="有多个rootfile时保留先后">Preserve order when multiple rootfiles exist</h2>
+
+<p>A container can list multiple rootfiles; they are not comic pages or automatically separate books. Preserve order, paths and media types, checking targets. The reading-system specification defaults to the first rootfile; this does not promise an in-app rendition chooser. Record actual resource selection honestly and do not overwrite the original after experimental reordering. The one-rootfile example does not limit every valid EPUB to one package document.</p>
+
+<h2 id="本地导入后仍核三页实际身份">Check actual three-page identity after local import</h2>
+
+<p>Import the self-made image EPUB through a visible local path and inspect all three labelled pages and positions. Valid path references do not replace content checks. A server interface treating EPUB as a text book without a comic-image path is outside this local result. If the reader does not expose OPF or rootfile fields, attribute them to the external report and put only visible pages in the app-observation column.</p>
+
+<h2 id="排查多套opf与大小写错位">Check multiple OPFs and case mismatches</h2>
+
+<p>For a missing target, check complete path, case and multiple directories instead of renaming every OPF alike. For missing images, inspect both link layers; a correct first link does not validate the second. Refresh a report from another edition rather than bind an old hash to new bytes. Use the original three-page sample, listing and target chain for support, retaining originals and not executing unfamiliar XML or scripts.</p>
+
+<h2 id="退出返回后重新走完整目标链">Leave and return through the complete target chain</h2>
+
+<p>Leave and return to the three pages, then reconstruct root, container.xml, full-path, package and image locations from the external listing. Preserve identity, rootfile order, both address layers, reading results and unknowns. Explain why META-INF is not prepended and OPF count is not page count, while acknowledging untested server paths. Success is a traceable chain with a readable copy, not a folder arrangement that happens to open.</p>
+
+<h2 id="相关教程与资料">Related guides and sources</h2>
+
+<p><a href="/en/guides/manyue-epub-unique-identifier-target-display-title/">Check EPUB identity in ManYue: unique-identifier points to an identifier element, not a title</a>; <a href="/en/guides/manyue-epub-manifest-spine-image-occurrence/">ManYue EPUB image order: separate the manifest, spine and image occurrences</a>.</p>
+
+<p>Checked on November 13, 2026: <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261113">Apple public information</a> lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities; verify specific controls in the installed version.</p>
+
+<p>Method reference: <a href="https://www.w3.org/TR/epub-33/#sec-container-metainf-container.xml">W3C: OCF container files and rootfile paths</a>. Samples, passages and controls are original exercises. Sources establish definitions and checking methods rather than new automatic analysis in the app. Manual records may be kept externally, and unknown fields should remain explicit. This article does not claim step-by-step testing on a physical device, private server or every output environment.</p>
+{% endraw %}

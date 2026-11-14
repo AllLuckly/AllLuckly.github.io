@@ -1,0 +1,70 @@
+---
+layout: null
+permalink: /en/guides/manyue-png-indexed-truecolour-bitdepth-palette/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Check PNG bit depth in ManYue: an eight-bit index differs from eight-bit RGB
+  samples'
+agent_source_url: https://allluckly.cn/en/guides/manyue-png-indexed-truecolour-bitdepth-palette/
+agent_source_sha256: 170cadf4837065d2492127f2acfb89142b3741dc8984fe8742741c2aec586d8e
+agent_generator_version: 1
+---
+{% raw %}# Check PNG bit depth in ManYue: an eight-bit index differs from eight-bit RGB samples
+
+Language: en
+Canonical: [Check PNG bit depth in ManYue: an eight-bit index differs from eight-bit RGB samples](<https://allluckly.cn/en/guides/manyue-png-indexed-truecolour-bitdepth-palette/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-png-indexed-truecolour-bitdepth-palette/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-png-indexed-truecolour-bitdepth-palette/>)
+Published: 2026-11-13T00:00:00+08:00
+Modified: 2026-11-13T09:43:51+08:00
+Author: Bison
+
+Compare IHDR colour type and PLTE to distinguish index capacity, channel precision and actual colours instead of guessing from file size.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-png-indexed-truecolour-bitdepth-palette/>), translated on 2026-11-13. Original publication dates, attribution, code and version notes are retained.
+
+Two PNGs labelled eight-bit need not represent pixel colour identically. Read self-made swatch pages in ManYue after checking both colour type and bit depth in external reports. Separate index bits, per-channel bits, compressed bytes and screen appearance. The app need not expose chunks, and manual inspection is not a newly claimed automatic colour-analysis feature.
+
+## Make a sample with a known small colour set
+
+Use an existing drawing tool to make four specified solid rectangles and corner markers, retaining the lossless source at eight hundred by six hundred pixels. Avoid photographs and gradients. Antialiased text can add colours; for exactly four values, omit text or assemble markers from the same swatches. Record antialiasing conditions rather than infer exactly four stored colours from four large visible regions.
+
+## Export indexed and truecolour copies
+
+When supported externally, export A as colour type three with bit depth eight and B as colour type two with bit depth eight, without transparency. Confirm via reports rather than labels or suffixes. If the tool instead creates four-bit indexed data, retain its actual value and adjust calculations. Export from the same source with matching dimensions and colour-management conditions. Do not alter the library or invent an in-app bit-depth control.
+
+## Calculate the addressable index range
+
+In A each pixel stores a palette index. Eight bits address zero through two hundred fifty-five, a capacity of two hundred fifty-six indices. That is not proof of that many palette entries or used colours; a four-colour page may use only four. Each PLTE entry contains three eight-bit RGB samples, so index width and palette-channel precision differ. Index one is not red-channel intensity one.
+
+## Interpret truecolour bit depth per channel
+
+Type-two B has red, green and blue samples for each pixel. Bit depth eight is per sample, totalling twenty-four raw colour bits without alpha. The theoretical RGB capacity is two hundred fifty-six cubed, sixteen million seven hundred seventy-seven thousand two hundred sixteen combinations, not necessarily all used here. It is neither a two-hundred-fifty-six-colour limit nor proof that the complete compressed PNG costs exactly three file bytes per pixel.
+
+The eight-hundred by six-hundred example has four hundred eighty thousand pixels. Ignoring row-filter and other overhead, A has that many eight-bit indices, while B has one million four hundred forty thousand eight-bit RGB samples. These are raw sample counts, not disk-file sizes or a guarantee of triple loading time.
+
+## Recheck representation before adding transparency
+
+Transparency is excluded from this round. A separate C requires a fresh report: indexed transparency can be associated with palette entries, while type six has truecolour plus a full alpha channel. A checkerboard does not prove that eight bits includes all transparency precision. White-looking corners do not prove opacity, and transparency differs from colour capacity. Leave unknowns if reports are unavailable; do not manually edit chunks or strip originals.
+
+## Read swatches under matching display conditions
+
+Import A and B with the same orientation, zoom and background. Check markers and swatch positions before visible colour differences. Similar appearance with different representations does not prove that the reader rewrote source types. Trace quantisation changes to the original and export reports. Visual similarity is not pixel, colorimeter or cross-device equivalence. Do not invent an application colour-count statistic when none is displayed.
+
+## Check palette capacity and size misconceptions
+
+If four swatches were recorded as two hundred fifty-six actual colours, correct the capacity-versus-use distinction. A claim that B must be exactly three times larger ignores compression and overhead. For wrong indexed colours, inspect quantisation, palette and selection before blaming bit-depth interpretation by the app. Change only an identified condition and preserve reports. An original small page suffices for support; no full-book upload or unfamiliar batch-fixing script is needed.
+
+## Leave and return to explain four quantities
+
+Leave and return, verifying markers and colour locations. Keep type, bit-depth meaning, palette/channel organisation, known limits on used colours, file size and appearance. Explain why eight-bit labels can describe different representations and why capacity is not actual usage. Success preserves distinct quantities and a readable original, not one universally best PNG type. Gradients, transparency or a new exporter require a fresh report.
+
+## Related guides and sources
+
+[Check PNG dimensions in ManYue: separate pixel counts and pHYs density](<https://allluckly.cn/en/guides/manyue-png-ihdr-pixels-phys-density/>); [ManYue: Check PDF page colours with a self-made reference sheet](<https://allluckly.cn/en/guides/manyue-pdf-colour-reference-check/>).
+
+Checked on November 13, 2026: [Apple public information](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261113>) lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the [official App Store](<https://apps.apple.com/cn/app/id6753895889>) for published capabilities; verify specific controls in the installed version.
+
+Method reference: [W3C: PNG colour types, bit depths and palettes](<https://www.w3.org/TR/png-3/>). Samples, passages and controls are original exercises. Sources establish definitions and checking methods rather than new automatic analysis in the app. Manual records may be kept externally, and unknown fields should remain explicit. This article does not claim step-by-step testing on a physical device, private server or every output environment.
+{% endraw %}

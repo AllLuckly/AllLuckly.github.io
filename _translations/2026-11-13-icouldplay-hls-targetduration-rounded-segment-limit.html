@@ -1,0 +1,57 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay HLS target duration: distinguish rounded segment limits from total duration'
+description: Calculate three fractional segment durations without treating their target limit as film length or
+  a cache guarantee.
+permalink: /en/guides/icouldplay-hls-targetduration-rounded-segment-limit/
+date: '2026-11-13 00:00:00 +08:00'
+modified: '2026-11-13 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 142
+topic: File markers and time boundaries
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-13-icouldplay-hls-targetduration-rounded-segment-limit.md
+source_url: /guides/icouldplay-hls-targetduration-rounded-segment-limit/
+translation_method: editorial
+translation_source_sha256: 1f63e4dbf53cda4796930db09e18a1481fb5450de513cf9be5d0506ee3ac3f6c
+translation_date: '2026-11-13T01:43:50+00:00'
+excerpt: Calculate three fractional segment durations without treating their target limit as film length or a cache
+  guarantee.
+---
+{% raw %}
+<p>TARGETDURATION of six is neither a six-second film nor a requirement that every segment last exactly six seconds. Calculate an original playlist excerpt, then separately record a real playable source in iCouldPlay. Example addresses supply no media. Keep format inspection separate from playback and do not modify server playlists to force a pass.</p>
+<h2 id="section-1">1. Identify the excerpt and real source separately</h2>
+<p>Use an authorized, identifiable playlist copy. If unavailable, calculate the teaching excerpt and mark real fields unavailable. Record address, version and acquisition time; distinguish a master playlist from a media playlist containing EXTINF. Check a real small source separately in iCouldPlay without inferring target fields from displayed duration. Preserve originals and do not expect the nonexistent teaching segment addresses to supply a film. Source inspection and playback have independent completion states.</p>
+<h2 id="section-2">2. Transcribe fractional seconds and units</h2>
+<p>This original version-three media playlist declares three segments but provides no resources. Pair each EXTINF with its following URI and record 3.2, 6.4 and 5.1 seconds. Text after the comma is not part of the duration. Target six is also seconds, not file count or bitrate. Decimal digits are not frame labels, and filename digits do not override durations. Preserve fractional inputs before rounding so another reader can reproduce the calculation.</p>
+<pre><code>#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:6
+#EXTINF:3.2,
+a.ts
+#EXTINF:6.4,
+b.ts
+#EXTINF:5.1,
+c.ts
+#EXT-X-ENDLIST
+</code></pre>
+<h2 id="section-3">3. Compare each nearest integer with the target</h2>
+<p><a href="https://www.rfc-editor.org/rfc/rfc8216.html#section-4.3.3.1">RFC 8216’s target-duration clause</a> compares each EXTINF rounded to the nearest integer with the target. Values become three, six and five, all at most six, so only this numerical condition passes. Although 6.4 exceeds six before rounding, that is not this particular comparison. No exact half-second ties are used, avoiding an unstated tie-breaking convention.</p>
+<h2 id="section-4">4. Sum durations independently of the target</h2>
+<p>Sum the original decimals to obtain 14.7 seconds, not target six multiplied by three to obtain eighteen. This is the excerpt’s declared segment-duration sum, not a measured exact ending; packaging, other tags and playlist scope remain separate. Adding another segment changes the sum through its own duration rather than automatically adding six. Record iCouldPlay’s display separately and retain differences instead of forcing both columns to match.</p>
+<h2 id="section-5">5. Change one duration to inspect a failing case</h2>
+<p>Save an inspection-only error changing only the second duration from 6.4 to 6.6. Its nearest integer becomes seven, exceeding six. Identify the exact declaration and comparison rather than labeling every URI broken. Do not upload the error for routine viewing. Raising the target to seven alone would not certify a real service: other format, access and decoding conditions remain. Preserve both versions and their identities.</p>
+<h2 id="section-6">6. Observe playback without inferring caching</h2>
+<p>For a real source, play from the beginning to a chosen anchor and record source, position and observed stalls. Do not invent confirmed segment boundaries if the app does not expose them. Target duration is neither buffer size nor a six-second offline guarantee. Record network conditions separately; the target alone cannot diagnose stalls. A live sliding window may differ from an earlier screenshot, so preserve acquisition time rather than reconstructing removed past entries from the current list.</p>
+<h2 id="section-7">7. Troubleshoot rounding, playlist type and transcription</h2>
+<p>If 6.4 was rejected directly, recheck the rounding step. If the sum became eighteen, check whether targets were added. Missing EXTINF may mean a master playlist, not zero-length media. Check decimal transcription, units and omitted entries individually. Clearing the library or changing the system clock does not repair arithmetic. Attribute only obtained source and visible behavior; unavailable real files remain unverified rather than certified by the teaching excerpt.</p>
+<h2 id="section-8">8. Reopen and deliver both duration records</h2>
+<p>Leave playback, reopen the real sample and confirm source and anchor. Deliver original decimals, rounded integers, target, individual comparisons, declared sum and observed playback, with the error labeled separately. Another reader should reproduce three/six/five and 14.7 and identify why 6.6 fails. Passing this clause is not certification of all HLS behavior, film duration or offline availability. Preserve earlier evidence and append a new acquisition time/scope after updates.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-hls-map-initialization-media-segment-ledger/">HLS initialization</a>, <a href="/en/guides/icouldplay-hls-playlist-offline-boundary/">Playlists and offline boundaries</a>.</p>
+<p>Checked on November 13, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}
