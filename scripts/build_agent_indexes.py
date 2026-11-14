@@ -202,6 +202,14 @@ class Indexes:
             raise ValueError('Technical metadata must cover the exact historical post inventory')
         for app_id in self.apps:
             lessons = self.lessons(app_id)
+            app = self.apps[app_id]
+            has_route = bool(app.get('guide_url'))
+            if has_route != bool(self.apps_en[app_id].get('guide_url')):
+                raise ValueError(f'Chinese and English learning-path availability differs: {app_id}')
+            if bool(lessons) != has_route:
+                raise ValueError(f'A learning path must have actual tutorials, and tutorials need a learning path: {app_id}')
+            if not has_route and app.get('minimum_guides') != 0:
+                raise ValueError(f'An app without tutorials must declare a zero tutorial target: {app_id}')
             positions = [r['data']['series_order'] for r in lessons]
             if positions != list(range(1, len(lessons) + 1)):
                 raise ValueError(f'Lesson order is incomplete or duplicated: {app_id}')
@@ -247,9 +255,9 @@ class Indexes:
     @staticmethod
     def boundaries(lang):
         if lang == 'en':
-            return ['These are guides and product information from Bison, the developer of the six apps; they are not independent reviews or rankings.',
+            return ['These are guides and product information from Bison, the developer of the listed apps; they are not independent reviews or rankings.',
                     'Markdown is another representation of the same HTML content. Read feature limits, source attributions and version notes in the linked page. English pages are translations of the Chinese originals.']
-        return ['本站作者 Bison 是这六款应用的开发者；这里是开发者撰写的产品介绍、教程与创作记录，不是独立第三方评测或排名。',
+        return ['本站作者 Bison 是这些应用的开发者；这里是开发者撰写的产品介绍、教程与创作记录，不是独立第三方评测或排名。',
                 'Markdown 是对应 HTML 页面的另一种表示，内容保持一致。功能边界、原文署名与版本说明以具体页面为准；英文页为中文原文的翻译。']
 
     @staticmethod
@@ -280,6 +288,8 @@ class Indexes:
     def build_language(self, lang):
         en = lang == 'en'
         local = lambda route: self.local_page(route, lang)
+        learning_apps = {app_id: app for app_id, app in self.apps.items()
+                         if app.get('guide_url') and self.lessons(app_id)}
         home, guides, journal, works, apps, about = [local(r) for r in ('/', '/guides/', '/journal/', '/works/', '/apps/', '/about/')]
         counterpart = self.local_page('/', 'zh' if en else 'en')
         self.emit(home, [
@@ -289,9 +299,9 @@ class Indexes:
         ])
         self.emit(guides, [
             ('Reading context' if en else '阅读说明', self.boundaries(lang)),
-            ('App learning paths' if en else '按应用学习', [self.link(local(a['guide_url']), index=True) for a in self.apps.values()]),
+            ('App learning paths' if en else '按应用学习', [self.link(local(a['guide_url']), index=True) for a in learning_apps.values()]),
         ])
-        for app_id, app in self.apps.items():
+        for app_id, app in learning_apps.items():
             route = local(app['guide_url'])
             app_page = local(app['url'])
             version = f"Version listed: {app['version']}; checked {app['verified']}; {app['os']}." if en else f"目录记录版本：{app['version']}；资料核对：{app['verified']}；{app['os']}。"

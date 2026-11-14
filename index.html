@@ -1,6 +1,6 @@
 ---
 layout: studio
-modified: 2026-10-23
+modified: 2026-11-14
 title: 让创作与阅读，成为日常
 description: Bison 的应用教程与开发笔记：从绘画、矢量设计，到漫画、电子书、影音播放和游戏收藏。
 ---
@@ -13,7 +13,7 @@ description: Bison 的应用教程与开发笔记：从绘画、矢量设计，�
 </section>
 <div class="topic-strip"><div class="wrap"><span>为喜欢的事，做顺手的工具。</span><span>水彩绘画 <i>✳</i> 矢量设计 <i>✳</i> 阅读与影音</span></div></div>
 <section id="apps" class="wrap section"><div class="section-heading"><div><p class="eyebrow">MADE WITH CARE / 01</p><h2>把喜欢的事，做成顺手的应用。</h2></div><a class="text-link" href="{{ '/apps/' | relative_url }}">查看全部应用 ↗</a></div><div class="app-grid">{% for app in site.data.apps %}{% include app-card.html %}{% endfor %}</div></section>
-<section class="wrap section guide-section" data-filter-group><div class="section-heading"><div><p class="eyebrow">LEARN BY DOING / 02</p><h2>从「想试试」到「做出来」。</h2><p class="section-intro">带着一个小目标，开始你的第一篇教程。</p></div><a class="text-link" href="{{ '/guides/' | relative_url }}">全部教程 ↗</a></div><div class="filters" aria-label="按应用筛选教程" hidden><button type="button" data-filter="all" aria-pressed="true">全部教程</button>{% for app in site.data.apps %}<button type="button" data-filter="{{ app.id }}" aria-pressed="false">{{ app.name }}</button>{% endfor %}</div><p class="filter-status sr-only" role="status" aria-live="polite"></p><div class="guide-grid">{% for app in site.data.apps %}{% assign guides = site.posts | where: 'layout', 'guide' | where: 'app_id', app.id | sort: 'series_order' %}{% for post in guides limit:1 %}{% include guide-card.html %}{% endfor %}{% endfor %}</div></section>
+<section class="wrap section guide-section" data-filter-group><div class="section-heading"><div><p class="eyebrow">LEARN BY DOING / 02</p><h2>从「想试试」到「做出来」。</h2><p class="section-intro">带着一个小目标，开始你的第一篇教程。</p></div><a class="text-link" href="{{ '/guides/' | relative_url }}">全部教程 ↗</a></div><div class="filters" aria-label="按应用筛选教程" hidden><button type="button" data-filter="all" aria-pressed="true">全部教程</button>{% for app in site.data.apps %}{% assign filter_guides = site.posts | where: 'layout', 'guide' | where: 'app_id', app.id %}{% if app.guide_url and filter_guides.size > 0 %}<button type="button" data-filter="{{ app.id }}" aria-pressed="false">{{ app.name }}</button>{% endif %}{% endfor %}</div><p class="filter-status sr-only" role="status" aria-live="polite"></p><div class="guide-grid">{% for app in site.data.apps %}{% assign guides = site.posts | where: 'layout', 'guide' | where: 'app_id', app.id | sort: 'series_order' %}{% if app.guide_url and guides.size > 0 %}{% for post in guides limit:1 %}{% include guide-card.html %}{% endfor %}{% endif %}{% endfor %}</div></section>
 {% assign works = site.posts | where: 'layout', 'work' %}
 {% if works.size > 0 %}
 <section class="wrap section work-section" data-work-section><div class="section-heading"><div><p class="eyebrow">IN MOTION / 创作记录</p><h2>从第一笔，看见作品。</h2><p class="section-intro">用视频记录创作过程，也把每一步写下来。</p></div><a class="text-link" href="{{ '/works/' | relative_url }}">全部作品视频 ↗</a></div><div class="work-grid">{% for post in works limit:2 %}{% include work-card.html %}{% endfor %}</div></section>

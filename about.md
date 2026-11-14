@@ -2,8 +2,8 @@
 layout: about
 permalink: /about/index.html
 title: 你好，我是 Bison。
-description: 我是 Bison，一名 iOS 开发者。这里记录 Aquarell、VectorPaint、漫阅+、书屿、云映与 Yearn 的开发过程，也分享它们的使用方法。
-modified: 2026-10-23
+description: 我是 Bison，一名 iOS 开发者。这里记录 Aquarell、VectorPaint、漫阅+、书屿、云映、Yearn、调调和键来的开发过程，也分享它们的使用方法。
+modified: 2026-11-14
 ---
 
 <div class="about-intro" markdown="1">
@@ -38,6 +38,12 @@ modified: 2026-10-23
 <section class="about-app">
 <img src="/assets/images/apps/yearn.png" alt="Yearn 图标" width="64" height="64" loading="lazy">
 <div><h3>Yearn</h3><p>一个复古游戏模拟器，用来整理自己准备的游戏文件。这里会写导入、手柄、画面设置与存档检查；先把一款游戏的保存和重新读取走通，再慢慢整理收藏。</p><a href="/apps/yearn/">看看应用 ↗</a><a href="/guides/yearn/">阅读游戏使用教程 →</a></div>
+</section>
+<section class="about-app">
+<img src="/assets/images/apps/diaodiao.jpg" alt="调调图标" width="64" height="64" loading="lazy"><div><h3>调调</h3><p>把自己收藏的音频带在身边。从文件或同一 Wi-Fi 下的电脑导入音乐，听已导入的离线歌曲，安排队列和睡眠定时；也可以连接兼容的个人音乐服务器。</p><a href="/apps/diaodiao/">了解个人音乐播放器 ↗</a></div>
+</section>
+<section class="about-app">
+<img src="/assets/images/apps/jianlai.jpg" alt="键来图标" width="64" height="64" loading="lazy"><div><h3>键来</h3><p>一款可自定义外观的输入法。主题、颜色、字体和背景可以按自己的喜好组合，也能单独设计空格键，在可用的输入环境里使用支持的语言与联想。</p><a href="/apps/jianlai/">了解自定义键盘 ↗</a></div>
 </section>
 </div>
 

@@ -32,7 +32,7 @@ bundle exec jekyll serve --host 127.0.0.1 --port 4000
 
 预览地址：<http://127.0.0.1:4000/>。生成文件位于 `_site/`。预览时 URL 与正式域名不同是正常现象；canonical 和结构化数据应继续使用正式域名。
 
-发布前检查首页、六个 App 专题与学习路线、教程详情、`/page2/`、`/sitemap.xml`和 `/robots.txt`。分页由 `jekyll-paginate` 生成，主页必须使用 `index.html`，`paginate_path` 使用 `page:num/`，使分页内链与 canonical 的尾斜线一致；历史 `/pageN` 地址继续由托管服务重定向至 `/pageN/`。
+发布前检查首页、全部 App 专题与现有学习路线、教程详情、`/page2/`、`/sitemap.xml`和 `/robots.txt`。分页由 `jekyll-paginate` 生成，主页必须使用 `index.html`，`paginate_path` 使用 `page:num/`，使分页内链与 canonical 的尾斜线一致；历史 `/pageN` 地址继续由托管服务重定向至 `/pageN/`。
 
 ## 常见问题
 

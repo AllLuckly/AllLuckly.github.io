@@ -15,15 +15,24 @@ ROOT = Path(__file__).resolve().parents[1] / '_site'
 SITE_URL = 'https://allluckly.cn/'
 catalog = yaml.safe_load((ROOT.parent / '_data/apps.yml').read_text())
 catalog_by_id = {app['id']: app for app in catalog}
+catalog_en_by_id = {app['id']: app for app in yaml.safe_load((ROOT.parent / '_data/apps_en.yml').read_text())}
+learning_catalog = [app for app in catalog if app.get('guide_url')]
 SITEMAP_NS = {'sm':'http://www.sitemaps.org/schemas/sitemap/0.9','video':'http://www.google.com/schemas/sitemap-video/1.1'}
 class Page(HTMLParser):
     def __init__(self, source):
-        super().__init__(); self.links=[]; self.graphs=[]; self.canonical=[]; self.h1=0; self.ld=False; self.buf=''; self.ids=set(); self.filter_items=[]; self.work_items=[]; self.videos=[]; self.sources=[]; self.tracks=[]; self.robots=[]; self.chapter_links=[]; self.chapter_label=None
+        super().__init__(); self.links=[]; self.graphs=[]; self.canonical=[]; self.h1=0; self.ld=False; self.buf=''; self.ids=set(); self.filter_items=[]; self.work_items=[]; self.videos=[]; self.sources=[]; self.tracks=[]; self.robots=[]; self.chapter_links=[]; self.chapter_label=None; self.app_cards=[]; self.anchors=[]; self.anchor=None; self.filter_choices=[]; self.library_apps=[]
         self.feed(source)
     def handle_starttag(self, tag, attrs):
         attrs=dict(attrs)
+        if tag=='article' and 'app-card' in attrs.get('class','').split():
+            self.app_cards.extend(value.removeprefix('theme-') for value in attrs.get('class','').split() if value.startswith('theme-'))
+        if tag=='a':
+            self.anchor={'href':attrs.get('href',''),'text':''}; self.anchors.append(self.anchor)
         if attrs.get('id'): self.ids.add(attrs['id'])
         if attrs.get('data-filter-item'): self.filter_items.append(attrs['data-filter-item'])
+        if tag=='button' and attrs.get('data-filter'): self.filter_choices.append(attrs['data-filter'])
+        if tag=='section' and 'data-library-section' in attrs:
+            self.library_apps.append(attrs.get('aria-labelledby','').removeprefix('library-'))
         if attrs.get('data-work-item'): self.work_items.append(attrs['data-work-item'])
         if tag=='video': self.videos.append(attrs)
         if tag=='source': self.sources.append(attrs)
@@ -40,9 +49,10 @@ class Page(HTMLParser):
         if tag=='video' and attrs.get('poster'): self.links.append(attrs['poster'])
     def handle_data(self, data):
         if self.ld: self.buf+=data
+        if self.anchor is not None: self.anchor['text']+=data
         if self.chapter_label is not None: self.chapter_label['_text']+=data
     def handle_endtag(self, tag):
-        if tag=='a': self.chapter_label=None
+        if tag=='a': self.chapter_label=None; self.anchor=None
         if tag=='script' and self.ld:
             self.graphs.append(json.loads(self.buf)); self.ld=False
 
@@ -87,7 +97,7 @@ for file,page in pages.items():
             if entity['@type']=='VideoObject' and not urlparse(entity['mainEntityOfPage']['@id']).path.startswith('/en/'): videos.append(entity)
 assert len(catalog_by_id)==len(catalog)
 app_ids={app['@id'] for app in apps}
-assert app_ids=={urljoin(SITE_URL,app['url'])+'#app' for app in catalog}, 'localized pages must share the six original product entities'
+assert app_ids=={urljoin(SITE_URL,app['url'])+'#app' for app in catalog}, 'localized pages must share the catalog product entities'
 expected_app_pages=[urljoin(SITE_URL,app['url']) for app in catalog]
 if (ROOT/'en/apps/index.html').is_file():
     expected_app_pages += [urljoin(SITE_URL,'en/'+app['url'].lstrip('/')) for app in catalog]
@@ -98,7 +108,10 @@ for article in articles:
     assert article['author']['name']=='Bison'
 for app in apps:
     assert 'aggregateRating' not in app and 'offers' not in app
-    assert app['downloadUrl'].startswith('https://apps.apple.com/cn/app/id')
+    original=next(item for item in catalog if urljoin(SITE_URL,item['url'])+'#app'==app['@id'])
+    parsed=urlparse(app['downloadUrl'])
+    assert parsed.scheme=='https' and parsed.hostname=='apps.apple.com' and re.search(r'/id\d+/?$',parsed.path), 'download URL must be an official HTTPS App Store product page'
+    assert app['downloadUrl']==original['store_url'], 'localized download URL must retain the catalog store identity and storefront'
 source_guides=[]; source_works=[]
 for source in (ROOT.parent/'_posts').glob('*.md'):
     text=source.read_text()
@@ -125,24 +138,43 @@ guide_urls={urljoin(SITE_URL,g['permalink']) for g in source_guides}
 guide_articles=[article for article in articles if article['url'] in guide_urls]
 assert Counter(article['url'] for article in guide_articles)==Counter(guide_urls), 'published guide URLs differ from source'
 article_counts=Counter(article['about']['@id'] for article in guide_articles)
-assert set(article_counts)==app_ids, f'missing app tutorials: {article_counts}'
+learning_app_ids={urljoin(SITE_URL,app['url'])+'#app' for app in learning_catalog}
+assert set(article_counts)==learning_app_ids, f'missing tutorials for a declared learning path: {article_counts}'
 for app in catalog:
+    assert type(app.get('minimum_guides')) is int and app['minimum_guides']>=0, f'invalid tutorial target: {app["id"]}'
+    assert app['minimum_guides']==catalog_en_by_id[app['id']].get('minimum_guides'), f'localized tutorial targets differ: {app["id"]}'
     assert article_counts[urljoin(SITE_URL,app['url'])+'#app']>=app['minimum_guides'], f'tutorial target not met: {app["id"]}'
 assert len({g['permalink'] for g in source_guides})==len(source_guides), 'duplicate tutorial URL'
 assert len({g['title'] for g in source_guides})==len(source_guides), 'duplicate tutorial title'
 for app in catalog:
     orders=sorted(int(g['series_order']) for g in source_guides if g['app_id']==app['id'])
     assert orders==list(range(1,len(orders)+1)), f'nonsequential learning route: {app["id"]}'
+    assert bool(app.get('guide_url'))==bool(catalog_en_by_id[app['id']].get('guide_url')), f'localized learning-path availability differs: {app["id"]}'
+    if not app.get('guide_url'):
+        assert not orders and app['minimum_guides']==0, f'promotional app must not invent a tutorial route: {app["id"]}'
+        for locale_app in [app,catalog_en_by_id[app['id']]]:
+            detail=pages[target(locale_app['url'])]
+            assert not any(re.search(r'查看学习路线|Explore the learning path|查看全部\s*0\s*篇|All\s+0\s+tutorials',anchor['text'],re.I) for anchor in detail.anchors), f'promotional app has an empty tutorial CTA: {locale_app["url"]}'
+            assert locale_app['store_url'] in detail.links, f'promotional app must expose its official download: {locale_app["url"]}'
+        continue
+    assert orders, f'a learning path must contain actual tutorials: {app["id"]}'
+    assert catalog_en_by_id[app['id']]['guide_url']=='/en'+app['guide_url'], f'English learning route must use the translated path: {app["id"]}'
     route_source=ROOT.parent / (app['guide_url'].strip('/')+'.html')
     stages=yaml.safe_load(route_source.read_text().split('---',2)[1])['stages']
     covered=[i for stage in stages for i in range(stage['start'],stage['end']+1)]
     assert covered==orders, f'learning stages must cover every lesson exactly once: {app["id"]}'
-assert Counter(pages[ROOT/'index.html'].filter_items)==Counter({app['id']:1 for app in catalog}), 'homepage must introduce all apps'
+for prefix in ['', 'en/']:
+    assert pages[ROOT/(prefix+'index.html')].app_cards==[app['id'] for app in catalog], 'homepage app cards must introduce the full catalog in order'
+    assert pages[ROOT/(prefix+'apps/index.html')].app_cards==[app['id'] for app in catalog], 'app directory must introduce the full catalog in order'
+    assert Counter(pages[ROOT/(prefix+'index.html')].filter_items)==Counter({app['id']:1 for app in learning_catalog}), 'homepage tutorial previews must only represent apps with a learning path'
+    for page_name in ['index.html','guides/index.html']:
+        assert pages[ROOT/(prefix+page_name)].filter_choices==['all']+[app['id'] for app in learning_catalog], 'tutorial filters must not offer apps without tutorials'
+    assert pages[ROOT/(prefix+'guides/index.html')].library_apps==[app['id'] for app in learning_catalog], 'tutorial directory must not render empty app sections'
 assert len(pages[ROOT/'guides/index.html'].filter_items)==len(guide_articles), 'directory must link every tutorial'
-for app in catalog:
+for app in learning_catalog:
     assert pages[target(app['guide_url'])].filter_items==[app['id']]*sum(g['app_id']==app['id'] for g in source_guides)
 collections=[('/apps/', [urljoin(SITE_URL,a['url']) for a in catalog]), ('/guides/', [urljoin(SITE_URL,g['permalink']) for a in catalog for g in sorted(source_guides,key=lambda x:x['series_order']) if g['app_id']==a['id']])]
-collections += [(a['guide_url'],[urljoin(SITE_URL,g['permalink']) for g in sorted(source_guides,key=lambda x:x['series_order']) if g['app_id']==a['id']]) for a in catalog]
+collections += [(a['guide_url'],[urljoin(SITE_URL,g['permalink']) for g in sorted(source_guides,key=lambda x:x['series_order']) if g['app_id']==a['id']]) for a in learning_catalog]
 for url,expected in collections:
     page=pages[target(url)]
     entity=next(e for graph in page.graphs for e in graph['@graph'] if e['@type']=='CollectionPage')
@@ -262,4 +294,4 @@ for work in source_works:
 for app in catalog:
     expected=Counter(work['permalink'] for work in source_works if work['app_id']==app['id'])
     assert Counter(pages[target(app['url'])].work_items)==expected, f'app work links differ: {app["id"]}'
-print(f'PASS: {graph_count} JSON-LD graphs, {len(urls)} sitemap URLs, Atom feed, {len(new)} new/updated pages, {len(guide_articles)} detailed tutorials, {len(catalog)} complete learning routes and {len(videos)} work videos')
+print(f'PASS: {graph_count} JSON-LD graphs, {len(urls)} sitemap URLs, Atom feed, {len(new)} new/updated pages, {len(guide_articles)} detailed tutorials, {len(learning_catalog)} complete learning routes and {len(videos)} work videos')

@@ -13,7 +13,9 @@
 
 ## 产品事实的唯一来源
 
-`_data/apps.yml` 为数组；`id` 是文章 `app_id` 的关联键，当前使用 `pastel`、`man_yue`、`draw_illustration`、`nas_book`、`icouldplay`、`yearn`。产品字段包括 `name`、可选的 `alternate_name`、`tagline`、`description`、`url`、`store_url`、`icon`、`category`、`os`、`version` 与 `verified`；教程字段为 `guide_url`、`guide_intro`、`minimum_guides`。内部关联键不作为对读者展示的产品名。
+`_data/apps.yml` 为数组；`id` 是文章 `app_id` 的关联键，当前使用 `pastel`、`man_yue`、`draw_illustration`、`nas_book`、`icouldplay`、`yearn`、`diaodiao`、`jianlai`。产品字段包括 `name`、可选的 `alternate_name`、`tagline`、`description`、`url`、`store_url`、`icon`、`category`、`os`、`version` 与 `verified`；`store_region` 可注明实际核对的商店地区，不能统一假定中国区。教程字段为 `guide_url`、`guide_intro`、`minimum_guides`。内部关联键不作为对读者展示的产品名。
+
+应用介绍可以先于教程系列发布。调调与键来接入中英文首页、应用目录、关于页、产品实体和阅读目录，`minimum_guides` 为 0，尚未设置 `guide_url`；页面提供真实介绍与下载，不生成空学习路线或“0篇教程”入口。文章搜索仍索引真实文章，产品介绍通过 `/apps/llms.txt`、`/en/apps/llms.txt` 与自身 Markdown 发现。建立实际教程系列后再添加路线与阶段，并按真实文章计数。
 
 - 正式产品名、开发者、版本、系统要求和商店链接以已核实来源为准。项目目录名不能直接当作商店名。
 - 产品专题页必须展示结构化数据包含的产品事实；不得在 JSON-LD 偷加正文没有的功能、评分或价格。
@@ -83,7 +85,7 @@ Bing 建议用清晰标题、表格、FAQ、事实证据和及时更新增强内
 ## 上线核验清单（待执行）
 
 - [ ] 用与 GitHub Pages 兼容的 Jekyll 构建；确认产物没有未渲染 Liquid、无效 JSON-LD 或 XML 错误。
-- [ ] 检查首页、6 个 App 页、教程、旧文章、404 的桌面和手机显示；正文、署名、链接、图片说明与元数据一致。
+- [ ] 检查首页、全部 App 页、教程、旧文章、404 的桌面和手机显示；正文、署名、链接、图片说明与元数据一致。
 - [ ] 部署后确认 HTTPS、主域名、旧链接、资源 URL、canonical 一致；关键 URL 返回 200，真正不存在的 URL 返回 404。
 - [ ] 检查线上 `/robots.txt`、`/sitemap.xml`、`/feed.xml`；每个 sitemap URL 都能访问且是预期 canonical，没有草稿、404 或 noindex 页面。
 - [ ] 使用 Google Rich Results Test 检查文章和面包屑；产品页缺少价格/评分时不通过虚构信息修补软件富结果提示。
@@ -111,6 +113,6 @@ Bing 建议用清晰标题、表格、FAQ、事实证据和及时更新增强内
 
 每个 App 的完整目录位于 `/guides/aquarell/`、`/guides/manyue/`、`/guides/vectorpaint/`、`/guides/nasbook/`、`/guides/icouldplay/` 和 `/guides/yearn/`。`series_order` 从 1 连续编号，同一 App 内不重复；目录、上一篇和下一篇都依据该字段排序。学习阶段的范围应完整覆盖所有教程且不重叠。新增内容时保持原 URL 稳定，更新必要的相关教程链接。
 
-`/guides/` 的应用筛选与关键词搜索只筛选页面已包含的链接，关闭 JavaScript 仍可阅读全部目录。搜索包含公开应用名和别名。首页按每个 App 各一篇入门教程展示，避免一次集中发布后只出现一种应用。
+`/guides/` 的应用筛选与关键词搜索只筛选页面已包含的链接，关闭 JavaScript 仍可阅读全部目录。搜索包含公开应用名和别名。首页按每个已有学习路线的 App 各展示一篇入门教程，避免一次集中发布后只出现一种应用；无教程的推广 App 仍出现在完整应用目录中。
 
 运行 `python3 scripts/validate_site.py` 会按 `minimum_guides` 核验各应用教程数量（目前 Aquarell、VectorPaint、漫阅+ 各 200 篇，书屿 180 篇，云映 160 篇，Yearn 20 篇），并检查连续编号、独立标题和 URL、正文规模、阶段覆盖、目录结构化数据、内部链接与锚点。字数检查只是发布底线，不能替代功能核对和逐篇编辑；证据维护于 `docs/tutorial-evidence-*.md`。不要用同义改写、重复段落或与任务无关的提醒凑数量和篇幅。

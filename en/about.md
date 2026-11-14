@@ -4,9 +4,8 @@ lang: en
 permalink: /en/about/
 source_url: /about/
 title: Hi, I’m Bison.
-description: I’m an iOS developer. This blog follows Aquarell, ManYue, VectorPaint, Book Isle, iCouldPlay and Yearn, with
-  tutorials and development notes.
-modified: '2026-10-23'
+description: I’m an iOS developer. This blog follows Aquarell, ManYue, VectorPaint, Book Isle, iCouldPlay, Yearn, 调调 and Jianlai, with product introductions, tutorials and development notes.
+modified: '2026-11-14'
 ---
 
 <div class="about-intro" markdown="1">
@@ -24,6 +23,8 @@ This blog used to focus mainly on iOS technical articles. Alongside development 
 <section class="about-app"><img src="/assets/images/apps/nas_book.png" alt="Book Isle icon" width="64" height="64" loading="lazy"><div><h3>Book Isle</h3><p>For organising personal ebooks and connecting NAS or Calibre libraries. I begin with importing one book and adjusting its reading layout, then cover tags, notes and reading-data sync. The tutorials distinguish readable formats from manageable files, and remote entries from real downloads.</p><a href="/en/apps/nasbook/">About the app ↗</a><a href="/en/guides/nasbook/">Read the tutorials →</a></div></section>
 <section class="about-app"><img src="/assets/images/apps/icouldplay.png" alt="iCouldPlay icon" width="64" height="64" loading="lazy"><div><h3>iCouldPlay</h3><p>One place to play local videos, NAS files and content from your personal media servers. Tutorials begin with a single video, then cover the library, subtitles, audio tracks and playback issues, with a clear result to compare after each change.</p><a href="/en/apps/icouldplay/">About the app ↗</a><a href="/en/guides/icouldplay/">Read the tutorials →</a></div></section>
 <section class="about-app"><img src="/assets/images/apps/yearn.png" alt="Yearn icon" width="64" height="64" loading="lazy"><div><h3>Yearn</h3><p>A retro game emulator for a collection of game files you provide. I cover importing, controllers, display settings and save checks. Begin by successfully saving and loading one game, then organise the rest of your collection.</p><a href="/en/apps/yearn/">About the app ↗</a><a href="/en/guides/yearn/">Read the tutorials →</a></div></section>
+<section class="about-app"><img src="/assets/images/apps/diaodiao.jpg" alt="调调 icon" width="64" height="64" loading="lazy"><div><h3>调调</h3><p>Keep your own audio close. Import through Files or a computer on the same Wi-Fi network, listen to imported songs offline, organise a queue and set a sleep timer. You can also connect a compatible personal music server.</p><a href="/en/apps/diaodiao/">Meet the personal music player ↗</a></div></section>
+<section class="about-app"><img src="/assets/images/apps/jianlai.jpg" alt="Jianlai icon" width="64" height="64" loading="lazy"><div><h3>Jianlai</h3><p>A keyboard with a look you can customise. Combine themes, colours, fonts and backgrounds, style the space bar separately, and use supported input languages and suggestions in available fields.</p><a href="/en/apps/jianlai/">Meet the custom keyboard ↗</a></div></section>
 </div>
 
 ## Get in touch

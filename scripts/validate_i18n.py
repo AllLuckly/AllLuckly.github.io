@@ -231,7 +231,7 @@ for path in (REPO / '_translations').rglob('*'):
 if not args.allow_partial:
     assert set(translations) == set(sources), f'full translation coverage missing: {set(sources) - set(translations)}'
 
-# Both languages describe the same six products; each directory lists only its own language.
+# Both languages describe the same catalog products; each directory lists only its own language.
 apps = yaml.safe_load((REPO / '_data/apps.yml').read_text())
 product_ids = {absolute(a['url']) + '#app' for a in apps}
 for path, page in pages.items():
