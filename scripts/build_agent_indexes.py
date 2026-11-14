@@ -255,9 +255,9 @@ class Indexes:
     @staticmethod
     def history(lang):
         if lang == 'en':
-            return ['Historical development notes from 2015–2017. Their original publication dates and source attribution are retained; translation or catalog updates do not make the examples current.',
+            return ['This collection includes current tool recommendations and historical development notes from 2015–2017. Read each article’s source date and version context; archived notes retain original dates and attribution.',
                     'The examples were not rerun for this reorganization. Old Swift syntax, APIs, dependencies, service addresses and App Store rules may be obsolete; check current official documentation before applying them.']
-        return ['这里保留 2015–2017 年的历史技术记录及原文归属。条目日期是本站原始发布日期，翻译或目录整理不表示示例已更新到当前版本。',
+        return ['这里收录当前工具推荐和 2015–2017 年的历史技术记录。推荐文章另列资料日期；历史记录保留原始发布日期及原文归属，翻译或目录整理不表示旧示例已更新。',
                 '本次整理未重新运行验证旧示例。旧 Swift 语法、API、依赖、服务地址与审核规则可能过期，实际使用前须对照当前官方文档。']
 
     def publication(self, page, lang):
