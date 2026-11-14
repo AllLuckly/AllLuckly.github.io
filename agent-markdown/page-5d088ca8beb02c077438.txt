@@ -1,0 +1,72 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-audio-polarity-inversion-mono-cancellation-model/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay polarity comparison: why normal solo audio can cancel in a mono
+  model'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-audio-polarity-inversion-mono-cancellation-model/
+agent_source_sha256: 1f44fb0ff83b4cb2d167012eef6353fc4f3e2a2ccd5df94d32551b27983a79b7
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay polarity comparison: why normal solo audio can cancel in a mono model
+
+Language: en
+Canonical: [iCouldPlay polarity comparison: why normal solo audio can cancel in a mono model](<https://allluckly.cn/en/guides/icouldplay-audio-polarity-inversion-mono-cancellation-model/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-audio-polarity-inversion-mono-cancellation-model/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-audio-polarity-inversion-mono-cancellation-model/>)
+Published: 2026-11-14T00:00:00+08:00
+Modified: 2026-11-14T09:32:28+08:00
+Author: Bison
+
+Calculate four signed samples and their average sum, separating polarity inversion, channel swaps, reverse playback and observations.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-audio-polarity-inversion-mono-cancellation-model/>), translated on 2026-11-14. Original publication dates, attribution, code and version notes are retained.
+
+Start with an auditable model: every right-channel sample is the negative of its left-channel partner. Calculate externally, then compare an owned short recording through the playback controls actually available in iCouldPlay. The formula is not a universal device downmix, and quieter sound alone does not diagnose an app defect.
+
+## 1. Identify original and inverted copies
+
+Choose a short self-recorded voice or tone and retain the original. Work externally on named original, inverted and stereo copies. This task concerns sample signs, not playback direction, caption timing or ear positions. Without an editor, complete the paper calculation and leave listening unperformed. Record duration, volume and output so later comparisons identify the exact file.
+
+## 2. Write four signed sample pairs
+
+Use illustrative normalized values L=\[0.2,-0.4,0.6,-0.2\] and R=-L. Negative samples are on the other side of zero, not negative volume or corruption. Pair identical sample times; an offset column changes the model. Four numbers support arithmetic, not a complete recording with a sample rate, duration and encoding, and must not be reported as an imported playback test.
+
+```
+L:  0.2  -0.4   0.6  -0.2
+R: -0.2   0.4  -0.6   0.2
+M=(L+R)/2: 0  0  0  0
+```
+
+## 3. Calculate the average sum and label its limits
+
+Under the explicitly chosen equal-weight model M=(L+R)/2, all four outputs are zero. For the in-polarity control R=L, M=L. Cancellation follows the opposite paired samples, not a rule that stereo is quieter. [Audacity’s Invert documentation](<https://manual.audacityteam.org/man/invert.html>) supports the principle. Unknown device coefficients, routing and processing prevent calling this the internal algorithm of iCouldPlay or every output device.
+
+## 4. Separate swaps, reversal and polarity
+
+Swapping columns keeps this average zero because addition is commutative, without establishing identical listening in every scenario. Reversing temporal order is reverse playback; changing signs alone is not reversal. Label position exchange, time reordering and sign inversion separately. Replace vague “reverse sound” notes with the exact operation before troubleshooting or editing a track.
+
+## 5. Change one condition during external preparation
+
+Export a control, invert only one copied channel externally and pair it with the unchanged channel while retaining export settings. Do not combine speed, compression, EQ and loudness changes. Reopen exports to verify names, channel structure and length; preserve originals. Unfinished preparation remains theoretical. This task promises no waveform editor or polarity switch inside iCouldPlay. Caption and source settings in the player do not replace external audio editing.
+
+## 6. Record the actual playback output
+
+Open prepared media through existing controls, identify the control and compare at the same system volume. Restore settings before ordinary playback instead of repeatedly increasing volume to find a quiet signal. Mark unknown downmix behavior unknown. Record the verified output and observed effect; two stereo ear channels are not automatically a summed mono signal. Leave listening blank if unperformed.
+
+## 7. Troubleshoot incomplete cancellation
+
+Check common source, alignment, equal amplitude and exported channel pairing before expecting perfect cancellation. Delay or gain changes break samplewise R=-L. A hollow timbre does not prove every frequency disappeared. Retain files and repeatable points, correct one condition and limit conclusions to the observed output when routing or channels cannot be established.
+
+## 8. Reopen and deliver two kinds of evidence
+
+Reopen the original with restored volume/output and reidentify the comparison. Deliver arithmetic, the in-polarity control, distinctions among operations and separate real-file/listening evidence. Success means explaining model cancellation and unresolved conditions, not forcing silence. Recheck changed tracks/devices and never promote theoretical cancellation into a universal repair or an unperformed device pass.
+
+## Related tutorials and sources
+
+[Channel and source identity](<https://allluckly.cn/en/guides/icouldplay-stereo-channel-reference/>), [Peak level and loudness](<https://allluckly.cn/en/guides/icouldplay-audio-sample-peak-dbfs-volume-boundary/>).
+
+Checked on November 14, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

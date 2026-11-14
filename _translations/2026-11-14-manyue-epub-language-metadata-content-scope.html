@@ -1,0 +1,67 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Check EPUB language declarations in ManYue: publication metadata and local content have different scopes'
+description: Compare dc:language with XHTML language attributes, separating metadata, original text and application interface
+  language.
+permalink: /en/guides/manyue-epub-language-metadata-content-scope/
+date: '2026-11-14 00:00:00 +08:00'
+modified: '2026-11-14 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 194
+topic: Pixel semantics and format declarations
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-14-manyue-epub-language-metadata-content-scope.md
+source_url: /guides/manyue-epub-language-metadata-content-scope/
+translation_method: editorial
+translation_source_sha256: 8f703a3da2795628d6495f88863528cee00ac7ad2a5247b7830f2d36d084d341
+translation_date: '2026-11-14T01:31:46+00:00'
+excerpt: Compare dc:language with XHTML language attributes, separating metadata, original text and application interface
+  language.
+---
+{% raw %}
+<p>An EPUB language declaration is neither an automatic translation control nor an application-menu preference. Inspect an original bilingual EPUB externally and save a short report as a supported PDF for reading and return in ManYue. Record publication language, chapter-root language and local passages separately, without requiring XML inspection in the app or guaranteeing every EPUB variant on a given path.</p>
+
+<h2 id="建立只有两段文字的原创样本">Build a two-paragraph original sample</h2>
+
+<p>Externally prepare a Chinese main paragraph and an English paragraph, such as an original Chinese statement about a lamp and <code>The lamp is by the door.</code> Record container, package path and XHTML path, preserving the source. Neither en in the filename nor English on the cover establishes declarations. Without a creator tool, use a clearly labelled paper report rather than claim an EPUB was generated. Produce the PDF report externally; ManYue reads it without an invented format-editing feature.</p>
+
+<h2 id="包元数据先读第一个语言元素">Read the first package language element</h2>
+
+<p>The example lists <code>&lt;dc:language&gt;zh-Hans&lt;/dc:language&gt;</code> first and <code>&lt;dc:language&gt;en&lt;/dc:language&gt;</code> second. The first declares the publication’s primary language; repeated elements can describe multilingual content, not a fabricated concatenated tag. Preserve document order rather than alphabetise and then infer a different primary language. Tags describe language and optional refinements, not file paths, server locations or copyright jurisdiction; do not replace zh-Hans with a translated book title or folder name.</p>
+
+<h2 id="章节语言不能只等包里继承">Do not assume the chapter inherits package metadata</h2>
+
+<p>Publication resources do not automatically inherit language from dc:language, so inspect the chapter’s own language mechanism. This XHTML root uses matching <code>xml:lang="zh-Hans"</code> and <code>lang="zh-Hans"</code>. Give package metadata and root attributes separate columns rather than call an omitted chapter declaration correct because the package mentions Chinese. This concerns document declarations, not a guarantee that an app path exposes them or selects a particular voice. Missing evidence cannot establish internal language handling.</p>
+
+<h2 id="局部英文另看元素上的范围">Inspect the scope of a local English span</h2>
+
+<p>The English paragraph can carry matching <code>xml:lang="en"</code> and <code>lang="en"</code> on its own element, differing from the Chinese root. Record start, end and enclosed text; do not extend a local declaration into later Chinese text outside that element. A span around one word covers that word, not the whole page. Read the text to check the declaration: an incorrect attribute cannot transform Chinese into English, and a present tag alone does not establish correctness.</p>
+
+<h2 id="语言变化不等于阅读方向变化">Separate language from reading direction</h2>
+
+<p>Record language separately from direction. English or Chinese declarations do not directly set page progression, right-to-left paragraphs or vertical CSS layout. Language, direction, progression and styling are distinct conditions. Rightward comic paging does not make the content Japanese; horizontal English does not require an English-primary package. Leave direction unchanged and unexamined here instead of altering layout while fixing language. Image-based lettering likewise does not become searchable OCR merely through a language attribute.</p>
+
+<h2 id="在pdf报告核声明与原文对应">Read the declaration-to-text report as PDF</h2>
+
+<p>Externally make a short PDF listing package order, root language, English scope and both original paragraphs. Label it an inspection report, not proof of faithful EPUB rendering. Open through a supported local PDF path in ManYue, enlarging quotes, hyphens and the English sentence and recording marker and location. If report wrapping breaks a tag visually, consult the original field rather than infer added XML characters. Reading and returning to the report does not establish an unperformed direct EPUB import.</p>
+
+<h2 id="排查界面语言与声明错配">Check interface-language and declaration mismatches</h2>
+
+<p>English menus can coexist with Chinese publication metadata; this alone requires no file change. An English passage inheriting a Chinese root without a local declaration calls for a recorded scope mismatch and authorised external correction of a copy. Underscore-style tags or several values forced into one element require specification and validator checks; opening a file does not establish valid metadata. Change only confirmed issues and preserve both reports. Translated text is not evidence that the declaration itself performed translation.</p>
+
+<h2 id="退出重开后复述三层语言范围">Reopen and reconstruct three language scopes</h2>
+
+<p>Reopen the report PDF, confirm identity and original paragraphs, then reconstruct package primary language, chapter root and local paragraph scopes, keeping menu language separate. Retain paths, element order, covered text and unknowns, explaining the absence of automatic dc:language inheritance. Reinspect relevant scopes after adding chapters or changing language order rather than edit a cover or filename alone. Completion is traceable declaration-to-text correspondence, not proof of automatic translation, EPUB repair or every language-assistance feature in ManYue.</p>
+
+<h2 id="相关教程与资料">Related guides and sources</h2>
+
+<p><a href="/en/guides/manyue-epub-unique-identifier-target-display-title/">Check EPUB identity in ManYue: unique-identifier points to an identifier element, not a title</a>; <a href="/en/guides/manyue-epub-manifest-spine-image-occurrence/">ManYue EPUB image order: separate the manifest, spine and image occurrences</a>.</p>
+
+<p>Checked on November 14, 2026: <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261114">Apple public information</a> lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities; verify specific controls in the installed version.</p>
+
+<p>Method reference: <a href="https://www.w3.org/TR/epub-33/#sec-opf-dclanguage">W3C: EPUB dc:language and resource language scope</a>. Samples, passages and controls are original exercises. Sources establish definitions and checking methods rather than new automatic analysis in the app. Manual records may be kept externally, and unknown fields should remain explicit. This article does not claim step-by-step testing on a physical device, private server or every output environment.</p>
+{% endraw %}

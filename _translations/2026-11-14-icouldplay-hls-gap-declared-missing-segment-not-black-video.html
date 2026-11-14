@@ -1,0 +1,58 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay HLS gap inspection: a GAP tag is not black video'
+description: Build a three-segment timeline and distinguish a declared missing segment from duration removal, black
+  frames and observed errors.
+permalink: /en/guides/icouldplay-hls-gap-declared-missing-segment-not-black-video/
+date: '2026-11-14 00:00:00 +08:00'
+modified: '2026-11-14 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 156
+topic: Gaps, colour and moving images
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-14-icouldplay-hls-gap-declared-missing-segment-not-black-video.md
+source_url: /guides/icouldplay-hls-gap-declared-missing-segment-not-black-video/
+translation_method: editorial
+translation_source_sha256: bc06162392934a889a71bbb0357a98a83244d319dc65e487225c909b5bb76d51
+translation_date: '2026-11-14T01:38:34+00:00'
+excerpt: Build a three-segment timeline and distinguish a declared missing segment from duration removal, black
+  frames and observed errors.
+---
+{% raw %}
+<p>Inspect a playlist’s declaration about missing media without deleting segments. Read a specific public work-in-progress draft, inspect an original three-entry excerpt and separately document real sources. Example names host no media and establish no playback or automatic repair; black output alone cannot prove a GAP tag.</p>
+<h2 id="section-1">1. Fix the exact reference version</h2>
+<p>Use <a href="https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis-22#section-4.4.4.7">HTTP Live Streaming second-edition draft 22</a>. It is work in progress dated May 1, 2026 with a November 2 expiry stated in its text, not a newly published RFC or a tag in old RFC 8216. Retain version/access date and separate document status, format semantics and actual implementation.</p>
+<h2 id="section-2">2. Retain real playlist provenance</h2>
+<p>Inspect authorized copies and record URL, time, source and media availability. Without real files, use the excerpt and mark actual fields unavailable rather than guessing from a player error. Filenames distinguish positions; “missing” in a filename is not the tag. Do not overwrite server files, delete sources or diagnose networking by repeatedly requesting nonexistent teaching URLs.</p>
+<h2 id="section-3">3. Attach the tag only to the next segment</h2>
+<p>In this excerpt GAP applies to the next segment, missing.ts: the draft describes no media data and says clients should not load it. Draw one arrow, neither backward to a.ts nor indefinitely forward. A declaration does not establish a server response or an encoded black clip. Keep tag semantics and actual object evidence separate.</p>
+<pre><code>#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:4
+#EXTINF:4.0,
+a.ts
+#EXTINF:4.0,
+#EXT-X-GAP
+missing.ts
+#EXTINF:4.0,
+c.ts
+#EXT-X-ENDLIST
+</code></pre>
+<h2 id="section-4">4. Retain the declared twelve-second ledger</h2>
+<p>Draw 0–4, 4–8 and 8–12, marking the middle declared gap. The listed EXTINF sum remains twelve seconds. This ledger does not promise a UI duration or a fixed wait/skip/display response. Deleting four seconds and retiming later content creates a different edited model. Keep relative timing, segment identity and availability separate.</p>
+<h2 id="section-5">5. Compare the concept of encoded black video</h2>
+<p>An actually encoded four-second black clip contains media and may contain sound, unlike the declaration about missing media. This is a conceptual control, not a supplied playback experiment. For real black output, record timing, sound and source without inferring GAP. Neither the tag nor filename edits promise black rendering or create absent media bytes.</p>
+<h2 id="section-6">6. Record reproducible iCouldPlay observations</h2>
+<p>Play a real source from an available point before the suspected gap and record visible timing, sound, waits/errors and recognizable later content. Without the playlist, describe observations only. Public notes do not certify every draft extension, and one result is not comprehensive compatibility. Retain available media/fallbacks and report established entries rather than promising reconstruction of absent content.</p>
+<h2 id="section-7">7. Separate declared gaps from request failures</h2>
+<p>A failed request without GAP remains a request result; adding a tag afterward does not establish original evidence. Recheck next-segment scope and duration arithmetic separately from UI progress. Correct one reading at a time and retain originals. Save updated sources with new acquisition times instead of combining different sessions or changing remote configuration without authority.</p>
+<h2 id="section-8">8. Reopen an available source and deliver limits</h2>
+<p>Reopen an owned complete source and ensure the teaching excerpt has not replaced daily media. Deliver reference version, ledger, scope arrow, black-frame comparison and observation status. Distinguish declared missing media, encoded black images and failed requests. Reinspect new playlists and keep unperformed device/resource/deployment checks unresolved.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-hls-targetduration-rounded-segment-limit/">Regular segment ledger</a>, <a href="/en/guides/icouldplay-hls-iframe-only-interval-preview-boundary/">I-frame playlists</a>.</p>
+<p>Checked on November 14, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

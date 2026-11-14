@@ -1,0 +1,77 @@
+---
+layout: null
+permalink: /guides/icouldplay-hls-gap-declared-missing-segment-not-black-video/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映 HLS 缺段跟读：GAP 标记不等于黑色视频
+agent_source_url: https://allluckly.cn/guides/icouldplay-hls-gap-declared-missing-segment-not-black-video/
+agent_source_sha256: 935b8f9dd45b763a1e715d1de90f39dd3f9c776645e342f844f8c7f095fdd349
+agent_generator_version: 1
+---
+{% raw %}# 云映 HLS 缺段跟读：GAP 标记不等于黑色视频
+
+语言：zh-CN
+原文：[云映 HLS 缺段跟读：GAP 标记不等于黑色视频](<https://allluckly.cn/guides/icouldplay-hls-gap-declared-missing-segment-not-black-video/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-hls-gap-declared-missing-segment-not-black-video/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-hls-gap-declared-missing-segment-not-black-video/>)
+发布于: 2026-11-14T00:00:00+08:00
+内容更新于: 2026-11-14T00:00:00+08:00
+署名：Bison
+
+建立三段时间台账，识别下一段缺媒体的声明，分开时长、黑帧与实际错误。
+
+这课讨论清单对缺少媒体的声明，不教删除片段。先读明确版本的公开工作草案，再用三个四秒条目的原创摘录检查作用范围，最后记录真实来源。示例地址不提供资源，不能把文字审核写成云映已播放或已自动修复；黑屏现象也不足以倒推出清单一定带有 GAP。
+
+## 一、先固定所依据的资料版本
+
+本课依据[HTTP Live Streaming第二版工作草案22](<https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis-22#section-4.4.4.7>)对 EXT-X-GAP 的说明。该文是工作草案，正文标注二〇二六年五月一日、十一月二日到期，不把它称为已正式发布的新 RFC，也不说旧 RFC 8216 已包含本标签。学习时保存这个明确版本与访问日期；以后文档变化重新核条文，不把草案状态、格式能力与具体播放器实现合并成一句“全都支持”。
+
+## 二、保留真实清单与来源身份
+
+只读取自己有权访问的清单副本，记地址、取得时间、来源名称与是否拿到媒体对象。没有真实资料时用下列摘录完成练读，真实字段写未取得；不从播放器画面或错误文字猜出原清单内容。示例三段名称 a、missing、c 只用于区分位置，字母不表示剧情，文件名中写 missing 也不是缺段标签的替代品。审核过程不覆盖服务器上的文件、不删除旧来源，也不把不存在的示例地址拿去反复重试当网络诊断。
+
+## 三、把标记只连到下一媒体段
+
+摘录把 GAP 放在第二段前，按该草案的定义，它声明所作用的下一媒体段 URI 不包含媒体数据，并建议客户端不加载。画箭头连到 missing.ts，不把它连到前一段 a.ts，也不让它一直作用到后续所有段。草案语义只说明声明的含义，不能凭文本证明真实服务器返回了什么，更不能将缺段解释为一个编码完整的黑色视频文件。对未知的 URI 返回对象保持待核，保留标记和对象两类证据。
+
+```
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:4
+#EXTINF:4.0,
+a.ts
+#EXTINF:4.0,
+#EXT-X-GAP
+missing.ts
+#EXTINF:4.0,
+c.ts
+#EXT-X-ENDLIST
+```
+
+## 四、保存十二秒声明范围的台账
+
+按摘录的相对时长画零到四、四到八、八到十二三格，第二格注明缺段声明，三条 EXTINF 相加仍为十二秒。这个台账仅解释清单声明，不保证设备界面显示什么总时长，也不保证遇缺段时会等待、跳转或显示某种固定画面。不能直接删第二行四秒就把后面内容重编号为四秒开始，那会变成另一份编辑后的时间模型，而非读懂原清单。每次记录都保留相对时间、段身份和实际可用性三栏。
+
+## 五、用黑色视频作概念对照
+
+另设对照：一段确有编码媒体数据的四秒黑画面。它可以有可解码画面甚至声音，与“下一 URI 不含媒体数据”的声明不同。这里只做概念辨析，没有提供该媒体文件，不把它写成已经跑过的播放实验。对实际看到的黑屏，先记录画面持续范围、声音是否仍在以及来源身份；仅凭黑色不能断定有 GAP，同样有 GAP 也不能承诺应用必定绘制黑色视频。不能靠改文件名或删除标签生成缺失的媒体字节。
+
+## 六、在云映记录可复查的现象
+
+对真实来源从缺段前的可用位置顺播，记录可见时间、声音、等待或错误的原文，再检查后续可用内容是否能认出。没有清单就只能描述现象，不能填“已发现 GAP”。当前公开更新没有承诺所有 HLS 草案扩展的支持；本课也不把一次结果扩大为完整兼容认证。保留原片与可用备用来源，若需要提供者补齐缺少媒体，只反馈自己实际掌握的清单条目和观察，不声称应用能凭空恢复不存在的内容。
+
+## 七、区分缺段声明与请求失败
+
+若没有 GAP 但某地址请求失败，应另记请求结果，不能反过来给原清单补一个标签再说证据一致。若标签位置不清，回到下一媒体段的作用范围核对；若总范围算错，重新逐条加时长，不用应用进度条替代清单算术。一次只修正文档中的一个误读，原资料保留。真实来源后来被更新时，新的取得时间与内容另存，避免将今天的标签和昨天的错误拼成同一次会话，更不能未经来源方授权改远端配置。
+
+## 八、重开可用来源并交付限制
+
+退出后重开自己的完整可用样本，确认日常来源没有被练习摘录替换。交付明确版本的参考、三段时间尺、标签作用箭头、黑帧对照与实际观察状态。通过标准是能分清“声明缺媒体”“有媒体但画面黑”“请求失败”三件事，并说明哪些未核。换清单后重新检查，不把本例第二段位置写成固定规则；未执行真机测试、资源获取或部署验证的部分都保留待核，不能改写为已通过。
+
+## 相关教程与资料
+
+[普通分片台账](<https://allluckly.cn/guides/icouldplay-hls-targetduration-rounded-segment-limit/>)、[关键帧清单](<https://allluckly.cn/guides/icouldplay-hls-iframe-only-interval-preview-boundary/>)。
+
+资料核对：2026 年 11 月 14 日，依据 [云映官方 App Store 说明](<https://apps.apple.com/cn/app/id6755653178>)与 [Apple 公开版本查询](<https://itunes.apple.com/lookup?id=6755653178&country=cn>)，当前版本 1.1.1，最低要求 iOS / iPadOS 15.0。1.1.1 的公开更新列出 Kodi、OpenList / AList 与 S3 兼容存储，并改进来源切换及跳转后的字幕显示；本文按这些公开范围与现有播放能力组织任务，具体入口以安装版本为准。自制样本、手工记录与外部文件整理不是应用新增自动功能；未声称已完成真机或私人服务器实测。
+{% endraw %}

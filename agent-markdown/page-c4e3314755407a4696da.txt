@@ -1,0 +1,65 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-shear-scale-composition-order-two-results/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint composition order: shear then double height differs from the reverse'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-shear-scale-composition-order-two-results/
+agent_source_sha256: ce8e52ab5e80d69df92b9a37ede955dcb8e611961d489e378c66553e94c76a4c
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint composition order: shear then double height differs from the reverse
+
+Language: en
+Canonical: [VectorPaint composition order: shear then double height differs from the reverse](<https://allluckly.cn/en/guides/vectorpaint-shear-scale-composition-order-two-results/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-shear-scale-composition-order-two-results/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-shear-scale-composition-order-two-results/>)
+Published: 2026-11-14T00:00:00+08:00
+Modified: 2026-11-14T09:33:58+08:00
+Author: Bison
+
+Audit point results three-two and four-two under opposite orders, then use equal area sixteen to show that equal areas do not identify transformations.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-shear-scale-composition-order-two-results/>), translated on 2026-11-14. Original publication dates, attribution, code and version notes are retained.
+
+A horizontal shear and vertical scaling can give different results when reversed. Calculate two transformation chains and manually draw intermediate and final states. Audit composition and inverse order, without repeating the earlier dissection proof or assuming an automatic matrix calculator.
+
+## Declare two operations and the starting point
+
+Define S(x,y)=(x+y,y) and D(x,y)=(x,2y) on paper. Start P=(2,1), declaring that “S then D” means calculate S first and pass its output to D. On an 1800×1200 canvas leave three panels per chain for original, intermediate and final states. Every panel has its own mathematical origin and the same scale; page spacing is not a translation. Fix S/D identities before plotting and never swap their names later.
+
+## Pass the sheared result to height scaling
+
+S sends (2,1) to (3,1), since 2+1=3. D then acts on that intermediate point, doubling its y to produce (3,2). Label P→P1→P2 with S and D and record both input/output pairs. The [W3C coordinate and matrix specification](<https://www.w3.org/TR/SVG2/coords.html#TransformMatrixDefined>) gives composition context. Here natural-language action order is explicit rather than guessed from matrix reading conventions; interface menu order is not evidence of calculation order.
+
+## Restart the reversed chain from the original point
+
+Restart at original P=(2,1). D gives (2,2), then S adds the new y=2 to x=2, producing (4,2). Final points (3,2)/(4,2) share y but differ in x by 1. Do not continue the reverse chain from the first chain’s endpoint, which would perform four operations. Nor reuse old y=1 in the second shear. Name intermediate states separately and use branching arrows and inputs if the drawing shares the original point.
+
+## Explain the difference with general coordinates
+
+For arbitrary (x,y), S then D yields (x+y,2y), whereas D then S yields (x+2y,2y), differing in x by y. Points with original y=0 therefore agree, without establishing equality for all points. Add Q=(3,0), which both chains leave at (3,0), then retain nonzero-y P as a counterexample. Separate agreement at one point from equality of composite functions. One axis point cannot prove commutation, and P’s disagreement does not imply no points can agree.
+
+## Send all four rectangle vertices through both chains
+
+Use rectangle A=(0,0), B=(4,0), C=(4,2), E=(0,2), naming its fourth vertex E to distinguish it from operation D. S then D gives (0,0),(4,0),(6,4),(2,4); D then S gives (0,0),(4,0),(8,4),(4,4). Both bases and perpendicular heights are 4, but top positions differ. Match every original vertex rather than comparing bounding boxes. Both areas are 16 versus original 8; equal area multiplication does not identify the two composite images.
+
+## Reverse operation order for the inverse
+
+Invert the first chain from (3,2): halve y to obtain (3,1), then subtract current y=1 from x to recover (2,1). Subtracting y first gives (1,2), then halving gives (1,1), failing. For the second chain, invert (4,2) by undoing shear first to (2,2), then height scaling to (2,1). Name correct and incorrect inverse chains separately. Application undo history is not proof of an inverse formula; this checks declared mathematical order without promising recovery of arbitrary editing states or preserved histories.
+
+## Troubleshoot lost intermediate states and auto-fitting
+
+If diagrams appear identical, check whether each was independently fitted to its frame. Restore shared scale and inspect upper vertices (6,4) versus (8,4). If both answers read (3,2), check stale y in the reversed chain or copied answers with only arrow labels changed. Without corresponding app controls, plot calculated points manually and label approximation rather than claiming a native shear command ran. Preserve intermediates: two endpoint screenshots do not identify the operations. Keep operation D distinct from vertex E and arrows clear of the crucial x difference.
+
+## Reopen and audit the counterexample and both inverses
+
+Save, leave and reopen. Hide conclusions and calculate P=(2,1) through (3,1)→(3,2) and (2,2)→(4,2), then use Q=(3,0) to show agreement is possible. Audit four vertices and both areas 16. Invert each chain in reverse order, confirming the wrong inverse stops at (1,1). Delivery retains operation definitions, inputs, intermediates and why equal areas do not imply equal maps. Untested formats stay unknown. Readers should reproduce order effects and inverses without inferring automatic commutation testing or equivalent physical processes from equal area.
+
+## Related tutorials and sources
+
+[VectorPaint translation and reflection: check each vertex coordinate and orientation](<https://allluckly.cn/en/guides/vectorpaint-coordinate-translation-reflection/>), [VectorPaint parallelogram dissections: fix base and perpendicular height before area](<https://allluckly.cn/en/guides/vectorpaint-parallelogram-cut-shear-height/>).
+
+Checked on November 14, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Scope follows the [official App Store](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261114>). Manual exercises use controls actually available in your installed version; external calculations, written records and diagrams imply no built-in automatic analysis. No step-by-step physical-device, private-file or all-export-environment testing is claimed.
+{% endraw %}

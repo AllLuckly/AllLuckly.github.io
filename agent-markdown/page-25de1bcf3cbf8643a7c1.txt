@@ -1,0 +1,67 @@
+---
+layout: null
+permalink: /en/guides/manyue-png-trns-colour-key-alpha-boundary/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Check PNG transparency in ManYue: separate colour keys from per-pixel alpha'
+agent_source_url: https://allluckly.cn/en/guides/manyue-png-trns-colour-key-alpha-boundary/
+agent_source_sha256: be2c7c99e31fe42e5e69c671ac880d0ac0dc91a87d38504869a3686742643738
+agent_generator_version: 1
+---
+{% raw %}# Check PNG transparency in ManYue: separate colour keys from per-pixel alpha
+
+Language: en
+Canonical: [Check PNG transparency in ManYue: separate colour keys from per-pixel alpha](<https://allluckly.cn/en/guides/manyue-png-trns-colour-key-alpha-boundary/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-png-trns-colour-key-alpha-boundary/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-png-trns-colour-key-alpha-boundary/>)
+Published: 2026-11-14T00:00:00+08:00
+Modified: 2026-11-14T09:31:46+08:00
+Author: Bison
+
+Compare truecolour tRNS and RGBA samples, checking colour keys, partial transparency and reader backgrounds without treating white as proof of opacity.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-png-trns-colour-key-alpha-boundary/>), translated on 2026-11-14. Original publication dates, attribution, code and version notes are retained.
+
+A white PNG background may belong to the file or show through transparent pixels from the reader background. Read original samples in ManYue after externally checking colour type and transparency information, then compare two backgrounds. Separate a transparency key, per-pixel alpha and the composited screen colour. No chunk editor or claim of precise colour equality from visual similarity is required.
+
+## Make original transparency controls
+
+Externally design three marked regions intended as opaque, fully transparent and partially transparent, preserving the original settings. An editor’s checkerboard may be a display aid rather than stored pixels; inspect exported data instead of treating an editor screenshot as a transparent file. Fix dimensions at four hundred by three hundred and put markers in an opaque area. Note that antialiased text may introduce intermediate alpha values so extra reported values have an explanation.
+
+## Understand a truecolour transparency key
+
+Export A as truecolour type two with tRNS specifying one RGB key, such as pure green, only if the tool supports it. The key matches the entire RGB sample tuple, not every greenish pixel. Matching pixels are fully transparent and others opaque; this key cannot assign an arbitrary half-opacity to a pixel. If the tool actually outputs type six, record RGBA rather than insist on tRNS because an export button mentioned transparency.
+
+## Record RGBA’s separate alpha sample
+
+Export B as type six with eight bits per sample: alpha is separate from RGB. Alpha zero means fully transparent, two hundred fifty-five fully opaque, and intermediate values partial transparency. A value of one hundred twenty-eight is one hundred twenty-eight over two hundred fifty-five, near rather than exactly one half. It is not green intensity, and four eight-bit channels do not total eight bits per pixel. Leave premultiplied internal buffers outside this exercise rather than confuse file samples with library memory layouts.
+
+## Keep indexed transparency distinct
+
+Optional indexed type-three C can associate alpha with palette entries through tRNS; do not transfer type-two’s single fully transparent RGB-key restriction to indexed transparency. Record which index maps to which palette colour and alpha: index is not alpha itself. A and B suffice, with C conditional on tool support and reports. Do not invent success or insert tRNS arbitrarily into type six as a second transparency system; the specification restricts that chunk for alpha-bearing types. No binary editing is required.
+
+## Compare compositing on light and dark backgrounds
+
+Open A and B through an existing local path and compare the same regions on light and dark backgrounds when the actual interface offers them. Otherwise record the available condition. Fully transparent regions reveal the background; partially transparent colours change composited appearance with it, without proving source RGB was rewritten. Use opaque markers to confirm file identity. A screenshot usually captures composited appearance and cannot recover a source alpha report by itself. Retain observations and source fields separately.
+
+## Inspect antialiased edges around a colour key
+
+If A shows a green fringe, inspect whether antialiasing created pale-green edge pixels unequal to the exact key; similarity does not make them transparent. Per-pixel alpha in B can represent smoother edges, but source and compositing still matter, so a type change does not guarantee removal of every fringe. Check centres and edges using original shapes before library-wide changes. If a tool flattened onto white earlier, reader themes cannot automatically recover discarded transparency.
+
+## Check white backgrounds and missing evidence
+
+An invisible patch on white does not establish missing content: change an available background or inspect alpha externally. Three channels with transparency may involve type-two tRNS rather than a false report. Distinguish an absent field from a tool that did not expose it; unknown is not none. Convert copies while preserving the transparent source, avoiding flattening the only original. Share colour design, type, transparency route and background without claiming unperformed cross-device agreement.
+
+## Reopen and explain three distinct layers
+
+Reopen A and B, checking markers, transparent regions and actual background rather than accidentally selecting a flattened screenshot. Retain source, export reports, key or alpha conditions, centre/edge observations and unperformed steps. Explain why white does not prove opacity and why appearance alone cannot establish the mechanism. Completion means traceable samples, transparency rules and compositing, not a universally best format. Reinspect fields after changes to depth, palette or export tool rather than reuse today’s labels.
+
+## Related guides and sources
+
+[Check PNG bit depth in ManYue: an eight-bit index differs from eight-bit RGB samples](<https://allluckly.cn/en/guides/manyue-png-indexed-truecolour-bitdepth-palette/>); [Checking transparent comic pages in ManYue: background compositing versus missing lines](<https://allluckly.cn/en/guides/manyue-transparent-page-background-check/>).
+
+Checked on November 14, 2026: [Apple public information](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261114>) lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the [official App Store](<https://apps.apple.com/cn/app/id6753895889>) for published capabilities; verify specific controls in the installed version.
+
+Method reference: [W3C: PNG tRNS transparency information](<https://www.w3.org/TR/png-3/#11tRNS>). Samples, passages and controls are original exercises. Sources establish definitions and checking methods rather than new automatic analysis in the app. Manual records may be kept externally, and unknown fields should remain explicit. This article does not claim step-by-step testing on a physical device, private server or every output environment.
+{% endraw %}

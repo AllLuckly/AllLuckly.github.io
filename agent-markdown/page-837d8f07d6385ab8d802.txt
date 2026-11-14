@@ -1,0 +1,66 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-cubic-bezier-three-level-midpoint-tangents/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint cubic Bézier curves: audit three midpoint levels and endpoint
+  tangents'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-cubic-bezier-three-level-midpoint-tangents/
+agent_source_sha256: 3cd77a7a4be24195b373938ba5f020805629e33946f95c7fa566f7761d6ce7bf
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint cubic Bézier curves: audit three midpoint levels and endpoint tangents
+
+Language: en
+Canonical: [VectorPaint cubic Bézier curves: audit three midpoint levels and endpoint tangents](<https://allluckly.cn/en/guides/vectorpaint-cubic-bezier-three-level-midpoint-tangents/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-cubic-bezier-three-level-midpoint-tangents/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-cubic-bezier-three-level-midpoint-tangents/>)
+Published: 2026-11-14T00:00:00+08:00
+Modified: 2026-11-14T09:33:58+08:00
+Author: Bison
+
+Use four control points and three interpolation levels to verify the midpoint, the two-thirds sample and endpoint tangent changes.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-cubic-bezier-three-level-midpoint-tangents/>), translated on 2026-11-14. Original publication dates, attribution, code and version notes are retained.
+
+Start with two endpoints and two controls, construct a cubic Bézier midpoint, then change one control and track which endpoint tangent remains fixed. Unlike a quadratic, this uses two controls and three interpolation levels. Calculate on paper and preserve the displayed curve separately from its construction polygon.
+
+## Declare four points and endpoint identities
+
+Use P0=(0,0), P1=(2,6), P2=(6,−2), P3=(8,4), connecting the control polygon in that order. A 1600×1200 canvas can use scale 100 with origin at (300,800) and mathematical y upward. P0/P3 are curve endpoints; P1/P2 are controls, not points the curve must pass through. Separate four markers, polygon, curve, interpolation points and answers. Declare roles before colouring so the final appearance still reveals endpoint nodes versus control-handle tips.
+
+## Find first-level midpoints on three edges
+
+At parameter one-half find A=(1,3) on P0P1, B=(4,2) on P1P2 and C=(7,1) on P2P3. Apply the same parameter to every edge rather than taking only the longest edge’s midpoint and estimating others. Draw thin AB and BC, distinguishing them from the original polygon and separating their labels from original vertices. The [W3C cubic Bézier path specification](<https://www.w3.org/TR/SVG2/paths.html#PathDataCubicBezierCommands>) identifies two controls for a cubic segment. Verify the three-level construction by hand instead of tracing the polygon as the final curve.
+
+## Construct the second and third levels
+
+Take D, midpoint of AB, as (2.5,2.5) and E, midpoint of BC, as (5.5,1.5). The final midpoint F of DE is (4,2), the curve position at one-half. F happens to coincide with first-level B in this example, but their roles differ. This does not permit skipping a level or claiming all cubic midpoints lie at the midpoint of the two controls. Label the coincidence as coordinate-specific and use distinct D/E markers. Changing controls may separate F and B without any software fault; the rule must explain both cases.
+
+## Use a two-thirds sample to break the coincidence
+
+Sample t=2/3, applying the same rightward interpolation fraction at every level. First-level points are (4/3,4), (14/3,2/3) and (22/3,2). Second-level coordinates are (32/9,16/9) and (58/9,14/9). The final point is (148/27,44/27), approximately (5.481,1.630). Retain exact fractions on paper and approximate coordinates in the diagram; a visually coincident marker cannot replace the calculation.
+
+## Match each endpoint tangent to its adjacent control
+
+The initial tangent follows P0→P1, direction (2,6); the terminal forward tangent follows P2→P3, also (2,6). Parallel endpoint tangents do not make the whole segment straight. [Apple’s path guide](<https://developer.apple.com/library/archive/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/dq_paths/dq_paths.html>) explains the roles of two controls in a cubic. Add short tangent arrows, ensuring the terminal arrow does not reverse into P3→P2. Distinguish displayed handle orientation from mathematical derivative direction; a handle’s appearance alone is not automatic tangent verification.
+
+## Move only the second control for a controlled comparison
+
+Duplicate the drawing and move only P2 from (6,−2) to (6,0). The initial tangent remains (2,6); the terminal becomes (2,4). At one-half the y increase is control weight 3/8 times 2, or 3/4, giving new midpoint (4,2.75). This independently checks endpoint direction and full interpolation rather than relabelling a quadratic exercise. Reconstruct all three levels, retaining original and modified identifiers. Do not also move the endpoint to restore parallel tangents, which would obscure the effect of the one changed control.
+
+## Troubleshoot controls mistaken for curve nodes
+
+When drawing with available pen and node controls, check that the segment has two endpoint nodes and that controls were not entered as extra corners. If handles cannot be positioned precisely, label the displayed curve approximate and preserve the exact construction separately; do not claim numerical parameter evaluation in the interface. Hide helpers and check the main curve has not closed into a filled region. If linked handles affect an adjacent segment, isolate a copy for inspection so coupled edits do not contaminate this four-point comparison. Zoomed screenshots alone cannot establish export precision.
+
+## Reopen and audit level counts and tangent changes
+
+Save and reopen, counting four original points, three first-level points, two second-level points and one final point, then distinguish the half and two-thirds samples. Preserve the explanation of original F/B coincidence. Independently recalculate the new midpoint (4,2.75) and terminal tangent (2,4). Hide answers and repeat the single-control prediction, confirming only P2 changes and the initial tangent stays fixed. Inspect minus signs, denominators and arrows in delivery, retaining approximation limits and untested-format status. The result rests on an explicit construction, not automatic differentiation or curvature measurement.
+
+## Related tutorials and sources
+
+[VectorPaint quadratic Bézier diagrams: two midpoint levels locate a curve point](<https://allluckly.cn/en/guides/vectorpaint-quadratic-bezier-two-level-midpoint-diagram/>), [Edit Bézier nodes in VectorPaint: smooth curves without adding anchors](<https://allluckly.cn/en/guides/vectorpaint-bezier-nodes/>).
+
+Checked on November 14, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Scope follows the [official App Store](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261114>). Manual exercises use controls actually available in your installed version; external calculations, written records and diagrams imply no built-in automatic analysis. No step-by-step physical-device, private-file or all-export-environment testing is claimed.
+{% endraw %}

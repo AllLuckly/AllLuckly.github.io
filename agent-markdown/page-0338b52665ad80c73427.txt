@@ -1,0 +1,67 @@
+---
+layout: null
+permalink: /en/guides/manyue-jpeg-exif-orientation-stored-display-map/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Check JPEG orientation in ManYue: separate stored rows from EXIF display intent'
+agent_source_url: https://allluckly.cn/en/guides/manyue-jpeg-exif-orientation-stored-display-map/
+agent_source_sha256: dc49a268c89d94a373ae1ccadd507262ff1d8e9bb79efca733f744625eab95bc
+agent_generator_version: 1
+---
+{% raw %}# Check JPEG orientation in ManYue: separate stored rows from EXIF display intent
+
+Language: en
+Canonical: [Check JPEG orientation in ManYue: separate stored rows from EXIF display intent](<https://allluckly.cn/en/guides/manyue-jpeg-exif-orientation-stored-display-map/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-jpeg-exif-orientation-stored-display-map/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-jpeg-exif-orientation-stored-display-map/>)
+Published: 2026-11-14T00:00:00+08:00
+Modified: 2026-11-14T09:31:46+08:00
+Author: Bison
+
+Use original top and corner markers to check orientation, rotation and reflection without confusing swapped dimensions with resampling.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-jpeg-exif-orientation-stored-display-map/>), translated on 2026-11-14. Original publication dates, attribution, code and version notes are retained.
+
+Different JPEG orientation in two tools does not necessarily mean recompression. Metadata can describe intended presentation separately from stored pixel rows and columns. Mark an original image’s top and corners and compare external reports with actual ManYue display. Do not assume all import paths handle it identically or require an EXIF-field interface in the app.
+
+## Fix orientation with asymmetric markers
+
+Create an original six-hundred-wide, four-hundred-high rectangle: “顶” (“top”) above, red circle upper-left, blue square upper-right and a short bar below. Asymmetric positions and shapes expose reflection. Retain a lossless source and avoid photographs carrying private metadata; only orientation is needed. Record filename, stored dimensions and marker positions. A horizontal long edge alone cannot establish top, since squares and text-free images can also carry intended orientation.
+
+## Read the value externally rather than guess labels
+
+Inspect JPEG copies read-only with a trusted tool and record the actual value and pixel dimensions. Use normal one and display-intent six, ninety degrees clockwise, as controls. Map textual tool labels to documented values rather than equate six rotation-button clicks with value six. If a tool already normalised pixels and removed or reset the tag, record that actual state instead of inventing a retained label. Name copies separately and preserve the source; no EXIF editor in ManYue is required.
+
+## Separate stored and oriented dimensions for six
+
+Let A retain stored dimensions six hundred by four hundred and orientation six. Its intended display extent becomes four hundred by six hundred. This is an orientation transform of the same grid, not a changed number of pixels: both products are two hundred forty thousand. All markers move together, rather than rotating text alone. This example starts from known stored orientation. If a tool reports already-oriented dimensions, label that convention instead of treating differing dimension conventions as corruption.
+
+## Do not reduce reflection to rotation
+
+Optional B uses orientation two, a horizontal-reflection display intent, with unchanged stored pixels. Left and right reverse together with text and markers; a half-turn also moves top to bottom and is not equivalent. Two is not two rotations, and this exercise need not enumerate eight cases. If the tool cannot change only the tag, use a labelled paper mapping rather than present physically flipped pixels as metadata-only change. Record whether an operation changed the tag or the pixels.
+
+## Check normalisation for double application
+
+If documented normalisation is available, save C with the intended transform baked into pixels and orientation reset to normal. Correctly interpreted A and C may look alike despite differing stored rows or file hashes. If transformed pixels retain six, another application can rotate them again. Inspect creation history before blaming arbitrary reader rotation. Perform this only with documented behaviour and copies, not library-wide tag removal that discards orientation information the images required.
+
+## Check every marker under matched reading conditions
+
+Place the JPEGs in a supported local image or comic copy and open in ManYue, fixing device orientation, page layout and zoom. Record top text, red circle, blue square and bar relations. Actual handling may depend on the path and decoder; observe rather than assume uniform support. Device-induced layout is not a metadata change. Change one condition at a time and claim no compatibility result for a value without a valid test file. Keep originals and normalised samples distinct.
+
+## Check reflection and dimension conventions
+
+Correct top/bottom with reversed left/right suggests a reflection value or previously flipped source, not more rotation clicks. For dimension mismatches, ask whether reports describe stored or oriented extents and confirm file identity. Restore the full page when cropping hides markers. Share original geometry and relevant orientation fields without private metadata. One tool ignoring a tag does not make every tool wrong, and unperformed per-value device tests remain unperformed. Retain before-and-after copies for comparison and recovery.
+
+## Reopen and explain metadata and pixels
+
+Exit and reopen the current copy, matching filename, four markers and report. Explain A’s orientation tag, B’s reflection and C’s normalisation. Keep stored dimensions, intended orientation, actual appearance and performed changes separately, with the two-hundred-forty-thousand-pixel calculation as a count check. Same appearance does not prove identical bytes, and swapped extents do not prove resampling. Keep unknown import handling unknown and repeat samples after exporter or path changes instead of generalising to every JPEG and app version.
+
+## Related guides and sources
+
+[ManYue scan orientation checks: distinguish stored pixels from displayed rotation](<https://allluckly.cn/en/guides/manyue-scan-orientation-reference/>); [ManYue orientation image counts: separate art browsing from close reading](<https://allluckly.cn/en/guides/manyue-orientation-image-counts/>).
+
+Checked on November 14, 2026: [Apple public information](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261114>) lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the [official App Store](<https://apps.apple.com/cn/app/id6753895889>) for published capabilities; verify specific controls in the installed version.
+
+Method reference: [Apple Image I/O: image orientation and reflection](<https://developer.apple.com/documentation/imageio/cgimagepropertyorientation>). Samples, passages and controls are original exercises. Sources establish definitions and checking methods rather than new automatic analysis in the app. Manual records may be kept externally, and unknown fields should remain explicit. This article does not claim step-by-step testing on a physical device, private server or every output environment.
+{% endraw %}

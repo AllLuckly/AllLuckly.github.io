@@ -1,0 +1,58 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay ASS positioning: separate script coordinates, anchors and device pixels'
+description: Compare two positions and a doubled script canvas without treating script units as device pixels.
+permalink: /en/guides/icouldplay-ass-pos-script-coordinate-display-pixels/
+date: '2026-11-14 00:00:00 +08:00'
+modified: '2026-11-14 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 151
+topic: Placement, streams and sound
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-14-icouldplay-ass-pos-script-coordinate-display-pixels.md
+source_url: /guides/icouldplay-ass-pos-script-coordinate-display-pixels/
+translation_method: editorial
+translation_source_sha256: 7eccc0a9f34009fbf80b8183bd783bf30905e8ecbc6a3eaa89e14f66284beec0
+translation_date: '2026-11-14T01:12:39+00:00'
+excerpt: Compare two positions and a doubled script canvas without treating script units as device pixels.
+---
+{% raw %}
+<p>A coordinate of 160 is not necessarily 160 phone pixels from the left. Prepare a complete ASS externally, interpret two points with a central anchor and script dimensions, then record actual iCouldPlay layout. Keep format, video region and device pixels separate without promising complete positioning/font fidelity across paths.</p>
+<h2 id="section-1">1. Fix the clip and display region</h2>
+<p>Choose an owned playable clip of at least ten seconds without the exercise wording burned in. Record identity, source, orientation and fitting mode; sketch the visible video boundary separately from black bars. Edit plain text externally and preserve originals. Without an available loading control, inspect source and mark playback unperformed. A file listing is not positioning evidence; do not change cropping and caption position together.</p>
+<h2 id="section-2">2. Save two identical-wording positioned lines</h2>
+<p>The complete file uses a 640×360 script, with center alignment and two explicit positions in event text. Timing is separate and wording/size identical. Preserve braces/backslashes in Events Text, not timing columns or appended pixel labels. Font substitution may change text width without changing coordinate values. Save actual UTF-8 ASS and inspect content, rather than merely rename an arbitrary file.</p>
+<pre><code>[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,24,&amp;H00FFFFFF,&amp;H000000FF,&amp;H00000000,&amp;H00000000,0,0,0,0,100,100,0,0,1,1,0,5,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:04.00,Default,,0,0,0,,{\an5\pos(160,90)}Read the anchor.
+Dialogue: 0,0:00:05.00,0:00:08.00,Default,,0,0,0,,{\an5\pos(480,270)}Read the anchor.
+</code></pre>
+<h2 id="section-3">3. Read positions as script-space points</h2>
+<p>Use <a href="https://aegisub.org/docs/latest/ass_tags/#set-position">Aegisub positioning documentation</a>: pos gives an anchor location whose role depends on alignment. Here x increases rightward and y downward. Points are one-quarter and three-quarters of script width/height. They are neither box dimensions nor sentence endpoints. Mark origin/axes and center anchors first. Changing alignment changes how text extends around a point, so the leftmost letter alone cannot diagnose coordinate reading.</p>
+<h2 id="section-4">4. Double script dimensions and positions together</h2>
+<p>For a control, double script dimensions to 1280×720 and positions to (320,180)/(960,540), retaining quarter/three-quarter anchors. Font-size scaling is another condition; this comparison concerns anchors, not identical text boxes. Doubling only dimensions makes the first point one-eighth of each dimension, an explicit missed-coordinate control. Preserve originals and label copies separately.</p>
+<h2 id="section-5">5. Check wording before position in iCouldPlay</h2>
+<p>Select the correct clip/copy and play from the beginning beyond eight seconds. Check full wording before relative position within the video, without substituting screenshot pixels for script units. Record readable text and mismatched position separately, including no visible difference honestly. Resume after pausing to check endings instead of attributing paused persistence to positioning. Keep orientation/control overlays comparable.</p>
+<h2 id="section-6">6. Keep fixed placement separate from motion</h2>
+<p>Check that the lines use fixed placement without move or unknown overrides. Two separate events do not define an animation between their points. Save a plain fallback removing placement overrides while retaining text/timings and verify selection/readability. Record actual app caption-position settings separately; they are not the ASS pos command, and absent controls do not justify inventing automatic calibration.</p>
+<h2 id="section-7">7. Troubleshoot anchor and display-coordinate confusion</h2>
+<p>For offsets, check alignment, script dimensions and selected copy before cropping/rotation, changing one identified condition. For literal tags, inspect format/braces/escaping rather than hide them with brightness changes. Eighth-position results suggest coordinates were not doubled. Preserve original values instead of editing them to fit a desired screenshot. Without measurement, report relative impressions rather than exact device pixels or universal renderer faults.</p>
+<h2 id="section-8">8. Reopen and deliver both coordinate records</h2>
+<p>Leave playback, reopen the clip, reselect the original exercise and check both sentences/anchors, then the readable fallback. Retain dimensions, alignment, points, doubled control, observations and unknowns. Paper coordinates are not physical-device measurements; fixed events are not automatic movement, and one path does not certify all devices. Preserve all originals/copies and append new display-mode observations instead of rewriting prior results.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-ass-numpad-alignment-anchor-grid/">ASS alignment</a>, <a href="/en/guides/icouldplay-display-edge-test-card/">Video display boundaries</a>.</p>
+<p>Checked on November 14, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

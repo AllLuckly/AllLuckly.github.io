@@ -1,0 +1,67 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Check OPDS indirect acquisition in ManYue: distinguish entry media from final publication formats'
+description: Trace an original catalogue excerpt through an HTML entry, ZIP package and final PDF, separating format declarations,
+  permissions and page streaming.
+permalink: /en/guides/manyue-opds-indirect-acquisition-format-levels/
+date: '2026-11-14 00:00:00 +08:00'
+modified: '2026-11-14 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 195
+topic: Pixel semantics and format declarations
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-14-manyue-opds-indirect-acquisition-format-levels.md
+source_url: /guides/manyue-opds-indirect-acquisition-format-levels/
+translation_method: editorial
+translation_source_sha256: 5d7dcab866ebb99b79756db41f1bb6d98f588213dd6a883ad68fe861cfe7c13a
+translation_date: '2026-11-14T01:31:46+00:00'
+excerpt: Trace an original catalogue excerpt through an HTML entry, ZIP package and final PDF, separating format declarations,
+  permissions and page streaming.
+---
+{% raw %}
+<p>An OPDS acquisition link typed as HTML does not require the final book to be a web page. Nested indirect-acquisition information can describe subsequent media types. Read an original excerpt externally, map its levels and use a supported sample or report in ManYue. Paper metadata is not a live download service or proof that the app automatically handles every fulfilment, login or packaging flow.</p>
+
+<h2 id="只制作无需账号的目录摘录">Make a catalogue excerpt without accounts</h2>
+
+<p>Write an original excerpt externally with relation <code>http://opds-spec.org/acquisition</code>, address <code>https://example.com/get/sample</code> and type <code>text/html</code>. The address is a teaching placeholder, not a file service; do not click or provide credentials. Add an original title and exercise identifier and preserve the text. This is field-reading material, not a claim of a complete deployable OPDS document with every required element. No server means no alleged successful connection.</p>
+
+<h2 id="先看链接自身的三个字段">Read the link’s own three fields first</h2>
+
+<p>Separate relation, href and type: relation identifies an acquisition entry, href its target and type the target media. Here text/html describes the entry resource; appending a PDF suffix would not create a direct download. “get” in a path does not establish full-book delivery, so actual response remains unknown. Do not copy a cover or preview type into acquisition: distinguish multiple links by relation before analysing indirect types.</p>
+
+<h2 id="读第一层间接类型的包装">Read the first indirect packaging level</h2>
+
+<p>Place <code>&lt;opds:indirectAcquisition type="application/zip"&gt;</code> inside the link as the first indirect level. A complete XML context must bind the opds prefix to its namespace; this field excerpt is not a validated standalone XML document. ZIP describes an expected packaging level, not HTTP Content-Encoding or page streaming. Retain HTML followed by ZIP rather than discard the entry and any legitimate acquisition steps simply because ZIP appears.</p>
+
+<h2 id="最终类型与同级项目各计各的">Distinguish final types from sibling items</h2>
+
+<p>Inside ZIP add <code>&lt;opds:indirectAcquisition type="application/pdf" /&gt;</code> and a sibling for <code>application/epub+zip</code>. This can describe multiple representations expected within a package. Nesting expresses levels; siblings do not mean read PDF and then automatically convert it to EPUB. Draw HTML to ZIP to two leaf types, not three comic chapters. For other catalogues use actual parent-child elements, not indentation alone, since whitespace alignment does not establish XML hierarchy.</p>
+
+<h2 id="权限与格式声明分开验收">Check permissions separately from media types</h2>
+
+<p>A final-PDF declaration supports only what the catalogue says is expected, not authorisation, successful downloading or complete bytes. A real source may require its normal authorised login or purchase flow; this exercise supplies no account and performs no transaction. Indirect acquisition is not an OPDS-PSE page template and does not make ordinary whole-file OPDS directly readable. Separate discoverable, authorised, acquired and page-decodable states, leaving unperformed checks unperformed rather than ticking all from one type.</p>
+
+<h2 id="用自己的pdf小样检查实际阅读">Check actual reading with your own PDF</h2>
+
+<p>Make a separate original three-page numbered PDF externally, without claiming it came from the placeholder HTML or ZIP. Import through an existing ManYue PDF path and inspect all page numbers, centres and return positions, with an optional report PDF beside it. Reading a report is not passing an acquisition protocol. A legitimately acquired real file may be recorded separately by identity and actual type. Without a server, stop at the local sample rather than invent responses, download times or logins.</p>
+
+<h2 id="排查类型层次与链接混接">Check mixed levels and mistaken links</h2>
+
+<p>If text/html is taken as proof that the final PDF is unsupported, restore entry-versus-leaf columns. If sibling types become sequential conversion, redraw nesting. A downloaded web page may be the entry, not the final file; renaming it cbz is insufficient. Displaying a catalogue does not establish every later authentication flow, so record the stopping level. Share original excerpts and redacted types, not signed private links. Editing a type declaration alone cannot repair absent files or permissions.</p>
+
+<h2 id="退出重开后重建获取层次">Reopen and reconstruct acquisition levels</h2>
+
+<p>Reopen the report and the local three-page sample, checking structure and pages separately so a same-title cover is not mistaken for content. Retain link fields, indirect-type tree, permission status, acquired-file identity and actual reading outcomes, each sourced or explicitly unknown. Explain how an HTML entry can declare a later PDF without guaranteeing automatic handling of intermediates. Reassess catalogue, packaging or login changes instead of treating this paper example as a real-service compatibility promise.</p>
+
+<h2 id="相关教程与资料">Related guides and sources</h2>
+
+<p><a href="/en/guides/manyue-opds-cover-sample-acquisition-links/">ManYue: Distinguish OPDS artwork, sample and acquisition links</a>; <a href="/en/guides/manyue-opds-pse-library/">ManYue OPDS connections: why a catalogue may not support page streaming</a>.</p>
+
+<p>Checked on November 14, 2026: <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261114">Apple public information</a> lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities; verify specific controls in the installed version.</p>
+
+<p>Method reference: <a href="https://specs.opds.io/opds-1.2#54-element-definitions">OPDS 1.2: indirect acquisition and nested media types</a>. Samples, passages and controls are original exercises. Sources establish definitions and checking methods rather than new automatic analysis in the app. Manual records may be kept externally, and unknown fields should remain explicit. This article does not claim step-by-step testing on a physical device, private server or every output environment.</p>
+{% endraw %}

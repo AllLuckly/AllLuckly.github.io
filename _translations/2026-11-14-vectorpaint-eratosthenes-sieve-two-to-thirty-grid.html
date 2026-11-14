@@ -1,0 +1,44 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint sieving up to thirty: retain each prime while removing its multiples'
+description: Track rounds for two, three and five in a fixed two-to-thirty grid, distinguishing first removals, revisits and the ten final primes.
+permalink: /en/guides/vectorpaint-eratosthenes-sieve-two-to-thirty-grid/
+date: '2026-11-14 00:00:00 +08:00'
+modified: '2026-11-14 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 199
+topic: Polyhedra, graphs and number theory
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-14-vectorpaint-eratosthenes-sieve-two-to-thirty-grid.md
+source_url: /guides/vectorpaint-eratosthenes-sieve-two-to-thirty-grid/
+translation_method: editorial
+translation_source_sha256: 81a05caf65ed3197ec98a1d25dc9911dae956e2788d68baca8b6ea2c6206f87a
+translation_date: '2026-11-14T01:33:58+00:00'
+excerpt: Track rounds for two, three and five in a fixed two-to-thirty grid, distinguishing first removals, revisits and the ten final primes.
+---
+{% raw %}
+<p>Use a static number grid to illustrate the sieve of Eratosthenes. Retain each current prime and distinguish revisiting an already removed number from removing it again. Keep manual algorithm records separate from VectorPaint layout; no built-in prime calculator is implied.</p>
+<h2 id="建立二至三十的不重复数格">Build a unique grid from two through thirty</h2>
+<p>Create a 1600×1200 canvas with six columns and five rows. Row one is 2..7, row two 8..13, continuing to a final row 26..30 with its last cell labelled outside scope. There are twenty-nine integers from 2 through 30, so thirty cells do not justify adding 1 or 31. Separate numbers, removal marks, retention circles and round notes. Fix positions across rounds. The grid organises reading; integer conditions, rather than colour or cell location, determine the algorithm.</p>
+<h2 id="先读筛法并声明一不在质数内">Read the sieve rule and exclude one</h2>
+<p>The <a href="https://xlinux.nist.gov/dads/HTML/sieve.html">NIST sieve entry</a> starts with unmarked integers from 2 and processes multiples of successive unmarked numbers. A prime is greater than 1 with only 1 and itself as positive divisors, so 1 is neither in this grid nor a missed surviving prime. Declare inclusive upper bound 30 and lower bound 2. Clarify removal as larger multiples after the prime, or starting at its square; beginning at one times the prime would wrongly remove the prime itself.</p>
+<h2 id="第一轮保二划十四个偶合数">Retain two and remove fourteen even composites</h2>
+<p>Circle 2 and remove 4,6,8,10,12,14,16,18,20,22,24,26,28,30: fourteen cells. Match each ledger value to its cell instead of colouring alternating positions, since row wrapping changes visual patterns. Four is 2², a valid starting point; 2×1 is the prime and stays. Retain a first-round-only copy so the fourteen first removals remain recoverable after later overlays rather than leaving only a final field of crosses.</p>
+<h2 id="第二轮保三并分清新旧划去">Retain three and distinguish new from repeated removals</h2>
+<p>The next unmarked integer is 3. Retain it and visit 9,12,15,18,21,24,27,30 from 3² upward. The visits to 12,18,24,30 overlap earlier multiples: specifically, the prime-two round already removed them. Only 9,15,21,27 are newly removed, four cells. Six is also a larger multiple of 3, but starting at 3² does not miss it because 2 already handled it. Use a distinct round style and separate first-removal dots so eight visits are not counted as eight new composites.</p>
+<h2 id="第三轮保五只新增二十五">Retain five and newly remove only twenty-five</h2>
+<p>Four is already removed and cannot start a new prime round. The next unmarked value is 5. Retain it and visit 25 and 30 from 5² within the bound; 30 is old, so only 25 is new. Smaller multiples 10,15,20 were handled by 2 or 3. Label 25=5×5: being odd and not divisible by 3 does not justify survival. Check that the retained 5 was not accidentally included in a deletion region with 25. Retention and removal marks must remain distinct.</p>
+<h2 id="以平方上界解释何时停止">Explain stopping with the square bound</h2>
+<p>Since √30 lies between 5 and 6, after processing 5 the next unmarked 7 has square 49 beyond the bound, so main sieving stops. Any composite at most 30 must have a factor at most √30; otherwise both factors would multiply to more than 30. Its smaller prime factor is therefore already among 2,3,5. Seven remains prime but needs no marking round. Record this mathematical stop condition rather than stopping for page space or visual confidence; √30 is not 30/2.</p>
+<h2 id="结果按十个保留与十九个删除核">Audit ten survivors and nineteen removed values</h2>
+<p>Survivors are 2,3,5,7,11,13,17,19,23,29: ten primes. New removals total 14+4+1=19; 10+19=29 matches the original grid size. Nine survivors suggests accidental removal of 2 or 5; eleven suggests a missed 25. Sort only a separate result list and keep the grid fixed so round evidence remains traceable. Removed values are not all nonprimes without qualification: 1, zero and negatives are outside this diagram’s range.</p>
+<h2 id="重开从三轮记录复算验收">Reopen and recalculate all three rounds</h2>
+<p>Save, leave and reopen. Hide final answers, audit fourteen first-round removals, then four new removals in the prime-three round and finally 25 in the prime-five overlay. Processing prime 5 completes the third round; check the total is three. Reconstruct all ten survivors and the stopping condition 7²&gt;30. Inspect numbers versus crosses and the out-of-scope empty cell in output, leaving untested formats unverified. Another reader should reproduce each round and count without inferring an automatic prime table or unlimited-range verification.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-seventy-two-prime-factor-tree/">VectorPaint factor trees for seventy-two: retain repeated primes and the leaf product</a>, <a href="/en/guides/vectorpaint-four-order-latin-square/">VectorPaint order-four Latin squares: check one to four in every row and column</a>.</p>
+<p>Checked on November 14, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Scope follows the <a href="https://apps.apple.com/cn/app/id1587272880">official App Store</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261114">Apple public lookup</a>. Manual exercises use controls actually available in your installed version; external calculations, written records and diagrams imply no built-in automatic analysis. No step-by-step physical-device, private-file or all-export-environment testing is claimed.</p>
+{% endraw %}

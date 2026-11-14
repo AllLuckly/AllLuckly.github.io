@@ -1,0 +1,65 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-pentagram-evenodd-nonzero-region-audit/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint pentagram interiors: distinguish even-odd and nonzero centre fills'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-pentagram-evenodd-nonzero-region-audit/
+agent_source_sha256: 6fbb57e67e5257e1d22e1c11532acb4209720949016c474e6d324d32ccc888cc
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint pentagram interiors: distinguish even-odd and nonzero centre fills
+
+Language: en
+Canonical: [VectorPaint pentagram interiors: distinguish even-odd and nonzero centre fills](<https://allluckly.cn/en/guides/vectorpaint-pentagram-evenodd-nonzero-region-audit/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-pentagram-evenodd-nonzero-region-audit/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-pentagram-evenodd-nonzero-region-audit/>)
+Published: 2026-11-14T00:00:00+08:00
+Modified: 2026-11-14T09:33:58+08:00
+Author: Bison
+
+Keep one self-intersecting five-segment path, count ray crossings and centre winding, and separate specification examples from import behaviour.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-pentagram-evenodd-nonzero-region-audit/>), translated on 2026-11-14. Original publication dates, attribution, code and version notes are retained.
+
+A pentagram may be one self-intersecting path or a simple outline with ten boundary vertices; similar appearances do not make them interchangeable. Draw region explanations for one five-segment path using SVG semantics, without assuming VectorPaint exposes a fill-rule switch.
+
+## Declare five vertices and one traversal order
+
+Create a 1600×1200 landscape canvas with two 600-square diagram areas. On paper name five equally spaced circular points A,B,C,D,E clockwise from the top, 72 degrees apart, using radius 200 if convenient. Traverse A→C→E→B→D→A, producing five crossing straight segments. A→B→C→D→E instead makes a pentagon and changes the task. Begin with an unfilled stroke diagram and direction arrows. Separate intersection markers from vertex labels so they are not all counted as path vertices.
+
+## Separate path vertices from segment crossings
+
+Trace from A through only the five original vertices and back. Intermediate crossings do not automatically create branches. Number the central pentagonal region and five tips before colouring. If editing splits intersections into independent objects, record the resulting region construction rather than using object count to prove the original five-segment structure. Arrows should recover the original traversal. Crossings are not junctions where a traveller may turn arbitrarily: the question concerns fill boundaries rather than maze routes.
+
+## Count ray crossings while avoiding vertices
+
+Under the [W3C fill rules](<https://www.w3.org/TR/SVG2/painting.html#FillRuleProperty>), an odd number of ray crossings identifies an interior point for even-odd filling. Choose a point near the centre off every edge and a thin horizontal ray avoiding vertices and crossings. It crosses twice before reaching the exterior, leaving the centre outside. A point inside a tip can use a ray crossing once, placing it inside. Number intersections individually; if a ray hits a vertex, move the test point slightly to avoid ambiguous counting of adjacent edges.
+
+## Accumulate signed crossings for nonzero filling
+
+For nonzero filling retain direction arrows and assign opposite crossing directions opposite signs before summing. The centre has winding-number magnitude two, each tip magnitude one and the exterior zero, so centre and tips fill. Reversing traversal changes signs without changing zero versus nonzero. “Two crossings” is not a complete definition of nonzero filling: in another path opposite crossings may cancel. Same-direction centre crossings are a property of this pentagram and must be shown before applying the conclusion here.
+
+## Separate specification references from manual diagrams
+
+Colour only the five tips on the left and both tips and centre on the right, titling them even-odd and nonzero explanatory diagrams. If the installed app does not expose the property, assemble independent closed regions manually and identify the result as a region diagram rather than a verified single-path property outcome. A white central overlay is not a transparent hole: it remains white over dark backgrounds. Keep the stroke-only original separately to establish that both explanations concern the same traversal rather than different star shapes.
+
+## Audit preservation when importing a reference
+
+If creating SVG references externally, retain identical path data and vary only fill-rule between evenodd and nonzero, importing separate copies through the existing workflow. These are external-file properties; advertised SVG support does not guarantee preservation of every structure. Record centre appearance, whether one path remains selectable, and output appearance. If structure cannot be inspected, record appearance only. A split import is not single-path success. Do not change direction and fill-rule simultaneously merely to obtain the desired colour, which would break the controlled comparison.
+
+## Troubleshoot empty centres and closure assumptions
+
+An empty centre first calls for checking the declared rule and path identity, rather than assuming a drawing fault. Then inspect actual closure: filling can implicitly close open subpaths, so visible fill alone does not prove a closed editing state. Check background, white overlays, opacity and masks separately, hiding one helper at a time. If reduction obscures the central opening, enlarge the diagram and reduce strokes rather than revising the rule to fit thick outlines. A screenshot records one appearance, not the underlying properties and background conditions.
+
+## Reopen and audit one path with two interiors
+
+Save and reopen, first tracing A→C→E→B→D→A in the stroke-only layer. Restore explanations and check tips are interior under both rules while the centre fills only in the nonzero diagram. Recount two centre-ray crossings and one tip crossing, checking arrows for accidental reversal. Inspect final output on light and dark backgrounds, identifying transparent regions and manual colour assemblies. Leave untested single-path imports and export compatibility unverified. Deliver an explainable diagram and record, not a promise of hidden controls in every app version.
+
+## Related tutorials and sources
+
+[VectorPaint reversible negative space: check a shared vase-and-profile boundary](<https://allluckly.cn/en/guides/vectorpaint-reversible-negative-space/>), [VectorPaint SVG compatibility checks: isolate missing images, masks and gradients](<https://allluckly.cn/en/guides/vectorpaint-svg-compatibility-check/>).
+
+Checked on November 14, 2026: VectorPaint public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Scope follows the [official App Store](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261114>). Manual exercises use controls actually available in your installed version; external calculations, written records and diagrams imply no built-in automatic analysis. No step-by-step physical-device, private-file or all-export-environment testing is claimed.
+{% endraw %}

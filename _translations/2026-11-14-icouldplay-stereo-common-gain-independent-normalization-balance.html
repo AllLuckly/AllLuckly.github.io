@@ -1,0 +1,54 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay stereo gain exercise: common gain versus independent normalization'
+description: Calculate channel peaks, shared gain and independent normalization while preserving ratios and limiting
+  listening conclusions.
+permalink: /en/guides/icouldplay-stereo-common-gain-independent-normalization-balance/
+date: '2026-11-14 00:00:00 +08:00'
+modified: '2026-11-14 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 154
+topic: Placement, streams and sound
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-14-icouldplay-stereo-common-gain-independent-normalization-balance.md
+source_url: /guides/icouldplay-stereo-common-gain-independent-normalization-balance/
+translation_method: editorial
+translation_source_sha256: ccd9f463526ba9dd5f79b11c3239c4cc13f4af1b08caf8f3c8bc093a31f0656b
+translation_date: '2026-11-14T01:32:28+00:00'
+excerpt: Calculate channel peaks, shared gain and independent normalization while preserving ratios and limiting
+  listening conclusions.
+---
+{% raw %}
+<p>Different channel peaks do not establish faulty volume. Use explicit peaks and synchronized samples to compare common amplification with independent normalization, then document an owned file in iCouldPlay. Process copies externally; the arithmetic does not imply new audio-production features in the player.</p>
+<h2 id="section-1">1. Prepare an original and three external records</h2>
+<p>Retain an owned recording and separate original, common-gain and independent-normalization records. Define a linear full-scale value of one, left peak 0.5 and right peak 0.25, with synchronized channels. A peak is maximum absolute sample value, not average loudness or a listening score. Without real media, complete the model and mark measurements/listening unperformed.</p>
+<h2 id="section-2">2. Preserve channel ratios with a common gain</h2>
+<p>A gain of two gives peaks 1 and 0.5, retaining their 2:1 ratio. At one paired instant, samples 0.4 and 0.1 become 0.8 and 0.2, retaining 4:1. Peaks may occur at different times, so their ratio is not every instant’s ratio. Common linear gain preserves existing corresponding-sample proportions rather than imposing a constant channel ratio.</p>
+<pre><code>Original peaks: L=0.50, R=0.25
+Common gain 2: L=1.00, R=0.50
+Paired sample: (0.40,0.10) -&gt; (0.80,0.20)
+</code></pre>
+<h2 id="section-3">3. Calculate different gains for independent normalization</h2>
+<p>Independently reaching peak one requires gains two and four. The same paired sample becomes 0.8 and 0.4, changing 4:1 to 2:1. This changes relative channel levels rather than turning one overall knob. <a href="https://manual.audacityteam.org/man/normalize.html">Audacity’s Normalize documentation</a> distinguishes independent channel processing. It does not establish player/system behavior or guarantee centered perception from equal peaks.</p>
+<pre><code>Independent gains: L x2, R x4
+Output peaks: L=1.00, R=1.00
+Paired sample: (0.40,0.10) -&gt; (0.80,0.40)
+</code></pre>
+<h2 id="section-4">4. Check scale, signs and clipping conditions</h2>
+<p>Retain sample signs: -0.2 times two is -0.4. Check maximum absolute values against one; a model reaching one does not certify every export or encoding condition. Doubling linear amplitude is not multiplying a decibel reading by two. Identify the tool’s units before combining values, and verify exported peaks separately.</p>
+<h2 id="section-5">5. Hold other export variables constant</h2>
+<p>Create two external copies with shared gain and independent normalization while holding EQ, dynamics, speed, format, duration and channel layout constant. Name and reopen exports to verify content and channels. Do not invent an editing control inside the player; use the paper model or properly prepared comparison files and identify external processing explicitly.</p>
+<h2 id="section-6">6. Compare under the same playback conditions</h2>
+<p>Open all three through available iCouldPlay controls, identify names/opening anchors and compare at fixed system volume and output. Describe audible balance without inferring exact peaks or integrated loudness. Record only known accessibility/audio settings. Return to the original at a comfortable volume; unperformed listening must remain expected/pending rather than copied model results.</p>
+<h2 id="section-7">7. Do not assume every channel difference needs repair</h2>
+<p>Unequal original peaks may reflect intentional spatial content; do not maximize both merely for matching numbers. If balance changes, compare shared gain and verify coefficients. If exports seem identical, reidentify selected files and processing records. Preserve originals and correct one issue at a time. Fit, content and routing are conditions to investigate, not established causes without evidence.</p>
+<h2 id="section-8">8. Reopen the original and deliver calculations with limits</h2>
+<p>Reopen the original with restored output and volume. Do not leave an experimental file as the only everyday copy. Deliver three peak pairs, three versions of one synchronized sample pair, gains and listening status. Explain how shared versus independent coefficients affect balance without requiring equal channel peaks universally. Remeasure new media rather than reusing these values, and retain device/date/unverified conditions separately from calculations.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-audio-sample-peak-dbfs-volume-boundary/">Peak level and loudness</a>, <a href="/en/guides/icouldplay-audio-polarity-inversion-mono-cancellation-model/">Polarity and downmix models</a>.</p>
+<p>Checked on November 14, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}

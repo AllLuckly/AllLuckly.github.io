@@ -1,0 +1,86 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-webvtt-region-anchor-two-line-rollup/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay WebVTT regions: two-line roll-up, anchors and cue end times'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-webvtt-region-anchor-two-line-rollup/
+agent_source_sha256: adca4b7906a794c522443a1021c0bfce7e506a10a0e1f592d757b84f3f3464f7
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay WebVTT regions: two-line roll-up, anchors and cue end times
+
+Language: en
+Canonical: [iCouldPlay WebVTT regions: two-line roll-up, anchors and cue end times](<https://allluckly.cn/en/guides/icouldplay-webvtt-region-anchor-two-line-rollup/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-webvtt-region-anchor-two-line-rollup/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-webvtt-region-anchor-two-line-rollup/>)
+Published: 2026-11-14T00:00:00+08:00
+Modified: 2026-11-14T09:38:34+08:00
+Author: Bison
+
+Prepare three overlapping cues in a two-line region and separate region placement, visible line capacity and cue timing.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-webvtt-region-anchor-two-line-rollup/>), translated on 2026-11-14. Original publication dates, attribution, code and version notes are retained.
+
+Ordinary cue placement and a scrolling region are different settings. Prepare a narrow region externally with three successive single-line cues, then observe a real playback path. Separate specification, expected model and installed-renderer evidence; a REGION block does not guarantee identical support everywhere.
+
+## 1. Prepare a short clip and caption copy
+
+Keep an owned clip of at least twelve seconds and its original captions. Create a UTF-8 VTT copy and verify the actual extension, encoding, length and playback path. Do not alter video or audio. Without a clip, complete syntax/timeline inspection and leave importing/display unperformed. Keep specification expectations and observations in separate columns.
+
+## 2. Save the complete region and three cues
+
+Place the region after the header with blank block separators. The note region is 40% wide with two-line capacity. All three short cues reference note, begin at one/three/five seconds and end at ten. Keep each on one line. Do not add line positioning or vertical settings to this minimal control; additional settings require separate compatibility checks.
+
+```
+WEBVTT
+
+REGION
+id:note
+width:40%
+lines:2
+regionanchor:0%,100%
+viewportanchor:10%,90%
+scroll:up
+
+00:00:01.000 --> 00:00:10.000 region:note
+A: first
+
+00:00:03.000 --> 00:00:10.000 region:note
+B: second
+
+00:00:05.000 --> 00:00:10.000 region:note
+C: third
+```
+
+## 3. Draw anchors on different rectangles
+
+Under [W3C’s WebVTT region model](<https://www.w3.org/TR/webvtt1/>), region and viewport anchors use separate rectangles. The region’s lower-left point aligns with viewport position 10%,90%. Draw both frames and their reference points. Viewport anchoring is not individual text alignment, and two lines do not specify a fixed pixel height. 100% in regionanchor does not place captions outside the image.
+
+## 4. Inspect capacity at three times
+
+Record A at two seconds, A/B at four, then inspect the two-line region when C enters at six. In this single-line roll-up model, capacity can remove A from view before its ten-second end. Distinguish active cue timing from visibility. If wrapping changes capacity, restore short text before diagnosing timing or changing end times.
+
+## 5. Make a capacity-only control
+
+Duplicate the file and change only lines:2 to lines:3. Compare six-second visibility while all end times remain ten. Name and retain both originals. If displays match, investigate file identity, region support and wrapping separately instead of changing several variables or extending one cue to force the expected result.
+
+## 6. Record actual renderer behavior in iCouldPlay
+
+Select the owned copy using available caption controls, verify readable text and observe near two/four/six/ten seconds. If that path does not accept VTT or display roll-up, report the observed limitation. Retain readable ordinary captions. File inspection and renderer compatibility need distinct conclusions; one result does not certify every region implementation.
+
+## 7. Troubleshoot identifiers, separators and wrapping
+
+Check REGION spelling, matching identifiers, percentages, commas and blank separators first. For unexpected capacity, inspect wrapping and selected version before changing fonts, video size or anchors. Reopen after one correction. A region failure does not prove all caption text is absent; verify readable cues and retain the ordinary fallback with unresolved region behavior recorded.
+
+## 8. Reopen and deliver a region timeline
+
+Reopen the same caption file and six-second point, then restore ordinary captions. Deliver text, anchor diagram, timed observations, two/three-line comparison and unresolved capabilities. Explain visibility versus cue end without claiming a measured pixel height. Reobserve changed devices/paths rather than treating the standard model as a completed device test. Do not alter the film’s original time order merely because the display differs.
+
+## Related tutorials and sources
+
+[Ordinary caption positioning](<https://allluckly.cn/en/guides/icouldplay-webvtt-position-size-cue-box-check/>), [Emphasis spans](<https://allluckly.cn/en/guides/icouldplay-webvtt-emphasis-nested-span-boundary/>).
+
+Checked on November 14, 2026 against the [official iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn>): version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.
+{% endraw %}

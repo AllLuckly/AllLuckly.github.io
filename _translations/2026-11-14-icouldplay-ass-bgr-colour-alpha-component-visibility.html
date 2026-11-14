@@ -1,0 +1,61 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay ASS colours: BGR order, alpha and outline components'
+description: Check BGR colour and alpha using three cues with fixed styling, without confusing hidden fill with
+  an entirely absent caption.
+permalink: /en/guides/icouldplay-ass-bgr-colour-alpha-component-visibility/
+date: '2026-11-14 00:00:00 +08:00'
+modified: '2026-11-14 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 157
+topic: Gaps, colour and moving images
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-14-icouldplay-ass-bgr-colour-alpha-component-visibility.md
+source_url: /guides/icouldplay-ass-bgr-colour-alpha-component-visibility/
+translation_method: editorial
+translation_source_sha256: a043f13692ac0aa7406d2161d196c6617cf4a104fa8c8f17d379d14d2802ff39
+translation_date: '2026-11-14T01:38:34+00:00'
+excerpt: Check BGR colour and alpha using three cues with fixed styling, without confusing hidden fill with an entirely
+  absent caption.
+---
+{% raw %}
+<p>ASS colour order differs from familiar web RGB, and alpha zero is not fully transparent. Prepare red-fill, invisible-fill and fully invisible controls externally, then observe available caption handling. Keep syntax, expectations and actual compatibility separate without claiming advance device success.</p>
+<h2 id="section-1">1. Save a minimal caption copy and original</h2>
+<p>Keep an owned clip of at least ten seconds and original captions. Save a separately named UTF-8 ASS file externally and verify extension, encoding and video identity. Fix font, size, position and outline across cues, changing colour/alpha only. Record font substitution separately. Without media, deliver syntax and predictions while leaving importing/display unperformed.</p>
+<h2 id="section-2">2. Decode blue-green-red order first</h2>
+<p><a href="https://aegisub.org/docs/latest/ass_tags/">Aegisub’s ASS tag documentation</a> specifies blue/green/red component order for colour overrides: 0000FF is red and FF0000 blue. Draw separate B/G/R byte boxes before decoding. Style colour fields also carry alpha; do not conflate an eight-digit style value with a six-digit colour override.</p>
+<h2 id="section-3">3. Save a complete fixed-position control</h2>
+<p>Use two-second cues separated by one second, a black outline, no shadow and fixed centered placement. Cue one sets red fill, cue two hides only fill and cue three hides all components. Preserve actual backslashes rather than web-style hash colours. Verify event fields/times and reopen the saved file to check that punctuation and escapes remain literal.</p>
+<pre><code>[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,32,&amp;H00FFFFFF,&amp;H00FFFFFF,&amp;H00000000,&amp;H00000000,0,0,0,0,100,100,0,0,1,2,0,5,10,10,10,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:03.00,Default,,0,0,0,,{\c&amp;H0000FF&amp;}RED
+Dialogue: 0,0:00:04.00,0:00:06.00,Default,,0,0,0,,{\c&amp;H0000FF&amp;\1a&amp;HFF&amp;}FILL HIDDEN
+Dialogue: 0,0:00:07.00,0:00:09.00,Default,,0,0,0,,{\alpha&amp;HFF&amp;}ALL HIDDEN
+</code></pre>
+<h2 id="section-4">4. Record both alpha endpoints</h2>
+<p>Alpha 00 is opaque and FF transparent in this notation. Cue two targets primary fill, leaving the styled outline potentially visible; cue three targets all components. Describe component visibility instead of assuming a middle alpha gives exactly half perceived brightness. Background and rendering conditions matter, and “caption present/absent” is too coarse for diagnosis.</p>
+<h2 id="section-5">5. Make a colour-only blue control</h2>
+<p>Duplicate the file and change only cue one from 0000FF to FF0000. Expect red to blue without automatically modifying later events; each event starts from its style. Compare files to avoid unintended replacements. If no display was performed, report text/semantic inspection only, not player results.</p>
+<h2 id="section-6">6. Record visible components at defined times</h2>
+<p>Select the copy through actual controls, verify source/caption identity and observe at two/five/eight seconds. Record fill, outline and literal-tag display. Unsupported external ASS or overrides remain a path-specific limitation. A black outline on black background may be hard to see; record that condition before comparing an owned bright clip. Unperformed observations remain pending.</p>
+<h2 id="section-7">7. Troubleshoot colour, alpha and component separately</h2>
+<p>For reversed colours, inspect BGR bytes before changing screen settings. Invisible fill with a remaining edge may match the intended component control. If cue three remains visible, verify file identity, literal backslashes and override handling. Reopen after one correction. An invisible cue still has timing, and invisibility alone does not prove the file was never loaded.</p>
+<h2 id="section-8">8. Restore ordinary captions and retain evidence limits</h2>
+<p>Reopen readable original captions. Deliver both texts, timed observations, BGR breakdown and alpha endpoint table. Explain red notation and component/global transparency with unresolved path capabilities. Recheck backgrounds/devices and distinguish document inspection, file preparation and actual playback rather than guaranteeing identical appearance or claiming unperformed tests.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-ass-pos-script-coordinate-display-pixels/">Script coordinates</a>, <a href="/en/guides/icouldplay-ass-fad-milliseconds-line-interval/">Fade timing</a>.</p>
+<p>Checked on November 14, 2026 against the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn">Apple public lookup</a>: version 1.1.1, requiring iOS / iPadOS 15.0 or later. The public 1.1.1 release notes list Kodi, OpenList / AList and S3-compatible storage, with improvements to source switching and captions after seeking. The tasks use this public scope and existing playback capabilities. Check controls in your installed version. Self-made samples, manual records and external file preparation are workflows, not newly promised automatic features. No physical-device or private-server test is claimed.</p>
+{% endraw %}
