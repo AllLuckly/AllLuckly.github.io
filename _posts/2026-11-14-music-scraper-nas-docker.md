@@ -55,7 +55,7 @@ MusicScraper 提供文件夹批量处理，也提供目录监测，用于发现�
 
 ## Docker 安装：复制配置，换成自己的目录
 
-官方 GitHub 的部署说明直接链接到 `minzgo/music-scraper`。你提供的 [Docker Hub 镜像](https://hub.docker.com/r/minzgo/music-scraper)就是该项目文档指定的安装入口，支持 amd64 与 arm64；以下使用 `latest` 标签，让 Docker 选择对应架构。NAS 仍需具备可运行相应镜像的 Docker 或容器环境。
+官方 GitHub 的部署说明直接链接到 `minzgo/music-scraper`。[Docker Hub 上的镜像](https://hub.docker.com/r/minzgo/music-scraper)就是该项目文档指定的安装入口，支持 amd64 与 arm64；以下使用 `latest` 标签，让 Docker 选择对应架构。NAS 仍需具备可运行相应镜像的 Docker 或容器环境。
 
 在 NAS 的容器项目目录中保存下面的 `compose.yaml`。**把 `/你的音乐目录` 改成真实的绝对路径**，并先建立 `data` 子目录，用于保存配置、数据库等数据。首次尝试可以挂载一份小型测试音乐目录。
 
