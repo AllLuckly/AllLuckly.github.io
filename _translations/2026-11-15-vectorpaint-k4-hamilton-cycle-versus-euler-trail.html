@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint four-vertex complete graph: visiting every vertex once differs from using every edge once'
+description: Verify a Hamilton cycle in a four-vertex six-edge graph, then exclude an Euler trail through four odd
+  degrees.
+permalink: /en/guides/vectorpaint-k4-hamilton-cycle-versus-euler-trail/
+date: '2026-11-15 00:00:00 +08:00'
+modified: '2026-11-15 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 209
+topic: Structural counts, probability and modular arithmetic
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-15-vectorpaint-k4-hamilton-cycle-versus-euler-trail.md
+source_url: /guides/vectorpaint-k4-hamilton-cycle-versus-euler-trail/
+translation_method: editorial
+translation_source_sha256: 21686344f776b2c54698a2604f167b371eedbc76cb17a45a346de89088830f89
+translation_date: '2026-11-15T01:50:55+00:00'
+excerpt: Verify a Hamilton cycle in a four-vertex six-edge graph, then exclude an Euler trail through four odd degrees.
+---
+{% raw %}
+<p>Visiting four vertices once does not use all six edges. Draw undirected K4 in VectorPaint, mark a cycle through every vertex and back to the start, then separately test for an edge-once trail. A Hamilton cycle and no Euler trail can coexist. The drawing is manual explanation, not a route solver.</p>
+<h2 id="section-1">Declare four vertices and six undirected edges</h2>
+<p>On an approximately 1700×1500 canvas use A=(800,300),B=(300,1200),C=(1300,1200),D=(800,800). Join AB,AC,AD,BC,BD,CD once each. Edges are undirected, without one-way arrows. D is a declared node, not an accidental crossing; this plane layout avoids extra crossings. Coordinates are layout, not real roads, distances or travel speeds.</p>
+<h2 id="section-2">Write separate acceptance conditions</h2>
+<p>A Hamilton cycle visits each vertex once except the closing return; an Euler trail uses each edge once and may revisit vertices. An Euler circuit additionally closes. Keep separate task cards and label which condition a route tests. Four letters do not prove edge coverage, nor six edges prove unique vertices. Colours and order numbers track traversal, not directions, edge counts or weights.</p>
+<h2 id="section-3">Check A-B-C-D-A step by step</h2>
+<p>For A-B-C-D-A, traversed edges AB,BC,CD,DA all exist. Each vertex occurs once except the final closing A, so this is Hamiltonian. An intermediate return would differ. Highlight these four edges while retaining unselected AC and BD, not deleting them into a four-edge cycle graph. The selected route has four edges; K4 still has six. Label selected/unselected edges to expose incomplete edge coverage.</p>
+<h2 id="section-4">Verify degree three at all four vertices</h2>
+<p>Each vertex neighbours the other three, so all four degrees are 3, odd. Degree sum 12 divided by two gives six edges. Endpoint incidences are not separate edges, and highlighted edges contribute no doubled degree. Interior D still has three neighbours. List neighbour names before degrees rather than relying on visible strokes; adjust overlapping drawing while preserving the declared model.</p>
+<h2 id="section-5">Use odd degrees to exclude an edge-once trail</h2>
+<p>In a connected undirected Euler trail, internal visits pair entry/exit, allowing at most two odd-degree endpoints; an Euler circuit has all even degrees. K4 has four odd vertices, so neither exists. Confirm connectivity and use degrees, not crossings or one drawing failure. Its Hamilton cycle remains valid because the constraints concern different objects. Put nonexistence on the edge-once card, not the vertex-once card.</p>
+<h2 id="section-6">Use a failed attempt as evidence to inspect, not proof</h2>
+<p>Try A-B-C-D-A-C separately: five distinct edges AB,BC,CD,DA,AC. C has no unused incident edge while BD remains. This illustrates getting stuck, not universal failure; four odd degrees supplies the proof. Revisiting A is allowed for Euler, so that alone is not the fault. Retain unused BD instead of deleting it, and do not continue over an already used edge under the edge-once rule.</p>
+<h2 id="section-7">Troubleshoot missing edges and closing-vertex confusion</h2>
+<p>For a claimed Euler trail inspect omitted AC/BD, then list each consecutive pair and require all six once. Distinguish final closure from intermediate repeats when assessing Hamilton. A disconnected crossing-like D is not this K4; restore the model. Correct model or route separately, not definitions and graph together. Keep faint endpoints visible beneath highlights and move labels without connections. Styling does not automatically certify completeness or optimality.</p>
+<h2 id="section-8">Reopen and assess the two task cards separately</h2>
+<p>Save native work, export PNG and reopen. Check four vertices/six edges, then trace the Hamilton cycle and two unselected edges. Inspect four degree-threes and the Euler nonexistence argument, keeping the failed attempt separate. Reopen editable model/route/text. Success supplies a vertex cycle and excludes an edge trail, not a vague one-stroke claim or a rule for every four-vertex graph. Reanalyse changed edges,directions,multiedges; no automatic solving or real-route test is claimed.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-each-edge-once-trail/">VectorPaint each-edge-once trails: distinguish revisited vertices from repeated edges</a>; <a href="/en/guides/vectorpaint-complete-bipartite-three-by-three-nonplanarity/">VectorPaint complete three-by-three bipartite graphs: crossings are not vertices and nonplanarity needs proof</a>.</p>
+<p>Sources checked on 15 November 2026: the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261115">Apple public lookup</a> show version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, paths, nodes, layers and text. Conditions, scales and layouts are original exercise arrangements; check installed controls. Keep editable native work and PNG previews. SVG/PDF may retain any bitmap content used. External calculations and static diagrams are not new automatic proof, statistics or solver features. No completed device, physical-object or universal export testing is claimed.</p>
+<p>Definitions: <a href="https://discrete.openmathbooks.org/dmoi2/sec_paths.html">Discrete Mathematics on Euler and Hamilton paths</a> separates once-per-edge and once-per-vertex conditions and gives odd-degree criteria. The K4 layout, routes and checks are original; one failed attempt is not a nonexistence proof.</p>
+{% endraw %}

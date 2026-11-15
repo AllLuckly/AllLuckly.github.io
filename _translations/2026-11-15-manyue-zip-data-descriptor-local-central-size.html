@@ -1,0 +1,67 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Check ZIP sizes in ManYue: a zero local-header size need not mean an empty image'
+description: Compare bit 3, data descriptors and the central directory, separating placeholder sizes, entry integrity and
+  actual pages.
+permalink: /en/guides/manyue-zip-data-descriptor-local-central-size/
+date: '2026-11-15 00:00:00 +08:00'
+modified: '2026-11-15 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 203
+topic: Field scales and request boundaries
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-15-manyue-zip-data-descriptor-local-central-size.md
+source_url: /guides/manyue-zip-data-descriptor-local-central-size/
+translation_method: editorial
+translation_source_sha256: 2a0d34275ca4f35d9442c690961566c1f4bfe25e82448a396dce87ae45b20220
+translation_date: '2026-11-15T02:03:44+00:00'
+excerpt: Compare bit 3, data descriptors and the central directory, separating placeholder sizes, entry integrity and actual
+  pages.
+---
+{% raw %}
+<p>A zero size in a ZIP local header does not immediately establish an empty comic image. Some writing flows append a descriptor after data, while a complete archive also has a central directory. Inspect these locations in an original three-page CBZ and then read its pages in ManYue. Record complete-structure checks separately from page readability, without requiring a binary inspector in the app.</p>
+
+<h2 id="保留三页原图与归档身份">Retain three source pages and archive identity</h2>
+
+<p>Make three original numbered PNGs with distinguishable filenames and package copies as CBZ or ZIP externally. Preserve images, archive and reports separately, recording bytes and integrity results. A packager may not use descriptors, so inspect its actual output instead of editing headers to fit the example. If the needed variant is unavailable, trace the specification on paper rather than claim that an ordinary copy tests every descriptor-reading path.</p>
+
+<h2 id="先看通用标志第三位状态">Read the general-purpose bit-three state</h2>
+
+<p>Inspect bit 3 of each entry’s general-purpose flag. This is bit index three, the fourth bit when numbering from zero, not a requirement that the entire decimal flag equal three. When set, a descriptor carries later size/check information, and the initial local header may lack final values. Separate entry name, flag and local size rather than transfer one entry’s state to all. Zero local size alone does not prove bit 3; missing flag evidence stays unknown, without guessing a streaming writer.</p>
+
+<h2 id="按记录位置追后置描述符">Trace the descriptor by record structure</h2>
+
+<p>The descriptor follows that entry’s compressed data; it is neither an extra comic page nor arbitrary text before the central directory. It carries CRC and compressed/uncompressed sizes, with variant-dependent lengths outside this manual-offset exercise. Descriptors may occur with or without the common signature, so searching one byte pattern cannot prove absence. Use a structural parser. If a tool reports only final sizes, state that it did not independently locate the descriptor rather than claim every underlying field was inspected.</p>
+
+<h2 id="中央目录尺寸与实际条目对照">Compare central sizes with the actual entry</h2>
+
+<p>Match central-directory information to each entry by path rather than pair first central with second local solely by position. The paper example has local size zero and bit 3 set, but final compressed size one hundred twenty and uncompressed size two hundred, agreeing across descriptor and central reports. Complete structure and parsable data, not zero alone, support nonemptiness. These are teaching values; actual samples use their own reports without forcing the same ratio.</p>
+
+<h2 id="真正零字节与占位零分开记">Distinguish empty entries from placeholder zeroes</h2>
+
+<p>Use an explicitly empty text entry as a control in a separate archive or label it outside the three comic pages. Final uncompressed size zero differs from a temporary local zero; page.png does not guarantee PNG data. Directory entries may also carry no content. Separate candidate images, directories, auxiliary text and decodable images rather than demand four pages from four entries. Actual image decoding still determines readable pages.</p>
+
+<h2 id="完整性通过后在漫阅逐页打开">Read every page after integrity checking</h2>
+
+<p>Check integrity read-only externally, then open all three numbered pages through an existing local ManYue import path, checking centres and markers. A listed directory or cover does not establish every image’s decoding. If one path fails, preserve identity and failure stage rather than conclude universal bit-three incompatibility. Results cover this copy and version, not all ZIP writers, encryption or truncation variants.</p>
+
+<h2 id="排查截断与字段不一致的不同层次">Separate truncation from inconsistent fields</h2>
+
+<p>A missing central directory, truncation or CRC failure requires preserving the copy; legitimate placeholder zeroes do not excuse corruption. Let a trusted parser investigate inconsistent records rather than copy one field into another and call it repair. Renaming cannot restore missing bytes. A retry needs a genuinely new copy rather than reopened cache. Share original pages and redacted reports, separating checked fields from paper assumptions without private comics or secret server logs.</p>
+
+<h2 id="重开后交付按条目的完整账本">Reopen with an entry-by-entry record</h2>
+
+<p>Reopen pages one through three and match sources, then reconstruct each entry’s local flag, descriptor, central final sizes and integrity outcome. Explain both why local zero need not mean empty and why that rule does not validate every zero or damaged archive. Mark descriptor checks inapplicable when the actual sample lacks one. Reinspect after repackaging; bookmark return checks location, not unchanged bytes. Retain source images independently for recovery.</p>
+
+<h2 id="相关教程与资料">Related guides and sources</h2>
+
+<p><a href="/en/guides/manyue-cbz-per-entry-compression-method/">ManYue CBZ compression methods: listing an archive does not prove every image can be read</a>; <a href="/en/guides/manyue-cbz-zip-readonly-integrity-test/">ManYue: Test CBZ archive integrity separately from readable pages</a>.</p>
+
+<p>Checked on November 15, 2026: <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261115">Apple public information</a> lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities; verify controls in the installed version.</p>
+
+<p>Method reference: <a href="https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT">PKWARE APPNOTE: bit 3 and data descriptors</a>. Materials and numbers are original exercises. Record external reports, paper reasoning and actual reading observations separately, without inventing missing conditions. Sources do not establish new automatic analysis by the app. No step-by-step physical-device, private-server or all-output-environment testing is claimed.</p>
+{% endraw %}

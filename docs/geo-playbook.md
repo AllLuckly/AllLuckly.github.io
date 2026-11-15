@@ -15,7 +15,7 @@
 
 `_data/apps.yml` 为数组；`id` 是文章 `app_id` 的关联键，当前使用 `pastel`、`man_yue`、`draw_illustration`、`nas_book`、`icouldplay`、`yearn`、`diaodiao`、`jianlai`。产品字段包括 `name`、可选的 `alternate_name`、`tagline`、`description`、`url`、`store_url`、`icon`、`category`、`os`、`version` 与 `verified`；`store_region` 可注明实际核对的商店地区，不能统一假定中国区。教程字段为 `guide_url`、`guide_intro`、`minimum_guides`。内部关联键不作为对读者展示的产品名。
 
-应用介绍可以先于教程系列发布。调调与键来接入中英文首页、应用目录、关于页、产品实体和阅读目录，`minimum_guides` 为 0，尚未设置 `guide_url`；页面提供真实介绍与下载，不生成空学习路线或“0篇教程”入口。文章搜索仍索引真实文章，产品介绍通过 `/apps/llms.txt`、`/en/apps/llms.txt` 与自身 Markdown 发现。建立实际教程系列后再添加路线与阶段，并按真实文章计数。
+应用介绍可以先于教程系列发布；只在实际文章齐备后添加路线和阶段。2026-11-15 调调与键来各新增首批10篇中文及完整英文教程，现已有真实 `guide_url`、学习阶段与连续编号。八款应用的目录计数均来自实际文章，`minimum_guides` 用作一致性检查。产品介绍仍通过 `/apps/llms.txt`、`/en/apps/llms.txt` 与自身 Markdown 发现；文章搜索仅收录真实文章。
 
 - 正式产品名、开发者、版本、系统要求和商店链接以已核实来源为准。项目目录名不能直接当作商店名。
 - 产品专题页必须展示结构化数据包含的产品事实；不得在 JSON-LD 偷加正文没有的功能、评分或价格。

@@ -1,0 +1,65 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Check PDF scale in ManYue: UserUnit changes unit length rather than coordinate counts'
+description: Check page boxes, UserUnit and inches while separating document scale, screen fitting and actual print results.
+permalink: /en/guides/manyue-pdf-userunit-coordinate-physical-scale/
+date: '2026-11-15 00:00:00 +08:00'
+modified: '2026-11-15 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 201
+topic: Field scales and request boundaries
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-15-manyue-pdf-userunit-coordinate-physical-scale.md
+source_url: /guides/manyue-pdf-userunit-coordinate-physical-scale/
+translation_method: editorial
+translation_source_sha256: ecc879f5f5873d82bd98f4f82ea2d8048bb1d1304a960f3748bcff8ce0e98a2c
+translation_date: '2026-11-15T02:03:44+00:00'
+excerpt: Check page boxes, UserUnit and inches while separating document scale, screen fitting and actual print results.
+---
+{% raw %}
+<p>A PDF width of one hundred forty-four does not by itself fix its size in inches. Use an original page and external report, read its content in ManYue and distinguish coordinate-unit length, display zoom and physical output. Interpret identical coordinates with different UserUnit values and recalculate physical lengths from the reported numbers. It assumes no field display in the reader and uses no screen ruler as proof of printing accuracy.</p>
+
+<h2 id="先制作带方向标记的单页">Make one page with orientation markers</h2>
+
+<p>Externally prepare an original page with bounds from zero/zero to one hundred forty-four/seventy-two, a central A label and different upper-left/lower-right markers. Record file, location, boxes and rotation and retain the source. Drawing-tool pixel dimensions are not automatically PDF units; inspect the actual report. If fields cannot be controlled, retain generated values and use these numbers as a separate paper example. An uncreated page is not a successful import.</p>
+
+<h2 id="读取单位倍率而非猜页面大小">Read the unit multiplier rather than guess size</h2>
+
+<p>Inspect page-dictionary UserUnit read-only externally; its default is one. It multiplies the default-user-space unit relative to one seventy-second inch, not page count, DPI or a percentage-zoom control. Use A with one and B with two only when the tool supports it, keeping coordinates and content structure fixed. Distinguish a genuinely absent/default field from an unreported field. No manual binary edit is required; object references and save structure can be affected. Use trustworthy reports and recoverable copies. See also <a href="https://opensource.adobe.com/dc-acrobat-sdk-docs/library/jsapiref/doc.html#getuserunitsize">Adobe’s UserUnit explanation</a> for the unit definition.</p>
+
+<h2 id="先以缺省倍率换算英寸">Convert the default-unit example to inches</h2>
+
+<p>A has width one hundred forty-four units at one seventy-second inch per unit, giving two inches; height seventy-two gives one inch. Separate coordinate difference, unit size and physical length. An upper-right coordinate is not width unless the origin permits it; this zero-origin example happens to do so. Multiplying inches by two point five four gives five point zero eight by two point five four centimetres. This is document-model arithmetic, not a measured result from any printer.</p>
+
+<h2 id="倍率二时重算而不添像素">Recalculate multiplier two without inventing pixels</h2>
+
+<p>B retains coordinate differences one hundred forty-four and seventy-two, but each unit is two seventy-seconds inch, giving four by two inches. Both dimensions double, so area changes from two to eight square inches, a factor of four. This creates no additional coordinates or higher embedded-raster resolution. Retain both multipliers and calculations rather than infer that the source box became two hundred eighty-eight by one hundred forty-four.</p>
+
+<h2 id="屏幕适配与文档尺度分栏">Separate fitted display from document scale</h2>
+
+<p>Open valid A/B copies through an existing local PDF path in ManYue, fixing device orientation and visible range and checking labels and markers. Fitting can make different document sizes occupy the same screen width; equal apparent size does not establish equal UserUnit. Record appearance without inventing internal zoom values or demanding an inch ruler. If B exists only on paper, mark its reading unperformed rather than reopen A under another name and call that a second successful test.</p>
+
+<h2 id="输出若选适合纸张要另记条件">Record fit-to-paper output conditions separately</h2>
+
+<p>If examining external print preview, record actual-size, fit-to-paper or percentage settings; physical printing is optional. Fitting B onto paper can equalise its visible frame without refuting the four-by-two-inch document model. Margins, drivers and devices affect output; unmeasured items remain blank. A preview paper name is not the source page size. Do not change UserUnit and the page box simultaneously, which would obscure the cause of a scale change.</p>
+
+<h2 id="排查dpi与坐标单位串栏">Check mixed DPI and coordinate units</h2>
+
+<p>If two becomes two DPI, restore its length-multiplier meaning. If area only doubles, recalculate both dimensions. Blurry photographs call for checking embedded pixels, zoom and display path, not treating UserUnit as compression quality. Subtract nonzero box origins. Share original pages and redacted reports while preserving sources. A reader not exposing a field does not prove its absence, and opening a file does not validate every physical-output path. A screenshot cannot fill unknown fields with certainty.</p>
+
+<h2 id="重开后交付两份尺度账本">Reopen with two scale records</h2>
+
+<p>Exit and reopen available copies, checking location, markers and identity. Reconstruct unchanged coordinate differences, multipliers one/two and inch sizes two-by-one/four-by-two. Retain areas two/eight square inches, display observations and unperformed output checks. Explain why same-width fitting does not establish identical document sizes. Reinspect reports after exporter, box or multiplier changes. Deliver traceable fields, units and observations rather than claim automatic prepress measurement or device-print acceptance.</p>
+
+<h2 id="相关教程与资料">Related guides and sources</h2>
+
+<p><a href="/en/guides/manyue-pdf-mediabox-cropbox-visible-page-boundary/">Check PDF page boxes in ManYue: MediaBox and CropBox are not two copies of the artwork</a>; <a href="/en/guides/manyue-pdf-page-rotate-metadata-view-orientation/">Check PDF orientation in ManYue: separate page rotation metadata from the current view</a>.</p>
+
+<p>Checked on November 15, 2026: <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261115">Apple public information</a> lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities; verify controls in the installed version.</p>
+
+<p>Method reference: <a href="https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf">Adobe-hosted ISO 32000-1: page UserUnit</a>. Materials and numbers are original exercises. Record external reports, paper reasoning and actual reading observations separately, without inventing missing conditions. Sources do not establish new automatic analysis by the app. No step-by-step physical-device, private-server or all-output-environment testing is claimed.</p>
+{% endraw %}

@@ -1,0 +1,87 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-ass-clip-iclip-glyph-video-boundaries/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay ASS clipping: a glyph window is not a crop of the video'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-ass-clip-iclip-glyph-video-boundaries/
+agent_source_sha256: a624c3b342649ccb4e513075e0c87a8afd9a1763b7181a89a406d1b82c789db1
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay ASS clipping: a glyph window is not a crop of the video
+
+Language: en
+Canonical: [iCouldPlay ASS clipping: a glyph window is not a crop of the video](<https://allluckly.cn/en/guides/icouldplay-ass-clip-iclip-glyph-video-boundaries/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-clip-iclip-glyph-video-boundaries/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-clip-iclip-glyph-video-boundaries/>)
+Published: 2026-11-15T00:00:00+08:00
+Modified: 2026-11-15T09:32:12+08:00
+Author: Bison
+
+Compare complementary clip and iclip regions with one rectangle, keeping glyph visibility, anchor and video framing separate.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-ass-clip-iclip-glyph-video-boundaries/>), translated on 2026-11-15. Original publication dates, attribution, code and version notes are retained.
+
+A subtitle reduced to a few central letters does not necessarily mean the video has been zoomed and cropped. Compare ordinary and inverse ASS clipping using one original sentence and rectangle. Audit the source window on paper, then observe the available iCouldPlay path. The number of surviving letters in one font is not a universal device result.
+
+## 1. Draw video and script boundaries separately
+
+Retain an owned video at least ten seconds long with identifiable picture edges, plus original subtitles. Fix orientation and fitting mode. Draw a separate 640×360 subtitle canvas without conflating navigation, black bars or script space. Mark the shared anchor (320,180). Establish selectable, readable ordinary text first; otherwise missing loading could be wrongly attributed to a rectangle hiding every glyph.
+
+## 2. Save shared positions with different window commands
+
+Both cues use identical wording, size and position, at 1–4 and 5–8 seconds. The first retains subtitle portions inside the rectangle and the second outside it, without moving that rectangle. Save the complete UTF-8 ASS below. Four integers specify upper-left and lower-right points, not x, y, width and height. Width is 240 and height 120. Do not also crop the video through player controls.
+
+```text
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,42,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,5,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:04.00,Default,,0,0,0,,{\an5\pos(320,180)\clip(200,120,440,240)}Compare this long sentence.
+Dialogue: 0,0:00:05.00,0:00:08.00,Default,,0,0,0,,{\an5\pos(320,180)\iclip(200,120,440,240)}Compare this long sentence.
+```
+
+## 3. Define complementary regions on paper
+
+Mark upper-left (200,120), lower-right (440,240) and the central anchor. Draw a long text band crossing the window and shade inside-retained and outside-retained regions separately. Clipping changes visible subtitle graphics; it does not reflow hidden text into the rectangle. A half-visible edge glyph does not mean half a source character was deleted. Record complete source wording separately from visible glyph portions.
+
+## 4. Compare sequential playback before inspecting positions
+
+Select video and draft in an available iCouldPlay flow, play from the beginning and record whether different parts of the same sentence appear. Pause for inspection only while keeping zoom, subtitle-position controls and orientation fixed. A central portion may remain in the first and ends in the second, but fonts, rendering and canvas mapping affect exact letters. Do not prefill a letter count. If both show complete wording, record that rather than manipulating video cropping to manufacture complementarity.
+
+## 5. Expand only the rectangle in another control
+
+Copy the source and change both lower-right x coordinates from 440 to 500, retaining everything else. Width becomes 300 while height remains 120. The first retained horizontal region increases and the second excluded region increases; wording and anchor stay fixed. Record this prediction before reselection, without calling it an observation. Also reducing font size would introduce a second explanation for additional visible text, requiring a return to the original control.
+
+## 6. Diagnose width-height values mistaken for endpoints
+
+Writing (200,120,240,120) while imagining width and height places both y endpoints at the same level, not the intended rectangle. List left, top, right and bottom, calculate their differences and only then inspect display. Check spelling, braces and backslashes too. Do not react to disappearing text by enlarging the font or shifting everything offscreen until a few letters happen to appear. Identify an explainable source condition.
+
+## 7. Separate substituted fonts from absent clipping
+
+Different devices can leave different glyph portions. Check identical source, canvas, font size and font availability first: equal rectangles do not guarantee equal glyph outlines. If this path ignores clipping, record readable text separately from effect behaviour and retain a plain fallback. Cropping affecting both subtitles and video warrants checking fitting mode too. Do not claim coverage of every engine or source; source inspection and site builds do not replace playback observations.
+
+## 8. Audit rectangle orientation using two points
+
+Mark paper point A=(190,180) and B=(210,180). A lies outside the rectangle to its left, while B is inside. Ordinary clipping retains subtitle graphics near B; inverse clipping retains those near A. These are script-plane points, not a promise that actual glyph strokes occupy them. Retaining empty space creates no letters. Change B’s y to 250 and it moves below the rectangle despite unchanged x. Checking both coordinates exposes one-dimensional reasoning about a two-dimensional visibility region.
+
+## 9. Deliver both regions and a plain fallback
+
+Reselect the original draft and audit cue times, wording and inside/outside notes. Save another copy without clip or iclip as ordinary fallback text. Reopen and confirm readable fallback and unchanged video boundaries. Deliver rectangle points, calculated dimensions, font conditions, visible portions and unknowns. State that clipping neither deletes source wording nor edits video pixels. Preserve this ledger and recheck mapping after changing clip or orientation.
+
+## Related tutorials and sources
+
+[Script coordinates](<https://allluckly.cn/en/guides/icouldplay-ass-pos-script-coordinate-display-pixels/>), [Picture edges](<https://allluckly.cn/en/guides/icouldplay-display-edge-test-card/>).
+
+[Aegisub: ASS tags](<https://aegisub.org/docs/latest/ass_tags/>).
+
+Sources checked on 15 November 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>) list version 1.1.1, requiring iOS or iPadOS 15.0. Files and calculations are prepared externally; iCouldPlay selects an available source and provides playback observations. No step-by-step physical-device or private-server testing is claimed. Use the controls available in your installed version.
+{% endraw %}

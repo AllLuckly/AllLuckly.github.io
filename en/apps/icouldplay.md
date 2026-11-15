@@ -5,7 +5,7 @@ title: 'iCouldPlay: Video Player for iPhone and iPad'
 description: Learn about iCouldPlay local videos, SMB, WebDAV, FTP, media servers, subtitles and playback engines through
   160 practical tutorials.
 permalink: /en/apps/icouldplay/
-modified: 2026-11-14
+modified: 2026-11-15
 lang: en
 source_url: /apps/icouldplay/
 ---

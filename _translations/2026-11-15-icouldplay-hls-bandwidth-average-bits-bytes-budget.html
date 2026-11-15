@@ -1,0 +1,78 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay HLS bandwidth fields: separate peak, average and byte budgets'
+description: Use two variants to practise bit/s-to-byte arithmetic without treating
+  declarations as measured speed, quality or offline size.
+permalink: /en/guides/icouldplay-hls-bandwidth-average-bits-bytes-budget/
+date: '2026-11-15 00:00:00 +08:00'
+modified: '2026-11-15 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 169
+topic: Playlists and audio measures
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-15-icouldplay-hls-bandwidth-average-bits-bytes-budget.md
+source_url: /guides/icouldplay-hls-bandwidth-average-bits-bytes-budget/
+translation_method: editorial
+translation_source_sha256: a1936e5dd9cbc904e583d8ce90a4b13adb9ee3295267681752fdba1c83008158
+translation_date: '2026-11-15T01:32:13+00:00'
+excerpt: Use two variants to practise bit/s-to-byte arithmetic without treating declarations
+  as measured speed, quality or offline size.
+---
+{% raw %}
+<p>A playlist value 800000 is neither 800000 downloaded bytes per second nor a resolution. Read two original variants, calculate a ten-second budget under an explicit assumption, then observe an actual owned source in iCouldPlay. Keep declarations, estimates and measured transfer separate.</p>
+
+<h2 id="1-retain-source-identity-before-choosing-a-number">1. Retain source identity before choosing a number</h2>
+
+<p>Use an owned master or the paper sample and record acquisition time, address and variant URIs. Entries are not proof of possessed media bytes. Without a service, audit fields and arithmetic only; sample filename failure is not compatibility evidence. A phone speed test measures current access conditions, while bandwidth attributes describe media variants. Do not replace one with the other.</p>
+
+<h2 id="2-copy-both-field-names-with-units">2. Copy both field names with units</h2>
+
+<p>Compact declares BANDWIDTH 800000 and AVERAGE-BANDWIDTH 600000; detail declares 1200000 and 900000, all in bit/s. The first concerns peak segment bitrate conditions; the second gives average segment bitrate information. They are not interchangeable names. Retain names and units, not bare numbers. Since no media is supplied, this exercise audits declarations without certifying their match to encoded bytes.</p>
+
+<pre><code class="language-text">#EXTM3U
+#EXT-X-STREAM-INF:BANDWIDTH=800000,AVERAGE-BANDWIDTH=600000
+compact.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=1200000,AVERAGE-BANDWIDTH=900000
+detail.m3u8
+</code></pre>
+
+<h2 id="3-state-the-constant-rate-assumption-beside-the-calculation">3. State the constant-rate assumption beside the calculation</h2>
+
+<p>Assume ten seconds of media transferred constantly at 600000 bit/s. Multiply by ten and divide by eight to obtain 750000 bytes. At 900000 the result is 1125000 bytes. Unit arithmetic is reproducible, but constant rate is an exercise assumption; the average attribute does not make every ten-second interval exactly that size. Decimal MB values are 0.75 and 1.125. If using binary units, label MiB and recalculate.</p>
+
+<h2 id="4-do-not-treat-a-peak-field-as-fixed-segment-size">4. Do not treat a peak field as fixed segment size</h2>
+
+<p>Neither 800000 nor 1200000 means every second consumes that exact amount. Peak information follows the specification’s segment-bitrate definition, while duration, audio combinations and encoding differ. Register actual segment durations and file bytes separately, leaving absent files unknown. Multiplying peak by whole-film duration is not a download measurement. An average below peak does not prove picture damage.</p>
+
+<h2 id="5-match-rendition-combinations-to-measured-objects">5. Match rendition combinations to measured objects</h2>
+
+<p>A variant may reference another audio group; its declaration cannot automatically be reduced to one video file. For an actual AUDIO reference, draw links and record selected audio first. Do not invent audio playlists for this sample. Measuring video-only bytes while a declaration covers a playable combination compares different scopes. Record playlist role, combination and measurement object before calculating discrepancies.</p>
+
+<h2 id="6-keep-icouldplay-smoothness-as-a-separate-observation">6. Keep iCouldPlay smoothness as a separate observation</h2>
+
+<p>With real media, play the same interval under fixed device, network and track conditions, recording startup, stalls and apparent detail. Without a visible selected variant, do not infer compact or detail from appearance. One smooth high-number session does not establish permanent network speed; a stalled lower-number session does not automatically establish a false declaration. Check resources, access and source state with time-specific conditions before comparing different days or networks.</p>
+
+<h2 id="7-audit-eightfold-and-unit-errors">7. Audit eightfold and unit errors</h2>
+
+<p>Mistaking 600000 bit/s for bytes/s changes ten-second estimates from 750000 to 6000000 bytes, exactly eightfold. Use this counterexample to require units on every number. Unify KiB and kB bases before alleging lost data. Rounded file-manager sizes support rough estimates; byte-level comparison needs actual properties. A few hundred bytes of playlist text are not its referenced video size.</p>
+
+<h2 id="8-test-an-average-using-two-consecutive-intervals">8. Test an average using two consecutive intervals</h2>
+
+<p>For another paper counterexample, two five-second intervals contain 250000 and 500000 bytes. Together they total 750000 bytes in ten seconds, averaging 600000 bit/s, despite different rates in each half. A matching total average does not establish constant per-second demand. These figures illustrate units, not compliance with the sample’s peak-segment definition: actual segmentation and scope were not specified. Equal ten-second totals cannot certify equal buffering needs, instantaneous transfer or quality; those require separate evidence.</p>
+
+<h2 id="9-deliver-declarations-budgets-and-observations">9. Deliver declarations, budgets and observations</h2>
+
+<p>Reopen the master, recheck four values and two links, and recompute both assumptions. Deliver field notes, unit-complete arithmetic, actual media statistics or unknowns, and current playback observations. Names do not guarantee quality and estimates are not downloads. Offline readiness separately requires dependencies and readable copies; a budget fitting free storage does not establish completion.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/icouldplay-audio-sample-rate-bit-rate-size/">Audio parameter units</a>, <a href="/en/guides/icouldplay-media-storage-budget/">Storage budgets</a>.</p>
+
+<p><a href="https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.2">RFC8216 §4.3.4.2</a>.</p>
+
+<p>Sources checked on 15 November 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software">Apple lookup</a> list version 1.1.1, requiring iOS or iPadOS 15.0. Files and calculations are prepared externally; iCouldPlay selects an available source and provides playback observations. No step-by-step physical-device or private-server testing is claimed. Use the controls available in your installed version.</p>
+{% endraw %}

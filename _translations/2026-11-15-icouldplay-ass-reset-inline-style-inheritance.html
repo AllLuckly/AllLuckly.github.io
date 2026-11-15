@@ -1,0 +1,86 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay ASS style resets: audit where a bold override stops'
+description: Compare identical cues with and without a reset, separating the base
+  style, inline overrides and following text.
+permalink: /en/guides/icouldplay-ass-reset-inline-style-inheritance/
+date: '2026-11-15 00:00:00 +08:00'
+modified: '2026-11-15 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 165
+topic: Caption structure and scope
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-15-icouldplay-ass-reset-inline-style-inheritance.md
+source_url: /guides/icouldplay-ass-reset-inline-style-inheritance/
+translation_method: editorial
+translation_source_sha256: 15270db431e94c72ea4eea52f4995eb8a6620dab5933ecb37ff184e387a4425b
+translation_date: '2026-11-15T02:00:44+00:00'
+excerpt: Compare identical cues with and without a reset, separating the base style,
+  inline overrides and following text.
+---
+{% raw %}
+<p>Whether the second half of a caption stays bold depends on override scope and resetting, not a full stop automatically terminating a style. Prepare two identical-wording ASS cues and audit their base style before comparing display. Author externally; use iCouldPlay only for available subtitle selection and playback.</p>
+
+<h2 id="1-record-an-auditable-base-style">1. Record an auditable base style</h2>
+
+<p>Retain an owned clip at least twelve seconds long and fix subtitle size, orientation and video fitting. The exercise uses style Default with Bold 0, requesting ordinary weight. Record name, requested font, size and bold field. Retain original video and subtitles. Naming a font does not prove installation. Without an external-subtitle selection flow, complete text inspection and mark appearance unperformed; do not invent an advanced reset control in the player.</p>
+
+<h2 id="2-save-events-differing-only-in-the-reset">2. Save events differing only in the reset</h2>
+
+<p>The first cue below requests bold with b1 and uses r before the next sentence to restore its base style. The second omits only r while retaining wording and style conditions. A normal space before the second sentence does not control styling. Save and reopen UTF-8 ASS. Count two events and two b1 commands but one reset. Separate event times avoid superimposed glyphs making apparent weight ambiguous.</p>
+
+<pre><code class="language-text">[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,42,&amp;H00FFFFFF,&amp;H000000FF,&amp;H00000000,&amp;H00000000,0,0,0,0,100,100,0,0,1,1,0,5,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:04.00,Default,,0,0,0,,{\b1}Bold first.{\r} Regular next.
+Dialogue: 0,0:00:05.00,0:00:08.00,Default,,0,0,0,,{\b1}Bold first. Regular next.
+</code></pre>
+
+<h2 id="3-predict-the-second-sentence-rather-than-the-first-word">3. Predict the second sentence rather than the first word</h2>
+
+<p>Divide cue one into the bold-request section and the ordinary-request section after reset. Both sentences of cue two remain after b1. The full stop does not reset; r is the variable. Openings may look identical, so compare the following sentence. Keep first- and second-section ledger columns. A screenshot showing only the initial bold word cannot establish successful reset. This format-level prediction still needs actual playback observations before claiming appearance.</p>
+
+<h2 id="4-compare-under-unchanged-icouldplay-conditions">4. Compare under unchanged iCouldPlay conditions</h2>
+
+<p>Select matching video and subtitles and play sequentially beyond eight seconds. Establish complete wording before comparing sections and the second cue’s ending. Avoid changing size, outline, brightness or engine between cues. If weight is difficult to judge at this display size, record uncertainty rather than treating magnified screenshot aliasing as real bolding. A larger-size control should change the whole comparison consistently and be saved separately.</p>
+
+<h2 id="5-test-which-base-the-reset-restores">5. Test which base the reset restores</h2>
+
+<p>Copy the file and change only Default’s Bold field to -1, requesting a bold base. Cue one’s reset now returns the second sentence to that bold base; it is no longer expected to become thin. This demonstrates that r is not synonymous with unconditionally disabling bold. Audit column order and values before reselection; accidentally changing PrimaryColour or Italic introduces another variable. Do not overwrite the original style file.</p>
+
+<h2 id="6-register-other-overrides-before-interpreting-reset">6. Register other overrides before interpreting reset</h2>
+
+<p>A reset restores style state. Do not pile on unexplained colour, rotation or animation overrides and then discuss only bold scope. This minimal draft excludes them. Verify each event contains only explained commands and isolate unknown tags in copies. To test disabling bold alone, make a separate b0 control and distinguish that from restoration of the complete base style. Similar appearance once does not establish universal interchangeability.</p>
+
+<h2 id="7-diagnose-three-reasons-for-inconclusive-weight">7. Diagnose three reasons for inconclusive weight</h2>
+
+<p>Identical-looking cues first require checks of selected copy, Default’s Bold field and the font’s weight rendering. Visible literal tags warrant auditing braces, backslashes, format and subtitle source, not brightness adjustments. Missing first-section glyphs with a readable second section belong in a separate text/font issue column. Preserve distinct observations: indistinguishable weight, a thinner ending and visible tags are not the same outcome and should not all become pass or incompatible.</p>
+
+<h2 id="8-add-an-independently-unstyled-cue">8. Add an independently unstyled cue</h2>
+
+<p>In a separate extended copy, add an ordinary event from nine to eleven seconds with no override braces and style Default. With base Bold 0, it requests regular weight. The previous event omitting r does not make its b1 cross an event boundary into this independent cue. Inspect the new event’s Style field rather than inferring state from the previous ending. Keep inline scope, current event base and next event base separate. Unexpected display needs the complete source and selected-copy record; deleting the next sentence to improve a screenshot does not repair the evidence.</p>
+
+<h2 id="9-reload-and-deliver-reset-evidence">9. Reload and deliver reset evidence</h2>
+
+<p>Reenter and reselect the original with base Bold 0. Check cue one’s sections and cue two’s inherited override. Deliver both style-base copies, field notes and actual observations with unknown-device fields left unfilled. A plain fallback can remove inline overrides while retaining wording, timing and base style; reselect and confirm readable text. Ensure conclusions do not describe r as deleting text, punctuation as a command or a weight impression as exhaustive compatibility testing.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/icouldplay-ass-style-fidelity-check/">ASS style fidelity</a>, <a href="/en/guides/icouldplay-webvtt-emphasis-nested-span-boundary/">VTT emphasis scope</a>.</p>
+
+<p><a href="https://aegisub.org/docs/latest/ass_tags/">Aegisub: ASS tags</a>.</p>
+
+<p>Sources checked on 15 November 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software">Apple lookup</a> list version 1.1.1, requiring iOS or iPadOS 15.0. Files and calculations are prepared externally; iCouldPlay selects an available source and provides playback observations. No step-by-step physical-device or private-server testing is claimed. Use the controls available in your installed version.</p>
+{% endraw %}

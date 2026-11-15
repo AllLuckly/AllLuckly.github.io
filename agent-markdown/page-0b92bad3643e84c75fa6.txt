@@ -1,0 +1,85 @@
+---
+layout: null
+permalink: /guides/icouldplay-ass-clip-iclip-glyph-video-boundaries/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映 ASS 裁剪对照：字幕可见窗口不等于视频裁切
+agent_source_url: https://allluckly.cn/guides/icouldplay-ass-clip-iclip-glyph-video-boundaries/
+agent_source_sha256: df51541aea914d02b31b3dd62aee2198d7380226646e752530af4e6a4320c069
+agent_generator_version: 1
+---
+{% raw %}# 云映 ASS 裁剪对照：字幕可见窗口不等于视频裁切
+
+语言：zh-CN
+原文：[云映 ASS 裁剪对照：字幕可见窗口不等于视频裁切](<https://allluckly.cn/guides/icouldplay-ass-clip-iclip-glyph-video-boundaries/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-clip-iclip-glyph-video-boundaries/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-clip-iclip-glyph-video-boundaries/>)
+发布于: 2026-11-15T00:00:00+08:00
+内容更新于: 2026-11-15T00:00:00+08:00
+署名：Bison
+
+用同一矩形比较clip与iclip的互补范围，分别记录文字可见部分、锚点和原画面。
+
+字幕只剩中间几个字，不一定是视频被放大裁掉了。本课用同一句自制文字和同一个矩形，比较 ASS 的普通裁剪与反向裁剪。源文窗口定义可以在纸上核查，云映是否呈现相同范围则由实际路径观察；不把某种字体下留下的字数当成所有设备的固定答案。
+
+## 一、把视频边界和脚本矩形分别画出
+
+准备至少十秒的自有影片，找得到画面四边的参照，保留原件与原字幕。固定播放方向和适应模式，纸上另画640乘360的字幕脚本矩形，不把系统导航栏、黑边和脚本画布直接混为一体。记录中央点320、180，作为本课两个条目共同锚点。先确认普通无特效文字能选择并显示，再谈局部裁剪，避免基础加载失败被误解释为矩形把所有字都隐藏了。
+
+## 二、保存相同位置与不同窗口命令
+
+两条事件使用完全相同的文字、字号和位置，分别位于一至四秒、五至八秒。第一条保留矩形里面的字幕部分，第二条保留矩形外面部分；并不把矩形移动到另一个位置。完整文件如下，复制后另存UTF-8 ASS。括号里的四个整数是左上、右下两点，不是x、y、宽、高；因此本例窗口宽240、高120。不要再添加应用裁切选项改变视频区域。
+
+```
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,42,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,5,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:04.00,Default,,0,0,0,,{\an5\pos(320,180)\clip(200,120,440,240)}Compare this long sentence.
+Dialogue: 0,0:00:05.00,0:00:08.00,Default,,0,0,0,,{\an5\pos(320,180)\iclip(200,120,440,240)}Compare this long sentence.
+```
+
+## 三、在纸上明确内外互补的含义
+
+把左上200、120和右下440、240标出，画中央锚点。先用一条足够长的文字带横穿窗口，分别涂出保留内部与保留外部两种区域。裁剪改变的是字幕图形可见范围，不会把被隐藏的文字重新排版或搬进矩形。靠近边缘的半个字可能被切开，不意味着源文本少了半个字符。记录源文完整句子和可见字形两栏，保留两者不同这一事实。
+
+## 四、先顺播比较再核帧内位置
+
+在云映实际入口选择视频与练习稿，从开头顺播，记录两条是否能看到同一句的不同部分。再按需要暂停阅读外观，保持缩放、字幕位置设置和屏幕方向相同。第一条可能因字形宽度只露中间，第二条可能两端露出；准确剩下哪些字由字体、渲染与画布映射共同影响，不能预填固定字数。若两条均完整显示，也应记录它们相同，而不是改视频裁切来伪造互补结果。
+
+## 五、单独扩展矩形做第二次对照
+
+复制源稿，只把两条右下点的横坐标440改为500，其他值保留。窗口宽从240变为300，高仍120。纸面上第一条能保留的横向区域增加，第二条被排除的区域增加，但源文字和锚点不变。先标这项预期，再重新选择副本观察，不把预测抄成已测结论。若顺手把字号也变小，文字露出更多就有两种原因，必须退回原稿重新隔离。
+
+## 六、检查是否误把宽高写成端点
+
+有人把窗口写成200、120、240、120，误以为后两数是宽高；实际上下两点同高，已不是预期的矩形。排查时逐项列左、上、右、下，先算右减左和下减上，再看实际字幕。命令拼写、花括号和反斜线也要逐字核对。不要仅凭字幕消失就扩大字体或把全部文字挪出屏幕，故障应在源文中找到可说明的条件，而不是不停调整直到偶然出现几个字。
+
+## 七、区分字体代替与裁剪不呈现
+
+两台设备留下的字形不同，先核是否选到同一原稿、相同画布、字号和字体可用性；相同矩形不保证字形轮廓完全相同。当前路径忽略窗口时，把文字显示与裁剪表现分别记录，保留普通回退稿。若字幕与原画面都被截边，另查视频显示模式，不能只归因 ASS。不要声称本课已测过每种引擎或所有字幕来源，源文审核和网页构建都不能替代这些播放记录。
+
+## 八、用两个点审核矩形方向
+
+在纸上另外标点甲一百九十、一百八十和点乙二百一十、一百八十。两点都在同一水平线上，甲位于矩形左外侧，乙位于内侧，因此普通裁剪保留乙附近的字幕部分，反向裁剪保留甲附近的字幕部分。这里标的是脚本平面测试点，不代表真实文字一定在那两个位置有笔画；没有笔画的空处不会因为保留区域就凭空出现字符。再把乙的纵坐标改为二百五十，它就移到下边界之外，虽然横坐标未改，归属也会变。用两个坐标共同判断，比只看x值更能发现把屏幕位置误当一维范围的问题。
+
+## 九、交付两种范围与普通回退
+
+最后选回原始练习稿，再核两条的时间、源句与内外范围记录；另存去掉clip和iclip覆盖的版本作为普通字幕。重开影片后确认回退文字可读，原视频边界仍是原边界。交付矩形两点、计算宽高、字体条件、实际可见部分和未知项。清楚写出裁剪没有删除源文，也没有编辑影片像素；后续换片或旋转画面时保留旧记录，重新检查映射关系。
+
+## 相关教程与资料
+
+[脚本坐标](<https://allluckly.cn/guides/icouldplay-ass-pos-script-coordinate-display-pixels/>)、[画面边缘](<https://allluckly.cn/guides/icouldplay-display-edge-test-card/>)。
+
+[Aegisub: ASS tags](<https://aegisub.org/docs/latest/ass_tags/>)。
+
+资料核对：2026 年 11 月 15 日，[云映官方说明](<https://apps.apple.com/cn/app/id6755653178>)及[Apple公开版本查询](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>)列出1.1.1，最低iOS / iPadOS 15.0。练习文件和计算在外部完成，云映用于选择实际来源并观察播放；没有声明真机或私人服务器逐项实测，具体选项以安装版本为准。
+{% endraw %}

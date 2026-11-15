@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-audio-rms-peak-window-duty-cycle-model/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay audio measures: equal peaks can have different RMS values'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-audio-rms-peak-window-duty-cycle-model/
+agent_source_sha256: 33cb24498db17a1f84fbaa3ee9805e99dad839f76d669c606fa9bc487fa67e10
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay audio measures: equal peaks can have different RMS values
+
+Language: en
+Canonical: [iCouldPlay audio measures: equal peaks can have different RMS values](<https://allluckly.cn/en/guides/icouldplay-audio-rms-peak-window-duty-cycle-model/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-audio-rms-peak-window-duty-cycle-model/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-audio-rms-peak-window-duty-cycle-model/>)
+Published: 2026-11-15T00:00:00+08:00
+Modified: 2026-11-15T09:32:13+08:00
+Author: Bison
+
+Calculate RMS for four-sample models, then compare fixed real-media windows while separating peaks, sustained level and perceived loudness.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-audio-rms-peak-window-duty-cycle-model/>), translated on 2026-11-15. Original publication dates, attribution, code and version notes are retained.
+
+Two signals can share a highest peak while differing in sustained level. Calculate RMS from four abstract samples, analyse an owned audio selection externally if possible, and listen to the identified interval in iCouldPlay. Do not play these abstract numbers directly through headphones or equate RMS with perceived loudness, hearing safety or volume percentages.
+
+## 1. Name models and media separately
+
+Prepare paper rows A and B, and separately record an actual owned file’s name, duration, sample rate and channels. Four model samples illustrate arithmetic, not four seconds of audio; duration depends on sampling rate. Use familiar, moderate material at comfortable volume rather than raising output to emphasise impacts. Preserve originals and save external processing separately from the current playback reference.
+
+## 2. Calculate both absolute peaks
+
+A contains 0.5,-0.5,0.5,-0.5; B contains 0.5,0,0,0. Take absolute values before finding maxima: both peaks are 0.5. Sign represents waveform direction, not negative listening volume. Do not cancel extrema or confuse signed samples with volume controls. Keep the sequence and absolute peak in distinct ledger columns.
+
+```text
+A = [0.5, -0.5, 0.5, -0.5]
+B = [0.5, 0.0, 0.0, 0.0]
+peak(A) = peak(B) = 0.5
+RMS(A) = sqrt((0.25 + 0.25 + 0.25 + 0.25) / 4) = 0.5
+RMS(B) = sqrt((0.25 + 0 + 0 + 0) / 4) = 0.25
+```
+
+## 3. Square, average and take the root in order
+
+A’s four squares are 0.25, summing to 1; dividing by four gives 0.25 and rooting gives 0.5. B’s square sum is 0.25, average 0.0625 and root 0.25. Retain intermediate values. Taking the ordinary average first is different: A averages to zero but is not absent signal. Deliver reproducible arithmetic rather than only memorising the result.
+
+## 4. Hold the window constant when including zeros
+
+Both models contain four samples. B’s three zero values remain in its averaging denominator. Selecting only its nonzero sample produces 0.5 but changes the window and question. For real media, record boundaries and whether silence is included. Do not compare a whole A passage to only B’s loudest instant and blame file format. Empty track space and actual digital silence must follow the external analyser’s documented treatment, which may differ.
+
+## 5. Separate ratios from device volume
+
+Under the same reference, 0.5 to 0.25 halves the amplitude measure, approximately -6.02 dB. This specifies no phone volume percentage. A 0.5 absolute peak relative to full scale is also about -6.02 dBFS, numerically coinciding while belonging in another column. These models omit frequency weighting, integration conventions and hearing. Twice the RMS does not directly mean twice perceived loudness and supplies no hearing-safety determination.
+
+## 6. Analyse fixed real intervals externally
+
+If an existing tool such as Audacity is available, select a fixed owned-track interval and use an actual analysis function to record RMS. Note tool version, boundaries, channel and values, applying the same window rules to another selection. Without a tool, deliver model arithmetic without inventing a report. Check both stereo channels contain data. The iCouldPlay progress bar and device volume slider are not RMS meters; identify external results explicitly as external.
+
+## 7. Keep iCouldPlay listening separate
+
+Open the same identified file, fix output device, volume and selected track, and listen to the recorded interval. Note sustained sound, a prominent transient or an inconclusive difference without rewriting perception to fit prediction. Register different normalisation, mixing or output processing before attributing every difference to RMS. Recheck identity after track changes so analysis of one file is not compared with a same-named alternative.
+
+## 8. Observe denominator changes caused by the window
+
+Append four zeros to B to form eight-sample C. Its peak remains 0.5 and square sum remains 0.25, but mean square becomes 0.03125 and RMS approximately 0.1768. Nonzero samples have not changed; the longer window changes the statistic, not an app secretly lowering volume. Circle denominators four and eight before checking whether a real selection includes extra silence. Decide between whole-recording sustained level and equal-duration excerpts before choosing windows. Removing quiet portions merely to align numbers changes the question, and these discrete models are not measurements of real songs.
+
+## 9. Recalculate and deliver layered evidence
+
+Reopen notes and recompute peak 0.5 and RMS 0.5/0.25 with denominator four and a common window. Deliver models, external records or unperformed status, and actual listening observations. Do not call four abstract samples a produced video or analysis values measured output across all playback paths. Preserve original audio and references, adding new rows after volume changes or transcoding so objects and units remain traceable.
+
+## Related tutorials and sources
+
+[Sample peaks](<https://allluckly.cn/en/guides/icouldplay-audio-sample-peak-dbfs-volume-boundary/>), [Common gain](<https://allluckly.cn/en/guides/icouldplay-stereo-common-gain-independent-normalization-balance/>).
+
+[Audacity: Contrast and RMS](<https://manual.audacityteam.org/man/contrast.html>).
+
+Sources checked on 15 November 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>) list version 1.1.1, requiring iOS or iPadOS 15.0. Files and calculations are prepared externally; iCouldPlay selects an available source and provides playback observations. No step-by-step physical-device or private-server testing is claimed. Use the controls available in your installed version.
+{% endraw %}

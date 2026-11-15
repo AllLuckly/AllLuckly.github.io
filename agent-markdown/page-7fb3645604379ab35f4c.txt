@@ -1,0 +1,83 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-srt-line-break-blank-block-boundary/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay two-line SRT cues: distinguish text lines, blank separators and
+  visual wrapping'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-srt-line-break-blank-block-boundary/
+agent_source_sha256: ea0c41bcd60e402245d262fd060451ff1faba8dad05fcf9e4e9e60df2991f401
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay two-line SRT cues: distinguish text lines, blank separators and visual wrapping
+
+Language: en
+Canonical: [iCouldPlay two-line SRT cues: distinguish text lines, blank separators and visual wrapping](<https://allluckly.cn/en/guides/icouldplay-srt-line-break-blank-block-boundary/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-srt-line-break-blank-block-boundary/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-srt-line-break-blank-block-boundary/>)
+Published: 2026-11-15T00:00:00+08:00
+Modified: 2026-11-15T09:32:11+08:00
+Author: Bison
+
+Use two cues and a missing-separator control to audit block boundaries before comparing their display.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-srt-line-break-blank-block-boundary/>), translated on 2026-11-15. Original publication dates, attribution, code and version notes are retained.
+
+One cue can contain two text lines, while a blank line separates cue blocks. Confusing them can turn a later counter and timestamp into unexpected visible wording. Prepare a two-line SRT externally and inspect source structure separately from iCouldPlay layout. The number of visually wrapped lines does not count cues.
+
+## 1. Choose a short clip with readable space
+
+Use an owned video of at least ten seconds with clear space near the bottom and no competing burned-in prompts. Record identity, orientation and selected subtitle state, retaining the video. Use a plain-text editor; displayed editor line numbers are aids, not file content. Save reference and failing copies under different names and record each selection. Changing one disk file while observing an older selection invalidates the comparison.
+
+## 2. Save the correctly separated two-line block
+
+The first cue below contains a normal newline between sentences, both belonging to one interval. A blank line before the second counter starts a new block. Copy the whole file with ASCII timing punctuation. The one-second gap helps identify the first cue ending. Do not insert a blank line between its sentences merely for visual spacing: that alters structure. Reopen the saved file to confirm that export has retained separators.
+
+```text
+1
+00:00:01,000 --> 00:00:04,000
+Top line stays together.
+Bottom line shares the interval.
+
+2
+00:00:05,000 --> 00:00:08,000
+A separate cue begins here.
+```
+
+## 3. Count fields rather than screen lines
+
+Classify cue one as counter 1, one interval and two text lines, and cue two as counter 2, another interval and one text line. There are two cues, not three; both first-cue sentences share entry and exit times. A narrow editor may wrap a sentence without adding newline characters. Record saved text and soft wrapping separately. Three visible player lines do not establish three source cues.
+
+## 4. Remove exactly one separator in a control
+
+Copy the correct draft and remove only the blank line between the first cue’s text and counter 2. Retain all other characters and times. Predict broken separation, then verify the actual source difference without promising one particular tolerant rendering. Parsers may reject, ignore or handle malformed input differently. Identify the missing boundary; do not interpret a single tolerated file as evidence that separators are unnecessary in every SRT workflow.
+
+## 5. Select the reference before judging layout
+
+Open the matching video in iCouldPlay, select the correct subtitles and play sequentially beyond eight seconds. Check both first-cue sentences, their common interval and the gap from four to five seconds. Establish complete wording before describing wrapping, which depends on width and size. A sentence wrapping over two lines still belongs to its original cue. Readability edits belong in a later copy; hold size, orientation and wording fixed during boundary comparison.
+
+## 6. Isolate selection from repair
+
+If an available flow allows reselection, choose the failing copy and record its actual behaviour. Otherwise deliver the source comparison and mark playback unperformed. Restore the reference and replay to check that observations follow file changes. Identical results may indicate an old selection, retained state or parser tolerance. Do not keep deleting counters or timestamps to force an expected failure: those extra variables would no longer isolate the missing separator.
+
+## 7. Diagnose unexpected gaps or duplicate prompts
+
+If only the upper sentence remains, inspect whether a real blank line entered between the sentences and confirm that the lower text was not saved with a different encoding. Duplicate overlaid prompts warrant checking embedded and external tracks separately, not blaming two-line structure. Visible counters or arrows first require a separator and file-selection audit, not colour or brightness adjustments. Copy the specific symptom into the ledger rather than reporting only generic incompatibility.
+
+## 8. Reconstruct text from a field card
+
+Make a field card with one timing line, two source text lines and a blank separator. Narrow the editor until a sentence wraps, then widen it and check whether saved text changed. Without an inserted newline there are still two source text lines; pressing Return adds a real line. Record the action difference rather than demanding player wrapping match the editor. A separate three-text-line copy still needs only one timing header and a terminating separator. More visual lines on a phone concern readability, not additional cue counters. Preserve copy names and provenance so layout experiments do not replace the reference.
+
+## 9. Retain a recoverable boundary explanation
+
+Reenter the video and select the correct draft, confirming two cues, three source text lines and the gap. Deliver both files, their single difference, selected name and a screenshot or written observation. A screenshot establishes appearance; source text establishes actual newlines. Neither substitutes for an unperformed path. For later bilingual prompts, place paired wording in one interval and finish that block with a blank line, checking each entry before adding more.
+
+## Related tutorials and sources
+
+[Minimal SRT](<https://allluckly.cn/en/guides/icouldplay-srt-comma-millisecond-counter-timing/>), [Bilingual layout](<https://allluckly.cn/en/guides/icouldplay-bilingual-caption-layout/>).
+
+[Library of Congress: SRT](<https://www.loc.gov/preservation/digital/formats/fdd/fdd000569.shtml>).
+
+Sources checked on 15 November 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>) list version 1.1.1, requiring iOS or iPadOS 15.0. Files and calculations are prepared externally; iCouldPlay selects an available source and provides playback observations. No step-by-step physical-device or private-server testing is claimed. Use the controls available in your installed version.
+{% endraw %}

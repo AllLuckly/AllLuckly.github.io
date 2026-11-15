@@ -1,0 +1,68 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-unequal-bin-width-frequency-density-area/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint unequal-width histogram: use frequency density so areas represent
+  four, nine and five'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-unequal-bin-width-frequency-density-area/
+agent_source_sha256: 808eb8d832ac1272c1851b215218518cf2bbee9db77622b80b75807037035878
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint unequal-width histogram: use frequency density so areas represent four, nine and five
+
+Language: en
+Canonical: [VectorPaint unequal-width histogram: use frequency density so areas represent four, nine and five](<https://allluckly.cn/en/guides/vectorpaint-unequal-bin-width-frequency-density-area/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-unequal-bin-width-frequency-density-area/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-unequal-bin-width-frequency-density-area/>)
+Published: 2026-11-15T00:00:00+08:00
+Modified: 2026-11-15T09:50:55+08:00
+Author: Bison
+
+Fix widths two, three, five and counts four, nine, five, distinguishing frequency density, relative density and area.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-unequal-bin-width-frequency-density-area/>), translated on 2026-11-15. Original publication dates, attribution, code and version notes are retained.
+
+Using raw counts as heights with unequal bins gives wide bins extra visual weight. Draw a three-bin frequency-density histogram in VectorPaint, dividing counts by widths and recovering counts through areas. Its height rule differs from equal-width frequency charts. Values are an original exercise, not survey results or automatic app statistics.
+
+## Declare bin boundaries and endpoint ownership
+
+Use bins \[0,2),\[2,5),\[5,10\], widths 2,3,5 and declared counts 4,9,5, total 18. Mark boundaries 0,2,5,10 without equal-width boxes. Values 2,5,10 belong respectively to middle,last,last under this convention, never two bins. This is an exercise table, not collected survey evidence; recount any real data separately. The horizontal variable uses invented units, not unstated age or speed.
+
+## Compute count density as count divided by width
+
+Densities are 4/2=2,9/3=3,5/5=1, in counts per horizontal unit. Use heights 2,3,1, not raw counts. Last-bin count 5 exceeds first-bin 4 despite lower height 1 versus 2; area carries the difference. Count density is not bin probability and may exceed one. Check units before multiplying by a separate pixel scale.
+
+## Draw adjacent rectangles with the actual widths
+
+On an approximately 1800×1400 canvas use 100 px per horizontal unit, origin (300,1000), giving x-ranges 300..500,500..800,800..1300. At 160 px per density unit, heights are 320,480,160 and tops y=680,520,840. Rectangles touch; draw shared boundaries once. Fix equal-width mistakes before changing heights. Different axis scales are allowed if declared; screen squares do not define mathematical area.
+
+## Recover four, nine and five from areas
+
+Areas are 2×2=4,3×3=9,5×1=5, total 18. First/last counts compare 4:5, not height ratio 2:1. Renaming the axis “frequency” without changing geometry changes meaning. Mathematical areas remove display scales; pixel areas share factor 100×160, preserving ratios but not values 4,9,5. Retain a short area ledger so neither tallest nor widest alone misleads.
+
+## Divide by eighteen for relative frequency density
+
+For total area one, divide densities 2,3,1 by 18 to get 1/9,1/6,1/18. Bin areas become 2/9,1/2,5/18, equivalently 4/18,9/18,5/18, summing to one. Relabel the axis relative frequency density. Keep widths, declare any different display scale and avoid implying unchanged values from similar heights. Even relative-density height is not bin probability; multiply by width.
+
+## Avoid inventing within-bin detail
+
+Constant rectangle height does not establish uniform observed values within a bin, and count nine cannot recover nine raw observations. New boundaries require raw-data rebinning, not proportional slicing presented as measured counts. Closing the last endpoint at ten does not make its width six: 10−5=5, not six listed integers. Keep interval width separate from discrete-category counting and state the exercise’s unknown within-bin detail.
+
+## Troubleshoot widths and axis labels
+
+Areas 8,27,25 reveal raw-count heights; divide by widths. Total area one with a count-density label suggests missing normalisation relabelling. Recheck width subtraction and half-open membership for 6-wide last bins or repeated boundary values. Correct one condition, preserving counts and total 18. Labels move without boundaries; decorative shadows carry no area. Inspect export objects and do not assume axis text automatically recalculates heights.
+
+## Reopen and check widths two-three-five and heights two-three-one
+
+Save native work, export PNG and reopen. Inspect unequal adjacent widths, then density axis and areas 4,9,5 enlarged. If both versions appear, distinguish total areas 18 and 1 rather than an unexplained shared vertical axis. Reopen separately editable boundaries/heights/text and retain membership plus both ledgers. Explain why a lower bar may hold more observations, without claiming real survey analysis or raw-data recovery. Recalculate changes in units,bins,total or counts.
+
+## Related tutorials and sources
+
+[VectorPaint equal-bin histograms: assign boundary values before drawing counts](<https://allluckly.cn/en/guides/vectorpaint-equal-bin-histogram/>); [VectorPaint area comparisons: calculate side lengths before arranging 1, 4 and 9 units](<https://allluckly.cn/en/guides/vectorpaint-area-comparison/>).
+
+Sources checked on 15 November 2026: the [official VectorPaint App Store listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261115>) show version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, paths, nodes, layers and text. Conditions, scales and layouts are original exercise arrangements; check installed controls. Keep editable native work and PNG previews. SVG/PDF may retain any bitmap content used. External calculations and static diagrams are not new automatic proof, statistics or solver features. No completed device, physical-object or universal export testing is claimed.
+
+Method: [MIT’s density-histogram material](<https://openlearninglibrary.mit.edu/asset-v1%3AMITx%2B18.05r_10%2B2022_Summer%2Btype%40asset%2Bblock/pdf_mit18_05_s22_class6-prep-b.pdf>) distinguishes widths and areas. This original exercise separately presents count density and total-normalised density; bins, counts and layout are invented.
+{% endraw %}

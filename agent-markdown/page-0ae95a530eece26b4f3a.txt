@@ -1,0 +1,67 @@
+---
+layout: null
+permalink: /en/guides/manyue-http-range-content-range-archive-byte-boundary/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Check range responses in ManYue: byte ranges are not comic-page ranges'
+agent_source_url: https://allluckly.cn/en/guides/manyue-http-range-content-range-archive-byte-boundary/
+agent_source_sha256: 52ec1527ef885d4e55d5ca4140a16a0df6ef944d4001694eca87ec5c167ecd45
+agent_generator_version: 1
+---
+{% raw %}# Check range responses in ManYue: byte ranges are not comic-page ranges
+
+Language: en
+Canonical: [Check range responses in ManYue: byte ranges are not comic-page ranges](<https://allluckly.cn/en/guides/manyue-http-range-content-range-archive-byte-boundary/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-http-range-content-range-archive-byte-boundary/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-http-range-content-range-archive-byte-boundary/>)
+Published: 2026-11-15T00:00:00+08:00
+Modified: 2026-11-15T10:03:44+08:00
+Author: Bison
+
+Use original response cards to count inclusive byte ranges, separating 206, 200, 416 and complete-archive usability.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-http-range-content-range-archive-byte-boundary/>), translated on 2026-11-15. Original publication dates, attribution, code and version notes are retained.
+
+A request for zero through ninety-nine generally names byte positions, not the first hundred comic pages. Read original HTTP cards externally, then inspect a complete local sample in ManYue, separating partial representation, full file and image entries. A paper exercise needs no real server, but must be labelled as such. No manual Range control or private-server reconfiguration in the app is assumed.
+
+## Fix the complete representation and teaching address
+
+Prepare an original three-page archive and record its real identity and size. Separately assume a one-thousand-byte representation on a paper card using example.com, not a live comic source. Real sample size may differ. State representation and content-coding conditions: this exercise fixes one representation without extra coding so gzip-layer offsets are not mixed. Without responses, invent neither network records, timing nor successful logins.
+
+## Count both endpoints of a byte range
+
+Card A requests `Range: bytes=0-99`. Zero-based offsets include both ends, so length is ninety-nine minus zero plus one: one hundred. B uses `bytes=100-199`, also one hundred, not a page number. Together they cover zero through one hundred ninety-nine without overlap, totalling two hundred bytes. Separate offsets, length and comic pages. Archive entries and overhead do not divide proportionally into three equal byte regions merely because three images exist.
+
+## Check 206 range and complete length
+
+For a teaching 206 response with `Content-Range: bytes 0-99/1000`, the interval is this part and one thousand is complete-representation length, not this body’s size. Check a one-hundred-byte body, corresponding offsets and consistent representation identity. This is a single-range card, not multipart. Status 206 alone is insufficient, and a total of one thousand in the header does not make the saved hundred-byte fragment a complete archive. Acquisition and integrity still need separate checks.
+
+## Record 200 and 416 by their semantics
+
+A server may ignore Range and return a complete 200 representation; absence of 206 alone does not establish damage, though completeness still needs checking. For a known thousand-byte representation, `bytes=1000-1099` starts beyond final offset nine hundred ninety-nine and may yield 416 with `Content-Range: bytes */1000`. The star is not an unknown comic page. Do not equate every 416 with a password error or append a full 200 body as though it were another part, duplicating the file. Use status, fields and bytes together.
+
+## Ensure resumed pieces belong to one representation
+
+The same path can serve a changed file between requests, so old and new pieces may not combine. Give paper versions A/B distinct identities and reject unverified assembly even if lengths total one thousand. Real resume and conditional requests follow normal client/server mechanisms; no manual concatenation script is prescribed. Preserve complete copies and sources rather than overwrite them with unidentified fragments. Missing version or validation evidence stays unknown, without assuming identical checks for every remote source.
+
+## Read only a complete valid sample
+
+Import the complete valid original archive through an existing ManYue path and inspect three numbered centres, recording copy and path. A hundred-byte fragment generally lacks complete archive structure; it need not display the first page, and a cbz suffix cannot restore a central directory. Any limited readable fragment is not proof that arbitrary ranges work. A response-card PDF may be read separately, but visible code does not establish that the app executed those requests. Keep both acceptance checks distinct.
+
+## Check off-by-one and fragment-completeness errors
+
+For zero through ninety-nine counted as ninety-nine bytes, restore the inclusive endpoint. For a hundred saved but a thousand recorded, separate Content-Range interval and total. Retry failures call for checking identity, status and received bytes, not disabling security or blaming every issue on cache. Entry CRC and HTTP total length prove different things and need corresponding data. Share original cards and redacted size records without signed URLs, cookies or comics. No capture means no claimed byte-level network verification.
+
+## Reopen and audit statuses and quantities
+
+Reopen the complete sample and response report, confirm identity and reconstruct one hundred, two hundred and one thousand as distinct quantities. Explain partial 206, potentially complete 200 and unsatisfied 416. Retain request, response, representation conditions, byte counts and actual reading results rather than only “download succeeded”. Reassess offsets after file or coding changes; they are not permanent page numbers. Deliver an explainable range/completeness record, not promises of manual app controls, universal resume or arbitrary-fragment reading.
+
+## Related guides and sources
+
+[Check compression layers in ManYue: Content-Encoding is not a CBZ entry method](<https://allluckly.cn/en/guides/manyue-http-content-encoding-container-compression-layers/>); [ManYue download names: a Content-Disposition suggestion is not comic identity](<https://allluckly.cn/en/guides/manyue-http-download-filename-disposition-identity/>).
+
+Checked on November 15, 2026: [Apple public information](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261115>) lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. See the [official App Store](<https://apps.apple.com/cn/app/id6753895889>) for published capabilities; verify controls in the installed version.
+
+Method reference: [RFC 9110: range requests and Content-Range](<https://www.rfc-editor.org/rfc/rfc9110.html#name-range-requests>). Materials and numbers are original exercises. Record external reports, paper reasoning and actual reading observations separately, without inventing missing conditions. Sources do not establish new automatic analysis by the app. No step-by-step physical-device, private-server or all-output-environment testing is claimed.
+{% endraw %}

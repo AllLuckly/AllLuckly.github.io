@@ -1,0 +1,87 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay moving ASS cues: separate event times from the relative movement
+  window'
+description: Audit a two-second movement within a four-second cue, separating delay,
+  motion and final hold from absolute media time.
+permalink: /en/guides/icouldplay-ass-move-line-relative-millisecond-window/
+date: '2026-11-15 00:00:00 +08:00'
+modified: '2026-11-15 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 163
+topic: Caption structure and scope
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-15-icouldplay-ass-move-line-relative-millisecond-window.md
+source_url: /guides/icouldplay-ass-move-line-relative-millisecond-window/
+translation_method: editorial
+translation_source_sha256: 3bb8336950a8a56324b23e30527af0c7aaa4c517b6ecbb1ef814ebe08574d4be
+translation_date: '2026-11-15T01:32:12+00:00'
+excerpt: Audit a two-second movement within a four-second cue, separating delay, motion
+  and final hold from absolute media time.
+---
+{% raw %}
+<p>A cue beginning at one second does not place its movement parameter 500 at media time 0.500. Create a complete ASS externally, with an initial wait, movement and final hold, then observe the available iCouldPlay path. Keep format expectations, calculated times and actual playback in separate fields; unperformed style tests are not passes.</p>
+
+<h2 id="1-fix-a-twelve-second-source-and-coordinate-reference">1. Fix a twelve-second source and coordinate reference</h2>
+
+<p>Retain an owned video at least twelve seconds long without the exercise prompts. Record duration, orientation and fitting mode. Draw a 640×360 script rectangle with x rightwards and y downwards. Script coordinates are not phone pixels, and black bars are not automatically part of that rectangle. Prepare a plain-text editor and distinct filenames externally rather than assuming the player contains a subtitle-motion authoring tool.</p>
+
+<h2 id="2-save-a-complete-file-with-a-static-control">2. Save a complete file with a static control</h2>
+
+<p>The first cue runs from one to five seconds, moving a central anchor horizontally. The second stays at the midpoint from six to ten seconds. Retain complete style and event columns. ASS event times use centiseconds, while the motion window uses integer milliseconds. Keep ASCII backslashes and braces in Text. Save UTF-8 move-window.ass, reopen the content and record whether an external-subtitle path is available.</p>
+
+<pre><code class="language-text">[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,42,&amp;H00FFFFFF,&amp;H000000FF,&amp;H00000000,&amp;H00000000,0,0,0,0,100,100,0,0,1,1,0,5,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:05.00,Default,,0,0,0,,{\an5\move(100,180,540,180,500,2500)}Track this anchor.
+Dialogue: 0,0:00:06.00,0:00:10.00,Default,,0,0,0,,{\an5\pos(320,180)}A fixed anchor.
+</code></pre>
+
+<h2 id="3-convert-the-relative-window-before-judging-playback">3. Convert the relative window before judging playback</h2>
+
+<p>The first cue lasts four seconds. Movement starts 500 ms after its start and ends after 2500 ms. Absolute phases are 1–1.5 seconds at the start, 1.5–3.5 moving, and 3.5–5 at the destination. Write absolute intervals beside relative milliseconds. Reading 500 and 2500 directly as media times 0.5 and 2.5 would shift the prediction one second early even for a correctly selected clip.</p>
+
+<h2 id="4-recalculate-the-straight-line-midpoint">4. Recalculate the straight-line midpoint</h2>
+
+<p>The horizontal difference between 100 and 540 is 440; y stays 180. Relative 1500 ms is midway through the motion window, giving anchor (320,180) at absolute 2.5 seconds. This is the anchor, not the sentence’s left edge. Font changes affect width without changing that paper coordinate. Check central alignment before trying to make the leftmost letter pass through 320; isolate one timing or coordinate variable at a time.</p>
+
+<h2 id="5-play-sequentially-before-revisiting-phases">5. Play sequentially before revisiting phases</h2>
+
+<p>Select the matching video and subtitle through available controls and play from the beginning beyond ten seconds. Check wording first, then initial waiting, movement and final holding separately. Confirm the static control too. Pausing or seeking can help inspect a position, but keep sequential observations separate: entering midway does not certify the entire motion sequence. Hold controls and orientation stable so interface reflow is not mistaken for subtitle movement.</p>
+
+<h2 id="6-change-only-the-movement-window-in-a-control">6. Change only the movement window in a control</h2>
+
+<p>Copy the draft and change the first window to 1000–3000 ms. Its paper motion becomes absolute 2–4 seconds with midpoint at three seconds; endpoints remain unchanged. Reselect the copy if possible and record whether behaviour follows. If it does not, check the selected file first. Do not add another move or pos to force a difference. Retain one positioning or movement command per event to avoid a conflicting command becoming another unknown.</p>
+
+<h2 id="7-separate-unsupported-effects-from-arithmetic-errors">7. Separate unsupported effects from arithmetic errors</h2>
+
+<p>Readable stationary wording calls for checking tags and selection, with static text marked passed and movement unknown or absent. The visible control alone does not certify movement support. A one-second discrepancy warrants checking addition of event start and video identity. An offscreen cue needs a script-size and anchor audit, not audio-track changes. Retain the failing draft and selected name so later repairs do not erase correct source calculations.</p>
+
+<h2 id="8-check-a-non-midpoint-and-final-hold">8. Check a non-midpoint and final hold</h2>
+
+<p>At relative 2000 ms, movement has run for 1500 ms out of its 2000 ms window: three quarters. The anchor is x=100+440×3/4=430, y=180, at absolute media time three seconds. Arrival at 3.5 seconds leaves a 1.5-second hold before the event ends at five. Mark both on the paper timeline so the final hold is not forgotten. A stationary subtitle at four seconds does not establish stalled playback: subtitle motion ending and video playback stopping require separate picture or sound evidence.</p>
+
+<h2 id="9-deliver-three-phases-and-recovery">9. Deliver three phases and recovery</h2>
+
+<p>Reopen the video and reselect the original, checking the three motion phases and static control. Deliver relative window, absolute intervals, midpoint calculation, actual result and installed version, naming unknowns. For ordinary fallback text, save a separate copy without motion overrides and confirm readable wording. Subtitle motion is not a real trajectory of an object in the footage; this exercise concerns an anchor, not subject or camera motion.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/icouldplay-ass-pos-script-coordinate-display-pixels/">Fixed positioning</a>, <a href="/en/guides/icouldplay-seek-caption-reentry-check/">Subtitles after seeking</a>.</p>
+
+<p><a href="https://aegisub.org/docs/latest/ass_tags/">Aegisub: ASS tags</a>.</p>
+
+<p>Sources checked on 15 November 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software">Apple lookup</a> list version 1.1.1, requiring iOS or iPadOS 15.0. Files and calculations are prepared externally; iCouldPlay selects an available source and provides playback observations. No step-by-step physical-device or private-server testing is claimed. Use the controls available in your installed version.</p>
+{% endraw %}

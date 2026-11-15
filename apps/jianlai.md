@@ -5,7 +5,7 @@ author: Bison
 title: 键来：iPhone 与 iPad 自定义输入法、主题与多语言键盘
 description: 了解键来的主题、字体、背景和空格键自定义，以及中文、英文、日文输入、26键与9键布局、琴音和触感反馈。
 permalink: /apps/jianlai/
-modified: 2026-11-14
+modified: 2026-11-15
 ---
 
 **键来（Jianlai）**是一款面向 iPhone 与 iPad 的自定义输入法。它把主题颜色、字体、背景和按键外观放进日常输入场景，也支持单独调整空格键的样式，让键盘更贴合自己的阅读与打字习惯。

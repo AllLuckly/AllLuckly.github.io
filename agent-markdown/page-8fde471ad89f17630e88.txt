@@ -1,0 +1,67 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-l-shaped-area-centroid-outside-material/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint L-shaped area centroid: a weighted 2.2 lies in the cut-out'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-l-shaped-area-centroid-outside-material/
+agent_source_sha256: abdd864d13958a1e0c9a3820cd0c5c36b0e3715e2410a2eeca87b276c7ed58a4
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint L-shaped area centroid: a weighted 2.2 lies in the cut-out
+
+Language: en
+Canonical: [VectorPaint L-shaped area centroid: a weighted 2.2 lies in the cut-out](<https://allluckly.cn/en/guides/vectorpaint-l-shaped-area-centroid-outside-material/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-l-shaped-area-centroid-outside-material/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-l-shaped-area-centroid-outside-material/>)
+Published: 2026-11-15T00:00:00+08:00
+Modified: 2026-11-15T09:50:54+08:00
+Author: Bison
+
+Check the centroid by two nonoverlapping rectangles and by subtracting a cut-out, retaining the uniform-area condition.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-l-shaped-area-centroid-outside-material/>), translated on 2026-11-15. Original publication dates, attribution, code and version notes are retained.
+
+An area centroid need not lie in occupied material. Draw an L-shape in VectorPaint, compute (2.2,2.2) by area weights, verify by subtraction and locate it in the cut-out. This concerns two-dimensional area; interpreting it as a thin plate’s centre of gravity additionally requires uniform density. No physical balancing experiment is claimed.
+
+## Fix the L inside a six-by-six envelope
+
+Use vertices (0,0),(6,0),(6,2),(2,2),(2,6),(0,6), then close. The upper-right x=2..6,y=2..6 cut-out is unoccupied. On an approximately 1800×1600 canvas use 150 px/unit and origin (300,1300), giving 900×900 extent. Inspect a pale fill before strokes, preserving the concave corner. Units are invented, not millimetres; do not fill the notch for appearance because its emptiness matters later.
+
+## Split into nonoverlapping areas twelve and eight
+
+R1 spans x=0..6,y=0..2, area 12 and centroid (3,1). R2 spans x=0..2,y=2..6, area 8 and centroid (1,4). They meet without overlap, total 20. A full left 2×6 plus full bottom 6×2 double-counts the lower 2×2. Label components/centres and keep their common edge a calculation guide, not a physical crack; the original is continuous.
+
+## Calculate both first moments as forty-four
+
+Compute x̄=(12×3+8×1)/20=44/20=2.2 and ȳ=(12×1+8×4)/20=2.2. Pair each area with its own coordinate; do not mix x/y entries. Calculate externally before placement. Unequal areas invalidate the simple average (2,2.5). A guide joining component centres can illustrate weighted placement but is neither a substitute for arithmetic nor a reason to use its midpoint.
+
+## Place the point and acknowledge the empty location
+
+C=(2.2,2.2) is right/up from the concave corner (2,2), inside the empty upper-right region. Screen C=(630,970), corner=(600,1000): 30 px right and up. Use a small cross and move only its label. Do not drag C into material for appearance. An empty-area centroid is valid; no physical support experiment or claim of directly propping material at that point follows.
+
+## Verify independently by thirty-six minus sixteen
+
+The outer 6×6 square has area 36, centre (3,3); the 4×4 cut-out has area 16, centre (4,4). Both coordinates become (36×3−16×4)/(36−16)=44/20=2.2. Negative area is subtraction bookkeeping, not real negative mass. Subtract in denominator too. Preserve the same notch position rather than moving it while retaining centre (4,4).
+
+## Use weighted placement to reject a plain-average control
+
+C lies between component centres, nearer larger R1. From (3,1) toward (1,4), use parameter 8/20=0.4, not 0.5: (3,1)+0.4(-2,3)=(2.2,2.2). Mark plain-average M=(2,2.5) separately as equal point weights, not this area distribution. Colour differences do not replace numeric weights; recolouring must leave areas and coordinates unchanged.
+
+## Troubleshoot overlap, density and point placement
+
+For area 24 inspect overlapping rectangles; for unequal x/y results inspect pairings. Reject a demand that C must lie inside material by revisiting the definition, not changing the answer. Varying thickness/density needs a new model beyond area weights. If the exported point lands on the corner, inspect mapping and decimals; rounding 2.2 to 2 cannot retain a precision claim. Preserve before/after arithmetic and inspect ordinary guide export separately.
+
+## Reopen and check contour and empty-region centroid together
+
+Save native work, export PNG and reopen. Inspect the L/notch small, then C above-right of the corner, coordinates (2.2,2.2) and area 20 enlarged. Move labels/leaders, not C; repair an accidentally filled notch in its path. Reopen independently editable shape, decomposition and results, retaining both ledgers. Success is reproducible calculation with an external centroid, not automatic weighing, physical balancing or a claim that every concave shape has an external centroid. Recalculate changed shapes/weights.
+
+## Related tutorials and sources
+
+[VectorPaint area comparisons: calculate side lengths before arranging 1, 4 and 9 units](<https://allluckly.cn/en/guides/vectorpaint-area-comparison/>); [VectorPaint triangle medians: check midpoints and the two-thirds centroid position](<https://allluckly.cn/en/guides/vectorpaint-triangle-median-centroid/>).
+
+Sources checked on 15 November 2026: the [official VectorPaint App Store listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261115>) show version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, paths, nodes, layers and text. Conditions, scales and layouts are original exercise arrangements; check installed controls. Keep editable native work and PNG previews. SVG/PDF may retain any bitmap content used. External calculations and static diagrams are not new automatic proof, statistics or solver features. No completed device, physical-object or universal export testing is claimed.
+
+Method: [Engineering Statics on composite centroids](<https://engineeringstatics.org/composite-parts.html>) weights component centroids by area. The L-shape, decompositions, numbers and counterexample are original; an unweighted average is not the general formula.
+{% endraw %}

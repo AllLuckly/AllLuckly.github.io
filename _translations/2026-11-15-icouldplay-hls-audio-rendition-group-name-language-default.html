@@ -1,0 +1,79 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay HLS audio groups: equal language labels can describe different
+  tracks'
+description: Trace audio group references, names and language fields, then audit the
+  selected track against its audible content.
+permalink: /en/guides/icouldplay-hls-audio-rendition-group-name-language-default/
+date: '2026-11-15 00:00:00 +08:00'
+modified: '2026-11-15 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 168
+topic: Playlists and audio measures
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-15-icouldplay-hls-audio-rendition-group-name-language-default.md
+source_url: /guides/icouldplay-hls-audio-rendition-group-name-language-default/
+translation_method: editorial
+translation_source_sha256: 5c66edf7858cbc3474b7f4a236be38e124b4197befc1b03abf937d4ba4b2b6d0
+translation_date: '2026-11-15T02:01:39+00:00'
+excerpt: Trace audio group references, names and language fields, then audit the selected
+  track against its audible content.
+---
+{% raw %}
+<p>Two tracks labelled English need not contain the same sound: they may be primary audio and separately recorded commentary. Trace group links and entries in an original master-playlist sample, then record displayed labels separately from audible content in an owned source. Fields are not speech-recognition results or a guarantee of one iCouldPlay default selection.</p>
+
+<h2 id="1-fix-master-and-content-identities">1. Fix master and content identities</h2>
+
+<p>Use owned multitrack HLS materials or the reading-only sample. Retain master, acquisition time and referenced audio playlists, recording the video source. Without media, do not treat sample filenames as online addresses; mark playback unperformed. Self-produced tracks can speak distinct original prompts for identification. Keep originals separate from notes and omit private authorisation parameters when sharing.</p>
+
+<h2 id="2-read-the-group-and-audio-entries">2. Read the group and audio entries</h2>
+
+<p>Both sample MEDIA entries are AUDIO in group voice, named Primary and Notes, with language en. The variant’s AUDIO attribute references the group, not an individual track filename. Each MEDIA URI points to an audio playlist; the line after STREAM-INF points to video. Draw these three links before assuming every m3u8 address supplies one identical combined file.</p>
+
+<pre><code class="language-text">#EXTM3U
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="voice",NAME="Primary",DEFAULT=YES,AUTOSELECT=YES,LANGUAGE="en",URI="audio-main.m3u8"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="voice",NAME="Notes",DEFAULT=NO,AUTOSELECT=NO,LANGUAGE="en",URI="audio-notes.m3u8"
+#EXT-X-STREAM-INF:BANDWIDTH=800000,AUDIO="voice"
+video.m3u8
+</code></pre>
+
+<h2 id="3-separate-labels-language-and-content">3. Separate labels, language and content</h2>
+
+<p>Make rows for NAME, LANGUAGE, URI and known content provenance. Notes is an exercise label, not a universal server convention. Equal en fields do not prove identical wording. Distinguishing main audio from commentary needs source information or listening. Administrators can rename labels and metadata can be incomplete or inaccurate, so retain a short actually heard prompt or content feature as evidence.</p>
+
+<h2 id="4-audit-default-and-automatic-selection">4. Audit default and automatic selection</h2>
+
+<p>Primary has DEFAULT=YES and AUTOSELECT=YES; Notes has NO for both. Check that the group does not declare two defaults. These are source selection attributes: AUTOSELECT=NO does not mean manual selection is prohibited, and DEFAULT=YES does not establish unconditional playback on every device. Saved choices, client capability and path can affect results. Record format guidance separately from what iCouldPlay initially plays.</p>
+
+<h2 id="5-listen-before-selecting-a-control">5. Listen before selecting a control</h2>
+
+<p>With actual media, enter through the normal video flow and record initial visible track label and sound. If track selection is available, switch and listen at the same interval after stabilisation. Confirm the video remains identical and avoid changing subtitle language simultaneously. If only language is displayed, record that limitation. Without a manual control, mark the step unperformed rather than inventing a development-only menu or commentary-detection button.</p>
+
+<h2 id="6-test-identification-using-a-same-language-counterexample">6. Test identification using a same-language counterexample</h2>
+
+<p>On paper, leave both LANGUAGE fields unchanged and rename Notes to Alternative without changing URI. A changed label does not create different referenced audio bytes, though a client may display new wording. This demonstrates why provenance and listening matter; it requires no production-server edits. If renaming seems to remove commentary, audit actual URI and files. Any real experiment should use only recoverable owned test copies.</p>
+
+<h2 id="7-diagnose-group-links-and-missing-tracks">7. Diagnose group links and missing tracks</h2>
+
+<p>For picture without sound, first compare variant AUDIO=voice with each GROUP-ID and then check the actual audio URI. Audit case and punctuation; louder output does not repair a mismatched group. If two entries are listed but one fails, separate playlist retrieval, media retrieval and decoding. Success of one track cannot certify the other. Retain original responses instead of repeatedly changing language fields to obscure missing media.</p>
+
+<h2 id="8-audit-the-defaultautoselect-combination">8. Audit the default/autoselect combination</h2>
+
+<p>In a paper fault copy, keep Primary DEFAULT=YES but set AUTOSELECT=NO. The RFC requires AUTOSELECT=YES when DEFAULT=YES, so this combination is an audit failure without waiting for a client to select unexpectedly. Restore that attribute and check the group has one default; deleting Notes would conceal the combination error. MEDIA members of the same group must have different NAME values. Identical NAMEs within a group are a field conflict to fix, even when the URIs differ; different URIs do not waive the uniqueness requirement. Keep source identity and actual audio separate rather than treating two visible English labels as proof of duplicate content. Change only owned copies and hand production corrections to the source administrator.</p>
+
+<h2 id="9-deliver-dual-track-evidence-and-a-fallback-choice">9. Deliver dual-track evidence and a fallback choice</h2>
+
+<p>Reenter, record whether the initial state remembers prior selection, recheck both contents and restore the desired track. Deliver links, labels, languages, listening evidence and unavailable fields, retaining uncertainty. One successful switch does not certify every HLS source or identical interfaces; equal languages are not grounds to delete a track. Preserve this ledger and re-audit audio after changing service or media version.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/icouldplay-audio-commentary-language-map/">Commentary and dialogue mapping</a>, <a href="/en/guides/icouldplay-hls-master-variant-media-map/">Variant playlists</a>.</p>
+
+<p><a href="https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.1">RFC8216 §4.3.4.1</a>.</p>
+
+<p>Sources checked on 15 November 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software">Apple lookup</a> list version 1.1.1, requiring iOS or iPadOS 15.0. Files and calculations are prepared externally; iCouldPlay selects an available source and provides playback observations. No step-by-step physical-device or private-server testing is claimed. Use the controls available in your installed version.</p>
+{% endraw %}

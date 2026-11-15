@@ -1,0 +1,45 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint cyclic quadrilateral: preserve circular order before checking opposite angles'
+description: Use four circular positions to check 105+75 and 90+90, keeping cyclic and crossed polygons distinct.
+permalink: /en/guides/vectorpaint-cyclic-quadrilateral-opposite-angle-pairs/
+date: '2026-11-15 00:00:00 +08:00'
+modified: '2026-11-15 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 202
+topic: Ratios, curves and area positions
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-15-vectorpaint-cyclic-quadrilateral-opposite-angle-pairs.md
+source_url: /guides/vectorpaint-cyclic-quadrilateral-opposite-angle-pairs/
+translation_method: editorial
+translation_source_sha256: 97ca5400e0e67ca3d1c84e113404444bdd112c3e7571fafeb81eaaf920ecb840
+translation_date: '2026-11-15T02:05:49+00:00'
+excerpt: Use four circular positions to check 105+75 and 90+90, keeping cyclic and crossed polygons distinct.
+---
+{% raw %}
+<p>Four points around a circle do not make adjacent angles supplementary. Build a convex cyclic quadrilateral in VectorPaint, check opposite pairs summing to 180°, then diagnose crossed connections and wrong pairings. Use manually arranged circles, points and paths without automatic cyclic recognition or angle measurement.</p>
+<h2 id="section-1">Fix one circle and mathematical angle direction</h2>
+<p>Use an approximately 1700×1600 canvas with O as mathematical origin and radius 4, optionally 100 px/unit for diameter 800. Measure counterclockwise from positive x, converting downward screen y. Separate circle, points, sides and annotations. Restore equal width/height before placing points on a distorted ellipse. Radius units are invented, not millimetres. Moving text must not move its point.</p>
+<h2 id="section-2">Place points at zero, sixty, one-eighty and two-seventy degrees</h2>
+<p>Place A,B,C,D at 0°,60°,180°,270° in circular order, with mathematical coordinates (4,0),(2,2√3),(-4,0),(0,-4); B’s y≈3.464. At screen centre (800,800), positions are approximately (1200,800),(1000,453.6),(400,800),(800,1200). Keep x/y pairs distinct and do not put a negative mathematical y above the screen centre. Label approximate placement if necessary, retaining mathematical angles without claiming automatic constraints.</p>
+<h2 id="section-3">Connect ABCD in circular order</h2>
+<p>Join A-B-C-D-A, rather than the crossed A-C-B-D order. A pale AC diameter is a guide, not a fifth polygon edge or a new vertex at an intersection. Hide the circle to inspect a simple closed outline, then restore it and check all four points. A centre-crossing line may be a guide; the error is changing polygon order while retaining convex-angle claims. Keep external labels away from actual endpoints and angle arcs.</p>
+<h2 id="section-4">Calculate intercepted arcs excluding the vertex</h2>
+<p>Adjacent arcs are 60°,120°,90°,90°, totalling 360°. Angle A intercepts BCD=210°, giving 105°; angle C intercepts DAB=150°, giving 75°. Identify the arc before halving it, never substitute small arc AB or copy a central angle. Use declared point order, not label placement. Angle A uses AB/AD, and angle C uses CB/CD.</p>
+<h2 id="section-5">Check the other opposite pair through the diameter</h2>
+<p>B intercepts ADC=180° and D intercepts ABC=180°, so each is 90°. Check A+C=180° and B+D=180°. Adjacent A+B=195° need not be supplementary. Four right angles would wrongly extend a diameter property to every vertex; this is no rectangle. Total 360° is an additional check but cannot detect swapped 105°/75° labels.</p>
+<h2 id="section-6">Separate angle marks from reference arcs</h2>
+<p>Put small interior angle arcs and values at vertices, grouping A/C and B/D by both colour and names. Keep circular arc annotations on guides. Hide selected guides for a cleaner final while retaining calculations. Do not label an exterior arc 105° as an interior angle. Move crowded text without moving points. Stroke width, arrows and screenshot appearance do not define angle values; retain data after scaling.</p>
+<h2 id="section-7">Diagnose crossed order and wrong pairings separately</h2>
+<p>In a separate copy, cross connections, identify changed order/self-intersection and undo; do not apply this convex-angle convention there. A second control keeps geometry but falsely pairs A/B, producing 195°. Change these errors separately. Rebuild an off-circle point from angle/radius rather than editing 180° to fit. Checks concern the declared construction, not automatic cyclic classification of arbitrary quadrilaterals.</p>
+<h2 id="section-8">Reopen and verify order and both 180-degree pairs</h2>
+<p>Save native work, export PNG and reopen. Read circular ABCD order and sides, then interior values A105,B90,C75,D90 enlarged. Label exported AC as a diameter guide or retain it hidden in the original. Reopen separately editable labels/points and record numeric versus approximate placement. Deliver arc total, both opposite sums and the adjacent-angle counterexample, without claiming precision testing or extending conclusions to noncyclic, crossed or degenerate quadrilaterals.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/vectorpaint-external-point-circle-two-tangents/">VectorPaint two tangents from an external point: check right angles and equal lengths</a>; <a href="/en/guides/vectorpaint-regular-hexagon-circumradius-six-triangles/">VectorPaint inscribed regular hexagons: verify six sides and six equilateral triangles</a>.</p>
+<p>Sources checked on 15 November 2026: the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint App Store listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261115">Apple public lookup</a> show version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, paths, nodes, layers and text. Conditions, scales and layouts are original exercise arrangements; check installed controls. Keep editable native work and PNG previews. SVG/PDF may retain any bitmap content used. External calculations and static diagrams are not new automatic proof, statistics or solver features. No completed device, physical-object or universal export testing is claimed.</p>
+<p>Theorem: <a href="https://mathcs.clarku.edu/~djoyce/elements/bookIII/propIII22.html">Euclid III.22</a> gives supplementary opposite angles in a cyclic quadrilateral. Point choices and calculations are original, not an application to every noncyclic quadrilateral.</p>
+{% endraw %}

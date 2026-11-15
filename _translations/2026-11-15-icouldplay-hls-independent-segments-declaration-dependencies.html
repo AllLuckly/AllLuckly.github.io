@@ -1,0 +1,84 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay independent HLS segments: decoding independence is not a complete
+  film'
+description: Audit the declaration, media dependencies and presentation scope without
+  treating a tag as transcoding or offline completion.
+permalink: /en/guides/icouldplay-hls-independent-segments-declaration-dependencies/
+date: '2026-11-15 00:00:00 +08:00'
+modified: '2026-11-15 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 167
+topic: Playlists and audio measures
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-15-icouldplay-hls-independent-segments-declaration-dependencies.md
+source_url: /guides/icouldplay-hls-independent-segments-declaration-dependencies/
+translation_method: editorial
+translation_source_sha256: b8d4f5e0252809de9bbb3c0c4f186931ce3bfe228228e25d5fa8d1f931f7b5d8
+translation_date: '2026-11-15T01:32:13+00:00'
+excerpt: Audit the declaration, media dependencies and presentation scope without
+  treating a tag as transcoding or offline completion.
+---
+{% raw %}
+<p>An INDEPENDENT declaration does not repair media missing necessary data. Audit its scope while separating decoding conditions, resource availability and complete offline ownership. iCouldPlay observes a real authorised source; a paper playlist does not create media files.</p>
+
+<h2 id="1-distinguish-declaring-from-producing-media">1. Distinguish declaring from producing media</h2>
+
+<p>Use owned HLS materials or the reading-only sample below. Record master versus media role, acquisition time and whether media bytes are available. Retain originals and annotate a copy instead of adding tags to a live server. Decoding independence is a condition of media data; writing a declaration does not re-encode it. Without encoding evidence, mark that condition unknown rather than treating syntactically complete text as generated playable segments.</p>
+
+<h2 id="2-audit-the-two-segment-sample">2. Audit the two-segment sample</h2>
+
+<p>This media playlist lists two four-second segments starting at sequence 40; ENDLIST ends additions. VERSION concerns compatibility, TARGETDURATION concerns segment timing, and the independence tag has no colon parameter. Give each a separate purpose in the ledger. Version 6 means neither six segments nor six seconds. The example does not supply segment-a.ts or segment-b.ts; use an existing complete owned source for playback.</p>
+
+<pre><code class="language-text">#EXTM3U
+#EXT-X-VERSION:6
+#EXT-X-TARGETDURATION:4
+#EXT-X-INDEPENDENT-SEGMENTS
+#EXT-X-MEDIA-SEQUENCE:40
+#EXTINF:4,
+segment-a.ts
+#EXTINF:4,
+segment-b.ts
+#EXT-X-ENDLIST
+</code></pre>
+
+<h2 id="3-identify-the-decoding-layer">3. Identify the decoding layer</h2>
+
+<p>The RFC declaration concerns decoding samples in each segment without information from other segments. It does not eliminate codec knowledge, needed initialisation resources or encryption authorisation. Register actual initialisation and key dependencies separately rather than letting one word erase all layers. This two-TS example needs a scope audit, not an invented key. For another owned format, list only resources and tags actually present.</p>
+
+<h2 id="4-separate-three-claims-of-independence">4. Separate three claims of independence</h2>
+
+<p>Use columns for decoding without other media segments, obtaining this segment on this device, and retaining the complete presentation. The first requires media conditions and declaration, the second an accessible resource path, and the third all required materials. A playable first four-second segment is not the complete eight-second sample. Two listed files likewise do not establish a truthful declaration or readable format. File counts and content evidence remain separate.</p>
+
+<h2 id="5-model-a-missing-resource-without-deleting-originals">5. Model a missing resource without deleting originals</h2>
+
+<p>In notes, suppose segment-b.ts was not delivered while playlist text stayed identical. Eight seconds are listed, but the supplied first segment covers only four; the declaration creates no missing duration. Mark the second item absent in a delivery ledger rather than deleting real media. Then suppose both files exist but encoding conditions are unknown: completeness passes while decoding remains unknown. One passing column must not certify the others.</p>
+
+<h2 id="6-record-sequential-playback-of-a-real-source">6. Record sequential playback of a real source</h2>
+
+<p>With complete authorised materials, enter through the normal playlist and inspect beginning, transition and ending under fixed engine and network conditions. Seeking, if available, gets a separate observation; one successful seek does not certify every encoding independence condition. Direct failure of an arbitrary segment is not automatically a player defect: playlist context or initialisation may still matter. Record missing materials and retain original server output, without assuming automatic reconstruction controls.</p>
+
+<h2 id="7-audit-declaration-scope">7. Audit declaration scope</h2>
+
+<p>A master-playlist independence tag applies across the media playlists it references; checking one variant cannot certify them all. Where shared tags appear at master and media levels, audit placement and consistency rather than duplicating them as insurance. This media-only sample covers just its own list. Name the precise declaration layer and conflicting media evidence instead of reporting only generic incompatibility.</p>
+
+<h2 id="8-assess-what-an-absent-declaration-establishes">8. Assess what an absent declaration establishes</h2>
+
+<p>Copy the sample and remove only the independence tag, retaining URIs, numbering, durations and ENDLIST. The explicit declaration is absent, but unchanged media bytes are not re-encoded by deleting text. Absence does not prove dependence on a preceding segment; it establishes only that this playlist does not make that declaration. Distinguish declared, undeclared and media-inspected evidence states. Proving actual dependencies requires relevant encoding or decoding evidence for identified segments, not an opposite-looking claim manufactured by editing playlist text.</p>
+
+<h2 id="9-deliver-a-declaration-ledger-and-playback-reference">9. Deliver a declaration ledger and playback reference</h2>
+
+<p>Keep original playlist, role, segments, dependencies, possession checks and observations, explicitly naming unperformed encoding checks. Reopen the real source and confirm identity and transitions, not just a screenshot of tag text. Ensure the conclusion distinguishes a declaration from transcoding, one segment from a complete offline film and protocol VERSION from app version. These boundaries make later gap and seek diagnostics reproducible without overstated claims.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/icouldplay-hls-map-initialization-media-segment-ledger/">Initialisation resources</a>, <a href="/en/guides/icouldplay-hls-gap-declared-missing-segment-not-black-video/">Missing-segment declarations</a>.</p>
+
+<p><a href="https://www.rfc-editor.org/rfc/rfc8216#section-4.3.5.1">RFC8216 §4.3.5.1</a>.</p>
+
+<p>Sources checked on 15 November 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software">Apple lookup</a> list version 1.1.1, requiring iOS or iPadOS 15.0. Files and calculations are prepared externally; iCouldPlay selects an available source and provides playback observations. No step-by-step physical-device or private-server testing is claimed. Use the controls available in your installed version.</p>
+{% endraw %}

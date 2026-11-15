@@ -1,0 +1,95 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-hls-media-sequence-sliding-window-overlap/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay HLS window updates: audit overlapping segments by media sequence'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-hls-media-sequence-sliding-window-overlap/
+agent_source_sha256: 60f49dc29a744635d9d1cd95e60256ab90b3996e88da2e9e48253052268fa913
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay HLS window updates: audit overlapping segments by media sequence
+
+Language: en
+Canonical: [iCouldPlay HLS window updates: audit overlapping segments by media sequence](<https://allluckly.cn/en/guides/icouldplay-hls-media-sequence-sliding-window-overlap/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-hls-media-sequence-sliding-window-overlap/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-hls-media-sequence-sliding-window-overlap/>)
+Published: 2026-11-15T00:00:00+08:00
+Modified: 2026-11-15T09:32:12+08:00
+Author: Bison
+
+Map media sequences 900–903 across two sliding-window snapshots without equating list position to playback progress.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-hls-media-sequence-sliding-window-overlap/>), translated on 2026-11-15. Original publication dates, attribution, code and version notes are retained.
+
+A changed first entry after a live-playlist refresh does not establish playback restarting. Audit media sequences and overlap using two original HLS reading snapshots, then separately observe an owned accessible source in iCouldPlay. This sample supplies no media segments and is not a playable colour-named video service.
+
+## 1. Preserve snapshots instead of overwriting one file
+
+For an authorised HLS source, record address, acquisition time and playlist role. Save initial content as A and later content as B. Without an actual source, use the paper sample and mark playback unperformed. Overwriting the first download destroys the comparison. Shared notes should omit credentials. Source inspection happens in an external text tool; the exercise does not require an in-app playlist inspector.
+
+## 2. Read two separate snapshots
+
+Snapshot A and Snapshot B are explanatory labels, not M3U8 syntax: inspect each file from its own EXTM3U. Both windows contain three four-second segments. B removes red and adds white, changing the starting media sequence from 900 to 901. Retain each EXTINF paired with its following URI and preserve order. Recognisable filenames label the exercise; they do not define sequence numbers.
+
+```text
+Snapshot A
+#EXTM3U
+#EXT-X-TARGETDURATION:4
+#EXT-X-MEDIA-SEQUENCE:900
+#EXTINF:4,
+red.ts
+#EXTINF:4,
+green.ts
+#EXTINF:4,
+blue.ts
+
+Snapshot B
+#EXTM3U
+#EXT-X-TARGETDURATION:4
+#EXT-X-MEDIA-SEQUENCE:901
+#EXTINF:4,
+green.ts
+#EXTINF:4,
+blue.ts
+#EXTINF:4,
+white.ts
+```
+
+## 3. Assign a sequence to each segment
+
+Start from MEDIA-SEQUENCE and increment per item. A maps red, green and blue to 900,901,902; B maps green, blue and white to 901,902,903. Green moves from second list position to first while remaining sequence 901. Renumbering each window temporarily as one, two, three cannot establish that a server reset its media numbering.
+
+## 4. Separate window duration from progress
+
+Each listed window totals twelve seconds, not the lifetime of the live stream. Green’s local cumulative offset is four seconds in A and zero in B. Sequence 900 does not mean second 900, and sequence numbers do not supply an absolute origin or wall-clock time. Keep sequence, local offset and playback observations separate rather than multiplying 900 by four and expecting progress 3600.
+
+## 5. Audit identity across overlapping entries
+
+Mark green and blue as overlap, white as added and red as removed. For a real source, combine matching sequence with URI and timing checks; matching filenames alone do not establish matching content. Equal numbers across different variants or sources do not directly synchronise media either. Unexpected remapping warrants checking master versus media playlists, selected rendition and redirected address before asking the source administrator, retaining original snapshots.
+
+## 6. Record actual iCouldPlay behaviour separately
+
+Select only an authorised source with real media. Record startup, identity, sequential playback and behaviour during later refreshes. Sample URI failure is not player-defect evidence. Without visible media sequence details, keep playback observations separate from external source mapping. Seek-range changes may accompany window removal, but one interface change does not prove old media was permanently deleted from the server.
+
+## 7. Diagnose a stale starting sequence
+
+If B removes its first segment but still says 900, it assigns green to 900, conflicting with A. Treat this as a source-audit control; do not alter a production playlist to experiment. Restore 901 in a copy and relist entries. URIs need not contain sequence numbers, and differing embedded digits do not override the field definition. DISCONTINUITY-SEQUENCE has another purpose and is not a substitute.
+
+## 8. Audit continuity with a third window
+
+Construct C on paper with starting sequence 902 and blue, white, black, each four seconds. Against B, blue and white overlap, green leaves and black enters at sequence 904. Against A, only blue overlaps; different snapshot intervals need not preserve two shared entries. The three-window union contains five named segments but establishes neither earlier nor later history. Record which snapshots and acquisition interval each comparison uses, distinguishing the one-step teaching model from widely spaced real snapshots without inventing whole-stream duration. Even a later window without shared entries first requires acquisition-interval and source-identity checks; no overlap alone does not prove all intervening media was lost.
+
+## 9. Deliver a change ledger with unknowns
+
+Reopen both snapshots and verify three entries each, two overlapping, one added and one removed, with consistent mapping across 900–903. Deliver acquisition times, identity, mapping, offset arithmetic and actual observations. Without a source, label this a reading exercise. Save later C separately. Completion means explaining a changed row position without changed identity, not claiming one downloaded window preserves an entire live history.
+
+## Related tutorials and sources
+
+[Discontinuities](<https://allluckly.cn/en/guides/icouldplay-hls-discontinuity-segment-boundary-map/>), [Program date-time](<https://allluckly.cn/en/guides/icouldplay-hls-program-date-time-playback-clock-map/>).
+
+[RFC8216 §4.3.3.2](<https://www.rfc-editor.org/rfc/rfc8216#section-4.3.3.2>).
+
+Sources checked on 15 November 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>) list version 1.1.1, requiring iOS or iPadOS 15.0. Files and calculations are prepared externally; iCouldPlay selects an available source and provides playback observations. No step-by-step physical-device or private-server testing is claimed. Use the controls available in your installed version.
+{% endraw %}

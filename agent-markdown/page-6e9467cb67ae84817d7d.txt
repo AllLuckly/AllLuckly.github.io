@@ -1,0 +1,93 @@
+---
+layout: null
+permalink: /guides/icouldplay-hls-media-sequence-sliding-window-overlap/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映 HLS 窗口更新：从媒体序号核对重叠分片
+agent_source_url: https://allluckly.cn/guides/icouldplay-hls-media-sequence-sliding-window-overlap/
+agent_source_sha256: 6a639b48a81ec61d997a4451b28ceeee138d9a375da6fa44e564872175c5b546
+agent_generator_version: 1
+---
+{% raw %}# 云映 HLS 窗口更新：从媒体序号核对重叠分片
+
+语言：zh-CN
+原文：[云映 HLS 窗口更新：从媒体序号核对重叠分片](<https://allluckly.cn/guides/icouldplay-hls-media-sequence-sliding-window-overlap/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-hls-media-sequence-sliding-window-overlap/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-hls-media-sequence-sliding-window-overlap/>)
+发布于: 2026-11-15T00:00:00+08:00
+内容更新于: 2026-11-15T00:00:00+08:00
+署名：Bison
+
+用两份滚动窗口快照映射900至903号分片，分开清单首项、媒体序号和播放器进度。
+
+直播清单刷新后，第一项变了，不表示影片从头重播。本课用两份自制 HLS 阅读样本，核对滚动窗口里的媒体序号与重叠项目，再用自己的可访问来源在云映记录实际播放。代码只供离线阅读，没有提供真实分片，也不应将其中的颜色文件名当作可直接观看的视频服务。
+
+## 一、保存快照而不追着同一文件覆盖
+
+为自己的合法HLS来源记录地址、取得清单的时间和来源角色。第一次内容另存A，稍后取得内容另存B；如果没有实际来源，就使用下方纸面样本，播放留未执行。不能把两次下载都保存到一个文件，最后失去变化前的参照。分享记录时只留去除凭据的地址结构，不抄私人令牌。云映是否有清单查看界面并非本课前提，源文本审核在外部纯文本工具完成。
+
+## 二、阅读两个独立快照
+
+样本中的Snapshot A和Snapshot B是解释标签，不属于实际M3U8文件；分别审核时从各自EXTM3U开始。两份窗口都列三段，每段四秒，B移走red并加入white，其首段媒体序号从900变为901。保留每个EXTINF和下一行地址的一一关系，不能只把所有地址抄出来就丢弃顺序。文件名只是本课可辨认的标记，不承担序号字段的定义。
+
+```
+Snapshot A
+#EXTM3U
+#EXT-X-TARGETDURATION:4
+#EXT-X-MEDIA-SEQUENCE:900
+#EXTINF:4,
+red.ts
+#EXTINF:4,
+green.ts
+#EXTINF:4,
+blue.ts
+
+Snapshot B
+#EXTM3U
+#EXT-X-TARGETDURATION:4
+#EXT-X-MEDIA-SEQUENCE:901
+#EXTINF:4,
+green.ts
+#EXTINF:4,
+blue.ts
+#EXTINF:4,
+white.ts
+```
+
+## 三、给每一行媒体项分配序号
+
+从每份清单的MEDIA-SEQUENCE起，给随后项目逐一加一。A中red、green、blue分别是900、901、902；B中green、blue、white分别是901、902、903。把同一个green在两份窗口的行位置写出来：它从第二项变第一项，但序号仍901。不能将每份窗口都重新编号为一、二、三，再用这个临时行号声称服务器重置了媒体编号。
+
+## 四、把窗口长度与进度分开计算
+
+每个窗口列出的时长都是十二秒，不代表整个直播只有十二秒。B中green相对窗口首项的累计偏移为零，A中则为四秒；同一媒体项在不同快照内的局部偏移不同。900也不是九百秒，清单序号并不提供影片的绝对起点或挂钟时刻。先保留序号、局部偏移和播放观察三栏，避免用序号乘四去猜播放器应该显示三千六百秒的进度。
+
+## 五、核重叠项目的连续身份
+
+纸上标出重叠集green与blue、新增white和移出red。实际审核来源时，相同媒体序号应结合对应URI与时间边界检查，不只凭文件名颜色相同认定内容相同。不同变体或不同来源的相同序号也不能直接用于媒体同步。若看到同一序号对应完全不同项目，先核是否混了主清单、不同媒体清单或重定向后的地址，保留原快照，再向来源管理者核实。
+
+## 六、在云映单独记录实际来源行为
+
+只对自己确有权限、分片真实存在的来源选择播放，记下启动时间、来源身份、是否可顺播以及后续更新时是否继续。不要将纸上样本地址输入后失败当作播放器缺陷。当前路径看不到精确媒体序号时，记录播放层观察，源文映射仍来自外部快照；两类证据分开。跳转条范围变化与清单项目移出可能相关，但不能凭一个界面变化证明所有旧片段已被服务器永久删除。
+
+## 七、排查媒体序号未随窗口移动
+
+若B删掉第一段却仍写900，纸面就会给green分配900，与A冲突。本课把这种错误作为清单审核问题，不能直接修改真实生产清单来试探。副本中恢复为901，再重新列序号。若URI中没有数字，它仍可按字段获得序号；若URI里的数字不同，也先遵循媒体序号定义而非字符串外观。不要用DISCONTINUITY-SEQUENCE替换本字段，两者有各自用途。
+
+## 八、再增加第三份窗口检查连续性
+
+最后在纸上构造C：首序号九百零二，依次列blue、white和black，三段仍各四秒。将B和C比较，blue、white重叠，green移出，black新增；black获得九百零四号。再把A和C直接比较，重叠只剩blue，不应硬要求每次比较都必须有两项共同内容，因为采样间隔不同。三份窗口全部并起来可见red至black五项，但仍不知道更早或更晚还有多少片段。账本中给每次比较写明对象与时间间隔，就能区分一次滚动一步的教学模型和实际隔很久才取得的快照，而不臆造整场时长。若下一次快照完全没有共同项，也先核取得间隔和来源身份，不能仅凭无重叠就断言所有中间媒体丢失。
+
+## 九、交付变化账本与未知项
+
+重开A和B，确认每份三项、两项重叠、一项新增和一项移出，序号900至903对应一致。交付快照时间、清单身份、映射表、局部偏移计算和云映实际观察；没有来源就明确交付阅读练习。保存之后的C快照时沿用同一方法，不覆盖A或B。完成标准是能说明一个项目为何换了行位置却没换身份，不是把整个窗口下载一次就宣称已保存完整直播历史。
+
+## 相关教程与资料
+
+[间断标记](<https://allluckly.cn/guides/icouldplay-hls-discontinuity-segment-boundary-map/>)、[节目时刻](<https://allluckly.cn/guides/icouldplay-hls-program-date-time-playback-clock-map/>)。
+
+[RFC8216 §4.3.3.2](<https://www.rfc-editor.org/rfc/rfc8216#section-4.3.3.2>)。
+
+资料核对：2026 年 11 月 15 日，[云映官方说明](<https://apps.apple.com/cn/app/id6755653178>)及[Apple公开版本查询](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>)列出1.1.1，最低iOS / iPadOS 15.0。练习文件和计算在外部完成，云映用于选择实际来源并观察播放；没有声明真机或私人服务器逐项实测，具体选项以安装版本为准。
+{% endraw %}

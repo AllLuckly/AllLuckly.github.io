@@ -1,0 +1,86 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-srt-comma-millisecond-counter-timing/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay minimal SRT: distinguish comma milliseconds, counters and display
+  intervals'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-srt-comma-millisecond-counter-timing/
+agent_source_sha256: c90d414e7cd2a69ae938a96072af8820f5cd754f3b9053e49b4779115dbfbca1
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay minimal SRT: distinguish comma milliseconds, counters and display intervals
+
+Language: en
+Canonical: [iCouldPlay minimal SRT: distinguish comma milliseconds, counters and display intervals](<https://allluckly.cn/en/guides/icouldplay-srt-comma-millisecond-counter-timing/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-srt-comma-millisecond-counter-timing/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-srt-comma-millisecond-counter-timing/>)
+Published: 2026-11-15T00:00:00+08:00
+Modified: 2026-11-15T09:32:11+08:00
+Author: Bison
+
+Prepare three original cues and audit counters, millisecond precision and media time against a reloadable reference.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-srt-comma-millisecond-counter-timing/>), translated on 2026-11-15. Original publication dates, attribution, code and version notes are retained.
+
+The counter 1 does not require a cue to appear at one second. Build an SRT reference from three original short prompts, inspect its plain-text structure, then select the matching video and subtitles in iCouldPlay. Deliver a reloadable file and timing notes rather than guessing offsets in an unfamiliar subtitle download.
+
+## 1. Preserve video and subtitle originals separately
+
+Choose an owned ordinary video at least twelve seconds long. Confirm sequential playback and ensure these prompts are not burned into its picture. Record filename, actual duration, source and orientation; retain the original. Create a plain-text draft externally, recording filename, extension and encoding separately. If the available iCouldPlay flow cannot select external subtitles, complete the file audit and mark playback unperformed. A directory listing does not establish loading.
+
+## 2. Save three prompts separated by blank lines
+
+Save the complete sample below as UTF-8 exercise.srt, retaining blank lines and ASCII timing punctuation. These original prompts are not film dialogue. Intervals are 1–3 seconds, 4.250–6.750 seconds and 8–10 seconds, with deliberate empty gaps that help distinguish real cue endings. In the editor, count three counters, three arrows, six timestamps and three text blocks. Automatic visual wrapping does not add a cue.
+
+```text
+1
+00:00:01,000 --> 00:00:03,000
+Check the first cue.
+
+2
+00:00:04,250 --> 00:00:06,750
+Read the middle cue.
+
+3
+00:00:08,000 --> 00:00:10,000
+Finish the comparison.
+```
+
+## 3. Separate counters from times
+
+Make three ledger rows with counter, start, end and duration. Durations are 2, 2.5 and 2 seconds. Counter 2 means neither second two nor two repetitions. Timestamps govern intervals; counters identify entries. Do not move text to make counters resemble seconds. Keep the initial numbering consecutive rather than relying on unverified parser tolerance. Return to this correct reference if numbering and observed ordering seem inconsistent.
+
+## 4. Audit the three digits after the comma
+
+This SRT notation separates seconds and milliseconds with a comma: 250 is one quarter second and 750 is three quarters. Subtract 4.25 from 6.75 to obtain 2.5 seconds, not two seconds and fifty frames. Avoid a Chinese comma or treating decimals as frame numbers. Make a separately saved, structurally complete VTT if comparing formats; changing only an extension or punctuation does not establish conversion.
+
+## 5. Check all three cues during sequential playback
+
+Use an actual subtitle-selection control for the matching video and record the selected file name. Play from the beginning beyond ten seconds, checking complete wording before approximate appearance and disappearance intervals. Finger-operated pauses are not millisecond measurements. Look for the gap before the middle cue and ensure the entries do not become one sentence. Fix orientation, size and speed; avoid changing tracks or cropping at the same time.
+
+## 6. Use the middle cue to diagnose loading
+
+If only the first cue appears, check the selected same-named file, the blank line before the second cue and its punctuation. If text remains visible, check whether playback is paused within its interval and resume before judging. If nothing appears, audit selection and file integrity before display controls. A global timing offset does not repair text structure. Retain the failing copy and compare it line by line with the correct draft to identify the changed field.
+
+## 7. Separate correct text from playback compatibility
+
+Record text audit, selectability on this path, actual wording and timing as separate checks, each allowing pass, fail or unknown. Correct sample structure does not guarantee identical device or engine behaviour, and a listed file does not prove readable subtitle bytes. Keep the correct file when a path fails and add a new observation for another available path. Report visible intervals without presenting unaided observation as frame-level synchronisation testing.
+
+## 8. A paper check across a minute boundary
+
+For a paper-only carry example, use start 00:00:59,900 and end 00:01:00,200. Convert to 59900 and 60200 total milliseconds before subtracting: 300 ms, or 0.3 seconds. Do not subtract timestamp components independently or write second 60. This interval lies outside the earlier twelve-second reference and supplies no playback observation. An actual test needs a separately identified owned clip long enough to include it. Keep correct arithmetic and insufficient media duration in separate columns rather than calling every beyond-duration cue corrupted.
+
+## 9. Reload and deliver the reference
+
+Leave playback, reopen the same video and reselect the draft. Confirm all cues and gaps again. Deliver video identity, subtitle source, selected name, timing notes and issues, naming devices not attempted. Copy this structure before adding more complex content one entry at a time, retaining the last known-working draft. Completion means reproducible observations from the same materials, not a single screenshot that happened to show the opening prompt.
+
+## Related tutorials and sources
+
+[External subtitles](<https://allluckly.cn/en/guides/icouldplay-external-subtitles/>), [VTT time units](<https://allluckly.cn/en/guides/icouldplay-webvtt-timestamp-unit-carry/>).
+
+[Library of Congress: SRT](<https://www.loc.gov/preservation/digital/formats/fdd/fdd000569.shtml>).
+
+Sources checked on 15 November 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>) list version 1.1.1, requiring iOS or iPadOS 15.0. Files and calculations are prepared externally; iCouldPlay selects an available source and provides playback observations. No step-by-step physical-device or private-server testing is claimed. Use the controls available in your installed version.
+{% endraw %}
