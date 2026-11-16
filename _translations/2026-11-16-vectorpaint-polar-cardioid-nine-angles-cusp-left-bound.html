@@ -1,0 +1,79 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint polar cardioid: distinguish its cusp from its leftmost points'
+description: Calculate nine parameter rows for r=2(1+cosθ), preserve its cusp and check the left bound of minus
+  one half.
+permalink: /en/guides/vectorpaint-polar-cardioid-nine-angles-cusp-left-bound/
+date: '2026-11-16 00:00:00 +08:00'
+modified: '2026-11-16 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 217
+topic: Coordinates, data and conditional reasoning
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-16-vectorpaint-polar-cardioid-nine-angles-cusp-left-bound.md
+source_url: /guides/vectorpaint-polar-cardioid-nine-angles-cusp-left-bound/
+translation_method: editorial
+translation_source_sha256: 9585379841efbdaf619600a360523f4310d3a5e8fa87b7f24d3da200c2484290
+translation_date: '2026-11-16T02:45:15+00:00'
+excerpt: Calculate nine parameter rows for r=2(1+cosθ), preserve its cusp and check the left bound of minus one
+  half.
+---
+{% raw %}
+<p>Build a right-facing cardioid from a polar equation, calculating nine angle-coordinate rows before manually approximating its outline with nodes. Focus on the zero-radius cusp, horizontal bounds and reversed screen Y. The curve’s name cannot replace numerical conditions; an ordinary heart icon does not automatically satisfy this equation.</p>
+
+<h2 id="section-1">Separate angles, radii and Cartesian coordinates</h2>
+
+<p>Write r=2(1+cosθ), with parameter θ from 0 through 2π. θ is in radians and r is nonnegative distance from the origin. Since cosine ranges from minus one to one, r ranges from 0 to 4. Add x=r cosθ and y=r sinθ for Cartesian placement. Do not treat r as x or angle numbers as pixel distances. Separate formulas, sample points and approximate outline into layers, then save an editable file. Without formula-entry controls, plot the externally calculated table rather than assume an automatic cardioid command.</p>
+
+<h2 id="section-2">Calculate radius before position for nine rows</h2>
+
+<p>Copy the nine angles in order, filling r before multiplying by the corresponding sine and cosine. At θ=π/3, r=3 gives (1.5,3√3/2); at θ=2π/3, r=1 gives (−0.5,√3/2), already left of the origin. Retain radicals until rounding to three decimals; do not round angles to integers first. First and last rows both give (4,0), so nine rows contain only eight distinct points. They record parameter closure, not two visible markers at the right endpoint.</p>
+
+<pre><code class="language-text">theta     r   (x,y)
+0         4   (4,0)
+pi/3      3   (1.5,3*sqrt(3)/2)
+pi/2      2   (0,2)
+2*pi/3    1   (-0.5,sqrt(3)/2)
+pi        0   (0,0)
+4*pi/3    1   (-0.5,-sqrt(3)/2)
+3*pi/2    2   (0,-2)
+5*pi/3    3   (1.5,-3*sqrt(3)/2)
+2*pi      4   (4,0)
+</code></pre>
+
+<h2 id="section-3">Plot at equal scales and check reflection</h2>
+
+<p>Use a suggested 1800×1600 canvas, screen origin (600,800), and 200 pixels per unit on both axes. With X=600+200x and Y=800−200y, (0,2) goes to (600,400), and (0,−2) to (600,1200). The highest sampled point is approximately (900,280.385), reflected at (900,1319.615) across screen Y=800. Hide the outline and inspect only points and labels, including both negative-x points at screen X=500. Unequal axis scales alter this geometric shape; restore equal scaling before adjusting nodes.</p>
+
+<h2 id="section-4">Follow parameter order and retain the cusp</h2>
+
+<p>Start at (4,0), follow the two upper samples and upper-left sample to O, then pass the lower-left and lower samples back to the right endpoint. Approximate using pen or Bézier nodes available in the installed tools. Retain a sharp cusp at O instead of smoothing through it or joining the two left samples while bypassing O. Close the first and last point at the right endpoint without a gap. Finite nodes do not ensure every intervening point satisfies the equation exactly, so label the result a manual approximation rather than an exported exact analytic curve. Optionally calculate an intermediate angle between two neighbouring samples to check the outline’s direction, without upgrading spot checks into an exact segment proof. Keep the nine-row main table fixed and list extra angles separately, preserving the count of eight distinct main samples.</p>
+
+<h2 id="section-5">Find the left bound instead of assuming x is nonnegative</h2>
+
+<p>Let c=cosθ. Then x=2(c+c²)=2(c+1/2)²−1/2, whose minimum is −1/2 at c=−1/2, namely θ=2π/3 or 4π/3. Add short guides showing both left-bound points; the cusp at O lies to their right. Maximum radius 4 does not imply minimum x is zero. Maximum x is 4, and vertical extrema are ±3√3/2, also sampled in the table. Use these bounds to check margins instead of shortening the left indentation to match a familiar icon. To check vertical extrema, differentiate y=2sinθ+sin2θ and solve 2cosθ+2cos2θ=0, giving cosθ=1/2 or −1. Comparing those locations and period endpoints yields extrema ±3√3/2. Maximum radius 4 is therefore not maximum height.</p>
+
+<h2 id="section-6">Distinguish the zero-radius cusp from closure</h2>
+
+<p>Solving r=0 gives cosθ=−1, so θ=π is the only such parameter in this period and locates the cusp at O. Parameters 0 and 2π coincide at (4,0), a different place; do not label their repeated row as the origin cusp. Add separate annotation arrows to the cusp and right-hand closure; arrowheads are not extra sample points. At π/2 and 3π/2, radius 2 gives different upper and lower points. If using degrees, convert the whole table consistently rather than mix π notation with an unexplained 60.</p>
+
+<h2 id="section-7">Troubleshoot formulas, placement and outline separately</h2>
+
+<p>If no x is negative, check the cosine sign at 2π/3. If the upper half appears below, check the screen-Y subtraction. If points are right but an intervening Bézier segment bulges beyond the left bound, shorten its handles. Do not remove correct samples to accommodate nodes or arbitrarily switch the radius sign for decoration. Preserve a faulty copy, record one correction and recalculate an untouched control point. Zoom into the cusp, then return to the full page to check closure and reflection so local smoothness cannot conceal global displacement. Also retain r=1, not −1, in the negative-x rows: leftward position comes from negative cosine, not negative distance. Restore a faulty radius table before plotting again; merely dragging points left would leave contradictory formulas.</p>
+
+<h2 id="section-8">Reopen and inspect eight distinct points</h2>
+
+<p>Reopen the native file and count nine parameter rows but eight distinct points. Check reflected pairs, an unsmoothed origin cusp and no doubled closure gap on the right. Inspect parentheses, θ and minus signs in a reading export, keeping it separate from editable nodes. Report radius range 0 to 4, x range −0.5 to 4 and vertical range ±3√3/2 as formula-based bounds, not screen measurement accuracy. Record paper-only or static work honestly; do not mark unperformed exports or reopening complete or call the approximate outline automatic equation solving.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-unit-circle-sine-projection/">VectorPaint unit-circle projections: distinguish sine height from screen y</a>; <a href="/en/guides/vectorpaint-logarithmic-spiral-quarter-turn-radius-ratio/">VectorPaint logarithmic spirals: audit radius doubling every quarter-turn</a>.</p>
+
+<p>Method sources: <a href="https://openstax.org/books/precalculus-2e/pages/8-4-polar-coordinates-graphs">OpenStax Precalculus 2e §8.4: polar graphs and cardioids</a>.</p>
+
+<p>Version and operation scope: checked on 16 November 2026 against the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261116-final5">Apple public lookup</a>: version 1.0.8, requiring iOS / iPadOS 17.0 or later. The listing describes shapes, pen and Bézier nodes, grids and guides, layers and text, plus native files and SVG, PDF and PNG output. Use controls actually visible in the installed version. Calculate formulas and solutions externally, then construct points manually. No automatic mathematical calculation or exhaustive physical-device testing is claimed.</p>
+{% endraw %}

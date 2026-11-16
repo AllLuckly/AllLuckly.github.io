@@ -1,0 +1,51 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Read fixed-layout reports in ManYue: viewport dimensions are not screen hardware
+  pixels'
+description: Turn original EPUB fixed-layout information into a PDF and check containing-block
+  dimensions, image size and proportional fitting.
+permalink: /en/guides/manyue-epub-fixed-layout-viewport-logical-dimensions/
+date: '2026-11-16 00:00:00 +08:00'
+modified: '2026-11-16 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 213
+topic: Image, layout and catalog fields
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-16-manyue-epub-fixed-layout-viewport-logical-dimensions.md
+source_url: /guides/manyue-epub-fixed-layout-viewport-logical-dimensions/
+translation_method: editorial
+translation_source_sha256: bf1518fc565bdb04176d7e4e91ef1b7276d4f76ad09d1b265adb8edab17dc605
+translation_date: '2026-11-16T02:38:47+00:00'
+excerpt: Turn original EPUB fixed-layout information into a PDF and check containing-block
+  dimensions, image size and proportional fitting.
+---
+{% raw %}
+<p>A 1200-unit layout does not require 1200 horizontal hardware pixels on the reading device. Prepare an original EPUB fixed-layout report and diagram, then save a supported PDF for reading in ManYue. Distinguish layout coordinates, image resolution and viewing windows. This does not require native EPUB opening, CSS interpretation or fixed-layout testing by ManYue: the report is externally authored.</p>
+<h2 id="先做有边框与角标的版面报告">Prepare a bordered layout report with markers</h2>
+<p>Use an external layout tool to draw a horizontal 2:1 rectangle with all four corners named and an original leaf in the middle. Beside it list publication layout declaration, content-document dimensions, image-resource dimensions and output page number separately. Set content width 1200 and height 600. Use original materials rather than altering a protected book. Write the report directly into PDF for ManYue reading. Without an actual EPUB, label fields as an invented exercise rather than claiming archive inspection from the report title.</p>
+<h2 id="先分固定版面声明与文档尺寸">Separate the fixed-layout declaration from document dimensions</h2>
+<p>Record <code>rendition:layout</code> as <code>pre-paginated</code> for the exercise. It declares fixed layout, not dimensions or physical paper size. Separately inspect the first viewport meta element in the XHTML document rather than substituting the deprecated global viewport property for every page. Current W3C treatment of that old property differs from content-document dimension requirements; similar names do not make them interchangeable. Reflowable material breaks this exercise’s premise and requires a separate layout check, not forced 2:1 assumptions.</p>
+<h2 id="读出首个viewport的两个正值">Read the two positive values in the first viewport</h2>
+<p>Use <code>width=1200, height=600</code>, aspect ratio 2:1. Preserve width/height order rather than reading 600×1200. Fixed-layout XHTML takes its dimensions from definitions in the first viewport meta element; a second element is not a reliable way to repair the first. This exercise uses explicit positive numbers rather than device-width or other device-dependent keywords. Nor does 1200 establish an image file’s pixel width. Mark a missing height as incomplete information instead of inventing 600 from a wide-looking illustration.</p>
+<p>As a report counterexample list first viewport 1200×600 and second 600×600. Under the specification, the later entry does not turn the first 2:1 block into 1:1. Repair the first externally and avoid duplicates; reader zoom does not repair XHTML. This report example is not a claim that the installed app executed either meta element.</p>
+<h2 id="图片二千四百与版面一千二百分开">Separate a 2400-pixel resource from a 1200-unit layout</h2>
+<p>Set the leaf resource to 2400×1200 actual pixels inside a 1200×600 layout region. Here that gives two resource pixels per layout unit, not detail invented by the reader. A 600×300 replacement can fill the same region with unchanged aspect ratio but different enlargement detail. Inspect the source report before judging legibility; matching PDF appearance does not prove identical source resources. Resource, CSS layout and final PDF page are distinct records, and PDF conversion does not automatically preserve all EPUB semantics.</p>
+<h2 id="在给定窗口中手算等比适配">Calculate proportional fitting in a declared window</h2>
+<p>Draw a 900×600 usable window, explicitly ignoring toolbars and assuming centered proportional fit of the whole page. The smaller of 900/1200 and 600/600 is 0.75, giving 900×450 and 150 vertical spare units, 75 above and below. Filling while cropping changes the rule and invalidates that margin result. Window units are a paper layout model, not reported phone hardware pixels. Recompute usable space after rotation or double-page layout rather than prescribing one fixed zoom for every reading mode.</p>
+<p>In this centered model the logical upper-left maps to window(0, 75), lower-right to(900, 525), and center(600, 300) to(450, 300). These points check scaling plus translation, exposing an omitted top margin after multiplying by 0.75. Toolbar space changes the usable window. Recalculate instead of calling 75 model units 75 device pixels.</p>
+<h2 id="打开pdf核四角而不冒充epub运行">Open the PDF and inspect corners without claiming EPUB execution</h2>
+<p>Open the exported PDF in ManYue. Check page number, four corner labels and leaf; first confirm all corners in a whole-page view, then enlarge fields using visible controls. Record the PDF’s visible border/text without claiming EPUB viewport support was tested. If landscape margins differ, record the current window and layout rather than equating them with the 900×600 model. A bookmark can return to this PDF report, not automatically to the original EPUB document or CSS node.</p>
+<h2 id="排查宽高交换与拉伸误判">Diagnose swapped dimensions and stretching</h2>
+<p>If the leaf stretches horizontally, check resource/layout aspect ratios and whether the exported PDF is already distorted. For corners missing only in the current view, restore whole-page display and distinguish clipping from absent source content before changing viewport values. Record different first/second-page dimensions separately: content documents can have different initial containing blocks. Do not overwrite the entire publication with page one’s dimensions. Keep versioned reports naming each document so identical labels cannot conceal different sizes.</p>
+<h2 id="重开用四栏说明每个尺寸的归属">Reopen and identify the owner of every dimension</h2>
+<p>Reopen the PDF’s four-column record and identify the fixed-layout declaration, 1200×600 logical region, 2400×1200 image and 900×600 exercise window. Derive 900×450 with 75-unit top/bottom margins while retaining the centered whole-page-fit condition. Keep originals, field notes and PDF. A clear exported image does not establish native fixed-layout support in every reading system. Recheck changed resources, page layout and windows rather than guessing coordinates from a device model name.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/manyue-epub-manifest-spine-image-occurrence/">Manifest and spine</a>; <a href="/en/guides/manyue-pdf-userunit-coordinate-physical-scale/">PDF coordinates and scale</a>.</p>
+<p>Sources checked on 16 November 2026: <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261116">Apple public lookup</a> shows ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. Published reading capabilities appear in the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store listing</a>. Use controls actually available in the installed version.</p>
+<p>Method references: <a href="https://www.w3.org/TR/epub-33/#sec-fxl-content-dimensions">W3C EPUB content-document dimensions</a>. Diagrams, numbers, counterexamples and recording arrangements are original exercises. Separate external preparation, paper expectations and actual reading results. Available documentation does not substitute for device observation, and no private-server or universal file-environment test is claimed.</p>
+
+{% endraw %}

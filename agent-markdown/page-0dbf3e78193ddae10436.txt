@@ -1,0 +1,72 @@
+---
+layout: null
+permalink: /en/guides/manyue-png-gamma-declaration-samples-display/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Check PNG gamma in ManYue: gAMA describes interpretation, not extra pixel
+  levels'
+agent_source_url: https://allluckly.cn/en/guides/manyue-png-gamma-declaration-samples-display/
+agent_source_sha256: 253f849087cc02005b757454231bc4552f7333484e9a7cef12a189d762f04f09
+agent_generator_version: 1
+---
+{% raw %}# Check PNG gamma in ManYue: gAMA describes interpretation, not extra pixel levels
+
+Language: en
+Canonical: [Check PNG gamma in ManYue: gAMA describes interpretation, not extra pixel levels](<https://allluckly.cn/en/guides/manyue-png-gamma-declaration-samples-display/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-png-gamma-declaration-samples-display/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-png-gamma-declaration-samples-display/>)
+Published: 2026-11-16T00:00:00+08:00
+Modified: 2026-11-16T10:38:47+08:00
+Author: Bison
+
+Use original gray patches and reports to separate gAMA integers, encoded samples, a linear-light model and observed reading.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-png-gamma-declaration-samples-display/>), translated on 2026-11-16. Original publication dates, attribution, code and version notes are retained.
+
+The same gray samples can carry different gamma declarations and therefore different interpretation conditions without gaining pixels or bit depth. Separate an original gray page, an external chunk report and ManYue observations. Read the four-byte field before comparing the same location. The task neither requires in-app PNG inspection nor treats a screenshot as a calibrated luminance measurement.
+
+## Prepare five gray patches with stable identity
+
+In an external image tool make an original 400×300 page with black, dark gray, middle gray, light gray and white patches labelled A–E. The page has 120000 pixels. Record endpoints separately from intermediate patches; five selected samples do not limit the file to five levels. Keep a lossless source and omit alpha for this comparison so background transparency adds no variable. Record bit depth, dimensions and patch positions before export. A brightened second image cannot be called pixel-identical. Without an inspector, make a paper report and label it exercise material rather than inventing detected values.
+
+## Convert the four-byte integer into gamma
+
+Find the `gAMA` chunk in an external report and record whether it exists; an undisplayed field is not automatically zero. It stores an unsigned gamma value multiplied by 100000. Exercise A uses 45455, meaning 0.45455, approximately 1/2.2; B uses 100000, meaning 1. Neither 45455 nor 100000 is a gray-level count, page number, display-brightness percentage or image count. Reading a four-byte declaration does not make the image 32-bit grayscale: inspect the image header separately for sample depth.
+
+If raw fields are available, 45455 is four-byte hexadecimal 00 00 B1 8F and 100000 is 00 01 86 A0. Read the big-endian integer, not a chunk checksum or total file length. Raw-byte editing is unnecessary: a normal tool’s field name and decoded value suffice for conversion.
+
+## Use a power model for one intermediate sample
+
+For a paper approximation let normalized encoded sample s=0.5. If encoding is s=L raised to gamma g, recover linear quantity L=s raised to 1/g. For g≈0.45455, L≈0.218; for g=1, L=0.5. Do not reverse the results or multiply 0.5 by g. Zero and one remain endpoints in both models, so checking only black and white can miss differences. The continuous 0.5 is explanatory: eight-bit integer 128 divided by 255 is not exactly 0.5. Compute real samples separately without claiming a screen-light measurement.
+
+## Exclude higher-priority color information first
+
+If export controls permit, retain copies A/B with the same dimensions, samples and other conditions and different verified gamma declarations. Also inspect higher-priority color information such as `sRGB`,`iCCP` or `cICP`. When understood by the decoder, higher-priority information prevents attributing display solely to gAMA. Use original test copies rather than stripping profiles from private originals. If a single-variable change cannot be established, label the comparison multivariable and retain the report. Different file hashes alone do not prove different pixel samples.
+
+## Record the difference actually visible in reading
+
+Place readable samples in your own image collection or supported CBZ and open them in ManYue under one layout. Verify A–E markers and 400×300 identity first. Keep screen brightness, theme and zoom fixed and compare middle gray without also changing the background. Record no obvious difference under these conditions or identify the particular changed patch and direction. Neither outcome alone proves which chunk the app used or ignored. If reading a report PDF, its text is externally authored, not an in-app PNG metadata panel. Leave unperformed observations blank.
+
+Prepare two observation rounds: A then B, followed by B then A at the same patch, to detect confusing order with file identity. Keep device/conditions fixed. A subjective brighter impression is an observation without an invented percentage. Retain contradictory rounds rather than deleting one; they indicate more display/operation conditions need checking.
+
+## Separate sample value, depth and transparency
+
+Use separate columns for encoded samples, per-sample depth and transparency. Changing gAMA does not upgrade 8-bit samples to 16-bit or increase 120000 pixels; changing alpha is another operation. Gamma processing does not apply to alpha samples, so do not apply the brightness power function to transparency and claim only interpretation changed. Unexpected checkerboards call for checking unintended alpha; gray patterns visible only when reduced call for checking scaling and source lines. Keep each observation tied to its own cause rather than explaining every gray issue with one gamma label.
+
+## Diagnose missing declarations and reciprocal mistakes
+
+After a conversion changes appearance, reread the report to see whether declarations were retained, rewritten or removed, then inspect any sample change. Writing 2.2 as this example’s encoding gamma reverses the≈0.45455 relation. Distinguish encoding and display exponents instead of copying a tool parameter merely named gamma. Without color-management evidence, stop at field presence and the paper model rather than inventing a rendering pipeline. Change one condition per correction and retain originals and notes so repeated saves do not erase the first difference’s provenance.
+
+## Reopen and deliver declaration, model and observation separately
+
+Reopen both copies at the same middle patch and revisit the report and calculation. Acceptance identifies the values represented by 45455 and 100000, separates sample count, depth and gamma, and states exactly what was observed. Mark unknown precedence rather than presenting paper value 0.218 as a device measurement. Archive the source, copies and reports and recheck fields after changing tools. One matching display does not guarantee identical handling by every future reader, exporter or screen.
+
+## Related tutorials and sources
+
+[PNG depth and color](<https://allluckly.cn/en/guides/manyue-png-indexed-truecolour-bitdepth-palette/>); [Transparent pages and backgrounds](<https://allluckly.cn/en/guides/manyue-transparent-page-background-check/>).
+
+Sources checked on 16 November 2026: [Apple public lookup](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261116>) shows ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. Published reading capabilities appear in the [official App Store listing](<https://apps.apple.com/cn/app/id6753895889>). Use controls actually available in the installed version.
+
+Method references: [W3C PNG: gAMA and gamma handling](<https://www.w3.org/TR/png-3/#11gAMA>). Diagrams, numbers, counterexamples and recording arrangements are original exercises. Separate external preparation, paper expectations and actual reading results. Available documentation does not substitute for device observation, and no private-server or universal file-environment test is claimed.
+{% endraw %}

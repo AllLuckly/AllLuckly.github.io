@@ -1,0 +1,84 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-hls-session-data-id-language-value-uri-record/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay HLS session data: audit identifiers, languages and external JSON'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-hls-session-data-id-language-value-uri-record/
+agent_source_sha256: c8637bf0c6d2f8b02d4e60003677fe60579e7c94e3b7d9f9a26b3ff8d048b4e8
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay HLS session data: audit identifiers, languages and external JSON
+
+Language: en
+Canonical: [iCouldPlay HLS session data: audit identifiers, languages and external JSON](<https://allluckly.cn/en/guides/icouldplay-hls-session-data-id-language-value-uri-record/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-hls-session-data-id-language-value-uri-record/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-hls-session-data-id-language-value-uri-record/>)
+Published: 2026-11-16T00:00:00+08:00
+Modified: 2026-11-16T10:09:12+08:00
+Author: Bison
+
+Read three SESSION-DATA entries and check unique keys, exclusive carriers and JSON references without treating metadata as captions.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-hls-session-data-id-language-value-uri-record/>), translated on 2026-11-16. Original publication dates, attribution, code and version notes are retained.
+
+Title text in a master playlist need not appear on the video. Build field cards from three original session-data entries, separating identity, language, inline values and external JSON before observing an owned real source in iCouldPlay. The exercise assumes no session-data editor and does not equate visible playlist text with loaded captions.
+
+## Preserve master and data-card identities
+
+Prepare exercise files in an external plain-text tool. For a real HLS source, separately record master address, acquisition time and selected video entry. Without one, finish the field task and mark playback unperformed rather than request nonexistent sample media. Name and preserve master and JSON separately; do not append JSON to M3U8 as one file. Separate resource access, sample syntax and interface metadata display. Opening a master cannot pass all three checks.
+
+## Read the three data entries separately
+
+Read the complete master sample below: English title, French title and external card. Titles share DATA-ID but have different LANGUAGE values; the third uses another identifier and URI. The final variant references video media. Prefer a collision-resistant reverse-domain-style identifier; org.example is a teaching namespace, not registration evidence. Codec and bandwidth values are hypothetical declarations. No media bytes are supplied, so complete syntax establishes neither a server, encoded media nor playable content.
+
+```text
+#EXTM3U
+#EXT-X-SESSION-DATA:DATA-ID="org.example.lesson.title",LANGUAGE="en",VALUE="Harbor notes"
+#EXT-X-SESSION-DATA:DATA-ID="org.example.lesson.title",LANGUAGE="fr",VALUE="Notes du port"
+#EXT-X-SESSION-DATA:DATA-ID="org.example.lesson.card",URI="session-card.json"
+#EXT-X-STREAM-INF:BANDWIDTH=900000,CODECS="avc1.4d401e,mp4a.40.2"
+lesson.m3u8
+```
+
+## Check identifier-language pairs for duplicates
+
+Make DATA-ID, LANGUAGE, carrier and value columns. The first keys are title+en and title+fr, so they are distinct. Copying the English entry and changing only VALUE creates a duplicate key to repair; moving it to the end does not help. Do not merge languages into a bilingual cue. Record absent LANGUAGE as undeclared rather than infer the device language. This audits one master; local uniqueness does not establish a centrally registered global identifier.
+
+## Audit the external card as JSON
+
+The third URI identifies a separate JSON resource, illustrated by the original card below. Check braces, quotes and array boundaries, then record exercise, edition and two chapter names. These custom keys do not create HLS chapters or caption timings. Resolve URI against its containing playlist. A json suffix does not establish JSON bytes; a login page is not a parsed card. Record actual response type and access. Reading this card independently is not an executed remote retrieval.
+
+```text
+{
+  "exercise": "harbor-card",
+  "edition": 2,
+  "chapters": ["arrival", "departure"]
+}
+```
+
+## Test the exclusive-carrier rule in a copy
+
+Copy the first entry and put VALUE and URI on the same SESSION-DATA line. This violates exclusive carrier choice, not a VALUE-first fallback scheme. Retain one carrier, restore the reference and recheck keys; DATA-ID with neither carrier also fails. LANGUAGE describes the value’s language, not automatic translation or a subtitle-track control. Changing it to de while retaining French wording needs a separate content-language check, not a claim that German data was generated.
+
+## Record only available iCouldPlay results
+
+With a complete real source, enter normally and record startup, sequential playback and actually visible programme text. Absent session titles can coexist with successful playback; mark display separately rather than infer missing media. A visible title does not certify all three entries. Hold source and version fixed instead of changing filename, matched metadata and session values together. Use recoverable owned test sources for comparisons and keep source inspection external, without inventing JSON viewers or caption-generation controls.
+
+## Separate access, syntax and display faults
+
+For missing metadata, check master identity, resolved resource URI and JSON bytes before altering segment URLs. Find duplicate keys through DATA-ID plus LANGUAGE rather than similar values. Repair carrier conflicts without changing video encoding. Label failures as master, data-resource or client-display issues, which can differ. Preserve the failing copy and its single change. Unknown fields remain unknown; one displayed title cannot certify a different failing entry or every compatibility path.
+
+## Reopen and verify keys and data scope
+
+Reopen master and JSON, reconstruct two title languages and one external card, and verify unique keys, one carrier per entry and edition 2. Reenter owned media only to add observations actually performed; otherwise deliver a reading exercise. Include files, ledger and path results, distinguishing session metadata from caption tracks, timed cues and media segments. Re-resolve URIs and inspect changed versions instead of assuming unchanged titles certify media identity, completeness and caption loading.
+
+## Related tutorials and sources
+
+[iCouldPlay HLS variants: map the master playlist, variants and media segments](<https://allluckly.cn/en/guides/icouldplay-hls-master-variant-media-map/>); [iCouldPlay HLS address worksheet: resolve relative segment references individually](<https://allluckly.cn/en/guides/icouldplay-hls-relative-uri-resolution-sheet/>).
+
+Method sources: [RFC8216 §4.3.4.4](<https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.4>).
+
+Checked on 16 November 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261116>) list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare samples manually in external plain text; iCouldPlay selects an existing real source for playback observations through installed controls. Placeholder URIs provide no media. Keep syntax, paper calculations and playback separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.
+{% endraw %}

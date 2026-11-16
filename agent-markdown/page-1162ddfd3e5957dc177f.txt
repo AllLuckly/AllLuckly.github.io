@@ -1,0 +1,80 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-cycloid-rolling-rim-point-centre-path-one-arch/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Draw a cycloid in VectorPaint: separate the wheel centre from its rim-point
+  path'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-cycloid-rolling-rim-point-centre-path-one-arch/
+agent_source_sha256: 46295c45ed52b56b9e49676acb3c0c7b6dc7746dad1f9e4f6a2785a99d6ea6af
+agent_generator_version: 1
+---
+{% raw %}# Draw a cycloid in VectorPaint: separate the wheel centre from its rim-point path
+
+Language: en
+Canonical: [Draw a cycloid in VectorPaint: separate the wheel centre from its rim-point path](<https://allluckly.cn/en/guides/vectorpaint-cycloid-rolling-rim-point-centre-path-one-arch/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-cycloid-rolling-rim-point-centre-path-one-arch/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-cycloid-rolling-rim-point-centre-path-one-arch/>)
+Published: 2026-11-16T00:00:00+08:00
+Modified: 2026-11-16T10:29:37+08:00
+Author: Bison
+
+Use a radius-two no-slip model and five parameter values to check centre, rim point and one-arch span.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-cycloid-rolling-rim-point-centre-path-one-arch/>), translated on 2026-11-16. Original publication dates, attribution, code and version notes are retained.
+
+A rolling wheel’s centre follows a straight line while one fixed rim mark traces a cycloid. Draw one arch and three static wheel positions, checking parameters externally before approximating the path with existing tools.
+
+## Fix no slip and one persistent rim mark
+
+Use radius 2, rolling right without slipping along a horizontal baseline, with the mark touching ground initially. The parameter is rotation in radians, not unspecified seconds. Track the same rim mark at every position rather than choose a new contact point each time, which would produce baseline points instead of a cycloid. Give wheel, centre and mark distinct symbols. This ideal geometry omits deformation, slipping and road irregularities; external calculations organise the illustration rather than reconstruct measured motion from a video.
+
+## Write coordinates as centre plus rotating offset
+
+The centre is (2t,2); the mark’s offset from it is (-2 sin t,-2 cos t), giving the ledger’s formula. At zero, the mark is at the origin while the centre is (0,2). Evaluate trigonometric functions in radians: a quarter-turn uses pi/2, not numeric 90. Retain exact expressions before decimal placement. No-slip centre travel determines wheel spacing, not a guess that consecutive wheel outlines should touch. Keep paper coordinates separate from manual node-placement error.
+
+```text
+r=2; 0<=t<=2*pi
+C(t)=(2*t,2)
+P(t)=(2*(t-sin(t)),2*(1-cos(t)))
+t=0       -> P=(0,0)
+t=pi/2    -> P=(pi-2,2)
+t=pi      -> P=(2*pi,4)
+t=3*pi/2  -> P=(3*pi+2,2)
+t=2*pi    -> P=(4*pi,0)
+span=4*pi; height=4
+```
+
+## Place five checked points before drawing the curve
+
+Use zero, quarter, half, three-quarter and full turns. Mark heights are 0,2,4,2,0; horizontal coordinates are 0, pi-2, 2pi, 3pi+2 and 4pi. These are not equally spaced. On a roughly 1600 by 1200 canvas, use 60 pixels per unit with baseline y=750 and start x=300. The arch spans about 754 pixels and rises 240 pixels. Keep equal scales and label parameter order rather than distributing the points evenly by eye.
+
+## Check radius and contact in three wheel positions
+
+Show only initial, half-turn and full-turn wheels lightly to avoid clutter. Their centres have x=0,2pi,4pi and constant height 2. Each radius-two wheel touches the same baseline. The mark is at the bottom initially/finally and top at the half-turn. Draw the centre path distinctly from the cycloid. A full turn advances one circumference, 4pi, rather than diameter 4. A half-turn mark still at the bottom indicates omitted rotation; translating a circle with a permanently fixed lower mark is not this rolling model.
+
+## Connect one arch while retaining its endpoint behaviour
+
+Build the main path in parameter order using pen/node tools, adding externally calculated samples near the ends if useful. Five correct nodes do not make every intervening Bézier point analytically exact; label the path a manual approximation. Keep the endpoint shape that joins neighbouring arches in cusps instead of rounding it into a half-ellipse. The arch is not a semicircle, with a different span-to-height relationship. Its highest point is central and its halves mirror about that centreline. Correct handles without moving verified samples merely to accommodate them.
+
+## Check symmetry and distinguish travel from curve length
+
+The quarter- and three-quarter-turn x coordinates sum to 4pi and share height 2. The central mark is at (2pi,4), giving a symmetry check. Centre travel equals horizontal span 4pi; the longer curved path does not increase that translation. This task does not measure arc length or substitute wheel circumference for cycloid length. Any added arc-length claim needs separate reasoning. Retain parameter, centre and mark as separate columns and update associated wheel positions after a changed condition instead of leaving old annotations beside a reshaped curve.
+
+## Diagnose angle units and point identity
+
+For a misplaced maximum, check radians versus degrees. A horizontal mark path suggests the centre was traced. Ground-only samples suggest a different contact point was selected each time. These are distinct mistakes, not a single smoothing problem. Correct one coordinate/object class and recheck five samples and three wheels. At small size, inspect which wheel each annotation reaches and reduce visual density without deleting identities. Static SVG export is not an animation; do not invent playback, speed or measured frame-rate results.
+
+## Reopen the path and its static wheel positions
+
+Save the editable original and reopen an export, checking outlines, labels and legend. Identify baseline, straight centre path, curved rim path and the mark at bottom/top/bottom in the three shown states. State span 4pi and height 4. Preserve the editable source separately from any flattened representation; a screenshot does not retain node structure. Move annotations obscuring endpoints instead of altering geometry. This is a repeatable original static diagram, not a claimed no-slip simulation or physical-device validation across every device.
+
+## Related guides and sources
+
+[Unit-circle projection](<https://allluckly.cn/en/guides/vectorpaint-unit-circle-sine-projection/>), [Coordinate plotting](<https://allluckly.cn/en/guides/vectorpaint-coordinate-line-chart/>).
+
+Method sources: [OpenStax Calculus Volume 2 §7.1](<https://openstax.org/books/calculus-volume-2/pages/7-1-parametric-equations>).
+
+Checked on November 16, 2026: the [official VectorPaint listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261116>) list public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Work within published shapes, pen/node editing, layers, grouping, text and export capabilities. Prepare coordinates and calculations externally and identify installed controls; no built-in geometry solver or equation plotter is assumed. No completed physical-device test is claimed.
+{% endraw %}

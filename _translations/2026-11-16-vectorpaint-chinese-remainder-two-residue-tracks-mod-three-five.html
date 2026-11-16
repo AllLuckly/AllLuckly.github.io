@@ -1,0 +1,80 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint Chinese remainder tracks: intersect two residue conditions at eight and twenty-three'
+description: Align residue tracks from zero to twenty-nine, solve eight modulo fifteen and test the coprime condition
+  with controls.
+permalink: /en/guides/vectorpaint-chinese-remainder-two-residue-tracks-mod-three-five/
+date: '2026-11-16 00:00:00 +08:00'
+modified: '2026-11-16 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 220
+topic: Coordinates, data and conditional reasoning
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-16-vectorpaint-chinese-remainder-two-residue-tracks-mod-three-five.md
+source_url: /guides/vectorpaint-chinese-remainder-two-residue-tracks-mod-three-five/
+translation_method: editorial
+translation_source_sha256: 047e29dbe1c346b63a16c1bae6bc4697c9e4e0ab7414980ddb8e2792a3695c72
+translation_date: '2026-11-16T02:45:15+00:00'
+excerpt: Align residue tracks from zero to twenty-nine, solve eight modulo fifteen and test the coprime condition
+  with controls.
+---
+{% raw %}
+<p>Place two remainder conditions on aligned integer tracks, locate their intersection, then express every integer solution beyond the frame. Check coprimality and non-coprime controls so two visible hits are not mistaken for the only solutions. VectorPaint manually aligns ticks and symbols; solve externally without assuming an automatic congruence solver.</p>
+
+<h2 id="section-1">State both conditions and the displayed range</h2>
+
+<p>Seek integers x with x≡2 modulo 3 and x≡3 modulo 5. Display only 0 through 29, thirty integers including endpoints, while the unknown may be any integer. Write “and”, not “or”: x−2 must be divisible by 3 and x−3 by 5. Create tick, modulo-3, modulo-5, intersection and derivation layers, saving an unmarked native version first. The frame is a reading window, not exclusion of negative solutions or those above 29. Remainders 2 and 3 are not the tracks’ pixel heights.</p>
+
+<h2 id="section-2">Share thirty tick columns to avoid false intersections</h2>
+
+<p>On a suggested 2000×1300 canvas, place integer n at X=200+45n for n=0 through 29, ending at X=1505. Set modulo-3, modulo-5 and intersection tracks at screen Y=450, 650 and 850, sharing every column. Label major values 0, 5, 10, 15, 20 and 25 first, then smaller values. Do not distribute each track independently and drift columns. Use grids or guides; if a distribution control measures edges rather than centres, inspect actual centre spacing instead of treating a button press as proof of correct ticks.</p>
+
+<h2 id="section-3">Enumerate both residue tracks completely</h2>
+
+<p>Starting at 2 and adding 3 gives ten modulo-3 marks: 2,5,8,11,14,17,20,23,26,29. Starting at 3 and adding 5 gives six modulo-5 marks: 3,8,13,18,23,28. Copy both complete lists below before plotting; do not stop on discovering 8. Use open circles for the first and triangles for the second, with a textual legend. Centre marks on integer columns without covering labels. Check the right ends too: 29−2=27 is divisible by 3, and 28−3=25 by 5.</p>
+
+<pre><code class="language-text">range: integers 0..29 inclusive
+x = 2 (mod 3): 2,5,8,11,14,17,20,23,26,29
+x = 3 (mod 5): 3,8,13,18,23,28
+both: 8,23
+</code></pre>
+
+<h2 id="section-4">Find common columns rather than add tracks</h2>
+
+<p>Compare columns: only 8 and 23 carry both symbols. Put solid dots in those intersection columns and use fine vertical guides to connect the conditions. Ten plus six marks are not sixteen common solutions, and two symbols in one column are not two integers. Verify that 8 and 23 each leave remainder 2 on division by 3 and 3 on division by 5, and record 23−8=15. Two hits suggest a period but do not prove the full solution set; derive the congruence class algebraically next.</p>
+
+<h2 id="section-5">Substitute one condition to derive all solutions</h2>
+
+<p>The first condition gives x=2+3t for integer t. Substitution yields 3t≡1 modulo 5. Since 3 times 2 leaves remainder 1, multiply by inverse 2 to obtain t≡2 modulo 5. Set t=2+5k, giving x=8+15k for any integer k, equivalently x≡8 modulo 15. Retain the equivalent steps for substitution checks. Values 8 and 23 belong to one class, not two. For k=−1, −7 is valid because −7−2=−9 and −7−3=−10 are divisible by 3 and 5. A zero-starting frame cannot exclude it. For any k, x−2=6+15k is divisible by 3 and x−3=5+15k by 5. Any two solutions differ by a multiple of both 3 and 5, hence of 15 because the moduli are coprime. No additional congruence class is omitted.</p>
+
+<pre><code class="language-text">x = 2+3*t
+3*t = 1 (mod 5)
+t = 2 (mod 5)
+x = 8+15*k, k any integer
+k=-1: x=-7; (-7-2)/3=-3; (-7-3)/5=-2
+</code></pre>
+
+<h2 id="section-6">Control the theorem with its coprime condition</h2>
+
+<p>Since 3 and 5 are coprime, the Chinese remainder theorem guarantees one class modulo 15 for any pair of their residues. “Unique” refers to a class, not an integer. Add a failing control: x≡1 modulo 4 and x≡2 modulo 6 cannot both hold, because the first requires odd and the second even; their residue difference is also not divisible by gcd 2. Multiplying moduli to 24 does not produce a solution. Frame this separately. After changing moduli, check gcd and compatibility before applying the coprime theorem. Split this display into fifteen-integer windows 0–14 and 15–29, each containing one hit, 8 and 23. A shifted window leaves the full solution formula unchanged, but its visible values and hit count must be enumerated again rather than copied from old labels.</p>
+
+<h2 id="section-7">Test a compatible non-coprime control</h2>
+
+<p>Non-coprime does not mean always unsolvable. For x≡2 modulo 4 and x≡2 modulo 6, x−2 must be a multiple of both 4 and 6, giving x=2+12k. The displayed range contains 2,14,26. Writing 2+24k misses 14: the period here is lcm 12. Keep this as a separate condition check, outside the main intersection at 8 and 23. Inspect shared columns for plotting faults and congruences plus gcd for solution faults; never move points to fit a wrong formula. Preserve a failing copy and enumerate again after one correction. Together the non-coprime controls show that a gcd greater than one neither forces no solution nor justifies a product period. Check divisibility of the residue difference by the gcd, then enumerate a compatible case so every plotted solid point has a mathematical basis.</p>
+
+<h2 id="section-8">Reopen and distinguish window counts from all solutions</h2>
+
+<p>Reopen the native file and verify thirty integer columns, ten marks on the first track, six on the second and two intersections, with guides at 8 and 23 aligned. Retain arbitrary integer k, negative example −7 and both non-coprime controls without clipping. Inspect congruence signs, moduli, minus signs and open markers in SVG or PDF export. A visible repetition does not replace the algebraic proof. Deliver tracks, lists, substitution and condition checks, leaving unperformed reopening or export pending. This presents manual calculations, not automatic theorem proving or cryptographic computation.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-mod-eight-step-cycles/">VectorPaint modulo-eight clocks: compare step-three coverage with two step-two cycles</a>; <a href="/en/guides/vectorpaint-modular-inverse-seven-mod-twenty-six-back-substitution/">VectorPaint modular-inverse card: back-substitute to show seven times fifteen leaves one</a>.</p>
+
+<p>Method sources: <a href="https://wstein.org/edu/2007/spring/ent/ent-html/node21.html">William Stein: The Chinese Remainder Theorem, §2.2</a>.</p>
+
+<p>Version and operation scope: checked on 16 November 2026 against the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261116-final5">Apple public lookup</a>: version 1.0.8, requiring iOS / iPadOS 17.0 or later. The listing describes shapes, pen and Bézier nodes, grids and guides, layers and text, plus native files and SVG, PDF and PNG output. Use controls actually visible in the installed version. Calculate formulas and solutions externally, then construct points manually. No automatic mathematical calculation or exhaustive physical-device testing is claimed.</p>
+{% endraw %}

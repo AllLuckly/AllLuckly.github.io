@@ -1,0 +1,84 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-ass-rotation-origin-position-anchor-quarter-turn/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay ASS rotation origin: separate the anchor from the pivot'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-ass-rotation-origin-position-anchor-quarter-turn/
+agent_source_sha256: b36c9e8acf420dd17dfe16375d4c9b9bf2b88de0c7aed4338cc4affcb11f458d
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay ASS rotation origin: separate the anchor from the pivot
+
+Language: en
+Canonical: [iCouldPlay ASS rotation origin: separate the anchor from the pivot](<https://allluckly.cn/en/guides/icouldplay-ass-rotation-origin-position-anchor-quarter-turn/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-rotation-origin-position-anchor-quarter-turn/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-rotation-origin-position-anchor-quarter-turn/>)
+Published: 2026-11-16T00:00:00+08:00
+Modified: 2026-11-16T09:40:13+08:00
+Author: Bison
+
+Audit a fixed pivot, default pivot and paper quarter-turn coordinates with three cue controls.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-ass-rotation-origin-position-anchor-quarter-turn/>), translated on 2026-11-16. Original publication dates, attribution, code and version notes are retained.
+
+An anchor at(300,180) need not also be the rotation pivot. ASS org and pos have different roles. Prepare three fixed states, calculate their geometry on paper and compare the available iCouldPlay presentation. Subtitle rotation does not rotate the footage or establish camera motion.
+
+## Fix a fourteen-second source and script directions
+
+Retain a normally playable owned clip of at least fourteen seconds and existing subtitles. Draw a 640×360 script frame with x right and y down. Mark anchor(300,180) and pivot(200,180) with different symbols. These are invented reference points, not measured body positions in the footage. Keep font size, orientation and fitting stable, without also mirroring or rotating the video.
+
+## Save three independent fixed states
+
+Save the complete UTF-8 origin.ass and reopen its style/event columns. Events 1–4 and5–8 share anchor/pivot but use zero and ninety degrees. The9–12 event retains anchor/angle while omitting org. Identical wording and one-second gaps provide controls. Do not stack three org tags in one line or infer a five-second animation from the second cue’s start: these are fixed states.
+
+```text
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,36,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,7,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:04.00,Default,,0,0,0,,{\an7\pos(300,180)\org(200,180)\frz0}Rotation sample.
+Dialogue: 0,0:00:05.00,0:00:08.00,Default,,0,0,0,,{\an7\pos(300,180)\org(200,180)\frz90}Rotation sample.
+Dialogue: 0,0:00:09.00,0:00:12.00,Default,,0,0,0,,{\an7\pos(300,180)\frz90}Rotation sample.
+```
+
+## Calculate the vector from the pivot first
+
+Subtract pivot from anchor to get vector(100,0). Zero rotation returns(300,180). A positive planar quarter-turn is counterclockwise, so the rightward vector turns upward, written(0,-100) in downward-y script coordinates. Add the pivot back to obtain(200,80). Record subtract, rotate and add-back separately; swapping absolute coordinates is not rotation around this pivot. Both anchor states remain100 units from the pivot. A proposed result200 units away calls for checking signs and pivot addition, not attributing the discrepancy to scaling: no scale change is specified.
+
+## Explain default and explicit pivots separately
+
+Without org, the third event’s pivot defaults to its position anchor. Its anchor stays there while glyph orientation still rotates. It does not inherit the previous event’s org. Identical pos values therefore need not yield identical presentation under different explicit pivots. The paper calculation concerns an anchor, not a particular letter’s ink edge, which also depends on alignment, font and rendering.
+
+## Observe each cue rather than angle alone
+
+Select the correct subtitle through an available flow and play beyond twelve seconds. Record readability, orientation and relative location for all three states. Without external-subtitle selection, retain text/paper checks and leave playback unperformed. Editing the footage is not evidence of an override effect. Record copy and orientation; seeking and screenshots do not certify all intervals.
+
+## Use a negative angle and common translation on paper
+
+For a paper negative quarter-turn, the vector turns down and the anchor becomes(200,280). Shifting both original pivot and anchor fifty units right preserves their difference and moves the positive-turn result to(250,80). Retain both derivations outside the original. Any playback control needs a separately named copy with only the specified change; correct geometry is not a completed loading test.
+
+## Diagnose pivot, angle and rendering layers
+
+For in-place rotation, inspect org in the actual event and selected copy. For reversed movement, inspect angle sign and downward y before mirroring footage. For offscreen text, inspect pivot/radius separately from fonts or cropping. Use one explicit org per event. One successful line does not certify all3D rotations or remote pivots; retain failing conditions.
+
+## Reopen, identify all three cues and restore
+
+Reopen and reselect the original, checking the three stated intervals. Deliver coordinate diagram, signed-angle calculations, actual presentation, version and pending items. Restore the former subtitle without deleting the library. Explain paper positions from pivot/vector/angle while distinguishing observed glyph bounds. Fixed states establish neither angular speed nor the real camera’s rotation centre.
+
+## Related tutorials and sources
+
+[Alignment anchors](<https://allluckly.cn/en/guides/icouldplay-ass-numpad-alignment-anchor-grid/>), [Movement windows](<https://allluckly.cn/en/guides/icouldplay-ass-move-line-relative-millisecond-window/>).
+
+Method source: [Aegisub ASS tags](<https://aegisub.org/docs/latest/ass_tags/>).
+
+Checked on November 16, 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261116>) list 1.1.1, requiring iOS / iPadOS 15.0. Prepare exercise materials externally; iCouldPlay selects an available source and supplies playback observations. Follow installed controls. No unperformed physical-device or private-server testing is claimed.
+{% endraw %}

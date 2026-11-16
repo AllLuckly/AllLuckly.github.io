@@ -1,0 +1,83 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 云映 HLS 字幕组跟读：CC1在流内，字幕清单另有URI
+description: 追两种EXT-X-MEDIA到变体引用，分清INSTREAM-ID、字幕清单与VTT文本，不虚构显示兼容。
+permalink: /guides/icouldplay-hls-closed-captions-instream-subtitles-uri-groups/
+date: '2026-11-16 00:00:00 +08:00'
+modified: '2026-11-16 00:00:00 +08:00'
+category: 教程
+level: 进阶
+series_order: 179
+topic: 清单声明与播放条件
+reading_time: 10
+---
+
+一个CC1字符串和一个字幕文件地址，指向的并不是相同层次。本课用自制主清单、字幕媒体清单和短VTT文本建立三文件阅读参照，追踪流内闭合字幕与外部字幕组。云映仅记录当前实际路径可见的选择和文字，不把声明一条字幕组写成所有设备已经解码成功。
+
+## 为三种文件分别留名称与角色
+
+在外部准备主清单、captions-en.m3u8和captions-0.vtt三份阅读文件，各自保留原稿。主清单引用的video.m3u8及真实视频不在本例交付，不能仅靠这三份文本期待自动播放。若自己已有完整测试来源，另记媒体版本、片长与可用字幕路径，并选至少六秒的自有素材。文件可见、组引用正确和屏幕文字显示应分别登记，目录里列出VTT不是加载证明。先保持同一视频与显示方向，后面只改变可选字幕来源，不同时换音轨或视频版本增加变量。
+
+## 从主清单读取两类MEDIA条目
+
+第一条TYPE为CLOSED-CAPTIONS，组名cc-in，用INSTREAM-ID指定CC1而没有URI。第二条TYPE为SUBTITLES，组名text-out，通过URI指向字幕媒体清单，不写INSTREAM-ID。变体分别以CLOSED-CAPTIONS和SUBTITLES属性引用对应组名，而不是直接引用NAME。样本假定H.264、AAC与WebVTT组合，CODECS用wvtt标识WebVTT的写法可参看Apple资料；这些都是阅读声明，未核媒体字节。两条语言同为en也不证明其字句相同，真实流内CC内容仍待实际来源提供。
+
+```text
+#EXTM3U
+#EXT-X-VERSION:4
+#EXT-X-MEDIA:TYPE=CLOSED-CAPTIONS,GROUP-ID="cc-in",NAME="English CC",LANGUAGE="en",DEFAULT=NO,AUTOSELECT=NO,INSTREAM-ID="CC1"
+#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="text-out",NAME="English text",LANGUAGE="en",DEFAULT=NO,AUTOSELECT=NO,FORCED=NO,URI="captions-en.m3u8"
+#EXT-X-STREAM-INF:BANDWIDTH=900000,CODECS="avc1.4d401e,mp4a.40.2,wvtt",CLOSED-CAPTIONS="cc-in",SUBTITLES="text-out"
+video.m3u8
+```
+
+## CC1标识服务不生成外挂文件
+
+CC1是规范所列CEA608通道标识之一，不是视频第一片、字幕第一行或某个扩展名。对应资料要存在于媒体分片中，写一条MEDIA声明不能凭空把VTT文字烧进视频。CLOSED-CAPTIONS条目不得带URI，因此给它追加captions-0.vtt并不是通用修复。INSTREAM-ID也不能随意挪到SUBTITLES条目；服务块写法SERVICE3还有另外的兼容版本条件，本课主代码只用CC1。先把这些字段所属层次核清，不从标签名字推断当前播放引擎一定提供解码或选择入口。
+
+## 字幕URI先到媒体清单再到VTT
+
+第二条URI先到下面这份字幕媒体清单，随后才由其中的分片URI到VTT文本，不能把两层直接压成一份文件。字幕清单是一段六秒、带结束标记的阅读样本；时长描述媒体段范围，不保证每一秒都有可见字。所有相对地址均按各自所在文件还原，主清单与字幕清单放在不同目录时尤其要分别核基址。只因后缀都和字幕有关，就把MEDIA的URI改成裸VTT，会改变引用角色。需要适配真实素材时保留正常生成结构，不在生产来源乱改地址试兼容。
+
+```text
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:6
+#EXT-X-MEDIA-SEQUENCE:0
+#EXTINF:6,
+captions-0.vtt
+#EXT-X-ENDLIST
+```
+
+## 短VTT核文字时段与整段范围
+
+VTT资源只在一至四秒给一条自制文字，带WEBVTT文件头与合法时间行。六秒段中，开头一秒和四秒以后没有这条提示，不能因为清单写六秒就把提示终点改六秒。三秒显示时长来自四减一，和CC1编号、语言en都无关。该文件是独立文本示例，不声称已复原流内闭合字幕内容。真实分段VTT还需要正确的时间映射与同步资料，本课没有给媒体时间戳，所以只核文本结构与纸面区间，不凭三个文件宣称完成所有音视频同步。
+
+```text
+WEBVTT
+
+00:00:01.000 --> 00:00:04.000
+Read this optional text.
+```
+
+## 可用路径中逐种观察而不叠加猜测
+
+真实来源可用时，先记当前字幕关闭或选择状态，再从目标提示之前顺播。界面若能区分两条来源，就分别选择并记名称、完整文字与大致显示区间，不把两条同时叠加后难辨的画面当成功。若只见一条或没有CC入口，写实际可见范围，不能虚构隐藏菜单。普通VTT能显示不为流内CC解码背书，反过来也一样。文字在画面中始终存在时，另查是否已画入视频；这项观察与MEDIA字段本身不能互相替代，当前未执行的路径仍写未执行。
+
+## 错配优先查类型与引用角色
+
+故障副本可给CLOSED-CAPTIONS加URI，或删去SUBTITLES的URI，分别在字段审核阶段指出违反条件，不需要等播放器给出某种固定报错。组找不到时核变体引用与GROUP-ID是否完全匹配，不能用加大字号修复组名。VTT内容不出现则分别查字幕清单访问、VTT取得、时间条件和实际选择，不把所有失败归为CC1。保留各份原文和唯一改动，两个来源即使显示名相近也按TYPE与路径识别；不能随手删除一条就宣布它们是重复资料。
+
+## 重开交付两条路径和三文件边界
+
+重开主清单、字幕清单和VTT，分别追cc-in到CC1、text-out到字幕清单再到文字资源，核前者无URI、后者有URI且不带INSTREAM-ID。真实观看做过才附结果，退出再进入同一来源后确认所选状态，不能假定总会沿用上次选择。交付角色图、字段表、三秒提示算式和未知媒体内容，说明六秒段不是六秒恒显。完成只表明引用与观察可追溯，不证明所有闭合字幕服务、字幕格式、设备或云映播放路径已逐项兼容。
+
+## 相关教程与资料
+
+[云映字幕来源身份表：分开内嵌轨道与外挂文件]({{ '/guides/icouldplay-embedded-external-subtitle-origin-map/' | relative_url }})、[云映 HLS 多版本清单：分开主清单、变体与媒体分片]({{ '/guides/icouldplay-hls-master-variant-media-map/' | relative_url }})。
+
+方法来源：[RFC8216 §4.3.4.1](https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.1)、[RFC8216 §4.3.4.2.1](https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.2.1)、[Apple HLS authoring：WebVTT的wvtt标识](https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html)。
+
+资料核对：2026年11月16日，[云映官方商店](https://apps.apple.com/cn/app/id6755653178)和[Apple公开查询](https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261116)列出1.1.1，最低iOS / iPadOS 15.0。样本在外部用纯文本手工准备，云映用于已有真实来源的选择与播放观察，入口以安装版本实际可见为准。占位URI不提供媒体；文法审核、纸面计算与实际播放分别记录，没有执行的步骤保留未执行。本文不声称完成真机、私人服务器、所有引擎或输出设备逐项兼容测试。

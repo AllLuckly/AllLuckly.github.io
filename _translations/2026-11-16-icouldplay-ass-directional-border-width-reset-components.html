@@ -1,0 +1,63 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay ASS borders: audit horizontal, vertical and uniform overrides'
+description: Compare xbord,ybord and a later bord on identical text without treating
+  outline width as font scaling.
+permalink: /en/guides/icouldplay-ass-directional-border-width-reset-components/
+date: '2026-11-16 00:00:00 +08:00'
+modified: '2026-11-16 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 174
+topic: Caption shapes and style calculations
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-16-icouldplay-ass-directional-border-width-reset-components.md
+source_url: /guides/icouldplay-ass-directional-border-width-reset-components/
+translation_method: editorial
+translation_source_sha256: c72dcd1a82b4caff9afff53ca50841bf9e80e9c4594fd60418288b34ceb493d4
+translation_date: '2026-11-16T01:40:13+00:00'
+excerpt: Compare xbord,ybord and a later bord on identical text without treating outline
+  width as font scaling.
+---
+{% raw %}
+<p>Thicker edges may reflect outlines rather than a larger or stretched font. Prepare three ASS controls with wide horizontal, wide vertical and reset uniform borders, then observe iCouldPlay. Values request style widths; font shape/rendering still affect visible edges. Keep source conditions separate from observations.</p>
+<h2 id="fix-a-fourteen-second-source-and-comparable-glyphs">Fix a fourteen-second source and comparable glyphs</h2>
+<p>Retain an owned clip at least fourteen seconds long and prior subtitles. Use one requested font, size 36 and identical wording, varying borders only. Font naming does not prove installation; record known font/fallback status. Fix640×360 script dimensions and the scaled-border declaration, plus orientation/fitting, rather than change video proportions simultaneously.</p>
+<h2 id="save-all-three-events-and-the-scaling-declaration">Save all three events and the scaling declaration</h2>
+<p>Save complete UTF-8 border-axis.ass with ScaledBorderAndShadow: yes. Events occupy1–4,5–8 and9–12 seconds, retaining position, text and zero shadow. Border requests are(8,2),(2,8), then(8,2) followed by uniform bord3. Preserve ordering and the same style name: a different style would obscure the later override. This is authored input, not a device-test log.</p>
+<pre><code class="language-text">[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,36,&amp;H00FFFFFF,&amp;H000000FF,&amp;H00000000,&amp;H00000000,0,0,0,0,100,100,0,0,1,1,0,7,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:04.00,Default,,0,0,0,,{\an5\pos(320,180)\shad0\xbord8\ybord2}Border sample.
+Dialogue: 0,0:00:05.00,0:00:08.00,Default,,0,0,0,,{\an5\pos(320,180)\shad0\xbord2\ybord8}Border sample.
+Dialogue: 0,0:00:09.00,0:00:12.00,Default,,0,0,0,,{\an5\pos(320,180)\shad0\xbord8\ybord2\bord3}Border sample.
+</code></pre>
+<h2 id="read-the-axes-and-their-target-first">Read the axes and their target first</h2>
+<p>xbord and ybord request horizontal/vertical outline widths, not text scale. Record(8,2) versus(2,8); equal sums do not imply equal presentation. Keep shadow zero so directional shadow is not mistaken for an outline. Record white fill and black outline independently. Colour changes alone do not verify width; inspect values, glyphs and actual presentation.</p>
+<h2 id="use-the-later-uniform-border-as-an-override-control">Use the later uniform border as an override control</h2>
+<p>The third event’s later bord3 sets both axes to 3; it neither adds3 nor merely edits the base style. Record final(3,3). Placing bord before the directional overrides would instead leave final(8,2). Order is evidence. Save any reordered experiment separately rather than mix both sequences in the original and lose the selected condition.</p>
+<h2 id="use-an-idealised-contour-box-on-paper">Use an idealised contour box on paper</h2>
+<p>For an invented100×40 fill bounding box, an ideal two-sided expansion gives116×44 for(8,2),104×56 for(2,8), and106×46 for(3,3). This checks adding each margin twice, not a real font measurement. Corners, antialiasing and scaling affect visible bounds. Paper box areas do not establish additional phone pixels. Also compare uniform bord0 with xbord0 alone:on paper, the former resets both axes while the latter leaves the unchanged vertical width. With shadow already zero, do not mistake shadow for a remaining outline. Fill remains a separate component.</p>
+<h2 id="observe-the-edge-controls-sequentially">Observe the edge controls sequentially</h2>
+<p>Load through the available subtitle path and play beyond twelve seconds. Record unchanged fill wording, distinguishable outline differences and gaps. Pausing may help, but different screenshot scales defeat width comparison. Separate readable text from absent border effects. An editor preview is not an iCouldPlay observation; retain output dimensions and pending items.</p>
+<h2 id="separate-clippingboldness-and-border-diagnosis">Separate clipping, boldness and border diagnosis</h2>
+<p>For one missing edge, inspect display clipping or clip tags before blaming ybord. Thicker fill calls for Bold/b overrides; a larger whole line calls for font size or scale. Change these classes separately and retain source/copy/failure. Return to the three-event baseline. One font cannot certify every outline style or renderer.</p>
+<h2 id="reopen-audit-final-conditions-and-restore">Reopen, audit final conditions and restore</h2>
+<p>Reopen/reselect the original and compare three final requests with their intervals. Deliver tag ordering, scaled-border declaration, paper boxes and observations, leaving unmeasured edge details unknown. Restore everyday captions and retain footage. Explain directional versus uniform overrides without inferring font dimensions from one screenshot. No video burn-in or printing/projection pixel measurement was performed.</p>
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+<p><a href="/en/guides/icouldplay-ass-bgr-colour-alpha-component-visibility/">Colours and components</a>, <a href="/en/guides/icouldplay-ass-clip-iclip-glyph-video-boundaries/">Clip windows</a>.</p>
+<p>Method source: <a href="https://aegisub.org/docs/latest/ass_tags/">Aegisub ASS tags</a>.</p>
+<p>Checked on November 16, 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261116">Apple public lookup</a> list 1.1.1, requiring iOS / iPadOS 15.0. Prepare exercise materials externally; iCouldPlay selects an available source and supplies playback observations. Follow installed controls. No unperformed physical-device or private-server testing is claimed.</p>
+{% endraw %}

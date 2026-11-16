@@ -1,0 +1,51 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Check catalog times in ManYue: published and updated do not replace volume
+  order'
+description: Convert offsets in an original Atom report and separate first availability,
+  entry updates, feed updates and comic chapters.
+permalink: /en/guides/manyue-opds-atom-published-updated-timezone-order/
+date: '2026-11-16 00:00:00 +08:00'
+modified: '2026-11-16 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 215
+topic: Image, layout and catalog fields
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-16-manyue-opds-atom-published-updated-timezone-order.md
+source_url: /guides/manyue-opds-atom-published-updated-timezone-order/
+translation_method: editorial
+translation_source_sha256: 1aeb9c6b597e217933ef92d6e507e78b41752e67589f8d03e8df3d2efd2d3bca
+translation_date: '2026-11-16T02:38:47+00:00'
+excerpt: Convert offsets in an original Atom report and separate first availability,
+  entry updates, feed updates and comic chapters.
+---
+{% raw %}
+<p>Nine in the morning need not be later than another entry’s 02:30 because offsets can differ. Prepare two original OPDS 1.2 entry reports, normalize to UTC and keep published, updated and volume identity separate. Browse an authorized catalog in ManYue or read a report PDF. Paper checking works without a server and is not a claimed private-catalog test.</p>
+<h2 id="先固定atom版本与两个条目身份">Fix the Atom-based version and two entry identities</h2>
+<p>Limit the exercise to OPDS 1.2 Atom XML. Entry A is“山路卷二”(Mountain Road volume 2), B volume 1, each with stable identity and an original cover marker. List title, id, published and updated per entry rather than copying feed updated into all entries. A different-generation JSON catalog needs its own field rules, not automatic reuse of XML element names. For offline reading export the table/covers as a two-page PDF and identify it as external material, not an app-generated protocol report.</p>
+<h2 id="先读published与updated各自意义">Read the meanings of published and updated first</h2>
+<p>Atom published identifies an early event in an entry’s lifecycle, usually associated with creation or initial availability; updated identifies the most recent modification considered significant by the publisher. Neither automatically means story date, print publication date or completed download time. Title/description corrections can update an entry without new chapters. Retain unknown or absent fields rather than substituting updated as the original work’s debut. Identify the resource represented by each field before comparing A/B: correct arithmetic cannot fix comparing different objects.</p>
+<h2 id="把加八小时的甲还原utc">Convert A’s plus-eight offset to UTC</h2>
+<p>Set A updated to <code>2026-11-16T09:00:00+08:00</code>. Its clock is eight hours ahead of UTC, so subtract eight hours to obtain 01:00:00Z on the same date. Do not add eight to get 17:00 or treat the plus sign as an arithmetic instruction rather than an offset. Preserve date, T separator, seconds and offset; 09:00 alone loses comparison conditions. This is an original exercise instant, not a claimed private-server update. Calculate externally without assuming an in-app UTC converter.</p>
+<h2 id="再比较乙与两条原始字符串">Compare B after retaining both original strings</h2>
+<p>Set B updated to <code>2026-11-16T02:30:00Z</code>, already UTC and 90 minutes later than A’s 01:00. Comparing 09 against 02 alone incorrectly orders different clocks. Keep original strings beside normalized instants to distinguish copying from conversion errors. Direct string ordering needs matching offset/representation conditions; this example explicitly avoids that shortcut. Volume 1 being updated later than volume 2 does not automatically change story reading order to 2 then 1.</p>
+<h2 id="另核首次时间与跨日边界">Check an initial time across a date boundary</h2>
+<p>Give A published <code>2026-11-15T20:00:00Z</code>. In plus-eight time that is November 16 at 04:00, five hours before A’s 09:00 updated. Crossing 15 to 16 does not mean a two-day interval; normalize before subtraction. The interval connects declared events, not reading duration or drawing time. If actual updated precedes published, preserve the anomaly and inspect source clocks rather than silently swapping fields. Do not invent an instant from a timestamp lacking an offset by assuming your own region.</p>
+<p>For another rollover check, November 15 at 23:30:00-07:00 converts by adding seven hours to November 16 at 06:30:00Z, four hours after B’s 02:30:00Z. It is not seven hours earlier. Positive and negative offsets use the same relation, local=UTC+offset. Rearrange that relation rather than memorizing inconsistent shortcuts.</p>
+<h2 id="浏览时只核可见排序与作品身份">Browse visible sorting while checking work identity</h2>
+<p>With an authorized OPDS library, verify A/B titles and cover markers in ManYue before recording visible sorting controls and actual order. Missing timestamp display neither proves no parsing nor guarantees updated-based sorting. In the report PDF use separate arrows for temporal and volume order so differences remain explicit. Ordinary whole-package OPDS entries gain no direct page-reading capability from these fields; retain the published protocol boundary. This lesson studies metadata without changing download or reading protocols.</p>
+<p>Add a declared feed update of November 16 at 03:00:00Z, later than both entry updates. That does not mean every work changed at 03:00. Collection-level changes can concern its entry list; inspect publisher scope. If the interface merely says recent, record its level instead of swapping it with volume order or initial availability.</p>
+<h2 id="排查目录更新时间与时区缺失">Diagnose feed times and missing offsets</h2>
+<p>Identical copied times may come from feed updated instead of each entry’s value. A sixteen-hour error can result from adding eight instead of subtracting eight; a one-day error calls for checking midnight rollover. Server configuration or caching may need separate investigation, but one list order proves no unique cause. Retain original strings and parser behavior when correcting, rather than deleting offsets for superficial consistency. Share an original table and field paths while removing private URL tokens; credentials are unnecessary.</p>
+<h2 id="重开用两种顺序回答问题">Reopen and answer with two separate orders</h2>
+<p>Reopen the catalog/report, identify A/B by id and marker, then recalculate 01:00Z, 02:30Z, the 90-minute difference and A’s five-hour published-to-updated interval. Answer separately which declared instant is later, which volume comes first and what the current interface actually shows. Keep original reports, normalized columns and observations, marking unknown sort rules. Recheck semantics after changing server, offset or catalog version. A list order is not original publication order, and an updated timestamp does not guarantee new comic content.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/manyue-opds-next-feed-pagination-acquisition-scope/">Catalog pagination and content</a>; <a href="/en/guides/manyue-opds-pse-library/">OPDS reading scope</a>.</p>
+<p>Sources checked on 16 November 2026: <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261116">Apple public lookup</a> shows ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. Published reading capabilities appear in the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store listing</a>. Use controls actually available in the installed version.</p>
+<p>Method references: <a href="https://www.rfc-editor.org/rfc/rfc4287.html">RFC 4287 Atom date elements</a>; <a href="https://www.rfc-editor.org/rfc/rfc3339.html">RFC 3339 offsets and ordering</a>; <a href="https://specs.opds.io/opds-1.2">OPDS 1.2 specification</a>. Diagrams, numbers, counterexamples and recording arrangements are original exercises. Separate external preparation, paper expectations and actual reading results. Available documentation does not substitute for device observation, and no private-server or universal file-environment test is claimed.</p>
+
+{% endraw %}

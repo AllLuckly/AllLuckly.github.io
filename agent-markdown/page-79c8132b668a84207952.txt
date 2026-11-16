@@ -1,0 +1,82 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-circle-inversion-line-to-punctured-circle-five-pairs/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint circle inversion: map a line to a circle with its origin excluded'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-circle-inversion-line-to-punctured-circle-five-pairs/
+agent_source_sha256: b7ba55549083b76f8d97039320e739aa4bcc59d5caf99ba6bfff36edb8f43f73
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint circle inversion: map a line to a circle with its origin excluded
+
+Language: en
+Canonical: [VectorPaint circle inversion: map a line to a circle with its origin excluded](<https://allluckly.cn/en/guides/vectorpaint-circle-inversion-line-to-punctured-circle-five-pairs/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-circle-inversion-line-to-punctured-circle-five-pairs/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-circle-inversion-line-to-punctured-circle-five-pairs/>)
+Published: 2026-11-16T00:00:00+08:00
+Modified: 2026-11-16T10:45:15+08:00
+Author: Bison
+
+Transform five point pairs in a radius-four inversion and check rays, distance products and the excluded origin.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-circle-inversion-line-to-punctured-circle-five-pairs/>), translated on 2026-11-16. Original publication dates, attribution, code and version notes are retained.
+
+Manually invert five points on x=2 and place both sets in one coordinate system. Show how reciprocal distance changes position and why the origin on the image circle must be excluded. Calculate and prove the result externally; VectorPaint supplies shapes, guides, nodes and labels. Five examples do not make the app automatically derive a whole curve.
+
+## Set the centre, radius and allowed inputs
+
+Create a landscape sheet labelled O=(0,0), inversion radius R=4, and “input must not be O”. Original and image points lie on the same ray from O, with OP times OP′ equal to 16; do not take reciprocals of the two coordinates separately. Start with P=(2,0), whose image is (8,0): the nearer input moves farther away. Distinguish inputs, images and reference circle by three line styles, using colour only as an aid so intersections imply no extra conditions. Save a native working file and a separate blank coordinate sheet.
+
+## Build an auditable page at one scale
+
+Use a suggested 2400×1800 canvas, screen origin (800,900), and 140 pixels per mathematical unit on both axes. Screen Y points downward, so use the conversion below. Draw thin axes and unit ticks, then the reference circle centred at O with a 560-pixel screen radius. Put x=2 at screen X=1080 and dash its extensions; canvas edges are not mathematical endpoints. If corresponding numeric fields are unavailable, place guides and points manually and label the drawing approximate. Do not claim unseen formula-entry controls.
+
+```text
+R = 4; O = (0,0); input P != O
+T(x,y) = (16*x/(x*x+y*y), 16*y/(x*x+y*y))
+screen(X,Y) = (800+140*x, 900-140*y)
+```
+
+## Calculate five pairs without losing signs
+
+For every input compute d=x²+y², then multiply both coordinates by 16/d. Preserve the positive-negative pairs below. For (2,4), d=20 gives (1.6,3.2), rather than replacing 4 with one quarter. Reflection across the x-axis is preserved: a negative input y still gives negative output y, not the opposite ray. Check 8/5 and 16/5 on paper, then plot small points labelled with matching primed letters. Do not draw an attractive arc first and alter the calculated points to fit it.
+
+```text
+input     image          image screen
+A (2,0)   (8,0)          (1920,900)
+B (2,2)   (4,4)          (1360,340)
+C (2,-2)  (4,-4)         (1360,1460)
+D (2,4)   (1.6,3.2)      (1024,452)
+E (2,-4)  (1.6,-3.2)     (1024,1348)
+```
+
+## Check rays and distance products separately
+
+Join O to B=(2,2) and B′=(4,4). Both lie on the same first-quadrant ray; their distances are square roots of 8 and 32, whose product is 16. For D=(2,4) and D′=(1.6,3.2), the positive scale factor is 0.8, placing the image between O and the input. Keep a calculation for each pair: apparent collinearity does not establish the product condition. Points on the reference circle remain fixed, but this does not put every input on it or require the five connecting segments to have equal lengths. Compare distance AB=2 with A′B′=4√2. Their difference shows that inversion does not preserve general pairwise distance; rotating or reflecting the whole input layer cannot perform it. Correspondence connectors must use the calculated image endpoints, not match points by equal segment lengths.
+
+## Derive the image circle before drawing it
+
+Call an image point (u,v). From u=32/(4+y²) and v=16y/(4+y²), obtain u²+v²=8u, hence (u−4)²+v²=16. Add a circle with mathematical centre (4,0), radius 4, screen centre (1360,900) and radius 560. Use an outline so the original line and five pairs remain visible. The points are spot checks; the whole-line claim relies on this derivation for every finite y. Every non-origin point on the circle inverts back to x=2, so the image is not merely the short arc between the sampled points. For the converse, 16u/(u²+v²)=2 follows from the circle equation with u nonzero. Every point of this circle except O has u positive. Thus all remaining circle points have finite preimages, while the reverse argument cannot substitute O.
+
+## Mark the origin as an excluded point
+
+The image circle passes through O, but inversion is undefined there and no finite input maps to O. Overlay a small open marker and label “O excluded”; this denotes a missing point, not removal of a nearby arc. As the absolute value of y grows along the line, images approach O without reaching it for finite y. Ensure the caption distinguishes a limit from an attained output. Keep reference and image circles distinct: both have radius 4, but their centres are O and (4,0), at different positions.
+
+## Locate plotting faults by inverting back
+
+If B′ appears below the axis, inspect the screen-Y subtraction rather than change its mathematical y to negative. If D′ leaves its ray, check for different multipliers on x and y. If all images miss the circle, check whether 16 became 4. Invert D′ back: its squared distance is 12.8, giving multiplier 1.25 and input (2,4). Correct graphic placement or scale when the arithmetic is right; retain the table. Preserve a faulty-layer copy, restore the reference and recheck without moving the origin or changing only one axis scale to conceal errors.
+
+## Reopen and check pairs, exclusion and export
+
+Close and reopen the native file, recount five input and five image labels, confirm distinct centres, and retain the open O marker and caption. After exporting an SVG or PDF reading copy, inspect fine dashes, primes and minus signs. A smaller hole in a raster preview does not change the mathematical set. Deliver the coordinate table, screen scale, circle derivation and inverse spot check, identifying the manual drawing as approximate and the formulas as exact. Mark unperformed reopening or export as pending rather than claim this example was tested on a particular device. In the reading copy, keep D and E labels above and below respectively without occlusion by the input line. Make guides lighter than image markers. Hiding guides must still leave the inversion radius and excluded point identifiable in text, rather than hide essential conditions too.
+
+## Related tutorials and sources
+
+[VectorPaint translation and reflection: check each vertex coordinate and orientation](<https://allluckly.cn/en/guides/vectorpaint-coordinate-translation-reflection/>); [VectorPaint two tangents from an external point: check right angles and equal lengths](<https://allluckly.cn/en/guides/vectorpaint-external-point-circle-two-tangents/>).
+
+Method sources: [Union College: Frame, Bemis, Clancy and Cogevina, Circle Inversions](<https://www.math.union.edu/research/circleinversions/>).
+
+Version and operation scope: checked on 16 November 2026 against the [official VectorPaint listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261116-final5>): version 1.0.8, requiring iOS / iPadOS 17.0 or later. The listing describes shapes, pen and Bézier nodes, grids and guides, layers and text, plus native files and SVG, PDF and PNG output. Use controls actually visible in the installed version. Calculate formulas and solutions externally, then construct points manually. No automatic mathematical calculation or exhaustive physical-device testing is claimed.
+{% endraw %}

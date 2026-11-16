@@ -1,0 +1,78 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-bayes-source-posterior-sixty-four-area-units/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint Bayes source diagram: condition on red within sixty-four area
+  units'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-bayes-source-posterior-sixty-four-area-units/
+agent_source_sha256: 6551fcbcf5fbd0ce8d672e4c88a8c86f8bf80f1b7f6223e49b6fc6bb631c7494
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint Bayes source diagram: condition on red within sixty-four area units
+
+Language: en
+Canonical: [VectorPaint Bayes source diagram: condition on red within sixty-four area units](<https://allluckly.cn/en/guides/vectorpaint-bayes-source-posterior-sixty-four-area-units/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-bayes-source-posterior-sixty-four-area-units/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-bayes-source-posterior-sixty-four-area-units/>)
+Published: 2026-11-16T00:00:00+08:00
+Modified: 2026-11-16T10:45:15+08:00
+Author: Bison
+
+Convert priors and conditional proportions to equal-area cells, retain red outcomes and verify posterior one half instead of three quarters.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-bayes-source-posterior-sixty-four-area-units/>), translated on 2026-11-16. Original publication dates, attribution, code and version notes are retained.
+
+Draw a probability-area diagram for two sources, partitioning first by source weight and then by red versus non-red. After observing red, recompute source proportions only within the red subset. Sixty-four cells represent probability mass, not guaranteed frequencies in sixty-four trials. Probabilities are stipulated exercise conditions; the app displays manually calculated cells and annotations.
+
+## State source selection and colour conditions
+
+Let A and B be mutually exclusive, exhaustive sources with priors 1/4 and 3/4. Conditional red probabilities are 3/4 given A and 1/4 given B; the remaining probabilities are non-red. Imagine two boxes of four objects: A has three red and one non-red, B one red and three non-red. Choose a box with the stipulated weights, then an object uniformly within it. Ask for the probability of A after seeing red, not a uniform draw from pooled objects. Write these conditions above the graphic; equal box counts do not make their selection weights one half. A concrete source-selection model uses four equally likely selector positions, one labelled A and three B, followed by a uniform choice among the selected box’s four objects. Sixteen equally likely basic choices, each subdivided into four mass cells, produce the sixty-four-cell diagram.
+
+## Encode mass in sixty-four cells, not observations
+
+Create an 8×8 grid of equal cells, each representing probability 1/64. Give A the first two columns, 16 cells, and B the remaining six, 48 cells, for area ratio 1:3. Suggested cells are 90 pixels, making a 720×720 square anchored at screen (250,350) on an 1800×1500 canvas. Keep identical dimensions; widening A cells would invalidate counting. These are probability-mass units, obtainable by subdividing each of sixteen basic equal units into four, not sixty-four trials, independent observed samples or actual stored objects.
+
+## Colour conditional proportions inside each source
+
+Within A’s two columns, mark the upper six rows red, 12 cells, and lower two rows non-red, four cells. Within B’s six columns, mark upper two rows red, 12 cells, and lower six non-red, 36 cells. Equal red counts represent different conditional proportions, 3/4 and 1/4, because source denominators differ. Use red plus an R label, hatch non-red, and label source boundaries A and B rather than relying solely on colour. Count source totals 16 and 48 and all four regions to 64, excluding overlaps and omissions before conditioning.
+
+## Calculate four joint probabilities and total red
+
+Multiply priors by conditional probabilities: A and red is 3/16, A and non-red 1/16, B and red 3/16, B and non-red 9/16. These sum to one. Total red is 3/16+3/16=3/8, equivalent to 24/64. Put the ledger beside the area graphic with multiplication and addition on separate lines so B-red is not omitted. Independence is not assumed; conditional red rates differ. Do not instead multiply P(A) by overall red probability for the joint probability, or confuse an intersection with a conditional event.
+
+```text
+region        probability          units out of 64
+A and red     (1/4)*(3/4)=3/16       12
+A and nonred  (1/4)*(1/4)=1/16        4
+B and red     (3/4)*(1/4)=3/16       12
+B and nonred  (3/4)*(3/4)=9/16       36
+red total     3/16+3/16=3/8          24
+P(A | red)    (3/16)/(3/8)=1/2       12/24
+```
+
+## Reset the denominator within the red subset
+
+Keep the original and duplicate it for a conditional view, fading non-red cells without changing red areas. There are now 24 red cells, 12 from A, so P(A given red)=12/24=1/2, also (3/16)/(3/8). Below, draw equal-length A-red and B-red strips labelled 12; do not use whole-source areas 16 and 48 as the conditional denominator. Title this view “given red” so readers do not mistake the posterior for a changed prior. Equal posterior source probabilities apply to this evidence and model, not arbitrary new observations. Check odds as well: prior A:B odds are 1:3, and the red likelihood ratio A:B is 3:1, producing posterior odds 1:1. This must agree with the areas while retaining the positive-red-probability condition.
+
+## Label three different probabilities explicitly
+
+Use separate labels P(A)=1/4, P(red given A)=3/4 and P(A given red)=1/2. Their denominators are all probability mass, A-source mass and red mass respectively. Swapping sides of the conditioning bar is not an equality rule merely because both labels mention A and red. Check 12 red cells divided by A’s 16 gives 3/4, whereas A’s 12 divided by all 24 red cells gives 1/2. The conditioning event must have positive probability; 3/8 qualifies here. A zero-probability observation cannot use this ordinary ratio unchanged. As a separate non-red check, A has probability 4/(4+36)=1/10, not one half. This leaves the main red task unchanged while checking that conditioning changes the denominator. Relabelling the two equal red strips as non-red would be incorrect.
+
+## Troubleshoot boundaries, counts and denominators
+
+A result of 3/4 suggests using A’s 16 cells as denominator; 3/16 suggests stopping at a joint probability without dividing by total red. If A appears to occupy half the area, check column widths and the two-versus-six boundary rather than recolour cells to conceal a scale error. Correct one layer at a time, preserve its previous version, then recount all four regions and 24 red cells. Never force actual random trial counts into these fixed totals. This is an exact area model of stipulated probabilities; real estimation error needs separate treatment, not neat vector edges.
+
+## Reopen and distinguish original and conditional views
+
+Reopen the native file and verify 64 total cells, source counts A16 and B48, and 24 red cells. Retain the conditional title and two strips of 12. In a reading export, inspect hatching, R labels, fractions and conditioning bars; faint non-red regions must not obscure the original full extent. Deliver conditions, joint-probability ledger, both views and the posterior calculation, without claiming actual sampling or automatic probability computation. Leave unperformed export or reopening pending and keep an editable native file, rather than only a thumbnail hiding cell counts and denominators.
+
+## Related tutorials and sources
+
+[VectorPaint two-draw probability trees: connect replacement assumptions to four paths](<https://allluckly.cn/en/guides/vectorpaint-replacement-draw-probability-tree/>); [VectorPaint three-toss distribution: group eight sequences into one-three-three-one probability bars](<https://allluckly.cn/en/guides/vectorpaint-three-fair-tosses-binomial-count-probability-bars/>).
+
+Method sources: [Hossein Pishro-Nik, ProbabilityCourse §1.4.3: Bayes Rule](<https://www.probabilitycourse.com/chapter1/1_4_3_bayes_rule.php>); [Hossein Pishro-Nik, ProbabilityCourse §1.4.2: Total Probability](<https://www.probabilitycourse.com/chapter1/1_4_2_total_probability.php>).
+
+Version and operation scope: checked on 16 November 2026 against the [official VectorPaint listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261116-final5>): version 1.0.8, requiring iOS / iPadOS 17.0 or later. The listing describes shapes, pen and Bézier nodes, grids and guides, layers and text, plus native files and SVG, PDF and PNG output. Use controls actually visible in the installed version. Calculate formulas and solutions externally, then construct points manually. No automatic mathematical calculation or exhaustive physical-device testing is claimed.
+{% endraw %}

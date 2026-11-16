@@ -1,0 +1,94 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-hls-closed-captions-instream-subtitles-uri-groups/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay HLS caption groups: distinguish in-stream CC1 from a subtitle playlist
+  URI'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-hls-closed-captions-instream-subtitles-uri-groups/
+agent_source_sha256: 0964b40d82bb65e58aec5a416f50413f68f829187afb053df19613a3b15515c2
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay HLS caption groups: distinguish in-stream CC1 from a subtitle playlist URI
+
+Language: en
+Canonical: [iCouldPlay HLS caption groups: distinguish in-stream CC1 from a subtitle playlist URI](<https://allluckly.cn/en/guides/icouldplay-hls-closed-captions-instream-subtitles-uri-groups/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-hls-closed-captions-instream-subtitles-uri-groups/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-hls-closed-captions-instream-subtitles-uri-groups/>)
+Published: 2026-11-16T00:00:00+08:00
+Modified: 2026-11-16T11:04:39+08:00
+Author: Bison
+
+Trace two EXT-X-MEDIA types through variant references and distinguish INSTREAM-ID, subtitle playlist and VTT without assuming rendering support.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-hls-closed-captions-instream-subtitles-uri-groups/>), translated on 2026-11-16. Original publication dates, attribution, code and version notes are retained.
+
+A CC1 string and a subtitle address name different layers. Build a three-file reference from an original master, subtitle media playlist and short VTT, tracing in-stream captions and an external subtitle group. Record only selections and text actually available in iCouldPlay, without treating a declared group as successful decoding on every device.
+
+## Name three files and their roles separately
+
+Prepare master, captions-en.m3u8 and captions-0.vtt as separate external reading files. The referenced video.m3u8 and real media are not supplied, so these texts alone cannot play. For an existing complete owned test source, record edition, duration and available caption paths, using media at least six seconds long. Separate file visibility, correct links and displayed text; a listed VTT is no loading proof. Hold video and orientation fixed and compare caption sources without simultaneously changing audio or edition.
+
+## Read both MEDIA types in the master
+
+The CLOSED-CAPTIONS entry belongs to cc-in, names CC1 with INSTREAM-ID and has no URI. SUBTITLES belongs to text-out, points to a subtitle media playlist and has no INSTREAM-ID. Variant attributes reference groups, not NAME. The hypothetical H.264/AAC/WebVTT combination uses wvtt as documented by Apple; it supplies no verified bytes. Shared language en does not establish identical wording, and actual in-stream caption content remains unavailable in this sample.
+
+```text
+#EXTM3U
+#EXT-X-VERSION:4
+#EXT-X-MEDIA:TYPE=CLOSED-CAPTIONS,GROUP-ID="cc-in",NAME="English CC",LANGUAGE="en",DEFAULT=NO,AUTOSELECT=NO,INSTREAM-ID="CC1"
+#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="text-out",NAME="English text",LANGUAGE="en",DEFAULT=NO,AUTOSELECT=NO,FORCED=NO,URI="captions-en.m3u8"
+#EXT-X-STREAM-INF:BANDWIDTH=900000,CODECS="avc1.4d401e,mp4a.40.2,wvtt",CLOSED-CAPTIONS="cc-in",SUBTITLES="text-out"
+video.m3u8
+```
+
+## Treat CC1 as a service identifier, not a file
+
+CC1 is one CEA608 channel identifier, not segment one, cue one or an extension. Data must exist inside media; a MEDIA declaration cannot burn VTT text into video. CLOSED-CAPTIONS must not carry URI, so appending captions-0.vtt is no repair. Do not transfer INSTREAM-ID to SUBTITLES. SERVICE3 has another compatibility-version condition; this master uses CC1 only. Audit field ownership without assuming a particular engine exposes decoding or selection controls.
+
+## Follow the subtitle URI through its playlist
+
+The second URI first reaches the subtitle media playlist below, whose segment URI then reaches VTT. Keep both layers separate. This ended reading sample contains one six-second segment, not visible wording every second. Resolve each relative address against its own containing file, especially across directories. Replacing the MEDIA URI with bare VTT changes its role despite both concerning captions. Preserve normally generated structures for real media rather than experiment on production addresses.
+
+```text
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:6
+#EXT-X-MEDIA-SEQUENCE:0
+#EXTINF:6,
+captions-0.vtt
+#EXT-X-ENDLIST
+```
+
+## Check VTT cue time against segment duration
+
+The VTT has a WEBVTT header and one original cue from one to four seconds. The six-second segment leaves an initial second and time after four without this cue; do not extend it to six merely to match the segment. Duration 4−1=3 is unrelated to CC1 or en. This is no reconstruction of in-stream captions. Real segmented VTT also needs correct timing mapping and synchronisation evidence. With no media timestamps, audit text and paper intervals without claiming full audiovisual synchronisation.
+
+```text
+WEBVTT
+
+00:00:01.000 --> 00:00:04.000
+Read this optional text.
+```
+
+## Observe available caption paths separately
+
+With a real source, record initial caption state and play from before the cue. If the interface distinguishes sources, select each separately and record name, complete wording and approximate interval instead of judging an indistinguishable overlay. Record a single entry or absent CC control honestly without invented menus. Displayed VTT cannot certify in-stream decoding, or vice versa. Permanently visible words may be burned into video and need separate checking. Field inspection does not replace observation, and unperformed paths remain unperformed.
+
+## Diagnose type and reference mismatches first
+
+Fault copies can add URI to CLOSED-CAPTIONS or remove it from SUBTITLES, producing field-audit failures without requiring one particular player error. Compare variant references with GROUP-ID exactly before adjusting font size. For absent VTT, separate subtitle-playlist access, VTT retrieval, timing and selection rather than blame CC1 for everything. Preserve originals and single changes. Similar names do not erase TYPE/path distinctions or justify declaring one entry redundant and deleting it.
+
+## Reopen with two paths and three file roles
+
+Reopen all three files and trace cc-in→CC1 and text-out→subtitle playlist→text resource. Verify no URI on the former and required URI without INSTREAM-ID on the latter. Add real observations only if performed; reenter the same source and inspect selection rather than assume persistence. Deliver role diagram, fields, three-second arithmetic and unknown media content. A six-second segment is not six-second continuous visibility. Traceable links and observations do not certify every service, format, device or iCouldPlay path.
+
+## Related tutorials and sources
+
+[iCouldPlay subtitle origins: distinguish embedded tracks from external files](<https://allluckly.cn/en/guides/icouldplay-embedded-external-subtitle-origin-map/>); [iCouldPlay HLS variants: map the master playlist, variants and media segments](<https://allluckly.cn/en/guides/icouldplay-hls-master-variant-media-map/>).
+
+Method sources: [RFC8216 §4.3.4.1](<https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.1>); [RFC8216 §4.3.4.2.1](<https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.2.1>); [Apple HLS authoring: WebVTT identifier](<https://developer.apple.com/streaming/hls-authoring-specification-for-apple-devices.html>).
+
+Checked on 16 November 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261116>) list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare samples manually in external plain text; iCouldPlay selects an existing real source for playback observations through installed controls. Placeholder URIs provide no media. Keep syntax, paper calculations and playback separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.
+{% endraw %}

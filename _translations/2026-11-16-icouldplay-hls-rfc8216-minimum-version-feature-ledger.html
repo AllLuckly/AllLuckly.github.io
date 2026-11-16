@@ -1,0 +1,113 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay HLS compatibility versions: calculate minima from feature combinations'
+description: Audit five separate RFC 8216 examples requiring 3, 4, 5, 6, 7 without confusing playlist compatibility
+  with app or latest-protocol versions.
+permalink: /en/guides/icouldplay-hls-rfc8216-minimum-version-feature-ledger/
+date: '2026-11-16 00:00:00 +08:00'
+modified: '2026-11-16 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 178
+topic: Playlist declarations and playback conditions
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-16-icouldplay-hls-rfc8216-minimum-version-feature-ledger.md
+source_url: /guides/icouldplay-hls-rfc8216-minimum-version-feature-ledger/
+translation_method: editorial
+translation_source_sha256: 7459198cc469530a7e5059a2b65e18921b2f5d7f5962504638180b83254f6bdb
+translation_date: '2026-11-16T02:52:10+00:00'
+excerpt: Audit five separate RFC 8216 examples requiring 3, 4, 5, 6, 7 without confusing playlist compatibility
+  with app or latest-protocol versions.
+---
+{% raw %}
+<p>A larger VERSION does not supply missing resources, and a lower number does not simplify media. Within RFC 8216 section 7, build a minimum-compatibility ledger from five independent reading samples. This is no inventory of every current HLS extension or guarantee that an iCouldPlay path decodes a declared version.</p>
+
+<h2 id="section-1">Define scope and five independent files</h2>
+
+<p>Make five external cards A–E, each beginning with its own EXTM3U, not five VERSION tags in one file. Record playlist role, features, requirements and resulting declaration. App 1.1.1 is no HLS compatibility level. RFC 8216 was published in 2017; this task covers its stated rules, without calling 7 the limit of every current HLS specification. No actual media is supplied. Real playback additionally needs bytes, dependencies and client capability, so complete text is not a prefilled pass.</p>
+
+<h2 id="section-2">Use floating durations to require 3 in A</h2>
+
+<p>A is an ended one-segment media playlist with EXTINF 4.5, requiring at least 3 here. Target duration 5 satisfies the rounded duration bound but does not cause the compatibility minimum. Do not copy target 5 into VERSION. Lowering the declaration to 2 while retaining floating duration does not remove the requirement. Base corrections on actual content and the specification rather than bypass an unsupported client. Correct minima still establish neither real 4.5-second bytes nor playback.</p>
+
+<pre><code class="language-text">#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:5
+#EXTINF:4.5,
+float-a.ts
+#EXT-X-ENDLIST
+</code></pre>
+
+<h2 id="section-3">Use byte ranges to require 4 in B</h2>
+
+<p>B has two four-second entries using 1000 bytes at 0 and 1000 bytes at 1000 of one resource. BYTERANGE requires at least 4. Inclusive ranges are 0–999 and 1000–1999, adjacent and disjoint; they are byte positions, not frames or seconds. Record minimum 4 separately from total 8 seconds. Deleting BYTERANGE while repeating the resource name changes segment references rather than merely lowering a version. Keep the sample intact instead of replacing structural inspection with suffix or number edits.</p>
+
+<pre><code class="language-text">#EXTM3U
+#EXT-X-VERSION:4
+#EXT-X-TARGETDURATION:4
+#EXTINF:4,
+#EXT-X-BYTERANGE:1000@0
+media.ts
+#EXTINF:4,
+#EXT-X-BYTERANGE:1000@1000
+media.ts
+#EXT-X-ENDLIST
+</code></pre>
+
+<h2 id="section-4">Combine I-frame-only and MAP requirements in C</h2>
+
+<p>C declares I-FRAMES-ONLY and MAP. Their requirements here are at least 4 and 5, so the combined minimum is the higher value 5, not 4+5=9. No initialization or I-frame bytes are supplied, and suffixes do not certify container structure. This is a tag-combination audit. A four-second I-frame interval is no four-second continuous action. Removing the I-frame-only declaration changes the MAP condition and calls for recalculation.</p>
+
+<pre><code class="language-text">#EXTM3U
+#EXT-X-VERSION:5
+#EXT-X-TARGETDURATION:4
+#EXT-X-I-FRAMES-ONLY
+#EXT-X-MAP:URI=&quot;iframe-init.mp4&quot;
+#EXTINF:4,
+iframe-a.m4s
+#EXT-X-ENDLIST
+</code></pre>
+
+<h2 id="section-5">Require 6 for MAP without I-frame-only in D</h2>
+
+<p>D also has MAP but lacks I-FRAMES-ONLY, requiring at least 6 under section 7. Circle the absence condition instead of treating every MAP as minimum 5. Initialization is not another timed media item needing EXTINF; the actual entry below has four seconds. Copying C’s 5 into D is the intended fault, which mp4/m4s suffixes cannot repair. Other format requirements may apply. These five cards audit selected conditions, not every output format or tag.</p>
+
+<pre><code class="language-text">#EXTM3U
+#EXT-X-VERSION:6
+#EXT-X-TARGETDURATION:4
+#EXT-X-MAP:URI=&quot;init.mp4&quot;
+#EXTINF:4,
+fragment-a.m4s
+#EXT-X-ENDLIST
+</code></pre>
+
+<h2 id="section-6">Require 7 for a master using SERVICE in E</h2>
+
+<p>E is a master whose caption INSTREAM-ID is SERVICE3, requiring at least 7 here. Three names a CEA708 service block, not segment 3, and not every master inherently requires 7. The entry has no URI because caption data belongs in the corresponding media; a declaration creates no bytes. Changing to CC1 does not prove every remaining requirement falls to 1: re-audit the master and references. This illustrates one compatibility condition, without claiming actual readable SERVICE3 data.</p>
+
+<pre><code class="language-text">#EXTM3U
+#EXT-X-VERSION:7
+#EXT-X-MEDIA:TYPE=CLOSED-CAPTIONS,GROUP-ID=&quot;cc-service&quot;,NAME=&quot;Service three&quot;,DEFAULT=NO,AUTOSELECT=NO,INSTREAM-ID=&quot;SERVICE3&quot;
+#EXT-X-STREAM-INF:BANDWIDTH=900000,CODECS=&quot;avc1.4d401e,mp4a.40.2&quot;,CLOSED-CAPTIONS=&quot;cc-service&quot;
+video.m3u8
+</code></pre>
+
+<h2 id="section-7">Separate declarations from real playback observations</h2>
+
+<p>For an owned source, identify role, list applicable conditions and meet their highest minimum. Higher declarations imply no better quality. RFC clients unsupported at the declared version must not attempt playback; lowering the tag is no universal workaround. Observe startup, sequential playback and ending on an available iCouldPlay path without inventing engine-version diagnostics. Keep version, resource access and decoding results separate. Preserve failures rather than change encoding, URIs and version together and lose causal evidence.</p>
+
+<h2 id="section-8">Reopen and verify 3, 4, 5, 6, 7 by card</h2>
+
+<p>Reopen each card and reconstruct floating 3, range 4, I-frame MAP 5, non-I-frame MAP 6 and SERVICE master 7. Verify one VERSION each, no master/media tag mixing and no concatenated examples. Deliver role, feature, minimum and actual playback or unperformed status, not a complete modern-version catalogue. Added KEYFORMAT or other extensions need their own evidence rather than another copied number. A declaration is neither transcoding, supplied dependencies nor an installed app update.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/icouldplay-hls-map-initialization-media-segment-ledger/">iCouldPlay HLS initialization: separate EXT-X-MAP from timed media segments</a>; <a href="/en/guides/icouldplay-hls-iframe-only-interval-preview-boundary/">iCouldPlay HLS I-frame playlists: one frame entry is not four seconds of continuous action</a>.</p>
+
+<p>Method sources: <a href="https://www.rfc-editor.org/rfc/rfc8216#section-7">RFC8216 §7</a>; <a href="https://www.rfc-editor.org/rfc/rfc8216#section-4.3.1.2">RFC8216 §4.3.1.2</a>.</p>
+
+<p>Checked on 16 November 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261116">Apple public lookup</a> list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare samples manually in external plain text; iCouldPlay selects an existing real source for playback observations through installed controls. Placeholder URIs provide no media. Keep syntax, paper calculations and playback separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.</p>
+{% endraw %}

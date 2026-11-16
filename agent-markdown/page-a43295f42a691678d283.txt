@@ -1,0 +1,83 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-ass-transform-relative-time-acceleration-scale-model/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay ASS transforms: audit a scale window and acceleration'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-ass-transform-relative-time-acceleration-scale-model/
+agent_source_sha256: fcf4061f39176fb06f49e242126dd4ed5a1cbc377fa4480c41c4fcf948d0c793
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay ASS transforms: audit a scale window and acceleration
+
+Language: en
+Canonical: [iCouldPlay ASS transforms: audit a scale window and acceleration](<https://allluckly.cn/en/guides/icouldplay-ass-transform-relative-time-acceleration-scale-model/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-transform-relative-time-acceleration-scale-model/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-transform-relative-time-acceleration-scale-model/>)
+Published: 2026-11-16T00:00:00+08:00
+Modified: 2026-11-16T09:40:13+08:00
+Author: Bison
+
+Compare linear and squared progress using identical text while separating cue times, style expectations and observations.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-ass-transform-relative-time-acceleration-scale-model/>), translated on 2026-11-16. Original publication dates, attribution, code and version notes are retained.
+
+Wider text need not be moving. ASS t transforms animate eligible style properties using milliseconds relative to the event start. Build two horizontal-scale controls, calculate intermediate values and observe the available iCouldPlay path. External authoring is not an animation editor claimed for the player.
+
+## Prepare a twelve-second source and initial style
+
+Retain an owned clip at least twelve seconds long, duration and subtitle path, preserving prior captions. Fix the640×360 script, font size 36 and initial horizontal/vertical scale 100%. Record absolute cue seconds, relative milliseconds, horizontal scale and observed state separately. Hold fitting, orientation and playback speed fixed; volume or video speed is not a substitute for subtitle styling.
+
+## Save complete linear and squared-progress cues
+
+Events 1–5 and6–10 use identical wording and placement. Both change horizontal scale 100→150 over relative0–2000ms; acceleration is 1 and2 respectively. Save UTF-8 transform.ass and reopen, preserving ASCII syntax. Vertical scale stays fixed and no move is specified. The t tag does not invent a trajectory or endlessly repeating animation.
+
+```text
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,36,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,7,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:05.00,Default,,0,0,0,,{\an5\pos(320,180)\fscx100\fscy100\t(0,2000,1,\fscx150)}Scale sample.
+Dialogue: 0,0:00:06.00,0:00:10.00,Default,,0,0,0,,{\an5\pos(320,180)\fscx100\fscy100\t(0,2000,2,\fscx150)}Scale sample.
+```
+
+## Add the event start to the transform window
+
+The first transform occupies media1–3s and holds at target during 3–5. The second changes at 6–8 and holds8–10. Identical relative millisecond values correspond to absolute times five seconds apart. List all intervals. The target scale does not keep text onscreen after its event; entering another event does not inherit the former event’s progress.
+
+## Calculate both intermediate scales independently
+
+At halfway through the window, fraction is 0.5. Acceleration1 gives100+50×0.5=125%; acceleration2 gives100+50×0.25=112.5%. These occur at media2s and7s for the respective events. They are scale percentages, not measured device-pixel widths. Acceleration2 changes progress shape without halving the total duration.
+
+## Observe start, middle and hold by sequential playback
+
+Load through available controls and play sequentially, checking text first and then each start/change/hold. Pausing can assist, but uncertain timing needs an observation range rather than an invented measured width. Font differences undermine comparison before they establish a curve error. Record text loading and animated scale separately as observed, absent or unperformed.
+
+## Recalculate quarter and three-quarter progress
+
+At quarter progress, scales are112.5% and103.125%; at three quarters,137.5% and128.125%. Both reach150% at the window end. The squared curve is slower initially, not unable to reach target. This model uses positive parameters; it establishes no behaviour for invalid ones. Keep calculations separate from timestamp uncertainty and actual screenshots. A separate1000–3000ms window moves the first change to media2–4s. At2.5s its fraction is now one quarter, giving112.5% and103.125%;do not reuse the original window’s progress.
+
+## Diagnose initial value, scope and eligible tags
+
+For an initially wide line, check fscx100 and copy identity. For no change, inspect t scope, milliseconds and rendering capability. Inserting an ineligible tag such as org is not a useful compatibility test. Unexpected height calls for checking fscy/font size. Change one condition and retain failures; identical wording does not replace an initial-style/font record.
+
+## Reopen and deliver the time/scale ledger
+
+Reopen and reselect the original, checking both intervals and holds before restoring prior captions. Deliver initial style, relative/absolute windows, three progress examples, actual observations and version. A computed112.5% is not a physical-device measurement. Recalculate changed targets/windows rather than reuse times. No video encoding, recording speed or audio pitch was changed.
+
+## Related tutorials and sources
+
+[Movement windows](<https://allluckly.cn/en/guides/icouldplay-ass-move-line-relative-millisecond-window/>), [Style reset](<https://allluckly.cn/en/guides/icouldplay-ass-reset-inline-style-inheritance/>).
+
+Method source: [Aegisub ASS tags](<https://aegisub.org/docs/latest/ass_tags/>).
+
+Checked on November 16, 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261116>) list 1.1.1, requiring iOS / iPadOS 15.0. Prepare exercise materials externally; iCouldPlay selects an available source and supplies playback observations. Follow installed controls. No unperformed physical-device or private-server testing is claimed.
+{% endraw %}

@@ -1,0 +1,81 @@
+---
+layout: null
+permalink: /guides/icouldplay-ass-transform-relative-time-acceleration-scale-model/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映 ASS 样式变换：用横向缩放核毫秒窗口与加速参数
+agent_source_url: https://allluckly.cn/guides/icouldplay-ass-transform-relative-time-acceleration-scale-model/
+agent_source_sha256: be617430ace7283936d54eea31f266fd40e5e31aea0a3b7c73fb1917d3d6b043
+agent_generator_version: 1
+---
+{% raw %}# 云映 ASS 样式变换：用横向缩放核毫秒窗口与加速参数
+
+语言：zh-CN
+原文：[云映 ASS 样式变换：用横向缩放核毫秒窗口与加速参数](<https://allluckly.cn/guides/icouldplay-ass-transform-relative-time-acceleration-scale-model/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-transform-relative-time-acceleration-scale-model/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-transform-relative-time-acceleration-scale-model/>)
+发布于: 2026-11-16T00:00:00+08:00
+内容更新于: 2026-11-16T00:00:00+08:00
+署名：Bison
+
+以两条相同文字比较线性与二次进度，保留事件时刻、样式预期和实际观察。
+
+字幕变宽不一定是它在画面中移动。ASS的t可以对可动画的样式属性作渐变，时间是相对该事件起点计算的毫秒。本课使用横向缩放建立两条对照，先算中间值，再在云映观察当前加载路径；不会把这些外部制作步骤说成播放器提供了动画编辑器。
+
+## 准备十二秒片源和初始样式
+
+保留至少十二秒的自有视频，记录实际时长和选中的字幕路径，原有字幕不覆盖。脚本画布固定六百四十乘三百六十，初始横向与纵向缩放都是百分之一百，字号三十六。准备一张记录卡，分列事件绝对秒、相对毫秒、横向比例与可见状态。不要用设备音量或视频倍速来模拟样式变宽；先固定画面适应、方向与播放速度，才能把变化归到当前这份字幕的明确设置上。
+
+## 保存线性与二次进度两条完整稿
+
+下方第一条从一至五秒出现，第二条六至十秒，二者文本和定位完全相同。两条都在相对零至两千毫秒把横向缩放从一百变成一百五十；第一条加速参数为一，第二条为二。保存UTF-8的transform.ass并重开核内容，保留花括号内的反斜线、逗号和括号。纵向比例没有改变，文字也没有设置move；读到t不应自行补出移动轨迹或无限循环动画。
+
+```
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,36,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,7,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:05.00,Default,,0,0,0,,{\an5\pos(320,180)\fscx100\fscy100\t(0,2000,1,\fscx150)}Scale sample.
+Dialogue: 0,0:00:06.00,0:00:10.00,Default,,0,0,0,,{\an5\pos(320,180)\fscx100\fscy100\t(0,2000,2,\fscx150)}Scale sample.
+```
+
+## 把事件起点加入样式时间窗
+
+第一条的变化阶段是影片一至三秒，随后三至五秒保持目标比例；第二条的变化阶段是六至八秒，随后八至十秒保持。两条虽然使用同一组毫秒数，绝对时刻相差五秒。将四个区间分别列出，不能直接去影片第二秒寻找第二条的结束状态。到事件末尾以后应看下一条或空档，目标比例不代表文字永远留在屏幕；重新进入事件时，也不能把上一条样式进度当新条目已完成的状态。
+
+## 独立计算两种中间比例
+
+在变化窗口经过一半时，进度分数为零点五。参数一使用这份进度，横向比例为一百加五十乘零点五，得到一百二十五。参数二把进度平方后使用，得到一百加五十乘零点二五，即一百一十二点五。它们对应第一条第二秒和第二条第七秒，各从自己的事件起点算。这里比较缩放百分数，不是报告设备上量到一百二十五个像素，也不把加速参数二说成总时长减半。
+
+## 先顺播记录开头、中间与停留
+
+在云映按实际可用入口选择文件并顺播，先看普通文字能否出现，再记录各自开始、变化和停留的现象。可以暂停辅助核对，但精确中间时刻若难以落到，应记录观察范围，不给未经测量的宽度填入计算值。两条之间若字体回退不同，应先处理可比条件，不能据此判定加速曲线错误。没有当前样式渲染能力时，可将文本加载与横向渐变分栏，分别写通过、未呈现或未执行。
+
+## 用四分之一与四分之三复算
+
+进度四分之一时，线性比例是一百一十二点五，二次进度为一百零三点一二五；进度四分之三时，线性比例是一百三十七点五，二次为一百二十八点一二五。两种方式都在窗口结束时达到一百五十，而不是二次曲线始终到不了终点。写清本课参数为正，不能据这个模型保证所有不合法参数都有同样行为。新增算例先留纸面，若要实际截图另记时点和误差，不替软件生成不存在的测量报告。另将窗口单独改成一千至三千毫秒时，第一条的变化移到影片二至四秒；二点五秒才处于新窗口四分之一，而不是沿用原来的进度。纸面应重新得到线性一百一十二点五、二次一百零三点一二五，原稿和新条件不可混用。
+
+## 按初值、范围和支持标签排查
+
+若开头已经很宽，先核初始fscx是否为一百以及是否选错文件；如果全程不变，核t括号范围、时间单位和当前渲染路径。不要往t里面随便加org或其他不可动画标签，再用没有效果推断全部字幕损坏。若纵向也变高，检查是否误改fscy或字号，而非只看整体大小。每次修一个条件，保留原稿和失败稿；相同文字可以帮助比较，却不能代替对初始样式及实际字体的明确记录。
+
+## 重开交付时间与比例对照表
+
+重开原片并重选源稿，核两条各自的区间与目标停留，最后恢复原字幕。交付初始样式、相对窗口、绝对时段、三组进度算例、实际现象与版本。能算出一百一十二点五不表示真机已量得同样数字，不能把数学验收与样式兼容合并。以后改变目标比例或窗口长度，应从新条件重算，不复用旧的中间时刻；本课没有调整影片编码、真实拍摄速度或声音音高。
+
+## 相关教程与资料
+
+[移动窗口](<https://allluckly.cn/guides/icouldplay-ass-move-line-relative-millisecond-window/>)、[样式复位](<https://allluckly.cn/guides/icouldplay-ass-reset-inline-style-inheritance/>)。
+
+方法来源：[Aegisub ASS tags](<https://aegisub.org/docs/latest/ass_tags/>)。
+
+资料核对：2026年11月16日，[云映官方商店](<https://apps.apple.com/cn/app/id6755653178>)与[Apple公开查询](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261116>)列出1.1.1，最低iOS / iPadOS15.0。练习材料在外部准备，云映负责实际来源选择和播放观察；以安装版可见入口为准，不声明已执行真机或私人服务器逐项测试。
+{% endraw %}

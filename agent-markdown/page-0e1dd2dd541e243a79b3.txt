@@ -6,7 +6,7 @@ noindex: true
 lang: zh-CN
 title: 云映 iCouldPlay 教程：本地视频、NAS 与字幕
 agent_source_url: https://allluckly.cn/guides/icouldplay/
-agent_source_sha256: 889377d9a9c627a448b94b431a1a940d0a982fa9f2d734d575c93160f2904dd2
+agent_source_sha256: 207f7fe479c73016ba07ecec7de137b12c62bc32c3499b8f7f3e0070b4ae9d4a
 agent_generator_version: 1
 ---
 {% raw %}# 云映 iCouldPlay 教程：本地视频、NAS 与字幕
@@ -16,7 +16,7 @@ agent_generator_version: 1
 中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay/>)
 English: [English HTML](<https://allluckly.cn/en/guides/icouldplay/>)
 
-学习路线 · 170 篇
+学习路线 · 180 篇
 
 从本地视频开始，连接 NAS 与媒体服务器，整理电影和剧集，再核对字幕、音轨与播放兼容。
 
@@ -1050,6 +1050,66 @@ English: [English HTML](<https://allluckly.cn/en/guides/icouldplay/>)
 170. ### [云映 声音量值对照：相同峰值为何有不同RMS](<https://allluckly.cn/guides/icouldplay-audio-rms-peak-window-duty-cycle-model/>)
 
      手算四样本序列的均方根，再用同一窗口记录真实素材，分开峰值、持续能量与主观响度。
+
+     约 10 分钟
+
+## 字幕形状与样式计算
+
+用向量轮廓、旋转原点、样式变换、描边与换行策略，核脚本要求和实际呈现。
+
+171. ### [云映 ASS 图形字幕：用绘图模式核对矩形与文字范围](<https://allluckly.cn/guides/icouldplay-ass-vector-drawing-mode-polygon-text-scope/>)
+
+     保存一份完整图形字幕，核对路径、闭合与绘图开关，再观察实际加载。
+
+     约 10 分钟
+172. ### [云映 ASS 旋转原点：把定位锚点与转轴位置分开](<https://allluckly.cn/guides/icouldplay-ass-rotation-origin-position-anchor-quarter-turn/>)
+
+     用三条旋转对照核固定原点、默认原点与四分之一转的纸面坐标。
+
+     约 10 分钟
+173. ### [云映 ASS 样式变换：用横向缩放核毫秒窗口与加速参数](<https://allluckly.cn/guides/icouldplay-ass-transform-relative-time-acceleration-scale-model/>)
+
+     以两条相同文字比较线性与二次进度，保留事件时刻、样式预期和实际观察。
+
+     约 10 分钟
+174. ### [云映 ASS 描边宽度：分别核横向、纵向与统一覆盖](<https://allluckly.cn/guides/icouldplay-ass-directional-border-width-reset-components/>)
+
+     用三条相同文字核xbord、ybord及后置bord，不把描边宽度当字体缩放。
+
+     约 10 分钟
+175. ### [云映 ASS 换行策略：用q1、q2与显式换行核可读范围](<https://allluckly.cn/guides/icouldplay-ass-wrap-style-automatic-break-explicit-newline/>)
+
+     固定文字、边距与字号，分别检查自动断行、禁止自动断行和源文指定断行。
+
+     约 10 分钟
+
+## 清单声明与播放条件
+
+区分会话数据、间断序号、版本要求、字幕组与声道字段的范围。
+
+176. ### [云映 HLS 会话资料核对：数据标识、语言与外部JSON分别记录](<https://allluckly.cn/guides/icouldplay-hls-session-data-id-language-value-uri-record/>)
+
+     读取三条SESSION-DATA，检查唯一组合、二选一载体与JSON引用，不把节目资料当字幕。
+
+     约 10 分钟
+177. ### [云映 HLS 间断序号核对：删掉边界后为何要递增基值](<https://allluckly.cn/guides/icouldplay-hls-discontinuity-sequence-base-removal-invariant/>)
+
+     对照三份窗口，用基值加前置标记数复算留存分片，不把间断编号当秒数。
+
+     约 10 分钟
+178. ### [云映 HLS 兼容版本核对：按标签组合分别计算最低要求](<https://allluckly.cn/guides/icouldplay-hls-rfc8216-minimum-version-feature-ledger/>)
+
+     用五份独立清单审核RFC8216的3、4、5、6、7要求，不把VERSION当应用版本或当前协议最新版。
+
+     约 10 分钟
+179. ### [云映 HLS 字幕组跟读：CC1在流内，字幕清单另有URI](<https://allluckly.cn/guides/icouldplay-hls-closed-captions-instream-subtitles-uri-groups/>)
+
+     追两种EXT-X-MEDIA到变体引用，分清INSTREAM-ID、字幕清单与VTT文本，不虚构显示兼容。
+
+     约 10 分钟
+180. ### [云映 HLS 声道字段核对：CHANNELS最大数不等于轨数或扬声器数](<https://allluckly.cn/guides/icouldplay-hls-audio-channels-maximum-count-not-track-output/>)
+
+     用同编码两种声道数审核CHANNELS必填条件，分开组数、条目数、媒体通道与实际输出。
 
      约 10 分钟
 {% endraw %}

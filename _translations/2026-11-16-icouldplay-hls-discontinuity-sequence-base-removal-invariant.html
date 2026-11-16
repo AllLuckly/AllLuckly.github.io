@@ -1,0 +1,110 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay HLS discontinuity sequences: preserve numbers when a boundary leaves the window'
+description: Compare three windows and recompute retained segment numbers from base plus preceding markers, separately
+  from seconds.
+permalink: /en/guides/icouldplay-hls-discontinuity-sequence-base-removal-invariant/
+date: '2026-11-16 00:00:00 +08:00'
+modified: '2026-11-16 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 177
+topic: Playlist declarations and playback conditions
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-16-icouldplay-hls-discontinuity-sequence-base-removal-invariant.md
+source_url: /guides/icouldplay-hls-discontinuity-sequence-base-removal-invariant/
+translation_method: editorial
+translation_source_sha256: ec79b8a03a8ce842b5d12e7442f76ec51a767fd30c8c0ba8313f9581fc721c0b
+translation_date: '2026-11-16T02:09:12+00:00'
+excerpt: Compare three windows and recompute retained segment numbers from base plus preceding markers, separately
+  from seconds.
+---
+{% raw %}
+<p>A new first segment does not justify arbitrarily resetting discontinuity numbering. Audit three snapshots with declared base, preceding-marker count and media sequence in separate columns. These are reading samples; record real iCouldPlay playback independently without assuming a visible low-level field or a fixed pause implied by a number.</p>
+
+<h2 id="section-1">Fix snapshot identity and counting scope</h2>
+
+<p>Preserve A/B acquisitions of the same owned media playlist without overwriting originals, or use the paper snapshots. Define discontinuity number as DISCONTINUITY-SEQUENCE base plus markers preceding that segment URI, counted in file order rather than inferred from scene cuts. Keep MEDIA-SEQUENCE separately. Declared base 20 establishes no earlier story, wall time or twenty observed events; use it only as the supplied integer. This scope permits checking retained-segment numbering.</p>
+
+<h2 id="section-2">Count four segments and one marker in A</h2>
+
+<p>A lists a–d from media sequence 400, four seconds each, with base 20 and one marker before b. Pair each EXTINF with its URI; the marker is no fifth segment. This updating-window model has no ENDLIST, VOD or EVENT declaration because content will leave. Names supply no media bytes or live service. Copy order and fields without editing production tags. An actual ended source retains its own role instead of being forced into this update model.</p>
+
+<pre><code class="language-text">#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:4
+#EXT-X-MEDIA-SEQUENCE:400
+#EXT-X-DISCONTINUITY-SEQUENCE:20
+#EXTINF:4,
+a.ts
+#EXT-X-DISCONTINUITY
+#EXTINF:4,
+b.ts
+#EXTINF:4,
+c.ts
+#EXTINF:4,
+d.ts
+</code></pre>
+
+<h2 id="section-3">Give each segment three distinct numbers</h2>
+
+<p>Assign media numbers 400–403, discontinuity numbers 20, 21, 21, 21 and local intervals 0–4, 4–8, 8–12, 12–16 seconds. A has no preceding marker; b/c/d each have one, rather than a new discontinuity per segment. Total duration is 16 seconds. Number 21 is no second 21 and 400 is no count of discontinuities. Local time comes from declared durations, not precise timestamp or synchronisation measurements.</p>
+
+<h2 id="section-4">Remove one segment and its following boundary in B</h2>
+
+<p>B removes a and the marker formerly before b, retaining b/c/d. Starting media sequence becomes 401 and discontinuity base 21; with no remaining marker all three still receive 21. Recompute and compare matching URIs with A instead of treating a larger header as an error. B lasts 12 seconds with unchanged target 4, retaining three target durations. This models numbering invariance, not immediate permanent deletion of media from the server.</p>
+
+<pre><code class="language-text">#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:4
+#EXT-X-MEDIA-SEQUENCE:401
+#EXT-X-DISCONTINUITY-SEQUENCE:21
+#EXTINF:4,
+b.ts
+#EXTINF:4,
+c.ts
+#EXTINF:4,
+d.ts
+</code></pre>
+
+<h2 id="section-5">Distinguish removing a segment from removing a marker</h2>
+
+<p>For C, remove only a and retain the marker before b. Media start is also 401, but base can stay 20 because that marker keeps all three numbers at 21. Count removed markers before incrementing base; removing one segment does not universally add one. Two removed markers would require preserving remaining numbers accordingly, but this example removes only one. B/C are distinct layouts preserving the same numbers, not a mixture with base 21 plus the extra leading marker.</p>
+
+<h2 id="section-6">Read the leading marker in C explicitly</h2>
+
+<p>In C, base precedes the first segment and every discontinuity marker; the leading marker precedes b’s URI. Scan once from zero to one, assigning that count to b and retaining it for c/d. Do not count it again per segment. An absent base defaults to zero, but deleting this declared 20 would lose the intended context. Cross-rendition comparisons also need their playlists and media timestamps: equal discontinuity numbers alone prove neither synchronisation nor identical content.</p>
+
+<pre><code class="language-text">#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:4
+#EXT-X-MEDIA-SEQUENCE:401
+#EXT-X-DISCONTINUITY-SEQUENCE:20
+#EXT-X-DISCONTINUITY
+#EXTINF:4,
+b.ts
+#EXTINF:4,
+c.ts
+#EXTINF:4,
+d.ts
+</code></pre>
+
+<h2 id="section-7">Observe only boundaries supported by a real source</h2>
+
+<p>With real media, play sequentially from before a supported candidate boundary and record picture, sound and continuation. If no sequence field is visible, leave it unavailable; numbering comes from external snapshots. Do not transfer paper b’s four-second position to another film or infer a false base from one stall. B giving b=20 suggests a stale base; 22 suggests C’s retained marker was mixed in. Keep failing copies rather than increase production values until startup happens. Access and numbering faults remain distinct.</p>
+
+<h2 id="section-8">Reopen and verify retained numbers</h2>
+
+<p>Reopen A/B/C and deliver a=20, other segments=21, with b–d invariant in both later layouts. A’s 16 seconds and B/C’s 12 are local window durations, not whole-stream length. Keep media numbering and base separate. Add source, acquisition and playback notes only if performed, without unsupported synchronisation claims. Recompute after later marker removals; base must not decrease or wrap. Renaming files or changing captions cannot repair this count. Retained numbers are verified while absent bytes and path compatibility stay unknown.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/icouldplay-hls-discontinuity-segment-boundary-map/">iCouldPlay HLS discontinuities: map segment order, boundaries and playback observations</a>; <a href="/en/guides/icouldplay-hls-media-sequence-sliding-window-overlap/">iCouldPlay HLS window updates: audit overlapping segments by media sequence</a>.</p>
+
+<p>Method sources: <a href="https://www.rfc-editor.org/rfc/rfc8216#section-4.3.3.3">RFC8216 §4.3.3.3</a>; <a href="https://www.rfc-editor.org/rfc/rfc8216#section-6.2.2">RFC8216 §6.2.1 and §6.2.2</a>.</p>
+
+<p>Checked on 16 November 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261116">Apple public lookup</a> list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare samples manually in external plain text; iCouldPlay selects an existing real source for playback observations through installed controls. Placeholder URIs provide no media. Keep syntax, paper calculations and playback separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.</p>
+{% endraw %}

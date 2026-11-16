@@ -1,0 +1,79 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'Draw a concave polygon in VectorPaint: audit signed shoelace order and the
+  closing edge'
+description: Use five original vertices to check area 18, then reverse and translate
+  them and contrast a self-crossing path.
+permalink: /en/guides/vectorpaint-concave-polygon-shoelace-signed-order-closing-edge/
+date: '2026-11-16 00:00:00 +08:00'
+modified: '2026-11-16 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 215
+topic: Loci, altitudes and signed area
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-16-vectorpaint-concave-polygon-shoelace-signed-order-closing-edge.md
+source_url: /guides/vectorpaint-concave-polygon-shoelace-signed-order-closing-edge/
+translation_method: editorial
+translation_source_sha256: 692d3805d6ae1994b8b59eb2fc2b7164d2ae2760f50cd777e4681056022a553b
+translation_date: '2026-11-16T02:29:38+00:00'
+excerpt: Use five original vertices to check area 18, then reverse and translate them
+  and contrast a self-crossing path.
+---
+{% raw %}
+<p>Concavity permits an edge-by-edge area calculation, but vertex order matters. Draw a concave pentagon, audit its area, then reverse and translate its ordered vertices to check sign and closure before considering a self-crossing control.</p>
+
+<h2 id="fix-five-vertices-in-boundary-order">Fix five vertices in boundary order</h2>
+
+<p>Walk A=(0,0), B=(6,0), C=(6,4), D=(3,2), E=(0,4), then close to A. D forms the upper notch and the five edges do not cross. Keep boundary order rather than sorting vertices by x, which changes the polygon. On a roughly 1600 by 1400 canvas, 140 pixels per unit and screen origin (150,950) give width 840 and height 560 pixels. Reverse vertical direction for screen placement and retain equal scales to keep the paper geometry readable.</p>
+
+<h2 id="include-the-final-to-first-pair-in-both-product-sums">Include the final-to-first pair in both product sums</h2>
+
+<p>Sum each x times the next y, then each y times the next x, including E back to A. The sums are 48 and 12, whose difference divided by 2 is signed area 18; ordinary area takes the absolute value. Repeating the first point in a ledger marks closure rather than a sixth vertex. This origin-based sample has a zero final contribution, so accidentally omitting it can pass. The translated control later deliberately tests closure instead of treating one correct answer as proof of a complete procedure.</p>
+
+<pre><code class="language-text">A=(0,0); B=(6,0); C=(6,4); D=(3,2); E=(0,4)
+order=A,B,C,D,E,A
+sum(x_i*y_next)=48; sum(y_i*x_next)=12
+signed_area=(48-12)/2=18
+reverse_signed_area=-18
+translated=(10,7),(16,7),(16,11),(13,9),(10,11)
+translated_sums=603,567; closing_cross_term=-40
+translated_without_closing=(36+40)/2=38
+bow_tie=(0,0),(4,4),(0,4),(4,0); signed_area=0
+</code></pre>
+
+<h2 id="draw-the-closed-notch-without-replacing-order-by-fill">Draw the closed notch without replacing order by fill</h2>
+
+<p>Use available path tools to join the five vertices and explicitly close the path. Keep C-D and D-E as notch edges instead of adding C-E and filling the missing triangle. Inspect five outline edges before applying a light fill and vertex marks. A filled appearance does not prove vertex order or calculate area. Thick joins can hide the concave point, so inspect it separately. Group diagram and notes so moving an annotation does not raise D to the top edge and change the shape into a rectangle of area 24.</p>
+
+<h2 id="independently-check-eighteen-by-removing-the-notch">Independently check eighteen by removing the notch</h2>
+
+<p>The bounding rectangle has width 6, height 4 and area 24. Remove a triangle with base 6 and height 2, area 6, leaving 18. This independent decomposition checks the shoelace result rather than using the entire bounding box. Measure notch height from top y=4 down to D at y=2, not from D to the baseline merely because both happen to be 2 here. A separate pale control can illustrate the subtraction. A difference of 6 suggests the notch was not removed; sign alone instead points to orientation.</p>
+
+<h2 id="reverse-boundary-traversal-to-change-signed-orientation">Reverse boundary traversal to change signed orientation</h2>
+
+<p>Reverse to A-E-D-C-B-A without moving any point. The two sums exchange to 12 and 48, producing signed area -18 but ordinary area 18. No reflection or coordinate change is needed; only traversal reverses. Screen y increases downward, so visual orientation differs from mathematical y-up orientation. State the coordinate convention. A changed absolute area suggests an omitted vertex or changed adjacency. Do not take each edge contribution’s absolute value before summing, which destroys the required signed cancellation.</p>
+
+<h2 id="use-a-translated-control-to-expose-a-missing-closing-edge">Use a translated control to expose a missing closing edge</h2>
+
+<p>Translate every point by (10,7), retaining boundary order. The ledger gives the new coordinate pairs. Product sums become 603 and 567, still differing by 36. Translation preserves lengths/area, but the final closing contribution is now -40 rather than zero. Omitting it incorrectly gives area 38. This control tests complete pairing; large intermediate sums do not mean larger geometric area. Retain both ledgers. Use separate panels if needed rather than compressing only one axis to fit both drawings.</p>
+
+<h2 id="do-not-treat-a-self-crossing-signed-sum-as-ordinary-union-area">Do not treat a self-crossing signed sum as ordinary union area</h2>
+
+<p>Use a separate bow-tie control through (0,0),(4,4),(0,4),(4,0). Its signed sum gives zero even though two visible triangles each have area 4. Directional cancellation does not mean an empty region. Apply this ordinary-area calculation to a simple non-self-crossing polygon; the absolute value of the bow-tie sum does not recover union area 8. Check crossings and define the intended region rather than infer meaning from fill appearance. Keep this control separate without inventing automatic polygon repair or union measurement.</p>
+
+<h2 id="reopen-with-edge-order-and-both-controls">Reopen with edge order and both controls</h2>
+
+<p>Save the editable original and reopen an export, checking five labels, notch and closure. Retain area 18, reversed signed -18 and translated area 18. First trace the closed boundary, then recompute both sums and verify rectangle-minus-triangle agreement. The bow-tie is only a condition warning. Enlarge annotations if signs/pairs are unreadable rather than omit the closing term. Separate pixel area from mathematical square units; export dimensions do not measure the polygon. This is an original path diagram with external calculations, not an in-app area engine or device measurement test.</p>
+
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-quadrilateral-midpoints-parallelogram-half-area/">Quadrilateral midpoint diagram</a>, <a href="/en/guides/vectorpaint-l-shaped-area-centroid-outside-material/">L-shaped area centroid</a>.</p>
+
+<p>Method sources: <a href="https://content.wolfram.com/sites/19/2015/06/Durrani.pdf">Ross Pure and Salman Durrani The Mathematica Journal §2 Theorem1</a>.</p>
+
+<p>Checked on November 16, 2026: the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261116">Apple public lookup</a> list public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Work within published shapes, pen/node editing, layers, grouping, text and export capabilities. Prepare coordinates and calculations externally and identify installed controls; no built-in geometry solver or equation plotter is assumed. No completed physical-device test is claimed.</p>
+{% endraw %}

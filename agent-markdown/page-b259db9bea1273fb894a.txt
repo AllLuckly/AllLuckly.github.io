@@ -1,0 +1,111 @@
+---
+layout: null
+permalink: /guides/icouldplay-hls-discontinuity-sequence-base-removal-invariant/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映 HLS 间断序号核对：删掉边界后为何要递增基值
+agent_source_url: https://allluckly.cn/guides/icouldplay-hls-discontinuity-sequence-base-removal-invariant/
+agent_source_sha256: e681eaf91144ac37c31adb0039f4aebc536f13be99f5f20530f0107269482d09
+agent_generator_version: 1
+---
+{% raw %}# 云映 HLS 间断序号核对：删掉边界后为何要递增基值
+
+语言：zh-CN
+原文：[云映 HLS 间断序号核对：删掉边界后为何要递增基值](<https://allluckly.cn/guides/icouldplay-hls-discontinuity-sequence-base-removal-invariant/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-hls-discontinuity-sequence-base-removal-invariant/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-hls-discontinuity-sequence-base-removal-invariant/>)
+发布于: 2026-11-16T00:00:00+08:00
+内容更新于: 2026-11-16T00:00:00+08:00
+署名：Bison
+
+对照三份窗口，用基值加前置标记数复算留存分片，不把间断编号当秒数。
+
+清单第一条媒体变了，间断序号却不应该随意重置。本课用三个独立快照审核DISCONTINUITY-SEQUENCE，把已声明基值、当前窗口的前置标记数与媒体序号分开计算。样本只供阅读，云映中的真实播放另行登记，不要求界面展示这个底层字段，也不把编号变化当固定停顿。
+
+## 先固定快照身份与计数口径
+
+为同一自有媒体清单保存A、B两个取得时点，原文不覆盖；没有服务就用本课纸面快照。先写间断序号等于DISCONTINUITY-SEQUENCE基值加该分片URI之前的间断标记数，标记要沿文件顺序数，而非凭画面转场猜。另给MEDIA-SEQUENCE留独立一栏，它按媒体项连续增加。声明基值二十不提供此前故事内容、挂钟时间或真实经历的二十次事件，本轮只把它作为已给整数。把这项边界写清，后面才能比较同一留存分片的编号是否稳定。
+
+## 快照A先数四片与一个标记
+
+A从媒体序号四百开始列a到d四片，每片四秒，基值二十；只有b之前有一个间断标记。把四条EXTINF各自配到下一行URI，不能把标记当第五片。这里是无结束标记的窗口模型，没有写VOD或EVENT，因为后面会移出内容。代码中的名字不包含完整影片字节，也不是本站实际直播地址。先抄字段和顺序，不在真实线上清单增删标签来模拟本课；实际已有ENDLIST的来源另保留原角色，不强行把它解释成相同直播更新规则。
+
+```
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:4
+#EXT-X-MEDIA-SEQUENCE:400
+#EXT-X-DISCONTINUITY-SEQUENCE:20
+#EXTINF:4,
+a.ts
+#EXT-X-DISCONTINUITY
+#EXTINF:4,
+b.ts
+#EXTINF:4,
+c.ts
+#EXTINF:4,
+d.ts
+```
+
+## 四片各填三种不同数字
+
+逐片写媒体序号四百、四百零一、四百零二、四百零三；间断序号则为二十、二十一、二十一、二十一。原因是a前零标记，b、c、d前各累计一个，而不是每经过一片间断数都加一。纸面局部区间另列零至四、四至八、八至十二、十二至十六秒，总长十六秒。三个数字体系不要互换：二十一不是第二十一秒，四百也不等于四百次间断。所有累计秒数都来自声明时长，未读取媒体时间戳时不能叫精确同步测量。
+
+## 快照B移走一片并移除其后边界
+
+B移走a及原来b前的间断标记，保留b、c、d。媒体起始序号成为四百零一，间断基值成为二十一；当前窗口没有间断标记，因此三片仍各得二十一。用B复算后与A逐项比同一URI，不能只看第一行数字变大就认定编号出错。B列三片共十二秒，目标时长仍四秒，保留了三倍目标时长的窗口长度。这里的算例仅演示编号守恒，不将文件移出列表解释为服务器立刻永久删除其媒体资源。
+
+```
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:4
+#EXT-X-MEDIA-SEQUENCE:401
+#EXT-X-DISCONTINUITY-SEQUENCE:21
+#EXTINF:4,
+b.ts
+#EXTINF:4,
+c.ts
+#EXTINF:4,
+d.ts
+```
+
+## 只移分片与移除标记不是同一动作
+
+另做纸面C，只移走a而保留b前那条间断标记。此时媒体起点也为四百零一，但基值仍可为二十，因为保留标记让b、c、d都得到二十一。先圈真正删除的标记数量，再决定基值递增多少，不能机械写每删一片就加一。若删掉两条标记，应核所留分片仍保持原间断序号；此本例只删一条，不假造第二条。C与B是两种可解释同一留存编号的文本布局，不把它们混拼成同时有基值二十一和额外前置标记的错误稿。
+
+## 把C的前置标记也逐行读完
+
+C代码中基值必须在第一片和任何间断标记之前，前置标记则位于b的URI之前。按文件从上到下把当前计数由零变一，再配给b，随后c和d仍用一，不把它读成两次或三次。没有显式基值时规范按零解释，但本图需要保留已有二十的上下文，不能随意删掉该字段让编号回到一。若实际来源跨不同变体比较，还需各自清单和媒体时间戳证据；相同间断号不是单独足够的同步证明，也不表示两个URI内容完全相同。
+
+```
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:4
+#EXT-X-MEDIA-SEQUENCE:401
+#EXT-X-DISCONTINUITY-SEQUENCE:20
+#EXT-X-DISCONTINUITY
+#EXTINF:4,
+b.ts
+#EXTINF:4,
+c.ts
+#EXTINF:4,
+d.ts
+```
+
+## 真实观看只核当前可对应边界
+
+有真实素材时，选同一来源从候选边界之前顺播，记画面、声音和后续是否继续；界面不显示间断号就留该栏未显示，编号来自外部快照。不要把纸面b的四秒位置硬套到别的影片，也不凭一次卡顿断言基值错误。若纸面算出B的b为二十，先查是否漏改基值；若算成二十二，先查是否混入C保留的标记。保留失败副本，不在生产服务器把字段不断加大直到播放器偶然启动。访问失败与编号失配仍是两个需要分别记录的问题。
+
+## 重开核留存三片的不变编号
+
+重开A、B、C分别计算，交付a为二十、其余三片二十一，以及B和C对b到d都不改变编号的账本。明确A十六秒、B与C十二秒是局部窗口长度，不是整场直播时长；媒体序号与基值仍各列。实际观看如果执行，附来源身份、取得时间和观察，不附未核同步结论。下一轮删除标记时重新算，基值不能递减或回绕；不要用改文件名或换字幕修复此计数问题。完成标准是同一留存片编号一致，未知媒体字节和路径兼容仍保留未知。
+
+## 相关教程与资料
+
+[云映 HLS 间断标记练习：分开分片序号、时间边界与播放观察](<https://allluckly.cn/guides/icouldplay-hls-discontinuity-segment-boundary-map/>)、[云映 HLS 窗口更新：从媒体序号核对重叠分片](<https://allluckly.cn/guides/icouldplay-hls-media-sequence-sliding-window-overlap/>)。
+
+方法来源：[RFC8216 §4.3.3.3](<https://www.rfc-editor.org/rfc/rfc8216#section-4.3.3.3>)、[RFC8216 §6.2.1与§6.2.2](<https://www.rfc-editor.org/rfc/rfc8216#section-6.2.2>)。
+
+资料核对：2026年11月16日，[云映官方商店](<https://apps.apple.com/cn/app/id6755653178>)和[Apple公开查询](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261116>)列出1.1.1，最低iOS / iPadOS 15.0。样本在外部用纯文本手工准备，云映用于已有真实来源的选择与播放观察，入口以安装版本实际可见为准。占位URI不提供媒体；文法审核、纸面计算与实际播放分别记录，没有执行的步骤保留未执行。本文不声称完成真机、私人服务器、所有引擎或输出设备逐项兼容测试。
+{% endraw %}

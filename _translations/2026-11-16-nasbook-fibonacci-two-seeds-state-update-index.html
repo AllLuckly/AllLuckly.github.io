@@ -1,0 +1,62 @@
+---
+layout: guide
+author: Bison
+app_id: nas_book
+title: 'Read recurrences in Book Isle: retain both seeds and old state to verify F8
+  equals twenty-one'
+description: List F0 through F8 from seeds zero and one, checking indices, recurrence
+  counts and simultaneous state updates.
+permalink: /en/guides/nasbook-fibonacci-two-seeds-state-update-index/
+date: '2026-11-16 00:00:00 +08:00'
+modified: '2026-11-16 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 194
+topic: Change, state and operations
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-16-nasbook-fibonacci-two-seeds-state-update-index.md
+source_url: /guides/nasbook-fibonacci-two-seeds-state-update-index/
+translation_method: editorial
+translation_source_sha256: 135f2696ff52dc3a21f1e5c2d8590d7a95a943fc33689f16889223fd1c4e31cf
+translation_date: '2026-11-16T02:37:27+00:00'
+excerpt: List F0 through F8 from seeds zero and one, checking indices, recurrence
+  counts and simultaneous state updates.
+---
+{% raw %}
+<p>“Each term sums the previous two” does not uniquely specify a sequence: seeds, starting index and update order matter. Read an original recurrence card in Book Isle and match definition/state table, checking F8=21 externally. Pseudocode explains a paper algorithm rather than app execution; finding familiar numbers does not verify all premises.</p>
+<h2 id="先固定零起点与两个初值">Fix zero-based indexing and both seeds</h2>
+<p>Card R1 declares F0=0, F1=1 and Fn=F(n−1)+F(n−2) for n≥2. Zero is an index, not a physical page zero. Map a textbook’s F1/F2 naming before comparison. Keep recurrence and both seeds in one readable PDF/EPUB passage and verify R1 after import. Do not omit seeds from an excerpt or merge two equal ones: equal values do not mean equal indices.</p>
+<p>Keep boundary queries separate:F0 returns seed zero, F1 returns one, without an extra update before output. This exercise accepts nonnegative integer indices; negative queries are outside its scope and are not arbitrarily extended backward. State inputs and whether stopping occurs before or after an update.</p>
+<h2 id="逐项展开到八而非只认熟悉数列">Expand through eight instead of recognizing a pattern</h2>
+<p>Compute F2=1+0=1, F3=1+1=2, then F4=3, F5=5, F6=8, F7=13, F8=21. F0..F8 contains nine terms, not eight, with seven newly computed terms F2..F8 beyond the seeds. Keep index, two inputs and sum per row rather than an unlabelled familiar list 0, 1, 1, 2, 3, 5, 8, 13, 21. Find the first incorrect row and its inputs instead of rewriting the rest from memory.</p>
+<h2 id="把状态对解释成连续两项">Interpret the state pair as consecutive terms</h2>
+<p>Define state(a, b)=(Fn, F(n+1)), initially(0, 1) at n=0. The next state uses old b and old a+old b:(0, 1)→(1, 1)→(1, 2)→(2, 3). Incrementing n shifts one term, not two. Record n/a/b every round so b is not mislabelled Fn. Page/scroll positions are unrelated indices; an eighth displayed row is not automatically F8 if a header/initial row is included.</p>
+<p>Pause the paper exercise at n=4, state(3, 5). Four more shifts reach n=8, state(21, 34). Resetting the counter without the pair mislabels indices. A reading bookmark returns to the row; it does not preserve/execute algorithm variables, so retain the complete state externally.</p>
+<h2 id="保存旧值再执行两次赋值">Save old values before two assignments</h2>
+<p>Use temporaries so both right sides refer to the same old state:</p>
+<pre><code class="language-text">next_a = b
+next_b = a + b
+a = next_a
+b = next_b
+</code></pre>
+<p>One execution from(0, 1) gives(1, 1). This explains assignment semantics without claiming Book Isle runs the four lines. A note saying only a becomes b is incomplete. Highlight calculation and assignment pairs separately if available; color does not prove simultaneous-state correctness.</p>
+<h2 id="对照覆盖旧a的错误顺序">Compare the overwrite-old-a error</h2>
+<p>The wrong order is:</p>
+<pre><code class="language-text">a = b
+b = a + b
+</code></pre>
+<p>From(0, 1), a becomes 1 before the second line uses new 1+old 1=2, yielding(1, 2); another round gives(2, 4). Correct two-round state is(1, 2). Matching an isolated two does not establish algorithm equivalence. Separate versions without changing seeds to hide overwriting. Repair old-state access rather than manually replacing every result.</p>
+<h2 id="换初值说明递推式并不唯一">Change seeds to show the recurrence is not unique</h2>
+<p>On R2 set G0=1, G1=1 with the same recurrence:1, 1, 2, 3, 5, 8, 13, 21, 34, so G8=34 rather than R1’s 21. Changed seeds define another sequence, not a reader omitting zero. For R1, eight state shifts yield a=21, b=34, while filling F2..F8 computes seven new list entries. One counts generated entries beyond two seeds and the other shifts from the initial pair. Their different starting points explain the counts.</p>
+<p>G’s first two values match F1/F2 and the same recurrence continues, so G_n=F_(n+1) under these seeds. G4=5 while F4=3 and F5=5. This is an index shift, not random output. Other seeds need not yield a one-term shift merely because recurrence forms match.</p>
+<h2 id="在书中返回定义而非只找答案串">Return to the definition rather than only the answer list</h2>
+<p>Bookmark R1’s definition/state table using visible controls, or record heading/marker externally. Search a distinctive textual R1 if supported instead of assuming mathematical subscripts are searchable, then verify both seeds in context. Note n, a/b meanings, retained old values and F8 versus F9. Restore lost subscripts from the source rather than treating filename digits as sequence indices. Distinguish your pseudocode from the author’s definition.</p>
+<h2 id="重开独立重建九项与八轮状态">Reopen and rebuild nine entries and eight state shifts</h2>
+<p>Reopen, hide results and rebuild nine entries from 0/1 through 21, then shift the old-state pair eight rounds to(21, 34). Explain the overwrite error from round one, R2’s 34 and both counting conventions. Rebuild after changed seeds, indexing or recurrence instead of applying this two-variable update to every recurrence. Restore the definition and version-linked notes. These are external calculations and reading checks, not app loops, automatic debugging or system-performance validation.</p>
+<h2 id="相关教程与资料">Related tutorials and sources</h2>
+<p><a href="/en/guides/nasbook-sequence-ratio-difference-term-index/">Sequence indices and rules</a>; <a href="/en/guides/nasbook-appendix-algorithm-handtrace/">Manual algorithm states</a>.</p>
+<p>Sources checked on 16 November 2026: <a href="https://itunes.apple.com/lookup?id=6766198898&amp;country=cn&amp;entity=software&amp;timestamp=20261116">Apple public lookup</a> shows Book Isle 1.1.4, requiring iOS / iPadOS 15.6 or later. Published capabilities appear in the <a href="https://apps.apple.com/cn/app/id6766198898">official App Store listing</a>. Selection, note and highlight availability depend on installed controls and the current format.</p>
+<p>Method references: <a href="https://discrete.openmathbooks.org/dmoi2/sec_recurrence.html">Discrete Mathematics recurrence relations and initial conditions</a>. Exercises, short passages, controls and recording arrangements are original, not copied source problems or literary quotations. Keep external calculations, textual interpretation and actual app observation separate. Reading does not imply automatic solving/recognition or completed device, private-server or universal input-environment testing.</p>
+
+{% endraw %}

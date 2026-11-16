@@ -1,0 +1,81 @@
+---
+layout: null
+permalink: /guides/icouldplay-ass-vector-drawing-mode-polygon-text-scope/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映 ASS 图形字幕：用绘图模式核对矩形与文字范围
+agent_source_url: https://allluckly.cn/guides/icouldplay-ass-vector-drawing-mode-polygon-text-scope/
+agent_source_sha256: d62e0bec3b87098f71783713430d44639071b5768acd195e474226b3a7e5c728
+agent_generator_version: 1
+---
+{% raw %}# 云映 ASS 图形字幕：用绘图模式核对矩形与文字范围
+
+语言：zh-CN
+原文：[云映 ASS 图形字幕：用绘图模式核对矩形与文字范围](<https://allluckly.cn/guides/icouldplay-ass-vector-drawing-mode-polygon-text-scope/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-vector-drawing-mode-polygon-text-scope/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-vector-drawing-mode-polygon-text-scope/>)
+发布于: 2026-11-16T00:00:00+08:00
+内容更新于: 2026-11-16T00:00:00+08:00
+署名：Bison
+
+保存一份完整图形字幕，核对路径、闭合与绘图开关，再观察实际加载。
+
+字幕事件里可以放绘图指令，但它们既不是视频原画，也不是让播放器自动画任意图片。本课在外部做一个简单矩形和一条文字参照，记录路径坐标、模式范围与实际可见效果。最终交付源稿、纸面轮廓及播放记录，图形是否呈现由当前实际路径观察，不把格式说明当兼容保证。
+
+## 准备十二秒参照与独立副本
+
+选择至少十二秒的自有视频，确认画面没有练习矩形，优先用中灰或深色背景，使白色填充容易辨认；保留原视频和既有字幕。纸上画宽六百四十、高三百六十的脚本框，横向向右、纵向向下。另建纯文本文件记录工作副本名、编码和所选来源；播放器里的适应或裁切先固定。没有外挂字幕入口时可完成文本核对，但实际呈现记未执行。不要把路径数字当设备屏幕像素，也不直接覆盖日常观看用的字幕。
+
+## 保存带绘图与文字对照的完整文件
+
+将下方完整内容另存UTF-8的polygon.ass，重新打开确认不是富文本。第一条在一至四秒使用绘图模式，矩形位于脚本中的定位点附近；第二条五至八秒是普通文字。保留全部样式和事件列，不只复制最后两行。绘图使用英文小写m和l以及空格分隔坐标，反斜线与括号都用半角；把文件名、两条起止时刻和源稿位置抄入记录，避免下轮选中同名旧副本。
+
+```
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,36,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,7,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:04.00,Default,,0,0,0,,{\an7\pos(100,100)\bord0\shad0\p1}m 0 0 l 120 0 120 60 0 60 0 0{\p0}
+Dialogue: 0,0:00:05.00,0:00:08.00,Default,,0,0,0,,{\an7\pos(100,220)}Shape control.
+```
+
+## 逐段追踪四边和闭合点
+
+先只读绘图正文，从零、零移到一百二十、零，再到一百二十、六十、零、六十，最后回零、零。纸面得到四条边，宽一百二十、高六十，面积七千二百个平方脚本单位。m开始新的轮廓，l继续直线；最后回起点用来明确本课边界。不要把五次坐标记录说成五个不同顶点，也不将面积数值当播放画面中实际覆盖的设备像素数量，缩放与定位还须另外解释。另在纸上把全部路径点向右平移二十单位，四边长度与面积都保持原值；若只改一个点，形状就可能改变。将整体平移和单点修改分成两张卡，能检查自己究竟改变了坐标基准还是轮廓本身，不把两种操作的结果混为同一次练习。
+
+## 把绘图模式与字符范围分开
+
+第一条的p1开启绘图解释，p0结束该范围；中间的m和l是路径命令，不是要显示的字幕词句。第二条未开启绘图，Shape control.属于普通文字，仍依赖可用字体。不要因为两者同处一个文件就当所有文字都已变成轮廓，也不要把p0当事件结束时间。若需要在同一事件混合文字，先另存实验副本并清楚界定范围，本课原参照保持图形和文字分条便于定位失败层次。
+
+## 在云映按两条时间区间观察
+
+选定对应视频与字幕后从开头顺播，分别记一至四秒是否出现矩形、五至八秒是否出现文字，空档是否有残留。先核当前所选文件名，再看位置、形状与消失时点；不要仅凭第二条可读就宣布绘图支持。图形会随脚本定位与整体显示条件变化，应记录方向及适应模式。没有执行顺播的项目保留未知，截图只说明对应时刻，不能代替整段时间检查。
+
+## 只改一个顶点制作形状反例
+
+复制稿只把右上点的一百二十、零改成一百、零，其余点与定位保持原样。纸上先重画：上边缩短，右侧变斜，而下边仍长一百二十，已经不是矩形。用这一明确形变检查自己是否读取了正确副本，不同时更改字体或脚本尺寸。副本重新加载后若没有差异，先核文件身份和路径解释，不通过修改视频裁切制造看似符合的斜边，也不把这份反例覆盖原矩形记录。
+
+## 按文字、路径和位置分别排查
+
+若屏幕出现m和数字，记下实际解释结果，核绘图开关有没有放在正确花括号内；若完全不可见，分开查字幕是否加载、事件时刻、定位和当前路径能力。若只有形状比例错，先对照顶点和脚本框，不用给音轨换语言来修。普通文字缺字与图形没出现也不是同一个故障。保留源稿与失败副本，通过原图轮廓和所选文件交接问题，不凭一次成功推断所有复杂贝塞尔图形都可呈现。
+
+## 重开并交付三份对应证据
+
+退出再进入同一片源，重新选择矩形原稿，核图形与文字仍在各自区间。交付完整文件、四边纸面核对、原稿与反例各自观察，写清软件版本与未完成项。恢复普通观看时换回原字幕而非删除影片。这个任务的结果是能追溯每个坐标如何组成一个简单形状，以及哪些只是预期；不能从矩形出现在视频上推断它已永久写入视频文件，媒体字节是否改变需要独立证据。
+
+## 相关教程与资料
+
+[脚本定位](<https://allluckly.cn/guides/icouldplay-ass-pos-script-coordinate-display-pixels/>)、[字幕裁剪](<https://allluckly.cn/guides/icouldplay-ass-clip-iclip-glyph-video-boundaries/>)。
+
+方法来源：[Aegisub ASS tags](<https://aegisub.org/docs/latest/ass_tags/>)。
+
+资料核对：2026年11月16日，[云映官方商店](<https://apps.apple.com/cn/app/id6755653178>)与[Apple公开查询](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261116>)列出1.1.1，最低iOS / iPadOS15.0。练习材料在外部准备，云映负责实际来源选择和播放观察；以安装版可见入口为准，不声明已执行真机或私人服务器逐项测试。
+{% endraw %}

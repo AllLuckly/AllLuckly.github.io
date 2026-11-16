@@ -1,0 +1,71 @@
+---
+layout: null
+permalink: /en/guides/manyue-jpeg-chroma-subsampling-component-count/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Check JPEG chroma sampling in ManYue: four-two-zero does not halve comic pages'
+agent_source_url: https://allluckly.cn/en/guides/manyue-jpeg-chroma-subsampling-component-count/
+agent_source_sha256: ff2b8900ff526012d8f323b843cf2cccf67c2051e4c5844d4b904e1c67ba9c9d
+agent_generator_version: 1
+---
+{% raw %}# Check JPEG chroma sampling in ManYue: four-two-zero does not halve comic pages
+
+Language: en
+Canonical: [Check JPEG chroma sampling in ManYue: four-two-zero does not halve comic pages](<https://allluckly.cn/en/guides/manyue-jpeg-chroma-subsampling-component-count/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-jpeg-chroma-subsampling-component-count/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-jpeg-chroma-subsampling-component-count/>)
+Published: 2026-11-16T00:00:00+08:00
+Modified: 2026-11-16T10:38:47+08:00
+Author: Bison
+
+Use original colored edges and component reports to distinguish 4:4:4 and 4:2:0 samples, pixels and compressed bytes.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-jpeg-chroma-subsampling-component-count/>), translated on 2026-11-16. Original publication dates, attribution, code and version notes are retained.
+
+Soft colored lettering cannot be diagnosed from file size alone. Prepare two JPEG controls from an original colored-edge page, calculate luminance and two chrominance sample counts, then inspect the same detail in ManYue. Four-two-zero describes sampling, not two surviving colors, a missing color channel or fewer comic pages. Keep coding reports distinct from reading observations.
+
+## Make colored and gray edges as controls
+
+Make an original 320×240 page with adjacent red/blue thin stripes, black/white stripes and large lettering, marked S and page 1. Both colored and gray edges distinguish chroma changes from general blur. There are 76800 pixels; divisibility by 16 avoids edge-padding complications in this ledger. Keep a lossless source instead of relying on repeatedly compressed online comics whose prior losses are unknown. Export both controls from that source, not the second from the first.
+
+## Confirm this example uses three YCbCr components
+
+First identify color model and component identities externally. This exercise is limited to common 8-bit lossy YCbCr JPEG. Y carries luminance-related information while Cb/Cr carry color differences; they are not independent red/green/blue pixel layers. Do not apply this three-component table directly to grayscale, RGB JPEG or other models. Record tool and copy identity. Unknown sampling stays unknown: a small file does not prove 4:2:0. External component inspection is separate from ManYue displaying the image.
+
+## Count full component grids for four-four-four
+
+For copy A use `4:4:4`: each component has 320×240=76800 samples, totalling 230400. This sums three component grids; it does not increase image pixels to 230400 or prescribe a JPEG byte size. A factor report can show 1×1 for all components in this example. Multiply width by height, then by component count, retaining identity and conditions rather than replacing the ledger with “four-four-four is clearer.”
+
+For the same 16×16 mathematical region, 4:4:4 has 256 samples per component, 768 total; 4:2:0 has 256 Y and 64 per chroma component, 384 total. This counts samples without asserting that both JPEG arrangements store all components as one identically sized coding unit. Coding structure and decoded grids need their own definitions.
+
+## Halve both chroma dimensions for four-two-zero
+
+For copy B use `4:2:0`: Y remains 320×240; Cb and Cr are each 160×120=19200, giving 115200 total samples. Total samples halve relative to A, while each chroma grid becomes one quarter, not one half. Common factors are Y 2×2 and Cb/Cr 1×1; their relative maxima determine dimensions, not a two-pixel-wide Y image. The zero in the label does not delete Cr: both chroma components remain.
+
+## Keep quantization conditions fixed before export comparison
+
+Use an external encoder with explicit sampling controls and keep source, size and quantization/quality settings fixed. Quality 100 does not make conventional lossy JPEG lossless: subsampling, quantization and rounding are distinct stages. Record real settings; quality 80 in two different tools does not establish matching quantization tables. Half as many samples does not guarantee half as many file bytes because content, entropy coding and metadata also matter. If controls cannot be fixed, limit conclusions to the verified sampling report rather than inventing an experiment.
+
+## Compare colored and gray edges at the same reading position
+
+Put the copies in clearly named supported archives. In ManYue verify S/page 1, inspect red/blue boundaries at the same zoom and then black/white stripes. Record actual color spreading and edge appearance without assuming every pair must look distinguishable. Keep fit-page and enlarged results separate because scaling can mask or alter detail. Do not simultaneously enable enhancement, change background and alter screen brightness. Mark uncertain conditions instead of attributing everything to sampling.
+
+Keep a red line one source pixel wide as a marker; enlarged screen cells do not establish source width. Decoder upsampling reconstructs full-size output, so B still displays 320×240, not 160×120 merely because chroma is smaller. Reconstructed color values do not mean every discarded original chroma detail was recovered exactly.
+
+## Check recompression and mistaken color models
+
+If dimensions differ, restore export settings rather than visually resizing them into apparent agreement. A grayscale one-component report invalidates Cb/Cr arithmetic; interpreting RGB factors as YCbCr also breaks the premise. Blocks or ringing do not uniquely identify chroma subsampling: check quantization and recompression separately. Keep earlier copies and name re-export rounds so later losses after overwriting cannot be attributed to the reader.
+
+## Reopen and verify two grids but one page identity
+
+Reopen A/B at the same marker and map 76800 plus two 19200 counts to 115200. Acceptance explains why 4:2:0 neither removes pages nor a chroma component and why sample ratios are not compression guarantees. Deliver the lossless source, copies, real reports and observation fields; identify a paper-only exercise if no display comparison occurred. Reinspect components after changing encoder or source rather than promising smaller or clearer results for all comics.
+
+## Related tutorials and sources
+
+[JPEG scans and a single image](<https://allluckly.cn/en/guides/manyue-jpeg-progressive-scans-single-image-identity/>); [Small text and source detail](<https://allluckly.cn/en/guides/manyue-small-lettering-check/>).
+
+Sources checked on 16 November 2026: [Apple public lookup](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261116>) shows ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later. Published reading capabilities appear in the [official App Store listing](<https://apps.apple.com/cn/app/id6753895889>). Use controls actually available in the installed version.
+
+Method references: [Official libjpeg-turbo usage documentation](<https://raw.githubusercontent.com/libjpeg-turbo/libjpeg-turbo/main/doc/usage.txt>). Diagrams, numbers, counterexamples and recording arrangements are original exercises. Separate external preparation, paper expectations and actual reading results. Available documentation does not substitute for device observation, and no private-server or universal file-environment test is claimed.
+{% endraw %}

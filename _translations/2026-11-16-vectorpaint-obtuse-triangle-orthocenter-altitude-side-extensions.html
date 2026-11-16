@@ -1,0 +1,79 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'Draw an obtuse triangle orthocentre in VectorPaint: extend altitudes beyond
+  the outline'
+description: Use three original vertices to check the obtuse angle, three altitudes
+  and external orthocentre, distinguishing sides from their lines.
+permalink: /en/guides/vectorpaint-obtuse-triangle-orthocenter-altitude-side-extensions/
+date: '2026-11-16 00:00:00 +08:00'
+modified: '2026-11-16 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 214
+topic: Loci, altitudes and signed area
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-16-vectorpaint-obtuse-triangle-orthocenter-altitude-side-extensions.md
+source_url: /guides/vectorpaint-obtuse-triangle-orthocenter-altitude-side-extensions/
+translation_method: editorial
+translation_source_sha256: a8118d40c8454fb4a7f516bc4b0f53dd4da1d8d532886bacb3ce3b07599cb9f4
+translation_date: '2026-11-16T02:29:37+00:00'
+excerpt: Use three original vertices to check the obtuse angle, three altitudes and
+  external orthocentre, distinguishing sides from their lines.
+---
+{% raw %}
+<p>Triangle centres need not lie inside the outline. Draw a fixed obtuse triangle and extend its three altitude lines to one external point, checking perpendicularity rather than connecting vertices to side midpoints.</p>
+
+<h2 id="establish-that-the-chosen-triangle-is-obtuse">Establish that the chosen triangle is obtuse</h2>
+
+<p>Use A=(0,0), B=(6,0), C=(2,1), joined in that order. At C, vectors (-2,-1) and (4,-1) have dot product -7, establishing an obtuse angle rather than relying on a flat appearance. The points are noncollinear, with base 6 and height 1. Reserve substantial space above for the orthocentre. On a roughly 1600 by 1400 canvas, screen origin (400,1100) and 90 pixels per unit keep equal scales. Grid-based placement may be approximate while the paper vertices remain fixed.</p>
+
+<h2 id="associate-each-altitude-with-its-opposite-side">Associate each altitude with its opposite side</h2>
+
+<p>An altitude starts at a vertex and is perpendicular to the full line containing the opposite side. Its foot can lie beyond that side segment. The ledger lists three line equations: A’s altitude is not its median, and C’s vertical is not a decorative upward line. Distinguish solid triangle sides from lighter dashed extensions and name the intersection separately. Use available layers/groups to separate outline, construction and labels so selecting an altitude does not accidentally move a defining vertex.</p>
+
+<pre><code class="language-text">A=(0,0); B=(6,0); C=(2,1)
+CA=(-2,-1); CB=(4,-1); CA dot CB=-7
+altitude(C): x=2
+altitude(A): y=4*x
+altitude(B): y=12-2*x
+H=(2,8)
+AH dot BC=(2,8) dot (4,-1)=0
+BH dot AC=(-4,8) dot (2,1)=0
+centroid=(8/3,1/3)
+</code></pre>
+
+<h2 id="draw-cs-vertical-altitude-and-its-baseline-foot">Draw C’s vertical altitude and its baseline foot</h2>
+
+<p>AB is horizontal, so C’s altitude has x=2. Its foot on AB is (2,0), distinct from C=(2,1), and the line also extends upward. Put a right-angle marker at the foot, not at every crossing. This line alone has infinitely many candidate points; the other altitudes must locate the orthocentre. Convert increasing mathematical height to decreasing screen y when placing the later point of height 8, instead of drawing it below the baseline.</p>
+
+<h2 id="draw-as-altitude-perpendicular-to-bc">Draw A’s altitude perpendicular to BC</h2>
+
+<p>BC has direction (4,-1) and slope -1/4. The perpendicular through A has slope 4, giving y=4x. Together with x=2, it meets at H=(2,8), well above C’s height 1. That external position is expected. Draw A’s altitude and extend BC beyond C toward its foot rather than bend the original side toward H. Crossing the triangle outline is not an error. If H is clipped, enlarge space or uniformly rescale the diagram instead of lowering only H to fit a frame.</p>
+
+<h2 id="use-bs-altitude-as-an-independent-third-check">Use B’s altitude as an independent third check</h2>
+
+<p>AC has direction (2,1), slope 1/2, so B’s altitude has slope -2 and equation y=12-2x. At x=2 it also gives y=8. Use this as an independent check instead of stopping after two lines intersect. Confirm its origin at B and perpendicularity to the line AC. Direction BH=(-4,8) dotted with AC=(2,1) is zero; AH=(2,8) dotted with BC=(4,-1) is also zero. These relations establish perpendicularity; a drawn right-angle icon by itself does not.</p>
+
+<h2 id="separate-orthocentre-medians-and-altitude-feet">Separate orthocentre, medians and altitude feet</h2>
+
+<p>Here H=(2,8), while the median centroid is (8/3,1/3). Medians join opposite midpoints; altitudes require perpendicularity. Changing colour does not exchange these conditions. An altitude foot is also distinct from the orthocentre: C’s foot is (2,0), while H is the common intersection of altitude lines. A marginal control note is enough without crowding every centre onto the main image. Joining A to BC’s midpoint (4,1/2) reaches that side but is not perpendicular. Keep such a wrong-direction control separate, not as an alternative valid altitude.</p>
+
+<h2 id="diagnose-vertices-perpendicularity-and-extension-scope">Diagnose vertices, perpendicularity and extension scope</h2>
+
+<p>For nonconcurrence, first check unchanged vertices, then altitude/opposite-side pairing, then slope signs and axis scales. A foot beyond a side is valid and need not be dragged inside. Move crowded labels without changing H. Correct one altitude using the other two as controls. Canvas-centre alignment is not an altitude construction, and no unpublished triangle-centre tool is assumed. If export simplifies dashes, retain a clear distinction between original sides and extensions rather than let dense auxiliaries imply another polygon.</p>
+
+<h2 id="reopen-the-external-intersection-and-three-zero-dot-checks">Reopen the external intersection and three zero-dot checks</h2>
+
+<p>Save the editable original and reopen an export, identifying obtuse C, sides, three altitude lines, C’s foot and external H. Include the line equations and perpendicular-direction checks; C’s vertical direction (0,1) also has zero dot product with base direction (6,0). Check the shared point and each originating vertex rather than mere accidental concurrence. Separate C/foot labels at small size while retaining height 1. This is an original obtuse-triangle construction with paper verification, not measured geometry or physical-device certification.</p>
+
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-triangle-median-centroid/">Triangle median centroid</a>, <a href="/en/guides/vectorpaint-right-triangle-incircle-circumcircle/">Incircle and circumcircle</a>.</p>
+
+<p>Method sources: <a href="https://resources.wolframcloud.com/FunctionRepository/resources/Orthocenter/">Ed Pegg Jr Orthocenter function and definition</a>.</p>
+
+<p>Checked on November 16, 2026: the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261116">Apple public lookup</a> list public version 1.0.8, requiring iOS / iPadOS 17.0 or later. Work within published shapes, pen/node editing, layers, grouping, text and export capabilities. Prepare coordinates and calculations externally and identify installed controls; no built-in geometry solver or equation plotter is assumed. No completed physical-device test is claimed.</p>
+{% endraw %}

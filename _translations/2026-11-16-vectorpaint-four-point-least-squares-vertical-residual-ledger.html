@@ -1,0 +1,82 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint least-squares line: four vertical residuals with squared sum 0.70'
+description: Fit four equally weighted points manually, draw vertical residuals and verify squared error rather
+  than perpendicular distances or exact hits.
+permalink: /en/guides/vectorpaint-four-point-least-squares-vertical-residual-ledger/
+date: '2026-11-16 00:00:00 +08:00'
+modified: '2026-11-16 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 218
+topic: Coordinates, data and conditional reasoning
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-16-vectorpaint-four-point-least-squares-vertical-residual-ledger.md
+source_url: /guides/vectorpaint-four-point-least-squares-vertical-residual-ledger/
+translation_method: editorial
+translation_source_sha256: 71d54f9d509c6be03c0f4998e18fcfbd116f1faedec6624ce9043ad7874af68c
+translation_date: '2026-11-16T02:45:15+00:00'
+excerpt: Fit four equally weighted points manually, draw vertical residuals and verify squared error rather than
+  perpendicular distances or exact hits.
+---
+{% raw %}
+<p>Fit an equal-weight least-squares line with an intercept to four fictional points. Calculate slope and intercept, draw each vertical residual, then compare a line that hits more points exactly. These are not real measurements and the line supplies no causal or predictive guarantee. VectorPaint displays externally calculated relationships rather than performing automatic regression.</p>
+
+<h2 id="section-1">Fix the four points and the objective</h2>
+
+<p>List (0,1), (1,2), (2,2) and (3,4), using dimensionless practice units and equal weights. Set ŷ=a+bx and e=y−ŷ, minimizing the sum of four squared e values. These residuals are vertical, not shortest distances to the sloping line. Allow a to vary; do not force the line through the origin. Create data, fitted-line, residual and calculation layers. Place only the original points and save first. Do not move data later to tidy the result or imply that the app imported experimental data and generated this analysis.</p>
+
+<h2 id="section-2">Calculate slope from centred products</h2>
+
+<p>Sum x to 6 and y to 9, then divide by four to obtain means 1.5 and 2.25. Compute centred differences for each point: Sxx=5 and Sxy=4.5, giving b=4.5/5=0.9. Then a=2.25−0.9×1.5=0.9. Retain these intermediate quantities in the calculation layer. If Sxx were zero this slope formula would fail, but the four different x values make it positive here. Sxy is not a correlation coefficient, and a positive slope does not justify inventing a real growth context. List Sxx terms 2.25, 0.25, 0.25, 2.25 and Sxy terms 1.875, 0.125, −0.125, 2.625. Sum before dividing and retain the negative term, making the calculation easier to audit than a slope alone.</p>
+
+<h2 id="section-3">Label both axis scales before drawing</h2>
+
+<p>Use a suggested 1600×1500 canvas with mathematical origin at screen (300,1200), 250 pixels per x unit and 200 per y unit. Thus X=300+250x and Y=1200−200y; screen data positions are below. Different scales are allowed, but the visible angle does not directly represent slope 0.9. Join fitted points (0,0.9) and (3,3.6) with a straight line and label its equation. Those endpoints frame the display, not the model’s domain. Without numeric fields, place by guides and acknowledge approximate graphics.</p>
+
+<pre><code class="language-text">model: yhat = 0.9 + 0.9*x
+screen: X = 300+250*x; Y = 1200-200*y
+x  y  yhat  e      observed screen  fitted screen
+0  1  0.9   0.1    (300,1000)       (300,1020)
+1  2  1.8   0.2    (550,800)        (550,840)
+2  2  2.7  -0.7    (800,800)        (800,660)
+3  4  3.6   0.4    (1050,400)       (1050,480)
+</code></pre>
+
+<h2 id="section-4">Draw signed vertical residuals point by point</h2>
+
+<p>Predictions are 0.9, 1.8, 2.7 and 3.6, with residuals 0.1, 0.2, −0.7 and 0.4. At each fixed x, draw from fitted value to observed point vertically, not perpendicular to the fitted line. The third observation lies below the fit, so its mathematical residual is negative although the 140-pixel downward screen displacement is positive. Label every e while keeping axes and data visible. Use equal stroke widths: a thicker third segment would misleadingly add weight beyond the magnitude already expressed numerically.</p>
+
+<h2 id="section-5">Check squared error and normal conditions</h2>
+
+<p>Squaring gives 0.01, 0.04, 0.49 and 0.16, totaling 0.70. Also check residual sum 0.1+0.2−0.7+0.4=0 and x-weighted residual sum 0+0.2−1.4+1.2=0; these help catch a mistyped prediction. Cancellation of signed residuals does not mean error vanishes: squared error stays positive. Label “residual sum” and “sum of squared residuals” separately, preserving decimal points and signs. If adding little squares, define their area scale; otherwise retain the numerical ledger rather than substitute decorative areas for calculations.</p>
+
+<h2 id="section-6">Test the objective against a line through three points</h2>
+
+<p>Add dashed y=x+1. It hits the first, second and fourth observations exactly but leaves residual −1 at the third, giving squared sum 1, greater than 0.70. Exact-hit count is not this objective. To check the global minimum, set u=a−0.9 and v=b−0.9 and use the nonnegative decomposition below. Extra terms vanish only when u=v=0, establishing more than a visual comparison of two candidates. This uses four equal weights and a free intercept; changed weights, a forced origin or shortest-distance objective require a new calculation. An optional horizontal baseline y=2.25 has squared error 4.75. It uses the y mean but ignores x variation; the fitted line passes through mean point (1.5,2.25). These checks depend on the current four points and cannot remain fixed after changing inputs.</p>
+
+<pre><code class="language-text">u = a-0.9; v = b-0.9
+SSE(a,b) = 0.70 + 4*(u+1.5*v)^2 + 5*v^2 &gt;= 0.70
+SSE(1,1) = 1.00
+minimum attained only at (a,b)=(0.9,0.9)
+</code></pre>
+
+<h2 id="section-7">Troubleshoot arithmetic, coordinates and residual direction</h2>
+
+<p>If the third segment appears upward, inspect whether its arrow runs from fit to observation or backward, then check screen Y; do not change −0.7 to positive to remove visual confusion. A line through the origin may indicate a missing intercept. Before changing a seemingly steep slope, inspect both axis units. For an incorrect squared sum, check all four squares, remembering that a negative residual squares positively. Preserve the faulty version, fix one item and repeat both zero-sum checks. Keep all four inputs fixed: deleting the third point invalidates the original fit.</p>
+
+<h2 id="section-8">Reopen and deliver a reproducible calculation</h2>
+
+<p>Reopen the native file and match four observations, four fitted values and four vertical residuals. Keep the control line dashed and the fit solid. After SVG or PDF export, check ŷ, minus signs, 0.70 and axis units; blurred raster numerals are not mathematical rounding. Deliver inputs, intermediate quantities, prediction-residual table, minimum decomposition and graphics. State that fictional points establish no causation, error distribution or reliable extrapolation. Mark reopening and export complete only if performed; these reproducible steps claim neither device-measured statistical precision nor automatic regression. Label residuals in y-axis units, never turning 20 screen pixels into 20 data units. For later real measurements, save a separate exercise, state source, units and weights, then refit rather than copy the two coefficients 0.9 as analysis results.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-paired-value-scatterplot/">VectorPaint scatterplots: map every point to two values</a>; <a href="/en/guides/vectorpaint-coordinate-line-chart/">VectorPaint manual line charts: plot coordinates before connecting one dataset</a>.</p>
+
+<p>Method sources: <a href="https://www.itl.nist.gov/div898/handbook/pmd/section4/pmd431.htm">NIST/SEMATECH e-Handbook §4.4.3.1: Least Squares</a>.</p>
+
+<p>Version and operation scope: checked on 16 November 2026 against the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261116-final5">Apple public lookup</a>: version 1.0.8, requiring iOS / iPadOS 17.0 or later. The listing describes shapes, pen and Bézier nodes, grids and guides, layers and text, plus native files and SVG, PDF and PNG output. Use controls actually visible in the installed version. Calculate formulas and solutions externally, then construct points manually. No automatic mathematical calculation or exhaustive physical-device testing is claimed.</p>
+{% endraw %}

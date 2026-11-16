@@ -5,7 +5,7 @@ author: Bison
 title: '调调: Personal Music Player for iPhone and iPad'
 description: Organise and play your own music with 调调, including file imports, Wi-Fi transfers, offline listening, lyrics, queues and compatible personal music servers.
 permalink: /en/apps/diaodiao/
-modified: 2026-11-15
+modified: 2026-11-16
 lang: en
 source_url: /apps/diaodiao/
 ---
@@ -42,8 +42,12 @@ The public description lists **MP3, M4A, AAC, WAV, AIFF, CAF and FLAC**, with a 
 
 调调 provides playback tools for music supplied by the user, without a public online music catalogue. For a personal server, start with one authorised library and verify its directory and playback before expanding the collection. The public description does not enumerate every compatible server, and a result with one service does not certify all services.
 
+## Music themes and Home Screen widgets
+
+The public release notes for 1.0.1 add multiple music themes and Home Screen widgets. Preserve your current appearance before selecting an available theme, then inspect the content of any widget you add. Follow the actual themes, widget types and interactions offered on your device. If an older installation lacks an entry, check again after updating.
+
 ## Version and sources
 
-Checked on 14 November 2026: Apple’s public lookups for Russia and China both listed 调调 **1.0**, requiring **iOS or iPadOS 17.6 or later**. This introduction uses the published description and the official store screenshots it lists. No step-by-step testing on a physical device or private music server is claimed.
+Checked on 16 November 2026: Apple’s public lookups for Russia and China both listed 调调 **1.0.1**, requiring **iOS or iPadOS 17.6 or later**. This introduction uses the published description and the official store screenshots it lists. No step-by-step testing on a physical device or private music server is claimed.
 
 Sources: [official App Store download page](https://apps.apple.com/ru/app/%E8%B0%83%E8%B0%83-%E4%B8%AA%E4%BA%BA%E9%9F%B3%E4%B9%90%E6%92%AD%E6%94%BE%E5%99%A8/id6827171352?l=en-GB), [Apple’s Russia lookup](https://itunes.apple.com/lookup?id=6827171352&country=ru&entity=software), [Apple’s China lookup](https://itunes.apple.com/lookup?id=6827171352&country=cn&entity=software).
