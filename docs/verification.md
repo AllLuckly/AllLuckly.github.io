@@ -12,6 +12,8 @@
 - Safari实际抽查本批正文、代码或任务样本、目录定位与语言点击；390×844手机宽度检查长标题和新增阶段卡片，结束后恢复桌面。逐页范围见本机忽略目录output/tutorials-20261117/safari-qa.json，不将网页检查当成应用操作实测。
 - GitHub Desktop获取origin/master，发布前基线c95960d；2474份旧文章与译文逐字节保留，无删除或其他任务改动。git diff --check及281个新增文件独立空白检查通过。Worker候选仅增加140条真实路由至2672，2532条旧路由和处理逻辑保持。GitHub Desktop负责提交和推送；精确提交的Pages部署、线上HTML/搜索/Markdown与边缘协商推送后另核，本地验证不记为已上线。
 
+- 首轮远程发布记录：2026-11-17，提交`cefc2ed2e08b44d80e2b109e013643cfa781ca24`的[Pages任务44050125351](https://github.com/AllLuckly/AllLuckly.github.io/actions/runs/44050125351)中，Jekyll构建和artifact上传成功；部署步骤创建Pages deployment时返回HTTP502。原稿、生成资源和本地验证均保留。本条记录重试依据，最终发布状态以随后精确提交的部署及线上核验为准。
+
 ## 2026-11-16：七款应用各新增 10 篇中文及完整英文教程
 
 - 新增70篇中文详细教程与70篇完整英文；Aquarell、VectorPaint、漫阅+各220篇，书屿200篇、云映180篇、调调与键来各20篇，Yearn保留20篇。全站1100篇中文教程、8条真实学习路线；连续编号、14个新增阶段和逐篇资料见[本批证据](tutorial-evidence-20261116.md)。
