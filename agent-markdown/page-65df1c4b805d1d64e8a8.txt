@@ -1,0 +1,77 @@
+---
+layout: null
+permalink: /en/guides/manyue-png-chunk-name-four-property-bits-report/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Read a PNG chunk-name report in ManYue: four letters carry four different
+  flags'
+agent_source_url: https://allluckly.cn/en/guides/manyue-png-chunk-name-four-property-bits-report/
+agent_source_sha256: 97f2da5ea87bcd16b9b8899ba4cd822e9d21e5e217936cf73cbe82cdcbbd6fe3
+agent_generator_version: 1
+---
+{% raw %}# Read a PNG chunk-name report in ManYue: four letters carry four different flags
+
+Language: en
+Canonical: [Read a PNG chunk-name report in ManYue: four letters carry four different flags](<https://allluckly.cn/en/guides/manyue-png-chunk-name-four-property-bits-report/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-png-chunk-name-four-property-bits-report/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-png-chunk-name-four-property-bits-report/>)
+Published: 2026-11-17T00:00:00+08:00
+Modified: 2026-11-17T14:45:22+08:00
+Author: Bison
+
+Separate critical, public, reserved and safe-copy properties in an original four-column report without treating chunk names as pages.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-png-chunk-name-four-property-bits-report/>), translated on 2026-11-17. Original publication dates, attribution, code and version notes are retained.
+
+Prepare a small report of PNG chunk names and read its four letters position by position in ManYue. The aim is to interpret an external inspection list, rather than edit images in the reader. Names reveal property bits, not an unknown payload, actual decoding outcome or comic page count.
+
+## Prepare a three-page report with return anchors
+
+In an external document editor make three pages: original names, a four-column interpretation ledger, then counterexamples and checks. Use IHDR, tEXt and the hypothetical private name vpAg without inserting bytes into a real PNG. Add P1–P3 markers, export PDF and retain the editable source. Import it into ManYue, confirm all three markers and bookmark the ledger. The four-letter strings are report text, not an in-app inspection panel; three examples do not establish three source-image pages.
+
+## Copy exact case before naming four columns
+
+Zoom P1 until uppercase I and lowercase t are distinguishable. Copy each whole name, then align positions one through four on P2. PNG type codes use four ASCII letters; bitwise AND with numeric mask 32 tests each property bit. This means a mask value, not a thirty-second character or thirty-two pages. Uppercase gives zero and lowercase one. Each position has a separate meaning, so counting lowercase letters cannot classify the whole name. IHDR gives 0,0,0,0; tEXt gives 1,0,0,1; vpAg gives 1,1,0,1.
+
+Independently check ASCII values: lowercase t is 116 and uppercase T 84, differing by 32. AND with 32 yields 32 for 116 and zero for 84. If recording flags as zero/one, explicitly map nonzero to one rather than call 32 a thirty-second property. Four letters occupy four bytes, not four separate chunks. If a report uppercases tEXt, obtain case-preserving output before interpreting it.
+
+```text
+name  bit5 per byte (mask 32)
+IHDR  0 0 0 0
+tEXt  1 0 0 1
+vpAg  1 1 0 1
+```
+
+## Use the first flag only for critical versus ancillary
+
+The first uppercase letter denotes critical and lowercase ancillary. IHDR is critical; tEXt and vpAg are ancillary. This does not make critical information necessarily visible or all ancillary data freely disposable. A decoder encountering an unknown critical type cannot assume it understands the whole image correctly; it may ignore unknown ancillary chunks. Record these format rules without inventing a ManYue error message. For an actual failed image retain its source and observed feedback; an uppercase initial alone cannot identify a damaged chunk.
+
+## Keep public/private separate from network access
+
+The second uppercase letter means public and lowercase private: E makes tEXt public and p makes vpAg private. This concerns type definition, not encryption, paid membership, personal information or server login. Public does not mean uploaded online. Here vpAg demonstrates only a letter pattern; no payload is defined, so do not guess cover art, pagination or authorship. If an inspector documents a real private type, retain that definition and tool version separately instead of treating this hypothetical example as a registry.
+
+## Do not turn the reserved flag into a rendering verdict
+
+In the cited PNG version the third reserved bit must be zero, meaning uppercase. D, X and A satisfy it. Writing vpag changes the third character to lowercase a, so that datastream does not conform to this version’s naming rule. The decoder guidance nevertheless treats it as an unknown type and says not to signal an error merely for the set reserved bit. Separate file conformance from a reader’s display outcome. Correct report text only; changing real PNG name bytes does not automatically repair checksums or semantics.
+
+## Put the fourth flag back in its editing context
+
+The fourth lowercase letter marks an unknown chunk safe to copy after image modification; uppercase marks unsafe. tEXt and vpAg end lowercase; IHDR does not. This is neither viewing permission nor a malware verdict. The mechanism chiefly guides PNG editors handling unknown ancillary chunks; known chunks retain their specific rules. Safe-to-copy does not permit moving a chunk across IDAT or arbitrary reordering. Reading the report requires no image edits. For later external conversions inspect retained metadata rather than infer preservation from one successful display.
+
+## Test interpretation with one-position counterexamples
+
+On P3 compare tEXt with TEXT as strings, without claiming they are the same valid chunk. The original first and fourth bits are one; the uppercase string has all zeros, changing critical and copy properties. Automatic capitalization is therefore not cosmetic. Compare vpAg with vpAG next: only the last flag changes; ancillary and private stay unchanged. If all columns change, return to positional reading. For illegible text zoom and inspect the source PDF’s font. Leave uncertain cells unconfirmed instead of filling guesses from blurred characters.
+
+## Reopen and deliver separate property and observation ledgers
+
+Leave reading, reopen the bookmarked ledger and classify all three examples before returning to P1 for character checks. Explain why ancillary is not private, private is not encrypted, and safe-copy does not allow arbitrary reordering. Retain counterexamples and correction reasons; mark unperformed reopening or bookmarking pending. Deliver PDF, editable source and actual-observation column. This establishes report interpretation rather than universal PNG compatibility. After changing inspectors check whether names remain case-exact, since normalization can erase the evidence.
+
+## Related tutorials and sources
+
+[PNG text-chunk encoding](<https://allluckly.cn/en/guides/manyue-png-text-chunk-encoding-visible-lettering/>); [PNG transparency information](<https://allluckly.cn/en/guides/manyue-png-trns-colour-key-alpha-boundary/>).
+
+Method references: [W3C PNG sections5.4,13.2 and14.2](<https://www.w3.org/TR/png-3/#5Chunk-naming-conventions>). Diagrams, report data, counterexamples and ledgers are original exercises.
+
+Version checked on 17 November 2026: the [Apple public lookup](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261117>) lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later; see the [official App Store](<https://apps.apple.com/cn/app/id6753895889>) for published capabilities. Use self-made PDFs or supported comic images; controls depend on the installed version. External preparation and paper predictions do not constitute device observations. Leave unperformed checks blank.
+{% endraw %}

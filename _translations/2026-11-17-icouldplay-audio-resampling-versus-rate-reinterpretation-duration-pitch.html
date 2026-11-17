@@ -1,0 +1,75 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'Compare audio rates in iCouldPlay: resampling differs from rate reinterpretation'
+description: Audit 48000 samples, proper conversion and unchanged samples at a new
+  rate; separate audio duration from the movie timeline.
+permalink: /en/guides/icouldplay-audio-resampling-versus-rate-reinterpretation-duration-pitch/
+date: '2026-11-17 00:00:00 +08:00'
+modified: '2026-11-17 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 183
+topic: Picture and sound measurements
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-17-icouldplay-audio-resampling-versus-rate-reinterpretation-duration-pitch.md
+source_url: /guides/icouldplay-audio-resampling-versus-rate-reinterpretation-duration-pitch/
+translation_method: editorial
+translation_source_sha256: 7716eaf0ec66501302dead872ec3ed8b2cd913e954cadce7e52d897992801e45
+translation_date: '2026-11-17T07:30:31+00:00'
+excerpt: Audit 48000 samples, proper conversion and unchanged samples at a new rate;
+  separate audio duration from the movie timeline.
+---
+{% raw %}
+<p>A new 44.1-kHz rate need not slow the sound. Identify externally prepared copies and sample counts, then compare them within owned video rather than treating player speed as sample-rate conversion.</p>
+
+<h2 id="fix-a-one-second-pcm-reference">Fix a one-second PCM reference</h2>
+
+<p>Use a paper source at 48000 samples per second: one second and 48000 mono samples. A separately generated known 1000-Hz tone can support listening; ordinary dialogue is not assigned that frequency by ear. Retain source/generation records and sample evidence rather than infer count from compressed size. Prepare variants in an available external tool and identify its actual rate/resampling controls. iCouldPlay plays the final owned video; no WAV-header inspector, tone generator or universal standalone-audio import is assumed.</p>
+
+<h2 id="compute-duration-as-sample-count-divided-by-rate">Compute duration as sample count divided by rate</h2>
+
+<p>Divide sample count by samples per second for this ideal PCM duration. Proper conversion to 44100 Hz while retaining one second yields 44100 samples. Keeping all 48000 samples but interpreting them at 44100 Hz instead gives 160/147 seconds, about 1.0884. Retain exact counts/fractions, without confusing 4800 with 48000. Channels and bit depth affect storage, but this duration ledger fixes a mono-sample framework instead of dividing bytes directly by hertz.</p>
+
+<pre><code class="language-text">A: N=48000 samples; fs=48000 Hz; duration=N/fs=1 s
+B: proper conversion; N=44100; fs=44100; duration=1 s
+C: unchanged N=48000; fs=44100; duration=160/147 s
+known 1000 cycles:
+A/B frequency=1000 Hz; C frequency=1000*147/160=918.75 Hz
+common picture timeline=3 s (does not measure audio duration)
+</code></pre>
+
+<h2 id="distinguish-resampling-from-changing-a-rate-label">Distinguish resampling from changing a rate label</h2>
+
+<p>Proper conversion reconstructs the signal on a new time grid with bandwidth handling; values and count may change. Save a properly resampled copy and a clearly named rate-interpretation experiment separately. Read the external tool’s semantics rather than trust a menu label. Check the one-second relation on PCM first. Later compressed export can add encoder delay/padding, so distinguish effective audio from container counts instead of demanding every packet quantity match this ideal ledger.</p>
+
+<h2 id="use-a-known-tone-as-a-calculable-control">Use a known tone as a calculable control</h2>
+
+<p>For an actual known 1000-cycle source, proper one-second conversion retains a 1000-Hz interpretation. Reinterpreting the same cycles over 160/147 seconds gives 918.75 Hz. That follows known cycles/time, not guessed dialogue pitch or byte-identical transcoding. Downsampling also introduces bandwidth constraints. The low reference lies well below either theoretical Nyquist limit, but one tone does not prove lossless conversion of arbitrary music or identify every filtering consequence.</p>
+
+<h2 id="retain-audio-boundaries-when-adding-a-picture">Retain audio boundaries when adding a picture</h2>
+
+<p>Place the three sounds into the same owned picture externally, with common audio starts and recorded endpoints. If all pictures last three seconds, all movie durations can remain three seconds despite different audio durations. Burned-in identities/expectations are labels, not live measurements. Recheck track/source pairing after export. Tail padding, trimming or automatic alignment changes conditions and must not be attributed to the resampler without evidence.</p>
+
+<h2 id="check-anchors-at-normal-playback-speed">Check anchors at normal playback speed</h2>
+
+<p>Open each through an available source and confirm file/track identity. Retain normal speed, output and volume while comparing anchors and the known tone. Compensating with a player speed setting does not repair the file’s conversion. Use available progress displays only within their precision; a one-decimal-place display is not a precise sample clock. Equal total movie lengths still require external audio-boundary evidence. Undisplayed sample counts remain external evidence, not an invented automatic player diagnosis.</p>
+
+<h2 id="separate-rate-interpretation-from-other-pitch-changes">Separate rate interpretation from other pitch changes</h2>
+
+<p>For longer duration plus lower pitch, inspect rate reinterpretation. Changed pitch without duration change suggests another process; changed listening alone needs track/output checks. These are different causes. Correct one external condition and retain the old copy rather than merely rename it. Tools may use pitch-preserving time stretch or export resampling, so inspect actual semantics. Filtering quality, codec delay and device compatibility remain untested unless checked separately; playability does not establish lossless conversion.</p>
+
+<h2 id="reopen-three-identities-and-two-timelines">Reopen three identities and two timelines</h2>
+
+<p>Retain the original, converted and rate-interpreted identities with count, rate, theoretical PCM duration, effective audio interval and movie duration separately sourced. Recompute 1.0884 seconds and 918.75 Hz only for this known example, keeping actual listening separate. Restore normal everyday playback and retain originals. Exclude unperformed editing/device steps. New counts, rates or codecs need a renewed ledger; this links file processing to playback without inventing an audio editor or universal repair feature.</p>
+
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+
+<p><a href="/en/guides/icouldplay-audio-sample-rate-bit-rate-size/">Audio parameters and units</a>, <a href="/en/guides/icouldplay-speed-pitch-preservation-control-copies/">Speed and pitch</a>.</p>
+
+<p>Method sources: <a href="https://www.audacityteam.org/manual/track-control-panel/audio-track-item/">Audacity audio-track rate and resampling</a>, <a href="https://manual.audacityteam.org/man/sample_rates.html">Audacity Sample Rates</a>.</p>
+
+<p>Checked on November 17, 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261117">Apple public lookup</a> list public version 1.1.1, requiring iOS / iPadOS 15.0 or later. Use published file sources, playback and visible controls. Prepare materials, reports and calculations externally. Installed capabilities and owned materials determine the actual result; no physical-device, private-server or exhaustive format test is claimed.</p>
+{% endraw %}

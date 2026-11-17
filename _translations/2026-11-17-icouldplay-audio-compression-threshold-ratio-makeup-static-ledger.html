@@ -1,0 +1,78 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'Listen to compressed dialogue in iCouldPlay: a four-to-one ratio is not quarter
+  volume'
+description: Check an original four-level static model against make-up gain and fixed
+  gain, keeping transient observations separate.
+permalink: /en/guides/icouldplay-audio-compression-threshold-ratio-makeup-static-ledger/
+date: '2026-11-17 00:00:00 +08:00'
+modified: '2026-11-17 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 182
+topic: Picture and sound measurements
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-17-icouldplay-audio-compression-threshold-ratio-makeup-static-ledger.md
+source_url: /guides/icouldplay-audio-compression-threshold-ratio-makeup-static-ledger/
+translation_method: editorial
+translation_source_sha256: ba9d82f858969382f1f389be41b6a4784c0ff39fe9cc45bd8007ed5f5c60f732
+translation_date: '2026-11-17T07:30:31+00:00'
+excerpt: Check an original four-level static model against make-up gain and fixed
+  gain, keeping transient observations separate.
+---
+{% raw %}
+<p>Dynamic compression differs from uniformly reducing an entire track. Prepare an authorised processed copy externally and compare playback on one output path after checking threshold, ratio and make-up gain on paper.</p>
+
+<h2 id="preserve-identities-for-original-and-processed-sound">Preserve identities for original and processed sound</h2>
+
+<p>Use owned dialogue or original test sound, preserving an unmodified source. Prepare a copy in an existing external editor and record actual threshold, ratio, knee, make-up, attack and release. Missing controls leave the model-only task available without invented menus. Place sound into owned playable video externally, retaining picture/cuts/captions across copies before opening them through an available source. A filename is not parameter evidence. iCouldPlay is not assumed to contain Audacity or its effects; editing, packaging and playback are separate checks.</p>
+
+<h2 id="calculate-four-inputs-with-an-ideal-hard-knee">Calculate four inputs with an ideal hard knee</h2>
+
+<p>Use threshold -18 dB, ratio 4:1 and initially zero make-up. Below threshold retain the input; above it divide only the excess by four, then add the threshold back. Inputs -24,-18,-14,-6 give -24,-18,-17,-15. This is not dividing -6 itself by four to get -1.5, nor reducing sample amplitude to one-quarter. All levels share a reference and describe an ideal steady-state hard-knee curve, not every instant of transient dialogue. Actual knee, timing and detector behaviour require separate records.</p>
+
+<pre><code class="language-text">ideal hard knee; common level reference; threshold T=-18 dB
+output(x)=x                       when x&lt;=T
+output(x)=T+(x-T)/4               when x&gt;T
+input:             -24, -18, -14, -6
+compressed:        -24, -18, -17, -15
+compressed+3 dB:   -21, -15, -14, -12
+fixed gain -9 dB:  -33, -27, -23, -15
+above-threshold span: 8 -&gt; 2 dB; whole-set span:18 -&gt; 9 dB
+</code></pre>
+
+<h2 id="compare-above-threshold-differences-with-total-span">Compare above-threshold differences with total span</h2>
+
+<p>The above-threshold pair spans 8 dB in and 2 dB out, matching 4:1. The entire set spans 18 dB in and 9 dB out, not 18/4, because the lower input is unchanged. Record these two comparisons separately instead of diagnosing a failed ratio from overall span. At -18 the rule joins continuously; an extra -20 input remains -20. These are paper expectations. Do not subtract player percentages from decibels or infer exact levels from listening.</p>
+
+<h2 id="treat-make-up-gain-as-a-uniform-output-shift">Treat make-up gain as a uniform output shift</h2>
+
+<p>Adding 3 dB afterward gives -21,-15,-14,-12 while retaining all output differences. Make-up can raise level without restoring the original relationships or guaranteeing freedom from clipping. Keep zero/+3 columns separate rather than also moving the threshold to -15 dB, which would change the conditions. Record actual automatic make-up or soft-knee behaviour instead of substituting an editor’s defaults into this ideal ledger. Preserve originals and export any changed audio under a new identity rather than reuse an old result label.</p>
+
+<h2 id="use-an-equal-peak-fixed-gain-control">Use an equal-peak fixed-gain control</h2>
+
+<p>Uniformly subtracting 9 dB from the four inputs gives -33,-27,-23,-15. Its peak matches zero-make-up compression, but quiet levels differ. Fixed gain preserves input differences while a dynamic curve changes their relationship; matching one peak does not make files equivalent. An externally labelled steady-state control can accompany dialogue under a distinct identity. Establish whether its plateau lasts long enough for actual timing behaviour. This is not a preference ranking or a claim about bitrate compression.</p>
+
+<h2 id="compare-segment-relationships-on-a-fixed-output-path">Compare segment relationships on a fixed output path</h2>
+
+<p>Open original and processed versions, identify the same sentence/segment and retain a comfortable everyday level, track and output. Do not chase each quiet section with the volume slider. Record soft speech, accents and transitions without treating an audible difference as an exact ratio measurement. Added music, denoising or mixing introduces extra variables. Without processed material, leave playback pending. A paper pass neither means iCouldPlay processed the sound nor tests every speaker, headset or long-play state.</p>
+
+<h2 id="diagnose-curve-parameters-and-transient-conditions">Diagnose curve parameters and transient conditions</h2>
+
+<p>For mismatch, inspect threshold/make-up, then knee, detector and timing. A short sound missing a steady-state value does not alone prove a broken tool. Record changed channels, replay gain or other processing and restore one condition. Retain the time/source of distortion instead of continually increasing gain. This lesson sets no loudness certification target. Meter display, file samples and subjective loudness are separate evidence; waveform image height does not calibrate every output path.</p>
+
+<h2 id="reopen-and-deliver-the-three-comparisons">Reopen and deliver the three comparisons</h2>
+
+<p>Retain originals, compressed/fixed-gain copies and the four-level ledger, then reopen identified segments. Recompute why the above-threshold 8 becomes 2 while the full span 18 becomes 9, and explain the uniform make-up shift. Report actual listening separately from unperformed peak/transient/device tests. Recalculate after parameter/material changes. This links external processing with playback observations; it does not invent a player compressor, automatic dialogue repair or a guarantee that any recording improves.</p>
+
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+
+<p><a href="/en/guides/icouldplay-audio-sample-peak-dbfs-volume-boundary/">Sound levels</a>, <a href="/en/guides/icouldplay-audio-rms-peak-window-duty-cycle-model/">Equal peaks and RMS</a>.</p>
+
+<p>Method sources: <a href="https://www.audacityteam.org/manual/effects/volume-and-compression/compressor/">Audacity Compressor manual</a>.</p>
+
+<p>Checked on November 17, 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261117">Apple public lookup</a> list public version 1.1.1, requiring iOS / iPadOS 15.0 or later. Use published file sources, playback and visible controls. Prepare materials, reports and calculations externally. Installed capabilities and owned materials determine the actual result; no physical-device, private-server or exhaustive format test is claimed.</p>
+{% endraw %}

@@ -1,0 +1,86 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Read a PDF outline report in ManYue: signed Count describes visible descendants,
+  not pages'
+description: Calculate visible entries in a six-item tree and distinguish document
+  outlines from reader-created bookmarks.
+permalink: /en/guides/manyue-pdf-outline-count-open-visible-descendants-report/
+date: '2026-11-17 00:00:00 +08:00'
+modified: '2026-11-17 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 222
+topic: Structure and meaning in file reports
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-17-manyue-pdf-outline-count-open-visible-descendants-report.md
+source_url: /guides/manyue-pdf-outline-count-open-visible-descendants-report/
+translation_method: editorial
+translation_source_sha256: be011d67d59e6308a4f6de5265bfdbe7bfe43c8ede867623d6759574eb1f342b
+translation_date: '2026-11-17T06:45:22.918977+00:00'
+excerpt: Calculate visible entries in a six-item tree and distinguish document outlines
+  from reader-created bookmarks.
+---
+{% raw %}
+<p>When an external PDF report contains Count, identify its dictionary first. This exercise analyzes outline-item counts using an original tree, separating all descendants, currently visible descendants and page count. Read the report as a normal PDF in ManYue; the paper and location checks work even without a document-outline panel.</p>
+
+<h2 id="draw-six-items-with-unambiguous-indentation">Draw six items with unambiguous indentation</h2>
+
+<p>In an external editor place A at the top, A1 and A2 below it, A1a and A1b below A1, and A2a below A2. This is six outline items including A. Use connectors or explicit indentation rather than adjacent text to establish parentage. Put the tree, count ledger and counterexamples on report pages P1–P3. Six items and three report pages describe different objects; multiple entries may target one page. Keep the editable source and do not claim the illustrated tree was embedded as real PDF outline objects.</p>
+
+<pre><code class="language-text">A [open]
+  A1 [open]
+    A1a
+    A1b
+  A2 [closed]
+    A2a
+</code></pre>
+
+<h2 id="list-children-before-all-descendants">List children before all descendants</h2>
+
+<p>For A, immediate children are A1 and A2, totaling two. All descendants additionally include A1a, A1b and A2a, totaling five. A is not its own descendant. A1 has two immediate children and two descendants; A2 has one of each. Establish these state-independent sets before calculating Count to avoid adding A again at every level. Repair unclear connectors in the source rather than choose a convenient hierarchy. Names identify entries: A1a is not a page-number notation.</p>
+
+<h2 id="calculate-open-a-from-visible-descendants">Calculate open A from visible descendants</h2>
+
+<p>Keep A and A1 open and A2 closed. Opening A exposes A1, A1a, A1b and A2; A2a remains hidden below A2. A’s outline-item Count is therefore +4, not all five descendants or just two immediate children. Add both immediate children, then recurse only through open A1 to add two more. Stop at closed A2. A1 has Count +2. List the four names beside the result for auditing. Do not substitute a root-outline dictionary Count or page-tree Count; each counts a different object.</p>
+
+<p>As another control, open A2 without changing the tree. A gains visible A2a, so Count changes 4 to 5 and A2 changes−1 to+1. All six items still exist. Circle the newly visible item and take the difference from the four-name list rather than guess Count from total entries.</p>
+
+<h2 id="interpret-negative-as-closed-rather-than-negative-quantity">Interpret negative as closed rather than negative quantity</h2>
+
+<p>Closed A2 would reveal one item, A2a, if opened, so its Count is −1. Closing A while preserving child states gives A Count −4, not −5 and not deletion of four entries. Now close only A1 and reopen A: only A1 and A2 are visible, so A becomes +2 and A1 is −2. Change one state and list visible names again to distinguish sign from magnitude. Leaves have no descendants; do not invent a nonzero Count for every leaf merely to fill a table.</p>
+
+<pre><code class="language-text">state                              A Count  A1 Count  A2 Count
+A open, A1 open, A2 closed             4         2        -1
+A closed, A1 open, A2 closed          -4         2        -1
+A open, A1 closed, A2 closed           2        -2        -1
+</code></pre>
+
+<h2 id="use-reading-anchors-without-inventing-an-outline-panel">Use reading anchors without inventing an outline panel</h2>
+
+<p>Import the report into ManYue, read P1 then P2, and create a reader bookmark for the first state’s four-name ledger. That bookmark returns to report content without proving a native outline exists. If a document-directory control is actually available, separately record its entry, displayed items and result. Otherwise read the report without claiming a tested panel. Check page markers when comparing states so another revision is not mistaken for the original. A reader bookmark named state one has no automatic relationship to a PDF outline Title field.</p>
+
+<h2 id="distinguish-the-pdf-dictionary-from-similarly-named-generator-parameters">Distinguish the PDF dictionary from similarly named generator parameters</h2>
+
+<p>Label P3 explicitly: this ledger concerns Count in a PDF outline-item dictionary, not Count in Adobe pdfmark generation syntax. The latter’s magnitude counts immediate children, unlike this recursive visible-descendant count. In the initial tree A has two immediate children but PDF-item Count 4; both values can be correct in their own context. If a report does not distinguish final PDF fields from generator parameters, mark the context unknown. Retain original keys and documentation instead of handing over bare integers as a compatibility judgment.</p>
+
+<p>Give A1a and A1b the same illustrative display title: they remain two items, not one after title deduplication. Renaming one item also adds no descendant. Preserve object or path identity in an inspection report instead of a supposedly unique title column. Without that evidence leave same-name relationships unconfirmed.</p>
+
+<h2 id="diagnose-counts-by-their-included-name-differences">Diagnose counts by their included-name differences</h2>
+
+<p>A result of five may include hidden A2a; six may additionally count A itself. Two may omit A1’s visible children. Four after closing A1 suggests stale state. Preserve the old name list and correction location instead of replacing only the result. Zoom small labels. If a tree splits across pages, repair external layout so a page break does not imply a hierarchy boundary. These diagnose the ledger, not evidence that the reader damaged the PDF.</p>
+
+<h2 id="reopen-and-accept-three-different-quantities">Reopen and accept three different quantities</h2>
+
+<p>Reopen the bookmarked report and reconstruct six total items, five descendants of A and four initially visible descendants. Its three report pages remain three regardless of illustrated expansion. Deliver the state table, generator distinction and actual-reading notes, leaving unperformed reopening pending. A later PDF with real outlines needs a separate file and reliable external structural inspection. This paper derivation does not establish every reader’s expansion behavior. On the next Count field, identify its object before counting.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/manyue-pdf-named-destination-key-target-page/">PDF destination identity</a>; <a href="/en/guides/manyue-page-bookmarks/">Reader bookmarks and locations</a>.</p>
+
+<p>Method references: <a href="https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/pdfreference1.7old.pdf">Adobe PDF1.7 section8.2.2</a>; <a href="https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html">Adobe pdfmark: OUT parameter distinction</a>. Diagrams, report data, counterexamples and ledgers are original exercises.</p>
+
+<p>Version checked on 17 November 2026: the <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261117">Apple public lookup</a> lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later; see the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities. Use self-made PDFs or supported comic images; controls depend on the installed version. External preparation and paper predictions do not constitute device observations. Leave unperformed checks blank.</p>
+{% endraw %}

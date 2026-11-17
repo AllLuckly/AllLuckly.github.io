@@ -1,0 +1,77 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'Read compositing controls in iCouldPlay: do not multiply premultiplied colour
+  twice'
+description: Use one linear working space to audit green over magenta and three records
+  within an already flattened video.
+permalink: /en/guides/icouldplay-straight-premultiplied-alpha-flattened-reference-colours/
+date: '2026-11-17 00:00:00 +08:00'
+modified: '2026-11-17 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 184
+topic: Picture and sound measurements
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-17-icouldplay-straight-premultiplied-alpha-flattened-reference-colours.md
+source_url: /guides/icouldplay-straight-premultiplied-alpha-flattened-reference-colours/
+translation_method: editorial
+translation_source_sha256: c009232cf9dc8bb80fa25a83f726b06f01c92e6b17bf8635913a2b03f4d016a4
+translation_date: '2026-11-17T06:55:49+00:00'
+excerpt: Use one linear working space to audit green over magenta and three records
+  within an already flattened video.
+---
+{% raw %}
+<p>A darker patch is not automatically a changed player brightness setting. Prepare a colour-explanation video externally, distinguishing straight, premultiplied and opaque results; iCouldPlay only replays the flattened video.</p>
+
+<h2 id="fix-the-working-space-and-an-opaque-backdrop">Fix the working space and an opaque backdrop</h2>
+
+<p>Use straight foreground green (0,1,0), alpha one-quarter, over opaque magenta (1,0,1). Define every component in one linear working space, not as screenshot byte values; display encoding requires a separate conversion. Record foreground, backdrop, alpha and calculation domain before creating the illustration. Without a suitable existing tool, keep the paper task and uncertainties rather than insert arbitrary screen-picker values. Retain sources and distinguish opaque from transparent backdrops.</p>
+
+<h2 id="multiply-straight-colour-by-alpha-once">Multiply straight colour by alpha once</h2>
+
+<p>With an opaque backdrop, foreground contribution is green times one-quarter and backdrop contribution is magenta times three-quarters. Their sum is (3/4,1/4,3/4). Output alpha is 1 because the backdrop is opaque, not the foreground’s one-quarter. The ledger gives equivalent straight/premultiplied forms for ordinary source-over. Other blend modes or calculation spaces are different conditions; do not compare them and diagnose an error in this model.</p>
+
+<pre><code class="language-text">all colour components use one declared linear working space
+straight Cs=(0,1,0); alpha_s=1/4; opaque Cb=(1,0,1)
+premultiplied cs=alpha_s*Cs=(0,1/4,0)
+correct output=cs+(1-alpha_s)*Cb=(3/4,1/4,3/4); alpha_o=1
+wrong double multiplication=(3/4,1/16,3/4)
+control alpha_b=1/2: co=(3/8,1/4,3/8); alpha_o=5/8
+control straight Co=co/alpha_o=(3/5,2/5,3/5)
+</code></pre>
+
+<h2 id="keep-premultiplied-colour-and-alpha-in-separate-fields">Keep premultiplied colour and alpha in separate fields</h2>
+
+<p>Premultiplied foreground is (0,1/4,0) while alpha remains one-quarter. Premultiplication does not set alpha to 1 or create another opaque object: the colour already carries its contribution. Add it directly to the remaining backdrop contribution. Multiplying again incorrectly reduces green to 1/16. Label representations explicitly instead of transmitting a component triple without its semantics. The same numbers under different conventions need not represent the same foreground; inspect record meaning separately from appearance.</p>
+
+<h2 id="check-output-conversion-with-a-translucent-backdrop">Check output conversion with a translucent backdrop</h2>
+
+<p>In a separate paper control, change only backdrop alpha to one-half. Foreground contribution stays quarter green and backdrop contribution becomes three-eighths magenta. Output premultiplied colour is (3/8,1/4,3/8), with output alpha 5/8. Divide by 5/8 to recover straight colour (3/5,2/5,3/5). Keep numerator/denominator order explicit. This control tests representation conversion without silently replacing the main backdrop. An output alpha of zero cannot be used as a divisor.</p>
+
+<h2 id="prepare-a-flattened-explanation-video-externally">Prepare a flattened explanation video externally</h2>
+
+<p>Create labelled correct, double-multiplied-error and original-component explanatory frames externally. Assemble them into an owned video whose frames are already flattened onto an opaque backdrop, using a known-playable export. This does not require iCouldPlay to composite layers or support every alpha-video track. Burned-in numbers are labels, not a player colour meter. Retain the working source and conversion notes. Display conversion can change numerical coordinates; a screenshot is not required to equal the paper’s linear triples.</p>
+
+<h2 id="read-labels-before-comparing-patches-on-one-output">Read labels before comparing patches on one output</h2>
+
+<p>Open the explanation clip through an available path and verify frame order/labels. Keep presentation, brightness and output fixed. Identify each calculation before interpreting darkness as an automatic display change. Record whether differences are visible under the actual conditions without inventing numerical colour error or calibration results. A new source/display mode is an added condition. App theme changes are also separate from pixel compositing and do not recalculate the source video.</p>
+
+<h2 id="diagnose-representation-compositing-and-presentation">Diagnose representation, compositing and presentation</h2>
+
+<p>For incorrect green contribution, inspect premultiplication before compensating with brightness. For incorrect alpha, inspect the backdrop. For screenshot differences, inspect working space/export/display. These are separate layers. Correct one external condition while retaining the previous result as a control. Leave decoder, colour-management and panel behaviour unknown unless tested. One patch does not certify all HDR/alpha formats. Without external rendering, deliver paper calculations rather than claim device-rendering validation.</p>
+
+<h2 id="reopen-with-representation-and-movie-identities">Reopen with representation and movie identities</h2>
+
+<p>Retain straight/premultiplied records, correct/error controls and the translucent-backdrop page, then reopen the identified explanation video. Explain the opaque main output, why premultiplied colour is not multiplied twice, and how 5/8 recovers the alternate straight result. Preserve observations separately from calculations and restore everyday display conditions. New components/spaces require a new ledger. These values are not universal screen standards or proof of added layer editing, alpha codecs or device-wide colour certification.</p>
+
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+
+<p><a href="/en/guides/icouldplay-ass-bgr-colour-alpha-component-visibility/">Caption colour and alpha</a>, <a href="/en/guides/icouldplay-hdr-colour-comparison/">Colour observation conditions</a>.</p>
+
+<p>Method sources: <a href="https://www.w3.org/TR/compositing-1/#simplealphacompositing">W3C Compositing and Blending Level1 draft §5.1</a>.</p>
+
+<p>Checked on November 17, 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261117">Apple public lookup</a> list public version 1.1.1, requiring iOS / iPadOS 15.0 or later. Use published file sources, playback and visible controls. Prepare materials, reports and calculations externally. Installed capabilities and owned materials determine the actual result; no physical-device, private-server or exhaustive format test is claimed.</p>
+{% endraw %}

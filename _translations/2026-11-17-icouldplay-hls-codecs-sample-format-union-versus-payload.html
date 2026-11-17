@@ -1,0 +1,82 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay HLS codec declarations: audit the list without treating it as payload proof'
+description: Parse avc1 and mp4a descriptors, union formats from a referenced audio group and compare separate media
+  evidence.
+permalink: /en/guides/icouldplay-hls-codecs-sample-format-union-versus-payload/
+date: '2026-11-17 00:00:00 +08:00'
+modified: '2026-11-17 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 188
+topic: Events, candidates and declaration evidence
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-17-icouldplay-hls-codecs-sample-format-union-versus-payload.md
+source_url: /guides/icouldplay-hls-codecs-sample-format-union-versus-payload/
+translation_method: editorial
+translation_source_sha256: ecc5cf25e3f92c6e2001e65c981c76294ff03adba3d75f806e154adde772c044
+translation_date: '2026-11-17T07:01:07+00:00'
+excerpt: Parse avc1 and mp4a descriptors, union formats from a referenced audio group and compare separate media
+  evidence.
+---
+{% raw %}
+<p>CODECS in a master is a declaration, not a report from inspected media bytes. Read one video and two audio candidates, check why three formats belong in the list, and separate hexadecimal from decimal fields. Observe current real-source playback in iCouldPlay; editing strings neither transcodes, creates tracks nor installs decoders.</p>
+
+<h2 id="section-1">Separate declarations from media evidence</h2>
+
+<p>Retain master text, acquisition time, video entry and referenced audio playlists, with separate byte identities for real resources. Without media, use the hypothetical sample and mark evidence unavailable instead of copying declarations into “measured codecs”. For owned media, use trustworthy production records or external inspection reports tied to file identity and time, not a same-named older copy. Separate declaration, report and playback. Neither third-party downloading nor a hexadecimal stream editor or automatic CODECS repair screen in iCouldPlay is assumed.</p>
+
+<h2 id="section-2">Read two different audio formats in one referenced group</h2>
+
+<p>The sound group has English AAC and French AC-3 audio candidates. Different default/automatic flags do not change formats. Additionally assume H.264 video in the same presentation, so CODECS lists avc1.4d401e, mp4a.40.2 and ac-3. These are not three simultaneously played audio tracks or a container called CODECS. BANDWIDTH is hypothetical, not evidence for a codec. No media or actual responses accompany these names and suffixes, so the text establishes no playable server.</p>
+
+<pre><code class="language-text">#EXTM3U
+#EXT-X-VERSION:4
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=&quot;sound&quot;,NAME=&quot;English AAC&quot;,LANGUAGE=&quot;en&quot;,DEFAULT=YES,AUTOSELECT=YES,CHANNELS=&quot;2&quot;,URI=&quot;audio-aac.m3u8&quot;
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=&quot;sound&quot;,NAME=&quot;French AC3&quot;,LANGUAGE=&quot;fr&quot;,DEFAULT=NO,AUTOSELECT=YES,CHANNELS=&quot;6&quot;,URI=&quot;audio-ac3.m3u8&quot;
+#EXT-X-STREAM-INF:BANDWIDTH=2400000,CODECS=&quot;avc1.4d401e,mp4a.40.2,ac-3&quot;,AUDIO=&quot;sound&quot;
+video.m3u8
+</code></pre>
+
+<h2 id="section-3">Parse sample entries and number bases under RFC 6381</h2>
+
+<p>avc1 is the sample-entry identifier; split 4d401e into hexadecimal bytes 4d,40,1e, decimal 77,64,30: profile, constraint-flags byte and level, not a frame count. In mp4a.40.2, 40 is a hexadecimal object-type indication, decimal 64; final 2 is the decimal AAC-LC audio object type. Identical characters 40 occupy different descriptor positions and do not establish the same media parameter. Values are case-sensitive: preserve avc1 and mp4a without inserting spaces to invent new identifiers.</p>
+
+<h2 id="section-4">Include formats from every rendition in the referenced group</h2>
+
+<p>For a variant referencing such a rendition group, RFC 8216 requires CODECS to include every sample format present in any member. Here union H.264 video with AAC and AC-3 audio, retaining all three even though AAC is default. Combine member format cards, then video, counting duplicate formats once rather than adding strings per track. The set describes possible combinations, not simultaneous decoding of both languages. Changed media encoding requires renewed declaration review even if an old playlist still opens; a tidy list is not permanent accuracy.</p>
+
+<h2 id="section-5">Compare independent media records instead of copying tags</h2>
+
+<p>The card below is explicitly assumed, not measured, for a paper set comparison. Replace each format with independent results tied to owned bytes in a real task, checking omissions, extras and configuration differences. A label H.264 alone may not establish the avc1 suffix; profile and level need reliable evidence. Mark partial match or unknown instead of guessing. Playback on one selected path cannot audit an unselected audio format. External inspection does not imply an identical built-in iCouldPlay tool or convert assumptions into observations.</p>
+
+<pre><code class="language-text">ASSUMED FORMAT CARD — NOT A MEASUREMENT
+video.m3u8       video: avc1.4d401e
+audio-aac.m3u8   audio: mp4a.40.2
+audio-ac3.m3u8   audio: ac-3
+required union: avc1.4d401e,mp4a.40.2,ac-3
+</code></pre>
+
+<h2 id="section-6">Record each playback candidate separately</h2>
+
+<p>With real media, start normally and record selected audio name, visible codec information and sound, marking undisplayed fields so. If another audio can be selected, replay the same interval with video, speed and output fixed. AAC success and AC-3 failure need separate access, media and decoding checks, not certification of all three descriptors. Editing CODECS neither creates missing audio nor installs decoding capability; do not replace identifiers with supposedly compatible names arbitrarily. Leave unperformed switching and inspection unperformed.</p>
+
+<h2 id="section-7">Locate a missing-format declaration in a copy</h2>
+
+<p>Copy the master and remove only ac-3 from CODECS while retaining the French candidate’s assumed actual format. The list remains readable but omits a required referenced-group format, detectable by set audit without a fixed player error. Restore three entries and check spelling, quotes and commas. A naïve comma split of the whole attribute line would break the quoted list. If independent media is no longer AC-3, preserve the mismatch and verify report identity rather than blindly restore an obsolete name. Keep one-factor copies and never call relabelling successful encoding.</p>
+
+<h2 id="section-8">Reopen with the set and its evidence limits</h2>
+
+<p>Reopen the correct master and count one video entry, two audio members and three formats. Recompute bytes 4d,40,1e as 77,64,30 and the final audio item as decimal 2. Deliver text, group-format set, report identity or assumed card, candidate results and unknowns. After reentry verify the actual selected track rather than infer it from an old default label. CODECS is neither extension, track total, automatic transcoding nor universal compatibility certification. The outcome is traceable declarations and evidence, not exhaustive byte or hardware validation.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/icouldplay-container-codec-stream-inventory/">iCouldPlay media inventory: separate container, video codec and audio streams</a>; <a href="/en/guides/icouldplay-hls-audio-channels-maximum-count-not-track-output/">iCouldPlay HLS CHANNELS: distinguish maximum count from tracks and speaker output</a>.</p>
+
+<p>Method sources: <a href="https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.1.1">RFC8216 §4.3.4.1.1</a>; <a href="https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.2">RFC8216 §4.3.4.2</a>; <a href="https://www.rfc-editor.org/rfc/rfc6381#section-3.3">RFC6381 §3.3</a>.</p>
+
+<p>Checked on 17 November 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261117-hls">Apple public lookup</a> list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Placeholder addresses supply neither media nor keys. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.</p>
+{% endraw %}

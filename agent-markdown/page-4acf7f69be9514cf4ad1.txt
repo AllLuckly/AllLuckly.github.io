@@ -1,0 +1,77 @@
+---
+layout: null
+permalink: /guides/manyue-epub-page-progression-direction-not-spine-reversal-report/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 漫阅+ EPUB方向报告跟读：rtl不把三项spine倒排成三二一
+agent_source_url: https://allluckly.cn/guides/manyue-epub-page-progression-direction-not-spine-reversal-report/
+agent_source_sha256: 442de0b889f0927e296ad0583fcabf35bedc230ea85a44ca537665d7d9ebe6b0
+agent_generator_version: 1
+---
+{% raw %}# 漫阅+ EPUB方向报告跟读：rtl不把三项spine倒排成三二一
+
+语言：zh-CN
+原文：[漫阅+ EPUB方向报告跟读：rtl不把三项spine倒排成三二一](<https://allluckly.cn/guides/manyue-epub-page-progression-direction-not-spine-reversal-report/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-epub-page-progression-direction-not-spine-reversal-report/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-epub-page-progression-direction-not-spine-reversal-report/>)
+发布于: 2026-11-17T00:00:00+08:00
+内容更新于: 2026-11-17T00:00:00+08:00
+署名：Bison
+
+将全局推进方向、文档次序与局部文字书写分别登记，再用原创三页故事核内容先后。
+
+一份报告写着从右向左推进，旁边又有按顺序列出的三个内容文档。阅读时容易把方向箭头理解成反转整个列表。本课准备左右两种声明的对照报告，在漫阅核对同一段故事的开门、进屋、关门次序，并保留局部文字方向与阅读器实际设置的独立记录。
+
+## 先做三张有因果关系的原创页
+
+在外部工具画三张小分镜：A人物开门，B同一人物进入，C从屋内关门。每张加字母与短句，门把和衣服颜色用作返回时的锚点，不依靠画得逼真判断先后。导出阅读用PDF，并做另一份字段报告；分镜页序先固定A、B、C，报告版本记R。这里读的是自己制作的静态材料，不把它命名为已测试EPUB。没有绘图工具也可用三个方框和文字，但必须保留实际内容，不能只给空白页配文件名后声称故事次序正确。
+
+## 从spine读取不变的文档次序
+
+报告先列a指向A、b指向B、c指向C，再把下面片段原样放在同一页。itemref的有序列表仍为a、b、c，先后依据来自元素在spine中的次序；rtl不是要求把列表从底往上读。先遮住方向属性，单独读出三份内容，再揭开它检查自己有没有无故改口成c、b、a。片段没有完整出版物所需的其他结构，不能单独当成验证合格的电子书。保留大小写、连字符和引号，不把较长属性名断字后写进新文件。
+
+```
+<spine xmlns="http://www.idpf.org/2007/opf" page-progression-direction="rtl">
+  <itemref idref="a"/>
+  <itemref idref="b"/>
+  <itemref idref="c"/>
+</spine>
+```
+
+## 三种属性值各写一条含义
+
+把允许值ltr、rtl、default列成三行：左到右、右到左、作者不表达偏好而由阅读系统选择。不要把default翻成所有设备都固定左到右，也不把rtl当旋转九十度的开关。属性设置全局内容推进方向，但不额外改变这三项引用身份或故事发生次序。给方向画独立的水平箭头，给文档先后画编号链，两套标记不要共用一个没有说明的箭头。报告没有写属性时，记录为未声明，不伪造检测值；实际软件最后怎样呈现还需要另核。
+
+另外留出双页呈现的未知栏：只给rtl仍不能确定本例第一页必在左侧还是右侧，因为还可能涉及单页或合成跨页、局部放置属性与阅读系统选择。本课不替这些缺失条件补值，也不画一张固定左右配对表冒充所有实现。报告能确定的是有序列表身份与全局声明，呈现栏须另有证据。
+
+## 把文字书写模式与全局推进分栏
+
+另画一个局部文字框，抄横排短句Door opens，并写它的局部样式可独立指定。例如CSS的writing-mode描述书写模式，HTML的dir涉及文字方向；不能因为全局rtl就把这句字符倒写成snepo rooD。规范允许内容文档及局部内容覆盖全局流向，阅读系统也可能提供用户覆盖机制。此处只列语义分工，不声称某一界面一定有这些开关。若要比较排版，应外部制作可见样例并说明条件，而不是在PDF报告上改一个字段文字就期待页面自动重排。
+
+局部文字也可换成中文门开了作对照：更换语言不会自动把引用列表变成另一顺序。若换字之后动作图也变了，应标为多项变化，不能继续称只测文字方向。
+
+## 在漫阅分别读内容和报告
+
+把两份PDF以清楚的名称导入，先打开分镜稿按A、B、C确认开门在进入前，进入在关门前，再切到报告R核rtl与引用次序。为报告关键页加书签，用纸面或外部表登记当前横竖屏、单页双页及可见阅读方向设置。应用有相应入口才作对照，没有就记未见，不补造滑动手势或按钮名。PDF报告的固定页序是外部导出的结果，不能把在漫阅成功读它说成应用采用了EPUB属性；观察栏须明确自己打开的是哪一种文件。
+
+## 单改方向与单改列表各做一稿
+
+复制报告成L，只把rtl改ltr；引用仍a、b、c，故事仍开门、进屋、关门。再另复制成O，保持rtl却把itemref次序改成c、b、a，才是文档顺序反转。比较时把变更写在封面，不能同时换分镜图与属性再把差异全归给方向。若仅需纸面练习，三稿可以是三张报告页，不必生成真实EPUB；但应如实标为模型对照。用这两种单项变更解释为什么声明方向与列表顺序都有关阅读，却不能当作同一个字段处理。
+
+## 用状态与字符检查定位错读
+
+若看到关门在开门前，先看报告是O还是R，再查PDF导出页序，不先切换所有阅读设置。若顺序正确而字母倒写，核源文字是否手工反转；若全文竖着显示，核外部版面或实际旋转条件，不拿rtl解释所有方向现象。局部放大检查属性时再回整页确认所属稿，避免把L的字段配到R的观察表。保留错误稿与修正项，单次只改一种条件。没有实际尝试某个阅读方向入口时，结论停在报告推理，不填已经排除该设置影响。
+
+## 重开复述三栏结论
+
+重开报告书签，依次说出全局推进rtl、文档次序a到c、局部文字按其自身条件三栏，再回分镜页核三个内容锚点。验收不是动作看起来向哪边滑，而是能指出每条结论依赖的字段或可见内容。保存R、L、O对照和实际操作记录，未执行重开则留待办。将来换用支持EPUB的其他工具时，应重新记录它的实现与用户覆盖，不沿用本次PDF阅读作兼容保证。最终交付应让复查者不用猜箭头就能分清先后、推进与书写。
+
+## 相关教程与资料
+
+[EPUB语言范围](<https://allluckly.cn/guides/manyue-epub-language-metadata-content-scope/>)、[阅读布局与跨页](<https://allluckly.cn/guides/manyue-reading-layout/>)。
+
+方法依据：[W3C EPUB3.3 §5.7.1](<https://www.w3.org/TR/epub-33/#sec-spine-elem>)。本课图、报告数据、错例及记录表均为原创练习。
+
+版本核对：2026年11月17日，[Apple公开查询](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261117>)显示漫阅+2.0.5，最低iOS / iPadOS 15.0；公开能力见[官方App Store](<https://apps.apple.com/cn/app/id6753895889>)。本课使用自制PDF或受支持的漫画图片阅读，具体入口依安装版本可见范围。外部制作与纸面预期不等于已做真机观察，未执行项目照实留空。
+{% endraw %}

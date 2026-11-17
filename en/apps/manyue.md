@@ -5,7 +5,7 @@ title: 'ManYue: Comic Reader for iPhone and iPad'
 description: Learn about ManYue comic imports, offline reading, WebDAV, SMB and personal comic servers, then choose a tutorial
   for your library.
 permalink: /en/apps/manyue/
-modified: 2026-11-16
+modified: 2026-11-17
 lang: en
 source_url: /apps/manyue/
 ---

@@ -1,0 +1,86 @@
+---
+layout: null
+permalink: /guides/icouldplay-hls-daterange-actual-planned-end-on-next-event-ledger/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映 HLS 事件区间核对：计划五秒为何可以实际六秒
+agent_source_url: https://allluckly.cn/guides/icouldplay-hls-daterange-actual-planned-end-on-next-event-ledger/
+agent_source_sha256: 03b484f07d4c3b9ab7edd1ce394fc2760905f1dc64bbee04043d541ab60478b2
+agent_generator_version: 1
+---
+{% raw %}# 云映 HLS 事件区间核对：计划五秒为何可以实际六秒
+
+语言：zh-CN
+原文：[云映 HLS 事件区间核对：计划五秒为何可以实际六秒](<https://allluckly.cn/guides/icouldplay-hls-daterange-actual-planned-end-on-next-event-ledger/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-hls-daterange-actual-planned-end-on-next-event-ledger/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-hls-daterange-actual-planned-end-on-next-event-ledger/>)
+发布于: 2026-11-17T00:00:00+08:00
+内容更新于: 2026-11-17T00:00:00+08:00
+署名：Bison
+
+读DATERANGE更新与同类后继，分清事件区间、分片时间和播放观察。
+
+一段事件可以从分片中间开始，也可以跨过分片边界。本课用自制DATERANGE清单核两秒到八秒的事件，把计划五秒、实际六秒和同类后继结束方式分别记清。云映只用于自己的完整来源播放观察，不假定它会自动画事件时间条或把事件资料变成字幕。
+
+## 分别保留清单快照和事件账本
+
+在外部纯文本工具准备练习清单，另建事件账本，列ID、开始、计划时长、实际结束与证据状态。主例只有三段各四秒的声明，没有媒体字节，不能把a.ts等名字当作可请求影片。实际有自有HLS来源时，另记最终地址、取得时间和内容身份，原文不覆盖。取得清单的时间不等于事件发生时间，也不是设备按下播放的时刻。先保留阅读任务，播放观察只有真实执行才补，避免为了填表把未知结束直接写成零秒或片尾。
+
+## 完整清单先核日期关联与三段范围
+
+下方媒体清单给a段首样本声明2026年11月17日八点整加八时区，纸面额外约定三段连续且各恰四秒。于是声明范围为零到十二秒，日期换成UTC为同日零点，不是把八点只改后缀成Z。DATERANGE存在时，清单至少还要有一条PROGRAM-DATE-TIME，不能把事件开始属性当它的替代。代码里两条事件标签拥有相同ID，这是同一事件的补充信息，不先按“标签行必须各有唯一ID”删掉其中一行；真正一致性下一步逐属性核。
+
+```
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:4
+#EXT-X-PROGRAM-DATE-TIME:2026-11-17T08:00:00+08:00
+#EXT-X-DATERANGE:ID="evt-a",CLASS="org.example.event",START-DATE="2026-11-17T08:00:02+08:00",PLANNED-DURATION=5
+#EXT-X-DATERANGE:ID="evt-a",CLASS="org.example.event",START-DATE="2026-11-17T08:00:02+08:00",PLANNED-DURATION=5,END-DATE="2026-11-17T08:00:08+08:00",DURATION=6
+#EXTINF:4,
+a.ts
+#EXTINF:4,
+b.ts
+#EXTINF:4,
+c.ts
+#EXT-X-ENDLIST
+```
+
+## 同ID更新保留共有属性相同
+
+两条ID均为evt-a，CLASS与START-DATE也相同；第二条在保留计划五秒的同时补实际结束和DURATION六秒。把它们合并为一行事件记录，而不是算成两个重叠事件。RFC要求同ID两标签共有的属性值相同，所以若第二条把START-DATE改成三秒，即使ID没变也是冲突，不能当作更新开始时间的通用方法。ID识别的是该清单中的区间，CLASS说明客户端自定语义，本例org.example.event只是练习命名，不自动生成章节、广告或影片中的可见标题。
+
+## 计划值不能替代实际结束算式
+
+事件从八点零二秒到八点零八秒，实际DURATION为八减二等于六，且END-DATE不早于START-DATE。PLANNED-DURATION五只是原先预期，允许与六不同；只有计划值而没有实际结束、实际时长或后继结束条件时，实际区间仍未知。把“预计到七秒”与“已声明到八秒”分两栏，不以五秒裁短真实事件。日期与时长同时出现时必须相符，本例若把实际时长改成七而结束仍八秒就应报不一致。零时长可以表示瞬间，但不是所有未知事件的填充值。
+
+## 另份副本用同类后继界定结束
+
+把主例两条事件行整体替换为下方两行，其余日期与分片保留，形成独立对照而不是四条混合事件。part-a带END-ON-NEXT=YES并有CLASS，part-b同类且在八秒开始，因此前者结束于八秒，仍是六秒范围。寻找的是同CLASS中开始晚于当前且最早的一项，不是简单“文本下一行”，更不从不同CLASS借结束。带该属性的条目不得同时含DURATION或END-DATE，同类区间也不能重叠；若后继尚未提供，结束仍待确定，不能用计划值强填。
+
+```
+#EXT-X-DATERANGE:ID="part-a",CLASS="org.example.part",START-DATE="2026-11-17T08:00:02+08:00",END-ON-NEXT=YES
+#EXT-X-DATERANGE:ID="part-b",CLASS="org.example.part",START-DATE="2026-11-17T08:00:08+08:00",DURATION=4
+```
+
+## 真实播放只核内容锚点与可见资料
+
+有完整自有来源时，从目标事件前顺播，记一个可见动作、播放器大致进度与可见事件资料；界面没有事件显示就写未显示，不虚构DATERANGE面板。事件落在二到八秒并不让播放器自动跳过其他时段，也不保证屏幕在该范围出现文字。清单日期对应到实际内容还需可信时间映射，不能看见一次镜头切换就认作事件边界。保持同一来源、速度和所选轨道，当前未执行的路径继续标未执行；文本文法通过不能替代实际媒体与客户端展示证据。
+
+## 按映射、属性冲突和未知状态排障
+
+事件时长不合先算起止差，再查是否把PLANNED当实际；同ID冲突逐个比较共有属性，不靠移动标签行解决。后继结束错位先查CLASS与最早后继，不用改分片EXTINF掩盖事件错误。删去PROGRAM-DATE-TIME的副本应在文法条件审核发现缺项，不因视频仍可能有画面就说事件映射完整。所有故障只改自己的文本副本，保留原稿与唯一变化。未知结束不算损坏文件，既不能默认无限长也不能默认零，先补来源证据再更新记录。
+
+## 重开交付一个事件和两种结束模型
+
+重开主清单，把两条evt-a合并为一个区间，重算开始二、实际结束八、实际六、计划五和总声明十二秒。再重开后继对照，确认part-a有CLASS和YES，却没有DURATION或END-DATE。交付原稿、两种模型、冲突副本与实际观察或未执行说明，日期时区随原值保留。若退出再进真实来源，重新确认内容身份和锚点，不假定事件标签被界面缓存。最终结论限于资料与范围可追，不声称云映按事件自动剪片、显示字幕或验证真实拍摄时刻。
+
+## 相关教程与资料
+
+[云映 HLS 日期时间核对：分开节目时刻、时区与播放进度](<https://allluckly.cn/guides/icouldplay-hls-program-date-time-playback-clock-map/>)、[云映 HLS 会话资料核对：数据标识、语言与外部JSON分别记录](<https://allluckly.cn/guides/icouldplay-hls-session-data-id-language-value-uri-record/>)。
+
+方法来源：[RFC8216 §4.3.2.7](<https://www.rfc-editor.org/rfc/rfc8216#section-4.3.2.7>)。
+
+资料核对：2026年11月17日，[云映官方商店](<https://apps.apple.com/cn/app/id6755653178>)与[Apple公开查询](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261117-hls>)列出1.1.1，最低iOS / iPadOS 15.0。文本与演算在外部手工准备，云映用于自己的已有真实来源选择和播放观察，入口按安装版本实际可见为准。占位地址不提供媒体或密钥。文法审核、假定算例、真实字节资料和观看分别记录，没有执行的步骤明确未执行；未声称完成真机、私人服务器、所有引擎或输出设备逐项兼容测试。
+{% endraw %}

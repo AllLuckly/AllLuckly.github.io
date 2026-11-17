@@ -1,0 +1,87 @@
+---
+layout: guide
+author: Bison
+app_id: nas_book
+title: 'Read eigenvectors in Book Isle: scalar-multiple output still requires nonzero
+  input'
+description: Compute a matrix action on two directions, checking eigenvalues 3 and
+  1, whole lines of nonzero multiples and the zero-vector exclusion.
+permalink: /en/guides/nasbook-eigenvector-scalar-multiple-nonzero-two-by-two/
+date: '2026-11-17 00:00:00 +08:00'
+modified: '2026-11-17 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 204
+topic: Bounds, counting and linear structure
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-17-nasbook-eigenvector-scalar-multiple-nonzero-two-by-two.md
+source_url: /guides/nasbook-eigenvector-scalar-multiple-nonzero-two-by-two/
+translation_method: editorial
+translation_source_sha256: 6d33075b295ad3df4721351ab985e0ad53f891a5fa6964972993e63ec8d97c9f
+translation_date: '2026-11-17T07:26:08.790916+00:00'
+excerpt: Compute a matrix action on two directions, checking eigenvalues 3 and 1,
+  whole lines of nonzero multiples and the zero-vector exclusion.
+---
+{% raw %}
+<p>A vector mapped to a scalar multiple of itself has a special role, but zero cannot establish every eigenvalue. Use an original two-by-two card in Book Isle to check multiplication, proportionality and nonzero input, then verify repeated action by decomposition. No automatic linear-algebra analysis is assumed.</p>
+
+<h2 id="copy-the-matrix-and-column-vector-convention">Copy the matrix and column-vector convention</h2>
+
+<p>V1 sets A rows(2, 1), (1, 2), acting on real columns. Seek nonzero v and scalarλ with Av=λv. The scalar and two-component vector are different objects. Keep the equation and nonzero condition in one visible box, import a clear PDF/EPUB and bookmark it. For image matrices inspect rows and columns without assuming searchable arrays. This specified real example does not establish identical eigenvector behavior for every real matrix.</p>
+
+<h2 id="check-both-output-components-for-each-candidate">Check both output components for each candidate</h2>
+
+<p>For u=(1, 1), row-column multiplication gives(3, 3)=3u. For v=(1, −1), it gives(1, −1)=1v. Eigenvalues are 3 and 1, not sums of output components 6 and 0. One scalar must account for both components simultaneously. Retain each product and minus sign. Symmetry does not permit entrywise multiplication; u/v are local labels, not universal textbook ordering.</p>
+
+<pre><code class="language-text">A=[[2,1],[1,2]]
+u=(1,1); A*u=(3,3)=3*u
+v=(1,-1); A*v=(1,-1)=1*v
+w=(1,0); A*w=(2,1), not a scalar multiple of w
+</code></pre>
+
+<h2 id="use-a-noncandidate-and-zero-to-test-the-definition">Use a noncandidate and zero to test the definition</h2>
+
+<p>For w=(1, 0), Aw=(2, 1), whereas everyλw has second component 0, so w is not an eigenvector. A0=0 andλ0=0 for everyλ; the definition excludes zero precisely because it cannot distinguishλ. Partial satisfaction is insufficient. Highlight nonzero and use w’s second component as a contradiction instead of appearance alone. Component ratios can help when defined, but zero components never justify division by zero.</p>
+
+<h2 id="find-eigenvalues-while-retaining-whole-lines">Find eigenvalues while retaining whole lines</h2>
+
+<p>det(A−λI)=(2−λ)²−1=λ²−4λ+3=(λ−1)(λ−3), giving eigenvalues 1 and 3. For 3 the components are equal: every nonzero c(1, 1) qualifies. For 1 they are opposite: every nonzero c(1, −1) qualifies. Two directions are not only two eigenvectors or only unit vectors. At c=2 the outputs are(6, 6) and(2, −2), with the same eigenvalues rather than doubledλ.</p>
+
+<p>Trace 2+2=4 equals 3+1, and determinant 4−1=3 equals 3×1. These catch some eigenvalue errors but do not establish arbitrary candidate vectors. Retain scalar checks for eigenvalues and vector multiplication for eigenpairs separately.</p>
+
+<h2 id="use-negative-and-zero-eigenvalues-as-separate-controls">Use negative and zero eigenvalues as separate controls</h2>
+
+<p>For B=diag(−1, 2), input(1, 0) maps to(−1, 0), so eigenvalue−1 is valid and reverses direction. For C=diag(1, 0), nonzero input(0, 1) maps to zero, so eigenvalue 0 is valid. Zero eigenvalue is allowed; zero eigenvector remains excluded. These controls do not replace V1: A still has only 3 and 1. Record matrix, input, output, λ together so an excerpt retains its object.</p>
+
+<h2 id="decompose-an-ordinary-input-to-verify-repeated-action">Decompose an ordinary input to verify repeated action</h2>
+
+<p>x=(3, 1)=2u+v is not itself an eigenvector. Linearity gives Ax=6u+v=(7, 5), matching direct multiplication. A²x=18u+v=(19, 17), also directly A(7, 5). Each directional coefficient gains its correspondingλ; do not multiply the whole ordinary input by 3. Separate decomposition and direct products to catch lost coefficients or assigning 3 to v. This does not guarantee two real eigenvector directions for every matrix.</p>
+
+<p>w=(u+v)/2 gives Aw=(3u+v)/2=(2, 1). Mixing directions with different eigenvalues generally does not yield one scalar multiple. A nonzero combination within one eigenspace retains its eigenvalue; the zero combination remains excluded.</p>
+
+<pre><code class="language-text">x=(3,1)=2*u+v
+A*x=6*u+v=(7,5)
+A^2*x=18*u+v=(19,17)
+B=[[-1,0],[0,2]]; B*(1,0)=(-1,0)
+C=[[1,0],[0,0]]; C*(0,1)=(0,0)
+</code></pre>
+
+<h2 id="save-definition-and-verification-together-in-book-isle">Save definition and verification together in Book Isle</h2>
+
+<p>Highlight or record locations for V1’s definition and products. Write a candidateλ before checking both components instead of copying 3 and 1 alone. Return by V1 if searchingλ fails. Six may add output components; zero input proving everyλ misses nonzero; scaling confusion calls for c=2. After one correction repeat direct and decomposed products. A saved excerpt is reading evidence, not an automatically verified eigenpair.</p>
+
+<p>A horizontally written coordinate pair still denotes a column input here. Display commas do not authorize row-vector right multiplication; changed orientation needs changed product evidence.</p>
+
+<h2 id="reopen-and-reject-overstrong-conclusions">Reopen and reject overstrong conclusions</h2>
+
+<p>Reopen and classify u, v, w, zero before stating A has two eigenvalues but infinitely many nonzero scalar-multiple eigenvectors. Revisit B/C to retain negative and zeroλ, then repeat both actions on(3, 1). Acceptance preserves matrix identity and nonzero input, not a universal parallel-arrow label. Save derivation, sources and actual operations; reopening stays pending if unperformed. A real rotation with no real eigenvector directions needs fresh analysis rather than this symmetric example generalized to every real matrix.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/nasbook-two-by-two-matrix-inverse-singular-check/">Matrix inverses and product checks</a>; <a href="/en/guides/nasbook-dot-product-orthogonality-nonzero-angle-boundary/">Dot products and zero conditions</a>.</p>
+
+<p>Method references: <a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/e820a9d3c5709407ebbd6cf8a065d1ed_MIT18_06S10_L21.pdf">MIT18.06 lecture21 eigenvalues and eigenvectors</a>. Diagrams, report data, counterexamples and ledgers are original exercises.</p>
+
+<p>Version checked on 17 November 2026: the <a href="https://itunes.apple.com/lookup?id=6766198898&amp;country=cn&amp;entity=software&amp;timestamp=20261117">Apple public lookup</a> lists Book Isle 1.1.4, requiring iOS / iPadOS 15.6 or later; see the <a href="https://apps.apple.com/cn/app/id6766198898">official App Store</a> for published capabilities. Use self-made PDFs, EPUBs or clear text materials; bookmarks, highlights and notes depend on format and visible controls, without automatic solving or literary analysis. External preparation and paper predictions do not constitute device observations. Leave unperformed checks blank.</p>
+{% endraw %}

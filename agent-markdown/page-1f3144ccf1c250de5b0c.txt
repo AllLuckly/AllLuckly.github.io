@@ -1,0 +1,89 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-hls-daterange-actual-planned-end-on-next-event-ledger/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay HLS date ranges: why five planned seconds can become six actual
+  seconds'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-hls-daterange-actual-planned-end-on-next-event-ledger/
+agent_source_sha256: e8804577f3bb69a884c05aa1014bdd29309708f357e01297f8ba917af7f4febb
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay HLS date ranges: why five planned seconds can become six actual seconds
+
+Language: en
+Canonical: [iCouldPlay HLS date ranges: why five planned seconds can become six actual seconds](<https://allluckly.cn/en/guides/icouldplay-hls-daterange-actual-planned-end-on-next-event-ledger/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-hls-daterange-actual-planned-end-on-next-event-ledger/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-hls-daterange-actual-planned-end-on-next-event-ledger/>)
+Published: 2026-11-17T00:00:00+08:00
+Modified: 2026-11-17T15:01:07+08:00
+Author: Bison
+
+Read DATERANGE updates and following ranges, distinguishing events, segment timing and playback observations.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-hls-daterange-actual-planned-end-on-next-event-ledger/>), translated on 2026-11-17. Original publication dates, attribution, code and version notes are retained.
+
+An event may begin inside a segment and cross its boundaries. Audit an original DATERANGE event from seconds two to eight, distinguishing planned five seconds, actual six seconds and ending at a following range of the same class. iCouldPlay observes owned complete media; assume no automatic event timeline or metadata-to-caption conversion.
+
+## Preserve playlist snapshots and an event ledger
+
+Prepare the playlist externally and an event ledger with ID, start, planned duration, actual end and evidence status. Three declared four-second segments supply no media bytes; names such as a.ts are not playable resources. For an owned HLS source, separately retain final address, acquisition time, content identity and untouched text. Acquisition is neither event time nor the moment playback starts. Complete reading first and add only performed playback observations, never fill an unknown end with zero or the film’s ending.
+
+## Check the date anchor and three-segment extent
+
+The media sample anchors a’s first sample to 08:00:00+08:00 on 17 November 2026. Additionally assume three continuous, exactly four-second segments, giving seconds zero through twelve and UTC 00:00 that day, not 08:00 with a changed suffix. A playlist containing DATERANGE requires at least one PROGRAM-DATE-TIME; an event’s start is not a substitute. The two event tags share an ID to supplement one event. Do not delete a line under an invented unique-ID-per-tag rule; audit shared attributes next.
+
+```text
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:4
+#EXT-X-PROGRAM-DATE-TIME:2026-11-17T08:00:00+08:00
+#EXT-X-DATERANGE:ID="evt-a",CLASS="org.example.event",START-DATE="2026-11-17T08:00:02+08:00",PLANNED-DURATION=5
+#EXT-X-DATERANGE:ID="evt-a",CLASS="org.example.event",START-DATE="2026-11-17T08:00:02+08:00",PLANNED-DURATION=5,END-DATE="2026-11-17T08:00:08+08:00",DURATION=6
+#EXTINF:4,
+a.ts
+#EXTINF:4,
+b.ts
+#EXTINF:4,
+c.ts
+#EXT-X-ENDLIST
+```
+
+## Keep shared attributes consistent in same-ID updates
+
+Both tags use evt-a, matching CLASS and START-DATE. The second retains planned duration five while adding actual end and duration six. Merge them into one event record, not two overlapping events. Shared attributes in same-ID tags must have identical values: changing the second start to second three is a conflict, not a general start-time update mechanism. ID identifies a range within this playlist and CLASS supplies client-defined semantics. org.example.event is a teaching name, generating neither chapters, advertisements nor visible titles automatically.
+
+## Do not replace the actual end with a planned value
+
+From 08:00:02 to 08:00:08, actual duration is eight minus two, six, with end no earlier than start. PLANNED-DURATION five is an expectation and may differ. Without actual end, duration or a following-range end condition, planned duration alone leaves the actual end unknown. Separate “expected through second seven” from “declared through second eight”; do not truncate actual events to five. If end and duration coexist they must agree: duration seven with the same end conflicts. Zero can represent an instant, not every unknown interval.
+
+## Use a same-class following range in a separate copy
+
+Replace both main event lines with the two below, keeping date anchor and segments, as a separate control rather than four mixed events. part-a has END-ON-NEXT=YES and CLASS; part-b of that class starts at second eight, ending part-a there for a six-second range. Find the earliest later start within the same CLASS, not merely the next text line or another class. END-ON-NEXT forbids DURATION and END-DATE, and same-class ranges must not overlap. An absent following range leaves the end unresolved, not filled from a plan.
+
+```text
+#EXT-X-DATERANGE:ID="part-a",CLASS="org.example.part",START-DATE="2026-11-17T08:00:02+08:00",END-ON-NEXT=YES
+#EXT-X-DATERANGE:ID="part-b",CLASS="org.example.part",START-DATE="2026-11-17T08:00:08+08:00",DURATION=4
+```
+
+## Observe content anchors and only visible metadata
+
+With complete owned media, play from before the event and record a visible action, approximate progress and any actually displayed event metadata. If absent, say so without inventing a DATERANGE panel. A two-to-eight-second event neither skips other content nor guarantees onscreen text. Mapping dates to content needs trustworthy timing evidence, not a cut assumed to be an event boundary. Hold source, speed and tracks fixed, leave unperformed paths unperformed, and distinguish syntax from media and client display evidence.
+
+## Troubleshoot mapping, conflicts and unknown states
+
+For a wrong duration, subtract dates and check whether planned became actual. Compare every shared attribute in same-ID conflicts rather than move lines. For a wrong following end, inspect class and earliest later start instead of changing EXTINF. Removing PROGRAM-DATE-TIME fails this playlist condition even if some video still appears. Modify owned text copies only, preserving original and single change. An unknown end is not necessarily corruption, zero or infinity; obtain evidence before updating it.
+
+## Reopen with one event and two ending models
+
+Reopen the main sample, merge evt-a into one event and recalculate start two, actual end eight, actual six, planned five and total declared twelve seconds. Reopen the following-range control and verify CLASS plus YES without DURATION or END-DATE on part-a. Deliver originals, models, conflicts and performed/unperformed observations with original timezone values. Reenter real media only after checking identity and anchor again, not assuming cached event display. Conclusions do not claim automatic clipping, captions or verified capture time.
+
+## Related tutorials and sources
+
+[iCouldPlay HLS dates: distinguish program timestamps, time zones and playback position](<https://allluckly.cn/en/guides/icouldplay-hls-program-date-time-playback-clock-map/>); [iCouldPlay HLS session data: audit identifiers, languages and external JSON](<https://allluckly.cn/en/guides/icouldplay-hls-session-data-id-language-value-uri-record/>).
+
+Method sources: [RFC8216 §4.3.2.7](<https://www.rfc-editor.org/rfc/rfc8216#section-4.3.2.7>).
+
+Checked on 17 November 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261117-hls>) list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Placeholder addresses supply neither media nor keys. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.
+{% endraw %}

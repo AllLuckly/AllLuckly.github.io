@@ -1,0 +1,78 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-bipartite-matching-alternating-path-hall-obstruction/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint bipartite matching: reassign three tasks along an alternating
+  path and test a local obstruction'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-bipartite-matching-alternating-path-hall-obstruction/
+agent_source_sha256: 91bea3cfed29159a52713ffc29651c50abedb0c7973533de57fd8ae76c3e29a4
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint bipartite matching: reassign three tasks along an alternating path and test a local obstruction
+
+Language: en
+Canonical: [VectorPaint bipartite matching: reassign three tasks along an alternating path and test a local obstruction](<https://allluckly.cn/en/guides/vectorpaint-bipartite-matching-alternating-path-hall-obstruction/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-bipartite-matching-alternating-path-hall-obstruction/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-bipartite-matching-alternating-path-hall-obstruction/>)
+Published: 2026-11-17T00:00:00+08:00
+Modified: 2026-11-17T15:55:37+08:00
+Author: Bison
+
+Select three disjoint-endpoint edges among five permissions, then remove one edge and use Hall’s condition to explain impossibility.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-bipartite-matching-alternating-path-hall-obstruction/>), translated on 2026-11-17. Original publication dates, attribution, code and version notes are retained.
+
+Draw permissions between three fictional objects and three tasks. A matching selects existing edges without reusing endpoints. Reassign a stuck partial choice along an alternating path, then remove an edge to show equal side counts do not guarantee a perfect matching. This manual relationship diagram assumes no scheduling or graph solver.
+
+## Fix both vertex sets and five permitted edges
+
+Use left A,B,C and right 1,2,3 with exactly five edges A1,A2,B1,C2,C3; do not invent B2 to finish. The graph is undirected permission, not dependency or transfer direction. A matching has no shared endpoints; a perfect matching covers all six vertices, requiring three edges here. Save permissions and separate vertices, full edges, choices and search arrows. Objects/tasks are abstract, without real ability, priority or cost claims. Drawn edge length is not an optimization objective.
+
+## Draw permissions before highlighting a partial matching
+
+Use a suggested 1800×1500 canvas: A/B/C at (400,350),(400,750),(400,1150), and 1/2/3 at (1400,350),(1400,750),(1400,1150). Draw five thin edges, then emphasize M0={A1,C2}; B and 3 remain unmatched. The drawing crossing of A2/B1 is not a seventh vertex. M0 is valid but not perfect. B’s lack of a currently free neighbour does not prove no perfect solution. Supplement colours with line styles for monochrome reading.
+
+## Alternate unused and selected permission edges
+
+From unmatched B, take B1 to 1, selected A1 backward to A, unused A2 to 2, selected C2 backward to C, then unused C3 to free 3. Path B–1–A–2–C–3 alternates unused/selected/unused/selected/unused across five edges. Search arrows are not added directed graph edges. Every step must be permitted and end at an unmatched right vertex to augment. Audit first instead of selecting all five path edges simultaneously and reusing endpoints. The path has three unused versus two selected edges, so flipping gains one while preserving unique endpoints. Adding B1 alone would assign task 1 to A and B. Repair requires the A2/C3 reassignments too; path arrows perform no automatic update.
+
+```text
+left={A,B,C}; right={1,2,3}
+E={A1,A2,B1,C2,C3}
+M0={A1,C2}
+alternating path: B-1-A-2-C-3
+remove={A1,C2}; add={B1,A2,C3}
+M1={A2,B1,C3}
+after deleting A2: S={A,B}; N(S)={1}; 1<2
+```
+
+## Flip path membership for a three-edge perfect matching
+
+Remove A1/C2 and add B1,A2,C3, obtaining M1={A2,B1,C3}, three edges instead of two. Each of six endpoints appears exactly once. Crossing lines are not conflicts; shared endpoints are. B must take 1, forcing A2 and C3, so this example’s perfect matching is unique, not every graph’s. Preserve before/after panels with unchanged permissions; only membership changes, and unused edges remain in the base layer.
+
+## Check neighbourhoods of all left subsets under Hall’s condition
+
+Hall’s condition for a finite bipartite graph is: a matching saturates the left side iff every left subset S has at least |S| distinct neighbours. Here singleton sizes are 2,1,2; AB,AC,BC sizes 2,3,3; ABC size 3. All seven nonempty subsets qualify; the empty set qualifies automatically. Equal side sizes make left saturation perfect here, while unequal cases retain the left-saturation wording. Count distinct tasks, not two appearances of task 1 via A1 and B1. Explicitly N(AB)={1,2}, N(AC)=N(BC)={1,2,3}, and the full neighbourhood is {1,2,3}. Sets expose duplicate counting better than sizes alone; ordering changes nothing and repeated task numbers count once.
+
+## A local obstruction after deleting A2 cannot be repaired by layout
+
+In a separate control delete only A2, leaving A/B both adjacent only to 1. S={A,B} has size 2 but neighbourhood size 1, violating Hall and preventing full left coverage; maximum size is two, for example A1,C3. Both sides still have three vertices and no isolated vertex, so global counts or nonisolation are insufficient. Mark deletion clearly. Moving A near task 2 adds no permission, and restoring the edge changes the problem. Impossibility comes from constraints, not unattractive layout.
+
+## Troubleshoot permissions, endpoint reuse and distinct neighbours
+
+For three invalid choices, inspect reused tasks. For a failed flip, inspect missing added or extra removed alternating members. A supposedly solved deletion control may still retain A2 underneath. Remove a spurious crossing vertex without moving original endpoints. Repair one copy factor and recount five original or four control edges, then selected endpoints and neighbourhood sets. Search arrows do not change permissions, and alignment/grouping performs no Hall test or matching computation.
+
+## Reopen with permissions, flip and obstruction evidence
+
+Save native work and reopen SVG/PDF, distinguishing two-edge M0, five-step path, three-edge M1 and A2-deletion control with readable S/N(S) counts. At fit-to-window size inspect styles; enlarged, confirm no crossing dot. Reopen permissions and choices separately. Deliver edge list, seven-subset audit and obstruction, not only three attractive links. Leave unperformed actions pending without real staffing, minimum-cost or built-in matching claims, or generalizing solvability to every graph.
+
+## Related tutorials and sources
+
+[VectorPaint five-node weighted routes: sum edge weights before comparing paths](<https://allluckly.cn/en/guides/vectorpaint-five-node-weighted-routes/>); [VectorPaint complete three-by-three bipartite graphs: crossings are not vertices and nonplanarity needs proof](<https://allluckly.cn/en/guides/vectorpaint-complete-bipartite-three-by-three-nonplanarity/>).
+
+Method sources: [MIT Mathematics for Computer Science §12.5: matching and Hall’s theorem](<https://courses.csail.mit.edu/6.042/spring18/mcs.pdf>).
+
+Version and operation scope: checked on 17 November 2026 against the [official VectorPaint listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261117-vectorpaint>): version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.
+{% endraw %}

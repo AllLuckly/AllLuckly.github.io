@@ -1,0 +1,75 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay HLS forced subtitles: audit candidates without assuming a universal override'
+description: Audit three subtitle candidates for default, automatic and forced flags, separating type restrictions,
+  defaults and environment matching.
+permalink: /en/guides/icouldplay-hls-forced-subtitles-default-autoselect-environment-matrix/
+date: '2026-11-17 00:00:00 +08:00'
+modified: '2026-11-17 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 187
+topic: Events, candidates and declaration evidence
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-17-icouldplay-hls-forced-subtitles-default-autoselect-environment-matrix.md
+source_url: /guides/icouldplay-hls-forced-subtitles-default-autoselect-environment-matrix/
+translation_method: editorial
+translation_source_sha256: 67c6348161d691744f146ff652732ecb322453017454b5f482ed6a682231ddb6
+translation_date: '2026-11-17T07:35:37+00:00'
+excerpt: Audit three subtitle candidates for default, automatic and forced flags, separating type restrictions,
+  defaults and environment matching.
+---
+{% raw %}
+<p>One language can offer full subtitles and a rendition containing only essential text. Build a three-SUBTITLES matrix, focusing on FORCED type scope and environment-based selection. Record playlist guidance separately from visible iCouldPlay results. YES neither burns text into video nor guarantees overriding every user preference.</p>
+
+<h2 id="section-1">Record three subtitle-content identities first</h2>
+
+<p>Create identity cards for English full text, English essential text and French full text. Playback additionally requires actual resources and timing maps. The master below supplies references, not subtitle bytes; the name Essential cannot certify its contents. Preserve originals and acquisition times, recording names, languages, URIs and separately unknown/verified content. Use existing iCouldPlay sources without assuming a subtitle editor. Without real resources, finish the attribute task and leave display/switching unperformed.</p>
+
+<h2 id="section-2">Read one group with three candidates</h2>
+
+<p>All three entries have TYPE=SUBTITLES, GROUP-ID text and distinct names; the variant references the group. English full uses explicit DEFAULT/AUTOSELECT YES and FORCED NO. English essential uses NO/YES/YES; French full NO/YES/NO. CODECS is omitted here and should later be verified against real media, not guessed as proof of encoding. Copy flag triples into a matrix without treating line two as higher priority or group name as a subtitle URL.</p>
+
+<pre><code class="language-text">#EXTM3U
+#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=&quot;text&quot;,NAME=&quot;English Full&quot;,LANGUAGE=&quot;en&quot;,DEFAULT=YES,AUTOSELECT=YES,FORCED=NO,URI=&quot;en-full.m3u8&quot;
+#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=&quot;text&quot;,NAME=&quot;English Essential&quot;,LANGUAGE=&quot;en&quot;,DEFAULT=NO,AUTOSELECT=YES,FORCED=YES,URI=&quot;en-essential.m3u8&quot;
+#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID=&quot;text&quot;,NAME=&quot;French Full&quot;,LANGUAGE=&quot;fr&quot;,DEFAULT=NO,AUTOSELECT=YES,FORCED=NO,URI=&quot;fr-full.m3u8&quot;
+#EXT-X-STREAM-INF:BANDWIDTH=1100000,SUBTITLES=&quot;text&quot;
+video.m3u8
+</code></pre>
+
+<h2 id="section-3">Check that FORCED appears only on subtitle entries</h2>
+
+<p>FORCED may appear only with SUBTITLES, accepts YES/NO and defaults to NO when absent. Changing an entry to AUDIO while retaining FORCED=NO is invalid too; the restriction is not limited to YES. YES denotes content considered essential, with selection still expected to match environment such as language, not immediate display everywhere. NO denotes content intended for explicit user request, not prohibition of manual selection. Separate attribute validity, content semantics and actual display; none establishes unclosable text or burned-in captions.</p>
+
+<h2 id="section-4">Retain precise conditions for default and automatic flags</h2>
+
+<p>DEFAULT and AUTOSELECT are optional, with absent values implicitly NO. Preserve the exact rule: if AUTOSELECT is present while DEFAULT is YES, AUTOSELECT must be YES. All sample flags are explicit: YES/YES on the first and consistent values on the others. At most one group member defaults YES, and names must differ. Keep explicit values for clarity without claiming AUTOSELECT must always be present. DEFAULT recommends a choice absent contrary user information; AUTOSELECT YES permits environment-based choice, neither unconditionally forces playback.</p>
+
+<h2 id="section-5">Distinguish automatic candidates by language and forced status</h2>
+
+<p>AUTOSELECT=YES members should have distinct combinations of LANGUAGE, ASSOC-LANGUAGE, FORCED and CHARACTERISTICS. The two en entries differ in FORCED NO versus YES; fr differs in language. Names alone do not create this distinction. Changing English essential to FORCED=NO with other selection attributes unchanged loses the recommended distinction despite a different NAME. Repair the copy or provide genuine content attributes, not a false language. Distinguish MUST requirements from SHOULD recommendations instead of declaring every recommendation failure unparseable syntax.</p>
+
+<h2 id="section-6">Record environment and user choice before observing iCouldPlay</h2>
+
+<p>With real media, record language environment, saved manual subtitle choice and entry path before initial display and visible name. If controls allow, select full and essential versions separately over the same interval and record actual text rather than claim both appear to satisfy YES expectations. Essential text may be absent between its cues; a few seconds without subtitle text do not establish failure. Without selection controls, content or timing maps, record unconfirmed. Do not infer hidden features by changing system language or copy another client’s result as an iCouldPlay test.</p>
+
+<h2 id="section-7">Separate type, group and content faults</h2>
+
+<p>Audit wrong-type FORCED, explicit YES/NO conflict, duplicate defaults and names before the recommended candidate distinction. Font size repairs none of these. A normal list without text requires separate URI, payload, timing-map and current-selection checks; flags are not subtitle bytes. Change recoverable owned copies one factor at a time and recheck three entries after restoration. A FORCED label cannot certify semantic necessity, and deleting it cannot remove text already burned into video; inspect that content separately.</p>
+
+<h2 id="section-8">Reopen with the three-row matrix and bounded conclusions</h2>
+
+<p>Reopen the correct master and reconstruct one group, three names, en/en/fr and flag triples. Keep FORCED subtitle-only and one default. After reentering real media, verify selection and restore the preferred everyday track if needed; leave unperformed steps so marked. Deliver matrix, identities, fault copies and environment observations without generalizing one result across engines/devices. Essential-content flag, automatic candidacy and user choice are related layers, not guarantees that every cue appears or can never be disabled.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/icouldplay-hls-audio-rendition-group-name-language-default/">iCouldPlay HLS audio groups: equal language labels can describe different tracks</a>; <a href="/en/guides/icouldplay-hls-closed-captions-instream-subtitles-uri-groups/">iCouldPlay HLS caption groups: distinguish in-stream CC1 from a subtitle playlist URI</a>.</p>
+
+<p>Method sources: <a href="https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.1">RFC8216 §4.3.4.1</a>; <a href="https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.1.1">RFC8216 §4.3.4.1.1</a>.</p>
+
+<p>Checked on 17 November 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261117-hls">Apple public lookup</a> list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Placeholder addresses supply neither media nor keys. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.</p>
+{% endraw %}

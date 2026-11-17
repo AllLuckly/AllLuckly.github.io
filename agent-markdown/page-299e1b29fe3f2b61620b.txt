@@ -1,0 +1,90 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-hls-session-key-preload-versus-media-key-scope/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay HLS key-tag reading: session preloading does not replace segment
+  scope'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-hls-session-key-preload-versus-media-key-scope/
+agent_source_sha256: c6cdfde97845bcfbc1930cc04d28fccb2efac366b960e587f537558632d3fa73
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay HLS key-tag reading: session preloading does not replace segment scope
+
+Language: en
+Canonical: [iCouldPlay HLS key-tag reading: session preloading does not replace segment scope](<https://allluckly.cn/en/guides/icouldplay-hls-session-key-preload-versus-media-key-scope/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-hls-session-key-preload-versus-media-key-scope/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-hls-session-key-preload-versus-media-key-scope/>)
+Published: 2026-11-17T00:00:00+08:00
+Modified: 2026-11-17T15:01:07+08:00
+Author: Bison
+
+Compare SESSION-KEY and KEY in two text samples, checking same-URI attributes, duplicate tuples and METHOD=NONE scope.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-hls-session-key-preload-versus-media-key-scope/>), translated on 2026-11-17. Original publication dates, attribution, code and version notes are retained.
+
+Listing key metadata in a master does not assign encryption state to each media segment. Read original placeholder samples to compare SESSION-KEY preloading with KEY’s subsequent scope. This task retrieves no keys, downloads no encrypted payload and performs no decryption. A tag supplies no promise of universal protection-system support in iCouldPlay.
+
+## Keep two text samples separate from real credentials
+
+Prepare master.m3u8 and media/main.m3u8 externally, preserving roles and bases. example.com is a reserved teaching domain; none of the URIs supplies real keys or media, and this task makes no requests to it. For an owned real source, record identity, tag state and acquisition time without publishing private tokens or key bytes. No encryption server is required: text suffices for the scope ledger. Add only observations from already normally accessible owned media and mark unperformed steps accordingly.
+
+## Read preloading metadata in the master
+
+SESSION-KEY declares AES-128, a placeholder URI, IV and explicit identity format/version string 1; the variant then references the media playlist. The tag allows preloading before reading media playlists, not a mandatory request, and is not associated with a particular media playlist. It is optional and does not establish one protection state for every subsequent segment. CODECS and bandwidth are hypothetical too. Record it as preload metadata rather than copy it into each segment’s current KEY state.
+
+```text
+#EXTM3U
+#EXT-X-VERSION:5
+#EXT-X-SESSION-KEY:METHOD=AES-128,URI="https://example.com/hls/keys/key-a.bin",IV=0x0000000000000000000000000000002a,KEYFORMAT="identity",KEYFORMATVERSIONS="1"
+#EXT-X-STREAM-INF:BANDWIDTH=1000000,CODECS="avc1.4d401e,mp4a.40.2"
+media/main.m3u8
+```
+
+## Read media KEY scope up to the next KEY
+
+The first media KEY is AES-128 and applies to seg42.ts. The next METHOD=NONE declares seg43.ts unencrypted within the same identity-format scope. Only one KEYFORMAT is used here; do not generalize clearing behaviour to multiple formats. Two four-second segments declare eight seconds; sequence 42 is not forty-two seconds. KEY also covers intervening declared initialization sections, but this example has no MAP or invented initialization file. Track method/URI per segment. A remaining master SESSION-KEY does not make segment two AES-128, and text does not certify payload preparation.
+
+```text
+#EXTM3U
+#EXT-X-VERSION:5
+#EXT-X-TARGETDURATION:4
+#EXT-X-MEDIA-SEQUENCE:42
+#EXT-X-KEY:METHOD=AES-128,URI="https://example.com/hls/keys/key-a.bin",IV=0x0000000000000000000000000000002a,KEYFORMAT="identity",KEYFORMATVERSIONS="1"
+#EXTINF:4,
+seg42.ts
+#EXT-X-KEY:METHOD=NONE
+#EXTINF:4,
+seg43.ts
+#EXT-X-ENDLIST
+```
+
+## Compare method and format/version for the same URI
+
+Both samples use the same absolute placeholder key URI, avoiding base-resolution differences. SESSION-KEY and KEY sharing a URI must match METHOD, KEYFORMAT and KEYFORMATVERSIONS: AES-128, identity and quoted 1 here. Their IVs also match by design, but that requirement names the preceding three attributes, not every attribute universally. Preserve original values and roles. A key-a.bin suffix does not certify a valid response; bytes remain unknown, and an address is not key content itself.
+
+## Read IV length and value without treating it as a key
+
+The IV has thirty-two hexadecimal digits after 0x, representing sixteen bytes. Final 2a is decimal 42, an original example matching the first sequence number. An explicit IV is read as given; do not claim every case must derive it automatically from sequence. IV is not key bytes, duration, rate or hash, and writing it decrypts nothing. Perform no AES operation or encrypted-file validation here: check length and scope only. Missing actual keys do not prevent the text task and require no searching or guessing.
+
+## Remove the preload tag without changing media state
+
+Delete only SESSION-KEY in a master copy and leave media unchanged. seg42 and seg43 remain AES-128 and NONE. The change removes an early metadata opportunity, not encryption. Conversely, retaining the master tag while deleting media KEY does not supply its missing segment scope and changes this sample’s media declarations. Use owned text copies only, without altering production access. Existing playback plus this paper control establishes neither actual request counts nor guaranteed startup improvements.
+
+## Audit forbidden NONE and duplicate session tuples
+
+SESSION-KEY forbids METHOD=NONE. Media KEY may use NONE, but that line must contain no other attributes such as URI or IV. Duplicating the master session entry exactly repeats the METHOD, URI, IV, KEYFORMAT and KEYFORMATVERSIONS tuple, forbidden in a master. Detect these in text without expecting a fixed player error. Real failure still needs separate playlist, authorized-resource and decoding evidence; one successful path certifies no other method or protection system. Preserve one-factor faults and never call a field repair key acquisition or authorization.
+
+## Reopen with role ledger and unperformed scope
+
+Reopen both correct texts and verify one master session entry, two media KEY tags, two methods and eight declared seconds, plus three matching attributes and the five-field uniqueness tuple. Separately attach actual owned-source entry, visible fields and playback results, or mark unperformed; an absent dedicated key interface is not failure. Deliver originals and deletion/fault copies, stating no placeholder requests, key-byte collection or download/decryption. Explain preload versus media scope without certifying DRM, every encryption path or all devices.
+
+## Related tutorials and sources
+
+[iCouldPlay HLS session data: audit identifiers, languages and external JSON](<https://allluckly.cn/en/guides/icouldplay-hls-session-data-id-language-value-uri-record/>); [iCouldPlay HLS compatibility versions: calculate minima from feature combinations](<https://allluckly.cn/en/guides/icouldplay-hls-rfc8216-minimum-version-feature-ledger/>).
+
+Method sources: [RFC8216 §4.3.4.5](<https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.5>); [RFC8216 §4.3.2.4](<https://www.rfc-editor.org/rfc/rfc8216#section-4.3.2.4>); [RFC8216 §5.2](<https://www.rfc-editor.org/rfc/rfc8216#section-5.2>).
+
+Checked on 17 November 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261117-hls>) list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Placeholder addresses supply neither media nor keys. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.
+{% endraw %}

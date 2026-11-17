@@ -1,0 +1,77 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-orthogonal-vector-projection-line-residual-distance/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint orthogonal projection: split vector (3,1) into line component
+  and residual'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-orthogonal-vector-projection-line-residual-distance/
+agent_source_sha256: 5e3ef2f2bbd7ae360994d3c8c168e6eed7cf7a3a02bfbb0ff77f97a27119a053
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint orthogonal projection: split vector (3,1) into line component and residual
+
+Language: en
+Canonical: [VectorPaint orthogonal projection: split vector (3,1) into line component and residual](<https://allluckly.cn/en/guides/vectorpaint-orthogonal-vector-projection-line-residual-distance/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-orthogonal-vector-projection-line-residual-distance/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-orthogonal-vector-projection-line-residual-distance/>)
+Published: 2026-11-17T00:00:00+08:00
+Modified: 2026-11-17T15:55:37+08:00
+Author: Bison
+
+Project onto the full line with direction (1,2), checking dot products, minimum distance and a nonzero direction.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-orthogonal-vector-projection-line-residual-distance/>), translated on 2026-11-17. Original publication dates, attribution, code and version notes are retained.
+
+Project p=(3,1) onto the line through the origin with direction u=(1,2). Draw q and residual p−q separately, proving the nearest point algebraically rather than trusting a right-angle icon. Calculate externally and arrange points, arrows and labels manually in VectorPaint.
+
+## Define a full line and a nonzero direction
+
+Let L={t(1,2): t real}, not only positive t or t between zero and one. This projects onto a full line, not a finite arrow. Direction u must be nonzero, while zero is an allowed input. Save p/u/L conditions and separate input, projection, residual and calculations. Units are dimensionless. Distinguish vector displacement from endpoint P. A drawn arrow for u illustrates direction and one length without restricting the line at its endpoint.
+
+## Use the dot product divided by squared direction length
+
+Compute p·u=3×1+1×2=5 and u·u=1²+2²=5, hence q=(5/5)u=(1,2). The denominator is squared length, not √5. The signed scalar component along the unit direction is 5/√5=√5, which multiplied by u/√5 still gives q. Separate scalar √5 from vector (1,2), rather than call them conflicting answers. Check q is a multiple of u and belongs to L; membership plus the next orthogonality condition establishes projection, not the coefficient alone.
+
+```text
+p=(3,1); u=(1,2); L={t*u : t real}
+p dot u=5; u dot u=5
+q=((p dot u)/(u dot u))*u=(1,2)
+r=p-q=(2,-1); u dot r=0
+|p-t*u|^2=5*(t-1)^2+5
+v=2*u=(2,4): ((p dot v)/(v dot v))*v=(10/20)*v=q
+```
+
+## Plot origin and endpoints at equal scales
+
+Use a suggested 1800×1900 canvas, screen origin (500,1500), 200 pixels per unit equally: X=500+200x, Y=1500−200y. P maps to (1100,1300), Q to (700,1100); distinguish OP/OQ styles. Display t from −0.5 to 2.5 only as a window with dashed continuations, not the line’s domain. Place from guides before arrowheads, acknowledging approximation without numeric controls. Unequal axis scales would distort right angles, so retain equal scales here. Window endpoints (−0.5,−1),(2.5,5) map to (400,1700),(1000,500). Label a displayed segment, retaining negative continuation rather than a positive ray only. Keep the right-angle marker small enough to expose the residual tail.
+
+## Draw the residual from Q toward P
+
+Residual r=p−q=(2,−1) is drawn from Q to P, with its tail at Q. Screen displacement (400,200) points down because mathematical y decreases by one; it is not r=(2,1). Since u·r=2−2=0 and both are nonzero, mark the right angle at Q. An optional origin-based r is a translated display, not extra residual mass. The identity p=q+r uses head-to-tail connection, not three origin arrows visually mistaken for a triangle.
+
+## Verify nearest distance for every line point
+
+For any tu=(t,2t), squared distance to P is (3−t)²+(1−2t)²=5(t−1)²+5. Only t=1 attains minimum 5, so Q uniquely minimizes distance, √5. This uses real Euclidean distance, not visual preference. Also |p|²=10, |q|²=5 and |r|²=5; ordinary lengths do not satisfy √10=√5+√5. A displayed window cannot replace the all-real argument. The minimum follows from formulas, not pixel measurements.
+
+## Test rescaled direction and zero input separately
+
+With v=2u=(2,4), p·v=10 and v·v=20, so (1/2)v still gives (1,2). Rescaling direction preserves the line and projection. Dividing only by |v| before multiplying raw v gives a different vector. Zero input legitimately yields zero projection/residual, though no measurable angle belongs to a zero residual. Zero direction instead makes the denominator zero and fails to specify the original line. Keep these two zero cases distinct. Input w=(2,−1) dots to zero with u, yielding zero projection and residual w. Input u yields projection u and zero residual. These distinguish input on versus perpendicular to the line without changing direction. Zero outputs are valid; the nonzero-direction condition does not forbid them.
+
+## Check direction, denominator and arrow endpoints
+
+If Q misses L, check its multiple of u; if on L but not perpendicular, check dot product and squared-length denominator. For reversed residuals inspect p−q and screen direction from Q to P rather than delete a minus sign. A distorted right angle calls for axis scales, not arbitrary movement of correct points. Repair one copy factor and retest v=2u. Moving p requires recomputing q/r; layers do not update projection automatically. Recheck both membership and orthogonality instead of adding an icon.
+
+## Reopen and verify the three-vector identity
+
+Save editable work and reopen SVG/PDF without guides, checking O/P/Q, arrow tails, fractions and √5 at reading size. Reopen input, line, residual and notes separately, labelling any extra r as translated. Deliver q=(1,2), r=(2,−1), p=q+r, zero dot product and the arbitrary-t distance formula, with nonzero-u and approximation conditions. Leave unperformed actions pending, without claiming automatic constraints, engineering measurement or mathematical precision in every output environment.
+
+## Related tutorials and sources
+
+[VectorPaint translation and reflection: check each vertex coordinate and orientation](<https://allluckly.cn/en/guides/vectorpaint-coordinate-translation-reflection/>); [VectorPaint composition order: shear then double height differs from the reverse](<https://allluckly.cn/en/guides/vectorpaint-shear-scale-composition-order-two-results/>).
+
+Method sources: [OpenStax Calculus Volume 3 §2.3: projections](<https://openstax.org/books/calculus-volume-3/pages/2-3-the-dot-product>).
+
+Version and operation scope: checked on 17 November 2026 against the [official VectorPaint listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261117-vectorpaint>): version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.
+{% endraw %}

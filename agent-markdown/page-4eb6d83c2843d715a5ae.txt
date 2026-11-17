@@ -1,0 +1,77 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-gradient-level-ellipse-unit-direction-local-change/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint gradient and contour: a unit-direction derivative is not a full-step
+  change'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-gradient-level-ellipse-unit-direction-local-change/
+agent_source_sha256: 901f83bb53f4ecda5c86ed4a8ead23ea4e750ebd07f79a5c8528c61524870ce6
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint gradient and contour: a unit-direction derivative is not a full-step change
+
+Language: en
+Canonical: [VectorPaint gradient and contour: a unit-direction derivative is not a full-step change](<https://allluckly.cn/en/guides/vectorpaint-gradient-level-ellipse-unit-direction-local-change/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-gradient-level-ellipse-unit-direction-local-change/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-gradient-level-ellipse-unit-direction-local-change/>)
+Published: 2026-11-17T00:00:00+08:00
+Modified: 2026-11-17T15:55:37+08:00
+Author: Bison
+
+Plot a gradient and tangent for x²+2y², checking unit-direction derivative 22/5 against a finite-step difference.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-gradient-level-ellipse-unit-direction-local-change/>), translated on 2026-11-17. Original publication dates, attribution, code and version notes are retained.
+
+Draw a contour of f(x,y)=x²+2y² and the gradient at P=(1,1). Fix a unit direction before calculating its derivative, then compare a finite move to distinguish local rate from accumulated change. Differentiate externally and use layers only for derived curves, arrows and notes.
+
+## Fix a differentiable function and the level-three point
+
+The polynomial is differentiable everywhere and f(1,1)=3, so draw x²+2y²=3. This ellipse is centred at the origin with semiaxes √3 and √(3/2), not a circle centred at P. Save function/point/layer definitions and separate contour, gradient, direction and notes. Coordinates and function values are abstract, not real terrain slope or fluid speed. Common contour colour denotes one value, without assigning an undefined extra quantity to line thickness or brightness.
+
+## Differentiate before anchoring the gradient at P
+
+Partial derivatives are f\_x=2x and f\_y=4y, hence ∇f(P)=(2,4). Anchored at P, the arrow ends at P+(2,4)=(3,5), not coordinate (2,4). Its direction indicates steepest local increase, but magnitude is defined too; any shortened display needs an explicit scale factor. Retain full length here. Separate differentiation, point evaluation and displacement instead of eyeballing a plausible normal. Function value three is not gradient magnitude.
+
+```text
+f(x,y)=x^2+2*y^2; P=(1,1); f(P)=3
+grad f(P)=(2,4); anchored endpoint=P+(2,4)=(3,5)
+u=(3/5,4/5); |u|=1; D_u f(P)=22/5
+tangent: x+2*y=3; tangent direction=(2,-1)
+f(P+t*u)=3+(22/5)*t+(41/25)*t^2
+f(P+u)-f(P)=151/25=6.04
+```
+
+## Draw ellipse, point and arrows at one scale
+
+Use a suggested 1800×2000 canvas, screen origin (500,1400), 200 pixels per unit equally: X=500+200x, Y=1400−200y. P is (700,1200), gradient endpoint (1100,400); ellipse semiaxes are approximately 346.410 and 244.949 pixels. Approximate with shapes/guides, checking P algebraically rather than distorting the curve to a wrong point. Without numeric controls, place manually and label approximation; nodes carry no function constraints. Group arrows separately so caption moves do not drag the gradient.
+
+## Separate a unit direction from a nonunit parameter
+
+Take unit u=(3/5,4/5). D\_u f(P)=∇f(P)·u=6/5+16/5=22/5=4.4. For v=(3,4), dot product 22 is the derivative per t along P+tv, not the same per-unit-distance value; it is not intrinsically erroneous. Normalize before comparing distance-based rates. The maximum unit-direction derivative is |∇f|=2√5≈4.472, above 4.4, along (1/√5,2/√5), not any vaguely northeast arrow.
+
+## Use the gradient normal to check the tangent
+
+At P, tangent equation 2(x−1)+4(y−1)=0 becomes x+2y=3. Direction (2,−1) dots with the gradient to 4−4=0; both are nonzero, giving a meaningful right angle. Draw a thin dashed tangent through P at the gradient tail, not a gradient from the origin toward it. Motion along the contour keeps f=3 and the tangent direction has zero first-order change, but a finite straight tangent step need not preserve f. Label tangency at P, not a second global contour. The nonzero gradient gives this contour a definite normal. At the origin the gradient is zero and level zero is a single point, not a curve with the same tangent. Reassess local conditions before reusing this representation elsewhere.
+
+## Keep the quadratic term for a finite-step control
+
+Substitution along unit u gives f(P+tu)=3+(22/5)t+(41/25)t². At t=1, the increment is 151/25=6.04 versus instantaneous derivative 4.4; the extra 1.64 is quadratic. Derivative times a full step is not exact change, and finite-step error does not refute the derivative’s limit. If plotting P+u=(1.6,1.8), keep it off the level-three ellipse. Distinguish it visually rather than drag it onto the contour while retaining the same move label. Along tangent v=(2,−1), f(P+tv)=3+6t²: first derivative zero but increment six at t=1. The straight tangent and curved contour share a direction at P, not a globally constant-value path.
+
+## Troubleshoot point evaluation, units and arrow anchoring
+
+For a wrong gradient endpoint, check anchoring at P. A fivefold derivative mismatch may mean omitted normalization. Substitute P into the tangent if it misses. Inspect axis scales before rotating correct vectors to repair a screen angle. A full-step change unlike 4.4 may have lost its quadratic term, not require changing f. Repair one copy condition and retain calculations. Moving P requires new gradient, tangent and level, not simply dragging the arrow group. No automatic differentiation or constraint update is assumed.
+
+## Reopen with local and finite quantities separated
+
+Save native work and reopen SVG/PDF, checking ∇,22/5,41/25,151/25 and arrow endpoints. At fit-to-window size keep ellipse/P visible beneath the long arrow. Reopen curve, tangent, gradient and notes independently, retaining unit-direction/differentiability premises. Deliver derivatives, tangent dot product, maximum rate and finite-step expansion; leave unperformed actions pending. This is not terrain measurement or trajectory simulation, nor a built-in gradient/differentiation feature or universal precision certification.
+
+## Related tutorials and sources
+
+[VectorPaint unit-circle projections: distinguish sine height from screen y](<https://allluckly.cn/en/guides/vectorpaint-unit-circle-sine-projection/>); [VectorPaint parabola diagrams: compare focus distance and perpendicular directrix distance](<https://allluckly.cn/en/guides/vectorpaint-parabola-focus-directrix-distance/>).
+
+Method sources: [OpenStax Calculus Volume 3 §4.6: gradients and directional derivatives](<https://openstax.org/books/calculus-volume-3/pages/4-6-directional-derivatives-and-the-gradient>).
+
+Version and operation scope: checked on 17 November 2026 against the [official VectorPaint listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261117-vectorpaint>): version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.
+{% endraw %}

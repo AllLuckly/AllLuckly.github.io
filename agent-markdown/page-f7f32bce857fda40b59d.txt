@@ -1,0 +1,82 @@
+---
+layout: null
+permalink: /guides/icouldplay-hls-codecs-sample-format-union-versus-payload/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映 HLS 编码声明核对：CODECS列了什么，又没证明什么
+agent_source_url: https://allluckly.cn/guides/icouldplay-hls-codecs-sample-format-union-versus-payload/
+agent_source_sha256: a386db90c339221a74fbbb95b7cb8cc463821f908e43d795e74707cb19171222
+agent_generator_version: 1
+---
+{% raw %}# 云映 HLS 编码声明核对：CODECS列了什么，又没证明什么
+
+语言：zh-CN
+原文：[云映 HLS 编码声明核对：CODECS列了什么，又没证明什么](<https://allluckly.cn/guides/icouldplay-hls-codecs-sample-format-union-versus-payload/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-hls-codecs-sample-format-union-versus-payload/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-hls-codecs-sample-format-union-versus-payload/>)
+发布于: 2026-11-17T00:00:00+08:00
+内容更新于: 2026-11-17T00:00:00+08:00
+署名：Bison
+
+拆读avc1与mp4a字段，合并引用音频组的编码集合，再向实际媒体证据核对。
+
+主清单的CODECS是一份格式声明，不是已经分析媒体字节的报告。本课读取一个视频和两种音频候选，核列表为何要同时含三种格式，再拆出十六进制与十进制字段。云映只观察真实来源当前的选择与播放，不把改字符串当作转码、补音轨或安装解码器。
+
+## 先给声明和媒体证据各留一栏
+
+保存主清单原文、取得时间、视频入口与引用音频清单，再给每个资源的实际字节身份留一栏。没有媒体时只完成下方假定样本，证据状态写未取得，不把清单值原样抄进“已测编码”。有自有素材可读其可信制作记录或外部媒体检查报告，报告也要对应文件身份与时间，不能拿同名旧版本充数。先分清声明、报告和当前播放三层，当前不要求下载不属于自己的素材，也不假设云映有十六进制码流编辑或自动修复CODECS界面。
+
+## 主清单引用两种不同音频格式
+
+下方有sound组两条AUDIO：英文AAC与法文AC-3，二者默认和自动属性不同但不改变格式身份。纸面另约定视频为H.264，音频都与它属于同一呈现；CODECS因此列avc1.4d401e、mp4a.40.2和ac-3三个标识。它们不是三条同时播放的音轨，也不说明媒体容器就叫CODECS。BANDWIDTH是本例假定声明，不据它推导编码。代码未附视频、音频或清单实际响应，名称和后缀只是阅读入口，无法凭这些行宣称已建立可播服务器。
+
+```
+#EXTM3U
+#EXT-X-VERSION:4
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="sound",NAME="English AAC",LANGUAGE="en",DEFAULT=YES,AUTOSELECT=YES,CHANNELS="2",URI="audio-aac.m3u8"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="sound",NAME="French AC3",LANGUAGE="fr",DEFAULT=NO,AUTOSELECT=YES,CHANNELS="6",URI="audio-ac3.m3u8"
+#EXT-X-STREAM-INF:BANDWIDTH=2400000,CODECS="avc1.4d401e,mp4a.40.2,ac-3",AUDIO="sound"
+video.m3u8
+```
+
+## 按RFC6381拆读样本项与进制
+
+avc1是样本项标识，后面4d401e按三个字节拆为4d、40、1e，十六进制转十进制分别为77、64、30；这些字节对应配置、约束标志字节和级别，不能把整串当帧数。mp4a.40.2的40是十六进制对象类型指示，值为64，末项2按十进制表示AAC-LC音频对象类型。两处40处在不同描述位置，不因字符相同就说两者是相同媒体参数。格式值区分大小写，记录时保留avc1与mp4a原样，不把人为加空格后的字符串当合法新标识。
+
+## 引用组的所有样本格式都进入集合
+
+按RFC8216，变体引用这样的Rendition组时，CODECS必须包含组内任一成员出现的每种样本格式。本例集合是视频H.264加音频AAC和AC-3，三项都应保留，不能因为默认是AAC就删ac-3。先把组内两行格式卡合并，再加视频格式；重复相同格式只计集合一次，不按轨道数机械增加字符串。这个集合说明可能组合需要哪些格式，不要求同时解码两种语言。若实际媒体后来变编码，旧清单即使仍可打开也需要重新核声明，列表整齐不等于永远准确。
+
+## 用独立媒体资料核而不循环抄标签
+
+下方资料卡明确是假定而非实测，供纸面对集合做对照。真实任务需把卡里的每个格式换成与自有字节对应的检查结果，核是否有缺列、多列或配置细节不同。只看到H.264名称不一定足以证明具体avc1后缀，配置与级别也需可靠依据；信息不足写部分匹配或未知，不猜全串。文件能播放只能说明当前所选路径有结果，不能替另一个未选音频候选完成编码核验。报告由外部读取不表示云映内置同样工具，也不能让自己的假设升级成采集事实。
+
+```
+ASSUMED FORMAT CARD — NOT A MEASUREMENT
+video.m3u8       video: avc1.4d401e
+audio-aac.m3u8   audio: mp4a.40.2
+audio-ac3.m3u8   audio: ac-3
+required union: avc1.4d401e,mp4a.40.2,ac-3
+```
+
+## 实际播放分候选记录而非给整列表背书
+
+真实来源可用时，从视频入口正常播放，记录当前音频名称、可见编码资料和实际声音；界面没有编码字段就写未显示。允许选择另一音频时回同一区间听辨，保持视频、速度与输出条件不变。AAC有声而AC-3无声，应分开查资源取得、媒体格式与解码路径，不将一次成功写成三项声明全部已测。改清单CODECS不会生成缺失音频，也不安装系统解码能力，不能为试验任意替换成听说更兼容的标识。未做的切换与媒体检查仍留未执行。
+
+## 用漏列AC-3的副本定位声明错误
+
+复制主清单，只从CODECS删去ac-3，保留法文候选的假定实际格式不变。此时语法上仍可读列表，却漏列引用组所需格式，应在集合审核指出，不需要等播放器给固定错误码。恢复三项后，再查拼写、双引号和逗号，不能把整条属性按逗号粗切而拆坏引号内列表。若报告显示媒体其实不是AC-3，先保留差异并核报告身份，不机械补回旧名掩盖内容变化。故障副本与原稿分开，每次只改一个原因，禁止把改标签称为重新编码成功。
+
+## 重开交付集合与字节证据范围
+
+重开正确主清单，数一个视频入口、两个音频成员和三种格式，再复算4d、40、1e的77、64、30以及音频末项十进制2。交付原文、组格式集合、外部报告身份或假定卡、候选播放结果与未知项。退出再进真实来源后实际确认当前音轨，不借旧默认标签判断已听哪条。最后核结论没有把CODECS等同文件扩展名、轨道总数、自动转码或设备全部兼容保证；本课完成的是声明与证据逐层对应，不是所有媒体字节和输出硬件已逐项验收。
+
+## 相关教程与资料
+
+[云映媒体信息清单：把容器、视频编码与音轨分别登记](<https://allluckly.cn/guides/icouldplay-container-codec-stream-inventory/>)、[云映 HLS 声道字段核对：CHANNELS最大数不等于轨数或扬声器数](<https://allluckly.cn/guides/icouldplay-hls-audio-channels-maximum-count-not-track-output/>)。
+
+方法来源：[RFC8216 §4.3.4.1.1](<https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.1.1>)、[RFC8216 §4.3.4.2](<https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.2>)、[RFC6381 §3.3](<https://www.rfc-editor.org/rfc/rfc6381#section-3.3>)。
+
+资料核对：2026年11月17日，[云映官方商店](<https://apps.apple.com/cn/app/id6755653178>)与[Apple公开查询](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261117-hls>)列出1.1.1，最低iOS / iPadOS 15.0。文本与演算在外部手工准备，云映用于自己的已有真实来源选择和播放观察，入口按安装版本实际可见为准。占位地址不提供媒体或密钥。文法审核、假定算例、真实字节资料和观看分别记录，没有执行的步骤明确未执行；未声称完成真机、私人服务器、所有引擎或输出设备逐项兼容测试。
+{% endraw %}

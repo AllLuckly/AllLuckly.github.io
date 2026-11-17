@@ -1,0 +1,79 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Read OPDS category reports in ManYue: separate term, scheme and display label'
+description: Compare three category records to distinguish relabelling from shared
+  labels across schemes without treating a category as book identity.
+permalink: /en/guides/manyue-opds-atom-category-term-scheme-label-report/
+date: '2026-11-17 00:00:00 +08:00'
+modified: '2026-11-17 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 225
+topic: Structure and meaning in file reports
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-17-manyue-opds-atom-category-term-scheme-label-report.md
+source_url: /guides/manyue-opds-atom-category-term-scheme-label-report/
+translation_method: editorial
+translation_source_sha256: 5ea6bfdd7dadecc3d9f92d53201c26bb994062046263c3673fb604f91b5061f5
+translation_date: '2026-11-17T06:45:22.928525+00:00'
+excerpt: Compare three category records to distinguish relabelling from shared labels
+  across schemes without treating a category as book identity.
+---
+{% raw %}
+<p>Identical catalogue labels need not identify one category, while one category can receive a different human-readable label. Read an Atom category excerpt as a PDF report in ManYue, tracking term, scheme, label individually. This explains Atom fields used by OPDS without promising XML inspection, field-based filters or automatic category merging.</p>
+
+<h2 id="prepare-three-auditable-sample-records">Prepare three auditable sample records</h2>
+
+<p>Externally save the three excerpts below as records A,B,C in order. Their example.invalid addresses are illustrative scheme identifiers, require no access and contain no personal server data. Put excerpts, a three-column ledger and an original comic-entry observation sheet on PDF pages P1–P3. The excerpts omit required feed/entry fields and are not a connectable OPDS service. Before importing, verify full addresses and quotes are legible rather than let report clipping erase evidence.</p>
+
+<pre><code class="language-xml">&lt;category xmlns="http://www.w3.org/2005/Atom" term="river" scheme="https://example.invalid/subjects" label="Rivers"/&gt;
+&lt;category xmlns="http://www.w3.org/2005/Atom" term="river" scheme="https://example.invalid/subjects" label="Waterways"/&gt;
+&lt;category xmlns="http://www.w3.org/2005/Atom" term="river" scheme="https://example.invalid/collections" label="Rivers"/&gt;
+</code></pre>
+
+<h2 id="copy-required-term-instead-of-guessing-from-labels">Copy required term instead of guessing from labels</h2>
+
+<p>Write river in the first column for all three records and verify term exists. Atom requires category term, a string identifying the category, rather than one uniquely displayed title. Missing term is a structural issue; an informative label does not automatically supply it. An English-looking term does not guarantee the interface displays that word. Retain exact characters without translating identifiers or changing plural forms. Keep table headings separate from field values so explanatory text does not enter the data.</p>
+
+<h2 id="treat-scheme-as-a-categorization-scheme-identifier">Treat scheme as a categorization-scheme identifier</h2>
+
+<p>Copy the complete scheme: A/B use subjects and C collections. Those endings are discussion abbreviations; retain full IRIs in evidence. Optional scheme identifies a categorization system, not an acquisition link, cover location or necessarily accessible web page. A placeholder failing to open is not invalid-category evidence, and it is not a server login base. Check presence before characters. Missing scheme means undeclared, not automatic inheritance from a neighboring record. This exercise compares specified strings without inventing complex IRI normalization rules.</p>
+
+<h2 id="use-label-as-human-readable-text-rather-than-a-unique-key">Use label as human-readable text rather than a unique key</h2>
+
+<p>Labels are Rivers, Waterways, Rivers. Optional label is user-facing, language-sensitive text; its absence does not remove the category. A/B share term and scheme and differ only in display wording, so the exercise’s identity ledger groups them. C also says Rivers but has another scheme and stays separate. Three records produce two scheme-term combinations and two label strings, coincidentally equal counts under different rules. Visual label equality is not permission to merge comic files or delete entries.</p>
+
+<p>Changing A’s label to Chinese河流 while retaining term and scheme preserves the recorded category combination. A language-sensitive label can change without translating identifiers. Removing C’s label still leaves term and scheme,so retain the category. Actual fallback to a term,blank or other text is not promised for an unknown client.</p>
+
+<h2 id="check-displayed-text-through-entity-escaping">Check displayed text through entity escaping</h2>
+
+<p>Add a P3 example using an amp entity between Maps and Rivers. In XML it denotes the ampersand character rather than new markup; decoded text is Maps &amp; Rivers. Keep raw syntax separate from decoded text instead of copying already decoded browser text back as raw XML. Escaped angle brackets likewise represent characters, not executable tags. In the PDF compare displayed source with expected text. If an entity name appears, inspect possible double escaping during external export before attributing it to OPDS processing in ManYue.</p>
+
+<pre><code class="language-xml">&lt;category xmlns="http://www.w3.org/2005/Atom" term="maps" label="Maps &amp;amp; Rivers"/&gt;
+</code></pre>
+
+<h2 id="record-only-what-a-real-catalogue-displays">Record only what a real catalogue displays</h2>
+
+<p>Read the report in ManYue and bookmark the ledger first. If an authorized OPDS library is already available, optionally record labels, title, author, cover for a known entry without demanding server changes. A visible label alone cannot reconstruct scheme or prove deletion of original term. Without an original response report mark those fields unknown. Keep ordinary OPDS whole-file acquisition separate from OPDS-PSE page streaming; displayed categories do not prove directly readable content. The PDF task remains complete without a personal catalogue.</p>
+
+<h2 id="trace-three-kinds-of-mistaken-merging">Trace three kinds of mistaken merging</h2>
+
+<p>Treating A/B as different schemes may confuse Waterways with scheme. Merging A/C may compare only Rivers. Filling a missing term from Rivers confuses a required identifier with optional display text. Correct one ledger column and retain the old value instead of bulk-editing server tags. Display differences may involve another entry, language or response, so verify identity and time before speculation. Category identity differs from book identity: one category can contain many books and one book multiple categories. Category count is not comic page count.</p>
+
+<p>Attach all three category records to one original entry and state one book entry,three category records,two explicit combinations. This catches category counts mistaken for book counts. Without a ranking rule,alphabetical order does not imply popularity,and two occurrences of a label do not prove two works.</p>
+
+<h2 id="reopen-and-deliver-source-identity-display-layers">Reopen and deliver source, identity, display layers</h2>
+
+<p>Reopen the report bookmark, cover the ledger and read each term and complete scheme, then explain why two Rivers labels cannot simply merge. Revisit P3’s decoded ampersand while retaining raw amp syntax. Acceptance preserves three records,two combinations,two label strings and unobserved fields; omitting a layer loses the explanation. Leave unperformed reopening or catalogue sampling pending and deliver the source and notes. Recheck responses after changing services; no universal OPDS scheme or automatic app deduplication is claimed.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/manyue-opds-cover-sample-acquisition-links/">OPDS link purposes</a>; <a href="/en/guides/manyue-lanraragi-tag-lookup/">LANraragi tag queries</a>.</p>
+
+<p>Method references: <a href="https://www.rfc-editor.org/rfc/rfc4287.html#section-4.2.2">RFC4287 section4.2.2 Atom categories</a>; <a href="https://specs.opds.io/opds-1.2">OPDS1.2 catalogue specification</a>. Diagrams, report data, counterexamples and ledgers are original exercises.</p>
+
+<p>Version checked on 17 November 2026: the <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261117">Apple public lookup</a> lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later; see the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities. Use self-made PDFs or supported comic images; controls depend on the installed version. External preparation and paper predictions do not constitute device observations. Leave unperformed checks blank.</p>
+{% endraw %}

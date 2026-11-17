@@ -1,0 +1,76 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint barycentric coordinates: weights summing to one do not make a point the centroid'
+description: Check normalized weights, signed areas and exterior negative weights in a noncollinear triangle without
+  treating the name as a physical centroid.
+permalink: /en/guides/vectorpaint-normalized-barycentric-coordinates-interior-negative-weights/
+date: '2026-11-17 00:00:00 +08:00'
+modified: '2026-11-17 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 223
+topic: Coordinate constraints and surface geometry
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-17-vectorpaint-normalized-barycentric-coordinates-interior-negative-weights.md
+source_url: /guides/vectorpaint-normalized-barycentric-coordinates-interior-negative-weights/
+translation_method: editorial
+translation_source_sha256: 8d0403e452f1727f1ec41d71aa2ec9f0db0f58eccec458e88b0188ad69928c88
+translation_date: '2026-11-17T07:45:01+00:00'
+excerpt: Check normalized weights, signed areas and exterior negative weights in a noncollinear triangle without
+  treating the name as a physical centroid.
+---
+{% raw %}
+<p>Assign normalized barycentric coordinates to an interior and exterior point of a right triangle. Keep weight-to-vertex assignments, sum one and noncollinearity explicit; the same coordinates can represent outside points. Calculate weights externally and display labels/regions manually, without computing a material centre of mass.</p>
+
+<h2 id="section-1">State normalization and the three vertices</h2>
+
+<p>Set A=(0,0), B=(6,0), C=(0,4), noncollinear and ordered with weights α,β,γ. Use the normalized convention P=αA+βB+γC and α+β+γ=1. Proportional unnormalized notation cannot be substituted directly into that expression. Save definitions/vertices and separate triangle, points, regions and text. Units are dimensionless and weights are not measured masses. Retain vertex order in every coordinate row rather than exchange weights when labels move visually.</p>
+
+<h2 id="section-2">Find interior weights from coordinates and their sum</h2>
+
+<p>For P=(2,1), x gives 6β=2, so β=1/3; y gives 4γ=1, so γ=1/4; α=1−1/3−1/4=5/12. Substitute to recover P. All positive weights put it strictly inside, not merely visually central. The triangle centroid G has three weights 1/3 and coordinates (2,4/3), different from P. The coordinate name does not make every point a centroid. Explain this separately without adding unnecessary medians to the main diagram.</p>
+
+<pre><code class="language-text">A=(0,0); B=(6,0); C=(0,4)
+P=alpha*A+beta*B+gamma*C; alpha+beta+gamma=1
+P=(2,1): (alpha,beta,gamma)=(5/12,1/3,1/4)
+Q=(7,1): (alpha,beta,gamma)=(-5/12,7/6,1/4)
+area ABC=12
+P opposite signed areas: 5,4,3
+Q opposite signed areas: -5,14,3
+</code></pre>
+
+<h2 id="section-3">Keep plotted points consistent with the weight table</h2>
+
+<p>Use a suggested 2200×1600 canvas, origin (400,1200), 200 pixels per unit equally: X=400+200x, Y=1200−200y. A/B/C map to (400,1200), (1600,1200), (400,400); P to (800,1000). Close edges before P and keep α associated with A in the ledger, not whichever region its label approaches. Separate labels from points. Approximate with guides if numeric controls are absent, retaining calculations. Leave room for exterior Q without moving B to accommodate text.</p>
+
+<h2 id="section-4">Match each opposite subarea to its weight</h2>
+
+<p>Total area is 6×4/2=12. Join P to the vertices: areas PBC,PCA,PAB are 5,4,3, corresponding to α,β,γ after division by 12. A’s weight uses the opposite triangle PBC, not an arbitrary region nearest A. Use translucent regions with clear borders and no spurious fourth overlap. Ordinary areas suffice inside. For outside points, the same formula needs signed areas; taking every term positive no longer preserves normalization. Boundary M=(3,0) has weights (1/2,1/2,0) on AB, not strictly inside. Nonnegative includes boundary; all positive gives interior for this nondegenerate triangle. Use an open boundary marker without deleting the zero entry and reordering vertices.</p>
+
+<h2 id="section-5">Retain negative weights for an exterior point</h2>
+
+<p>For Q=(7,1), β=7/6, γ=1/4 and α=−5/12 still sum to one and reconstruct Q. Negative weight excludes a convex combination but not a valid affine representation. Plot Q at (1800,1000), outside right, with a different marker. Ordered signed subareas are −5,14,3, totaling 12; absolute values total 22 and cannot serve as the original normalized weights. Separate signed quantities from physical areas rather than describe a paper region as having negative size.</p>
+
+<h2 id="section-6">Test missing normalization and collinearity separately</h2>
+
+<p>Doubling all P weights yields (4,2) if directly summed, not P. Proportional notation must first divide by total two under this convention. For collinear vertices (0,0),(2,0),(4,0), point (1,0) has normalized representations (1/2,1/2,0) and (3/4,0,1/4), losing uniqueness. They cannot represent a point with y=1. Keep separate controls without changing main C and retaining area 12. Valid representation, uniqueness and interior convex combination have different conditions. Translate vertices and P together by (1,−2): new vertices (1,−2),(7,−2),(1,2), P=(3,−1). Original weights still work because the translation is multiplied by weight sum one. Moving only P would not preserve the old weights.</p>
+
+<h2 id="section-7">Troubleshoot assignment, signs and total weight</h2>
+
+<p>If substitution misses P, check vertex–weight assignments, denominators and sum before dragging the point inside. A supposedly invalid exterior point may confuse nonnegative interior weights with all affine representations. Area total 22 signals lost signs. For display mismatch check screen Y and scale while retaining fractions. Change one copy condition, recompute weights and both coordinates, and keep shading off vertex labels. Paths and translucent fills do not automatically solve new weights after dragging.</p>
+
+<h2 id="section-8">Reopen with two points and two weight classes</h2>
+
+<p>Save native work and reopen SVG/PDF without guides, retaining interior P, exterior Q and both weight tables. Inspect −5/12,7/6 and vertex letters enlarged; move captions for readability, not points. Reopen regions, vertices and text independently. Deliver definitions, substitution, area pairing and collinear control. Leave unperformed actions pending. This is normalized-coordinate illustration, not an automatic centroid tool, mass measurement or universal export-precision certification.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-triangle-median-centroid/">VectorPaint triangle medians: check midpoints and the two-thirds centroid position</a>; <a href="/en/guides/vectorpaint-quadrilateral-midpoints-parallelogram-half-area/">VectorPaint quadrilateral midpoints: verify a parallelogram and half-area seventeen</a>.</p>
+
+<p>Method sources: <a href="https://msl.cs.uiuc.edu/vr/node206.html">Steven LaValle, Virtual Reality: barycentric coordinates</a>.</p>
+
+<p>Version and operation scope: checked on 17 November 2026 against the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261117-vectorpaint">Apple public lookup</a>: version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.</p>
+{% endraw %}

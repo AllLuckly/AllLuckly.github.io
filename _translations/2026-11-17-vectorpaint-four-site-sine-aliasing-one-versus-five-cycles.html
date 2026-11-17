@@ -1,0 +1,76 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint four-site sampling: one set of values can come from one or five cycles'
+description: Sample sinθ and sin5θ at four distinct sites, avoid recounting closure and distinguish the functions
+  off-grid.
+permalink: /en/guides/vectorpaint-four-site-sine-aliasing-one-versus-five-cycles/
+date: '2026-11-17 00:00:00 +08:00'
+modified: '2026-11-17 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 230
+topic: Interpolation, statistics and discrete distinctions
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-17-vectorpaint-four-site-sine-aliasing-one-versus-five-cycles.md
+source_url: /guides/vectorpaint-four-site-sine-aliasing-one-versus-five-cycles/
+translation_method: editorial
+translation_source_sha256: 28f8549a6673c94757bd12a3594dd7953a34699c1e50303f6478d94aa12ad3c1
+translation_date: '2026-11-17T07:45:01+00:00'
+excerpt: Sample sinθ and sin5θ at four distinct sites, avoid recounting closure and distinguish the functions off-grid.
+---
+{% raw %}
+<p>Four uniform positions in a zero-to-two-π window give identical values for two different sine functions. Draw known functions and common samples to show that passing through them does not uniquely identify a continuous original. Curve guides come from external formulas; manual smoothing is display, not automatic signal reconstruction or audio sampling.</p>
+
+<h2 id="section-1">Fix functions, phase and four sampling sites</h2>
+
+<p>Use f(θ)=sinθ and g(θ)=sin5θ in radians, window 0≤θ&lt;2π, at θ_n=nπ/2 for n=0,1,2,3. Add no amplitude or phase; samples are ideal point values, not interval averages or noisy measurements. Save definitions/sites/window and separate function guides, common samples and notes. A displayed 2π closure repeats the periodic position zero, not a fifth distinct site. Distinct positions do not assert probabilistic independence; this is deterministic comparison.</p>
+
+<h2 id="section-2">Prove sample equality through periodicity</h2>
+
+<p>Since 5θ_n=θ_n+2πn, periodicity gives values 0,1,0,−1 for both. The identity holds for every integer n, though only four period sites are displayed. Changed spacing, phase or functions require renewed substitution, not a copied sequence. Keep indices paired: π is the third site, not second, and angles are not seconds or pixels. Calculate before placing identical markers; equality does not depend on how smooth the graphic looks.</p>
+
+<pre><code class="language-text">f(theta)=sin(theta); g(theta)=sin(5*theta)
+0 &lt;= theta &lt; 2*pi; theta_n=n*pi/2
+n:       0,    1,   2,     3
+theta:   0, pi/2,  pi, 3*pi/2
+f=g:     0,    1,   0,    -1
+5*theta_n=theta_n+2*pi*n
+closure theta=2*pi repeats periodic site theta=0
+off-grid theta=pi/4: f=sqrt(2)/2; g=-sqrt(2)/2
+</code></pre>
+
+<h2 id="section-3">Use the same angular scale in both panels</h2>
+
+<p>Use a suggested 1900×1700 canvas. Share X=300+1200θ/(2π), with baselines Y=500 and Y=1200 and 200 pixels per value upward. Four x positions are 300,600,900,1200; mark closure at 1500 open. Upper sample y positions are 500,300,500,700; lower 1200,1000,1200,1400. Values match despite different baselines. Label both zero lines rather than compare absolute screen heights. Retain the conversion table even with approximate manual placement.</p>
+
+<h2 id="section-4">Separate known-function guides from the samples</h2>
+
+<p>Draw one f cycle through 0,1,0,−1,0 at the quarter-period sites/closure. Draw five g cycles using optional guide nodes θ=kπ/10, k=0…20, where g=sin(kπ/2) cycles 0,1,0,−1. Those dense guides come from the known formula, not additional observed samples. Approximate with pen paths and calculated extrema, not a stretched raster copy. Finite intervening segments remain approximate, not exact analytic exports or completed reconstruction.</p>
+
+<h2 id="section-5">Show different values at an off-grid position</h2>
+
+<p>At θ=π/4, f=√2/2 while g=−√2/2, clearly different. Put this in a separate control, not among the original four sites; an actual extra sample changes the information available. One versus five cycles cannot become equal frequency merely because four values match. θ is angular, with no seconds specified, so these are window cycle counts, not actual hertz or pitch. A dashed π/4 guide is annotation, neither a new function nor an erroneous data link. Shifting sites to π/4+nπ/2 while retaining the functions makes g the negative of f there. The original shared sequence no longer applies. Phase and sampling origin are conditions, not a guarantee under arbitrary sampling.</p>
+
+<h2 id="section-6">Neither joining nor smoothing identifies the original unconditionally</h2>
+
+<p>Straight joining yields a polyline; another smooth interpolant can give different intermediate values. Neither automatically equals f or g. Recovering an original needs assumptions such as frequency bounds, sampling rules and reconstruction method, not visual smoothness. More sites may distinguish these candidates without eliminating every unknown high frequency. Higher export resolution is not more original samples. This exercise proves nonuniqueness from finite data, not a real system’s sampling limit or anti-aliasing performance. Another family h=sinθ+a sin2θ shares the four values for every real a because sin(2θ_n)=sin(nπ)=0. It need not be plotted in full but proves more than two candidates. State a when used instead of hiding different curves as path error.</p>
+
+<h2 id="section-7">Troubleshoot angle units, indices and curve identities</h2>
+
+<p>For mismatched samples, check radians, nπ/2 and multiplication by five before moving points onto manual paths. For four or six lower cycles, inspect k=0…20 guides. Correct the distinct-site count if closure was counted twice while retaining its display. Same signs at π/4 require checking the 5π/4 quadrant. Repair one copy factor and repeat both common-site and off-grid checks. Smooth nodes, display antialiasing and image tracing are not mathematical reconstruction or automatic original-wave identification.</p>
+
+<h2 id="section-8">Reopen with common samples and distinct candidates</h2>
+
+<p>Save editable work and reopen SVG/PDF, retaining four solid sites per panel, open closure, one/five-cycle guides and separate π/4 control. At fit-to-window size inspect assignments; enlarged, retain the minus in −√2/2 and angle units. Reopen samples, paths and guides independently. Deliver periodicity identity, value table, off-grid control and reconstruction premises. Leave unperformed actions pending without device audio measurement, automatic curves or uniquely determined intermediate values from the original data.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-unit-circle-sine-projection/">VectorPaint unit-circle projections: distinguish sine height from screen y</a>; <a href="/en/guides/vectorpaint-cubic-bezier-three-level-midpoint-tangents/">VectorPaint cubic Bézier curves: audit three midpoint levels and endpoint tangents</a>.</p>
+
+<p>Method sources: <a href="https://graphics.stanford.edu/courses/cs348b-02/sampling.pdf">Pat Hanrahan, Stanford: Basic Signal Processing, sampling and aliasing</a>.</p>
+
+<p>Version and operation scope: checked on 17 November 2026 against the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261117-vectorpaint">Apple public lookup</a>: version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.</p>
+{% endraw %}

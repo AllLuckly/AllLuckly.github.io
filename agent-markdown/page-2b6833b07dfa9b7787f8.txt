@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /en/guides/manyue-epub-spine-linear-auxiliary-primary-sequence-report/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Read an EPUB sequence report in ManYue: a linear=no answer page is not deleted'
+agent_source_url: https://allluckly.cn/en/guides/manyue-epub-spine-linear-auxiliary-primary-sequence-report/
+agent_source_sha256: 7642a2f2b0e6cd9ebb21a8c2732b9fba02fc24a6339dfc0da86b469c1000ee52
+agent_generator_version: 1
+---
+{% raw %}# Read an EPUB sequence report in ManYue: a linear=no answer page is not deleted
+
+Language: en
+Canonical: [Read an EPUB sequence report in ManYue: a linear=no answer page is not deleted](<https://allluckly.cn/en/guides/manyue-epub-spine-linear-auxiliary-primary-sequence-report/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-epub-spine-linear-auxiliary-primary-sequence-report/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-epub-spine-linear-auxiliary-primary-sequence-report/>)
+Published: 2026-11-17T00:00:00+08:00
+Modified: 2026-11-17T14:45:22+08:00
+Author: Bison
+
+Record three spine entries, two primary items and a route to supplementary content without promising a fixed paging behavior.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-epub-spine-linear-auxiliary-primary-sequence-report/>), translated on 2026-11-17. Original publication dates, attribution, code and version notes are retained.
+
+A publication can list an answer page between chapters while declaring it auxiliary. That is neither deletion nor a guarantee that every reading system skips it identically. Use an original exercise-and-answer report in ManYue to check identity, primary sequence and access routes, without requiring EPUB parsing or execution.
+
+## Give three contents distinct anchors
+
+Externally prepare a as the question four plus five, b as answer nine with one explanatory sentence, and c as the next exercise three times four. Label them A-question, B-answer and C-next, retaining source text. Put resource mapping, a spine excerpt and access routes on report pages P1–P3; page markers differ from content identities. Do not import XML expecting chapters or suggest the app solved an answer written in the report. Record honestly whether the contents were actually made as separate files.
+
+## Resolve each idref to a resource first
+
+Map manifest IDs a,b,c to a.xhtml,b.xhtml,c.xhtml, then connect the three itemref lines below. b retains its resource mapping despite linear=no. An idref references a manifest item ID, not a general rule of removing a filename extension; similar names here are a convenience. Put unresolved spellings in an error box rather than guess a file to complete the ledger. This excerpt demonstrates selected fields, not a complete valid EPUB with metadata, navigation and container.
+
+```xml
+<spine xmlns="http://www.idpf.org/2007/opf">
+  <itemref idref="a"/>
+  <itemref idref="b" linear="no"/>
+  <itemref idref="c" linear="yes"/>
+</spine>
+```
+
+## List the spine and primary content separately
+
+In document order the spine list is a,b,c, three entries. The primary-contribution list is a,c, two: omitted linear on a defaults to yes; c states yes; b states no. Two is neither image count nor final physical page count, since one content document may contain multiple images or screens. Mark b auxiliary rather than absent. A spine must include at least one linear item; changing all three to no does not leave an ordinary conforming empty-primary example. Read attributes rather than infer no from an answer-like filename.
+
+Retain the attribute location: linear belongs on itemref, not as an auxiliary mark for an entire manifest folder. Resource identity and use in the reading sequence are different layers. Highlight b for comparison without treating highlighting as a field; the original excerpt must still show the literal no without relying on color.
+
+## Retain an explicit route to the answer
+
+On P3 draw A-to-B and B-to-A links labelled b.xhtml and a.xhtml. These are externally designed routes, not automatically clickable PDF links; test real links separately if created. EPUB creators must provide access to nonlinear content, for example through content or navigation links, rather than use no to leave an unreachable resource. Check the actual four-plus-five answer nine to identify B instead of trusting only a filename. Without an EPUB implementation, deliver the route design and report without claiming package validation or server testing.
+
+## Separate the hint from system choices
+
+Use three rows: b is declared auxiliary; possible presentation includes separate or popup access; actual presentation requires observation. The specification does not force every system to skip b immediately during paging. It may present b at its spine position or defer access. The semantic primary list a,c therefore does not guarantee that the next page action on a device goes directly A-to-C. Linear is not horizontal layout or animation speed. Keep actual behavior unknown instead of drawing an identical implementation flow for every system.
+
+Use content to catch wrong targets: B answers four plus five with nine, whereas C introduces three times four. Numbers on both do not make them interchangeable. A return route from the answer must reach A rather than C. Correct linear syntax does not cure an incorrect content target; track that as a separate issue.
+
+## Read three identities in ManYue’s report workflow
+
+Import the PDF, inspect A/B/C mapping on P1, compare three entries with two primary items on P2, then trace both routes on P3. Bookmark P2 and record a,c primary with b accessible, using an external note if no in-app note control exists. Reading an arrow is different from triggering a real EPUB link, so completing one cannot complete the other. After zooming return to full lines to check quotes and endings; screen wrapping does not create another itemref.
+
+## Locate mistakes with one-field changes
+
+Save a control report changing only b to linear=yes. Primary items become a,b,c; there are still three resources, answer nine and the same spine order. Deleting b’s itemref is a separate structural change, not just an auxiliary flag change. An erroneous idref d is an unresolved reference before any auxiliary-content discussion. If reading position differs from expectation, verify original versus control report and markers before deleting an answer to fit the prediction. Keep both filenames and a change ledger for reproduction.
+
+## Reopen and explain neither deletion nor guaranteed skipping
+
+Return to the shelf, reopen P2’s bookmark and state three spine entries, two primary and one auxiliary item before tracing access to B on P3. Acceptance includes default yes, at least one primary item and the fact that no does not uniquely determine presentation. Mark only paper checks if reopening was not performed. Deliver source, report and single-field control. Observe behavior again after changing reading software; successful PDF-report reading proves neither EPUB execution in ManYue nor deletion of auxiliary content.
+
+## Related tutorials and sources
+
+[EPUB resources and spine](<https://allluckly.cn/en/guides/manyue-epub-manifest-spine-image-occurrence/>); [EPUB navigation and landmarks](<https://allluckly.cn/en/guides/manyue-epub-landmarks-navigation-spine-targets/>).
+
+Method references: [W3C EPUB3.3 section5.7.2](<https://www.w3.org/TR/epub-33/#sec-itemref-elem>). Diagrams, report data, counterexamples and ledgers are original exercises.
+
+Version checked on 17 November 2026: the [Apple public lookup](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261117>) lists ManYue 2.0.5, requiring iOS / iPadOS 15.0 or later; see the [official App Store](<https://apps.apple.com/cn/app/id6753895889>) for published capabilities. Use self-made PDFs or supported comic images; controls depend on the installed version. External preparation and paper predictions do not constitute device observations. Leave unperformed checks blank.
+{% endraw %}

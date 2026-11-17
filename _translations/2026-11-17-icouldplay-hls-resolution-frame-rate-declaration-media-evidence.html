@@ -1,0 +1,80 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay HLS size and frame-rate audit: separate display declarations from media timestamps'
+description: Read two variants’ RESOLUTION and maximum FRAME-RATE, calculate 60000/1001 and distinguish screen refresh
+  from media evidence.
+permalink: /en/guides/icouldplay-hls-resolution-frame-rate-declaration-media-evidence/
+date: '2026-11-17 00:00:00 +08:00'
+modified: '2026-11-17 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 189
+topic: Events, candidates and declaration evidence
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-17-icouldplay-hls-resolution-frame-rate-declaration-media-evidence.md
+source_url: /guides/icouldplay-hls-resolution-frame-rate-declaration-media-evidence/
+translation_method: editorial
+translation_source_sha256: ec4cec66a18c113dd5acc0558b650dd4c4295048f0c61517c977b2823e3dc052
+translation_date: '2026-11-17T07:01:07+00:00'
+excerpt: Read two variants’ RESOLUTION and maximum FRAME-RATE, calculate 60000/1001 and distinguish screen refresh
+  from media evidence.
+---
+{% raw %}
+<p>A larger image need not have a higher frame rate. Compare two original variant declarations against an explicitly hypothetical display-size and timestamp-interval card. RESOLUTION describes optimal display pixels; FRAME-RATE describes the maximum across a variant’s video. Neither guarantees window dimensions, screen refresh or every frame actually displayed.</p>
+
+<h2 id="section-1">Identify variants and evidence beyond quality labels</h2>
+
+<p>Retain master text, acquisition time and both variant URIs, with independent media/report identities. Filenames 720p60 and 1080p30 are labels, not measurements. This video-only reading sample supplies no payload. Without real media, complete paper checks and mark playback unperformed. With owned material, bind reports to the current version and selected variant, not an older same-named encode. Record only visible iCouldPlay information without assuming frame-timestamp analysis or display-refresh calibration controls.</p>
+
+<h2 id="section-2">Put resolution and rate in separate columns</h2>
+
+<p>The first entry declares RESOLUTION=1280x720 and FRAME-RATE=59.940; the second 1920x1080 and 29.970. Bind each pair to its URI. Preserve integers joined by lowercase x and an unquoted decimal rate, not a fraction. BANDWIDTH/CODECS are hypothetical accompanying declarations, not derived from dimensions. More pixels do not justify raising the second rate, and first in the master is not proof of current selection. Establish attribute-to-URI assignment before comparing reports.</p>
+
+<pre><code class="language-text">#EXTM3U
+#EXT-X-STREAM-INF:BANDWIDTH=3000000,CODECS=&quot;avc1.4d4028&quot;,RESOLUTION=1280x720,FRAME-RATE=59.940
+v720p60.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=4500000,CODECS=&quot;avc1.4d4028&quot;,RESOLUTION=1920x1080,FRAME-RATE=29.970
+v1080p30.m3u8
+</code></pre>
+
+<h2 id="section-3">Do not treat RESOLUTION as required screen occupancy</h2>
+
+<p>RFC RESOLUTION describes optimal pixel dimensions for displaying all video in that variant, not the phone panel or an exact playback window. Real evidence may involve coded size, sample aspect ratio or rotation; report widths are not interchangeable automatically. The card explicitly assumes square pixels, no rotation and reported display size, enabling direct comparison here. Missing real premises remain pending. Do not substitute fitted/cropped screenshot dimensions into the manifest; changing declarations creates no media detail.</p>
+
+<h2 id="section-4">Retain maximum-rate rounding and rational evidence</h2>
+
+<p>FRAME-RATE is the maximum across all video in the variant, rounded to three decimal places. With consecutive presentation timestamps 1001 ticks apart and tick duration 1/60000 s, cadence is 60000/1001≈59.94005994, declared 59.940. A 2002-tick interval gives 29.97002997, declared 29.970. Equal intervals are an extra assumption, not a maximum derived from an average. Variable-rate media needs interval evidence, not total frames divided by duration alone. The RFC recommends the field if any video exceeds thirty fps; this is not a guaranteed client error rule.</p>
+
+<h2 id="section-5">Use the assumed card for calculation, then obtain real evidence separately</h2>
+
+<p>The card is not actual tool output; its three fields form a self-defined paper model. Read display, time_base and delta_ticks separately. Ticks are not milliseconds, and a one-second progress jump is not one lost frame. A real task needs method, media identity and coverage before judging size and maximum rate. One inspected segment cannot certify an entire variant. Average-only reports leave maximum unknown. Agreement supports those parameters, not losslessness, no dropped frames or complete device presentation.</p>
+
+<pre><code class="language-text">ASSUMED TIMING CARD — NOT A MEASUREMENT
+premises: square pixels, no rotation, equal presentation intervals
+v720p60.m3u8:  display=1280x720;  time_base=1/60000 s; delta_ticks=1001
+v1080p30.m3u8: display=1920x1080; time_base=1/60000 s; delta_ticks=2002
+</code></pre>
+
+<h2 id="section-6">Keep window and content anchors fixed during playback</h2>
+
+<p>For real playback, record visible quality, size or frame-rate fields, marking absent ones undisplayed. If variant selection exists, replay from before one content anchor with orientation, speed and output fixed. Record detail and motion impressions without inventing exact rates from them. A sixty-hertz screen is not a sixty-fps file; systems may repeat, drop or convert cadence. Without independent selection controls, report that limitation rather than invent a quality menu. Keep calculations separate from impressions and leave unperformed paths unperformed.</p>
+
+<h2 id="section-7">Troubleshoot assignment, units and coverage</h2>
+
+<p>If the 720 entry acquires 29.970, check swapped URI/report assignments. About 0.0167 fps may mean seconds per frame were mistaken for frames per second. Restore three-place rounding from 59.94005994. Relabelling repairs no damaged frames or low-resolution content. Preserve both records and verify identity, time base and coverage before changing speed, window and source together. Modify owned text copies only. Leave unsupported maxima unknown rather than fill them with screen refresh rates.</p>
+
+<h2 id="section-8">Reopen with four values and their assumptions</h2>
+
+<p>Reopen and read 1280x720 with 59.940, then 1920x1080 with 29.970; recompute from 1001/2002 ticks. Deliver original, assumed/real reports, square-pixel/no-rotation premises and actual options/observations. More pixels do not imply a higher maximum rate. Reenter real media and verify selection rather than infer it from first-entry position. Keep optimal display size, media maximum rate and actual device presentation separate: supported declarations are not exhaustive per-frame decoding/display validation.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/icouldplay-frame-count-file-time-boundary/">iCouldPlay frame counts and time notes: keep average rate separate from frame position</a>; <a href="/en/guides/icouldplay-sample-display-aspect-ratio-check/">iCouldPlay aspect ratios: separate pixel dimensions, sample ratio and display ratio</a>.</p>
+
+<p>Method sources: <a href="https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.2">RFC8216 §4.3.4.2</a>.</p>
+
+<p>Checked on 17 November 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261117-hls">Apple public lookup</a> list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Placeholder addresses supply neither media nor keys. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.</p>
+{% endraw %}

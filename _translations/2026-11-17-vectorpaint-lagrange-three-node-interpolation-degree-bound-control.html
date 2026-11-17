@@ -1,0 +1,76 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint three-node interpolation: a degree bound makes the polynomial unique'
+description: Build three Lagrange basis polynomials, verify node values and add a cubic nodal factor to test the
+  degree condition.
+permalink: /en/guides/vectorpaint-lagrange-three-node-interpolation-degree-bound-control/
+date: '2026-11-17 00:00:00 +08:00'
+modified: '2026-11-17 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 226
+topic: Interpolation, statistics and discrete distinctions
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-17-vectorpaint-lagrange-three-node-interpolation-degree-bound-control.md
+source_url: /guides/vectorpaint-lagrange-three-node-interpolation-degree-bound-control/
+translation_method: editorial
+translation_source_sha256: b3f28e9f02b2c0225c66ee4875f07bc636871d6253687275fe9c5c742b022c99
+translation_date: '2026-11-17T07:45:01+00:00'
+excerpt: Build three Lagrange basis polynomials, verify node values and add a cubic nodal factor to test the degree
+  condition.
+---
+{% raw %}
+<p>Construct a polynomial of degree at most two through three distinct x nodes. Each basis polynomial is one at its own node and zero at the others, then weighted by the supplied y values. Passing through three points alone does not specify every possible curve or imply built-in fitting/formula plotting.</p>
+
+<h2 id="section-1">Fix three nodes and degree at most two</h2>
+
+<p>Use (0,2),(1,1),(3,5), with distinct x nodes zero, one and three. Seek a real polynomial of degree at most two, not any smooth line; constants/linears are included without requiring a nonzero quadratic term in advance. Save nodes/conditions and separate basis, result, points and controls. Values are fictional, not experimental. Two different y values at one x would fail even a single-valued function and cannot be repaired with a vertical graphic segment.</p>
+
+<h2 id="section-2">Normalize each basis at its own node</h2>
+
+<p>Set L0=(x−1)(x−3)/3, L1=−x(x−3)/2 and L3=x(x−1)/6. Denominators are products of node differences; retain L1’s minus sign. Substitute zero,one,three into each to obtain its one/zero/zero pattern. Subscript three names x=3, not a fourth basis. These are basis functions, not the final answer. Weight them by matching y values two,one,five, preserving node assignment throughout.</p>
+
+<pre><code class="language-text">nodes: (0,2),(1,1),(3,5)
+L0=(x-1)*(x-3)/3
+L1=-x*(x-3)/2
+L3=x*(x-1)/6
+p=2*L0+L1+5*L3=x^2-2*x+2
+at x=2: (L0,L1,L3)=(-1/3,1,1/3); p=2
+q=p+x*(x-1)*(x-3); q(2)=0; degree(q)=3
+</code></pre>
+
+<h2 id="section-3">Combine, expand and check all three nodes</h2>
+
+<p>Expand p=2L0+L1+5L3: x² coefficient 2/3−1/2+5/6=1, x coefficient −8/3+3/2−5/6=−2, constant two. Thus p=x²−2x+2, returning 2,1,5 at 0,1,3. At the extra check x=2, basis values −1/3,1,1/3 sum to one and yield −2/3+1+5/3=2. This catches summing y values without bases, but x=2 is calculated, not a fourth supplied observation. The bases sum identically to one: quadratic coefficients 1/3−1/2+1/6 and linear coefficients −4/3+3/2−1/6 cancel. This check is independent of y values. Equal values c would produce constant c, not compulsory quadratic curvature.</p>
+
+<h2 id="section-4">Plot nodes before approximating the polynomial</h2>
+
+<p>Use a suggested 1800×1800 canvas, origin (400,1500), 200 pixels per unit equally: X=400+200x, Y=1500−200y. Nodes map to (400,1100),(600,1300),(1000,500); calculated (2,2) to (800,1100). Display p over zero to three with continuation notes, not a function defined only at three sites. Approximate via pen nodes from external values, without claiming exact polynomial export. Correct bulging handles against check points rather than move supplied nodes.</p>
+
+<h2 id="section-5">Keep basis plots separate from the final curve</h2>
+
+<p>If plotting bases, use separate panels sharing x ticks and clearly label L0,L1,L3 and p rather than overlay four tangled curves. Negative basis values do not invalidate inputs: L0 is negative at x=2 while the combination works. Transparency distinguishes membership, not algebraic addition. Different panel y ranges need labels and cannot support height-based coefficient comparisons. A basis-value table suffices without claiming the app converts expressions automatically into curves.</p>
+
+<h2 id="section-6">Add a nodal-zero factor to test the degree premise</h2>
+
+<p>Define q=p+x(x−1)(x−3). The extra factor vanishes at all three nodes, so q also passes through them but is cubic, outside the prescribed space. At x=2 it gives 2−2=0 versus p(2)=2. Use a dashed control or table without replacing p labels. Uniqueness follows because two degree-at-most-two candidates differ by a polynomial with three distinct roots and therefore zero identically, not because three points determine every curve. Repeated equal nodes do not create independent constraints; distinctness and degree bound both matter. At x=−1, p=5 is the chosen polynomial’s extension, not a new measurement. For data from an unknown real function, uniqueness holds only inside the stipulated polynomial space, without automatic between-node error or extrapolation guarantees.</p>
+
+<h2 id="section-7">Troubleshoot node differences, signs and degree</h2>
+
+<p>A basis not one at its node calls for its difference-product denominator. Wrong result values call for weights two,one,five; wrong x=2 calls for L1’s sign and fraction arithmetic. Never drag nodes to fit an approximate path or remove q’s leading term while retaining the same control claim. Fix one copy factor and recheck nodes plus extra point. A polygonal export concerns manual path design, not failure of interpolation. No automatic interpolation or polynomial-check button is assumed.</p>
+
+<h2 id="section-8">Reopen with nodes and candidate classes distinguished</h2>
+
+<p>Save native work and reopen SVG/PDF, checking nodes, p, basis subscripts, q’s cubic factor and all signs/denominators. At fit-to-window size distinguish result and dashed control; inspect (2,2) versus q’s zero at two enlarged. Reopen points, paths and notes separately. Deliver basis table, expansion, cubic control and degree premise. Leave unperformed actions pending, without automatic fitting, measurement precision or exact whole-function representation by finite manual nodes.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-quadratic-bezier-two-level-midpoint-diagram/">VectorPaint quadratic Bézier diagrams: two midpoint levels locate a curve point</a>; <a href="/en/guides/vectorpaint-four-point-least-squares-vertical-residual-ledger/">VectorPaint least-squares line: four vertical residuals with squared sum 0.70</a>.</p>
+
+<p>Method sources: <a href="https://math.ucla.edu/~njhu/notes/na/interp/polyinterp/">Nicholas Hu, UCLA: polynomial interpolation</a>.</p>
+
+<p>Version and operation scope: checked on 17 November 2026 against the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261117-vectorpaint">Apple public lookup</a>: version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.</p>
+{% endraw %}

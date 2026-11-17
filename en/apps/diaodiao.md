@@ -5,7 +5,7 @@ author: Bison
 title: '调调: Personal Music Player for iPhone and iPad'
 description: Organise and play your own music with 调调, including file imports, Wi-Fi transfers, offline listening, lyrics, queues and compatible personal music servers.
 permalink: /en/apps/diaodiao/
-modified: 2026-11-16
+modified: 2026-11-17
 lang: en
 source_url: /apps/diaodiao/
 ---

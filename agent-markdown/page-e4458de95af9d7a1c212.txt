@@ -1,0 +1,75 @@
+---
+layout: null
+permalink: /guides/vectorpaint-zero-pearson-correlation-five-node-dependent-model/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: VectorPaint零相关散点图：五节点平方关系仍然不独立
+agent_source_url: https://allluckly.cn/guides/vectorpaint-zero-pearson-correlation-five-node-dependent-model/
+agent_source_sha256: bb0c7c938235eb2b5ac586a636770d6de183aba78fff3e06ddc8bdbb27185f67
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint零相关散点图：五节点平方关系仍然不独立
+
+语言：zh-CN
+原文：[VectorPaint零相关散点图：五节点平方关系仍然不独立](<https://allluckly.cn/guides/vectorpaint-zero-pearson-correlation-five-node-dependent-model/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-zero-pearson-correlation-five-node-dependent-model/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-zero-pearson-correlation-five-node-dependent-model/>)
+发布于: 2026-11-17T00:00:00+08:00
+内容更新于: 2026-11-17T00:00:00+08:00
+署名：Bison
+
+用五个等概率输入与Y=X²核相关零，分清有限模型证明与五条观测的推广。
+
+先明确一个有限概率模型：X在−2、−1、0、1、2上等概率取值，Y=X²。画五个散点并算Pearson相关，再用事件概率证明不独立。若仅拿到五条现实观测，经验相关为零不能直接推广未知总体；本课的独立性结论依赖已写明的完整模型。
+
+## 固定概率模型而不是伪造观测报告
+
+把五个等概率节点和确定关系写在页首，每点概率1/5，不用五张同名照片冒充等概率证据。得到的有序对是(−2,4)、(−1,1)、(0,0)、(1,1)、(2,4)，没有把正负输入合并成一个点。横纵都是抽象数，当前没有真实调查、随机试验或仪器测量。建立节点、均值参考、算表和结论层，先保存原生稿。若以后换成真实数据，必须另存身份、抽样条件和样本范围，不能照抄此模型的完整分布或独立性结论。
+
+## 均值先算再做同点配对的离差
+
+五个x合计零，五个y合计十，所以均值分别为零与二。每一行保留同一个有序对，x离差为−2、−1、0、1、2，y离差为2、−1、−2、−1、2。不能把两列各自排序后重新配对，那会改变数据关系。先画水平y=2与竖直x=0的淡参考线，它们只定位均值，不是拟合结论。左右两点同样高来自平方关系，但y均值二并不要求有一个节点正好落在这个高度，也不意味着所有差值相互独立。
+
+## 交叉和为零但两个平方和非零
+
+按配对相乘得−4、1、0、−1、4，合为Sxy=0；Sxx=4+1+0+1+4=10，Syy=4+1+4+1+4=14。因此r=Sxy/√(Sxx Syy)=0。分母确为正，不是把零除零随意记零。均匀五节点模型中的共同权重在这个比值中抵消，得到同样的零；若只是五条观测，这里先是经验计算。把平方和留在图旁，不能只列最终r而省掉定义成立的条件，也不能因相加抵消就说每一对乘积都为零。
+
+```
+X uniform on {-2,-1,0,1,2}; Y=X^2
+x:       -2,-1,0,1,2
+y:        4, 1,0,1,4
+mean x=0; mean y=2
+Sxy=-4+1+0-1+4=0; Sxx=10; Syy=14
+r=Sxy/sqrt(Sxx*Syy)=0
+P(X=0,Y=0)=1/5 != (1/5)*(1/5)=1/25
+```
+
+## 散点只表示五节点不偷换连续支持
+
+建议1800×1600画布，原点屏幕(900,1300)，横轴每单位250像素、纵轴每单位200像素，明确两轴比例不同。五点依次在(400,500)、(650,1100)、(900,1300)、(1150,1100)、(1400,500)。使用小实点，不把同高两点连成一条横杠而丢掉输入身份。若画抛物线辅助轮廓，标“关系导向，概率只在五点”，不能让填色或平滑路径暗示所有实数都等概率。数值栏不可见时按网格手工近似，纸面精确关系不转化为像素测量声明。
+
+## 用一个事件对否定独立性
+
+模型给P(X=0)=1/5、P(Y=0)=1/5，而同时发生X=0且Y=0的概率是1/5，不是乘积1/25，所以X、Y不独立。也可看P(Y=0给定X=0)=1，与无条件1/5不同，条件事件概率为正。这个证明不依赖散点看着弯，而依赖完整概率定义；它不会由五条未知抽样来源的数据自动成立。零Pearson相关只排除当前线性协动量，不能据此说没有关系、没有预测信息或变量必然独立，图旁必须保留这句范围说明。 此模型的Y只取零、一、四，概率依次1/5、2/5、2/5，并非三种值各三分之一。把同一个输出对应的输入合并计概率，能再查独立性证明的分母没有误用“不同输出种数”。这里模型给全分布，现实观测频数不能未经依据替代它。
+
+## 线性与常量对照检查相关的范围
+
+同样五个x若改Y=2X+3，点全落正斜率直线，相关为一，但不能据相关就推出真实因果。若改Y恒等于二，Syy变零，Pearson公式未定义，不能把横线图的r自动写零。这两个是独立小对照，不改变主模型的Y=X²，也不为追求不同r移动主图节点。比较时保留横坐标集合与配对规则，只有Y规则改变；记录哪个条件被改变，比只放三张不同形状图更容易核查。当前不计算置信区间、显著性或任何真实总体推断。 线性对照的五个y为−1、1、3、5、7，均值三，Sxy为20、Syy为40，与Sxx十给r=20/√400=1。保留这次正分母计算，再与常量对照的零分母并看，可避免把所有确定关系都误写为相关一。
+
+## 按配对、分母和模型身份排障
+
+r不为零时先查左右配对与乘积符号，再核y均值是否为二；r写不独立的结论却没有概率前提，就补回完整模型或缩小到经验相关。不要把两列重新排序来凑对称，也不删除负x节点求好看。若常量对照被写零，检查分母而不是换一种线色。保留原稿，每次只改一个故障副本，重算Sxy、Sxx和Syy，再读事件概率。软件绘制平滑线不证明概率独立，图层中的五个小圆也不是五次真实随机抽取的证据。
+
+## 重开交付零相关与非独立的两种证据
+
+保存原生稿，导出SVG或PDF另开，核五个点、均值线和概率说明都在，平方和与1/25的分母清楚。适应窗口看主图与两个对照分框，放大核负号没有变成短装饰线。重开可编辑文件让点位、参考与文字可分别改，交付完整分布、算表、事件反例和经验推广限制。未实际执行的导出重开留待做，不宣称应用自动统计、识别非线性或用五条现实数据证明任何未知总体结论。
+
+## 相关教程与资料
+
+[VectorPaint 散点图：让每个点同时对应两项数值](<https://allluckly.cn/guides/vectorpaint-paired-value-scatterplot/>)、[VectorPaint最小二乘直线：四点的竖直残差怎样合成零点七](<https://allluckly.cn/guides/vectorpaint-four-point-least-squares-vertical-residual-ledger/>)。
+
+方法来源：[Philip Stark, Berkeley SticiGui: correlation and association](<https://www.stat.berkeley.edu/pub/users/stark/SticiGui/Text/correlation.htm>)、[OpenStax Introductory Statistics 2e §3.2: independence](<https://openstax.org/books/introductory-statistics-2e/pages/3-2-independent-and-mutually-exclusive-events>)。
+
+版本与操作范围：2026年11月17日核[VectorPaint官方商店](<https://apps.apple.com/cn/app/id1587272880>)与[Apple公开查询](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261117-vectorpaint>)，公开1.0.8，最低iOS / iPadOS 17.0。使用已公开的形状、钢笔、贝塞尔节点、网格辅助线、对齐、图层分组、文字和保存输出手工绘图；入口按安装版本实际可见为准。计算、定义与复算在应用外准备，不推断内置公式、统计或图论求解能力。原生稿保留可编辑结构，SVG、PDF、PNG各按需要阅读检查，含导入位图的SVG或PDF不自动成为全矢量。画布与样本为原创教学设定，未执行真机或实物测量，未做的操作明确待做。
+{% endraw %}

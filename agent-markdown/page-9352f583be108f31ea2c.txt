@@ -1,0 +1,85 @@
+---
+layout: null
+permalink: /guides/manyue-pdf-outline-count-open-visible-descendants-report/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 漫阅+ PDF大纲报告跟读：Count正负与可见后代不是正文页数
+agent_source_url: https://allluckly.cn/guides/manyue-pdf-outline-count-open-visible-descendants-report/
+agent_source_sha256: c872d9f67e86931647e1ee3049e61d54fc1f51f0d8765ca62f7e6f2a57a5fe71
+agent_generator_version: 1
+---
+{% raw %}# 漫阅+ PDF大纲报告跟读：Count正负与可见后代不是正文页数
+
+语言：zh-CN
+原文：[漫阅+ PDF大纲报告跟读：Count正负与可见后代不是正文页数](<https://allluckly.cn/guides/manyue-pdf-outline-count-open-visible-descendants-report/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-pdf-outline-count-open-visible-descendants-report/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-pdf-outline-count-open-visible-descendants-report/>)
+发布于: 2026-11-17T00:00:00+08:00
+内容更新于: 2026-11-17T00:00:00+08:00
+署名：Bison
+
+用六项小树逐层计算展开和收起后的可见项，分开原生大纲与自己添加的阅读书签。
+
+面对外部PDF检查报告中的Count，先找它属于哪一种字典。本课只分析大纲项目的计数，用原创小树区分全部后代、当前可见后代与正文页数。把报告做成普通PDF在漫阅读，即使安装版本不提供文档大纲面板，也能完成纸面与阅读定位核验。
+
+## 画一棵六项树并固定缩进
+
+在外部文档工具把A放顶层；A下面有A1与A2，A1下面有A1a与A1b，A2下面有A2a。这共六个大纲项目，包括A自身。用竖向连线或明确缩进表示亲子关系，不靠文字相邻猜层级。把树图放报告第一页，第二页留计数，第三页写反例；各页另有P1到P3角标。六个项目和三页报告是不同对象，允许多个项目指向同一正文页。保存可编辑原稿，不把这份示意树当已经写进PDF对象结构的真实大纲。
+
+```
+A [open]
+  A1 [open]
+    A1a
+    A1b
+  A2 [closed]
+    A2a
+```
+
+## 先列直接孩子再列全部后代
+
+在计数页为A列两栏：直接孩子是A1、A2，共二项；全部后代还包括A1a、A1b、A2a，共五项。A自身不在自己的后代集合里。A1的直接孩子与全部后代都为二，A2的两项计数都为一。先完成这些不依赖展开状态的集合，再讨论Count，可以避免每看到一层就重复加A。若树图中的连线看不清，先回原稿修清楚而不是挑一个能凑出答案的层级。报告中的项目名只是身份符号，A1a不是第一点一页。
+
+## 按可见规则计算展开的A
+
+固定A与A1展开、A2收起。打开A时可见A1、A1a、A1b和A2，A2a藏在收起的A2下面，因此A的大纲项目Count为正四，而不是全部后代五，也不是直接孩子二。计算时先加两个直接孩子，再只向展开的A1继续加其两个孩子；遇到收起的A2停止向下递归。A1的Count为正二。把四个实际名称写在数值旁，比只画四条线更容易复查。此处不把大纲根字典的Count或页面树的Count混进来，它们各有自己的计数对象。
+
+作为独立对照，再把A2也展开而不改变树，A的可见后代会增加A2a，Count从四变五，A2从负一变正一。全部六项仍未增删，变化来自可见状态。报告里可给新增那项圈一条细线，再与原始四项名单求差；这比按总项目数猜Count更容易发现遗漏。
+
+## 负数表示收起而非负数量
+
+A2现在收起，若展开它会多显示A2a一项，因此它的Count为负一。若把A也收起而保留子项各自状态，A的Count应为负四；不是负五，也不是删掉四项。再只把A1改为收起，A重新展开后只能见A1和A2，A的Count变正二，A1为负二。只改变一个展开状态就重列可见名单，能看出符号与绝对值分别干什么。叶子没有后代，不应为了让表格整齐给每个叶子都强塞一个非零Count。
+
+```
+state                              A Count  A1 Count  A2 Count
+A open, A1 open, A2 closed             4         2        -1
+A closed, A1 open, A2 closed          -4         2        -1
+A open, A1 closed, A2 closed           2        -2        -1
+```
+
+## 用阅读锚点核报告而不假装开合面板
+
+将报告PDF导入漫阅，先读P1再到P2，给第一种状态的四项名单加自己的阅读书签。书签帮助返回报告页，不能证明文档真的含那棵原生大纲。如果当前版本有可见文档目录入口，可另记实际入口、显示项与操作结果；没有就只读报告，不能把未见面板写成已测试。比较三种状态时始终核页角标，避免翻到另一份修订报告还沿用旧数。实际书签名称可写状态一，但它与PDF中A的Title字段不是自动关联。
+
+## 区分PDF字典与生成工具同名参数
+
+在P3另写一个标签：本表计算PDF大纲项目字典的Count，不是Adobe pdfmark生成语法里的Count。后者的绝对值数直接下属项目，与此处递归可见后代不同。在初始树中A直接孩子为二，而PDF项目Count为四，两个数可以同时正确。若外部报告没有说明它列的是成品PDF字段还是生成脚本参数，先标来源不明，不擅自替换。核到工具文档后把原字段名与上下文一并保留，不能只复制一列整数给别人做兼容性判断。
+
+另给A1a和A1b临时写相同显示标题示例，计数仍是两个不同项目，不按标题去重。反过来，同一个项目改标题也不会增加后代。外部检查报告应保留对象或路径身份，不能只交一列看似唯一的文字；没有这些证据时，先把同名项的关系留待确认。
+
+## 用名单差异定位漏算和重复计算
+
+算出五时查是否越过收起的A2数了A2a；算出六时再查是否把A自身也加入。只算二时查是否漏掉展开的A1下面两项。若A1收起后仍是四，说明沿用了旧状态。每次更正都保留原名单和改动位置，别只把数字改成期望答案。报告字体太小则先缩放，树图跨页断开时回外部原稿重排，避免把排版换页误读为父子关系结束。这里的排障针对自己的计数，不把任何一种错数归因于阅读器损坏文档。
+
+## 重开用三种数量验收
+
+退出并重开自己的书签页，从P1重新列六项全集、A的五个全部后代与初始状态四个可见后代。再核三页报告总页数仍为三，没有因展开示意改变。交付时保留状态表、生成语法区别和实际阅读记录；尚未操作的重开项目写待做。若后来制作带真实大纲的PDF，另存新文件并用可靠外部工具检查其结构，不把本次纸面推导升级为已验证所有阅读器开合行为。这样下次看到同名Count，仍能先问清计数的对象。
+
+## 相关教程与资料
+
+[PDF目的地身份](<https://allluckly.cn/guides/manyue-pdf-named-destination-key-target-page/>)、[阅读书签与定位](<https://allluckly.cn/guides/manyue-page-bookmarks/>)。
+
+方法依据：[Adobe PDF 1.7 §8.2.2](<https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/pdfreference1.7old.pdf>)、[Adobe pdfmark：OUT参数区别](<https://opensource.adobe.com/dc-acrobat-sdk-docs/library/pdfmark/pdfmark_Basic.html>)。本课图、报告数据、错例及记录表均为原创练习。
+
+版本核对：2026年11月17日，[Apple公开查询](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261117>)显示漫阅+2.0.5，最低iOS / iPadOS 15.0；公开能力见[官方App Store](<https://apps.apple.com/cn/app/id6753895889>)。本课使用自制PDF或受支持的漫画图片阅读，具体入口依安装版本可见范围。外部制作与纸面预期不等于已做真机观察，未执行项目照实留空。
+{% endraw %}

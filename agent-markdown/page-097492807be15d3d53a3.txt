@@ -1,0 +1,80 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-video-full-range-luma-code-values-interpretation/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Compare grey ramps in iCouldPlay: video-range codes still represent black
+  and white'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-video-full-range-luma-code-values-interpretation/
+agent_source_sha256: b304b3fdc8656408556e85a8123ca858d419aaeecdbef6fb7205e694587fd280
+agent_generator_version: 1
+---
+{% raw %}# Compare grey ramps in iCouldPlay: video-range codes still represent black and white
+
+Language: en
+Canonical: [Compare grey ramps in iCouldPlay: video-range codes still represent black and white](<https://allluckly.cn/en/guides/icouldplay-video-full-range-luma-code-values-interpretation/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-video-full-range-luma-code-values-interpretation/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-video-full-range-luma-code-values-interpretation/>)
+Published: 2026-11-17T00:00:00+08:00
+Modified: 2026-11-17T14:55:49+08:00
+Author: Bison
+
+Audit eight-bit SDR video/full ranges with grey ramps, separating code position, signal interpretation and display brightness.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-video-full-range-luma-code-values-interpretation/>), translated on 2026-11-17. Original publication dates, attribution, code and version notes are retained.
+
+Code 16 means different things under different range conventions. Map both ranges on paper, then check documented owned grey-ramp clips in iCouldPlay. Playback does not imply a range-retagging control or a colour meter.
+
+## Limit this task to eight-bit SDR
+
+Keep an owned eight-bit SDR ramp, export notes and an external report, retaining the original. Record codec, depth, range tag and output. This task isolates the grey luma component with neutral chroma, excluding ten-bit HDR and unrelated decoder behaviour. Without documented clips, do the paper mapping and leave playback pending. Grey appearance does not reveal original codes. Presence and report inspection are separate; an absent range field stays unknown rather than being inferred from an extension or an assumed pixel reader in the player.
+
+## Normalise each nominal range by its endpoints
+
+Nominal eight-bit video-range black/white are 16 and 235, separated by 219. Full-range endpoints 0 and 255 are separated by 255. These are endpoint-relative signal positions: (code-16)/219 versus code/255. Do not swap denominators. Video-range code 16 represents nominal black rather than missing black. The five listed inputs are paper expectations, not measured movie pixels. Neutral chroma 128 is a separate component and does not establish a luma midpoint.
+
+```text
+eight-bit SDR grey; neutral Cb=Cr=128
+video position=(code-16)/219; full position=code/255
+code: 16, 71, 126, 180, 235
+video: 0, 55/219, 110/219, 164/219, 1
+full: 16/255, 71/255, 126/255, 180/255, 235/255
+code 0 interpreted as video: -16/219
+code 255 interpreted as video: 239/219
+video nominal endpoints: 219 intervals, 220 inclusive codes
+full endpoints: 255 intervals, 256 inclusive codes
+```
+
+## Interpret a code before comparing grey positions
+
+Read as full range, codes 16 and 235 sit near 0.0627 and 0.9216. Treating video-range values as full range compresses the occupied endpoint interval and can lift black/lower white. That is a mismatched interpretation, not a universal diagnosis for every grey-looking movie. Recalculate the middle code 126 under each equation as well. These positions are not linear physical luminance or perceived half-brightness. Transfer functions, display mapping and viewing conditions are separate, so a position near 0.5 does not mean half the measured nits.
+
+## Separate reverse mismatch from outside-nominal values
+
+Interpreting full-range 0 with the video-range equation gives -16/219; code 255 gives 239/219, above one. A path that clamps those positions may merge shadows/highlights, but clamping is conditional, not identical across every player. Values outside nominal black/white are not automatically corruption and should not be removed by overwriting originals. Distinguish 219 intervals from 220 inclusive integer codes; full range similarly has 255 intervals and 256 codes. Inclusive counting does not replace the normalisation denominator.
+
+## Prepare matched content and one mismatch externally
+
+Using an existing external tool with explicit range export, prepare matched correctly encoded video-range and full-range clips plus a mismatch illustration or paper control. Retain layout, duration and identifying labels, recording actual exports externally. Correctly handled versions can look similar; full range is not inherently darker or brighter. Compression can change exact pixels, while a tag alone does not certify every sample. Do not invent pixel-level checks. If the tool cannot control range, preserve that uncertainty rather than rename a file and claim conversion.
+
+## Check identity and endpoint detail on one output
+
+Open each through an available source, checking title, duration and ramp layout first. Keep normal speed, presentation, brightness and output fixed. Describe distinguishable adjacent dark/light patches and intermediate steps instead of a vague quality ranking. A new screen/casting path requires a separate record. Burned-in values are production labels, not live player measurements. Screenshots pass through presentation/saving stages and cannot directly certify source codes 16 and 235. Preserve observations alongside external reports.
+
+## Diagnose tags, samples and presentation separately
+
+For report/identity mismatch, locate the right copy. For tag/generation mismatch, revisit the external source. If the same file changes only on a new display path, record that condition first. These do not establish one generic player fault. Correct one factor and retain controls rather than compensate with player brightness and claim correct range interpretation. Do not apply eight-bit endpoints to ten-bit/HDR material. Without sample evidence, limit the conclusion to observed differences and exclude unperformed exports, device checks or calibration.
+
+## Reopen with mappings and actual observations
+
+Retain sources, matched copies, mismatch control, export notes and the five-level ledger, then reopen under the documented conditions. Explain why code 16 is black under one convention but above zero under another, why 219 is a difference rather than an inclusive count, and why correct full/video ranges need no viewing-quality hierarchy. Separate calculations, sample evidence and visible playback, preserving unknowns. New depths/codecs/outputs need new records. This is a reviewable material comparison, not an added range editor or device certification.
+
+## Related guides and sources
+
+[Source parameter inventory](<https://allluckly.cn/en/guides/icouldplay-container-codec-stream-inventory/>), [Colour observation conditions](<https://allluckly.cn/en/guides/icouldplay-hdr-colour-comparison/>).
+
+Method sources: [Apple vImage YCbCr pixel range overview](<https://developer.apple.com/documentation/accelerate/vimage_ypcbcrpixelrange>), [Apple TN2307 pixel-buffer ranges](<https://developer.apple.com/library/archive/technotes/tn2307/_index.html>).
+
+Checked on November 17, 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261117>) list public version 1.1.1, requiring iOS / iPadOS 15.0 or later. Use published file sources, playback and visible controls. Prepare materials, reports and calculations externally. Installed capabilities and owned materials determine the actual result; no physical-device, private-server or exhaustive format test is claimed.
+{% endraw %}

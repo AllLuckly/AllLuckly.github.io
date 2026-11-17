@@ -1,0 +1,66 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 云映 HLS 必要字幕核对：FORCED不是覆盖所有选择的开关
+description: 用三条字幕候选核默认、自动选择和FORCED，分清类型禁用条件、缺省与环境匹配。
+permalink: /guides/icouldplay-hls-forced-subtitles-default-autoselect-environment-matrix/
+date: '2026-11-17 00:00:00 +08:00'
+modified: '2026-11-17 00:00:00 +08:00'
+category: 教程
+level: 进阶
+series_order: 187
+topic: 事件、候选与声明证据
+reading_time: 10
+---
+
+同一语言可以有完整字幕与只含必要文字的字幕候选。本课用三条SUBTITLES建立属性矩阵，重点检查FORCED所属类型与环境选择，分别记录清单指示和云映实际可见结果。写YES不会把字幕烧入影片，也不保证所有用户设置都被覆盖。
+
+## 把三份字幕内容身份先写清
+
+准备三份自制字幕资料的阅读身份卡，英文完整稿、英文必要文字稿和法文完整稿，真实播放时还要有相应媒体及时间映射。下面只提供主清单引用，没有字幕字节，不能因名字叫Essential就断言文件确实只含必要内容。先留原稿与取得时间，三个显示名、语言和URI各记一栏，另给实际内容留未知或已核。应用只做当前已有来源的选择观察，不假定有字幕制作器；无真实资源可完成属性任务，显示与切换栏保留未执行。
+
+## 主清单读取一个组和三个候选
+
+三行都为TYPE=SUBTITLES，GROUP-ID同为text，NAME分别不同，变体以SUBTITLES引用整个组。第一条是英文完整稿，显式默认和自动YES、FORCED为NO；第二条英文必要稿默认NO、自动YES、FORCED为YES；第三条法文完整稿默认NO、自动YES、FORCED为NO。主例省略CODECS而保留建议以后按真实媒体补核，不能猜一个字符串证明资源已编码。本节先把三组旗标照抄进矩阵，不把第二行位置解释为较高优先级，也不把组名当成字幕文件地址。
+
+```text
+#EXTM3U
+#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="text",NAME="English Full",LANGUAGE="en",DEFAULT=YES,AUTOSELECT=YES,FORCED=NO,URI="en-full.m3u8"
+#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="text",NAME="English Essential",LANGUAGE="en",DEFAULT=NO,AUTOSELECT=YES,FORCED=YES,URI="en-essential.m3u8"
+#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="text",NAME="French Full",LANGUAGE="fr",DEFAULT=NO,AUTOSELECT=YES,FORCED=NO,URI="fr-full.m3u8"
+#EXT-X-STREAM-INF:BANDWIDTH=1100000,SUBTITLES="text"
+video.m3u8
+```
+
+## 先核FORCED只能出现在字幕类型
+
+FORCED只允许用于SUBTITLES，值可为YES或NO，未写时隐含NO。因此故障副本把任一行改为TYPE=AUDIO却仍保留FORCED=NO，也违反属性所属条件；不是只有写YES才受限制。YES说明该版本含被视为必要的内容，客户端选择时仍应匹配环境，例如语言，不等于所有设备立刻强制显示这条。NO表示面向用户明确请求的内容，也不是禁止手动选择。把格式允许、内容语义与实际显示三栏分开，不从一个英文单词推出不可关闭字幕或视频内已经烧字。
+
+## 默认和自动属性保留精确的条件语气
+
+DEFAULT与AUTOSELECT都可省略，省略隐含NO；但判断显式组合时要读完整条件：AUTOSELECT若出现，而DEFAULT为YES，它就必须写YES。主样本三条均显式列出，因此第一条YES配YES，另两条不冲突。同组最多一条默认YES，三个NAME也必须不同。为减少含混，本练习保留全部显式值，不把省略自动属性概括成它必须永远出现。DEFAULT的客户端行为是没有相反用户信息时的建议，AUTOSELECT的YES是允许结合环境选择，不能写成两者都无条件强制播放。
+
+## 自动候选按语言和FORCED等组合区分
+
+规范建议同组AUTOSELECT=YES成员的LANGUAGE、ASSOC-LANGUAGE、FORCED、CHARACTERISTICS组合彼此可区分。本例两个en依FORCED的NO与YES区分，fr则语言不同，三个候选没有只靠NAME换名冒充差异。若把英文必要稿也改成FORCED=NO且其他这些属性相同，虽然NAME仍不同，自动候选就失去这组建议的区别，应修副本或补真正的内容属性，而非伪造语言。这里区分MUST的硬性要求与SHOULD的建议，不能把所有建议未满足都说成文法必然无法解析。
+
+## 云映观察先记环境与用户选择
+
+真实来源可用时，记当前语言环境、已有手动字幕选择和进入路径，再看初次显示哪条、名称是否可见。当前界面允许时分别选完整与必要稿，在同一内容区间顺播，记实际文字，而不是为得到YES预期强写两条都显示。必要稿在没有相应提示的时段可能无字，不能仅凭几秒空白判定字段失效。没有选择入口、内容或时间映射就写未确认，不改系统语言来猜隐藏功能，也不把另一个客户端的行为抄成云映已测结论。
+
+## 用类型、组约束和实际字节分层排障
+
+字段审核先找FORCED放错类型、显式YES配NO、同组双默认和重名，再查自动候选的建议区别，不能用加大字号修复这些关系。列表正常却不见文字时，另核字幕URI、文件内容、时间映射与当前选择，清单旗标不是字幕有效载荷。修改只用自己的可恢复副本，每次保留唯一变化，恢复正确稿后重新核三行。FORCED名称不证明文字语义真的必要，删标签也不会从视频移除已烧入的文字，这类画内文字需由素材内容另行识别。
+
+## 重开交付三行矩阵与有限选择结论
+
+重开正确主清单，重列一组、三名、en/en/fr和三组旗标，确认FORCED只在字幕行且同组只有一默认。退出再进入真实来源后实际确认选择，必要时恢复自己日常需要的一条，未做就保留未执行。交付属性矩阵、内容身份、故障副本和环境观察，不把一次选择当成所有引擎或设备的统一政策。最终说明必要内容标志、自动候选与用户选择是相关但不同的层次，完成的是条件可核与结果可追，不承诺每条提示都显示或永远不能关闭。
+
+## 相关教程与资料
+
+[云映 HLS 音频组核对：语言相同也可能是不同讲解轨]({{ '/guides/icouldplay-hls-audio-rendition-group-name-language-default/' | relative_url }})、[云映 HLS 字幕组跟读：CC1在流内，字幕清单另有URI]({{ '/guides/icouldplay-hls-closed-captions-instream-subtitles-uri-groups/' | relative_url }})。
+
+方法来源：[RFC8216 §4.3.4.1](https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.1)、[RFC8216 §4.3.4.1.1](https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.1.1)。
+
+资料核对：2026年11月17日，[云映官方商店](https://apps.apple.com/cn/app/id6755653178)与[Apple公开查询](https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261117-hls)列出1.1.1，最低iOS / iPadOS 15.0。文本与演算在外部手工准备，云映用于自己的已有真实来源选择和播放观察，入口按安装版本实际可见为准。占位地址不提供媒体或密钥。文法审核、假定算例、真实字节资料和观看分别记录，没有执行的步骤明确未执行；未声称完成真机、私人服务器、所有引擎或输出设备逐项兼容测试。

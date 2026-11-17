@@ -1,0 +1,77 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'Compare shutter samples in iCouldPlay: exposure duration is not the frame
+  interval'
+description: Hold capture at 24 fps and distinguish 180/45-degree exposure, frame
+  intervals and observed motion blur.
+permalink: /en/guides/icouldplay-shutter-exposure-frame-cycle-motion-blur-control/
+date: '2026-11-17 00:00:00 +08:00'
+modified: '2026-11-17 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 181
+topic: Picture and sound measurements
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-17-icouldplay-shutter-exposure-frame-cycle-motion-blur-control.md
+source_url: /guides/icouldplay-shutter-exposure-frame-cycle-motion-blur-control/
+translation_method: editorial
+translation_source_sha256: cf8e89a38c1a9014be8257e6d52353f733b39a11314ac045b2c5e630c78134c7
+translation_date: '2026-11-17T06:55:47+00:00'
+excerpt: Hold capture at 24 fps and distinguish 180/45-degree exposure, frame intervals
+  and observed motion blur.
+---
+{% raw %}
+<p>Two 24-fps clips can have different moving edges. Check owned capture records, calculate exposure and frame intervals separately, then inspect comparable actions in iCouldPlay without treating playback brightness or speed as a shutter control.</p>
+
+<h2 id="prepare-two-clips-with-genuine-capture-records">Prepare two clips with genuine capture records</h2>
+
+<p>Choose authorised clips with genuine capture notes, ideally the same viewpoint/action at 24 fps with two shutter settings. Without them, complete the paper ledger and leave viewing pending rather than guess settings from an existing file. Record identity, capture frame rate, exposure/angle, export rate and action time, retaining originals. Capture settings belong to the capture tool; a playback brightness slider does not reveal sensor exposure. Unrecorded automatic exposure stays unknown, and an extension is not a capture log.</p>
+
+<h2 id="calculate-frame-cycles-and-exposure-windows-separately">Calculate frame cycles and exposure windows separately</h2>
+
+<p>For constant capture rate, the frame cycle is 1/24 second. Multiply it by the shutter-angle fraction of a full turn: 180 degrees gives 1/48 second and 45 degrees gives 1/192. Exposure differs by four while frame spacing stays the same. Keep seconds and milliseconds distinct from angles and display refresh rates. These are paper relations, not promises that a camera offers every angle. If capture notes give time directly, use it without inventing a matching player menu.</p>
+
+<pre><code class="language-text">capture_rate=24 frames/s
+frame_cycle=1/24 s=41.6666667 ms
+exposure=angle/360*frame_cycle
+angle=180 -&gt; 1/48 s=20.8333333 ms
+angle=45  -&gt; 1/192 s=5.2083333 ms
+ideal_projected_speed=960 pixels/s
+between_frames=40 pixels; exposure_trails=20,5 pixels
+</code></pre>
+
+<h2 id="separate-two-displacements-with-an-ideal-moving-mark">Separate two displacements with an ideal moving mark</h2>
+
+<p>As a separate paper model, a projected mark moving at 960 pixels per second advances 40 pixels per frame, but moves 20 or 5 pixels during the two exposures. Those are ideal trails under constant projected speed and fixed viewpoint, not measured edges of arbitrary recordings. They omit defocus and readout skew. Put between-frame position and within-frame motion on separate lines. Without measured speed, observe edge shape rather than infer exact exposure from apparent trail width or contradict capture records.</p>
+
+<h2 id="verify-file-identity-and-normal-playback-after-import">Verify file identity and normal playback after import</h2>
+
+<p>Open each clip through an available local or existing source path and confirm title, duration and an action anchor. Keep normal playback speed, presentation mode and output fixed rather than also changing speed/cropping. Record any export-rate conversion externally; that pair is no longer a shutter-only control. Presence, playability and matching records are separate checks. Preserve feedback instead of changing every engine or clearing the library merely to establish identity.</p>
+
+<h2 id="compare-the-same-action-in-moving-and-stationary-regions">Compare the same action in moving and stationary regions</h2>
+
+<p>Play the comparable action, identifying the moving object and a stationary edge in the same view. Record trail appearance and background clarity. Pause at repeatable times if available, without inventing frame-step controls or calling a screenshot a raw capture frame. Shorter exposure can sharpen an image without guaranteeing smoother motion in playback. Note differences in lighting, depth of field or action rather than assume them identical. Describe observed appearance without a universal ranking of clips.</p>
+
+<h2 id="do-not-infer-shutter-settings-from-display-cadence">Do not infer shutter settings from display cadence</h2>
+
+<p>Different displays can present 24-fps material with different cadence. Repeated presentation, stalling and exposure trails are not one phenomenon. Compare on one output path and record dropped frames/network waits separately; a pause delay does not measure capture exposure. One clip per different device lacks a common display control. Embedded blur is not recaptured by reducing brightness. Speed changes playback time without recovering all processes integrated into an original frame. Preserve capture and presentation evidence separately.</p>
+
+<h2 id="diagnose-records-export-and-display-separately">Diagnose records, export and display separately</h2>
+
+<p>For calculation mismatch, inspect angle/time units; for rate mismatch, inspect export/identity; for unstable playback, inspect source/display conditions. These are different diagnoses. Do not sharpen or re-encode originals to force a 20-pixel trail. Substitute one documented control and preserve the pair. Missing capture records prevent precise inference but still permit bounded observations. No automatic shutter-metadata reader or motion-speed meter is assumed. Use authorised samples and redacted settings for a report.</p>
+
+<h2 id="reopen-and-deliver-timing-plus-observations">Reopen and deliver timing plus observations</h2>
+
+<p>Retain originals, capture notes, timing ledger and actual observations, then reopen the same clips at normal speed. Explain equal frame cycles with unequal exposure, distinguishing the model’s 40-pixel between-frame displacement from 20/5-pixel exposure trails. Exclude unperformed pausing, sampling or exact measurements. Recalculate after changing rate/action rather than generalise these values. The deliverable is a sourced conditional comparison, not a claimed camera-shutter control, lossless deblurring feature or device certification.</p>
+
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+
+<p><a href="/en/guides/icouldplay-frame-count-file-time-boundary/">Frames and time</a>, <a href="/en/guides/icouldplay-pan-motion-artifact-comparison/">Panning observations</a>.</p>
+
+<p>Method sources: <a href="https://www.arri.com/resource/blob/178016/ad23969317dafff402f0902d47bb4ab7/alexa-studio-electronic-and-mirror-shutter-white-paper-data.pdf">ARRI Electronic and Mirror Shutter White Paper §Exposure Time</a>.</p>
+
+<p>Checked on November 17, 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261117">Apple public lookup</a> list public version 1.1.1, requiring iOS / iPadOS 15.0 or later. Use published file sources, playback and visible controls. Prepare materials, reports and calculations externally. Installed capabilities and owned materials determine the actual result; no physical-device, private-server or exhaustive format test is claimed.</p>
+{% endraw %}

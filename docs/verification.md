@@ -1,5 +1,17 @@
 # 验证记录
 
+## 2026-11-17：七款应用各新增 10 篇中文及完整英文教程
+
+- 新增70篇中文详细教程及70篇完整英文；Aquarell、VectorPaint、漫阅+各230篇，书屿210篇，云映190篇，调调与键来各30篇，Yearn保留20篇。全站1170篇中文教程与8条真实学习路线，14个新增阶段、连续编号和逐篇资料见[本批证据](tutorial-evidence-20261117.md)。
+- 当日重新核对Apple公开版本、系统条件与实际能力；保留用户给定的调调RU与键来FI推广入口，并与CN资料交叉核身份。各课的资料、原创任务、计算预期、结果检查、排障及完整英文逐项对应，不编造未发布能力。
+- 新中文正文共120,884汉字，单篇1,520–1,998汉字，不含frontmatter、含资料段。70对全文由未参与该组写作的审阅者复核，最终140份源译SHA绑定；实际Liquid→Kramdown结构、字面代码、唯一标题ID、内链、作者、日期、UTC及源文哈希通过，未发现实质长段整段复用。
+- 独立核乐器与生物结构、数学定义/反例、格式语义与自然过程；复算曝光、压缩、重采样、预乘透明度、灰阶范围、HLS条件和作用域，以及PCM数据量、音频时间映射、歌词差值与集合变更。键盘任务区分精确字符、可见排版、宿主编辑与系统行为。已发现的术语和具体问题修正后绑定最终源哈希；网站检查不表示App真机、私人服务器或全部宿主已实测。
+- 两轮production Jekyll3.10构建成功，两轮之间导出语义原文URL并生成Markdown、阅读目录和技能摘要。本次实际启动命令显式设置JEKYLL_ENV=production并使用Homebrew Ruby；23项按顺序完成，build-1与build-2均有独立成功记录。站点最终结果：2942 JSON-LD graphs, 2938 sitemap URLs, Atom feed, 2536 new/updated pages, 1170 detailed tutorials, 8 complete learning routes and 8 work videos。
+- 双语最终结果：1336 reciprocal language pairs, 1307/1307 complete English articles, preserved code/attribution/dates, localized collections and captions。旧技术文章、7个专题、既有阅读说明与发现链接通过当前仓库验证。
+- Markdown最终结果：2672 pages (2614 articles, 58 entry pages); 2238 code blocks and 4040 inline code nodes preserved; 0 files changed Generated sources are current.；阅读目录：Checked 40 llms.txt indexes; 2632 unique direct Markdown targets; 0 changed files.。技能摘要、Agent访问与搜索、API目录、站点/统计脚本与图标检查通过；中英文搜索各1307条，本批每种语言70条新记录齐全。
+- Safari实际抽查本批正文、代码或任务样本、目录定位与语言点击；390×844手机宽度检查长标题和新增阶段卡片，结束后恢复桌面。逐页范围见本机忽略目录output/tutorials-20261117/safari-qa.json，不将网页检查当成应用操作实测。
+- GitHub Desktop获取origin/master，发布前基线c95960d；2474份旧文章与译文逐字节保留，无删除或其他任务改动。git diff --check及281个新增文件独立空白检查通过。Worker候选仅增加140条真实路由至2672，2532条旧路由和处理逻辑保持。GitHub Desktop负责提交和推送；精确提交的Pages部署、线上HTML/搜索/Markdown与边缘协商推送后另核，本地验证不记为已上线。
+
 ## 2026-11-16：七款应用各新增 10 篇中文及完整英文教程
 
 - 新增70篇中文详细教程与70篇完整英文；Aquarell、VectorPaint、漫阅+各220篇，书屿200篇、云映180篇、调调与键来各20篇，Yearn保留20篇。全站1100篇中文教程、8条真实学习路线；连续编号、14个新增阶段和逐篇资料见[本批证据](tutorial-evidence-20261116.md)。
