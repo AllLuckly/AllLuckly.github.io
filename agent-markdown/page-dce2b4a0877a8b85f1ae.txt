@@ -1,0 +1,77 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-srgb-signal-midpoint-versus-linear-light-grey/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay grey samples: half an sRGB signal is not half linear light'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-srgb-signal-midpoint-versus-linear-light-grey/
+agent_source_sha256: a4b483f43eca8883dbf0b045ee0de84aaf9becee0e4e582dbae170b037bc3087
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay grey samples: half an sRGB signal is not half linear light
+
+Language: en
+Canonical: [iCouldPlay grey samples: half an sRGB signal is not half linear light](<https://allluckly.cn/en/guides/icouldplay-srgb-signal-midpoint-versus-linear-light-grey/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-srgb-signal-midpoint-versus-linear-light-grey/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-srgb-signal-midpoint-versus-linear-light-grey/>)
+Published: 2026-11-18T00:00:00+08:00
+Modified: 2026-11-18T10:00:55+08:00
+Author: Bison
+
+Audit two neutral-grey midpoints and eight-bit rounding in an owned explanation clip, without treating screenshots or brightness controls as conversion reports.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-srgb-signal-midpoint-versus-linear-light-grey/>), translated on 2026-11-18. Original publication dates, attribution, code and version notes are retained.
+
+A black-to-white midpoint depends on the numeric space used. Prepare two neutral greys and their conversion ledger externally, then read one explanation clip in iCouldPlay. The calculation uses a declared sRGB transfer function, not every HDR/video encoding, and does not promise screen-luminance measurements from paper ratios.
+
+## Fix one sRGB neutral-grey task
+
+In an owned image project stipulate equal RGB components normalized to0–1, black 0 and white 1. Card A takes encoded-signal midpoint 0.5; card B takes linear-light midpoint 0.5. Do not label both merely fifty-percent grey while omitting the space. Retain project, colour identification and ledger separately rather than infer sRGB from an unknown screenshot. There are no alpha layers or capture-exposure changes here, separating this transfer-function problem from premultiplication or automatic camera exposure.
+
+## Separate encoding and decoding directions
+
+Let C denote an sRGB encoded component and L its linear component. For this positive range, decode with L=C/12.92 when C≤0.04045, otherwise L=((C+0.055)/1.055)^2.4. Encode with C=12.92L when L≤0.0031308, otherwise C=1.055L^(5/12)−0.055. Retain both branches and directions rather than square every value from one remembered exponent. Compute externally; no formula-entry or per-pixel inspection tool is assumed in iCouldPlay.
+
+## Calculate the counterpart of each midpoint
+
+For A, C=0.5 decodes to L≈0.214041. For B, L=0.5 encodes to C≈0.735357. Use equal components throughout rather than brighten one channel and introduce a tint. Black/white round trips return 0/1 as endpoint checks. Display six decimals while retaining more calculation precision. Neither call 0.214 a perceptual-brightness percentage nor claim B must look exactly twice as bright under every condition. The model concerns representation, with perception and device output adding conditions.
+
+```text
+declared neutral sRGB model: R=G=B; no alpha compositing
+decode(C)=C/12.92 if C<=0.04045 else ((C+0.055)/1.055)^2.4
+encode(L)=12.92*L if L<=0.0031308 else 1.055*L^(5/12)-0.055
+A: C=0.5 -> L=0.2140411405; nearest 8-bit C=128
+B: L=0.5 -> C=0.7353569831; nearest 8-bit C=188
+decode(128/255)=0.2158605001
+decode(188/255)=0.5028864580
+```
+
+## Record eight-bit rounding separately
+
+For eight-bit encoded artwork, round 255C to the nearest integer: approximately 128 for A and188 for B. Multiply encoded C, not linear 0.5 to produce B=128. After rounding,128/255 is not exactly 0.5 and188/255 is not0.735357. Decoding those codes gives approximately 0.215861 and0.502886. Keep original real values and quantized approximations separate rather than call small rounding differences a contradiction or alter the white endpoint to force an exact midpoint.
+
+## Prepare an identified explanation clip externally
+
+Create black, white, A and B patches with encoded/linear labels, then place them in an owned exportable clip with both midpoints simultaneously readable. Retain working-space and export-conversion records. Another transfer function, matrix or lossy video export need not preserve original 128/188 integers at every decoded pixel. Burned-in numbers are explanations, not iCouldPlay measurements. Establish identity with a known-readable export; leave unexported projects pending rather than call paper equations an existing test video.
+
+## Keep output conditions fixed in iCouldPlay
+
+Open the identified clip through an available source, checking patch names, simultaneous order and source correspondence. Keep brightness, display mode, fitting and output device fixed. Record distinguishability and label readability rather than move brightness until A resembles B and call that conversion. A different output path needs a new condition row. A darker app theme does not change video encoding. Without instrumentation claim no precise luminance, colour error or calibration; verify screenshot values against source/export evidence rather than substitute screenshots for the full colour-management path.
+
+## Check direction and space before appearance
+
+If B is also 128, check whether linear values were treated as encoded. For negative/out-of-range answers check premises, exponents and direction. If only the exported clip differs, inspect space/compression records instead of labelling every difference a player colour fault. Repair one failure-copy condition, retaining formulas and both source cards. Do not apply this sRGB mapping directly to PQ, HLG or unidentified video, or infer increased capture exposure merely from a larger code value. Keep model, material processing and observation traceable separately.
+
+## Reopen with both midpoints and export conditions
+
+Save both midpoints, eight-bit approximations, round trips and clip identity. Reopen and ensure C/L columns were not swapped. If reopening iCouldPlay, verify the same source/output; without viewing deliver calculations and preparation records only. Explain 0.5 encoded→about 0.214 linear,0.5 linear→about 0.735 encoded, and approximate eight-bit128/188. Restore everyday display settings and retain unknown conversions, claiming neither built-in sRGB editing, HDR measurement, professional calibration nor one transfer function for all movies.
+
+## Related tutorials and sources
+
+[Read compositing controls in iCouldPlay: do not multiply premultiplied colour twice](<https://allluckly.cn/en/guides/icouldplay-straight-premultiplied-alpha-flattened-reference-colours/>); [Compare grey ramps in iCouldPlay: video-range codes still represent black and white](<https://allluckly.cn/en/guides/icouldplay-video-full-range-luma-code-values-interpretation/>).
+
+Method sources: [W3C Specification of sRGB: component transfer functions](<https://www.w3.org/Graphics/Color/srgb>).
+
+Checked on 18 November 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261118-hls>) list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.
+{% endraw %}

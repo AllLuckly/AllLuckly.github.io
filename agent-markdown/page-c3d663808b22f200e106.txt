@@ -1,0 +1,83 @@
+---
+layout: null
+permalink: /en/guides/nasbook-orthogonal-rotation-transpose-inverse-length-reflection-controls/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Read orthogonal rotations in Book Isle: verify orthonormal columns before
+  using transpose as inverse'
+agent_source_url: https://allluckly.cn/en/guides/nasbook-orthogonal-rotation-transpose-inverse-length-reflection-controls/
+agent_source_sha256: 81d02df21255c467cf0cd0be617862734783dfbe19a3477e64a6685a2c7e59be
+agent_generator_version: 1
+---
+{% raw %}# Read orthogonal rotations in Book Isle: verify orthonormal columns before using transpose as inverse
+
+Language: en
+Canonical: [Read orthogonal rotations in Book Isle: verify orthonormal columns before using transpose as inverse](<https://allluckly.cn/en/guides/nasbook-orthogonal-rotation-transpose-inverse-length-reflection-controls/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/nasbook-orthogonal-rotation-transpose-inverse-length-reflection-controls/>)
+English: [English HTML](<https://allluckly.cn/en/guides/nasbook-orthogonal-rotation-transpose-inverse-length-reflection-controls/>)
+Published: 2026-11-18T00:00:00+08:00
+Modified: 2026-11-18T10:33:43+08:00
+Author: Bison
+
+Check both products, a length-five vector and inverse rotation for a three-fifths/four-fifths matrix, with reflection and determinant-one scaling controls.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/nasbook-orthogonal-rotation-transpose-inverse-length-reflection-controls/>), translated on 2026-11-18. Original publication dates, attribution, code and version notes are retained.
+
+Transpose equals inverse only under the required conditions, not for every grid of fractions. Read a two-dimensional rotation matrix row by row in Book Isle: check columns before transforming, reversing and comparing lengths. Keep external mathematics separate from reading position; page rotation or zoom is not a matrix computation.
+
+## Fix column vectors and the usual plane orientation
+
+Externally set Q with rows (3/5,−4/5) and (4/5,3/5), using column vectors and mathematical x right/y up. Make P1 matrix/conventions, P2 products/transforms and P3 reflection/scaling controls, exporting a clear PDF and retaining editable work. Verify the minus sign in row one, column two and bookmark P2. Record both complete rows rather than confuse displayed column order with rows. No automatic matrix inverse is assumed in the app.
+
+## Check unit length as well as column orthogonality
+
+Columns q1=(3/5,4/5) and q2=(−4/5,3/5) each have squared norm 9/25+16/25=1 and mutual dot −12/25+12/25=0. They are unit and perpendicular, not just perpendicular. These conditions make this real square matrix orthogonal. Multiplying every entry by two preserves mutual zero dot but makes each column length two, losing normalization. Record two self-dots and one cross-dot, not just a right-angle icon.
+
+Deliberately losing Q’s minus sign gives R with rows (3/5,4/5),(4/5,3/5). Both columns still have unit length but cross-dot 24/25, not orthogonal. R also sends (5,0) to (3,4), preserving this sample’s length. For (1,1), however, output (7/5,7/5) has squared norm 98/25 rather than two. The contrasting samples and column test explain why one direction is insufficient.
+
+## Check all four entries after transposing
+
+Qᵀ has rows (3/5,4/5) and (−4/5,3/5). Computing each entry of the matrix product gives QᵀQ=I, with diagonal ones and off-diagonal zeros; QQᵀ also gives I, proving Q⁻¹=Qᵀ. One upper-left one is insufficient: verify all four entries. This shortcut requires the current square orthonormal-column matrix; it is not a universal inverse rule for transposes. Even orthonormal columns in a rectangular matrix do not supply this same two-sided square inverse.
+
+```text
+Q = [[3/5,-4/5],[4/5,3/5]]
+transpose(Q) = [[3/5,4/5],[-4/5,3/5]]
+transpose(Q)*Q = Q*transpose(Q) = [[1,0],[0,1]]
+Q*[5,0]^T = [3,4]^T; transpose(Q)*[3,4]^T = [5,0]^T
+reflection H=diag(1,-1): transpose(H)*H=I; det(H)=-1
+scaling D=diag(2,1/2): det(D)=1; transpose(D)*D=diag(4,1/4)
+```
+
+## Transform a length-five input forward and back
+
+For p=(5,0), Qp=(3,4); both lengths are five. Multiplying (3,4) by Qᵀ gives first coordinate 9/5+16/5=5 and second −12/5+12/5=0, recovering p. Inverse rotation is not the reciprocal of each entry. Another p=(1,2) gives (−1,2), both squared lengths five. A negative coordinate is not negative length. Zero maps to zero and legitimately preserves length, without exclusion from the transformation.
+
+Applying Q again does not undo the first rotation. Q² has rows (−7/25,−24/25),(24/25,−7/25), sending original (5,0) to (−7/5,24/5), still length five but not the original position. Undo with Qᵀ, not Q itself unless a special matrix is separately proved self-inverse. Compare two forward rotations with forward-then-inverse, checking input and operation order rather than final length alone.
+
+## Prove length preservation for every input
+
+For any real column p, squared output length is (Qp)ᵀ(Qp)=pᵀQᵀQp=pᵀp, a general proof rather than extrapolation from two points. Determinant 9/25+16/25=1 makes this two-dimensional orthogonal transformation orientation-preserving. It has cosθ=3/5 and sinθ=4/5, counterclockwise about 53.130° in the stated coordinates. A screen with downward y may look opposite; do not change the matrix sign to fit a display. Keep mathematical and interface axes separate.
+
+Similarly, transformed dot product (Qp)ᵀ(Qr)=pᵀr. With both inputs nonzero, preserved norms also preserve their angle. If either is zero, the dot identity remains valid without defining a measurable angle. Separate the general algebra from the nonzero-length requirement for an angle; invertibility does not give a direction to every zero vector.
+
+## Orthogonal reflection and nonorthogonal determinant-one scaling
+
+H=diag(1,−1) has HᵀH=I and preserves lengths, but determinant −1 reflects across the horizontal axis rather than the current pure rotation. D=diag(2,1/2) has determinant one yet DᵀD=diag(4,1/4)≠I, doubling the length of (1,0). It even sends (1,2) to (2,1), accidentally preserving this sample’s length without preserving every length. Keep orthonormality, orientation and one accidental equal-length sample as distinct evidence; one determinant value does not replace the product test.
+
+## Troubleshoot sign placement and multiplication order
+
+For failed recovery of (5,0), inspect transpose row/column exchange, entrywise reciprocal mistakes and column-vector multiplication order. Perpendicular columns still need both self-dots one; determinant one alone calls for D. Correct one note-copy entry and return to Q. Zoom unclear fractions and inspect source rather than copy 3/5 as 35 or lose −4/5’s sign. Reader zoom helps recognition without verifying matrix products or the all-vector proof.
+
+## Reopen with products, recovery and two controls
+
+Reopen P2, give Qᵀ’s rows and both products I, then send (5,0) to (3,4) and recover it. On P3 use H for length preservation without pure rotation and D for insufficiency of determinant one or one equal-length sample. Deliver column checks, complete products and coordinate convention, leaving unperformed highlight/reopen actions pending. This is external exact-fraction algebra, not native Book Isle matrix computation or geometric precision certification across displays.
+
+## Related tutorials and sources
+
+[Book Isle: Align matrix row and column labels before checking a transpose](<https://allluckly.cn/en/guides/nasbook-matrix-row-column-transpose/>); [Read matrix inverses in Book Isle: check the determinant and both identity products](<https://allluckly.cn/en/guides/nasbook-two-by-two-matrix-inverse-singular-check/>).
+
+Method references: [MIT Strang18.06 Lecture17 transcript: orthogonal matrices](<https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/e87f2914b2eb2f53e38688040c04b9b1_0MtwqhIwdrI.pdf>). Diagrams, report data, counterexamples and ledgers are original exercises.
+
+Version checked on 18 November 2026: the [Apple public lookup](<https://itunes.apple.com/lookup?id=6766198898&country=cn&entity=software&timestamp=20261118>) lists Book Isle 1.1.4, requiring iOS / iPadOS 15.6 or later; see the [official App Store](<https://apps.apple.com/cn/app/id6766198898>) for published capabilities. Use self-made PDFs, EPUBs or clear text materials; bookmarks, highlights and notes depend on format and visible controls, without automatic solving or literary analysis. External preparation and paper predictions do not constitute device observations. Leave unperformed checks blank.
+{% endraw %}

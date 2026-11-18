@@ -1,0 +1,77 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-homogeneous-line-intersections-finite-ideal-degenerate/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint homogeneous intersections: distinguish finite points, ideal directions
+  and an invalid zero vector'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-homogeneous-line-intersections-finite-ideal-degenerate/
+agent_source_sha256: 3689592efe7e0be1b643580a86d3d9011bc807960707000424662decd1e726a4
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint homogeneous intersections: distinguish finite points, ideal directions and an invalid zero vector
+
+Language: en
+Canonical: [VectorPaint homogeneous intersections: distinguish finite points, ideal directions and an invalid zero vector](<https://allluckly.cn/en/guides/vectorpaint-homogeneous-line-intersections-finite-ideal-degenerate/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-homogeneous-line-intersections-finite-ideal-degenerate/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-homogeneous-line-intersections-finite-ideal-degenerate/>)
+Published: 2026-11-18T00:00:00+08:00
+Modified: 2026-11-18T10:45:13+08:00
+Author: Bison
+
+Cross line coefficients to intersect two lines, with parallel and coincident controls and no division by a zero third component.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-homogeneous-line-intersections-finite-ideal-degenerate/>), translated on 2026-11-18. Original publication dates, attribution, code and version notes are retained.
+
+Draw affine lines beside a three-component ledger. A finite intersection belongs in the coordinate plot; parallel lines yield an ideal point representing direction, not a dot at the canvas edge. Coincident lines produce a zero vector, which is not a valid point. Give the three cases distinct result cards.
+
+## Separate point coordinates from line coefficients
+
+Represent a plane point by a nonzero homogeneous triple p=(x,y,w); when w≠0 its affine coordinates are(x/w,y/w). A line is a nonzero coefficient triple l=(a,b,c), incident when ax+by+cw=0. Do not confuse these roles because both use three numbers. Let l1=(1,1,−4), l2=(2,−1,−2), giving x+y=4 and 2x−y=2 at w=1. Create line, intersection, label and classification layers, then save native work. The origin is(0,0,1), not the invalid zero triple.
+
+## Cross in a declared order and retain all components
+
+For l1×l2, components are 1(−2)−(−4)(−1)=−6, (−4)2−1(−2)=−6, and 1(−1)−1·2=−3. Thus p=(−6,−6,−3). Since w≠0, divide by −3 to get(2,2,1), hence affine point(2,2). Do not retain only the first two components as(−6,−6), or use absolute values to invent a position. Reversing cross-product order changes the entire sign but represents the same nonzero homogeneous point.
+
+## Substitute into both equations independently
+
+At(2,2), line residuals are 2+2−4=0 and 4−2−2=0; both must vanish. Substituting the unnormalized triple gives−6−6+12=0 and−12+6+6=0. These agree because a nonzero overall scale does not change the point. Failure on one line calls for checking cross-product signs/components and line-versus-point roles, rather than dragging a dot to a visual crossing and deleting the failed ledger. Residual checks are stronger than thick strokes hiding an error. For example p=(4,4,2) also normalizes to(2,2), not a more distant point. Allowed scale factors must be nonzero: multiplication by zero destroys the homogeneous object rather than preserving its representation.
+
+## Separate the finite plot from the homogeneous ledger
+
+Use a suggested 2400×1600 canvas with origin(400,1200),120px/unit on both axes. The intersection maps to(640,960). Clip visible line portions to a declared x∈\[−1,5\], y∈\[−3,8\] window after calculating valid boundary endpoints. Label this a display window; its frame is not an added mathematical line. Keep cross-product/normalization in a ledger at right, with annotation leaders excluded from calculations. Approximate with guides when numeric controls are absent, distinguishing illustration from exact residuals and inferring no projective solver.
+
+## Treat parallel lines as an ideal direction, not an edge dot
+
+Let l3=(1,1,−6), or x+y=6, parallel to but distinct from l1. Their cross-product is(−2,2,0): nonzero with w=0, an ideal projective point for direction(−1,1). They have no affine intersection. Do not divide by zero or place a supposed very-large coordinate at the canvas edge. Use a result card saying “no finite intersection; homogeneous direction(−2,2,0)” beside parallel lines. Finite separation does not imply that sufficiently long extension produces a finite meeting point.
+
+## Classify the coincident-line zero vector separately
+
+Let l4=(2,2,−8)=2l1. Nonzero proportional coefficients represent the same line, whose cross-product is(0,0,0). This is no projective point and must not be confused with the preceding nonzero triple having w=0. Coincident lines share an entire line, not a unique intersection; “no valid single-point result” does not mean no common points. Compare finite intersection, distinct parallel lines and coincidence using all three components, not just the last number.
+
+```text
+l1=(1,1,-4); l2=(2,-1,-2)
+l1 cross l2=(-6,-6,-3) -> (2,2,1) -> affine (2,2)
+l3=(1,1,-6)
+l1 cross l3=(-2,2,0): nonzero ideal point, no affine intersection
+l4=(2,2,-8)=2*l1
+l1 cross l4=(0,0,0): invalid point, coincident lines
+```
+
+## Diagnose errors with scale controls and zero inputs
+
+Multiplying all of l1 by 3 or all of finite p by −2 must preserve the normalized line/point. A changed position suggests scaling only some components. Reject l=(0,0,0) before calculation because it does not define a line. Diagnose nonzero inputs, coefficient roles, signs, w classification and normalization in order. Nearly parallel lines may meet far outside the window; invisibility does not establish w=0. These integer controls use exact arithmetic rather than a visual threshold.
+
+## Reopen and explain each classification card
+
+Save editable lines/cards; inspect SVG/PDF and a separately opened PNG. At reduced size match each description to its case, then enlarge minus signs and zero third components. Reopen, hide the finite dot, recompute from coefficients and restore it; do not add fictitious single dots to parallel/coincident controls. Deliver cross-products, two residuals, scale invariance and invalid-zero-input checks, marking unperformed output checks pending. This manual projective-coordinate illustration establishes no real-camera parameters, depth or built-in3D reconstruction.
+
+## Related tutorials and sources
+
+[VectorPaint translation and reflection: check each vertex coordinate and orientation](<https://allluckly.cn/en/guides/vectorpaint-coordinate-translation-reflection/>); [VectorPaint one-point corridors: give receding lines one vanishing point](<https://allluckly.cn/en/guides/vectorpaint-one-point-corridor/>).
+
+Method sources: [Stanford CS231A Single View Metrology, homogeneous points and lines](<https://web.stanford.edu/class/cs231a/course_notes/02-single-view-metrology.pdf>).
+
+Version and operation scope: checked on 18 November 2026 against the [official VectorPaint listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261118-vectorpaint>): version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.
+{% endraw %}

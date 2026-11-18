@@ -1,0 +1,80 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-negative-edge-shortest-walk-settled-dijkstra-counterexample/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint negative-edge shortest walks: a settled four can be beaten by
+  three, while a negative cycle removes a finite minimum'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-negative-edge-shortest-walk-settled-dijkstra-counterexample/
+agent_source_sha256: 80e08af9bbe571006d106b3ea3667711cf07959ec4399321fcd49e3b819900c6
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint negative-edge shortest walks: a settled four can be beaten by three, while a negative cycle removes a finite minimum
+
+Language: en
+Canonical: [VectorPaint negative-edge shortest walks: a settled four can be beaten by three, while a negative cycle removes a finite minimum](<https://allluckly.cn/en/guides/vectorpaint-negative-edge-shortest-walk-settled-dijkstra-counterexample/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-negative-edge-shortest-walk-settled-dijkstra-counterexample/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-negative-edge-shortest-walk-settled-dijkstra-counterexample/>)
+Published: 2026-11-18T00:00:00+08:00
+Modified: 2026-11-18T10:09:42+08:00
+Author: Bison
+
+Check edge-limited distances on four vertices, separating Dijkstra’s nonnegative premise from reachable negative cycles.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-negative-edge-shortest-walk-settled-dijkstra-counterexample/>), translated on 2026-11-18. Original publication dates, attribution, code and version notes are retained.
+
+Draw a directed graph with one negative edge, list S-to-T routes and independently verify distances with an edge-limited ledger. The initial acyclic graph already defeats a settled-vertex Dijkstra process applied indiscriminately to negative weights. Add one edge separately to show why a reachable negative cycle can eliminate a finite minimum.
+
+## Declare directed edges and abstract weights
+
+Use vertices S,A,B,T and edges S→A:2,S→B:5,B→A:−4,A→T:2,B→T:10. Weights are additive abstract costs, not physical distances/times becoming negative. S,B,A,T is a topological order, so the initial graph is acyclic. Omitting directions changes the problem. Create vertex, arrow, weight, route-ledger and control layers; save native work. “Route” here permits repeated-vertex directed walks; initial acyclicity prevents repetition, while the later negative-cycle control uses it explicitly.
+
+## List the three complete routes and minimum three
+
+The original graph has exactly three S-to-T routes: S→A→T costs 2+2=4, S→B→T costs 5+10=15, and S→B→A→T costs 5−4+2=3. The minimum is 3 through B then A; best S-to-A cost is 1 rather than direct 2. Compare complete routes rather than treating more edges as automatically longer. Highlight the optimum independently while retaining all edges, labelled “abstract cost 3,” without turning negative weights into a real travel recommendation.
+
+## Demonstrate the failed settled-vertex premise step by step
+
+From S, tentative A=2,B=5 settle A first and produce T=4. Since 4\<5, stopping when T is settled returns 4 before processing B’s−4 improvement. Continuing while refusing to update settled A also misses its correct 1. This demonstrates failure of the nonnegative-weight guarantee, not that every graph with a negative edge necessarily fails. Algorithms reopening vertices need their own definitions/proofs; renaming a process does not preserve Dijkstra’s guarantee.
+
+## Start an at-most-one-edge ledger
+
+Define δ\_k(v) as the minimum S-to-v cost using at most k edges. Set δ0(S)=0 and others∞ for no route, not a very large real number. Layer 1 gives A=2,B=5,T=∞. Each layer keeps a previous value or adds one incoming edge to a previous-layer value, then minimizes. Read only the previous layer; mixing newly updated entries does not represent one additional edge. Label columns S,A,B,T and “at most,” avoiding confusion with exactly-k-edge rules.
+
+## Compute two more layers and compare route enumeration
+
+Layer 2 gives A=min(2,5−4)=1, B=5, T=min(2+2,5+10)=4. Layer 3 improves T from previous-layer A=1 to 3, retaining A=1, B=5. T entries across layers 0–3 are∞,∞,4,3, agreeing with enumeration. With four vertices and no cycle, every route has at most three edges, so three layers suffice here. This is not a blind three-step limit for arbitrary cyclic graphs. Retain minus signs and treat∞ plus a finite weight as unreachable, never zero. A topological pass S,B,A,T independently gives B=5, then A=1 through−4, then T=3. This order respects every edge, providing another valid acyclic-graph check without pretending all weights are nonnegative.
+
+```text
+S->A:2; S->B:5; B->A:-4; A->T:2; B->T:10
+S-A-T=4; S-B-T=15; S-B-A-T=3
+at most k edges; columns S,A,B,T
+k=0: 0,inf,inf,inf
+k=1: 0,2,5,inf
+k=2: 0,1,5,4
+k=3: 0,1,5,3
+control add A->B:1
+cycle A-B-A=1-4=-3, reachable from S and able to reach T
+```
+
+## Separate a negative edge from an added negative cycle
+
+Save a control adding only A→B with weight 1. Cycle A→B→A costs 1−4=−3, is reachable from S, and can still lead to T. Each repetition lowers cost by 3, so walks allowing repeated vertices have no finite minimum. Restricting to simple paths defines another finite-candidate problem and does not refute this control. The original negative-edge graph has no negative cycle and minimum 3; a negative sign alone does not eliminate an answer. Preserve both versions.
+
+## Draw directions clearly and separate reverse arcs
+
+On a suggested 2200×1500 canvas place S=(300,750),B=(900,350),A=(900,1100),T=(1800,750). The−4 edge runs B downward to A; draw added A→B as a separate offset arc, not one undirected line with two weights. Place vertices, arrows, then labels. Pixel lengths are layout, not weights. Diagnose directions/signs, previous-layer reads and stopping conditions. If highlighting hides arrowheads, adjust its stroke without altering weights or deleting a necessary counterexample edge.
+
+## Reopen, verify routes, then explain the algorithm limit
+
+Save both editable graphs/ledgers; inspect SVG/PDF and a separately opened PNG. At reduced size retain B→A direction; enlarge−4 and−3 signs. Reopen, recover minimum 3 from complete routes, explain the settled process’s4, then state reachability conditions for no finite minimum in the control. Deliver graph, layered ledger and premises, marking unperformed checks pending. VectorPaint manually displays a graph, with no implied shortest-path solver, negative-cycle detector, real-network optimizer or unperformed successful execution.
+
+## Related tutorials and sources
+
+[VectorPaint five-node weighted routes: sum edge weights before comparing paths](<https://allluckly.cn/en/guides/vectorpaint-five-node-weighted-routes/>); [VectorPaint dependency diagrams: match arrows to feasible orders](<https://allluckly.cn/en/guides/vectorpaint-dependency-arrows-feasible-order/>).
+
+Method sources: [MIT6.006 Lecture13, Dijkstra and nonnegative weights](<https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/d819e7f4568aced8d5b59e03db6c7b67_MIT6_006S20_lec13.pdf>); [MIT6.006 Lecture12, Bellman–Ford and negative cycles](<https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/2430d7903a5529451d80c17f89a41fe8_MIT6_006S20_lec12.pdf>).
+
+Version and operation scope: checked on 18 November 2026 against the [official VectorPaint listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261118-vectorpaint>): version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.
+{% endraw %}

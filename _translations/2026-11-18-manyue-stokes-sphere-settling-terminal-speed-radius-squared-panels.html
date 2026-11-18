@@ -1,0 +1,79 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Read settling panels in ManYue: quadrupled terminal speed for doubled radius
+  needs low Reynolds number'
+description: Check weight, buoyancy and Stokes drag in a stipulated viscous-fluid
+  model before comparing settling times.
+permalink: /en/guides/manyue-stokes-sphere-settling-terminal-speed-radius-squared-panels/
+date: '2026-11-18 00:00:00 +08:00'
+modified: '2026-11-18 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 239
+topic: Conditional reading of phase changes, Earth processes and orbits
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-18-manyue-stokes-sphere-settling-terminal-speed-radius-squared-panels.md
+source_url: /guides/manyue-stokes-sphere-settling-terminal-speed-radius-squared-panels/
+translation_method: editorial
+translation_source_sha256: d223440964e6c0a586d5a4419bc4a3e1b263292e1d02548b30c0ff39ce2ad18a
+translation_date: '2026-11-18T01:39:12.822902+00:00'
+excerpt: Check weight, buoyancy and Stokes drag in a stipulated viscous-fluid model
+  before comparing settling times.
+---
+{% raw %}
+<p>A larger sphere drawn falling faster does not make every large particle obey a radius-squared law. Read three pages for two ideal small spheres in ManYue, following three forces, terminal speed and applicability, then checking Reynolds number. Values are original external-model assumptions, not viscosity measured from a comic or a requested home drop experiment.</p>
+
+<h2 id="put-sphere-and-fluid-assumptions-on-the-diagram">Put sphere and fluid assumptions on the diagram</h2>
+
+<p>Externally set smooth rigid spheres of density 2000kg/m³ with radii A=0.0005m and B=0.001m. Fluid density is 1000kg/m³, dynamic viscosity η=1Pa·s and g=10m/s². Assume a Newtonian fluid at fixed temperature, distant walls, sparse particles and very slow flow. Export P1 conditions/three forces, P2 calculations and P3 controls/troubleshooting, keeping editable work. Check radius versus diameter on import and bookmark P2. No actual liquid is named; η=1 is no universal syrup or oil value.</p>
+
+<h2 id="retain-both-upward-forces-in-the-terminal-panel">Retain both upward forces in the terminal panel</h2>
+
+<p>Choose down positive. For downward motion, weight acts down while buoyancy and viscous drag act up. At terminal speed acceleration is zero: weight minus buoyancy minus drag vanishes, not weight itself. Sphere volume is 4πr³/3; use particle/fluid densities respectively for weight/buoyancy, giving effective weight as volume×density difference 1000×g. Draw buoyancy separately; balancing drag against full particle weight would overestimate this terminal speed. Label all three arrows explicitly rather than infer identity from thickness.</p>
+
+<h2 id="derive-the-radius-square-from-stokes-drag">Derive the radius square from Stokes drag</h2>
+
+<p>For this low-Reynolds-number sphere use F_drag=6πηrv. Equate it with effective weight and cancel π and one radius to get vt=2r²(ρ_particle−ρ_fluid)g/(9η). The square comes from cubic volume divided by linear-radius drag, not a guessed exponent for a large ball. A gives 1/1800m/s≈0.000556m/s=0.556mm/s; B gives 1/450m/s≈0.002222m/s=2.222mm/s. Use exact fractions for later timing, with decimals only for display rather than as an alleged model discrepancy.</p>
+
+<pre><code class="language-text">rho_particle=2000; rho_fluid=1000 kg/m^3; eta=1 Pa*s; g=10 m/s^2
+terminal_v=2*r^2*(rho_particle-rho_fluid)*g/(9*eta)
+A: r=0.0005 m; terminal_v=1/1800 m/s; Re=1/1800
+B: r=0.0010 m; terminal_v=1/450 m/s; Re=1/225
+terminal descent over 0.010 m: A=18 s; B=4.5 s
+</code></pre>
+
+<h2 id="substitute-the-result-into-reynolds-number">Substitute the result into Reynolds number</h2>
+
+<p>Using fluid density and sphere diameter, Re=ρ_fluid v(2r)/η. A gives 1/1800≈0.000556 and B 1/225≈0.004444, both much less than one, consistent with creeping flow. Re is dimensionless, not m/s. This is a post-solution applicability check, not authorization for every larger sphere: increasing radius changes both velocity and characteristic length, making Re grow quickly. Non-Newtonian fluid or nearby walls still requires reassessment even with small Re; one condition does not establish all assumptions.</p>
+
+<p>Independently substitute forces: A’s effective weight is π/600000N≈0.000005236N, matching 6πηrv at its terminal speed. B gives π/75000N, eight times A. Eightfold here describes effective weight, not terminal speed, checking three distinct ratios. Keep sufficient display precision rather than round a small nonzero force to zero and conclude no settling.</p>
+
+<h2 id="compare-times-only-over-an-already-terminal-segment">Compare times only over an already-terminal segment</h2>
+
+<p>Give both spheres a 0.010m descent segment after terminal conditions are established. A takes 0.010/(1/1800)=18s; B takes 4.5s. Fourfold speed means one-quarter time over the same distance. This excludes the release-to-terminal acceleration, which was not calculated. Put timing start inside the terminal region, not at the liquid surface. Total container height alone is not all a terminal-speed path, and the diagrams establish no actual ball reaching constant speed.</p>
+
+<h2 id="change-one-factor-for-scaling-and-failure-controls">Change one factor for scaling and failure controls</h2>
+
+<p>Doubling radius multiplies effective weight by eight. At unchanged speed, Stokes drag only doubles, so terminal speed must quadruple to rebalance. Doubling viscosity alone halves both terminal speeds and doubles segment times. If sphere and fluid densities become equal, the zero density difference removes gravity-driven settling in this model; retain neither the old 18s nor a zero travel time from zero speed. Turbulence, aggregation and wall effects are outside this scaling law, which cannot predict arbitrary river sand or raindrops.</p>
+
+<p>A tenfold radius trial from A makes the old-formula Reynolds estimate a thousand times larger, about 0.556, no longer much less than one as required here. It cannot certify the new terminal speed. A trial computation can expose model boundaries without being a reliable out-of-range prediction. Creeping-flow applicability is stricter than mechanically approving any Re below one, and wall/fluid assumptions remain separate.</p>
+
+<h2 id="troubleshoot-density-difference-radius-and-timing-start">Troubleshoot density difference, radius and timing start</h2>
+
+<p>A factor-two speed excess may omit buoyancy, using 2000 instead of density difference 1000. A factor-four excess may use diameter as radius. Only doubled B speed may miss r². For wrong time, check millimetres-to-metres and the already-terminal segment. Repair one copy item and return to the bookmark, not resize the drawing to change assumptions. Missing viscosity/temperature information stays insufficient; apparent thickness does not supply η. Keep observations separate from predictions.</p>
+
+<h2 id="reopen-with-both-numerical-and-applicability-checks">Reopen with both numerical and applicability checks</h2>
+
+<p>Reopen P1 and predict terminal-speed ratio 1:4 and segment times 18/4.5s before verifying P2. Explain buoyancy subtraction, Reynolds checks and exclusion of initial acceleration rather than recite fourfold scaling. Deliver force diagram, exact fractions, units and model boundaries, marking unperformed bookmark/reopen actions pending. Claim no ManYue particle measurement, automatic terminal-speed solver, observed settling or validation for every fluid—only external predictions under stipulated conditions.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/manyue-buoyancy-displaced-volume-floating-balance/">Read buoyancy diagrams in ManYue: displaced volume before rising or floating balance</a>; <a href="/en/guides/manyue-hydrostatic-pressure-depth-gauge-absolute-area-reading/">Read hydrostatic diagrams in ManYue: depth first, then gauge pressure, absolute pressure and force</a>.</p>
+
+<p>Method references: <a href="https://openstax.org/books/college-physics-2e/pages/12-6-motion-of-an-object-in-a-viscous-fluid">OpenStax Motion of an Object in a Viscous Fluid</a>. Diagrams, report data, counterexamples and ledgers are original exercises.</p>
+
+<p>Version checked on 18 November 2026: the <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261118">Apple public lookup</a> lists ManYue 2.0.6, requiring iOS / iPadOS 15.0 or later; see the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities. Use self-made PDFs or supported comic images; controls depend on the installed version. External preparation and paper predictions do not constitute device observations. Leave unperformed checks blank.</p>
+{% endraw %}

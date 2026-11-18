@@ -1,0 +1,76 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint Pick theorem: count boundary points once and distinguish area scaling from interior-point counts'
+description: Check area 12 from seven interior and twelve boundary lattice points, then compare37 interior points
+  after doubling coordinates.
+permalink: /en/guides/vectorpaint-pick-lattice-area-boundary-interior-scaling/
+date: '2026-11-18 00:00:00 +08:00'
+modified: '2026-11-18 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 234
+topic: Geometric invariants and projective coordinates
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-18-vectorpaint-pick-lattice-area-boundary-interior-scaling.md
+source_url: /guides/vectorpaint-pick-lattice-area-boundary-interior-scaling/
+translation_method: editorial
+translation_source_sha256: 5222bbceba8af72c58164a5261681fa984404796daccf764ca804632818e05a0
+translation_date: '2026-11-18T02:09:42+00:00'
+excerpt: Check area 12 from seven interior and twelve boundary lattice points, then compare37 interior points after
+  doubling coordinates.
+---
+{% raw %}
+<p>Build a triangle-area diagram with a lattice-point ledger. Verify area independently by base and height, and count interior and boundary points separately without duplicating vertices. Distinguish geometric enlargement from view zoom and check both theorem premises and changing discrete counts.</p>
+
+<h2 id="section-1">Declare the integer lattice and a simple closed polygon</h2>
+
+<p>Use a unit lattice with A=(0,0), B=(6,0), C=(2,4), joined A–B–C–A. The triangle is simple, closed, hole-free and has integer-coordinate vertices on this declared lattice. An App snapping grid still needs coordinate verification; arbitrary background squares do not define mathematical units. Separate lattice, boundary points, interior points, outline and counts, then save native work. Stroke thickness neither changes the mathematical boundary nor makes nearby points boundary points.</p>
+
+<h2 id="section-2">Obtain an independent area from base and height</h2>
+
+<p>Base AB=6 and altitude 4 give area(1/2)×6×4=12 square units. Keep this as an independent check rather than deriving point counts from the theorem under test. Maintain equal axis scales. On a suggested 2400×1800 canvas use X=300+150x, Y=1500−150y, mapping vertices to(300,1500),(1200,1500),(600,900). Pixels place the illustration; area remains in declared mathematical square units.</p>
+
+<h2 id="section-3">List edge points and remove duplicated vertices</h2>
+
+<p>AB contains seven lattice points x=0 through 6. BC contains(6,0),(5,1),(4,2),(3,3),(2,4), and CA contains(2,4),(1,2),(0,0). Adding 7+5+3=15 duplicates each vertex, leaving B=12 distinct boundary points. Keep three edge lists and mark the three duplicates rather than remove corners entirely. Integer coordinates determine lattice points on sloping edges; evenly spacing extra dots by eye can introduce nonlattice positions and invalidate the count.</p>
+
+<h2 id="section-4">Count the seven interior points row by row</h2>
+
+<p>At y=1 the interior x values are 1,2,3,4: four points. At y=2 they are 2,3: two points; x=1 and 4 lie on the boundary. At y=3 only x=2 is interior and x=3 is boundary. Thus I=7; rows y=0,4 have none. Use filled interior and hollow boundary dots with a grayscale-readable legend. Require strictly interior positions, and do not miss(2,3) near the apex. Classification should remain explainable from the ledger when the outline is hidden.</p>
+
+<h2 id="section-5">Substitute into Pick’s formula and check boundary vectors</h2>
+
+<p>Pick gives A=I+B/2−1=7+12/2−1=12, agreeing with base/height. Independently sum coordinate-difference gcd values: gcd(6,0)=6, gcd(4,4)=4, gcd(2,4)=2, total B=12. This closed-polygon gcd sum already counts vertices once; do not subtract three again. Distinguish endpoint-inclusive edge lists from per-edge lattice-step contributions so duplicate removal is not applied to both methods.</p>
+
+<pre><code class="language-text">vertices: (0,0), (6,0), (2,4)
+area=6*4/2=12
+boundary edge-list appearances=7+5+3=15
+distinct boundary B=15-3=12
+interior rows: y=1 -&gt; 4; y=2 -&gt; 2; y=3 -&gt; 1
+I=7; I+B/2-1=7+6-1=12
+doubled coordinates: area=48; B=24; I=48-12+1=37
+</code></pre>
+
+<h2 id="section-6">Double coordinates and recount rather than scale every count</h2>
+
+<p>Save a control with vertices(0,0),(12,0),(4,8) on the same unit lattice. Length doubles, area becomes 48, boundary count 24 and I=48−12+1=37, not 7×4=28. New integer points enter the enlarged polygon, so interior counts do not simply scale with area. Mere view zoom leaves coordinates and I=7 unchanged. Keep separate versions labelled “same unit lattice”; a zoomed screenshot is not a doubled-coordinate control. Independently count the enlarged triangle’s interior rows y=1 through 7:10,8,7,5,4,2,1, totaling 37 without solving Pick’s formula backward. Keep these seven subtotals beside the control. Its new B=(2100,1500), C=(900,300) remain inside the suggested canvas.</p>
+
+<h2 id="section-7">Limit use with noninteger vertices and crossing edges</h2>
+
+<p>Changing C to(2,4.5) violates integer vertices on the current unit lattice; do not apply the same count or silently round 4.5 to 4. A half-unit lattice needs new coordinates, cell area and counts. Self-crossing outlines or regions with holes also fall outside this lesson’s simple hole-free scope. Diagnose lattice definition, closure/crossings, integer vertices, duplicated corners and interior/boundary confusion before visual polish. Preserve failed controls for inspection.</p>
+
+<h2 id="section-8">Reopen and recover the area from point lists</h2>
+
+<p>Save editable dots and legend; inspect SVG/PDF and a separately opened PNG. At reduced size retain the two dot styles; enlarge(1,2),(4,2) to confirm boundary classification. Reopen and inspect seven interior dots row by row, and verify unchanged units in the enlarged control. Deliver original area 12,B=12,I=7 and enlarged 48,24,37, marking unperformed export/reopening pending. Acceptance includes premises and two area checks, not a claim of automatic lattice recognition or theorem verification.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-concave-polygon-shoelace-signed-order-closing-edge/">Draw a concave polygon in VectorPaint: audit signed shoelace order and the closing edge</a>; <a href="/en/guides/vectorpaint-area-comparison/">VectorPaint area comparisons: calculate side lengths before arranging 1, 4 and 9 units</a>.</p>
+
+<p>Method sources: <a href="https://mathworld.wolfram.com/PicksTheorem.html">MathWorld Pick’s Theorem</a>.</p>
+
+<p>Version and operation scope: checked on 18 November 2026 against the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261118-vectorpaint">Apple public lookup</a>: version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.</p>
+{% endraw %}

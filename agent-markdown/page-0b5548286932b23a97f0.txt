@@ -1,0 +1,80 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-mid-side-half-sum-difference-reversible-channel-matrix/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay M/S models: recover left and right from a half-sum and difference'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-mid-side-half-sum-difference-reversible-channel-matrix/
+agent_source_sha256: c1325727de4792b5fc86f402fc465cd7296c4a1028b9153ad6545a46c001ca5c
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay M/S models: recover left and right from a half-sum and difference
+
+Language: en
+Canonical: [iCouldPlay M/S models: recover left and right from a half-sum and difference](<https://allluckly.cn/en/guides/icouldplay-mid-side-half-sum-difference-reversible-channel-matrix/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-mid-side-half-sum-difference-reversible-channel-matrix/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-mid-side-half-sum-difference-reversible-channel-matrix/>)
+Published: 2026-11-18T00:00:00+08:00
+Modified: 2026-11-18T10:00:55+08:00
+Author: Bison
+
+Audit four coefficient cases under M=(L+R)/2 and S=(L−R)/2, separating representation, channel labels and playback observations.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-mid-side-half-sum-difference-reversible-channel-matrix/>), translated on 2026-11-18. Original publication dates, attribution, code and version notes are retained.
+
+Mid/Side is a stereo representation, not automatic extraction of separate vocal and accompaniment recordings. Declare a normalization, calculate sums/differences and their inverse externally, then verify labels in an owned explanation clip. No iCouldPlay M/S encoder, source separator or automatic mix analyzer is assumed.
+
+## Fix one source waveform and channel identities
+
+Choose owned speech u(t), externally bounded in normalized magnitude by1, and define L/R as scaled copies of that same waveform.0.6 and0.2 in the ledger are gain coefficients, not constant values of every sample or audible DC demonstrations. Retain source, coefficients and left/right labels. Prepare audio externally; iCouldPlay reads the resulting explanation clip. A mono source does not establish two original inputs, and one volume slider cannot supply independent-channel evidence.
+
+## State the half-sum/half-difference convention
+
+Define M=(L+R)/2 and S=(L−R)/2, with inverse L=M+S and R=M−S. Other devices/formats may scale differently, so an M/S label alone does not justify these numbers. Retain forward and inverse matrix cards and prove the algebra first. Omitting division by2 doubles the reconstructed signal; lowering player volume is no correction to the matrix. There are still two numerical channels. Side is not a third extracted speaker, nor is Mid guaranteed to contain only vocals or sounds from the picture centre.
+
+## Recalculate four original coefficient cases
+
+Case 1 has L=0.6u,R=0.2u, giving M=0.4u,S=0.2u and recovering 0.6u/0.2u. Swapping left/right in case 2 leaves M unchanged and makes S=−0.2u, tying its sign to the declared order. Case 3 L=R=0.5u gives S=0. Case 4 L=0.5u,R=−0.5u gives M=0,S=0.5u. Minus denotes polarity, not negative time or reverse playback. Every row uses the same u so coefficient comparisons are valid; another recording requires new input relationships.
+
+```text
+declared convention: M=(L+R)/2; S=(L-R)/2
+inverse: L=M+S; R=M-S
+all coefficients below multiply the SAME bounded waveform u(t)
+case       L       R        M        S
+1          0.6     0.2      0.4      0.2
+2          0.2     0.6      0.4     -0.2
+3          0.5     0.5      0.5      0
+4          0.5    -0.5      0        0.5
+case1 with S discarded: reconstructed L=R=0.4*u
+raw M/S labelled as L/R is NOT the inverse transform
+```
+
+## Make a controlled omission of S
+
+In a case 1 failure copy discard S and decode with S=0. Both outputs become 0.4u, not the original 0.6u/0.2u. Information loss changes recoverability; this does not prove every mono playback path uses that calculation. Another failure labels raw M/S directly as left/right without inversion, producing 0.4u/0.2u rather than reconstructed L/R. Preserve the exact two procedures. Reversible representation, component omission and channel mislabelling are distinct changes; establish numeric identities before listening.
+
+## Prepare an externally labelled matrix explanation clip
+
+Create owned explanation frames for four cases, correct inversion and S omission. With external audio tools, produce stereo segments from the same u and check for extra automatic normalization before saving. Export ordinary decoded left/right audio for iCouldPlay rather than expect the player to recognize raw M/S and decode automatically. If only text frames are prepared, keep them silent and state that no listening comparison occurred. Retain project/export records; compression or system resampling means algebraic reversibility does not imply identical final device bytes.
+
+## Separate channel labels from spatial impressions in playback
+
+Open the identified explanation clip, reading its case and whether it contains correct inversion before listening. Fix volume, output and audio settings, recording actual channel distinguishability. System mono, speaker crosstalk or different headphones can alter perception; a central image does not prove the player invoked the M equation. External source evidence must support channel labels: writing Left on screen does not place audio in the left channel. Without measurement claim no isolation, correlation or lossless certification, and do not describe this as automatic vocal removal.
+
+## Troubleshoot normalization, signs and inversion
+
+For doubled reconstruction check the missing half factor; for swapped channels check S sign and inverse; for a common-only result inspect S omission before changing all volume/output settings. If external data are correct but playback differs, inspect packaging, channels and system processing rather than reject an algebraic identity from one listening result. Repair one copy factor against the four rows and retain unmodified u. Different M/S normalizations are not automatically one numeric protocol; consult a real tool’s definitions and retain unknowns.
+
+## Reopen with both transforms and omitted information
+
+Retain forward/inverse cards, four results and two failure copies. Reopen and verify M+S→L and M−S→R, with all coefficients multiplying the same u. Repeat only available iCouldPlay viewing/listening conditions, leaving unmade or unplayed examples pending. Explain the sign change after L/R exchange,0.4u/0.4u after discarding S and why M/S is not three sources. Preserve recording/editable project and promise no added M/S editor, automatic source separation, perfect localization or device-wide sample reconstruction.
+
+## Related tutorials and sources
+
+[iCouldPlay polarity comparison: why normal solo audio can cancel in a mono model](<https://allluckly.cn/en/guides/icouldplay-audio-polarity-inversion-mono-cancellation-model/>); [iCouldPlay stereo gain exercise: common gain versus independent normalization](<https://allluckly.cn/en/guides/icouldplay-stereo-common-gain-independent-normalization-balance/>).
+
+Method sources: [iZotope: mid/side sum and difference concepts; normalizations vary](<https://www.izotope.com/community/blog/what-is-midside-processing>).
+
+Checked on 18 November 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261118-hls>) list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.
+{% endraw %}

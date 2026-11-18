@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-two-state-markov-row-vector-stationary-approach/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint two-state Markov chain: row probabilities approach but do not
+  reach stationarity in finite steps'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-two-state-markov-row-vector-stationary-approach/
+agent_source_sha256: aba98df647f430788baf55c23cedb3c499d6fe3cef3f0957540556885193bd6f
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint two-state Markov chain: row probabilities approach but do not reach stationarity in finite steps
+
+Language: en
+Canonical: [VectorPaint two-state Markov chain: row probabilities approach but do not reach stationarity in finite steps](<https://allluckly.cn/en/guides/vectorpaint-two-state-markov-row-vector-stationary-approach/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-two-state-markov-row-vector-stationary-approach/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-two-state-markov-row-vector-stationary-approach/>)
+Published: 2026-11-18T00:00:00+08:00
+Modified: 2026-11-18T10:09:42+08:00
+Author: Bison
+
+Check a quarter-factor contraction using four probability arrows and distribution bars under an explicit row-vector convention.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-two-state-markov-row-vector-stationary-approach/>), translated on 2026-11-18. Original publication dates, attribution, code and version notes are retained.
+
+Build a fictional two-state probability model with four directed conditional transitions, then calculate two-step distributions and stationarity. Probability bars are not observed headcounts or an assumed model of independent repeated choices. Declare states, time steps and matrix orientation before explaining approach through a recurrence.
+
+## Declare exhaustive states and a row-vector convention
+
+A and B are mutually exclusive and exhaustive. Given the present state, the next-state distribution does not depend on earlier history, and the same transition rule applies at every step. Use row probabilities p=(a,b), updated by right multiplication p\_next=pP. The reference uses column-stochastic matrices/column vectors; transposition reconciles conventions. Do not apply a column formula unchanged to this row table. Create state, arrow, matrix, distribution-bar and condition layers; save native work. p0=(1,0) means certain initial A, not an observed survey headcount.
+
+## Check four arrows by their source-state row sums
+
+Set A→A=3/4, A→B=1/4, B→A=1/2, B→B=1/2. These are rows(3/4,1/4),(1/2,1/2) of P, with nonnegative entries summing to 1 per row. Sum outgoing edges for each source state, not incoming edges into A. On a suggested 2200×1600 canvas use centres(650,650),(1550,650), separated reverse arcs and self-loops. Check arrowheads, fraction labels and legend together; colour alone must not identify a state.
+
+## Calculate two steps from the certain initial state
+
+p1=(1,0)P=(3/4,1/4). Multiplying again gives A=(3/4)(3/4)+(1/4)(1/2)=11/16 and B=(3/4)(1/4)+(1/4)(1/2)=5/16, still summing to 1. A’s second-step probability is not simply copied as 3/4 because B contributes incoming probability. For total bar width 960px, use 720/240 for p1 and 660/300 for p2, with exact fraction labels. Width maps probability;11/16 does not report eleven observed occurrences out of sixteen.
+
+## Independently check two-step B through two paths
+
+Two mutually exclusive paths reach B after two steps: A→A→B with probability(3/4)(1/4)=3/16, and A→B→B with(1/4)(1/2)=1/8, totaling 5/16. Products use conditional transition probabilities, not an assumption that successive states are independent. Draw this path ledger and compare the matrix result; omitting self-loops loses a path. Reusing one matrix over time does not detach transitions from the current state: time homogeneity is not independent identical sampling.
+
+## Solve stationarity and substitute both components
+
+Let π=(a,1−a) satisfy πP=π. Then a=(3/4)a+(1/2)(1−a), giving a=2/3 and b=1/3. Substitution yields 1/2+1/6=2/3 for A and 1/6+1/6=1/3 for B, summing to 1. Split the 960px stationary bar 640/320. Stationarity is not the simple row average(5/8,3/8), nor equal transition probabilities. Normalization matters: the delivered vector is a probability distribution, not an arbitrary scalar multiple. At stationarity A→B probability flow is(2/3)(1/4)=1/6 and B→A is(1/3)(1/2)=1/6. An unchanged distribution does not mean every trajectory stays put. Retain self-loops and cross-state edges rather than erase arrows at stationarity.
+
+## Prove approach rather than finite-step equality
+
+A probabilities satisfy a\_next=1/2+a\_current/4, hence a\_next−2/3=(a\_current−2/3)/4. From a0=1, a\_n=2/3+1/(3·4^n). The extra term is positive for every finite nonnegative integer n, so the distribution approaches stationarity without exactly reaching it in finite steps. Distinguish equality from approximation; a displayed 0.667 does not prove exact equality. This recurrence proves convergence for this model, not unconditionally for chains with other rules, absorbing classes or periodicity. Starting at π would keep π at every step, consistent with the strict finite-step deviation from certain A. Deliver the initial condition with the closed form instead of applying that solution unchanged to every starting distribution.
+
+```text
+row convention: p_next=p*P
+P=((3/4,1/4),(1/2,1/2))
+p0=(1,0); p1=(3/4,1/4); p2=(11/16,5/16)
+A-A-B=3/16; A-B-B=1/8; total B=5/16
+pi=(2/3,1/3); pi*P=pi
+a_next=1/2+a/4
+a_n=2/3+1/(3*4^n), n=0,1,2,...
+finite n: a_n>2/3; limit a_n=2/3
+```
+
+## Diagnose invalid rows and transpose mistakes
+
+A mistaken row(3/4,1/2) sums to5/4 and is not a transition distribution; check inputs rather than forcibly renormalize the answer. Reading this matrix unchanged as column-stochastic also fails: its first column sums to5/4. Preserve a one-factor error/control and correction. Diagnose exhaustive states, row sums, arrow directions, vector convention, multiplication and normalization. Bars filling a common width do not prove valid probabilities. This fictional model predicts no real population movement or recommended behaviour.
+
+## Reopen and reconstruct matrix and recurrence from arrows
+
+Save editable arcs, labels and three distribution rows; inspect SVG/PDF and a separately opened PNG. At reduced size distinguish self-loops from reverse arrows; enlarge fractions and deviation signs. Reopen, hide the matrix, rebuild rows from outgoing edges, and recalculate p2/stationarity. Deliver row convention, path check, recurrence and invalid-row control, marking unperformed output steps pending. Drawing is manual and matrix/limit work external; infer no App Markov simulator, random experiment or automatic stationary solver.
+
+## Related tutorials and sources
+
+[VectorPaint two-draw probability trees: connect replacement assumptions to four paths](<https://allluckly.cn/en/guides/vectorpaint-replacement-draw-probability-tree/>); [VectorPaint Bayes source diagram: condition on red within sixty-four area units](<https://allluckly.cn/en/guides/vectorpaint-bayes-source-posterior-sixty-four-area-units/>).
+
+Method sources: [Georgia Tech Interactive Linear Algebra, Stochastic Matrices](<https://textbooks.math.gatech.edu/ila/stochastic-matrices.html>).
+
+Version and operation scope: checked on 18 November 2026 against the [official VectorPaint listing](<https://apps.apple.com/cn/app/id1587272880>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261118-vectorpaint>): version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.
+{% endraw %}

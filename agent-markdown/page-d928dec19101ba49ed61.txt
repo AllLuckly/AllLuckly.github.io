@@ -1,0 +1,89 @@
+---
+layout: null
+permalink: /en/guides/jianlai-font-cmap-coverage-system-fallback-evidence/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Jianlai missing-character fallback: separate font mappings, visible Chinese
+  and rendering claims'
+agent_source_url: https://allluckly.cn/en/guides/jianlai-font-cmap-coverage-system-fallback-evidence/
+agent_source_sha256: bc09d3487770c36e717ecbcd16e25e8a5df87175a939b99c3e3476a4c028d567
+agent_generator_version: 1
+---
+{% raw %}# Jianlai missing-character fallback: separate font mappings, visible Chinese and rendering claims
+
+Language: en
+Canonical: [Jianlai missing-character fallback: separate font mappings, visible Chinese and rendering claims](<https://allluckly.cn/en/guides/jianlai-font-cmap-coverage-system-fallback-evidence/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/jianlai-font-cmap-coverage-system-fallback-evidence/>)
+English: [English HTML](<https://allluckly.cn/en/guides/jianlai-font-cmap-coverage-system-fallback-evidence/>)
+Published: 2026-11-18T00:00:00+08:00
+Modified: 2026-11-18T10:24:22+08:00
+Author: Bison
+
+Compare Latin text and one unmapped Chinese character using a verified font: inspect character mappings externally before observing the keyboard. Deliver coverage evidence and display records. The official image says missing characters use a system font, but visual resemblance does not establish precisely which system family rendered a glyph.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/jianlai-font-cmap-coverage-system-fallback-evidence/>), translated on 2026-11-18. Original publication dates, attribution, code and version notes are retained.
+
+Compare Latin text and one unmapped Chinese character using a verified font: inspect character mappings externally before observing the keyboard. Deliver coverage evidence and display records. The official image says missing characters use a system font, but visual resemblance does not establish precisely which system family rendered a glyph.
+
+## 1. Fix the inspected file rather than a family name alone
+
+Choose an authorized font that the installed app can actually import or select, retaining source file and provenance. The external example uses the Noto Sans file below with the full hash of this batch’s saved copy so a later same-named update is not assigned old results. No universal acceptance of this variable font is required. A family name does not establish identical bytes or coverage, and another Noto family cannot inherit the result. Record selected Jianlai font, theme, sizes and host while retaining drafts. Without confirmed selection, perform only external coverage work, not a claimed phone fallback observation. Use public author sources or authorized copies.
+
+```
+NotoSans[wdth,wght].ttf
+SHA-256: bfb7bb691513f12e734dc346c03a03f784912432d7e3fa8e56efcf906fe86b3d
+```
+
+## 2. Define coverage through character identity
+
+On an external card identify uppercase A as U+0041 and 雨 as U+96E8. Ask whether those code points have nonzero default-glyph mappings in this specific font. OpenType cmap maps character codes to default glyph indices, with missing characters represented by index zero. A dictionary key alone is therefore insufficient without an effective mapping. This does not identify the actual keyboard’s fallback family or certify complex shaping and variation sequences. Keep filename, Unicode identity and displayed outline separate. A correctly displayed 雨 does not retroactively prove that the selected file itself contains it.
+
+## 3. Inspect the table with external tools, not the keyboard
+
+With an existing Python and FontTools environment, save the code below as a computer exercise and run it after verifying the actual font path. It is not executable by pasting into Jianlai. The code obtains a Unicode cmap, checks for nonzero glyphs and stops explicitly without one, rather than calling unknown coverage universal absence. Another existing font-character reporter can substitute with its method recorded. Family publicity is not coverage evidence. This batch independently inspected the saved font’s binary mappings: A is mapped and 雨 is not. That is external-file evidence, not a claim that this FontTools code or phone rendering was run. Recheck a different version instead of copying expectations as output.
+
+```
+from fontTools.ttLib import TTFont
+
+font = TTFont("NotoSans[wdth,wght].ttf")
+try:
+    cmap = font.getBestCmap()
+    if cmap is None:
+        raise ValueError("No Unicode cmap; coverage not established")
+    for ch in ["A", "雨"]:
+        name = cmap.get(ord(ch))
+        glyph_id = font.getGlyphID(name) if name is not None else 0
+        print(f"U+{ord(ch):04X}", glyph_id != 0)
+finally:
+    font.close()
+```
+
+## 4. Locate observable characters in the same keyboard
+
+Hold font and theme fixed, return to a private ordinary note and confirm Jianlai. Inspect A on an actual letter layout, then obtain 雨 as a candidate through a familiar enabled Chinese scheme, using its real procedure rather than assuming one pinyin code for every scheme. Mark absent candidates or regions not applicable instead of substituting a host-text screenshot. The official image scopes font effects to keys, candidates and the encoding area; record whichever layers are genuinely observable. Check committed text separately. A host using its own font does not establish failed Jianlai import; it is a different evidence layer.
+
+## 5. Interpret missing coverage alongside visible output
+
+If the selected file is verified not to map 雨 but the candidate still displays it, record consistency with the published system-fallback explanation. Do not name a specific system family from appearance or claim the font file gained a glyph. A resembling the default may simply have a similar outline; retain selection and coverage evidence before declaring no application. If another font maps both characters, this missing-character contrast is absent. Use a genuinely unmapped character with a new identity card or leave fallback observation pending rather than alter a report to fit expectations.
+
+## 6. Use the default as a reference, not a renderer detector
+
+After saving the custom-font result, use a real Restore default font control for a separate reference round and regenerate the same candidates. Pending composition need not survive settings navigation. Change only font, not candidate size or language. Similar Chinese outlines across rounds are visual comparisons, not system renderer logs proving the cascade. Missing-character fallback also does not certify every symbol, emoji or combining mark in every environment. This exercise concerns two declared ordinary code points. If the default differs from daily use, restore the recorded original afterward rather than equate default with the exact previous configuration.
+
+## 7. Diagnose mappings, selection and display layers
+
+Without a Unicode cmap, retain unknown coverage. A missing selectable family calls for file/import checks, while different host text calls for host styling. These are not all missing-glyph failures, and one invisible character does not establish a damaged font. Changed candidates first require scheme and sample checks, not an inference that glyph mappings changed. Fix one factor while retaining original font and report, without editing glyphs to satisfy a prior conclusion. No font editing, fallback generation or automatic keyboard-coverage scanner is supplied here. Unrun tools and unobserved layers remain pending.
+
+## 8. Deliver file, mapping and display ledgers
+
+Retain font source/hash, external mapping results for both code points, observable keyboard layers and body text. Distinguish tool output, published explanation and personal observation. Check selection after reopening only before passing return. Explain why an unmapped Chinese character may still appear while acknowledging that appearance cannot expose all private rendering details. New font versions, Chinese schemes or devices require renewed checks. Do not extrapolate this file’s A/雨 result to a same-named family or every character. Restore a confirmed daily state and preserve sources.
+
+## Related guides and sources
+
+[Font import and restoration](<https://allluckly.cn/en/guides/jianlai-licensed-font-file-import-identity-select-restore/>); [Confusable glyphs and code points](<https://allluckly.cn/en/guides/jianlai-confusable-latin-digit-three-line-glyph-card/>).
+
+Checked on 18 November 2026: [Apple’s Finland lookup](<https://itunes.apple.com/lookup?id=6754281557&country=fi&entity=software&timestamp=20261118>) and [China lookup](<https://itunes.apple.com/lookup?id=6754281557&country=cn&entity=software&timestamp=20261118>) both list Jianlai 1.0.5, requiring iOS / iPadOS 16.0 or later. The [official store](<https://apps.apple.com/fi/app/id6754281557>) describes themes, backgrounds, fonts and multilingual input. Use controls actually present in the installed version; system editing and host processing are distinguished separately. These are repeatable instructions and paper expectations, not claims of completed device input, host compatibility or format-parser tests.
+
+Method references: [Official Apple keyboard-settings image at full reading size](<https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/20/df/1e/20df1ed5-88bd-f0fe-4841-ef8c26a70aa0/03-_U5b57_U4f53_U4e0e_U5927_U5c0f-2064x2752.png/2048x2732bb.jpg>); [Noto Sans in the official Google Fonts repository](<https://github.com/google/fonts/tree/main/ofl/notosans>); [Microsoft OpenType cmap specification](<https://learn.microsoft.com/en-us/typography/opentype/spec/cmap>); [FontTools TTFont interface](<https://fonttools.readthedocs.io/en/latest/ttLib/ttFont.html>).
+{% endraw %}

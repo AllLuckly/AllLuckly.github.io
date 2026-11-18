@@ -1,0 +1,77 @@
+---
+layout: null
+permalink: /guides/vectorpaint-mobius-rectangle-gluing-single-boundary-trace/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: VectorPaint莫比乌斯带：半扭粘合端点，两条长边接成一个边界
+agent_source_url: https://allluckly.cn/guides/vectorpaint-mobius-rectangle-gluing-single-boundary-trace/
+agent_source_sha256: 1432261908665c2c2a9954b3b57e22df17b1b5fd3fc0c9966a15d9ee78d4ff75
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint莫比乌斯带：半扭粘合端点，两条长边接成一个边界
+
+语言：zh-CN
+原文：[VectorPaint莫比乌斯带：半扭粘合端点，两条长边接成一个边界](<https://allluckly.cn/guides/vectorpaint-mobius-rectangle-gluing-single-boundary-trace/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-mobius-rectangle-gluing-single-boundary-trace/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-mobius-rectangle-gluing-single-boundary-trace/>)
+发布于: 2026-11-18T00:00:00+08:00
+内容更新于: 2026-11-18T00:00:00+08:00
+署名：Bison
+
+用单位矩形的端点等价类逐段追踪边界，与不反转端点的圆柱对照，不靠交叉画面猜拓扑。
+
+画一张矩形粘合示意，明确哪两条边被识别、端点怎样配对，再用闭合行走核边界分支数。莫比乌斯带的半扭不能只靠一处遮挡线表现就当成证明；本课交付的是二维定义图与边界账，不要求真实扭带、剪切或应用三维建模。
+
+## 先声明单位矩形与反转识别
+
+取矩形坐标(x,t)，两者都从零到一。把左边(0,t)与右边(1,1−t)识别，意味着同一个t在另一端对应一减t，不能误写成同高相接。内部点不因此全部重合，两条竖边粘合后成为带的接缝而非剩余边界。新建矩形、端点配对、长边追踪和圆柱控制层，先存原稿。坐标为抽象参数，没有厘米或真实材料厚度；定义讨论的是理想曲面及边界，不从描边宽度推断带的物理结构或机械性能。
+
+## 为四个角写出两个等价类
+
+记L0=(0,0)、L1=(0,1)、R0=(1,0)、R1=(1,1)。反转粘合给L0等价R1、L1等价R0，形成两类角点。先在账本画两行配对，再用相同字母标在矩形两端；不能把左右同高度角点配成一类。建议2200×1700画布，L0=(350,800)、L1=(350,300)、R0=(1750,800)、R1=(1750,300)，屏幕Y向下，所以参数t增大对应屏幕向上。标签写参数角名，避免只看屏幕方向读反端点编号。
+
+## 沿下边通过接缝走到上边
+
+从L0沿t=0的下长边走到R0，接缝识别R0与L1，于是接着沿t=1的上长边从L1走到R1，再由R1等价L0回到起点。一次闭合追踪包含两条长边，所以剩余边界只有一个连通分支。画分段箭头并在跨接缝处用等价号，不把参数图外的配对引线当作额外边界。两条竖边已被粘合，不加入边界步数；若沿矩形四边绕一圈，你追的是未粘合纸片的周长，不是所得曲面的边界。
+
+## 用同高粘合制作圆柱双边界控制
+
+另存只把规则改为(0,t)等价(1,t)的版本，即L0等价R0、L1等价R1。下边从L0走到R0立刻闭合，上边从L1到R1另成一圈，故圆柱有两个边界分支。矩形尺寸、两条长边和起点编号保持不动，只改端点配对。两版都画成平面矩形也能得到不同结论，说明拓扑由识别规则决定，不由画面是否像立体带子决定。把“一个分支”和“两个分支”写成文字，不能仅用一色与两色作为证明。
+
+```
+rectangle: 0<=x<=1, 0<=t<=1
+Mobius gluing: (0,t)~(1,1-t)
+L0~R1; L1~R0
+boundary: L0 ->bottom-> R0~L1 ->top-> R1~L0
+remaining boundary components=1
+cylinder gluing: (0,t)~(1,t)
+L0~R0; L1~R1
+bottom closes separately; top closes separately
+remaining boundary components=2
+```
+
+## 区分边界数量与单侧不可定向
+
+莫比乌斯带通常称单侧、不可定向：沿中心圈连续携带局部法向，一圈后方向反转，不能在整个带上连续选定一致的法向。这个性质与“边界一个分支”相关于同一曲面，但两种断言不能仅互作定义或彼此替代证明。可在旁栏注明半扭导致法向反转，把本课主核验仍放在端点边界追踪。图上涂两种颜色或只看到纸带正面不是定向性的判断方法，遮挡、显示角度和屏幕上的平面填色不会改变定义。
+
+## 交叉示意不额外制造粘接点
+
+如果另画带状轮廓帮助阅读，在投影交叉处用短断线或浅色压暗表示前后，不把交叉当成曲面两点被粘在一起。边界追踪仍以矩形配对表为准，装饰立体图不能覆盖定义图。笔画、贝塞尔节点与文字均手工组织，先画路径再调遮挡层；不要求应用自动扭曲三维曲面。若交叉处四条边全接成结点，会暗示另一个商空间，应回到原配对核查，而不是靠更逼真的渐变掩盖结构错误。没有立体小图也不影响本课边界证明完成。
+
+## 按配对查错而非按外观猜结果
+
+若莫比乌斯版算出两个分支，先查是否错误配L0与R0；若得到四条开放边，查是否忘记识别接缝；若把全部四角合为一点，查是否把两行等价类串合。每次从一个长边端点出发，直到回原等价类才停，再问是否有尚未经过的剩余长边。保留错误追踪和修正版，所有跳转写明等价依据。不能把“绕两段”误说成两个边界分支：分支数看闭合连通圈数，不看所画分段数量，也不看走了几个屏幕面板。
+
+## 重开从角点账恢复一圈与两圈
+
+保存可编辑矩形、配对表和追踪箭头，导出SVG或PDF并另开PNG，缩小核两版粘合规则清楚，放大核一减t、下标零一及等价号。重开原稿先隐藏结论，逐段恢复莫比乌斯的一圈与圆柱的两圈，再检查投影交叉没有新增粘接。交付定义、端点类、边界行走和单侧性质的独立说明，未实际做的输出重开标待办。不声称完成实体剪切试验、材料验证、三维建模或自动拓扑识别；二维手工图的价值在于规则透明且可复核。
+
+## 相关教程与资料
+
+[VectorPaint 交织色带：用上下交替检查遮挡关系](<https://allluckly.cn/guides/vectorpaint-woven-colour-strips/>)、[VectorPaint 循环遮挡三角：用分段控制三处前后关系](<https://allluckly.cn/guides/vectorpaint-cyclic-overlap-triangle/>)。
+
+方法来源：[MathWorld Möbius Strip](<https://mathworld.wolfram.com/MoebiusStrip.html>)。
+
+版本与操作范围：2026年11月18日核[VectorPaint官方商店](<https://apps.apple.com/cn/app/id1587272880>)与[Apple公开查询](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261118-vectorpaint>)，公开1.0.8，最低iOS / iPadOS 17.0。使用已公开的形状、钢笔、贝塞尔节点、网格辅助线、对齐、图层分组、文字和保存输出手工绘图；入口按安装版本实际可见为准。计算、定义与复算在应用外准备，不推断内置公式、统计或图论求解能力。原生稿保留可编辑结构，SVG、PDF、PNG各按需要阅读检查，含导入位图的SVG或PDF不自动成为全矢量。画布与样本为原创教学设定，未执行真机或实物测量，未做的操作明确待做。
+{% endraw %}

@@ -1,0 +1,71 @@
+---
+layout: guide
+author: Bison
+app_id: nas_book
+title: 书屿古语词细读：ere的旧式用法，与oft的文学标签分栏读
+description: 对原创两行逐词查义，再用现代替换和here、soft子串控制，避免由语体猜年代。
+permalink: /guides/nasbook-archaism-ere-oft-register-word-boundaries-writing-date/
+date: '2026-11-18 00:00:00 +08:00'
+modified: '2026-11-18 00:00:00 +08:00'
+category: 教程
+level: 进阶
+series_order: 217
+topic: 语词、诗行与情境的证据
+reading_time: 10
+---
+
+陌生词可能是旧式用法，也可能仍是活跃的文学词；两者都不能单独证明作品写于古代。本课在书屿细读ere和oft的原创材料，把词典释义、语体标签、整词位置与作用候选分别保存。阅读标记不是自动断代，理解也不能只靠看起来像古英语的拼写。
+
+## 先保存原创A与现代改写B
+
+外部把下方A作为两条作者行，B为保持基本意思的现代词替换，C只用于字串控制。标签和行号不属于正文。保存可编辑稿，导出固定作者行的PDF或标明行界的EPUB，导入书屿核两行末词与逗号，再给A加书签。手机自动折行可能把Ere单独放一行，但不改变它与后面从句的语法联系。需要高亮时只用当前格式可见入口，没有入口就在外部表记整句，别为了便于选择把原句重新断成无上下文的单词清单。
+
+```text
+A
+L1: Ere the lamps went out, I left the gate.
+L2: I oft return to hear the river.
+
+B
+L1: Before the lamps went out, I left the gate.
+L2: I often return to hear the river.
+
+C
+L1: I stood here before the gate.
+L2: The soft rain crossed the river.
+```
+
+## 词典的两个标签不能自动并成一类
+
+RPO把archaism说明为有当前替代词时使用旧式或过时词。Merriam-Webster对ere标old-fashioned与literary，释为before；对oft标chiefly literary，释为often。后者的文学标签不等于这个词已完全消失，更不能把两项都统一登记成没有现代使用者。笔记分开写词形、当前释义与原标签，只有在给定语境和定义下才提出古语色彩候选。词典历史首见年份也不是当前诗句写作年份，别把词的历史直接贴到作品年代栏。
+
+## 把ere放回完整时间从句
+
+A第一行的Ere引出the lamps went out，整体意思是灯灭之前，我离开门口。灯灭和离开之间有明确先后，不能把ere当here解释成“这里”，也不把它误抄成ear听觉名词。B用Before替换时保留过去式went与left，先后关系没有因为现代词改变。可在外部表写“离开早于灯灭”再回原句核，避免只查一个词就忘了主句。此处词典的连词用法与带完整从句的环境相符，不是把任何词典第一条义项机械填进所有句子。
+
+## oft对应频度而不替换动作时态
+
+第二行I oft return说我常回来听河声，oft修饰return的频度，不说只回来过一次，也不把现在习惯动作改成已经完成的过去事件。B用often，基本频度仍在。比较时记录A两行分别九词与七词，替换后B词数也九与七；字数一样并不保证声音节奏相同。ere与before、oft与often的常用读音长短可以影响候选节奏，但本课不凭两个词就宣布整首符合某一种格律，更不假定软件已自动朗读并测出音节。
+
+## C控制证明子串命中不等于古词
+
+C的here包含连续字母ere，soft包含oft，但两处都不是本课要查的完整词。搜索若返回这些子串，应回正文核词界，而不是将C也标成两处旧式用法。C中的词各有自己的意思，不能删去here的h或soft的s把它们强行变成目标词。比较规则仅在匹配时忽略句首大小写与外侧标点，不自动删前缀或把词中相同字母都算出现；原文拼写保持原样，笔记另写为什么这个命中被排除。
+
+## 语体色彩与年代事实分开推断
+
+A可让读者感到较旧式、较诗化，B更接近日常措辞，这是有词汇对照支持的语体解释。它不证明说话者是中世纪人物，不证明作者生活在某朝代，也不保证所有读者觉得庄重。A本来就是本课原创文字，足以提醒今天也能有意选择旧词。若作品要断代，需要版次、手稿或出版资料；若解释语气，则回灯、门与河声的上下文。两种问题用不同证据，不拿一个词典标签兼答作者身份、故事时间和文本年代三栏。
+
+## 按整词、标签和句法逐项排障
+
+把ere译“这里”先回整词与时间从句；把oft当过时无人使用，核词典实际写的是chiefly literary。搜索here、soft后多出两项，按词界撤销错误标记，而非删掉原文字母。若材料来自OCR，先对原页确认ere并非漏印的here，再考虑古词解释；未核原页的疑字保留未确认。只修自己的笔记副本，并保留原标签与义项链接，不把自己的现代改写覆盖掉A，也不将高亮颜色当词典自动分类结果。
+
+## 重开交付三层记录而非古诗标签
+
+重开A先给ere的before义与时间先后，再给oft的often义和习惯频度。到B、C解释词数相同仍可换语体，以及子串相同不等于完整词相同。交付原文、词典标签表与一个有依据但可讨论的语气候选，并把未执行的书签高亮重开列待办。读完不应只留“这是古诗”四字；书屿没有被假定能自动识别古语、测定写作年代、推断作者身份或把词典资料当已做真机测试。
+
+## 相关教程与资料
+
+[书屿跨章词表：把同一术语的不同用法保留在上下文里](/guides/nasbook-cross-chapter-glossary/)、[书屿双语段落对照：按命题和连接词核对同一小段](/guides/nasbook-parallel-language-paragraph-map/)。
+
+方法依据：[多伦多大学RPO：Archaism](https://rpo.library.utoronto.ca/glossary?page=1)、[Merriam-Webster：ere](https://www.merriam-webster.com/dictionary/ere)、[Merriam-Webster：oft](https://www.merriam-webster.com/dictionary/oft)。本课图、报告数据、错例及记录表均为原创练习。
+
+版本核对：2026年11月18日，[Apple公开查询](https://itunes.apple.com/lookup?id=6766198898&country=cn&entity=software&timestamp=20261118)显示书屿1.1.4，最低iOS / iPadOS 15.6；公开能力见[官方App Store](https://apps.apple.com/cn/app/id6766198898)。本课使用自制PDF、EPUB或清楚的文本材料阅读，书签、高亮和笔记依实际格式与可见入口操作，不假定自动求解或文学分析功能。外部制作与纸面预期不等于已做真机观察，未执行项目照实留空。

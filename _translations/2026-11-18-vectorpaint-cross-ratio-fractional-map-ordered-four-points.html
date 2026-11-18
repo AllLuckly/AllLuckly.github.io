@@ -1,0 +1,76 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint cross-ratio: a fractional map changes distance ratios while preserving an ordered four-point
+  invariant'
+description: Map0,1,3,6 to 0,1/2,3/4,6/7, checking point order and every denominator.
+permalink: /en/guides/vectorpaint-cross-ratio-fractional-map-ordered-four-points/
+date: '2026-11-18 00:00:00 +08:00'
+modified: '2026-11-18 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 233
+topic: Geometric invariants and projective coordinates
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-18-vectorpaint-cross-ratio-fractional-map-ordered-four-points.md
+source_url: /guides/vectorpaint-cross-ratio-fractional-map-ordered-four-points/
+translation_method: editorial
+translation_source_sha256: 7cf818b1d4c2ab02aa7fdded5ebf4f89b6f4af005d5613fcb47ac82d96882dc7
+translation_date: '2026-11-18T02:15:52+00:00'
+excerpt: Map0,1,3,6 to 0,1/2,3/4,6/7, checking point order and every denominator.
+---
+{% raw %}
+<p>Make two labelled number lines showing four points before and after a fractional map. Each panel declares its own display scale. Compare cross-ratios calculated from coordinates rather than screen-pixel ratios. Retain directed differences, point names and the forbidden input so the invariant has an auditable ledger.</p>
+
+<h2 id="section-1">Choose a cross-ratio convention and fix point order</h2>
+
+<p>Define CR(A,B;C,D)=[(c−a)(d−b)]/[(d−a)(c−b)], using directed coordinates on one number line. Set A=0,B=1,C=3,D=6: distinct points with nonzero denominator. References can permute points or adopt reciprocal conventions, so display the formula before comparison. Create source-axis, image-axis, ticks/points and ledger layers, then save native work. Identify order by names, not a temporary left-to-right visual arrangement, and retain each input/output pairing.</p>
+
+<h2 id="section-2">Calculate the original value and identify reciprocal-order risks</h2>
+
+<p>In the chosen order the numerator is(3−0)(6−1)=15 and denominator(6−0)(3−1)=12, giving 5/4=1.25. This is five quarters, not four fifths. Swapping A and B yields 4/5=0.8. Keep this order control with the original point labels so a reciprocal after permutation is not blamed on the map. Record 15/12 before reduction to distinguish wrong differences, inverted fractions and decimal transcription errors.</p>
+
+<h2 id="section-3">Evaluate the fractional map point by point</h2>
+
+<p>Use T(x)=x/(x+1), excluding x=−1. Its coefficient determinant is 1, not zero, so it is not a degenerate constant map. The images are 0,1/2,3/4,6/7. Evaluate each independently. Adjacent spacings change; a uniform horizontal scale of the source group does not implement this map. Keep a four-row input/output table in fractions. Decimals aid placement only: replacing 6/7 by0.86 is unsuitable for an exact identity check.</p>
+
+<h2 id="section-4">Recalculate the image cross-ratio with exact fractions</h2>
+
+<p>The image numerator is(3/4)(6/7−1/2)=15/56; the denominator is(6/7)(3/4−1/2)=3/14. Their quotient is5/4. Ordinary AC/BC changes from 3/2 to(3/4)/(1/4)=3, while AD/BD changes from 6/5 to(6/7)/(5/14)=12/5. Each ordinary ratio changes although their combination in the defined cross-ratio does not. Put these columns together without extending the invariant to all lengths, distance ratios or angles. Externally derive T(v)−T(u)=(v−u)/[(v+1)(u+1)]. In the four image differences, each input’s plus-one factor occurs once in numerator and denominator and cancels. This explains invariance beyond numerical coincidence. All inputs must avoid the pole and the cross-ratio denominator must be nonzero.</p>
+
+<pre><code class="language-text">CR(a,b;c,d)=((c-a)*(d-b))/((d-a)*(c-b))
+(a,b,c,d)=(0,1,3,6)
+CR=15/12=5/4
+T(x)=x/(x+1), x != -1
+(T(a),T(b),T(c),T(d))=(0,1/2,3/4,6/7)
+image numerator=15/56; image denominator=3/14
+image CR=(15/56)/(3/14)=5/4
+swap A and B: CR=4/5
+</code></pre>
+
+<h2 id="section-5">Declare each panel’s display scale</h2>
+
+<p>Use a suggested 2200×1500 canvas. Place the source axis at Y=450 with X=300+240x, so D has X=1740. At Y=1050 use X=300+1500t for the image: B′,C′,D′ have X=1050,1425,approximately 1585.714. The different panel scales prohibit cross-panel pixel-length comparisons. Label pixels per unit and exact fractions. Move crowded text rather than points. Draw axes/ticks manually, approximating with guides when numeric fields are unavailable; exact evidence remains external rational arithmetic.</p>
+
+<h2 id="section-6">Check the domain using a pole and repeated inputs</h2>
+
+<p>For input−1 the denominator vanishes, so no ordinary finite-axis coordinate exists in this lesson. A projective point at infinity requires an extended representation; the canvas edge is not a substitute. Setting C=B also gives a zero cross-ratio denominator and violates distinctness. Do not retain 5/4 in that case. Diagnose domain/order before denominators, reduction and panel scale. Preserve the control’s failed premise instead of deleting inconvenient labels to make the drawing look correct.</p>
+
+<h2 id="section-7">Separate ordering errors from approximation errors</h2>
+
+<p>Hide the answer and read the four directed differences in A,B,C,D order before restoring the displayed formula. A result 0.8 suggests swapped A/B or another convention. A near 1.25 discrepancy suggests premature decimal rounding; a large discrepancy may come from mixing panel pixel scales. Change one factor and preserve both versions. Correspondence leaders assist reading; they are not camera rays or physical lengths, and this one-dimensional illustration does not establish camera calibration. These inputs preserve left-to-right order, yet names still determine the formula. On other legal intervals, do not silently rename the leftmost point A to force an answer.</p>
+
+<h2 id="section-8">Reopen and deliver the definition rather than isolated decimals</h2>
+
+<p>Save editable axes, points and text; inspect SVG/PDF and a separately opened PNG. At reduced size check correspondence rows, then enlarge denominators, primes and the excluded−1 input. Reopen native work and confirm separate axes and correct labels. Deliver 15/12, the image quotient(15/56)/(3/14), order control 4/5 and pole control, marking unperformed output checks pending. A reader should recompute the invariant and explain changing ordinary ratios without attributing it to an unpublished automatic projective or cross-ratio tool.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-coordinate-translation-reflection/">VectorPaint translation and reflection: check each vertex coordinate and orientation</a>; <a href="/en/guides/vectorpaint-shear-scale-composition-order-two-results/">VectorPaint composition order: shear then double height differs from the reverse</a>.</p>
+
+<p>Method sources: <a href="https://mathworld.wolfram.com/CrossRatio.html">MathWorld Cross Ratio</a>.</p>
+
+<p>Version and operation scope: checked on 18 November 2026 against the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261118-vectorpaint">Apple public lookup</a>: version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.</p>
+{% endraw %}

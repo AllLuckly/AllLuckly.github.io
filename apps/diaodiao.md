@@ -5,7 +5,7 @@ author: Bison
 title: 调调：iPhone 与 iPad 个人音乐播放器、本地导入与离线听歌
 description: 用调调整理和播放自己的音乐，了解文件导入、Wi-Fi 传歌、离线播放、歌词、队列与个人音乐服务器的使用范围。
 permalink: /apps/diaodiao/
-modified: 2026-11-17
+modified: 2026-11-18
 ---
 
 **调调**是一款面向 iPhone 与 iPad 的个人音乐播放器。你可以把自己收藏的音频导入设备，也可以连接兼容的个人音乐服务器，把已有的收藏整理成随手可听的音乐库。

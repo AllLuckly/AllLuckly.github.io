@@ -1,0 +1,71 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay ASS seven-parameter fades: three alpha levels and four relative times'
+description: Map a five-second seven-parameter fade into five phases, separating relative times, playback times
+  and a still-visible final level.
+permalink: /en/guides/icouldplay-ass-seven-parameter-fade-relative-times-three-alpha-levels/
+date: '2026-11-18 00:00:00 +08:00'
+modified: '2026-11-18 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 195
+topic: Playlist declarations and subtitle parameters
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-18-icouldplay-ass-seven-parameter-fade-relative-times-three-alpha-levels.md
+source_url: /guides/icouldplay-ass-seven-parameter-fade-relative-times-three-alpha-levels/
+translation_method: editorial
+translation_source_sha256: 51cb7d94653d0acd74bead35628537a82265136fd4234729d77ab74292065308
+translation_date: '2026-11-18T01:24:31+00:00'
+excerpt: Map a five-second seven-parameter fade into five phases, separating relative times, playback times and
+  a still-visible final level.
+---
+{% raw %}
+<p>A complex fade need not begin fully transparent or vanish completely before an event ends. Prepare one five-second ASS event externally and audit five phases from three alpha levels and four relative times. Separate numeric expectations from actual iCouldPlay appearance, particularly screen-luminance measurements.</p>
+
+<h2 id="section-1">Fix a five-second event and a sufficiently long clip</h2>
+
+<p>Use an owned still-scene clip longer than ten seconds and a legal ASS copy, placing the event at absolute 2–7 s for five seconds. Establish readable Default font, colour and size without competing fade/transform tags, and explicitly set base alpha 0 for this example. Edit externally and retain a working baseline; iCouldPlay is not assumed to enter seven parameters. A four-second clip cannot show the7 s ending: obtain suitable owned material or record the missing prerequisite rather than claim the observation.</p>
+
+<h2 id="section-2">Separate three alpha levels from four time values</h2>
+
+<p>Choose decimal alpha levels a1=192,a2=64,a3=224, with 0 visible and255 invisible. They are neither percentages nor hexadecimal colour-field syntax. Times 500,1500,3000,4500 ms are ordered, line-relative and inside its5000 ms duration. Make a seven-parameter role ledger before reading the tag:192 is not192 ms. Record the absolute 2 s start separately, without adding it to alpha values or script coordinates.</p>
+
+<h2 id="section-3">Place the literal event inside a complete legal file</h2>
+
+<p>The following event Format and Dialogue require your complete Script Info, styles and Events section; two lines alone are not full ASS. Confirm Default and the actual field order, then save a new practice copy. Overrides set base alpha 0 and all seven fade parameters; visible text is Fade card. Do not substitute the two-time fad abbreviation, which changes the task. Restore altered backslashes, fullwidth commas or missing parentheses before evaluating fading. Unparsed text cannot test the curve.</p>
+
+<pre><code class="language-text">Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:02.00,0:00:07.00,Default,,0,0,0,,{\alpha&amp;H00&amp;\fade(192,64,224,500,1500,3000,4500)}Fade card
+</code></pre>
+
+<h2 id="section-4">Expand the line-relative timeline into five phases</h2>
+
+<p>Hold 192 from 0–500 ms; transition 192→64 during 500–1500; hold 64 during 1500–3000; transition 64→224 during 3000–4500; then hold 224 to5000. There are two transitions and three holds, not four fade-outs. Under the paper linear-interpolation model, relative 1000 ms gives 128 and3750 ms gives 144, the two transition midpoints. This alpha ledger describes parameters, not a measured pixel luminance or a completed rendering test.</p>
+
+<h2 id="section-5">Map relative times back to absolute playback seconds</h2>
+
+<p>Add the absolute 2 s start: relative 500,1500,3000,4500 ms correspond to playback 2.5,3.5,5,6.5 s, and line end5000 ms is7 s. Transition midpoints are3 and5.75 s. Keep axes side by side; seeking to0.5 s cannot show this event, and6.5 s is not its duration. Readouts guide sampling while actual pause positions and boundaries need observation. If the installation cannot locate exact decimals, inspect inside neighbouring phases rather than claim millisecond verification from coarse seeking.</p>
+
+<h2 id="section-6">Separate a faint final level from the event ending</h2>
+
+<p>a3=224 rather than 255 leaves a nonzero model visibility component, not full transparency. Using 1−alpha/255 as an illustrative visibility factor gives 31/255 at the end. That mixing factor is not a perceptual brightness percentage; background, colour and display conditions matter. The event’s absolute 7 s end is a separate stopping condition. Do not force a3 to255 to fit expectations. On a separate counterexample change only a3 to255 and distinguish an ongoing transparent event from an ended event, retaining the original three levels.</p>
+
+<h2 id="section-7">Verify the subtitle association before diagnosing fading</h2>
+
+<p>Associate your complete file through a genuinely available iCouldPlay path. Verify Fade card inside its event and remove duplicate subtitle overlays that could hide alpha changes. Keep display/override conditions fixed and record observations and imprecise samples. For no change check stale copies, parsing and competing overrides before rejecting the seven-parameter definition. A uniform 2 s offset points first to mixed absolute/relative axes. Change one failure condition and reopen; an external editor’s preview does not replace actual player observation.</p>
+
+<h2 id="section-8">Reopen with all five phases and the observation scope</h2>
+
+<p>Save complete ASS, parameter roles, both axes, midpoint calculations 128/144 and the final-level condition. Reopen notes to confirm three alphas and four times were not exchanged. If reopening iCouldPlay, verify the same video and subtitle copy and pass only phases actually observed. Explain the five phases, the2 s shift to playback time, why224 is not full transparency and how event ending differs. Leave unperformed association, pauses and counterexamples pending, claiming neither built-in fade editing, pixel-luminance measurement nor identical effects in every ASS renderer.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/icouldplay-ass-fad-milliseconds-line-interval/">iCouldPlay ASS fades: separate millisecond effects from cue intervals</a>; <a href="/en/guides/icouldplay-ass-transform-relative-time-acceleration-scale-model/">iCouldPlay ASS transforms: audit a scale window and acceleration</a>.</p>
+
+<p>Method sources: <a href="https://aegisub.org/docs/latest/ass_tags/">Aegisub ASS tags: complex seven-parameter fade</a>.</p>
+
+<p>Checked on 18 November 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261118-hls">Apple public lookup</a> list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Placeholder addresses supply neither media nor keys. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.</p>
+{% endraw %}

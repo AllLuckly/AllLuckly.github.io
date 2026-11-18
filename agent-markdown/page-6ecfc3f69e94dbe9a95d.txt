@@ -1,0 +1,72 @@
+---
+layout: null
+permalink: /guides/icouldplay-ass-fax-fay-shear-not-font-italic-or-rotation/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映ASS错切对照：fax与fay变形，不等于字体斜体或旋转
+agent_source_url: https://allluckly.cn/guides/icouldplay-ass-fax-fay-shear-not-font-italic-or-rotation/
+agent_source_sha256: c01fab60e30fd8ab7d99673532bfdb39ab52d6d59d8e248632ffe287f45da03e
+agent_generator_version: 1
+---
+{% raw %}# 云映ASS错切对照：fax与fay变形，不等于字体斜体或旋转
+
+语言：zh-CN
+原文：[云映ASS错切对照：fax与fay变形，不等于字体斜体或旋转](<https://allluckly.cn/guides/icouldplay-ass-fax-fay-shear-not-font-italic-or-rotation/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-fax-fay-shear-not-font-italic-or-rotation/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-fax-fay-shear-not-font-italic-or-rotation/>)
+发布于: 2026-11-18T00:00:00+08:00
+内容更新于: 2026-11-18T00:00:00+08:00
+署名：Bison
+
+用同一AB12样本分别检查水平与垂直错切标签，保留无变形参照及外部几何模型。
+
+字幕看起来歪斜，可能来自字体斜体、旋转或错切，不能凭外观给出同一个原因。本课外部准备三段同字样的ASS覆盖片段，再在云映实际可用的字幕路径观察；数学示意与真实字形像素分开，不把播放器当成字幕编辑器或几何计算工具。
+
+## 先固定原片、字样与可读样式
+
+用自己的十秒静景短片和一份已能正常阅读的ASS练习副本，固定脚本画布六百四十乘三百六十及可用Default样式。三次只显示AB12，不换句子、字号、字重或字体，以免字形宽窄混入错切比较。样式原件保留，编辑在外部完成，不假设云映能输入覆盖标签。若手上只有SRT，不能仅改后缀就称已具备合法ASS；先取得正确格式与头部，原片本身也不为这次字幕变形重新裁切或旋转。
+
+## 为三种条件安排不重叠区间
+
+把无错切、fax为0.25、fay为0.25依次放在一至三秒、三至五秒、五至七秒，各持续两秒。所有区间都用相同居中锚点与同一定位，标明旋转零、斜体零和缩放一百作为控制条件。时间是在ASS的Dialogue字段里写出的绝对起止，不是标签后小数的秒数；0.25在这里是无单位的错切因子。保留一张条件表，把预期标签、实际看到的字形和未知项分栏，三秒边界不拿一张截图证明两个区间都已经检查。
+
+## 把覆盖片段放进现成合法ASS
+
+下方是匹配常见事件Format的Dialogue行，需要放进已有Script Info、V4+ Styles与Events头部，不能单独当作完整字幕文件。先核本机副本Format确实采用Layer、Start、End、Style等对应顺序，再替换练习事件；若顺序不同先按自己的头部调整，别只粘几行便宣称格式正确。每行都把fax与fay写全，让前一行的设定不会被误当成后一行默认。大括号内是指令，AB12才是正文；若实际看见反斜杠与标签，应先核解析而非继续比较歪斜。
+
+```
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:03.00,Default,,0,0,0,,{\an5\pos(320,180)\frz0\i0\fscx100\fscy100\fax0\fay0}AB12
+Dialogue: 0,0:00:03.00,0:00:05.00,Default,,0,0,0,,{\an5\pos(320,180)\frz0\i0\fscx100\fscy100\fax0.25\fay0}AB12
+Dialogue: 0,0:00:05.00,0:00:07.00,Default,,0,0,0,,{\an5\pos(320,180)\frz0\i0\fscx100\fscy100\fax0\fay0.25}AB12
+```
+
+## 把错切因子和几何示意分开解释
+
+Aegisub文档将零因子定义为没有错切，fax与fay分别是两个方向的变形。外部纸面示意可另行定义H(x,y)=(x+0.25y,y)，于是点(40,20)到(45,20)；V(x,y)=(x,y+0.25x)则到(40,30)。这组坐标只是明确声明的数学模型，不能把它们直接当真实字体在云映屏幕上的像素位置，因为字形坐标、锚点和渲染缩放另有条件。先画水平与垂直参照轴，保留原点，再记录实际画面方向，而非用纸面值替代测量。
+
+## 用斜体与旋转两个反例限制推断
+
+另存一份副本，只把第一段i0改为i1而fax、fay仍为零，另一个副本只改frz为十度；它们分别检验字体斜体与旋转，不与原三条件混成同一组结果。斜体可能调用另一套字形，并非保证与0.25错切完全相同；旋转会改变整体方向，也不等于只沿一轴错切。文档还说明错切在旋转之后进行且坐标系统不受org影响，本课因此先固定旋转为零，不把复杂标签组合的顺序猜成随便可交换。反例只看自己真正生成的版本。
+
+## 播放时先核字幕身份再核外观
+
+将自己完整ASS副本按云映安装版实际支持的路径关联到同一原片，先核AB12能显示、三段时刻正确、没有同时叠上另一份字幕。各取区间内部的位置观察，不在恰好切换时下结论；保持播放器显示模式、字号覆盖和方向一致，若某项不能固定就写进条件表。实际有错切差异、没有差异或字幕未解析都按所见记，不能因为外部编辑器能显示便替云映填通过。公开字幕能力不代表每一种ASS覆盖指令在所有引擎表现一致。
+
+## 按解析、覆盖与裁边次序排障
+
+若出现指令原文，先核ASS结构与事件Format；若三段都斜，查Default是否本来斜体、是否读取了旧文件或另有标签；若变形后少字，先检查字幕框与画面边缘，不把裁边误判成字符被删除。每次只调整故障副本一个条件并保留正常第一段，不同时换字体、改旋转和加粗。把可读性与标签是否生效分成两项，过强变形即使发生也可能难读。文档提示常用因子较小，本例0.25用于温和对照，不靠极端数值制造必然的兼容结论。
+
+## 重开交付三段对照与参数边界
+
+保存合法完整ASS、三行原样片段、外部H与V点值和实际观察表，重开原片后再次核同一字幕身份。能够指出哪一段只改fax、哪一段只改fay，并解释为什么i1与frz十度不属于同一个变量。原片方向与内容保持，修改只在自己的字幕副本；尚未关联播放或未核反例就明确留待做。最后不把纸面点位说成实测字体像素、不声称云映有自动错切编辑功能，也不根据一种字体的一次结果保证别的字体、脚本尺寸和输出设备。
+
+## 相关教程与资料
+
+[云映 ASS 旋转原点：把定位锚点与转轴位置分开](<https://allluckly.cn/guides/icouldplay-ass-rotation-origin-position-anchor-quarter-turn/>)、[云映 ASS 定位核对：分开脚本坐标、锚点与设备像素](<https://allluckly.cn/guides/icouldplay-ass-pos-script-coordinate-display-pixels/>)。
+
+方法来源：[Aegisub ASS tags: text shearing, rotation and italics](<https://aegisub.org/docs/latest/ass_tags/>)。
+
+资料核对：2026年11月18日，[云映官方商店](<https://apps.apple.com/cn/app/id6755653178>)与[Apple公开查询](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261118-hls>)列出1.1.1，最低iOS / iPadOS 15.0。文本与演算在外部手工准备，云映用于自己的已有真实来源选择和播放观察，入口按安装版本实际可见为准。占位地址不提供媒体或密钥。文法审核、假定算例、真实字节资料和观看分别记录，没有执行的步骤明确未执行；未声称完成真机、私人服务器、所有引擎或输出设备逐项兼容测试。
+{% endraw %}

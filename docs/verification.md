@@ -1,5 +1,18 @@
 # 验证记录
 
+## 2026-11-18：七款应用各新增10篇中文及完整英文教程
+
+- 首次完整流程在双语目录验证发现云映英文新增阶段误用旧编号；修正为191–195和196–200并恢复原阶段。另为漫阅与书屿四个历史、四个新增阶段补齐确定性ID和由原summary保留的description，所有原字段值不变。首次失败记录保留，修正后重新执行两轮production构建及全部验证；前后共四次构建成功，最终两次对应修正后资源。
+- 新增70篇中文详细教程及70篇完整英文；Aquarell240篇、漫阅+240篇、VectorPaint240篇、书屿220篇、云映200篇、调调40篇、键来40篇，Yearn保留20篇。全站1240篇中文教程、8条真实学习路线。14个新增阶段、连续编号及逐篇来源见[本批证据](tutorial-evidence-20261118.md)。
+- 重新核当日Apple公开版本、系统和实际能力；漫阅+当前2.0.6，在中英文介绍补充公开备份恢复范围并保留2.0.5历史说明。调调RU/CN和键来FI/CN交叉核身份，官方截图与功能说明分项留证，不把外部任务或宿主行为当未发布功能。
+- 中文正文共115,871汉字，单篇1,503–1,936汉字，不含frontmatter、含资料段；字数只用于发现缺稿。70对完整中英文均经独立跨组全文复核，最终140份源译SHA绑定。实际Liquid→Kramdown结构、字面代码、ID、内链、原始日期、作者和UTC通过，未发现实质长段整段复用。
+- 原创材料、任务条件、计算、反例、结果检查和排障分别审阅。App真机、私人服务器、所有键盘宿主、加密、编解码或设备输出未执行的项目均不记为通过；静态核验与网站抽查有明确范围。
+- 两轮production Jekyll3.10构建通过，两轮之间导出语义原文并生成Markdown、阅读目录和技能摘要。实际启动显式设置JEKYLL_ENV=production并使用Homebrew Ruby；23项按顺序成功。站点结果：3096 JSON-LD graphs, 3092 sitemap URLs, Atom feed, 2676 new/updated pages, 1240 detailed tutorials, 8 complete learning routes and 8 work videos。
+- 双语结果：1406 reciprocal language pairs, 1377/1377 complete English articles, preserved code/attribution/dates, localized collections and captions。当前旧技术文章、专题和阅读说明验证通过。
+- Markdown结果：2812 pages (2754 articles, 58 entry pages); 2378 code blocks and 4040 inline code nodes preserved; 0 files changed Generated sources are current.；阅读目录：Checked 40 llms.txt indexes; 2772 unique direct Markdown targets; 0 changed files.。技能摘要、Agent访问/搜索、API目录、统计/站点脚本及图标检查通过；两语言搜索各1377条，本批每种语言70条新记录齐全。
+- 原生Safari抽查本批正文、任务样本、实际语言点击与目录定位，以及手机宽度下的长标题和新增学习阶段；结束后恢复桌面。范围见本机忽略目录output/tutorials-20261118/safari-qa.json，网页检查不等于App真机操作。
+- 发布前通过GitHub Desktop同步origin/master，基线1a26684。2614份旧文章与译文逐字节保持，无删除或其他任务改动；git diff --check与281个新增文件独立空白检查通过。Worker候选仅新增140条真实公开路由至2812，保留2672条旧路由及原处理逻辑。GitHub Desktop负责提交/推送；精确提交的Pages部署、边缘路由及线上目录/搜索/HTML/Markdown另核，本地检查不记为上线。
+
 ## 2026-11-17：七款应用各新增 10 篇中文及完整英文教程
 
 - 新增70篇中文详细教程及70篇完整英文；Aquarell、VectorPaint、漫阅+各230篇，书屿210篇，云映190篇，调调与键来各30篇，Yearn保留20篇。全站1170篇中文教程与8条真实学习路线，14个新增阶段、连续编号和逐篇资料见[本批证据](tutorial-evidence-20261117.md)。

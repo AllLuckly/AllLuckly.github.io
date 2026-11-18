@@ -1,0 +1,79 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: iCouldPlay two-tone beats:440 and442 Hz are not a new2-Hz track
+description: Audit2-Hz beats, a441-Hz carrier and absolute envelope under fixed phase/amplitude, separating envelope
+  maxima from instantaneous samples.
+permalink: /en/guides/icouldplay-two-tone-beats-difference-frequency-carrier-envelope/
+date: '2026-11-18 00:00:00 +08:00'
+modified: '2026-11-18 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 200
+topic: Media values and sound models
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-18-icouldplay-two-tone-beats-difference-frequency-carrier-envelope.md
+source_url: /guides/icouldplay-two-tone-beats-difference-frequency-carrier-envelope/
+translation_method: editorial
+translation_source_sha256: f426156f5fe72d2366c5773ed2762122dc0e2056ef95e8f8d47af6ad12474779
+translation_date: '2026-11-18T02:00:55+00:00'
+excerpt: Audit2-Hz beats, a441-Hz carrier and absolute envelope under fixed phase/amplitude, separating envelope
+  maxima from instantaneous samples.
+---
+{% raw %}
+<p>Two nearby tones can produce periodic strength changes without creating a third low-frequency track. Prepare two sine sources and their equal-gain sum externally, keeping formula, material production and actual iCouldPlay listening separate. Without generation/measurement evidence, claim no exact beat detection from arbitrary music.</p>
+
+<h2 id="section-1">Fix frequency, phase and amplitude</h2>
+
+<p>Define x1=0.2sin(2π440t),x2=0.2sin(2π442t), with seconds t and zero starting phase, provisionally two-second mono sources.0.2 uses one normalized amplitude convention, not a player-volume percentage. Generate externally; iCouldPlay is not assumed to contain an oscillator. Retain originals, pre/post-sum data and generation records. Two unrelated songs are not controlled sines. If a tool cannot establish frequency/phase, complete the paper exercise and leave material conditions unknown instead of guessing.</p>
+
+<h2 id="section-2">Separate carrier and envelope through an identity</h2>
+
+<p>The sum is0.4cos(2πt)sin(2π441t). The fast sine carrier uses mean frequency 441 Hz. The signed slow cosine has frequency 1 Hz, while its absolute envelope repeats every 0.5 s, giving beat frequency|442−440|=2 Hz. Name all three roles:441 is not the beat rate and the signed 1-Hz factor does not mean one envelope maximum per second. This is another expression for the same two-tone sum, not an automatically added 2-Hz spectral track or doubled playback speed.</p>
+
+<h2 id="section-3">Check five envelope points without calling them waveform peaks</h2>
+
+<p>At t=0,0.25,0.5,0.75,1 s the absolute envelope is0.4,0,0.4,0,0.4. Those are envelope values, not necessarily instantaneous waveform peaks. At t=0 both sines are zero: sample 0 coexists with maximum envelope. Keep waveform and envelope rows separate. A negative cosine changes the fast factor’s polarity rather than creating negative volume. Record actual perception/output conditions separately; a five-point table does not prove identical heard pulses for every listener.</p>
+
+<pre><code class="language-text">t in seconds; both sources start at phase zero
+x1=0.2*sin(2*pi*440*t); x2=0.2*sin(2*pi*442*t)
+x1+x2=0.4*cos(2*pi*t)*sin(2*pi*441*t)
+absolute envelope=0.4*abs(cos(2*pi*t))
+t:                  0     0.25     0.5     0.75     1
+absolute envelope:  0.4   0        0.4     0        0.4
+actual sample at t=0 is ZERO, not 0.4
+beat rate=abs(442-440)=2 Hz; carrier=(440+442)/2=441 Hz
+control440+440: no slow beat envelope
+control440+443: beats3 Hz; carrier441.5 Hz
+</code></pre>
+
+<h2 id="section-4">Make equal-frequency and changed-difference controls</h2>
+
+<p>Control 1 sets both frequencies to440 with equal phase, yielding 0.4sin(2π440t) without this slow envelope; greater amplitude is not faster beats. Control 2 changes only 442→443: beat rate 3 Hz and mean carrier 441.5 Hz require new envelope points, not the original quarter-second zeros. Save controls separately. Changing amplitude or phase adds conditions, and ideal complete zeros are not guaranteed for unknown recordings.</p>
+
+<h2 id="section-5">Preserve addition without hidden normalization in production</h2>
+
+<p>With external tools use matching rates/durations and record any automatic normalization or limiting during summing. The ideal absolute upper bound is0.4, permitting moderate production levels without raising device volume. Burn identities for originals, sum and controls into an owned explanation clip, retaining project/export evidence. Paper formulas are not audio files. Sound and displayed envelope must share their declared time origin rather than moving the plot arbitrarily and calling phase verified.</p>
+
+<h2 id="section-6">Record single-tone and summed playback separately</h2>
+
+<p>Open the identified clip through an existing source, reading each label before comparing originals, sum and controls at normal speed with fixed output and comfortable volume. Record perceived strength changes without demanding exact 441 Hz or millisecond zeros by ear. System processing, compression and generation error can affect results. A different output or single earpiece is a new condition. Successful playback establishes that material path, not automatic beat analysis or creation of a third media track.</p>
+
+<h2 id="section-7">Troubleshoot frequency difference, phase and identity</h2>
+
+<p>For one recorded maximum per second, inspect the missing absolute value. For waveform sample 0.4 at zero, check confusion with the envelope. Unexpected real strength changes call for verifying source frequencies, phases, gains and processing externally, not changing all settings until a desired result appears. Repair one copy factor and retain both formulas. Beat frequency and metronome tempo are different concepts;2 Hz is neither musical tempo nor a speaker count in dialogue. Keep labels and values tied to evidence.</p>
+
+<h2 id="section-8">Reopen with frequencies, envelope and actual observations</h2>
+
+<p>Save the440/442 definitions,441-Hz carrier,2-Hz beat rate, five-point envelope and two controls. Reopen to verify units and starting phase. Repeat only available iCouldPlay materials/conditions, leaving generation, export or listening pending when unperformed. Explain how a signed 1-Hz factor gives a2-Hz absolute envelope and why maximum envelope at zero still has sample 0. Retain projects and unknown processing, claiming no built-in spectrum detector, source separation, hearing test or preservation of exact beat detail on every device.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/icouldplay-music-pulse-subdivision-interval-count/">iCouldPlay beat practice: separate pulses, subdivisions and elapsed intervals</a>; <a href="/en/guides/icouldplay-audio-polarity-inversion-mono-cancellation-model/">iCouldPlay polarity comparison: why normal solo audio can cancel in a mono model</a>.</p>
+
+<p>Method sources: <a href="https://openstax.org/books/university-physics-volume-1/pages/17-6-beats">OpenStax University Physics Volume 1 §17.6: beats</a>.</p>
+
+<p>Checked on 18 November 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261118-hls">Apple public lookup</a> list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.</p>
+{% endraw %}

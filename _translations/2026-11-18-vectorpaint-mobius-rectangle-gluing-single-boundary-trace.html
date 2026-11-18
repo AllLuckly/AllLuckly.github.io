@@ -1,0 +1,78 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint Möbius strip: reversed end identification joins two long edges into one boundary'
+description: Trace boundary edges through endpoint classes on a unit rectangle, contrasting cylinder gluing without
+  inferring topology from a crossing sketch.
+permalink: /en/guides/vectorpaint-mobius-rectangle-gluing-single-boundary-trace/
+date: '2026-11-18 00:00:00 +08:00'
+modified: '2026-11-18 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 240
+topic: Discrete updates, cycles and boundaries
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-18-vectorpaint-mobius-rectangle-gluing-single-boundary-trace.md
+source_url: /guides/vectorpaint-mobius-rectangle-gluing-single-boundary-trace/
+translation_method: editorial
+translation_source_sha256: 06561d0413360cd65f3830abfa59ed23191decf78a4941b546894c97cf6fe690
+translation_date: '2026-11-18T02:09:42+00:00'
+excerpt: Trace boundary edges through endpoint classes on a unit rectangle, contrasting cylinder gluing without
+  inferring topology from a crossing sketch.
+---
+{% raw %}
+<p>Draw a rectangle-identification diagram naming the glued edges and endpoint pairings, then trace closed boundary walks. A crossing or occlusion alone does not prove a Möbius half-twist. Deliver a two-dimensional definition diagram and boundary ledger, without requiring physical twisting/cutting or App 3D modelling.</p>
+
+<h2 id="section-1">Declare the unit rectangle and reversed identification</h2>
+
+<p>Take(x,t)∈[0,1]×[0,1], identifying left(0,t) with right(1,1−t). The opposite-end parameter is 1−t, not the same height. Interior points do not all merge, and glued vertical edges become a seam rather than remaining boundary. Create rectangle, pairing, long-edge trace and cylinder-control layers; save native work. These are abstract parameters without centimetres/material thickness. The ideal surface definition, not stroke width, determines topology or boundary; it establishes no mechanical performance.</p>
+
+<h2 id="section-2">Write two equivalence classes for four corners</h2>
+
+<p>Name L0=(0,0),L1=(0,1),R0=(1,0),R1=(1,1). Reversed gluing gives classes L0~R1 and L1~R0. Write two pairing rows before matching letters on opposite ends; do not pair equal-height corners. On a suggested 2200×1700 canvas use L0=(350,800),L1=(350,300),R0=(1750,800),R1=(1750,300). Screen Y increases downward, so increasing t goes upward. Use parameter-corner names rather than infer numbering from screen direction.</p>
+
+<h2 id="section-3">Trace from the bottom edge through the seam to the top</h2>
+
+<p>Start L0 along bottom t=0 to R0, identified with L1. Continue along top t=1 from L1 to R1, identified with L0, closing one walk containing both long edges. Thus the remaining boundary has one connected component. Draw segment arrows and equivalence signs at seam jumps; external pairing leaders are not extra boundary. Glued vertical edges are excluded. Traversing all four rectangle edges instead traces the unglued sheet perimeter, not the quotient surface’s boundary.</p>
+
+<h2 id="section-4">Use same-height gluing as a two-boundary cylinder control</h2>
+
+<p>Save a control changing only identification to(0,t)~(1,t): L0~R0 and L1~R1. The bottom closes on itself, while the top forms another closed walk, giving a cylinder two boundary components. Keep dimensions, long edges and corner names, changing only pairing. Both panels can remain flat rectangles yet have different results: identification, not a 3D-looking silhouette, determines topology. State one/two components in words rather than treating one/two colours as proof.</p>
+
+<pre><code class="language-text">rectangle: 0&lt;=x&lt;=1, 0&lt;=t&lt;=1
+Mobius gluing: (0,t)~(1,1-t)
+L0~R1; L1~R0
+boundary: L0 -&gt;bottom-&gt; R0~L1 -&gt;top-&gt; R1~L0
+remaining boundary components=1
+cylinder gluing: (0,t)~(1,t)
+L0~R0; L1~R1
+bottom closes separately; top closes separately
+remaining boundary components=2
+</code></pre>
+
+<h2 id="section-5">Distinguish boundary count from one-sided nonorientability</h2>
+
+<p>The Möbius strip is one-sided and nonorientable: transporting a local normal around its centre reverses direction, preventing a globally consistent continuous normal. This and “one boundary component” describe the same surface but are not interchangeable definitions or proofs. Note half-twist normal reversal separately; the main verification here is endpoint boundary tracing. Two paint colours or seeing only a front face do not determine orientability. Occlusion, view angle and planar fill do not change the identification.</p>
+
+<h2 id="section-6">Prevent a crossing sketch from adding false identifications</h2>
+
+<p>If a band silhouette aids reading, use an over/under gap or pale shading at a projected crossing without identifying the surface points there. The rectangle pairing table remains authoritative; decoration cannot overwrite it. Organize paths, Bézier nodes and text manually, then adjust occlusion layers, with no requirement for automatic 3D twisting. Joining every crossing edge at one node suggests another quotient space. Recheck pairings rather than conceal the error with realistic gradients. The boundary proof remains complete without a 3D inset.</p>
+
+<h2 id="section-7">Diagnose pairings rather than guess from appearance</h2>
+
+<p>Two components in the Möbius panel suggest mistaken L0~R0 pairing; four open edges suggest an unglued seam; one class for all corners suggests accidentally merging the two classes. Start at a long-edge endpoint, stop on returning to its equivalence class, then check for unvisited long edges. Retain failed and corrected traces with every seam jump justified. Traversing two segments does not mean two boundary components: count closed connected loops, not drawn segments or screen panels.</p>
+
+<h2 id="section-8">Reopen and recover one loop versus two from corner classes</h2>
+
+<p>Save editable rectangles, pairing tables and trace arrows; inspect SVG/PDF and a separately opened PNG. At reduced size distinguish gluing rules; enlarge 1−t,0/1 subscripts and equivalence signs. Reopen, hide conclusions, recover one Möbius loop/two cylinder loops, and check that projected crossings add no gluing. Deliver definition, corner classes, boundary walks and a separate one-sidedness explanation, marking unperformed output/reopening pending. Claim no physical cutting/material test, 3D modelling or automatic topology recognition; the manual diagram makes rules transparent and auditable.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-woven-colour-strips/">VectorPaint woven strips: verify alternating over-and-under crossings</a>; <a href="/en/guides/vectorpaint-cyclic-overlap-triangle/">VectorPaint cyclic-overlap triangles: control three crossings with local segments</a>.</p>
+
+<p>Method sources: <a href="https://mathworld.wolfram.com/MoebiusStrip.html">MathWorld Möbius Strip</a>.</p>
+
+<p>Version and operation scope: checked on 18 November 2026 against the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261118-vectorpaint">Apple public lookup</a>: version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.</p>
+{% endraw %}

@@ -1,0 +1,69 @@
+---
+layout: guide
+author: Bison
+app_id: nas_book
+title: 书屿黎明别离诗细读：先找惜夜与离别，不把清晨景色单独当诗体证据
+description: 按原创四行和明示情境核黎明、两位恋人、离开动作与未说出的原因，不预设固定韵式。
+permalink: /guides/nasbook-aubade-dawn-parting-speaker-time-form-evidence/
+date: '2026-11-18 00:00:00 +08:00'
+modified: '2026-11-18 00:00:00 +08:00'
+category: 教程
+level: 进阶
+series_order: 220
+topic: 语词、诗行与情境的证据
+reading_time: 10
+---
+
+黎明出现在一首诗里，还要看它如何结束夜晚、触发离别或带来留恋。本课在书屿读一张原创aubade样卡，分开作者给定情境、诗中时间线索与读者作用解释。类型判断不是自动关键词分类，也不把诗里的“我”认成真实作者的经历。
+
+## 先保留四作者行与情境说明的边界
+
+外部保存A四行与单独的情境说明：两位恋人在共同度过的夜晚结束后，必须在黎明分别。说明是本课给定背景，不算第五行，也不是从一个代词自动推出的事实。另存B为对照，导出固定行界PDF或清楚标行EPUB，留可编辑稿。导入书屿先核L1到L4完整、说明与正文分区，为A加书签。手机折行不改变四行数；不要先读文件名含aubade就跳过背景与动作证据，也不把自己补的后日重逢写入原文。
+
+```text
+A context: two lovers must part at dawn after a night together.
+L1: The first tram rings below your windowpane.
+L2: I fold the note and leave before the rain.
+L3: You wake; the milk-white east divides the sky.
+L4: We count the bells instead of saying why.
+
+B: morning-only control
+L1: At dawn the tram begins its rounds.
+L2: I check the clock and count the stops.
+```
+
+## 类型定义先留often而非硬性全部
+
+Academy of American Poets将aubade说明为迎接清晨而留恋夜晚结束的黎明歌，常涉及恋人的分别。常见情境不等于每首都必须同一对恋人、同一行数或同一悲伤强度。本课检查A属于这类黎明离别场景的哪些证据，不把它缩成“出现太阳就算”或“没有哭泣就不算”。把黎明、夜晚结束、离别或惜夜关系列成问题表，分别找原句与给定背景；定义里的常见、可能与必需不能在笔记里悄悄换词。
+
+## 时间线索与城市钟声一起核
+
+A给定背景明说黎明，L1的first tram与L3的milk-white east提供相应的城市声响和渐亮意象。首班车在真实城市未必恰是日出，所以单独一句first tram不能用于计算太阳高度或精确钟点；本题背景与诗句共同提供阅读条件。L2的before the rain把离开放在预期雨之前，未写已经落雨。把明说时间、相对先后和读者联想分开，不能因东边天色就补出季节、纬度或哪座城市，也不把画面亮度当真实气象仪器读数。
+
+## I、you、we追两人关系而不认作者本人
+
+L1的your、L3的You指向被对话或想及的对象；L2的I承担折信和离开的动作，L4的We在本课两人情境中将两者纳入共同数钟的瞬间。恋人关系来自给定说明和整体阅读，不由任何一个you在所有诗中都自动成立。写笔记时用“说话者”“对象”标身份，不把I替换为Bison的真实行程。原文未给姓名、性别或恋爱时长，不能从windowpane或note推断；角色与作者、语法主语与真实人物须保留不同栏。
+
+## 离开与回避说明构成作用候选
+
+fold the note、leave与instead of saying why共同把动作安排到天亮后的分别附近。可以提出不舍、克制或回避直说原因的候选，并给每种解释配词。原文没有写永久离开、分手或死亡，也没写信里内容；不能因为晨别传统常有哀伤，就替这张卡补悲剧结局。We count the bells让注意转向可数声音，但不直接证明两人毫无情感。题设背景给必要情境，诗句仍留解释空间；把有支持的语气与尚无证据的故事事实分层记录。
+
+## 形式可另记，不能代替情境条件
+
+A的windowpane与rain、sky与why按常见读音可配成AABB，但这是本课原创样卡的形式，不是所有aubade固定四行且AABB。删去韵也不自动消除黎明别离关系，保留韵却改成单纯天气说明也不自动保留本课场景。B只写晨间电车与看钟数站，没有A的恋人背景、惜夜与分别关系；它不足以证明本课所核的离别分支，但不能据此否定所有更宽的晨歌用法。形式分类与情境类型要各列证据，不用一个韵式包办。
+
+## 按背景来源与未证信息排障
+
+看到first就判黎明，回查背景是否真给了时段；看到We就认定是作者与某位真实伴侣，退回角色表。将雨已降、信是诀别信写成事实时，逐句寻找证据，没有就标未证。若文件转换漏掉instead of，语气关系会改变，应先核原稿而非继续套旧解释。只改自己的笔记副本，保留题设背景与四行各自身份；没有实际朗读或高亮就留待做，不把软件搜索到dawn或why当成已完成诗体分析。
+
+## 重开用时间、角色、动作三栏验收
+
+重开A不看笔记，先说黎明背景与两项诗句线索，再给I、you、we的角色关系及离开动作。到B解释为什么仅有晨景不足以证成当前分别情境，最后指出AABB与四行不是全部定义。交付原文、情境表、两种可讨论语气及一条未证结局，未执行的书签重开照实待办。读者得到的是有依据的类型阅读，不声称书屿自动识别aubade、判定作者私生活或已在真机上完成文学情绪测量。
+
+## 相关教程与资料
+
+[书屿诗歌代词笔记：分清谁在说、对谁说与代词指谁](/guides/nasbook-poem-pronoun-speaker-reference/)、[书屿聚焦细读：分开讲述声音、感知线索与可达信息范围](/guides/nasbook-focalization-information-voice-perception/)。
+
+方法依据：[Academy of American Poets：Aubade](https://poets.org/glossary/aubade)。本课图、报告数据、错例及记录表均为原创练习。
+
+版本核对：2026年11月18日，[Apple公开查询](https://itunes.apple.com/lookup?id=6766198898&country=cn&entity=software&timestamp=20261118)显示书屿1.1.4，最低iOS / iPadOS 15.6；公开能力见[官方App Store](https://apps.apple.com/cn/app/id6766198898)。本课使用自制PDF、EPUB或清楚的文本材料阅读，书签、高亮和笔记依实际格式与可见入口操作，不假定自动求解或文学分析功能。外部制作与纸面预期不等于已做真机观察，未执行项目照实留空。

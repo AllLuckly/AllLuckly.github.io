@@ -1,0 +1,77 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay interval samples: adding220 Hz does not give equal octave gaps'
+description: Fix a220-Hz reference and audit frequency ratios and log2 intervals, separating frequency, level, tempo
+  and actual listening.
+permalink: /en/guides/icouldplay-frequency-ratio-octave-reference-linear-hertz-spacing/
+date: '2026-11-18 00:00:00 +08:00'
+modified: '2026-11-18 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 199
+topic: Media values and sound models
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-18-icouldplay-frequency-ratio-octave-reference-linear-hertz-spacing.md
+source_url: /guides/icouldplay-frequency-ratio-octave-reference-linear-hertz-spacing/
+translation_method: editorial
+translation_source_sha256: 0dcb25caff18793bad3d70d11be54832fb5ba36befac73fc613f828da113bdde
+translation_date: '2026-11-18T02:36:24+00:00'
+excerpt: Fix a220-Hz reference and audit frequency ratios and log2 intervals, separating frequency, level, tempo
+  and actual listening.
+---
+{% raw %}
+<p>Equal differences in hertz do not imply equal musical intervals. Build an external ratio ledger and owned explanation clip for four frequencies, then follow its labels in iCouldPlay. Separate frequency units, reference and actual level, rather than use playback-speed changes to manufacture the four source samples.</p>
+
+<h2 id="section-1">Fix four frequencies and the reference</h2>
+
+<p>Use target frequencies 220,440,660,880 Hz with common reference 220 Hz, provisionally three seconds each, the same waveform type and production gain. Establish frequency from generation records or known source, not a title or guessed voice pitch. Without generation tools complete the ledger and leave listening pending; four renamed copies are not four frequency sources. These are teaching numbers, not a full tuning system. In particular an integer 660 is not automatically the exact equal-tempered frequency of a named note.</p>
+
+<h2 id="section-2">Separate hertz differences, ratios and intervals</h2>
+
+<p>Adjacent frequencies all increase by220 Hz, but adjacent ratios are2,3/2 and4/3. An octave uses a2:1 frequency ratio, so only the first adjacent pair is exactly an octave. Retain integer fractions and their source pair before decimals. Hertz counts cycles per second, not beats per minute, and three-second duration is not frequency. Increasing frequency labels do not imply increasing level; production gain and frequency are distinct conditions.</p>
+
+<h2 id="section-3">Calculate cumulative octaves from one reference</h2>
+
+<p>With n=log2(f/220), the cumulative octave counts are 0, 1, about 1.584963, and 2. The ratio 660/220=3 does not mean three octaves: three octaves require an eightfold ratio. Moving 440→880 spans one octave, while 220→880 spans two, showing why the reference matters. Adjacent gaps are approximately 1, 0.584963, and 0.415037 octaves, summing to 2. Six displayed decimals are approximate; retain exact ratios and logarithmic definitions rather than manufacture discrepancies from rounding.</p>
+
+<pre><code class="language-text">common reference f0=220 Hz
+f (Hz):              220        440        660          880
+f/f0:                  1          2          3            4
+log2(f/f0):            0          1          1.584963     2
+adjacent ratios:             2         3/2          4/3
+adjacent octave gaps:        1         0.584963     0.415037
+doubling control: 220 -&gt; 440 -&gt; 880; one octave per step
+440 -&gt; 880 is ONE octave; 220 -&gt; 880 is TWO octaves
+</code></pre>
+
+<h2 id="section-4">Prepare doubling and equal-addition controls</h2>
+
+<p>Compare the doubling sequence 220,440,880, whose two steps are each one octave, with the original equal-addition four-value sequence. Shared points do not make identical groupings; removing 660 changes the original task. A440/660 control has ratio 1.5 rather than 2, showing only that it is not an octave without assigning a name in every tuning system. Label adjacent versus common-reference questions with explicit values rather than low/middle/high, so reopening remains auditable.</p>
+
+<h2 id="section-5">Prepare equal-condition three-second materials externally</h2>
+
+<p>With external tools generate four materials using controls actually available, holding waveform, duration, rate and production gain fixed. Equal short edge fades may avoid abrupt transitions, but record affected intervals. Burn frequency/source identities into an owned explanation video and retain source audio/export records. Establish four genuine source identities rather than substitute iCouldPlay speed changes. Record rate/codec conversions; a setting alone does not establish exact final frequency or unchanged amplitude throughout.</p>
+
+<h2 id="section-6">Read the current frequency before comparing in iCouldPlay</h2>
+
+<p>Open the explanation through an existing source with normal speed, fixed output and comfortable everyday level. Read each label and follow the original order, recording perceived rises without demanding exact hertz by ear. Equal production gain does not guarantee equal perceived loudness; changing individual levels adds a variable. For an inaudible part inspect source, track and output rather than conclude that the frequency does not exist or the app blocks it. Without listening, deliver ratios only and do not pass listening checks.</p>
+
+<h2 id="section-7">Troubleshoot units, reference and processing records</h2>
+
+<p>For660 labelled three octaves, check ratio versus logarithm. For440→880 labelled two octaves, check accidental use of the220 reference. If only one source was pitch-changed, inspect files and speed state. Correct one failure-card factor while retaining the four targets, rather than alter numbers to match expectations. Note names, plugin readings and mathematical frequencies have different provenance. Claim no detector use without executing it, and keep system volume, file peaks and tempo outside the frequency-ratio equation.</p>
+
+<h2 id="section-8">Reopen with four identities and both interval types</h2>
+
+<p>Save frequencies, adjacent ratios, reference-relative octaves, adjacent gaps and export evidence. Reopen by recomputing 220→880 as two octaves and checking 660’s threefold ratio. In iCouldPlay verify the same material order/normal speed while retaining unknown output stages. Explain unequal intervals despite equal 220-Hz additions, fixed-reference requirements and level versus loudness. Leave generation, export and listening individually pending when unperformed, claiming no built-in pitch generation/analysis, tuning measurement, hearing test or identical device perception.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/icouldplay-speed-pitch-preservation-control-copies/">iCouldPlay speed comparisons: separate duration, pitch and pitch-preserving processing</a>; <a href="/en/guides/icouldplay-music-pulse-subdivision-interval-count/">iCouldPlay beat practice: separate pulses, subdivisions and elapsed intervals</a>.</p>
+
+<p>Method sources: <a href="https://newt.phys.unsw.edu.au/jw/notes.html">UNSW Music Acoustics: frequency ratios and octave calculations</a>.</p>
+
+<p>Checked on 18 November 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261118-hls">Apple public lookup</a> list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.</p>
+{% endraw %}

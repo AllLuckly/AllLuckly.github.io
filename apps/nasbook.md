@@ -4,7 +4,7 @@ app_id: nas_book
 title: 书屿：iPhone 与 iPad 电子书阅读器、NAS 与 Calibre 个人书库
 description: 了解书屿的本地导入、WebDAV、SMB、OPDS、Calibre、笔记与阅读数据同步，并按 180 篇中文教程建立自己的阅读流程。
 permalink: /apps/nasbook/
-modified: 2026-11-17
+modified: 2026-11-18
 ---
 
 书屿把本地电子书和个人 NAS 书库接到手机、平板的书架中，适合已经有一批书籍文件，希望自己整理、阅读和保存笔记的人。

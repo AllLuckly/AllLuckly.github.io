@@ -5,7 +5,7 @@ title: 'Book Isle: Ebook Reader for iPhone and iPad'
 description: Learn about Book Isle local imports, WebDAV, SMB, OPDS, Calibre, notes and reading-data sync through a 180-tutorial
   learning path.
 permalink: /en/apps/nasbook/
-modified: 2026-11-17
+modified: 2026-11-18
 lang: en
 source_url: /apps/nasbook/
 ---

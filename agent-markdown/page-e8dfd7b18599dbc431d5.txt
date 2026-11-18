@@ -1,0 +1,80 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-signed-sixteen-bit-pcm-quantization-grid-endpoint-asymmetry/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay PCM quantization: why signed16-bit endpoints are asymmetric'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-signed-sixteen-bit-pcm-quantization-grid-endpoint-asymmetry/
+agent_source_sha256: 29da0d14224dbc73519359f7252c53c563c83d02226e3b3afe321c0c33b677f6
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay PCM quantization: why signed16-bit endpoints are asymmetric
+
+Language: en
+Canonical: [iCouldPlay PCM quantization: why signed16-bit endpoints are asymmetric](<https://allluckly.cn/en/guides/icouldplay-signed-sixteen-bit-pcm-quantization-grid-endpoint-asymmetry/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-signed-sixteen-bit-pcm-quantization-grid-endpoint-asymmetry/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-signed-sixteen-bit-pcm-quantization-grid-endpoint-asymmetry/>)
+Published: 2026-11-18T00:00:00+08:00
+Modified: 2026-11-18T10:04:17+08:00
+Author: Bison
+
+Fix two’s-complement and s/32768 normalization to audit steps, clipping and little-endian bytes without claiming sample-perfect playback.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-signed-sixteen-bit-pcm-quantization-grid-endpoint-asymmetry/>), translated on 2026-11-18. Original publication dates, attribution, code and version notes are retained.
+
+Sixteen bits specify a code count, not exact storage of every floating amplitude. Build a numeric grid under an explicit signed-PCM mapping, then use an owned explanation clip to separate source samples, packaging and playback. Normal sound does not establish sample-perfect preservation across an output chain.
+
+## Fix integer and normalization conventions
+
+Restrict source data to signed 16-bit two’s-complement PCM, s=−32768…32767, normalized as x=s/32768. Zero is integer 0, unlike the midpoint code common in unsigned 8-bit PCM. Floating PCM or another normalization needs a separate case; a WAV extension alone is insufficient. Record encoding, valid bits, byte order, channels and sample rate externally while retaining source audio. No binary sample inspector is assumed in iCouldPlay, and artwork or volume bars cannot fill unknown fields.
+
+## Count codes separately from adjacent intervals
+
+There are65536 integer codes but65535 adjacent intervals. The normalized step q=1/32768≈0.000030517578125. The negative endpoint is−1; the positive endpoint is1−q, not an extra nonexistent 32768 code. Check max−min+1 for code count and max−min for intervals separately. This is a representation range, not sound pressure, device power or a hearing/dynamic-range measurement, and it requires no full-scale endpoint playback.
+
+## Audit half-scale values, endpoints and little-endian bytes
+
+Under the stipulated mapping,0.5 gives 16384=hex4000, little-endian 00 40.−0.5 gives−16384, two’s-complement C000, little-endian 00 C0. Maximum 32767 is FF 7F; minimum−32768 is00 80. The following ledger is not a complete WAV with headers and cannot be imported as audio text. Separate bytes and signed interpretation.00 80 is not zero because its first byte is zero, and C000 is not unconditionally positive 49152.
+
+```text
+defined signed16-bit two's-complement model: x=s/32768
+s range: -32768..32767; codes=65536; intervals=65535
+q=1/32768=0.000030517578125
+     x                  s          little-endian hex bytes
+  0.5                16384          00 40
+ -0.5               -16384          00 C0
+  32767/32768        32767          FF 7F
+ -1                 -32768          00 80
+no-dither nearest model: Q(0.49*q)=0; Q(0.51*q)=q
+clamped model: Q(+1)=32767/32768; Q(-1)=-1
+```
+
+## Test two small inputs under a stated rounding rule
+
+Separately stipulate quantization as rounding 32768x to the nearest integer, positive half ties upward, then clamping to endpoints. Avoid ties with inputs 0.49q and0.51q: they become 0 andq. Nearby inputs can occupy different bins, and common output does not prove equal inputs. Record signed output-minus-input errors. Real tools may round or dither differently; without processing records this undithered model is not their observed algorithm, and tiny differences are not guaranteed audible.
+
+## Distinguish clipping from ordinary quantization
+
+Input+1 yields 32768 before clamping to32767, hence 1−q. Input−1 is already legal and remains−1. An out-of-range 1.25 cannot recover its peak shape by changing a filename’s bit count: multiple inputs collapse to one endpoint. Compare these on paper without raising device volume to maximum. Keep quantization, clipping, compression and later gain separate. Flat waveform tops require source/processing evidence; a player volume slider does not establish source clipping.
+
+## Prepare a numeric explanation and playable copy externally
+
+Create owned explanation frames for integers, bytes and grid, optionally adding moderate-level owned speech or silence, then export a known-readable clip. Retain original 16-bit PCM externally. If the movie audio becomes AAC or another encoding, record conversion instead of claiming sample identity with the PCM source. iCouldPlay reads the explanation and its actual audio; burned-in hex is not a built-in analyzer result. Without making the copy, deliver the paper ledger rather than call headerless bytes/formulas tested media.
+
+## Verify media identity before diagnosing sound
+
+Open the identified clip through an existing source, checking text, duration and audio identity with fixed output and comfortable everyday volume. Endpoint asymmetry need not be heard, and normal sound does not pass bit-perfect output. For silence first check whether the clip intentionally has no audio. For wrong byte labels inspect source endianness/sign rather than volume. Change one failure-copy condition while retaining reports. Record unknown mixing, resampling or lossy export separately; an unknown downstream stage does not invalidate every model number.
+
+## Reopen with range, grid and playback limits
+
+Save 65536 codes,65535 intervals, q, endpoints and four byte cases. Reopen and decode bytes to signed integers, then divide by32768. In iCouldPlay verify only the same explanation clip/readable recording, keeping viewing separate from external sample audit. Explain the positive endpoint below 1,0.49q rounding to0 and why renaming adds no valid bits. Leave unperformed export/playback pending, retain original recording/reports, and claim no built-in PCM editing, professional noise measurement or lossless certification of the full output chain.
+
+## Related tutorials and sources
+
+[iCouldPlay audio calculations: distinguish sample rate, bit depth and encoded bitrate](<https://allluckly.cn/en/guides/icouldplay-audio-sample-rate-bit-rate-size/>); [Listen to compressed dialogue in iCouldPlay: a four-to-one ratio is not quarter volume](<https://allluckly.cn/en/guides/icouldplay-audio-compression-threshold-ratio-makeup-static-ledger/>).
+
+Method sources: [ITU-R BS.1352-4 Attachment1 to Annex1 §2.2: PCM sample values and byte packing](<https://www.itu.int/dms_pubrec/itu-r/rec/bs/R-REC-BS.1352-4-202305-I%21%21PDF-E.pdf>).
+
+Checked on 18 November 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261118-hls>) list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.
+{% endraw %}

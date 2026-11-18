@@ -1,0 +1,58 @@
+---
+layout: guide
+author: Bison
+app_id: diaodiao
+title: '调调 lossless comparison: verify WAV/FLAC decoded samples before observing playback'
+description: Create FLAC from one integer-PCM master, compare externally decoded samples in one agreed representation
+  and separately record 调调 import and sound. Different whole files, matching decoded samples and audible playback
+  are three conclusions. Similar sound does not certify bit-perfect device output, and a duplicate skip is not a
+  second successful playback.
+permalink: /en/guides/diaodiao-wav-flac-decoded-pcm-equality-not-device-bitperfect/
+date: '2026-11-18 00:00:00 +08:00'
+modified: '2026-11-18 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 35
+topic: Source identity and audio boundaries
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-18-diaodiao-wav-flac-decoded-pcm-equality-not-device-bitperfect.md
+source_url: /guides/diaodiao-wav-flac-decoded-pcm-equality-not-device-bitperfect/
+translation_method: editorial
+translation_source_sha256: 644ab7276151aeaff73c8bc19456be696f5ee8fdd325123f59f81a249fdfa6b1
+translation_date: '2026-11-18T01:43:07+00:00'
+excerpt: Create FLAC from one integer-PCM master, compare externally decoded samples in one agreed representation
+  and separately record 调调 import and sound. Different whole files, matching decoded samples and audible playback
+  are three conclusions. Similar sound does not certify bit-perfect device output, and a duplicate skip is not a
+  second successful playback.
+---
+{% raw %}
+<p>Create FLAC from one integer-PCM master, compare externally decoded samples in one agreed representation and separately record 调调 import and sound. Different whole files, matching decoded samples and audible playback are three conclusions. Similar sound does not certify bit-perfect device output, and a duplicate skip is not a second successful playback.</p>
+<h2 id="section-1">1. Choose a clearly specified PCM master</h2>
+<p>Externally prepare an owned twenty-second WAV at 44,100 hertz, mono, signed sixteen-bit integer PCM, with recognizable sound. Verify stream properties through a tool; the WAV suffix does not prove integer PCM. Converting an old MP3 does not restore information already lost. Preserve the master and use new output names. A twenty-four-bit or floating source needs a different comparison agreement rather than silently adopting sixteen bits. Narrow conditions reduce resampling and quantization confounds. Without generation and verification, twenty seconds is a plan, not a measured sample count.</p>
+<h2 id="section-2">2. Encode FLAC and decode to one representation externally</h2>
+<p>With FFmpeg already available, use the three commands below: encode FLAC from the master, then decode each first audio stream into signed sixteen-bit little-endian raw PCM. Verify the input parameters first. No volume, mixing or sample-rate transformation is specified. No-overwrite behavior requires new output names; after a failure, an old file cannot count as newly generated. These raw files are only for external comparison, not headerless imports for 调调 to guess. Another tool must produce the same depth, channels, rate and byte order; do not compare one WAV including its header with one raw stream. Encoding and decoding occur in computer tools, not new 调调 functionality.</p>
+<pre><code>ffmpeg -n -i master35.wav -map 0:a:0 -c:a flac copy35.flac
+ffmpeg -n -i master35.wav -map 0:a:0 -c:a pcm_s16le -f s16le from-wav35.pcm
+ffmpeg -n -i copy35.flac -map 0:a:0 -c:a pcm_s16le -f s16le from-flac35.pcm
+</code></pre>
+<h2 id="section-3">3. Compare sample counts and payload lengths first</h2>
+<p>For the twenty-second target, mono sample count is 882,000, at two bytes each, giving 1,764,000 raw bytes. Check actual lengths and parameters first. Missing material, stereo conversion or a depth change breaks the agreement. Do not enter whole-WAV size as raw payload. If actual duration is not exactly twenty seconds, recompute from actual sample count rather than delete trailing bytes to fit the plan. Equal lengths still do not establish equal content; they are a preliminary necessary check. Keep planned values, actual samples and actual bytes in separate columns so a formula is not mistaken for file inspection.</p>
+<h2 id="section-4">4. Compare payloads rather than whole containers</h2>
+<p>Use an existing file comparator or hash tool on the two raw PCM outputs and record actual results. Matching SHA-256 values support byte identity in this controlled check; article expectations are not execution output. Whole WAV and FLAC files have different containers and compressed representations, so whole-file hashes are not required to match. The paper sequence minus one thousand, zero, one thousand, two thousand becomes the eight little-endian sixteen-bit bytes below. The same decoded samples should have the same representation. This is an illustrative control, not a hash from a generated twenty-second file. FLAC’s lossless goal is recovering input samples, not a fixed compression ratio for every source.</p>
+<pre><code>samples: -1000, 0, 1000, 2000
+s16le bytes: 18 fc 00 00 e8 03 d0 07
+</code></pre>
+<h2 id="section-5">5. Import separately and preserve duplicate responses</h2>
+<p>After external verification, import the actual WAV and FLAC, not the raw comparison files. Both formats are listed publicly, but system readability and duplicate handling remain conditions. Common-source samples may be skipped; two extensions do not guarantee two entries. Preserve a skip rather than alter sound or add noise to bypass deduplication while still claiming identical samples. If only one item is confirmed, app observations cover it and the other remains independently unverified. External sample equality remains evidence but is not a second playback result. No deletion of imported music or library clearing is required.</p>
+<h2 id="section-6">6. Fix the output and check audible identity</h2>
+<p>For each actual identifiable item, hear a known opening and middle passage under the same output, volume and ordinary playback conditions, recording title and visible duration. If both open independently, check each; one successful item cannot pass the other. Matching phrases establish identity and audibility of those passages, not equality of every sample or bit-perfect preservation through system mixing, volume and hardware. External decode equality and the device output chain are separate layers. This lesson provides checkable evidence for the former and observations for the latter, not professional output certification.</p>
+<h2 id="section-7">7. Diagnose parameter changes separately from import</h2>
+<p>For unequal raw data, first inspect master identity, resampling, depth conversion, export processing and output representation. Do not blame 调调 for an external step it has not participated in. If external data match but the app cannot open an asset, retain format, system and actual response as an import issue rather than refuting lossless coding. For perceived sound differences, check output, volume and version identity before alleging lost samples. Repair one stage at a time and preserve data and old reports instead of repeatedly re-encoding until a subjectively similar pair appears. Unrun hashing or playback remains pending.</p>
+<h2 id="section-8">8. Deliver three conclusions and recoverable sources</h2>
+<p>Retain the master, FLAC copy, raw-output parameters and actual comparison, plus per-item 调调 responses. Answer separately whether whole files differ, external decoded data agree and which content was actually heard in the app. Do not merge them into “lossless passed.” Reopen confirmed entries and mark identity or return checks only if performed. Restore daily volume and queue as needed. Comparison files may remain externally and must not be labelled app library exports. Twenty-four-bit, multichannel or other sources require new representation and compatibility agreements rather than extrapolating this mono sixteen-bit exercise to all audio and hardware.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/diaodiao-pcm-wav-fixed-duration-rate-depth-payload/">PCM payload capacity</a>; <a href="/en/guides/diaodiao-duplicate-copy-cross-entry-result-check/">Duplicate content and entries</a>.</p>
+<p>Checked on 18 November 2026: <a href="https://itunes.apple.com/lookup?id=6827171352&amp;country=ru&amp;entity=software&amp;timestamp=20261118">Apple’s Russia lookup</a> and <a href="https://itunes.apple.com/lookup?id=6827171352&amp;country=cn&amp;entity=software&amp;timestamp=20261118">China lookup</a> both list 调调 1.0.1, requiring iOS / iPadOS 17.6 or later. The <a href="https://apps.apple.com/ru/app/id6827171352?l=en-GB">official store</a> describes audio import, playback, lyrics and version 1.0.1 music themes and Home Screen widgets. Use owned or authorized material and controls actually visible in the installed version. Keep external preparation, paper expectations and real observations separate; no completed device, private-server or exhaustive format-compatibility test is claimed.</p>
+<p>Method references: <a href="https://www.rfc-editor.org/rfc/rfc9639.html">RFC 9639 FLAC definition</a>; <a href="https://ffmpeg.org/ffmpeg-formats.html">FFmpeg ADTS and raw PCM formats</a>; <a href="https://ffmpeg.org/ffmpeg.html">FFmpeg command documentation</a>.</p>
+{% endraw %}

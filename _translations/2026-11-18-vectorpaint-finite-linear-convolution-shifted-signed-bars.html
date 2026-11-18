@@ -1,0 +1,78 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint finite convolution: retain signs in a four-column shifted-sum ledger'
+description: Convolve(1,2,1) with(1,−1) under zero extension, distinguishing linear output from circular folding
+  or overlap averaging.
+permalink: /en/guides/vectorpaint-finite-linear-convolution-shifted-signed-bars/
+date: '2026-11-18 00:00:00 +08:00'
+modified: '2026-11-18 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 236
+topic: Discrete updates, cycles and boundaries
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-18-vectorpaint-finite-linear-convolution-shifted-signed-bars.md
+source_url: /guides/vectorpaint-finite-linear-convolution-shifted-signed-bars/
+translation_method: editorial
+translation_source_sha256: c4d7643b46d55f89748d98587411f288b1dab996c6e574fc21b436dc87e900dd
+translation_date: '2026-11-18T02:09:42+00:00'
+excerpt: Convolve(1,2,1) with(1,−1) under zero extension, distinguishing linear output from circular folding or
+  overlap averaging.
+---
+{% raw %}
+<p>Draw a shifted-sum diagram for discrete convolution: list each input sample’s contribution, then add contributions sharing an index. Keep negative bars below zero and all four output indices, including the last. This illustrates external mathematics rather than applying an image or audio filter.</p>
+
+<h2 id="section-1">Declare finite indices and zero extension</h2>
+
+<p>Let x[0..2]=(1,2,1), h[0..1]=(1,−1), with both zero outside their ranges. Define y[n]=Σ over integer k of x[k]h[n−k]; only finitely many terms are nonzero. The−1 is a signed value, not missing data or a magnitude needing an absolute value. Create input, shifted contribution, output bar, index and note layers, then save native work. Samples are dimensionless and indices discrete positions, not automatically seconds or pixels. Any sampling interval requires a separate declaration.</p>
+
+<h2 id="section-2">Determine the four output positions before drawing columns</h2>
+
+<p>The support runs from 0+0=0 through 2+1=3, so the complete linear output uses n=0,1,2,3: length 3+2−1=4. Keep an index even if its sum is zero. Draw four ledger columns before contributions so the last is not cropped. Convolution is not pointwise multiplication. A three-item answer(1,−2,1) neither handles the two-item h correctly nor implements the shifted sum.</p>
+
+<h2 id="section-3">Generate a weighted shifted row for each input sample</h2>
+
+<p>At k=0, weight 1 contributes(1,−1,0,0). At k=1, shift h right once and multiply both entries by 2, giving(0,2,−2,0). At k=2, shift twice with weight 1, giving(0,0,1,−1). Label k and x[k], align columns with pale boxes and retain explicit zeros. Weight 2 multiplies both signs, not just the positive bar. Blank positions are zero by extension, not extra ones or values to choose for visual balance.</p>
+
+<h2 id="section-4">Sum columns and spot-check the defining formula</h2>
+
+<p>Column sums give y=(1,1,−1,−1). Independently y[1]=x[0]h[1]+x[1]h[0]=−1+2=1, and y[2]=x[1]h[1]+x[2]h[0]=−2+1=−1. Out-of-range terms are zero; do not wrap h[−1] or h[2] to an endpoint. Show one output bar per column while retaining contribution layers. Adding absolute heights instead of signed values would compute a different quantity, not convolution. Because h=(1,−1), y[n]=x[n]−x[n−1]. Zero extension gives the first 1−0 and last 0−1, independently checking endpoints. The zero kernel sum also rules out dividing by that sum to create a normalized average.</p>
+
+<h2 id="section-5">Check externally through sums and polynomial multiplication</h2>
+
+<p>The output sum 1+1−1−1=0 equals input sum 4 times kernel sum 0. This is a useful necessary check, not proof that every column is right. Also expand(1+2z+z²)(1−z)=1+z−z²−z³; its four coefficients agree. Here z is formal, not the canvas vertical coordinate. Keep both side checks alongside the column calculation. A zero total cannot excuse swapped middle signs or other local index errors.</p>
+
+<pre><code class="language-text">x[0..2]=(1,2,1); h[0..1]=(1,-1); zero elsewhere
+y[n]=sum_k x[k]*h[n-k]
+k=0: 1 -1  0  0
+k=1: 0  2 -2  0
+k=2: 0  0  1 -1
+y:   1  1 -1 -1
+sum(y)=0=sum(x)*sum(h)
+(1+2z+z^2)*(1-z)=1+z-z^2-z^3
+length-3 circular control: (0,1,-1)
+</code></pre>
+
+<h2 id="section-6">Keep a common signed baseline and column spacing</h2>
+
+<p>Use a suggested 2200×1700 canvas with output x positions 400,800,1200,1600, baseline Y=1300 and 180px upward per value 1. Positive bars reach 1120 and negative bars 1480, inside the canvas; label signed values. Put input/contribution tables above without hiding the baseline. Approximate with guides when numeric fields are absent, never flip a negative bar upward to fit. Retain vector bars/text in SVG/PDF and separately record any imported bitmap reference rather than automatically calling mixed output entirely vector.</p>
+
+<h2 id="section-7">Distinguish circular folding and overlap averaging</h2>
+
+<p>Under a separately defined length 3 circular convolution, fold linear y[3]=−1 into index 0 to obtain(0,1,−1). This changes the boundary rule; it is not a correction to the four-column linear result. Dividing each sum by overlap count likewise defines another averaging operation absent here. Diagnose linear/circular rules, extension and index direction before signs/weights. Save explicitly named controls instead of hiding changed definitions behind an alleged software-display difference.</p>
+
+<h2 id="section-8">Reopen and rebuild all four outputs from shifted rows</h2>
+
+<p>Save editable contribution rows/output groups; inspect SVG/PDF and a separately opened PNG. At reduced size retain four indices; enlarge both negative bars/signs. Reopen, hide output, recompute columns from three rows and restore comparison, checking n=3 was neither cropped nor wrapped. Deliver definition, ledger, sum/polynomial checks and circular control, marking unperformed actions pending. This illustrates finite linear convolution without promising App signal processing, automatic convolution or real-time filtering, or inferring real sound/image quality from dimensionless samples.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-coordinate-line-chart/">VectorPaint manual line charts: plot coordinates before connecting one dataset</a>; <a href="/en/guides/vectorpaint-four-site-sine-aliasing-one-versus-five-cycles/">VectorPaint four-site sampling: one set of values can come from one or five cycles</a>.</p>
+
+<p>Method sources: <a href="https://www.dspguide.com/CH6.PDF">Steven W. Smith, The Scientist and Engineer’s Guide to DSP, Chapter6</a>.</p>
+
+<p>Version and operation scope: checked on 18 November 2026 against the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261118-vectorpaint">Apple public lookup</a>: version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.</p>
+{% endraw %}

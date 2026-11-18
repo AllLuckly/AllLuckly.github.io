@@ -1,0 +1,75 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay HLS I-frame entries: the URI attribute identifies the target'
+description: Compare ordinary variants and standalone I-frame entries, checking required fields, relative paths
+  and excluded rendition attributes.
+permalink: /en/guides/icouldplay-hls-iframe-stream-inf-uri-attribute-master-entry/
+date: '2026-11-18 00:00:00 +08:00'
+modified: '2026-11-18 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 192
+topic: Playlist declarations and subtitle parameters
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-18-icouldplay-hls-iframe-stream-inf-uri-attribute-master-entry.md
+source_url: /guides/icouldplay-hls-iframe-stream-inf-uri-attribute-master-entry/
+translation_method: editorial
+translation_source_sha256: 9df0552a983672d97e1d638257f8db3e97b35ba51acfef089efff9fc43d17ff2
+translation_date: '2026-11-18T01:24:31+00:00'
+excerpt: Compare ordinary variants and standalone I-frame entries, checking required fields, relative paths and
+  excluded rendition attributes.
+---
+{% raw %}
+<p>Master-playlist I-frame entries and ordinary variants both declare bandwidth but locate their targets differently. Build a per-tag ledger from an original six-line playlist and trace the child playlist. Without real I-frame resources, finish the audit only; placeholder text does not generate thumbnails or enable an assumed iCouldPlay preview.</p>
+
+<h2 id="section-1">Prepare ordinary-playback and I-frame evidence separately</h2>
+
+<p>Keep ordinary-playback playlist evidence from an owned clip and separately name the I-frame playlist produced externally. Record real paths, media bytes and packaging reports only when outputs exist; removing tags from an ordinary video does not create I-frame resources. The paper example names main/video.m3u8 and trick/iframes.m3u8. The directory trick is not an iCouldPlay menu command. Similar names do not establish a common timeline; preserve generation sources and the shared source identity.</p>
+
+<h2 id="section-2">Identify which tag owns each target</h2>
+
+<p>An ordinary EXT-X-STREAM-INF takes its following URI line as target. EXT-X-I-FRAME-STREAM-INF stands alone and supplies its own URI attribute. Give each tag a ledger row labelled following-line or attribute, rather than attaching whichever address looks nearest. The longer I-FRAME name does not inherit main/video.m3u8 or merge the declarations into one stream. Preserve case, hyphens and quotes. Compare syntax rather than visual wrapping: a long displayed line can still be one tag.</p>
+
+<h2 id="section-3">Audit the required fields in six sample lines</h2>
+
+<p>The I-frame entry includes BANDWIDTH and URI, while the ordinary entry is followed by main/video.m3u8. Its referenced media playlist must contain EXT-X-I-FRAMES-ONLY. That child file is not shown here, so mark it for inspection rather than certifying it from its name. Version 4 is stipulated, not a repair achieved by raising the number. Bandwidth is bits/s:80000 is not80000 bytes/s. Ordinary 1600000 and I-frame 80000 describe different resources; the smaller declaration does not mean the full movie lost quality.</p>
+
+<pre><code class="language-text">#EXTM3U
+#EXT-X-VERSION:4
+#EXT-X-I-FRAME-STREAM-INF:BANDWIDTH=80000,URI=&quot;trick/iframes.m3u8&quot;,CODECS=&quot;avc1.4d401f&quot;
+#EXT-X-STREAM-INF:BANDWIDTH=1600000,CODECS=&quot;avc1.4d401f,mp4a.40.2&quot;
+main/video.m3u8
+# child trick/iframes.m3u8 must contain EXT-X-I-FRAMES-ONLY
+</code></pre>
+
+<h2 id="section-4">Resolve the two distinct child-playlist locations</h2>
+
+<p>For base https://media.example.invalid/lesson/master.m3u8, resolve targets under lesson/main and lesson/trick rather than appending to master.m3u8. Remove attribute quotes for URL interpretation while retaining them in source syntax. Do not contact the reserved invalid domain. Real sources require actual responses and redirect bases, not an old directory note substituted for a resource. Record each target once with its ordinary/I-frame role so later ordinary playback is not mistakenly attributed to the I-frame resource.</p>
+
+<h2 id="section-5">Do not copy excluded rendition attributes</h2>
+
+<p>The RFC does not define FRAME-RATE, AUDIO, SUBTITLES or CLOSED-CAPTIONS for this I-frame tag. In a failure copy add AUDIO=&quot;voice&quot;, identify that it is outside the tag definition, then remove it; do not invent a voice group to retain the mistake. This distinction does not prove every I-frame resource lacks any audio bytes or require a particular iCouldPlay error. Audit syntax separately from file content. Unknown player tolerance stays unknown, and tolerated mistakes do not rewrite the specification.</p>
+
+<h2 id="section-6">Record ordinary playback and preview observations for real media</h2>
+
+<p>Open the externally checked real master through an existing iCouldPlay source entry and verify ordinary source identity, action and audio first. If the installation offers preview or relevant selection, record its actual picture and time. Seeing a frame after seeking does not by itself prove this I-frame URI was fetched; retain resource evidence you control. Without preview controls, record ordinary playback only and the child-playlist syntax audit separately. Renaming bandwidth or sizes cannot manufacture a service that supplies no I-frame media.</p>
+
+<h2 id="section-7">Troubleshoot fields, ownership and child files separately</h2>
+
+<p>For a missing URI, identify the genuine required target; moving the next line closer is no repair. A child without I-FRAMES-ONLY requires checking packaging identity rather than tagging arbitrary media. Preserve separate ordinary-success and preview-unknown results. Change one copy factor and recount declarations and unique targets. Repair unmatched quotes before paths. A server returning an HTML login page does not supply I-frame media: resolve authorization or addressing rather than treating HTTP 200 as correct content.</p>
+
+<h2 id="section-8">Reopen with entry relationships and unchecked items</h2>
+
+<p>Retain the original six lines, failure difference, two resolved paths and the location of any actual child inspection. Reopen notes to ensure entry roles were not exchanged. In iCouldPlay repeat only source/control checks actually available, verifying identity first. Identify the owning URI attribute, excluded copied attributes and required child marker, explicitly recording whether preview was tested. Without real preview evidence claim neither generated thumbnails, unrestricted seeking nor compatibility with every I-frame encoding. Paper audit and viewing retain their distinct limits.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/icouldplay-hls-iframe-only-interval-preview-boundary/">iCouldPlay HLS I-frame playlists: one frame entry is not four seconds of continuous action</a>; <a href="/en/guides/icouldplay-hls-master-variant-media-map/">iCouldPlay HLS variants: map the master playlist, variants and media segments</a>.</p>
+
+<p>Method sources: <a href="https://www.rfc-editor.org/rfc/rfc8216">RFC8216 §4.3.4.3 and §4.3.3.6</a>.</p>
+
+<p>Checked on 18 November 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261118-hls">Apple public lookup</a> list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Placeholder addresses supply neither media nor keys. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.</p>
+{% endraw %}
