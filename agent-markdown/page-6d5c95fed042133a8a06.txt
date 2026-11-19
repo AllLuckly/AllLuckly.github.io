@@ -1,0 +1,110 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-ass-cubic-bezier-b-control-points-versus-endpoints/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay ASS cubic Bézier: two b control points are not required polyline
+  vertices'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-ass-cubic-bezier-b-control-points-versus-endpoints/
+agent_source_sha256: be0d2b74a8c9519eb87c75893191c755cfb5d8302f342e07ec1f8dc63f90bddb
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay ASS cubic Bézier: two b control points are not required polyline vertices
+
+Language: en
+Canonical: [iCouldPlay ASS cubic Bézier: two b control points are not required polyline vertices](<https://allluckly.cn/en/guides/icouldplay-ass-cubic-bezier-b-control-points-versus-endpoints/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-cubic-bezier-b-control-points-versus-endpoints/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-cubic-bezier-b-control-points-versus-endpoints/>)
+Published: 2026-11-19T00:00:00+08:00
+Modified: 2026-11-19T10:09:59+08:00
+Author: Bison
+
+Save two complete ASS events for a closed filled shape, changing only the first control point’s Y coordinate. Compare curve and endpoints, externally calculate the parameter midpoint and unchanged endpoints, and distinguish the geometric parameter from playback time. Observe through a genuinely supported path without inventing curve-design or measurement tools in the player.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-ass-cubic-bezier-b-control-points-versus-endpoints/>), translated on 2026-11-19. Original publication dates, attribution, code and version notes are retained.
+
+Save two complete ASS events for a closed filled shape, changing only the first control point’s Y coordinate. Compare curve and endpoints, externally calculate the parameter midpoint and unchanged endpoints, and distinguish the geometric parameter from playback time. Observe through a genuinely supported path without inventing curve-design or measurement tools in the player.
+
+## Prepare a source and fixed conditions for the curved edge
+
+Use an owned still-scene clip at least ten seconds long, preserving footage, normal subtitles and display conditions. Fix a 640 × 360 script, position (120,140), p1, zero baseline offset, both scales 100 and no border/shadow; white fill is easier to see on dark footage. A curved upper edge and straight lower closure form a visible filled region. Calculations concern points on the upper curve, not the filled shape’s centre. Script position is not a device-pixel assertion. Keep prepared parameters and observations separate rather than substitute player zoom for a control-point change.
+
+## Name the start, two controls and endpoint
+
+Name current point P0 = (0,60), first control P1 = (0,0), second control P2 = (120,0) and endpoint P3 = (120,60). The m command places the pen at P0; b then supplies P1, P2 and P3, without repeating P0 as its first pair. Aegisub describes departure towards P1 and arrival at P3 from P2’s direction. Controls shape the curve rather than impose successive polyline vertices. Replacing b with three l segments is different geometry. Label all four roles before mistaking a control for the start or omitting the endpoint.
+
+## Save both complete ASS events with one changed value
+
+Save complete UTF-8 plain-text bezier-control.ass with header, style and two events, checking extension and ASCII punctuation on reopening. Event one at 1–4 s uses the original points. Event two at 5–8 s changes only P1 Y from 0 to 30, preserving the other five b numbers, m, straight closure, position and display parameters. Put b/l in drawing text outside braces and finish with p0. Both events are static, without transform/motion; sequential display is not continuous curve animation. Edit externally and record file/source identity rather than assume a control-handle editor in iCouldPlay.
+
+```
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,36,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:04.00,Default,,0,0,0,,{\an7\pos(120,140)\bord0\shad0\fscx100\fscy100\pbo0\p1}m 0 60 b 0 0 120 0 120 60 l 120 80 0 80 0 60{\p0}
+Dialogue: 0,0:00:05.00,0:00:08.00,Default,,0,0,0,,{\an7\pos(120,140)\bord0\shad0\fscx100\fscy100\pbo0\p1}m 0 60 b 0 30 120 0 120 60 l 120 80 0 80 0 60{\p0}
+```
+
+## Define the paper curve with cubic weights
+
+Externally define the standard cubic model for t from 0 to 1. Its four weights are (1-t) cubed, 3(1-t) squared times t, 3(1-t) times t squared and t cubed. Multiply P0 through P3 respectively and add componentwise to obtain B(t). Non-negative weights sum to one; t = 0/1 returns P0/P3. This t is a geometric parameter, not playback seconds. One-half is neither two seconds nor partial drawing halfway through an event. Each event displays a static whole shape; parameter samples check the model without claiming an in-app sweep feature.
+
+```
+B(t) = (1-t)^3 P0 + 3(1-t)^2 t P1 + 3(1-t)t^2 P2 + t^3 P3
+0 <= t <= 1; t is a GEOMETRIC PARAMETER, NOT playback time
+P0=(0,60), P1=(0,0), P2=(120,0), P3=(120,60)
+```
+
+## Calculate endpoints, parameter midpoint and wrong substitutes
+
+At t = one-half, weights 1, 3, 3 and 1 divided by 8 give (60,15). The controls’ average (60,0) and endpoint-chord midpoint (60,60) are not this parameter midpoint. Quarter/three-quarter samples are (18.75,26.25) and (101.25,26.25), consistent with symmetry. These are local coordinates, not screen-picked measurements. Although both control Y values are zero, this curve does not pass through those controls; its minimum local Y is 15. Expanding Y gives 60 - 180t + 180t squared, or 180(t - one-half) squared + 15. Thus the minimum is established, not guessed from a single midpoint calculation. Equal parameter steps do not guarantee equal arc lengths; the quarter-parameter point is not automatically a quarter-distance point. Neither the control polygon nor the filled region’s centroid substitutes for B(t).
+
+```
+Original LOCAL curve:
+B(0)    = (0,60)
+B(1/4)  = (18.75,26.25)
+B(1/2)  = (60,15)
+B(3/4)  = (101.25,26.25)
+B(1)    = (120,60)
+Control average = (60,0); endpoint-chord midpoint = (60,60)
+```
+
+## Check fixed endpoints after changing only the first control Y
+
+The second event changes only P1 to (0,30), leaving P0/P2/P3 fixed. At the same midpoint weights, Y increases by (3/8) × 30 = 11.25, giving B(1/2) = (60,26.25), while endpoints remain (0,60) and (120,60). Their horizontal separation stays 120; a deformed curve does not imply a larger endpoint distance. Shape changes without endpoint movement do not imply uniform translation. The modified curve is no longer left-right symmetric; its half-parameter point is not automatically a new extremum. Keep that one-value control. Also changing P3 destroys the fixed-endpoint comparison; restore by returning P1 Y to zero.
+
+```
+Modified P1=(0,30), all other points fixed:
+B(0)   = (0,60)
+B(1/2) = (60,26.25)
+B(1)   = (120,60)
+Midpoint Y change = (3/8)*30 = 11.25
+```
+
+## Observe the curve through an actual subtitle path
+
+Associate complete ASS/source through a genuine installed subtitle path. Verify the filled shape, timing and identity in event one, then observe discernible upper-curve changes and endpoint conditions inside event two. The file draws no control circles/connecting guides, so absent handles do not show failed parsing. Do not claim screen measurement of calculated coordinates. Literal commands call for mode/brace checks; absent shapes need copy/p1/path/support checks. Without association/playback, source/model checks can pass while rendering remains pending. External-editor preview is separate evidence.
+
+## Deliver complete shapes, the one-variable sample and parameter notes
+
+Retain both ASS events, four-point roles, formula/samples and actual file/viewing conditions, restoring normal subtitles without editing video. Identify b’s controls/endpoint and m’s start, explain why controls need not be traversed, and reject the control average as the parameter midpoint. Keep the original symmetry/minimum separate from the asymmetric modified curve. Record source syntax, external mathematics, previews and iCouldPlay viewing independently, leaving unperformed reopening/display pending. Promise no identical antialiasing across engines or player animation generation, control editing or professional path analysis.
+
+## Related guides and sources
+
+[Drawing mode and closed polygons](<https://allluckly.cn/en/guides/icouldplay-ass-vector-drawing-mode-polygon-text-scope/>); [Drawing coordinate resolution and local dimensions](<https://allluckly.cn/en/guides/icouldplay-ass-p2-p4-drawing-coordinate-resolution-divisor/>).
+
+Checked on 19 November 2026: [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261119-root>) lists iCouldPlay 1.1.1, requiring iOS / iPadOS 15.0 or later. The [official store](<https://apps.apple.com/cn/app/id6755653178>) describes ASS/SSA and embedded/external subtitles. Prepare source, syntax and mathematics externally; associate and observe through actual installed paths. Format support does not guarantee every instruction across all engines/devices. No completed physical-device subtitle rendering, professional pixel measurement, exhaustive-format or private-server testing is claimed.
+
+Method references: [Aegisub ASS override tags](<https://aegisub.org/docs/latest/ass_tags/>).
+{% endraw %}

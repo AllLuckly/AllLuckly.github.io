@@ -1,0 +1,79 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint bisection brackets: six sign-preserving steps enclose the cube root of two'
+description: Bisect from one to two, checking six endpoint updates, interval width and midpoint error, with a discontinuous-function
+  counterexample.
+permalink: /en/guides/vectorpaint-bisection-cube-root-two-bracket-midpoint-error/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 245
+topic: Concurrency, metric identities, hulls and brackets
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-19-vectorpaint-bisection-cube-root-two-bracket-midpoint-error.md
+source_url: /guides/vectorpaint-bisection-cube-root-two-bracket-midpoint-error/
+translation_method: editorial
+translation_source_sha256: 087dedda5b82310acca6bc1deaf47e02115c1d9f9ca47a0f5e924e1409d2b146
+translation_date: '2026-11-19T02:01:54+00:00'
+excerpt: Bisect from one to two, checking six endpoint updates, interval width and midpoint error, with a discontinuous-function
+  counterexample.
+---
+{% raw %}
+<p>Draw bisection as a column of shrinking intervals, focusing on a root-preserving bracket rather than an apparent curve crossing. Use continuous f(x)=x³−2 on [1,2] and determine signs with exact fractions. Drawing does not execute root finding: prepare the interval ledger externally so every midpoint and endpoint update is reproducible.</p>
+
+<h2 id="section-1">State continuity and opposite endpoint signs</h2>
+
+<p>f is continuous on [1,2], with f(1)=−1 and f(2)=6, so a root lies inside. Strictly increasing x³ makes it unique here. If an endpoint value is zero, it is already a root rather than a strictly opposite-sign case. On about 2000 × 1500 pixels place a sign ledger left, six interval rows right and a separate counterexample frame. Group intervals, endpoints, midpoints, values and notes, then save. Horizontal position represents abstract x; row spacing is not elapsed time, and the app does not solve roots or enforce continuity.</p>
+
+<h2 id="section-2">Keep only the half with opposite endpoint signs</h2>
+
+<p>For [a,b], take m=(a+b)/2 and stop if f(m)=0. Otherwise, if f(a) and f(m) have opposite signs keep [a,m]; if not, keep [m,b]. Decide by signs rather than apparent proximity or whichever half has a smaller residual. Given opposite endpoint signs and nonzero midpoint value, exactly one half preserves them. Add a new-bracket column and complete it before drawing the next row, without using updated endpoints to rewrite the previous midpoint as the same step.</p>
+
+<h2 id="section-3">Obtain the left endpoint one and one quarter in two steps</h2>
+
+<p>The first midpoint is 3/2 with f=11/8&gt;0, leaving [1,3/2]. The second is 5/4 with f=−3/64&lt;0, leaving [5/4,3/2]. This time the left endpoint changes; do not copy the first update direction. Keep the old interval faint and overlay the retained bracket darker, with a separate midpoint marker. Discarded portions may remain pale, not as a route travelled by a root. Length encodes width; write plus/minus signs as well as colours for monochrome checking.</p>
+
+<h2 id="section-4">Determine four further signs through integer numerators</h2>
+
+<p>Midpoints three through six are 11/8, 21/16, 41/32, 81/64. Their f values are 307/512, 1069/4096, 3385/32768, 7153/262144, all positive. Each becomes the new right endpoint while 5/4 stays left. After six steps the bracket is [5/4,81/64]; the sixth tested midpoint is not the midpoint of this final bracket. Cube fractions and subtract two before judging signs, rather than rounding 1.265625 to 1.3. Every retained interval must nest inside its predecessor with half the width.</p>
+
+<h2 id="section-5">Separate final width from midpoint error bound</h2>
+
+<p>Initial width one becomes 1/64=0.015625 after six steps. The final bracket midpoint is 161/128=1.2578125, with absolute root error at most half-width 1/128=0.0078125. Using an endpoint instead guarantees only full-width error from the bracket. This bound follows from root containment, not matching units of f and x. Separate interval and midpoint markers. The final midpoint need not have been one of the six evaluated points; record any extra evaluation separately. For a new midpoint-error target of at most 0.001, initial width one requires 1/2^(n+1)≤0.001. After eight steps half-width 1/512 is too large; nine gives 1/1024, which qualifies. Six steps cannot claim this new guarantee. A target on the full interval width of at most 0.001 instead requires ten steps. State whether stopping concerns point error or bracket width before choosing a count. This prior bound needs no decimal value of the true root, and a small residual does not replace it.</p>
+
+<pre><code class="language-text">f(x)=x^3-2; initial [1,2], signs (-,+)
+m1=3/2: f=11/8; keep [1,3/2]
+m2=5/4: f=-3/64; keep [5/4,3/2]
+m3=11/8: f=307/512
+m4=21/16: f=1069/4096
+m5=41/32: f=3385/32768
+m6=81/64: f=7153/262144
+final [5/4,81/64]; width=1/64
+final midpoint=161/128; error&lt;=1/128
+h(x)=-1 if x&lt;7/5 else +1: no zero
+</code></pre>
+
+<h2 id="section-6">Test small residuals and discontinuity separately</h2>
+
+<p>First set g(x)=10^(−9)f(x). Roots and signs are unchanged, but tiny g(1)=−10^(−9) occurs at x=1, still more than 1/4 from the root. A small residual alone does not imply a small location error. Separately define h(x)=−1 for x&lt;7/5 and +1 otherwise. Its endpoints on [1,2] have opposite signs but it has no zero, because continuity fails. Frame the controls separately; dropping continuity removes the existence guarantee without invalidating the original function’s result.</p>
+
+<h2 id="section-7">Diagnose old midpoint values and new brackets in order</h2>
+
+<p>If the sixth width remains 1/32, check for only five completed updates. Separate tested midpoint 81/64 from final estimate 161/128. For a lost minus sign, recompute 125/64−128/64 at 5/4 rather than guessing from colour. Keep the faulty draft and redraw each row after correcting the ledger; a correct last label does not fix wrong intermediate rows. Restoring f also requires removing inappropriate g/h conclusions. Match all six rows to fractions; shorter drawn lines create no new convergence evidence.</p>
+
+<h2 id="section-8">Reopen and reconstruct all six rows from the initial bracket</h2>
+
+<p>Save native work and fractions, export SVG or PDF and open a PNG separately. At fit-to-window size inspect six nested rows; enlarge to distinguish 1/64 from 1/128. Reopen editable work, hide the last row and reconstruct six steps from [1,2], then restore the final midpoint and error bound. Deliver continuity, uniqueness and endpoint-zero rules, both controls and pending output steps. SciPy documents bisection conditions; this exercise calls no library and claims no automatic app iteration, convergence certification or device numerical test.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-coordinate-line-chart/">VectorPaint manual line charts: plot coordinates before connecting one dataset</a>; <a href="/en/guides/vectorpaint-lagrange-three-node-interpolation-degree-bound-control/">VectorPaint three-node interpolation: a degree bound makes the polynomial unique</a>.</p>
+
+<p>Method sources: <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.bisect.html">SciPy official documentation: continuity and opposite signs for bisection</a>. The documentation establishes bisection prerequisites, without importing its default tolerances. Six rational updates, midpoint bounds and both controls are independently calculated from original examples.</p>
+
+<p>Version and operation scope: checked on 19 November 2026 against the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261119-vectorpaint">Apple public lookup</a>: version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.</p>
+{% endraw %}

@@ -1,0 +1,76 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint max flow and min cut: pair a feasible flow of ten with a cut of ten'
+description: Check capacities, conservation and directed cuts in a four-vertex five-edge network, then reduce one
+  capacity for a maximum-six control.
+permalink: /en/guides/vectorpaint-maximum-flow-feasible-ten-cut-capacity-bound/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 246
+topic: Flow certificates, weighted averages and coloured graphs
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-19-vectorpaint-maximum-flow-feasible-ten-cut-capacity-bound.md
+source_url: /guides/vectorpaint-maximum-flow-feasible-ten-cut-capacity-bound/
+translation_method: editorial
+translation_source_sha256: c6fca02c4f1e61876dc47a8710e055b965f1228afd032551d9513700f0f7d934
+translation_date: '2026-11-19T02:01:54+00:00'
+excerpt: Check capacities, conservation and directed cuts in a four-vertex five-edge network, then reduce one capacity
+  for a maximum-six control.
+---
+{% raw %}
+<p>Draw a fictional directed network with both a feasible flow and an upper bound for how much can be sent. Capacities are flow limits over one abstract period, not edge lengths or arrival times. One widest route is insufficient: flow may split, but intermediate vertices must conserve it and each edge must obey its own capacity.</p>
+
+<h2 id="section-1">List capacities on four vertices and five edges</h2>
+
+<p>Use source S, sink T and intermediate A/B, with only S→A capacity seven, S→B five, A→B three, A→T four, B→T six. On about 1800 × 1400 pixels place S left, A upper-middle, B lower-middle and T right. Group arrows, capacities, flows and cuts, then save. Capacities are nonnegative integers here. A→B does not grant B→A capacity three. Layout length encodes no capacity, and unlisted connections are absent.</p>
+
+<h2 id="section-2">Label each edge with flow slash capacity</h2>
+
+<p>Assign flows SA seven, SB three, AB three, AT four, BT six, labelled 7/7, 3/5, 3/3, 4/4, 6/6. These are flow/capacity labels, not probabilities or fractions to reduce to one. Check 0≤flow≤capacity on every edge. SB has two unused units, but that alone cannot increase total flow. Source output 7+3 and sink input 4+6 both equal ten. Check both totals, then intermediate vertices; matching endpoint totals alone can hide flow creation or loss inside.</p>
+
+<h2 id="section-3">Check conservation separately at A and B</h2>
+
+<p>At A, inflow seven equals AB three plus AT four. At B, SB three plus AB three equals BT six. Put each equation beside its own vertex rather than replacing them with one global statement. Decompose into S–A–T four, S–A–B–T three and S–B–T three, totalling ten and adding contributions on shared edges. Filling each path independently would overuse BT; check shared edges before allocation. This network has no circulation and represents no pipe or communication test. The maximum value need not determine every edge flow uniquely. Another flow SA five, SB five, AB one, AT four, BT six respects all capacities, conserves five=one+four at A and five+one=six at B, and still has value ten. Save it as a distinct equal-value allocation without changing capacities or the minimum cut. The first solution’s SA seven does not mean every optimum saturates SA, and unused capacity on one edge does not prove more total flow is possible. Optimal value and its realisation are distinct.</p>
+
+<h2 id="section-4">Sum only source-side to sink-side capacities in a cut</h2>
+
+<p>Take source side X={S,A,B} and sink side {T}. Outgoing crossing edges AT four and BT six give cut capacity ten. Every feasible flow value is bounded by every S–T cut, so the feasible ten attains this bound. Neither a bound alone nor a feasible flow alone proves optimality. A cut is a vertex partition, not an arbitrary drawn line touching edges. Do not add capacities of reverse-crossing edges to this directed cut capacity. State that X contains S and excludes T.</p>
+
+<h2 id="section-5">Enumerate four source-side sets to verify the minimum cut</h2>
+
+<p>With S in and T out, A and B each have two memberships, giving four cuts. Capacities are {S}:7+5=12; {S,A}:5+3+4=12; {S,B}:7+6=13, excluding inward AB; {S,A,B}:4+6=10. The minimum ten matches the feasible flow, with every partition covered. In particular {S,B} is not seven plus three plus six: inward AB is not charged. Enumeration is practical for this small graph, not a promise that a larger drawn network is equally easy to calculate.</p>
+
+<pre><code class="language-text">capacity: SA=7; SB=5; AB=3; AT=4; BT=6
+flow:     SA=7; SB=3; AB=3; AT=4; BT=6
+A: 7=3+4; B: 3+3=6; value=7+3=4+6=10
+cut capacities: {S}:12; {S,A}:12; {S,B}:13; {S,A,B}:10
+control BT capacity=2
+control flow SA=4; SB=2; AB=0; AT=4; BT=2
+control value=cut({S,A,B})=6
+</code></pre>
+
+<h2 id="section-6">Change both flow and bound after reducing BT</h2>
+
+<p>Save a version changing only BT capacity from six to two. Old BT flow six is now invalid, so withdraw total ten. Use SA four, SB two, AB zero, AT four, BT two: A and B conserve flow and total six is feasible. Cut {S,A,B} now has capacity 4+2=6, proving maximum six. Source capacity remains twelve, showing why source outlets alone overestimate throughput. Keep nodes and edges fixed, updating capacity, flow and cut together rather than mixing old labels such as 7/7 into the control.</p>
+
+<h2 id="section-7">Diagnose directions, conservation and cut capacity in order</h2>
+
+<p>If total twelve reaches a sink accepting only ten, check AT/BT capacity violations. If endpoints show ten but A fails conservation, repair that vertex instead of moving labels to hide a missing edge. For a cut of sixteen, check inward edges and duplicate capacities; cut capacity is not current flow. Keep the faulty version, read every flow/capacity label, trace paths and verify all four partitions. No costs are given, so maximum ten says nothing about cheapest allocation, shortest S–T route or minimum tree connecting every vertex.</p>
+
+<h2 id="section-8">Reopen with both feasibility and a matching bound</h2>
+
+<p>Save native work, five edges and four cuts, export SVG or PDF and open a PNG separately. At fit-to-window size inspect source/sink arrows; enlarge to distinguish 3/5 from 3/3 and control BT=2/2. Reopen the source, hide “optimal”, recheck all edge constraints and A/B conservation, then restore the conclusion using cut ten or six. Deliver both conditions and pending output steps, not one highlighted route. MIT supplies flow definitions and the bound theorem, not evidence of an app max-flow solver, capacity sensor or engineering certification.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-five-node-weighted-routes/">VectorPaint five-node weighted routes: sum edge weights before comparing paths</a>; <a href="/en/guides/vectorpaint-five-node-minimum-spanning-connection/">VectorPaint minimum spanning connections: cover five nodes before comparing four-edge totals</a>.</p>
+
+<p>Method sources: <a href="https://courses.csail.mit.edu/6.854/21/Scribe/s6-maxflow/s6-maxflow.html">MIT 6.854: network flows and max-flow min-cut</a>. The source establishes nonnegative capacity, conservation and directed-cut bounds. The five-edge network, four cuts and reduced-capacity control are original; flows are not costs or measured rates.</p>
+
+<p>Version and operation scope: checked on 19 November 2026 against the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261119-vectorpaint">Apple public lookup</a>: version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.</p>
+{% endraw %}

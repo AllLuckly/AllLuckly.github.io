@@ -1,0 +1,77 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay delay reference: one millisecond gives different phase angles at different frequencies'
+description: Hold delay at eight samples, check phase and equal-amplitude summation at four frequencies, then observe
+  owned reference clips.
+permalink: /en/guides/icouldplay-fixed-delay-frequency-phase-one-millisecond/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 207
+topic: Sampling, delay and conditions for sound analysis
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-19-icouldplay-fixed-delay-frequency-phase-one-millisecond.md
+source_url: /guides/icouldplay-fixed-delay-frequency-phase-one-millisecond/
+translation_method: editorial
+translation_source_sha256: ad25a3898c311f122e210ea7e2b2ebfa552417217ec9a27128964933ada23548
+translation_date: '2026-11-19T02:08:40+00:00'
+excerpt: Hold delay at eight samples, check phase and equal-amplitude summation at four frequencies, then observe
+  owned reference clips.
+---
+{% raw %}
+<p>Delaying a sound by one millisecond differs from negating every sample. Delay produces a frequency-dependent phase difference; negation changes polarity. Build four calculation cards at a fixed rate and delay, then observe owned clips with documented production conditions in iCouldPlay. No audio-delay control or precision measurement feature is assumed.</p>
+
+<h2 id="section-1">Distinguish source delay from playback-path delay</h2>
+
+<p>Write that the delay is added externally to the source, not adjusted inside iCouldPlay. Fix the rate at 8 kHz and delay at eight samples: 8/8,000 seconds is one millisecond. If a production tool accepts milliseconds, also record the actual exported sample offset. A progress bar is not a one-millisecond ruler. Keep undelayed originals and named delayed copies. Without an existing production tool, complete the paper model and defer video observations; an assumed eight-sample offset is not a measured device result.</p>
+
+<h2 id="section-2">Calculate an angle for each frequency</h2>
+
+<p>List 125, 250, 500 and 1,000 Hz. A pure delay gives phase -2*pi*frequency*seconds, or -45, -90, -180 and -360 degrees, while the time delay remains one millisecond. The minus sign indicates lag, not negative frequency or volume. Add each period: 8, 4, 2 and 1 ms. The fixed delay therefore represents one eighth, one quarter, one half and one full cycle, rather than a quarter cycle in every row.</p>
+
+<pre><code class="language-text">Fs = 8000 samples/s
+D = 8 samples = 0.001 s
+phase_degrees(f) = -360 * f * D / Fs
+</code></pre>
+
+<h2 id="section-3">A full-cycle phase match does not remove a real delay</h2>
+
+<p>For an indefinitely sustained 1 kHz sine in steady state, a full-period delay produces coinciding sample values. A finite file’s start, end and transient markers still move eight samples later. Matching steady-state phase does not erase time delay. An actual reference may include an owned brief start marker with its onset documented externally, but the infinite-sine formula does not describe that marker. Record the steady tone, onset transition and ending separately instead of deriving every source’s absolute onset delay from one frequency. Make a separate paper case changing only initial phase; the delay remains one millisecond. List initial phase and delay phase separately rather than treating their sum as the delay itself.</p>
+
+<h2 id="section-4">Match amplitude and starting conditions before summation</h2>
+
+<p>Give the original and delayed sine equal amplitudes of 0.2 and add them in steady state. Resulting amplitude is 0.4 times the absolute cosine of half the phase difference: approximately 0.369552, 0.282843, zero and 0.4. The 500 Hz cancellation requires equal amplitudes, a half-period offset and a steady sine; it does not mean a 1 ms delay removes arbitrary dialogue. State that two paths are summed into one signal. Separate stereo listening does not automatically perform the same electrical sum as a mono mix.</p>
+
+<pre><code class="language-text">x(t) = 0.2 * sin(2*pi*f*t)
+y(t) = 0.2 * sin(2*pi*f*(t-0.001))
+steady_sum_amplitude = 0.4 * abs(cos(pi*f*0.001))
+</code></pre>
+
+<h2 id="section-5">Compare identified originals and mixed exports</h2>
+
+<p>Use distinct titles and names for original, delayed and summed video exports. Record production tool, rate, amplitude and any tail trimming. Select through the app’s visible controls, confirming file identity rather than a similar poster, and listen briefly at normal speed through one output path. Record playback, soundtrack selection and obvious level differences, not unmeasured fractional amplitudes. A stereo file with one signal per channel does not verify mono cancellation if no summed export was made. Record known downmix or processing conditions as well.</p>
+
+<h2 id="section-6">Recalculate after changing delay to half a millisecond</h2>
+
+<p>Create a four-sample, half-millisecond paper control at 8 kHz. At 500 Hz the difference becomes -90 degrees and summed amplitude about 0.282843 rather than zero. At 1 kHz it becomes -180 degrees and ideally cancels in steady state. Keep the two delay conditions on separate cards with other parameters fixed. For actual new exports, save distinct names and inspect sample positions; renaming alone does not change content. Cancellation depends jointly on frequency and delay, not a filename or a player mode with a universal muting effect.</p>
+
+<h2 id="section-7">Check finite boundaries before rejecting the model</h2>
+
+<p>If a nominal cancellation remains audible, check equal amplitude, actual summation, steady state and extra markers. The first eight samples lack complete overlap by design. A thousandfold phase error suggests a milliseconds-to-seconds mistake. Matching steady-state 1 kHz phases with different onsets is not a reason to stretch time. Track actual device-path delay separately from the source’s eight samples. Retain failures and production parameters, change one variable at a time and avoid declaring polarity reversal or a driver fault from one listening observation.</p>
+
+<h2 id="section-8">Deliver time, sample and phase descriptions together</h2>
+
+<p>Reopen the original and control, confirm names, soundtracks and normal speed, then restore normal viewing. Deliver the sample/time conversion, four phase angles, summation predictions, four-sample control and actual observations, explicitly listing unfinished material. Attach rate and frequency to conclusions rather than saying 45 degrees late without a reference. At another sampling rate, decide whether to preserve eight samples or one millisecond; these generally differ. This documented choice is reproducible and does not imply that the player measured the source model precisely.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/icouldplay-audio-polarity-inversion-mono-cancellation-model/">iCouldPlay polarity comparison: why normal solo audio can cancel in a mono model</a>; <a href="/en/guides/icouldplay-mid-side-half-sum-difference-reversible-channel-matrix/">iCouldPlay M/S models: recover left and right from a half-sum and difference</a>.</p>
+
+<p>Method sources: <a href="https://www.dsprelated.com/freebooks/filters/Phase_Group_Delay.html">Julius O. Smith: Phase and Group Delay</a>.</p>
+
+<p>Checked on 19 November 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261119-hls">Apple public lookup</a> list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.</p>
+{% endraw %}

@@ -1,0 +1,76 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint Lorenz allocation: four values one, one, two, six give area 0.3 and Gini 0.4'
+description: Check cumulative shares and trapezoid areas for four fictional equal-weight nonnegative allocations,
+  defining the empirical coefficient and comparing equality and concentration.
+permalink: /en/guides/vectorpaint-lorenz-four-person-gini-area-finite-maximum/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 249
+topic: Flow certificates, weighted averages and coloured graphs
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-19-vectorpaint-lorenz-four-person-gini-area-finite-maximum.md
+source_url: /guides/vectorpaint-lorenz-four-person-gini-area-finite-maximum/
+translation_method: editorial
+translation_source_sha256: 609617ab8adc35894adb9496d60491086413cebbcdb1a5439c9e06862a5c7fbf
+translation_date: '2026-11-19T02:34:58+00:00'
+excerpt: Check cumulative shares and trapezoid areas for four fictional equal-weight nonnegative allocations, defining
+  the empirical coefficient and comparing equality and concentration.
+---
+{% raw %}
+<p>Draw a Lorenz polyline for four fictional values one, one, two and six, not an income survey. Sort ascending before accumulating population and allocation shares. Define G=1−2A using the polyline area, without finite-sample correction, distinguishing the zero-to-one coefficient, zero-to-one-hundred index and an individual’s share.</p>
+
+<h2 id="section-1">Specify equal weights, nonnegative values and positive total</h2>
+
+<p>Use four equally weighted individuals with nonnegative values (1,1,2,6), already sorted, total ten. Positive total is required for this zero-to-one share construction; all-zero data would create a zero denominator rather than the same calculation. On about 1700 × 1700 pixels group data, axes, polyline, area and controls, then save. Use shares from zero to one on both axes, without silently mixing percentages and headcounts. Retain all four values, since different allocations can share total ten but have different curves.</p>
+
+<h2 id="section-2">Compute cumulative points from zero to one</h2>
+
+<p>Increase population share by 1/4 per person and divide cumulative allocation by ten, giving (0,0), (1/4,1/10), (1/2,1/5), (3/4,2/5), (1,1). The two ones are distinct individuals, not duplicates to remove; they yield equal adjacent slopes. Vertical increments 0.1,0.1,0.2,0.6 sum to one. Accumulating an unsorted input order can change the graph and fails this poorest-to-richest definition. Compute the point table externally before plotting, keeping labels clear of endpoints.</p>
+
+<h2 id="section-3">Separate equality diagonal from empirical polyline</h2>
+
+<p>Map shares by u=250+1200p, v=1450−1200q with equal scales and join the five points by straight segments. Bézier smoothing would change area. Draw q=p separately as a faint equality diagonal. The polyline stays below it, with nondecreasing slopes 0.4,0.4,0.8,2.4 from sorting. Shared endpoints are not extra population observations. Stroke width aids reading; calculate from centreline coordinates, not painted stroke area.</p>
+
+<h2 id="section-4">Sum four trapezoid areas to three tenths</h2>
+
+<p>Each interval has width 1/4, so trapezoid areas are 1/80,3/80,6/80,14/80, summing to 24/80=3/10. Equality has area 1/2, leaving gap 1/5; G=(1/5)/(1/2)=2/5=0.4, equivalently 1−2×0.3. Percentage-coordinate areas carry scale factors and cannot be substituted unchanged into a zero-to-one formula. Shade the gap lightly and keep trapezoid divisions on a checking layer rather than obscuring the curve with grid lines.</p>
+
+<h2 id="section-5">Distinguish coefficient 0.4 from index forty</h2>
+
+<p>Here G is a zero-to-one coefficient; multiplying by one hundred gives index forty under the same definition, not forty people or forty percent in poverty. G measures relative inequality, without a real income unit or poverty threshold. Multiplying all four values by three gives (3,3,6,18), with a total of thirty. This preserves shares, the curve and G without establishing identical absolute living standards. The reference’s percentage scale supports the definition, not a national-survey interpretation of four fictional individuals or policy/group comparisons.</p>
+
+<h2 id="section-6">Use equality and concentration to check the finite-population maximum</h2>
+
+<p>Equality control (2.5,2.5,2.5,2.5) has total ten and follows the diagonal: area 1/2, G=0. Concentration (0,0,0,10) stays at zero through population share 3/4, then forms a triangle of area 1/8, so G=3/4=0.75, not one. With this four-person empirical polyline and no 4/3 correction, the fixed-four nonnegative maximum is 3/4. Another corrected coefficient requires a new definition, not a silent change leaving 0.4 unchanged. Label controls separately without overwriting the original data. The maximum follows from area: nonnegative cumulative heights make the first three areas nonnegative. The last width is 1/4, its final height one and initial height nonnegative, so its area is at least 1/8. Thus total area is at least 1/8 and G≤3/4, attained by concentration. This bounds every four-person nonnegative input under the stated definition, not just one example. Different population sizes or weights require a new final-interval width and bound.</p>
+
+<pre><code class="language-text">x=(1,1,2,6); n=4; total=10
+Lorenz=(0,0),(1/4,1/10),(1/2,1/5),(3/4,2/5),(1,1)
+trapezoids=(1,3,6,14)/80; area=3/10
+G=1-2*area=2/5=0.4; index=40
+equality (2.5,2.5,2.5,2.5): G=0
+concentration (0,0,0,10): area=1/8; G=3/4
+no finite-sample correction
+</code></pre>
+
+<h2 id="section-7">Diagnose sorting, denominators and straight segments</h2>
+
+<p>If the endpoint misses (1,1), check a dropped duplicate one or incorrect total ten. For a curve above equality, check sorting and accumulation rather than flipping the picture. If G=0.6, check whether under-curve area 0.3 was mistaken for the gap. If concentration gives one, inspect a silently changed finite-sample definition. Keep the faulty draft, repair the data table, then points and straight segments, not just the final G label. A smooth curve through the same points may change area and therefore the coefficient.</p>
+
+<h2 id="section-8">Reopen and recover the coefficient from shares and area</h2>
+
+<p>Save native work, four inputs and trapezoid ledger, export SVG or PDF and open a PNG separately. At fit-to-window size inspect separately framed baseline and controls; enlarge for denominators such as 1/80 and the 0.4/40 scale note. Reopen editable work, hide G, recompute cumulative points and areas, then check concentration at 0.75. Deliver equal weights, nonnegativity, positive total, linear interpolation and no correction; mark unperformed output pending. The app merely depicts statistics, without retrieving World Bank data, estimating poverty, handling survey weights or certifying economic conclusions.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-paired-value-scatterplot/">VectorPaint scatterplots: map every point to two values</a>; <a href="/en/guides/vectorpaint-boxplot-quartile-whisker-convention/">VectorPaint box plots: declare quartile and whisker conventions first</a>.</p>
+
+<p>Method sources: <a href="https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SI.POV.GINI">World Bank: Gini/Lorenz definitions and scale</a>. The reference supplies cumulative-share and relative-area definitions, without national data. The four-person uncorrected empirical polyline, allocations and finite maximum are calculated under this lesson’s explicit definition.</p>
+
+<p>Version and operation scope: checked on 19 November 2026 against the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261119-vectorpaint">Apple public lookup</a>: version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.</p>
+{% endraw %}

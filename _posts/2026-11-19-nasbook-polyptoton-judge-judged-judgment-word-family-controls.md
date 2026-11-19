@@ -1,0 +1,70 @@
+---
+layout: guide
+author: Bison
+app_id: nas_book
+title: 书屿同根异形细读：judge、judged与judgment不能只靠子串搜索数齐
+description: 固定九词原创句的三个同根形式，再用精确重复、替词与追加句区分出现次数和词形数。
+permalink: /guides/nasbook-polyptoton-judge-judged-judgment-word-family-controls/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: 教程
+level: 进阶
+series_order: 226
+topic: 词形、修饰与诗文结构的证据
+reading_time: 10
+---
+
+三个词看起来不完全相同，仍可能以同一词根形成近距离呼应。本课在书屿读一个原创英语短句，先按词定位，再核词族关系和语境作用。中文说明只解释阅读任务，不把翻译后的汉字差异冒充原英语词形结构。
+
+## 先给原句与计词规则固定边界
+
+自制卡A只有下方一句，大小写不区分词形，句末句号不计词，按空格分成九个完整词。P1放原句，P2放词号、词形与功能表，P3放控制，导出保留字母的PDF或EPUB并留源稿。导入后核judgment没有被OCR改成其他拼写，给P1书签。有高亮时分别选三词，不能选字则外部记词号，不假定应用自动分词、词干还原或识别修辞；正文里的术语说明不纳入这句的出现次数。
+
+## 先列词号再确定三个候选
+
+依次为Those一、who二、judge三、the四、judged五、must六、question七、their八、judgment九。候选落第三、第五、第九词，各出现一次，共三个词次，三个不同书写形式。judge在句中是动词，judged在the judged中指被评判的人，judgment是名词，不能仅按都含几个相同字母便跳过功能。表格保留原样词及所在短语，尤其the judged不能断成一个无对象的“已经判断了”来解释全句。
+
+分词规则写在表头：按空格切分并去末尾句号，不把judged拆成judge加d，也不把judgment按词根另计两词。人工判断词族与机械统计字符各答不同问题。若源稿将judg-ment断行，先回可编辑稿恢复整词，再统计，不能用排版连字符制造一个新词形来夸大修辞密度。
+
+```text
+A: Those who judge the judged must question their judgment.
+tokens: Those1 who2 judge3 the4 judged5 must6 question7 their8 judgment9
+selected positions=3,5,9; occurrences=3; written forms=3
+B: Those who judge the accused must question their verdict.
+C: Judge, judge, judge.
+D: A followed by: They judge.
+```
+
+## 按同根异形定义建立关系
+
+polyptoton在所引修辞定义中是邻近使用同词的不同形式或同源词。本句judge、judged、judgment构成这一词族关系，变化既有屈折也有派生，不只限动词时态。judgment少了judge末尾e，不能据严格子串未出现judge就说它不属于词族。反过来，相同字母片段也不自动证明同源；本课不把词根判断简化为任意三个连续字母相同。缺乏词汇关系依据的新词应标待核，而不是让搜索次数替代定义。
+
+## 语境作用要从动作关系推候选
+
+原句把执行评判的动作、被评判者和评判结果放在同一小段，末尾要求检查自己的judgment，可读为把注意力从他人转向评判者自身。词族联系支持这种局部回转，不证明作者一定愤怒、讽刺或代表某种现实立场。句中question是质疑这一动词，不属于所选judge词族，不能为了多凑一个相近意思就算入形式链。保存字面关系与效果候选两栏，解释若超出句中证据就明确写成推测。
+
+## 精确重复卡不满足本次异形证据
+
+卡C只写Judge, judge, judge，按当前忽略大小写和标点规则有三词次，但只有一种书写形式。它有重复，不能凭出现三次就恢复卡A三种形态的证据。本课检查的是词形差异，不否认重复本身可能有别的修辞作用；若讨论同形而词性改变，还需明确另一判据，不能无说明混入当前表。字母大小写变化也不是自动产生了不同派生形式，必须先统一计数约定再比较。
+
+## 替词与追加句分清范围变化
+
+卡B把judged改accused、judgment改verdict，留下judge一项，因此所选同根异形链在该句不成立；意义相近不保留原词形结构。卡D则在完整A后另加They judge，所选词族词次变四，书写形式仍三，并非新增一个第四词形。两卡都要保留新范围，不能把B的词与A混算，或将D的追加句算进A原九词。控制用于查计数对象，不宣称新句意思与原句完全相同，尤其换词可能改变语气与指称。
+
+再做大小写控制，把句首Those改成THOSE而不改任何judge词族成员，三个位置和三种词形都不变。本课忽略大小写的约定不是说所有语义差别都可删掉；若将judgment改成question，词族总数就从三降到二。一次只替一词，原文、控制与结果分别保存，不能把词族数和句子总词数混成一列。
+
+## 搜索结果回到完整词与原句核
+
+若检索judge只显示部分候选，先核是否按子串、整词或其他规则匹配，不从结果数直接认定修辞不存在。可分别检索judge、judged、judgment并回原句手工定位，不能把一处重复命中算两次；扫描不能检索则直接看P1。三词位置、词形数和词族判断分栏，不把书屿全文搜索说成词源分析器。排障先核原拼写与范围，再核定义，最后才讨论效果，保留修正前表让读者知道为何一次“找到三个”仍可能数错。
+
+## 重开交付位置词族与限定解释
+
+重开P1遮住表，先指第三、第五、第九词，再给三词次三词形，并用C和D解释次数与形式为何可分开变化。恢复B核同义替换不保证结构保留，最后将语境效果留作有据候选。交付原英语、计数约定、控制与手工检索记录，未执行高亮书签重开标待办。中文释义没有被声称自动保留英语词根效果，书屿也未被说成已识别修辞或完成语言学测试；结论只到所给短句和明确判据。
+
+## 相关教程与资料
+
+[书屿首语重复细读：固定连续分句开头，再核相同词组的变化](/guides/nasbook-anaphora-successive-clause-opening-scope/)、[书屿句末重复细读：先定分句边界，再核共同收尾短语](/guides/nasbook-epistrophe-clause-ending-repetition-scope/)。
+
+方法依据：[BYU Burton：polyptoton](https://rhetoric.byu.edu/Figures/P/polyptoton.htm)。本课图、报告数据、错例及记录表均为原创练习。
+
+版本核对：2026年11月19日，[Apple公开查询](https://itunes.apple.com/lookup?id=6766198898&country=cn&entity=software&timestamp=20261119)显示书屿1.1.4，最低iOS / iPadOS 15.6；公开能力见[官方App Store](https://apps.apple.com/cn/app/id6766198898)。本课使用自制PDF、EPUB或清楚的文本材料阅读，书签、高亮和笔记依实际格式与可见入口操作，不假定自动求解或文学分析功能。外部制作与纸面预期不等于已做真机观察，未执行项目照实留空。

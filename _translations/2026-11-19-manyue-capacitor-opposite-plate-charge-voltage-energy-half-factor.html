@@ -1,0 +1,81 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Read capacitor cards in ManYue: zero net plate charge does not mean zero stored energy'
+description: Track opposite charges on a four-microfarad capacitor and check the half factor using the voltage-versus-transferred-charge
+  area.
+permalink: /en/guides/manyue-capacitor-opposite-plate-charge-voltage-energy-half-factor/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 243
+topic: Quantitative cards for charge, energy and fields
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-19-manyue-capacitor-opposite-plate-charge-voltage-energy-half-factor.md
+source_url: /guides/manyue-capacitor-opposite-plate-charge-voltage-energy-half-factor/
+translation_method: editorial
+translation_source_sha256: 258b19529da8f9e7180c7582e27116767a7e14d2f4cbf4ea0fb8a971a67afeb1
+translation_date: '2026-11-19T01:51:03+00:00'
+excerpt: Track opposite charges on a four-microfarad capacitor and check the half factor using the voltage-versus-transferred-charge
+  area.
+---
+{% raw %}
+<p>Adding opposite plate charges to zero does not erase stored field energy. Separate a plate diagram, Q/V ledger and energy-area panel, distinguishing charge magnitude from system net charge. Use an ideal linear capacitor only, without physical charging or discharging.</p>
+
+<h2 id="fix-plate-identities-and-the-potential-difference">Fix plate identities and the potential difference</h2>
+
+<p>Use an ideal 4μF capacitor, initially uncharged, with separate static final voltages 3V and 6V while geometry/material remain unchanged. Put plates/signs on P1, charges on P2 and voltage versus transferred charge on P3; export PDF and retain source work. Check μ is not m after import and bookmark P3. V is the magnitude of plate potential difference; Q is each equal-and-opposite plate-charge magnitude, not their combined net charge.</p>
+
+<h2 id="compute-each-plate-magnitude-using-cv">Compute each plate magnitude using CV</h2>
+
+<p>Q=CV gives 12μC at 3V: +12 on one plate and −12 on the other. At 6V they are +24 and −24μC. Combined net is zero in both cases; sums of absolute charges are 24 and 48μC, also distinct from Q=12 and 24. Label all three quantities. Transferring charge from one plate to the other establishes separation; net neutrality does not imply zero local charge everywhere or permit deleting plate signs.</p>
+
+<p>An uncharged Q=0, V=0 control still has specified C=4μF; 0/0 is not zero farads. Q=CV remains valid at the origin, but that one ratio cannot determine C without a nonzero state or slope. Distinguish existing device parameter, zero present energy and undefined ratio, without claiming parameter fitting from device readings.</p>
+
+<h2 id="cross-check-three-equivalent-energy-expressions">Cross-check three equivalent energy expressions</h2>
+
+<p>For a linear ideal capacitor U=CV²/2 gives 18μJ at 3V and 72μJ at 6V. QV/2 gives 12×3/2 and 24×6/2, and Q²/(2C) agrees. Doubling voltage doubles charge but quadruples energy. μF times V² produces μJ, not 72J. Stored energy is nonnegative; the negative plate’s −24 does not add a minus sign to total energy.</p>
+
+<p>List 72μJ=0.072mJ=0.000072J and 18μJ=0.000018J. Different bare numbers do not imply different energy when prefixes change. Use one unit across state bars or change number/unit together. Extra displayed digits aid checking within specified inputs, not a claim of equivalent physical measurement precision.</p>
+
+<pre><code class="language-text">C=4 microfarad; equal opposite plate charges
+V=3 V: Q=12 microcoulomb; U=18 microjoule
+V=6 V: Q=24 microcoulomb; U=72 microjoule
+plate net charge=+Q-Q=0
+U=C*V^2/2=Q*V/2=Q^2/(2*C)
+wrong full rectangle Q*V at 6 V=144 microjoule
+</code></pre>
+
+<h2 id="explain-the-half-factor-with-a-triangular-area">Explain the half factor with a triangular area</h2>
+
+<p>On P3 let horizontal q run 0–24μC and vertical v=q/C run 0–6V. Reversible quasistatic charging work is area under v versus q: a triangle of base 24 and height 6 gives 72μJ, not the 144μJ rectangle using final voltage throughout. The 3V triangle has base 12, height 3, area 18. q is a process variable and Q the endpoint. This line does not imply linear voltage versus time; no time axis was supplied.</p>
+
+<p>For the 3V→6V segment, energy increase 72−18=54μJ and extra transferred charge 24−12=12μC. Linear voltage rises 3→6V, so segment-average 4.5V times 12μC gives 54μJ. Using final 6V throughout gives 72μJ; using initial 3V gives 36μJ. Neither is this increment. Separate endpoint energy from increase relative to a specified starting state.</p>
+
+<h2 id="choose-the-controlled-quantity-for-isolated-versus-voltage-held-cases">Choose the controlled quantity for isolated versus voltage-held cases</h2>
+
+<p>Consider a separate mathematical 8μF control. At fixed 6V, Q=48μC and U=144μJ. Isolated at fixed Q=24μC, V=3V and U=36μJ. These constraints differ; doubling C cannot retain both original Q and V. No physical method of changing geometry/material is prescribed, and external mechanical work, real losses and source output are not calculated. Stored-energy change alone is not a complete real-operation energy budget.</p>
+
+<h2 id="keep-ideal-storage-separate-from-device-ratings">Keep ideal storage separate from device ratings</h2>
+
+<p>Mark linearity, unchanged material state and specified potential differences. A real 4μF value does not supply voltage rating, leakage, losses or nonlinear response; the 6V card is no operating instruction for every 4μF component. 72μJ also determines neither peak discharge current nor duration without resistance and circuit dynamics. This task checks endpoint charge/energy. Field lines indicate direction, not measured strength from their drawn count.</p>
+
+<h2 id="check-the-quantity-before-its-exponent">Check the quantity before its exponent</h2>
+
+<p>Zero energy from zero net charge calls for identifying Q as a single-plate magnitude. 36μJ at 6V suggests treating voltage linearly; 144μJ suggests missing the half. Enlarge μ, squares and plate signs and revisit triangle versus rectangle on P3. Correct one field while preserving the faulty card, not resizing drawings to match answers. Net plate charge alone without V/C leaves energy undetermined; a familiar symbol supplies no numbers.</p>
+
+<h2 id="reopen-and-check-two-endpoints-and-the-constraint-control">Reopen and check two endpoints and the constraint control</h2>
+
+<p>At the reopened area bookmark, hide answers and recover 12μC/18μJ at 3V and 24μC/72μJ at 6V, explaining why net zero does not erase them. Check 144 versus 36μJ for 8μF under fixed V/Q. Deliver plate identities, three formulas, area reasoning and controlled quantities, leaving unperformed import/reopening pending. This reproducible reading diagram is not App capacitance measurement, automatic integration, device charging or component-rating validation.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/manyue-current-net-charge-section-electron-opposite-direction-ledger/">ManYue current and net charge</a>; <a href="/en/guides/manyue-resistor-power-fixed-voltage-versus-current-energy-ledger/">ManYue power and energy</a>.</p>
+
+<p>Method references: <a href="https://openstax.org/books/university-physics-volume-2/pages/8-1-capacitors-and-capacitance">OpenStax capacitors and capacitance</a>; <a href="https://openstax.org/books/university-physics-volume-2/pages/8-3-energy-stored-in-a-capacitor">OpenStax energy stored in a capacitor</a>. Diagrams, report data, counterexamples and ledgers are original exercises.</p>
+
+<p>Version checked on 19 November 2026: the <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261119">Apple public lookup</a> lists ManYue 2.0.6, requiring iOS / iPadOS 15.0 or later; see the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities. Use self-made PDFs or supported comic images; controls depend on the installed version. External preparation and paper predictions do not constitute device observations. Leave unperformed checks blank.</p>
+{% endraw %}

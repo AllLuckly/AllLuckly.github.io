@@ -1,0 +1,77 @@
+---
+layout: null
+permalink: /guides/vectorpaint-ramsey-three-three-six-two-colours-five-cycle-control/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: VectorPaint两色完全图：六点必有同色三角，五点循环可避开
+agent_source_url: https://allluckly.cn/guides/vectorpaint-ramsey-three-three-six-two-colours-five-cycle-control/
+agent_source_sha256: b18939f2d3f57408b71173bb3bf4161fe51f1d7fafd2a4b7d7099d5a1b17ab26
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint两色完全图：六点必有同色三角，五点循环可避开
+
+语言：zh-CN
+原文：[VectorPaint两色完全图：六点必有同色三角，五点循环可避开](<https://allluckly.cn/guides/vectorpaint-ramsey-three-three-six-two-colours-five-cycle-control/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-ramsey-three-three-six-two-colours-five-cycle-control/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-ramsey-three-three-six-two-colours-five-cycle-control/>)
+发布于: 2026-11-19T00:00:00+08:00
+内容更新于: 2026-11-19T00:00:00+08:00
+署名：Bison
+
+以六点十五边与五点十边控制核R(3,3)=6，分完全图、同色三边和图面交叉点。
+
+给每对不同顶点之间的边恰涂红蓝之一，问是否一定存在三条边同色的三角形。不是先画一个彩色三角再宣称任何图都有，也不把只缺一边的V形当三角。先证明六点足够，再用五点反例证明不能降低到五，两份证据一起才得到最小值六。
+
+## 先建六点十五边的完全图
+
+顶点编号零到五，每一无序对恰有一边，无自环、无平行重复边、无方向，共6×5/2=15边。建议2000×1600像素，六点放近正六边形位置，仅为减少标签重叠，不赋予边长含义。顶点、全部边、色类、证明与五点控制分组并存原稿。先逐点核五个邻居，别漏三条长对角；每边只选红或蓝一个类别，未涂边或同时两色都会改变问题。线的交叉不增加新顶点。
+
+## 从任一点的五条边找三个同色邻点
+
+任选顶点零，它连出五边。红蓝两类中至少一类有三条或更多，否则各至多二条合起来至多四，与五条矛盾。为讲解设红边至少三，选其三个端点一、二、三；若多数类是蓝，后续把红蓝互换即可。此步只保证零到这三点同色，并未保证三端点之间的边是什么颜色。图里先把三条边加粗，保留另外两条，不把未选邻点删掉后误称只剩四点完全图。
+
+## 三个邻点分成两种完整情况
+
+查看一二、一三、二三三条边：若其中任一红，例如一二红，则零一、零二、一二构成红三角。若一条红都没有，这三条必须全蓝，于是一二三构成蓝三角。两情况覆盖全部红蓝选择，所以六点任意涂色必有同色三角。注意只说至少一只，不说恰一只，也不保证含顶点零；第二种蓝三角就不含零。必须三点之间三边齐同色，三条红边都从零发散本身还不构成三角。
+
+## 画一个可核验例但不把例子当证明
+
+示例红边选01、02、03、12，其余十一边全蓝，共四红十一蓝仍十五。高亮红三角012，核三条确在红清单；这只是通用证明的一种呈现，不代表所有涂色都有同一012。可另在检查层把12、13、23都改蓝、保留01、02、03红，直接看蓝三角123出现。改色控制不新增或删除边，旧高亮随条件更新，不能只换一根颜色还沿用旧三角名。三角形可跨过画面其他线条，不据封闭小面数量计数。
+
+## 五点红五环与蓝五环没有同色三角
+
+另框用零到四的完全图，共十边，红边为01、12、23、34、04，即一个五环；其余02、03、13、14、24为蓝。蓝边按0到2到4到1到3再回0也构成五环，两色各五边，都没有三边短环。逐个三点核亦可：没有一组的三边同色。这个五点涂色反例说明五不够，不是说任何五点涂色都没有同色三角；全红五点当然有。边交叉仍不增加交点顶点，否则反例对象已不是五点图。
+
+## 上下界合在一起才写最小六
+
+把六点任意涂色必有写成R(3,3)≤6，五点存在反例写成R(3,3)\>5，两者合得R(3,3)=6。这里R指最少顶点数，三三指目标两种颜色各自的完全三点子图，不是六条边或三个红点三个蓝点。所有顶点本身不涂分类色，颜色只赋给边。图例可用实线红、虚线蓝加R/B文字，保证黑白输出仍可追边；高亮另用外圈，不把某条红边叠蓝而变成第三色。
+
+```
+K6: vertices=6; edges=6*5/2=15
+example red={01,02,03,12}; blue=all other pairs
+red triangle={01,02,12}
+at 0: >=3 incident edges share a colour
+three selected neighbours: same-colour edge or opposite-colour triangle
+K5 control red={01,12,23,34,04}
+K5 control blue={02,03,13,14,24}
+no monochromatic triangle in K5 control
+R(3,3)<=6 and R(3,3)>5, hence R(3,3)=6
+```
+
+## 按完整边表与三边同色排障
+
+若六点没有找到同色三角，先核十五边是否齐、每边是否恰一类，再按顶点零的五边重新分组，不能只搜索三个相邻外框点。若找到V形就停，补查端点间第三边；若五点反例出红三角，先核04与02是否抄反。保留故障稿，一次只修边身份或色类，重读清单后再高亮。证明只涉及确定的有限图，不推导现实人际关系概率、调查样本或任何随机颜色频率，图的几何美观也不影响结论。
+
+## 重开凭两份证明恢复最小值
+
+保存原生图、十五边例与十边控制，导出SVG或PDF并另开PNG。适应窗口核六点五点分框，放大查蓝虚线不断成漏边、交叉无多余圆点。重开编辑稿先隐藏结论，用五边两类论证恢复上界，再沿红蓝五环恢复下界。交付同色三角定义、两情况与五点边表，未做输出步骤记待办。应用仅手工呈现图，不自动穷举涂色、证明Ramsey数或分析现实社交网络；本课不把一次例图通过当所有构型的设备测试。
+
+## 相关教程与资料
+
+[VectorPaint 三对三连图：交叉不是节点，非平面性需要证明](<https://allluckly.cn/guides/vectorpaint-complete-bipartite-three-by-three-nonplanarity/>)、[VectorPaint二部图匹配：交替路重配三项任务，局部邻域不足就无解](<https://allluckly.cn/guides/vectorpaint-bipartite-matching-alternating-path-hall-obstruction/>)。
+
+方法来源：[MIT：Ramsey Numbers及R(3,3)证明](<https://math.mit.edu/~apost/courses/18.204_2018/ramsey-numbers.pdf>)。来源核两色完全图、最小顶点数及六点上界五点反例原理。编号、四红十一蓝示例和全部边表独立核算，不导入现实社交含义。
+
+版本与操作范围：2026年11月19日核[VectorPaint官方商店](<https://apps.apple.com/cn/app/id1587272880>)与[Apple公开查询](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261119-vectorpaint>)，公开1.0.8，最低iOS / iPadOS 17.0。使用已公开的形状、钢笔、贝塞尔节点、网格辅助线、对齐、图层分组、文字和保存输出手工绘图；入口按安装版本实际可见为准。计算、定义与复算在应用外准备，不推断内置公式、统计或图论求解能力。原生稿保留可编辑结构，SVG、PDF、PNG各按需要阅读检查，含导入位图的SVG或PDF不自动成为全矢量。画布与样本为原创教学设定，未执行真机或实物测量，未做的操作明确待做。
+{% endraw %}

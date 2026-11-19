@@ -4,7 +4,7 @@ app_id: icouldplay
 title: 云映 iCouldPlay：iPhone 与 iPad 视频播放器、NAS 与个人媒体库
 description: 了解云映的本地视频、SMB、WebDAV、FTP、媒体服务器、字幕和双引擎播放功能，从 160 篇中文教程中选择自己的使用路线。
 permalink: /apps/icouldplay/
-modified: 2026-11-18
+modified: 2026-11-19
 ---
 
 云映的英文名是 **iCouldPlay**。它用来播放和整理自己已有的视频：文件可以保存在手机、相册、NAS，也可以由 Emby、Jellyfin、Plex、Kodi 或绿联云视频提供。先接好内容来源，再整理海报和字幕，会比一开始就扫描整个硬盘更容易排查问题。

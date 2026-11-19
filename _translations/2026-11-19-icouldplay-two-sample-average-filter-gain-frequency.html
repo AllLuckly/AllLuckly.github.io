@@ -1,0 +1,81 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay two-sample average: halving adjacent samples does not halve every frequency'
+description: 'Check two-point averaging with four original sequences: frequency response, unity DC gain and the
+  Nyquist zero, then observe externally processed clips.'
+permalink: /en/guides/icouldplay-two-sample-average-filter-gain-frequency/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 209
+topic: Sampling, delay and conditions for sound analysis
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-19-icouldplay-two-sample-average-filter-gain-frequency.md
+source_url: /guides/icouldplay-two-sample-average-filter-gain-frequency/
+translation_method: editorial
+translation_source_sha256: 0e8a5cf3021e6012f06f7a2375ab997dded61d83c1421dab970b0d684daa1628
+translation_date: '2026-11-19T01:27:23+00:00'
+excerpt: 'Check two-point averaging with four original sequences: frequency response, unity DC gain and the Nyquist
+  zero, then observe externally processed clips.'
+---
+{% raw %}
+<p>Averaging two adjacent audio samples is a simple filter. Halving each sample independently is uniform gain. Both operations contain a factor of one half, but their frequency behavior differs. Start with original discrete sequences and only then observe externally produced sources in iCouldPlay; the app is not assumed to contain this filter.</p>
+
+<h2 id="section-1">Define averaging and a separate gain control</h2>
+
+<p>Fix the rate at 8 kHz. Define y as the current plus previous input sample divided by two, and a separate control v as the current sample divided by two. Start indices at zero and state that sinusoidal gains are steady-state results. For a finite clip, define its preceding sample as zero rather than silently wrapping the end. Retain distinct input, processing and export records. No undocumented two-point filter button is required in iCouldPlay. If existing external tools cannot perform it, complete the sequences and mark processing and playback unperformed; renaming one original does not create different treatments.</p>
+
+<pre><code class="language-text">y[n] = (x[n] + x[n-1]) / 2
+v[n] = x[n] / 2
+Fs = 8000
+</code></pre>
+
+<h2 id="section-2">Check unity gain with a constant input</h2>
+
+<p>For a sustained input of 0.2, averaging remains 0.2 once both samples are within the constant region; uniform halving gives 0.1. This disproves equivalence. With a zero preceding sample, a finite clip begins at 0.1 and reaches 0.2 on the next sample. Keep that boundary separate from steady-state gain. A constant is a mathematical DC input, not material to play through speakers for an extended test. Do not use audibility to decide whether DC is preserved; equations, sample inspection and listening have different scopes.</p>
+
+<h2 id="section-3">Calculate gain at each frequency</h2>
+
+<p>For a sine or cosine at f, steady-state amplitude gain is abs(cos(pi*f/Fs)). At 8 kHz this is approximately 0.923880 at 1 kHz, 0.707107 at 2 kHz and zero at 4 kHz. Uniform halving gives 0.5 throughout. For input amplitude 0.2, the first two averaged amplitudes are approximately 0.184776 and 0.141421; gain is not an instantaneous sample. At 4 kHz use the alternating signs of a cosine, avoiding a zero-phase sine whose sampled values are already all zero and therefore cannot demonstrate filtering.</p>
+
+<pre><code class="language-text">steady_amplitude_gain(f) = abs(cos(pi*f/Fs))
+</code></pre>
+
+<h2 id="section-4">Calculate alternating samples and an impulse boundary</h2>
+
+<p>For a sustained sequence alternating 0.2 and -0.2, adjacent pairs sum to zero; uniform halving still alternates 0.1 and -0.1. In a separate calculation, let only input n=0 equal one and all other values, including the preceding sample, equal zero. Averaging produces 0.5 at n=0 and n=1, then zero; halving gives 0.5 only at n=0. Label indices and do not describe the two output values as soundtracks. This checks adjacency and finite-start conditions. Unit amplitude is mathematical, not a request to play a full-scale impulse.</p>
+
+<pre><code class="language-text">input impulse:  [1,   0,   0, 0]
+average output: [0.5, 0.5, 0, 0]
+half output:    [0.5, 0,   0, 0]
+preceding input sample = 0
+</code></pre>
+
+<h2 id="section-5">Do not hide delay by removing the first output</h2>
+
+<p>Between zero and half the sample rate, where gain is nonzero, the average also has half a sample of phase delay: 62.5 microseconds at 8 kHz. This does not mean storing samples at fractional indices or aligning every transient by deleting half a number; output values remain on integer sample positions. Phase is not normally readable where the 4 kHz gain vanishes. Keep gain and phase conditions separate. Deleting the first whole sample to force a visual match introduces another time shift and changes boundaries.</p>
+
+<h2 id="section-6">Compare only processing actually present in exports</h2>
+
+<p>With trusted tools, title owned exports original, adjacent average and uniform half-gain, retaining soundtrack parameters. Confirm externally that the audio processing was applied before selecting videos in iCouldPlay. Keep normal speed, soundtrack position and output settings fixed and compare briefly at comfortable volume. Calculated gains are not measured device values. Comparing only originals cannot establish filtering, and similar posters do not establish file identity. Restore the original source for normal viewing rather than leaving an unidentified processed copy selected.</p>
+
+<h2 id="section-7">Check prior samples, phase and rate for mismatches</h2>
+
+<p>If both operations always match, check whether the previous sample was incorrectly replaced with zero or only a coincidental input was tested. For a silent 4 kHz case, first ensure the input was not already all zero. Check whether external tools used a longer window, normalized again or changed rate. At 16 kHz, a 2 kHz tone no longer has the gain 0.707107 from this example. Record corrections and identities without changing player engines to hide production differences. Without sample inspection, do not infer an exact 62.5-microsecond delay from listening.</p>
+
+<h2 id="section-8">Deliver input conditions and evidence for each stage</h2>
+
+<p>Reopen originals and copies, confirming names, titles, soundtracks and speed. Deliver constant, alternating and impulse tables, two nonzero-frequency gain calculations, phase limits and playback records, marking unmade or untested stages. Limit conclusions to this equal-weight two-point average, not every tool called smoothing or noise reduction; dialogue and music are not eternal single tones. Explain preserved constants, canceled alternation and uniform halving. A text and mathematics review makes the record reproducible, not a claim of app-based filtering, automatic measurement or all-device listening tests.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/icouldplay-audio-sample-peak-dbfs-volume-boundary/">iCouldPlay audio levels: separate sample-peak dBFS, volume controls and listening impressions</a>; <a href="/en/guides/icouldplay-audio-polarity-inversion-mono-cancellation-model/">iCouldPlay polarity comparison: why normal solo audio can cancel in a mono model</a>.</p>
+
+<p>Method sources: <a href="https://www.dsprelated.com/freebooks/filters/Rederiving_Frequency_Response.html">Julius O. Smith: Rederiving the Frequency Response</a>.</p>
+
+<p>Checked on 19 November 2026: the <a href="https://apps.apple.com/cn/app/id6755653178">official iCouldPlay listing</a> and <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261119-hls">Apple public lookup</a> list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.</p>
+{% endraw %}

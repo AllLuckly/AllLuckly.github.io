@@ -1,0 +1,96 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-ass-p2-p4-drawing-coordinate-resolution-divisor/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay ASS drawing resolution: p2 divides by two and p4 by eight'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-ass-p2-p4-drawing-coordinate-resolution-divisor/
+agent_source_sha256: 56842a6091746b9edc409c41b0e58a0ca76623bb0d1b06e1ddb3cccda2eecdc1
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay ASS drawing resolution: p2 divides by two and p4 by eight
+
+Language: en
+Canonical: [iCouldPlay ASS drawing resolution: p2 divides by two and p4 by eight](<https://allluckly.cn/en/guides/icouldplay-ass-p2-p4-drawing-coordinate-resolution-divisor/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-p2-p4-drawing-coordinate-resolution-divisor/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-p2-p4-drawing-coordinate-resolution-divisor/>)
+Published: 2026-11-19T00:00:00+08:00
+Modified: 2026-11-19T10:09:59+08:00
+Author: Bison
+
+Display identical rectangle coordinates under p1, p2 and p4, then add a coordinate-compensated p4 event in a complete four-event ASS. Separate the mode’s exponential divisor, local dimensions and script canvas. Higher coordinate resolution does not itself mean a larger drawing, sharper video or more device pixels.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-ass-p2-p4-drawing-coordinate-resolution-divisor/>), translated on 2026-11-19. Original publication dates, attribution, code and version notes are retained.
+
+Display identical rectangle coordinates under p1, p2 and p4, then add a coordinate-compensated p4 event in a complete four-event ASS. Separate the mode’s exponential divisor, local dimensions and script canvas. Higher coordinate resolution does not itself mean a larger drawing, sharper video or more device pixels.
+
+## Fix rectangle coordinates and other scales
+
+Use an owned still-scene clip at least fourteen seconds long, preserving normal subtitles. Fix a 640 × 360 script and an initial rectangle 96 wide by 48 high, zero border/shadow, both scales 100, baseline offset zero and position (120,140). Keep fill/style/viewing conditions fixed to isolate drawing-coordinate interpretation. Do not alter source-video dimensions, encoding or sharpness. Record display overrides; screenshot dimensions are not the local script units below. Preserve restoration paths for normal viewing.
+
+## Assign four intervals to modes and compensation
+
+Use p1 at 1–3 s, p2 at 4–6 s and p4 at 7–9 s with identical coordinates. At 10–12 s retain p4 but change the path to width 768 and height 384 as a separate compensation condition. The first three change only mode; the fourth intentionally changes coordinates to compensate the divisor, so not all four use the same coordinates. Although local dimensions should be restored, independently verify event identity rather than log a replay of the first as the fourth. Observe inside events, using gaps for identification and a clip extending beyond 12 s. Viewing earlier events cannot pass the unviewed fourth.
+
+## Save all four events and inspect drawing switches
+
+Save the complete UTF-8 plain-text drawing-resolution.ass with header, styles and four events, then check extension/Format columns. Each event has its mode and closing p0, outside-brace coordinates and explicit closure. p0 disables drawing; it is neither another zero-scale entry nor n=0 in the positive-integer formula. Edit externally without assuming a built-in vector editor. Record source/copy identity so accidentally loading an old p1 file is not mistaken for a failed p4 divisor.
+
+```
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,36,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:03.00,Default,,0,0,0,,{\an7\pos(120,140)\bord0\shad0\fscx100\fscy100\pbo0\p1}m 0 0 l 96 0 96 48 0 48 0 0{\p0}
+Dialogue: 0,0:00:04.00,0:00:06.00,Default,,0,0,0,,{\an7\pos(120,140)\bord0\shad0\fscx100\fscy100\pbo0\p2}m 0 0 l 96 0 96 48 0 48 0 0{\p0}
+Dialogue: 0,0:00:07.00,0:00:09.00,Default,,0,0,0,,{\an7\pos(120,140)\bord0\shad0\fscx100\fscy100\pbo0\p4}m 0 0 l 96 0 96 48 0 48 0 0{\p0}
+Dialogue: 0,0:00:10.00,0:00:12.00,Default,,0,0,0,,{\an7\pos(120,140)\bord0\shad0\fscx100\fscy100\pbo0\p4}m 0 0 l 768 0 768 384 0 384 0 0{\p0}
+```
+
+## Calculate the power-of-two divisor explicitly
+
+Aegisub specifies positive-integer mode n with resolution factor two to the power n minus one, interpreting coordinates divided by that value. Divisors are 1 for p1, 2 for p2 and 8 for p4, not 4 or 16. Dividing the corner (96,48) gives (96,48), (48,24) and (12,6), also the respective dimensions. This is not playback speed, video sample rate, glyph percentage or four path copies. Write the power before the division. Doubling coordinates at fixed mode doubles local dimensions rather than adding video detail.
+
+## Recalculate local dimensions and compensation externally
+
+With both scales 100 and pbo zero, the paper dimensions/areas are 96 × 48 = 4608, 48 × 24 = 1152 and 12 × 6 = 72. Both axes scale, so dividing area only by eight to obtain 576 is wrong for p4. Multiplying both coordinates by eight gives 768/8 = 96 and 384/8 = 48, restoring the first event’s local dimensions. Check every corner: (96,0) becomes (768,0), (96,48) becomes (768,384), and (0,48) becomes (0,384); zero start/end remain zero. Updating only the lower-right corner deforms the shape. Pair original/target points in an external table and divide each by eight to check. The player does not calculate this list, and longer numbers do not automatically refine it. This is geometric compensation, not pixel-identical antialiasing across renderers or measured device area. Compensating only width does not restore the whole rectangle.
+
+```
+Declared LOCAL dimensions; fscx=fscy=100; pbo=0
+p1 divisor 1: 96/1 x 48/1 = 96 x 48; area 4608
+p2 divisor 2: 96/2 x 48/2 = 48 x 24; area 1152
+p4 divisor 8: 96/8 x 48/8 = 12 x 6;  area 72
+p4 compensated: 768/8 x 384/8 = 96 x 48; area 4608
+p3 control: divisor 4; 96/4 x 48/4 = 24 x 12; area 288
+```
+
+## Observe the small and compensated drawings separately
+
+Associate through an actual supported installed subtitle path. Verify the first event and timing, inspect the smaller second/third drawings and check the fourth separately. An indistinct small drawing is an observation limit, not proof of no drawing. Any display enlargement creates a new condition rather than a comparable absolute-size measurement against earlier unscaled views. Format listings do not pass actual tag support. Without association/playback retain completed paper calculations with iCouldPlay pending; label external previews separately.
+
+## Change only event three from p4 to p3
+
+Save drawing-resolution-p3.ass and change only event three’s p4 to p3, retaining coordinates, timing and other tags. Its divisor becomes 4: paper width 24, height 12 and area 288, between p2 and p4, not width 12 plus one. A literal comparison should find just that mode digit changed; altering pbo zero adds a baseline factor. Compare the reloaded third event without altering the fourth. For unclear differences check current copy/mode and display path before enlarging video or inferring documented fractional-mode support from unknown tolerance.
+
+## Deliver the divisor table and recoverable original
+
+Retain complete ASS, interval list, dimension/area table, compensation calculation and p3 copy, then restore normal subtitles/display. Derive the divisor from n, explain p0, and distinguish smaller unchanged-coordinate p4 from compensated dimensions and video sharpness. Keep source checks, external models, previews and iCouldPlay viewing separate. Do not pass unperformed reopening or promise pixel-identical outputs. Changed fonts/scales/rendering paths require a new four-condition observation rather than recycling local calculations as device measurements.
+
+## Related guides and sources
+
+[p1 polygons and text scope](<https://allluckly.cn/en/guides/icouldplay-ass-vector-drawing-mode-polygon-text-scope/>); [Baseline-offset direction and dimensions](<https://allluckly.cn/en/guides/icouldplay-ass-pbo-drawing-baseline-positive-negative-offset/>).
+
+Checked on 19 November 2026: [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261119-root>) lists iCouldPlay 1.1.1, requiring iOS / iPadOS 15.0 or later. The [official store](<https://apps.apple.com/cn/app/id6755653178>) describes ASS/SSA and embedded/external subtitles. Prepare source, syntax and mathematics externally; associate and observe through actual installed paths. Format support does not guarantee every instruction across all engines/devices. No completed physical-device subtitle rendering, professional pixel measurement, exhaustive-format or private-server testing is claimed.
+
+Method references: [Aegisub ASS override tags](<https://aegisub.org/docs/latest/ass_tags/>).
+{% endraw %}

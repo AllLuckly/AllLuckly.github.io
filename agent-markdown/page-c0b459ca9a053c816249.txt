@@ -1,0 +1,77 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-finite-dft-window-zero-padding-bin-spacing/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay spectrum material: padding a 16-point window to 64 does not lengthen
+  the recording'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-finite-dft-window-zero-padding-bin-spacing/
+agent_source_sha256: a68cf70250f6546f3a4f433939147a661604a4a80d188c9a596d287558fe0ad6
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay spectrum material: padding a 16-point window to 64 does not lengthen the recording
+
+Language: en
+Canonical: [iCouldPlay spectrum material: padding a 16-point window to 64 does not lengthen the recording](<https://allluckly.cn/en/guides/icouldplay-finite-dft-window-zero-padding-bin-spacing/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-finite-dft-window-zero-padding-bin-spacing/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-finite-dft-window-zero-padding-bin-spacing/>)
+Published: 2026-11-19T00:00:00+08:00
+Modified: 2026-11-19T10:10:49+08:00
+Author: Bison
+
+Check DFT bins, leakage and zero-padding with original integer- and half-integer-cycle cosines; observe only genuinely prepared owned clips.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-finite-dft-window-zero-padding-bin-spacing/>), translated on 2026-11-19. Original publication dates, attribution, code and version notes are retained.
+
+More points in a spectrum do not mean a longer or more accurate recording. Window length, signal frequency and zero-padding are often confused. Build a reproducible record from an original sixteen-point sequence, then follow its cards in an owned explanation clip in iCouldPlay. Spectrum calculation is external, not a hidden app analyzer.
+
+## Fix the real sample count and analysis interval
+
+Create two sixteen-sample cosines at 16 kHz, amplitude 0.2, with frequencies 2 kHz and 2.5 kHz. Indices are zero through fifteen. The N/Fs analysis block is 1 ms, while first-to-last sample span is 15/16,000 seconds or 0.9375 ms; these describe different intervals. Retain actual samples separately rather than calling padded zeros recorded values. Paper sequences are sufficient. A teaching video must label its calculation cards rather than imply device spectrum measurements, preserving sequence, external analysis and video identities.
+
+## Specify the DFT and normalization
+
+Here X is the sum after multiplication by complex exponentials, and displayed magnitude is abs(X)/16 without another factor of two. Sixteen-point bin spacing is 1 kHz: k=2 and k=3 mean 2 and 3 kHz. k is an integer index, not an arbitrary frequency label. A real cosine has positive- and negative-frequency components, so an on-bin cosine of amplitude 0.2 gives 0.1 in its positive bin under this convention. Document single-sided doubling or other scaling in external tools before comparing, rather than blaming text entry, video or playback.
+
+```text
+Fs = 16000
+N = 16
+x[n] = 0.2 * cos(2*pi*f*n/Fs),  n = 0..15
+X_M[k] = sum(x[n] * exp(-2*pi*i*k*n/M), n=0..15)
+shown_magnitude = abs(X_M[k]) / 16
+M = 16 or 64 (zero-padding only)
+```
+
+## Check the integer-cycle reference
+
+The 2 kHz reference completes exactly two cycles in the 1 ms block. Its normalized sixteen-point DFT is 0.1 at positive bin k=2 and symmetric negative bin k=14, with other theoretical values zero apart from numerical residue. Recalculate with existing tools and document formula, length and precision. Residue near 1e-15 is not evidence of an added audible noise. Concentration applies to this on-bin pure cosine with rectangular truncation, not every short musical window. Video titles or audio markers are outside this defined sixteen-point sequence.
+
+## Inspect the noninteger-cycle boundary
+
+The 2.5 kHz reference spans 2.5 cycles, and the sixteen-point grid has no 2.5 kHz bin. With the same normalization, magnitudes are about 0.059652 at k=2 and 0.067958 at k=3, with nonzero values elsewhere. The original did not suddenly become separate 2 and 3 kHz tones; this is its finite-window DFT representation. Compare it with the integer-cycle reference while retaining all sixteen samples. Repeating the waveform to extend it changes the analyzed signal and invalidates this check. Separate window boundaries from genuinely added samples.
+
+## Zero-padding changes the grid, not observed duration
+
+Append forty-eight zeros to the same sixteen samples and compute a 64-point DFT, still dividing magnitude by the original sixteen. Bin spacing becomes 16,000/64=250 Hz, and k=10 evaluates 2.5 kHz. The actual observation remains sixteen samples, not a 4 ms recording. The spectrum is sampled more densely, but the finite window’s main-lobe width and ability to distinguish neighboring sources do not automatically improve. Recording forty-eight additional real samples is a different experiment; equal array lengths do not establish equal evidence.
+
+## Windowing is a separate change of weights
+
+Choosing a Hann or another window multiplies samples by new weights, changing the rectangularly truncated sequence and requiring documented amplitude calibration. It may reduce distant sidelobes while changing the main lobe, not eliminate every form of leakage or always improve clarity. First complete the rectangular numerical check, then save separately windowed cases with the tool’s actual definition. Symmetric and periodic windows need not have identical weights. No scientific library installation is required. If existing tools cannot reproduce a comparison, mark it unperformed instead of using someone else’s screenshot as your result.
+
+## Read units and versions when viewing the cards
+
+Create separate owned cards for on-bin, off-bin and padded results. If production tools are already available, include them in an owned explanation clip with clear titles. Select through actual local-video controls and read recorded count, analysis count, rate, bin spacing and normalization denominator on each card. For small text, check the source card’s clarity. Playing a DFT card does not analyze the current soundtrack. Without a video, record text verification and leave viewing unperformed. Changing playback speed cannot change the source-analysis numbers.
+
+## Troubleshoot conventions and deliver reproducible files
+
+An on-bin value of 0.2 may indicate single-sided doubling. A fourfold amplitude reduction after padding suggests division by 64 instead of 16. Thousandfold frequency differences suggest Hz versus kHz. Check starting phase, count and window weights one condition at a time. Retain sequences, formulas, outputs, padding/window descriptions and actual card-viewing records. Reopen the identified source before restoring ordinary viewing. Explain why more spectral grid points and longer real observations differ. Mathematical and page checks establish traceability, not app-based spectrum measurement or unlimited separation of close frequencies.
+
+## Related tutorials and sources
+
+[iCouldPlay frame counts and time notes: keep average rate separate from frame position](<https://allluckly.cn/en/guides/icouldplay-frame-count-file-time-boundary/>); [iCouldPlay audio calculations: distinguish sample rate, bit depth and encoded bitrate](<https://allluckly.cn/en/guides/icouldplay-audio-sample-rate-bit-rate-size/>).
+
+Method sources: [SciPy official Discrete Fourier Transforms tutorial](<https://docs.scipy.org/doc/scipy/tutorial/fft.html>).
+
+Checked on 19 November 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261119-hls>) list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.
+{% endraw %}

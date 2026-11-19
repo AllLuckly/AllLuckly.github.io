@@ -1,0 +1,95 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-ass-pbo-drawing-baseline-positive-negative-offset/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay ASS drawing baseline: pbo offsets are not line position or rectangle
+  height'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-ass-pbo-drawing-baseline-positive-negative-offset/
+agent_source_sha256: e516599db87dc8ea59c14116534b97c255c1d45e7cda859b0d1d972fab413353
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay ASS drawing baseline: pbo offsets are not line position or rectangle height
+
+Language: en
+Canonical: [iCouldPlay ASS drawing baseline: pbo offsets are not line position or rectangle height](<https://allluckly.cn/en/guides/icouldplay-ass-pbo-drawing-baseline-positive-negative-offset/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-pbo-drawing-baseline-positive-negative-offset/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-pbo-drawing-baseline-positive-negative-offset/>)
+Published: 2026-11-19T00:00:00+08:00
+Modified: 2026-11-19T10:09:59+08:00
+Author: Bison
+
+Create three events with the same text prefix and rectangle, using offsets zero, positive twenty and negative twenty. Save complete ASS and observe relative positions through an actual path. Use a declared local-coordinate model for direction and dimensions, without equating baseline offsets with device coordinates or extending drawing directives to ordinary text/video.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-ass-pbo-drawing-baseline-positive-negative-offset/>), translated on 2026-11-19. Original publication dates, attribution, code and version notes are retained.
+
+Create three events with the same text prefix and rectangle, using offsets zero, positive twenty and negative twenty. Save complete ASS and observe relative positions through an actual path. Use a declared local-coordinate model for direction and dimensions, without equating baseline offsets with device coordinates or extending drawing directives to ordinary text/video.
+
+## Prepare one text prefix and a separate drawing
+
+Use an owned still-scene clip at least fourteen seconds long, preserving normal subtitles/video. Each event starts with BASE and one space, enters p1 drawing for an 80-wide, 30-high rectangle, then returns to text mode with p0. Text is a relative reference within the event, not a promise of a device-measurable font baseline. Fix a 640 × 360 script, example Arial size 36, both scales 100 and zero border/shadow. Record fallback and hold font, size and video fitting fixed rather than manufacture the expected position through altered line layout.
+
+## Assign separate intervals to zero and signed offsets
+
+Use pbo0 at 1–4 s, pbo20 at 5–8 s and pbo-20 at 9–12 s, with identical text, path, position (120,140) and remaining parameters. Observe inside events, for example at 2, 6 and 10 s, rather than only a transition frame. These are successive static conditions without interpolation; their gaps are not continuous translation animation. Ask separately about drawing direction relative to baseline, rectangle dimensions and line-position conditions. The sign belongs to the drawing offset, not event timing: the negative-offset event still starts at 9 s, not twenty seconds earlier.
+
+## Save the full baseline comparison rather than isolated commands
+
+Save the complete UTF-8 plain-text drawing-baseline.ass, checking header, style, events and extension instead of rich text or ass.txt. BASE lies outside overrides; m/l coordinates are between p1 and p0, outside braces. Put pbo in the drawing-enabling override. Every path explicitly returns to its start. Retain final p0 even without following text so later additions do not inherit an overlooked drawing mode. Edit externally; iCouldPlay association/viewing depends on actual installed paths, with no assumed path editor, baseline ruler or generation button.
+
+```
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,36,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:04.00,Default,,0,0,0,,{\an7\pos(120,140)\bord0\shad0\fscx100\fscy100}BASE {\p1\pbo0}m 0 0 l 80 0 80 30 0 30 0 0{\p0}
+Dialogue: 0,0:00:05.00,0:00:08.00,Default,,0,0,0,,{\an7\pos(120,140)\bord0\shad0\fscx100\fscy100}BASE {\p1\pbo20}m 0 0 l 80 0 80 30 0 30 0 0{\p0}
+Dialogue: 0,0:00:09.00,0:00:12.00,Default,,0,0,0,,{\an7\pos(120,140)\bord0\shad0\fscx100\fscy100}BASE {\p1\pbo-20}m 0 0 l 80 0 80 30 0 30 0 0{\p0}
+```
+
+## Read the documented downward and upward directions
+
+Aegisub defines pbo as a drawing-baseline Y offset: positive places the drawing below the baseline and negative above. Calling pbo20 an upward shift reverses the definition. It neither resets pos nor changes video-frame coordinates. Interpret the script’s downward Y direction at a fixed drawing scale. Font metrics, line bounds and alignment anchors can affect final layout, so adding 20 to pos Y 140 does not establish a rectangle top at device pixel 160. Absolute bounds need separate rendering/measurement evidence.
+
+## Check local ranges at fixed p1 without claiming device pixels
+
+The external paper model covers only this p1 drawing at vertical scale 100, mapping local y to y plus the offset. Its original x range is 0–80 and y range 0–30; offset 20 gives y 20–50 and offset -20 gives -20–10. Width 80, height 30 and area 2400 remain unchanged; negative coordinates do not create negative height. Check corners too: positive twenty takes upper-left (0,0) to (0,20) and lower-right (80,30) to (80,50). Both move equally, not just the bottom edge. Negative twenty gives (0,-20) and (80,10); the lower endpoint 10 is not a new height of 10. This distinguishes translation from a height parameter, without calculating font line boxes, player overrides or device pixels. Different drawing modes/vertical scales need separate models rather than this fixed-condition table.
+
+```
+Declared LOCAL p1 model; fscy=100; NOT device pixels
+pbo 0:   x [0,80], y [0,30],    width 80, height 30, area 2400
+pbo 20:  x [0,80], y [20,50],   width 80, height 30, area 2400
+pbo -20: x [0,80], y [-20,10],  width 80, height 30, area 2400
+pbo 10:  x [0,80], y [10,40],   width 80, height 30, area 2400
+```
+
+## Verify actual association and drawing-mode boundaries
+
+Associate with the source through an actual supported iCouldPlay subtitle workflow. Confirm readable BASE, a rectangle and baseline-event identity, then inspect all three events. Record relative height, discernible dimensions and display overrides/wrapping. The prefix is a reference, not an independently pinned screen baseline. Text without a drawing calls for p1/path/p0, current-file and path checks before declaring the positive offset ineffective. Without playback/association leave observation pending; an external-editor preview has its own provenance and cannot pass iCouldPlay.
+
+## Change only positive twenty to ten for a control
+
+Save drawing-baseline-ten.ass and change only event two from pbo20 to pbo10, preserving timing/path literally. Its paper y range changes from 20–50 to 10–40, with unchanged width, height and area; it neither returns to zero nor halves height. Compare only original/modified second events after re-association, preserving the original and negative event. Changing pos involves prefix/line positioning and is another task. Replacing path coordinate 30 with 15 changes path height; that mixed modification cannot demonstrate pbo scaling.
+
+## Deliver direction, dimensions and actual observation separately
+
+Retain full sample, interval table, local translation calculations, positive-ten copy and actual-path records, then restore normal subtitles/display. Explain positive-down/negative-up, positive height despite negative coordinates, and the differences among drawing baseline, line position and video. Document uncontrolled fonts/display and failed comparisons rather than remove inconsistent results. Separate source checks, external preview and iCouldPlay viewing; unperformed reopening stays pending. Claim no device-pixel measurement, built-in drawing editor or universal engine compatibility. Saved parameters allow the same three-event test on a later path.
+
+## Related guides and sources
+
+[Drawing mode and ordinary text](<https://allluckly.cn/en/guides/icouldplay-ass-vector-drawing-mode-polygon-text-scope/>); [Script position and device pixels](<https://allluckly.cn/en/guides/icouldplay-ass-pos-script-coordinate-display-pixels/>).
+
+Checked on 19 November 2026: [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261119-root>) lists iCouldPlay 1.1.1, requiring iOS / iPadOS 15.0 or later. The [official store](<https://apps.apple.com/cn/app/id6755653178>) describes ASS/SSA and embedded/external subtitles. Prepare source, syntax and mathematics externally; associate and observe through actual installed paths. Format support does not guarantee every instruction across all engines/devices. No completed physical-device subtitle rendering, professional pixel measurement, exhaustive-format or private-server testing is claimed.
+
+Method references: [Aegisub ASS override tags](<https://aegisub.org/docs/latest/ass_tags/>).
+{% endraw %}

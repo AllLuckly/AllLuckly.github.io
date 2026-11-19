@@ -1,0 +1,80 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Read power cards in ManYue: doubling resistance depends on fixed voltage or fixed current'
+description: Compare ideal resistors under two supply conditions, separating power, duration and energy while retaining
+  the temperature assumption.
+permalink: /en/guides/manyue-resistor-power-fixed-voltage-versus-current-energy-ledger/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 242
+topic: Quantitative cards for charge, energy and fields
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-19-manyue-resistor-power-fixed-voltage-versus-current-energy-ledger.md
+source_url: /guides/manyue-resistor-power-fixed-voltage-versus-current-energy-ledger/
+translation_method: editorial
+translation_source_sha256: ac787b4bb1f15886e861380192dfe842b7935511c1cd599a467beb8435c1af10
+translation_date: '2026-11-19T01:51:03+00:00'
+excerpt: Compare ideal resistors under two supply conditions, separating power, duration and energy while retaining
+  the temperature assumption.
+---
+{% raw %}
+<p>Two cards saying “resistance increases” can have opposite power changes. Separate fixed-voltage and fixed-current ledgers, read their controlled quantities in ManYue and compare energy bars. No real wiring is required, and colour brightness does not diagnose resistor temperature.</p>
+
+<h2 id="declare-two-separate-supply-models-at-the-top">Declare two separate supply models at the top</h2>
+
+<p>Use ideal ohmic resistors of 3Ω or 6Ω, each resistance constant during its calculation, excluding temperature-induced changes. P1 fixes terminal voltage at 6V; P2 independently fixes current at 2A. They are not simultaneous conditions of one source experiment. Put units/controls on P3, export a PDF and retain editable work. After import, inspect each heading and bookmark P2. Draw a single resistor symbol rather than secretly change topology.</p>
+
+<h2 id="recover-current-from-ohms-law-on-the-voltage-fixed-page">Recover current from Ohm’s law on the voltage-fixed page</h2>
+
+<p>With 6V across each resistor, 3Ω gives I=6/3=2A and 6Ω gives 1A. Doubling resistance halves current; do not retain 2A in the second fixed-6V card. Check V=IR: 2×3=6 and 1×6=6. Voltage is a terminal potential difference, not an unreferenced value at one point. Without duration, proceed to power rather than claim a joule consumption.</p>
+
+<p>Hide resistance labels for an inverse check: at 6V, 6W gives I=P/V=1A and R=6Ω; 12W gives 2A and 3Ω. Recover the original cards rather than assume larger power means larger resistance. The inversion retains nonzero voltage/ohmic conditions. Power alone without voltage/current does not uniquely determine R, and colour supplies no missing input.</p>
+
+<h2 id="substitute-one-consistent-state-into-all-power-forms">Substitute one consistent state into all power forms</h2>
+
+<p>P=VI gives 12W and 6W. V²/R gives 36/3 and 36/6, again 12 and 6; I²R gives 4×3 and 1×6. The formulas agree when V, I, R describe the same state. Keep all three inputs on each row instead of importing an incompatible value from another page. The R factor in I²R alone does not imply increasing power with resistance under fixed voltage.</p>
+
+<p>Changing only the 3Ω card from 6V to 12V gives 4A and 48W, four times 12W. Check 12×4=144/3 instead of retaining old 2A. Resistance and duration stay fixed. This tests the square relation under its conditions, not a fourfold guarantee for nonlinear or temperature-changing devices.</p>
+
+<h2 id="allow-voltage-to-change-on-the-current-fixed-page">Allow voltage to change on the current-fixed page</h2>
+
+<p>On P2 fix I=2A: 3Ω requires 6V and 6Ω requires 12V. I²R gives 12W and 24W, doubling with resistance; VI agrees as 2×6 and 2×12. This does not claim a real source supplies unlimited voltage or power. A card retaining 6V,2A,6Ω violates Ohm’s relation. Mark inconsistent conditions before selecting a power answer that hides the conflict.</p>
+
+<pre><code class="language-text">R values: 3 ohm, 6 ohm; ideal ohmic, constant R
+fixed V=6 V: I=(2,1) A; P=(12,6) W
+fixed I=2 A: V=(6,12) V; P=(12,24) W
+for 5 s: energies fixed-V=(60,30) J; fixed-I=(60,120) J
+P=V*I=I^2*R=V^2/R for each consistent state
+</code></pre>
+
+<h2 id="separate-five-second-energy-bars-from-power-columns">Separate five-second energy bars from power columns</h2>
+
+<p>For 5s at unchanged states, E=Pt gives fixed-voltage energies 60J, 30J and fixed-current energies 60J, 120J. Watts are energy-transfer rates; joules are interval amounts. 12W does not mean 12J over five seconds. A separate 10s control for the 6W resistor gives 60J, matching 12W over 5s despite unequal power. Label duration instead of measuring it from a drawn bar.</p>
+
+<p>For 3Ω at 2A over 2s then 1A over 4s, energy=12×2+3×4=36J and six-second average power=6W. Average current is 4/3A; its square times 3Ω is 16/3W, not the time-averaged power. Squaring is nonlinear. Keep this varying-current control separate from the constant-state five-second cards instead of extending one instantaneous power across a whole interval.</p>
+
+<h2 id="do-not-infer-temperature-or-brightness-from-power-alone">Do not infer temperature or brightness from power alone</h2>
+
+<p>P describes electrical-energy conversion rate in ideal resistors. Heat capacity, cooling, area and environment are absent, so 24W supplies no Celsius temperature. Equal-power objects can have different temperatures under different cooling. Lamp brightness also depends on material and efficiency; fixed R is not every filament model. Separate larger power, greater interval energy and higher temperature. With equal duration the first two can be compared here; temperature remains unknown.</p>
+
+<h2 id="diagnose-controlled-quantities-and-incompatible-inputs">Diagnose controlled quantities and incompatible inputs</h2>
+
+<p>If both pages say 24W, check whether a fixed-current answer migrated to fixed voltage. A 2 A result with 6V/6Ω requires division checked. “Consumption twelve” lacks watts, joules or time. Enlarge Ω and squares. Correct one controlled quantity or input, then verify with another power form. If source type is absent, record insufficient conditions rather than assume voltage/current control or App parameter recognition.</p>
+
+<h2 id="reopen-and-explain-the-opposite-changes">Reopen and explain the opposite changes</h2>
+
+<p>Reopen at the fixed-current bookmark and write 12W→24W, then return to fixed voltage for 12W→6W, explaining why formulas agree. Check four five-second energies and the ten-second equal-energy control. Deliver controlled quantities, V/I/R and power/time ledgers, not merely a red-resistor image. Mark unperformed import/bookmark/reopening pending. These are ideal paper results, not appliance tests, measured heating or validated power-supply plans.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/manyue-current-net-charge-section-electron-opposite-direction-ledger/">ManYue current-section ledger</a>; <a href="/en/guides/manyue-mechanical-work-force-displacement-angle-sign-panels/">ManYue work conditions</a>.</p>
+
+<p>Method references: <a href="https://openstax.org/books/university-physics-volume-2/pages/9-5-electrical-energy-and-power">OpenStax electrical energy and power</a>. Diagrams, report data, counterexamples and ledgers are original exercises.</p>
+
+<p>Version checked on 19 November 2026: the <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261119">Apple public lookup</a> lists ManYue 2.0.6, requiring iOS / iPadOS 15.0 or later; see the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities. Use self-made PDFs or supported comic images; controls depend on the installed version. External preparation and paper predictions do not constitute device observations. Leave unperformed checks blank.</p>
+{% endraw %}

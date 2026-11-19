@@ -1,0 +1,83 @@
+---
+layout: null
+permalink: /en/guides/manyue-half-life-parent-nuclei-remaining-interval-decays-ledger/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Read half-life panels in ManYue: halve what remains, not the initial amount
+  each time'
+agent_source_url: https://allluckly.cn/en/guides/manyue-half-life-parent-nuclei-remaining-interval-decays-ledger/
+agent_source_sha256: 594d553840b88280569821e8b04715ee4da5e0a6ab3d6220bfb74cc5fde5c382
+agent_generator_version: 1
+---
+{% raw %}# Read half-life panels in ManYue: halve what remains, not the initial amount each time
+
+Language: en
+Canonical: [Read half-life panels in ManYue: halve what remains, not the initial amount each time](<https://allluckly.cn/en/guides/manyue-half-life-parent-nuclei-remaining-interval-decays-ledger/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-half-life-parent-nuclei-remaining-interval-decays-ledger/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-half-life-parent-nuclei-remaining-interval-decays-ledger/>)
+Published: 2026-11-19T00:00:00+08:00
+Modified: 2026-11-19T09:51:03+08:00
+Author: Bison
+
+Separate a model mean curve for eight thousand parent nuclei from interval decay counts, without predicting one nucleus’s decay time.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/manyue-half-life-parent-nuclei-remaining-interval-decays-ledger/>), translated on 2026-11-19. Original publication dates, attribution, code and version notes are retained.
+
+Fewer parent-nucleus dots in successive panels do not mean subtracting the same count every interval. Use a fictional nuclide/time table to read remaining fractions, interval decays and activity in ManYue. This statistical model involves no radioactive material or medical, storage, dating advice.
+
+## Declare parent count and half-life
+
+Use a fictional parent nuclide with half-life 2h, N0=8000, in a closed sample with no new parents, tracking only this parent decay. Put 0,2,4,6h panels on P1, interval ledger on P2 and randomness controls on P3; export PDF and retain editable work. Check hours versus seconds and bookmark P2. Values are model means or large-sample predictions, not guaranteed exact halving for a real 8000-nucleus sample. Daughter behaviour is outside the specification.
+
+## Repeatedly multiply the remaining amount by one half
+
+After one, two, three half-lives the model leaves 4000,2000,1000, or fractions 1/2,1/4,1/8. N(t)=8000×2^(−t/2h) uses a dimensionless time ratio; 6h is not six half-lives. Subtracting initial-half 4000 every 2h incorrectly reaches zero at 4h and negative at 6h. Keep that linear-loss control rather than erase negatives. The specified decay constant does not change as the population decreases.
+
+## Compute interval losses from consecutive remaining amounts
+
+Model decays are 4000 over 0–2h,2000 over 2–4h,1000 over 4–6h. Cumulative loss by 6h is 7000, plus 1000 remaining restores 8000. Later intervals do not each lose 4000, and 1000 remaining is not 7000 decays in the final interval. Label interval endpoints and the cumulative origin. From 2–6h the loss is 4000−1000=3000, not 8000 minus the endpoint. Equal endpoints do not imply equal questions.
+
+On whole-half-life cards, N≤500 first occurs at four half-lives, 8h, since 8000/2⁴=500. Strict N\<500 excludes 8h; the next card at 10h has 250. In continuous time the strict condition is t\>8h, with no smallest real value immediately above 8. Declare time grid and inequality before equating a first card with a continuous-time threshold.
+
+```text
+fictional parent half_life=2 h; N0=8000
+model mean N(t)=8000*2^(-t/(2 h))
+t=0,2,4,6 h: remaining=8000,4000,2000,1000
+interval decays=4000,2000,1000; cumulative at 6 h=7000
+2..6 h decays=3000
+activity=lambda*N; lambda=ln(2)/(2 h)
+```
+
+## A half-half-life is not a quarter of the initial amount lost
+
+At 1h, N=8000/√2≈5656.854, remaining fraction≈0.707107, not linear subtraction of 2000 giving 6000. Expected cumulative loss is ≈2343.146. Fractional values describe expectation/continuum approximation, not fractional physical nuclei. Round only display values to three decimal places; retain radicals/exponents for exact ratios. Inferring an exact half-life from rounded dots confuses depiction error with changing physical parameters.
+
+## Activity halves with the parent count but needs consistent units
+
+For this parent A=λN,λ=ln2/(2h), so activity ratios at 0,2,4,6h are 1,1/2,1/4,1/8. For decays per second convert half-life to 7200s: first A≈0.770164s⁻¹ and at 6h≈0.096270s⁻¹. An hourly rate is not automatically becquerels, and activity is not sample mass. Radioactive daughters or mixed nuclides require further accounting before applying this curve to total activity.
+
+Doubling only N0 to 16000 with half-life 2h gives 8000,4000,2000 at 2,4,6h and twice the original activity at each time. Fractions still halve and λ stays unchanged. More parents do not make each nucleus decay faster. Keep number scale separate from time scale; do not also shorten half-life and attribute the change to N0 alone.
+
+## Keep single-nucleus lifetimes separate from population means
+
+On P3 show one surviving parent without a compulsory “decay at hour two” countdown. A half-life describes population survival probabilities; one nucleus still has half survival probability after that interval, not a scheduled decay time. The rule concerns remaining parents, not an instruction that numbered first 4000 decay before the rest. Dot positions confer no such identity. Unknown individual events remain unknown despite an exact expected curve.
+
+A positive finite-time mean curve does not guarantee a survivor in every actual small-sample observation. A statistical mean and one integer count are different records, especially with few parents. One zero reading also does not make the half-life zero; sample, detection and statistics would need checking. No detector data were provided, so observation fields remain blank rather than copied from smooth expected decimals.
+
+## Diagnose time units and the question’s starting point
+
+Zero at 4h suggests constant subtraction; 6000 at 1h suggests linear interpolation; 7000 lost over 2–6h uses the wrong origin. An activity 3600 times too large suggests hours/seconds confusion. Enlarge axes and cumulative labels, repair one field and restore remaining+cumulative=8000. Missing closure, parent-input or daughter-count conditions stay unknown; fewer cartoon dots alone do not establish a pure decay experiment.
+
+## Reopen with separate expected and unknown-event records
+
+At the reopened ledger hide answers and recover remaining 4000,2000,1000 and matching interval losses, then explain 3000 over 2–6h. Check the 1h radical and per-second activity, and mark one nucleus’s event time unknown. Deliver model, units, intervals and randomness scope, leaving unperformed reader actions pending. Separate calculable expectation from unobserved events, without App radioactivity measurement, nuclide identification, cultivation or real-sample disposal conclusions.
+
+## Related tutorials and sources
+
+[ManYue isotope counts](<https://allluckly.cn/en/guides/manyue-isotope-ion-proton-neutron-electron-symbol-ledger/>); [ManYue interval-current ledger](<https://allluckly.cn/en/guides/manyue-current-net-charge-section-electron-opposite-direction-ledger/>).
+
+Method references: [OpenStax radioactive decay and half-life](<https://openstax.org/books/chemistry-2e/pages/21-3-radioactive-decay>). Diagrams, report data, counterexamples and ledgers are original exercises.
+
+Version checked on 19 November 2026: the [Apple public lookup](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261119>) lists ManYue 2.0.6, requiring iOS / iPadOS 15.0 or later; see the [official App Store](<https://apps.apple.com/cn/app/id6753895889>) for published capabilities. Use self-made PDFs or supported comic images; controls depend on the installed version. External preparation and paper predictions do not constitute device observations. Leave unperformed checks blank.
+{% endraw %}

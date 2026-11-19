@@ -1,0 +1,81 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Read Coulomb-force cards in ManYue: double distance quarters force while the pair stays equal'
+description: Record forces by target charge and check a third-charge cancellation, separating a pair force from
+  the net force.
+permalink: /en/guides/manyue-coulomb-point-charge-force-direction-inverse-square-superposition/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 244
+topic: Quantitative cards for charge, energy and fields
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-19-manyue-coulomb-point-charge-force-direction-inverse-square-superposition.md
+source_url: /guides/manyue-coulomb-point-charge-force-direction-inverse-square-superposition/
+translation_method: editorial
+translation_source_sha256: 3ef9ae564759c7b9a7b7027426fd2cf31a64b2b4e38032e2d9ee8e2b03e446a7
+translation_date: '2026-11-19T01:51:03+00:00'
+excerpt: Record forces by target charge and check a third-charge cancellation, separating a pair force from the
+  net force.
+---
+{% raw %}
+<p>Unequal charge values do not imply unequal interaction-force magnitudes. Use distance/sign cards to read target objects, inverse-square scaling and resultant force in ManYue. Inputs are an electrostatic point-charge model, without real discharges or handling charged objects.</p>
+
+<h2 id="declare-positions-and-the-vacuum-approximation">Declare positions and the vacuum approximation</h2>
+
+<p>Set q1=+2μC at x=0 and q2=+3μC at x=0.30m, using approximate k=9×10⁹N·m²/C², no other charges and fixed point charges in vacuum. Put positions on P1, distance/sign controls on P2 and a third-charge control on P3; export PDF and retain source work. Check decimal points and μ after import and bookmark P1. Pixels or a three-centimetre printed gap do not measure the declared 0.30m.</p>
+
+<p>Translate all positions by one metre to 1.00,1.30,1.60m: separations remain 0.30,0.30,0.60m and forces unchanged. Coulomb’s law uses pair separation, not distance to an arbitrary origin. A drawn origin is not a fourth charge; adding one requires its own charge/position before including its force.</p>
+
+<h2 id="compute-force-magnitude-using-absolute-charge-product">Compute force magnitude using absolute charge product</h2>
+
+<p>F=k|q1q2|/r². Convert μC to 2×10⁻⁶ and 3×10⁻⁶C; their product is 6×10⁻¹²C². The numerator is 0.054N·m²; dividing by 0.09m² gives 0.6N. This magnitude column has no left/right sign. Dividing by 0.30 only once incorrectly gives 0.18 and fails inverse-square/dimensional checks. Preserve r² explicitly before substitution.</p>
+
+<h2 id="place-each-same-sign-repulsion-on-its-own-target">Place each same-sign repulsion on its own target</h2>
+
+<p>With positive q1 left and q2 right, repulsion gives q1 a leftward −0.6N force and q2 a rightward +0.6N force. Label source and target at each arrow; do not put both on q2 and cancel them. They act on different objects, not as balanced forces on one particle. Charge ratio 3:2 does not divide the interaction unequally. Comparing accelerations would require masses, absent here.</p>
+
+<h2 id="change-distance-and-sign-in-separate-controls">Change distance and sign in separate controls</h2>
+
+<p>Save q2 at x=0.60m with charges unchanged: double distance gives 0.15N, one quarter rather than half. Independently return to 0.30m and change only q2 to −3μC: magnitude remains 0.6N but attraction sends q1 right and q2 left. Do not combine both changes and call it one-factor control. A negative charge does not make magnitude negative; sign relation and relative target position set direction.</p>
+
+<pre><code class="language-text">k=9e9 N*m^2/C^2; q1=+2e-6 C at x=0
+q2=+3e-6 C at x=0.30 m
+F magnitude=0.6 N; on q1=-0.6 N; on q2=+0.6 N
+r=0.60 m, same charges: magnitude=0.15 N
+q2=-3e-6 C at 0.30 m: attraction, magnitude=0.6 N
+control q3=+2e-6 C at x=0.60 m: net on positive q2=0
+</code></pre>
+
+<h2 id="sum-contributions-on-one-target-in-the-three-charge-control">Sum contributions on one target in the three-charge control</h2>
+
+<p>On P3 retain the original positive pair and add q3=+2μC at x=0.60m. q2 is 0.30m from each side: q1 contributes +0.6N and q3 contributes −0.6N, making net force on q2 zero. Neither pair interaction disappears. This checks q2 only and does not establish zero resultant on q1 or q3. Add arrows at one target while retaining source labels.</p>
+
+<p>Check outer targets too: q1 receives 0.6N left from q2 plus 0.1N left from q3 at 0.60m, giving −0.7N. Symmetric q3 has +0.7N and middle q2 zero. Internal-force sum zero does not make every individual resultant zero or exclude external constraints. The three-target ledger exposes cancellation of arrows incorrectly placed on one object.</p>
+
+<p>Changing only q3 to −2μC at 0.60m gives middle positive q2 two rightward 0.6N contributions: repulsion from left and attraction from right, net +1.2N. That is correct for this sign control, not the original all-positive card. Do not label a number permanently wrong without identifying inputs, directions and target.</p>
+
+<h2 id="retain-point-model-and-positive-distance-limits">Retain point-model and positive-distance limits</h2>
+
+<p>Require r&gt;0. Coincident points create a zero denominator, not a conveniently huge finite value. Extended charged bodies, materials or redistribution may need another model; circular icons alone do not justify a centre-point formula. Fixed charges define static force reading, not an unconstrained dynamical claim of rest. Without masses, initial velocities and constraints, predict neither trajectories nor a collision.</p>
+
+<h2 id="diagnose-units-separation-and-target-labels">Diagnose units, separation and target labels</h2>
+
+<p>A 600000 N answer calls for checking missing 10⁻⁶ factors; half-force at doubled distance calls for r²; unequal pair forces suggest confusing charge and force ratios. A 1.2 N result on the third-charge page requires direction checked before changing charges. Enlarge signs and 0.30/0.60 positions, preserve errors and fix one field. Missing medium/separation definitions remain insufficient information, not accurate forces measured from panel spacing.</p>
+
+<h2 id="reopen-and-distinguish-pair-forces-from-one-target-resultants">Reopen and distinguish pair forces from one-target resultants</h2>
+
+<p>From the reopened bookmark recover original forces ±0.6N, doubled-distance 0.15N and sign-control 0.6N with reversed directions, then zero resultant on middle q2. Explain which arrows share a target instead of delivering four unlabelled numbers. Retain approximate k, point model, legend and actual reading notes, marking unperformed actions pending. Acceptance is force-target and inverse-square reading, not App electrostatic solving, charge measurement or a discharge experiment.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/manyue-frictionless-incline-weight-components-normal-acceleration/">ManYue force components</a>; <a href="/en/guides/manyue-capacitor-opposite-plate-charge-voltage-energy-half-factor/">ManYue capacitor charges</a>.</p>
+
+<p>Method references: <a href="https://openstax.org/books/university-physics-volume-2/pages/5-3-coulombs-law">OpenStax Coulomb law and superposition</a>. Diagrams, report data, counterexamples and ledgers are original exercises.</p>
+
+<p>Version checked on 19 November 2026: the <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261119">Apple public lookup</a> lists ManYue 2.0.6, requiring iOS / iPadOS 15.0 or later; see the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities. Use self-made PDFs or supported comic images; controls depend on the installed version. External preparation and paper predictions do not constitute device observations. Leave unperformed checks blank.</p>
+{% endraw %}

@@ -1,0 +1,75 @@
+---
+layout: null
+permalink: /guides/vectorpaint-maximum-flow-feasible-ten-cut-capacity-bound/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: VectorPaint最大流最小割：先核十的可行流，再用十的割给上界
+agent_source_url: https://allluckly.cn/guides/vectorpaint-maximum-flow-feasible-ten-cut-capacity-bound/
+agent_source_sha256: cee201c4069c7bf91804916d8dfbc2de44eaff96f7860eba9cb6b79618700d69
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint最大流最小割：先核十的可行流，再用十的割给上界
+
+语言：zh-CN
+原文：[VectorPaint最大流最小割：先核十的可行流，再用十的割给上界](<https://allluckly.cn/guides/vectorpaint-maximum-flow-feasible-ten-cut-capacity-bound/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-maximum-flow-feasible-ten-cut-capacity-bound/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-maximum-flow-feasible-ten-cut-capacity-bound/>)
+发布于: 2026-11-19T00:00:00+08:00
+内容更新于: 2026-11-19T00:00:00+08:00
+署名：Bison
+
+用四顶点五有向边核容量、守恒和割向，再降一条容量得到最大六的控制，不把最短路线当最大流。
+
+画一个虚构有向网络，让“最多能送多少”同时有可行流与上界两份证据。容量是同一抽象期间的流量上限，不是边长或到达时间。仅画一条最宽路线还不够：流可以分路，但中间顶点必须守恒，且任何边都不能超过各自容量。
+
+## 先列四点五边的容量清单
+
+顶点S为源、T为汇，中间A、B；只设S到A容量七、S到B五、A到B三、A到T四、B到T六，没有其他边。建议1800×1400像素，S在左，A上中、B下中、T右，箭头、容量、流值和割各分组，先存原稿。所有容量非负，本例整数；箭头方向不能省，A到B不暗示B到A也可送三。像素布局只为可读，边画得长不表示容量大，未列连接按无边处理。
+
+## 每边用流值斜杠容量标注
+
+取流值SA七、SB三、AB三、AT四、BT六，旁注7/7、3/5、3/3、4/4、6/6。斜杠前后是流与容量，不是分数概率，更不把7/7约成一丢失容量信息。逐边核零≤流≤容量，SB还剩二容量但不能因此立即把总流再加二。源输出七加三等十，汇输入四加六等十，先核这两个总数，再检查中间节点；只核总量相同仍可能在中间凭空创造或损失流。
+
+## A与B分别核入等于出
+
+A输入七，输出AB三加AT四为七；B输入SB三加AB三为六，输出BT六，均守恒。把两份算式贴在对应节点外，不用一条“总守恒”横跨所有点代替。流可拆成S到A到T四、S到A到B到T三、S到B到T三，三条路径合十，任何共用边按各路径贡献相加。若把三条路径容量独立取满，会重复占用BT，先核共边再谈分配。当前网络没有环流，原有流也不代表实际管路或通信测试。 最大值也不等于每条边的流都唯一。例如另一份流SA五、SB五、AB一、AT四、BT六同样逐边不超限，A入五出一加四，B入五加一出六，总值仍十。把它另存为同值分配，不改容量表或最小割，说明两个不同流可达到同一上界。不能因第一份图用了SA七就宣布所有最优解必须把SA送满，也不以某条边尚有余量判断全网还能增流；最优值与具体实现是两个不同问题。
+
+## 割只加从源侧到汇侧的容量
+
+取源侧X={S,A,B}、汇侧只{T}，跨出的边为AT四与BT六，割容量十。任何可行流的值不超过任一S到T割容量，因此本图上界十，已有可行十就达最大。上界与可行缺一不能只靠漂亮粗箭头宣布最优。割是顶点划分，不是用剪刀任意画一条线碰到几根边；若有反向跨割边，不把它的容量也正加进本课有向割容量。图例明确X含S而不含T。
+
+## 枚举四个源侧集合复核最小割
+
+四顶点中固定S在源侧、T不在，A、B各有两种归属，共四割。X={S}容量7+5=12；{S,A}为5+3+4=12；{S,B}为7+6=13，AB方向从外进内不计；{S,A,B}为4+6=10。最小十与可行流一致，清单没有遗漏其他分法。注意{S,B}不是七加三加六，逆向跨割AB不能重复收费。枚举只适合当前小图，扩大网络不因能画所有顶点就有相同的手算工作量保证。
+
+```
+capacity: SA=7; SB=5; AB=3; AT=4; BT=6
+flow:     SA=7; SB=3; AB=3; AT=4; BT=6
+A: 7=3+4; B: 3+3=6; value=7+3=4+6=10
+cut capacities: {S}:12; {S,A}:12; {S,B}:13; {S,A,B}:10
+control BT capacity=2
+control flow SA=4; SB=2; AB=0; AT=4; BT=2
+control value=cut({S,A,B})=6
+```
+
+## 降BT容量后流与上界同时改
+
+另存只把BT容量六改二的版本，原BT流六已越限，旧总十必须撤销。新流SA四、SB二、AB零、AT四、BT二，A入四出四，B入二出二，总六可行；割{S,A,B}容量四加二等六，所以新最大六。源侧总容量仍十二，证明只看源出口会高估可送量。控制不移动节点或加边，先改容量标签再重算流与割，不能保留旧7/7等数字让两版条件混用。
+
+## 按方向守恒割容量的顺序排障
+
+若总流十二却汇只能收十，先查BT或AT越限；若端点都十而A不守恒，按每节点独立修，不移动标签掩盖漏边。割算成十六时先查反向边和重复容量，不能把当前流值当割容量。保留问题版，逐边读流斜杠容量，再从S追各路径，最后核四个分割集合。网络没有给费用，不能从最大十推断最便宜方案；也不把流量最大与S到T最短路径或连接全部点的最小树当同一目标。
+
+## 重开交付可行流和相等上界
+
+保存原生图、五边清单与四割账，导出SVG或PDF并另开PNG。适应窗口核源汇箭头，放大看3/5与3/3未互换、控制BT确为2/2。重开编辑稿隐藏最优字样，独立重核每边约束与A、B守恒，再用十或六的割恢复结论。交付两版条件与未做输出待办，不只交一条高亮路线。MIT资料核网络流定义和上界定理，不表示应用内置最大流求解器、真实容量检测或工程运行认证。
+
+## 相关教程与资料
+
+[VectorPaint 五节点加权路线：先加边权再比较候选路径](<https://allluckly.cn/guides/vectorpaint-five-node-weighted-routes/>)、[VectorPaint 最小连接树：先连齐五节点，再比较四边总权](<https://allluckly.cn/guides/vectorpaint-five-node-minimum-spanning-connection/>)。
+
+方法来源：[MIT 6.854：网络流与最大流最小割](<https://courses.csail.mit.edu/6.854/21/Scribe/s6-maxflow/s6-maxflow.html>)。来源核非负容量、节点守恒及有向割上界。五边网络、四割枚举与降容量控制均原创，流值不是成本或实测速率。
+
+版本与操作范围：2026年11月19日核[VectorPaint官方商店](<https://apps.apple.com/cn/app/id1587272880>)与[Apple公开查询](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software&timestamp=20261119-vectorpaint>)，公开1.0.8，最低iOS / iPadOS 17.0。使用已公开的形状、钢笔、贝塞尔节点、网格辅助线、对齐、图层分组、文字和保存输出手工绘图；入口按安装版本实际可见为准。计算、定义与复算在应用外准备，不推断内置公式、统计或图论求解能力。原生稿保留可编辑结构，SVG、PDF、PNG各按需要阅读检查，含导入位图的SVG或PDF不自动成为全矢量。画布与样本为原创教学设定，未执行真机或实物测量，未做的操作明确待做。
+{% endraw %}

@@ -1,0 +1,107 @@
+---
+layout: null
+permalink: /guides/icouldplay-ass-cubic-bezier-b-control-points-versus-endpoints/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映ASS三次贝塞尔：b的两个控制点不是必须经过的折线顶点
+agent_source_url: https://allluckly.cn/guides/icouldplay-ass-cubic-bezier-b-control-points-versus-endpoints/
+agent_source_sha256: 384bb770782a7a194f671c75018d05d32a064ff1d01cb8f86bc597d8b58b08eb
+agent_generator_version: 1
+---
+{% raw %}# 云映ASS三次贝塞尔：b的两个控制点不是必须经过的折线顶点
+
+语言：zh-CN
+原文：[云映ASS三次贝塞尔：b的两个控制点不是必须经过的折线顶点](<https://allluckly.cn/guides/icouldplay-ass-cubic-bezier-b-control-points-versus-endpoints/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-cubic-bezier-b-control-points-versus-endpoints/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-cubic-bezier-b-control-points-versus-endpoints/>)
+发布于: 2026-11-19T00:00:00+08:00
+内容更新于: 2026-11-19T00:00:00+08:00
+署名：Bison
+
+为同一封闭色块保存两段完整ASS，只改第一个控制点的纵坐标，比较曲边与端点。外部复算参数中点和端点不变条件，明确几何参数不是播放时间；再在真实支持路径观察，不将播放器说成曲线设计或自动测量工具。
+
+为同一封闭色块保存两段完整ASS，只改第一个控制点的纵坐标，比较曲边与端点。外部复算参数中点和端点不变条件，明确几何参数不是播放时间；再在真实支持路径观察，不将播放器说成曲线设计或自动测量工具。
+
+## 准备能辨认曲边的原片与固定坐标条件
+
+使用至少十秒的自有静景视频，先保留原片、原字幕与日常显示条件。示例画布640乘360，定位120、140，p1绘图、基线偏移零、横纵比例100、无描边和阴影，白色填充在暗背景上较易分辨。图形上边是一段曲线，下面用直线闭合为色块，便于观看而非依赖极细描边。先区分曲线与填充区域，数学算例只核上方曲边上的点，不把整个色块的中心当曲线中点。脚本位置也不是当前设备绝对像素，外部准备的参数表与实际观察分别记录，不用播放器缩放替换控制点变化。
+
+## 先给起点、两个控制点和终点分别命名
+
+先把当前笔位置P0写为0、60，第一控制点P1为0、0，第二控制点P2为120、0，终点P3为120、60。m命令把笔移到P0；随后b的三组数依次是P1、P2、P3，起点不再作为b的第一组重复输入。Aegisub说明曲线从当前点出发朝P1方向，并从P2方向到达P3。两控制点用于塑造曲线，不是规定要像折线那样逐个穿过；因此不能把b换成三段l还说几何相同。先在纸面区分四点角色，避免把第一控制点误标成曲线起点，或漏掉真正终点。
+
+## 保存两段完整ASS并保留单项改动
+
+把全文保存为UTF-8纯文本bezier-control.ass，保留头部、样式表与两条事件，重开核扩展名及ASCII标点。第一条一至四秒使用原四点，第二条五至八秒只把P1纵坐标从0改30，其余五个b数值、m、闭合直线、定位与显示参数不变。b和l在绘图文本区而非花括号里，结尾p0恢复文字模式。两事件均静态，没有t变换或移动，不能因展示先后把它说成连续曲线动画。编辑在外部进行，实际关联时记录文件名与原片身份，不假设云映有控制柄编辑器。
+
+```
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,36,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:04.00,Default,,0,0,0,,{\an7\pos(120,140)\bord0\shad0\fscx100\fscy100\pbo0\p1}m 0 60 b 0 0 120 0 120 60 l 120 80 0 80 0 60{\p0}
+Dialogue: 0,0:00:05.00,0:00:08.00,Default,,0,0,0,,{\an7\pos(120,140)\bord0\shad0\fscx100\fscy100\pbo0\p1}m 0 60 b 0 30 120 0 120 60 l 120 80 0 80 0 60{\p0}
+```
+
+## 用三次权重公式定义纸面曲线
+
+外部定义标准三次贝塞尔模型，参数t在0至1，四项权重分别为一减t的三次方、三乘一减t的平方乘t、三乘一减t乘t平方、t的三次方。将它们乘P0至P3再相加，得到B(t)，横纵坐标分别计算。这些权重非负且和为1，端点代入t为0或1便回P0与P3。这里t是几何参数，不是播放器秒数，t等于二分之一也不表示两秒或事件播放过半时开始画到那里。字幕全段显示同一静态形状，纸面参数取点仅为核曲线定义，不声称云映提供参数扫描功能。
+
+```
+B(t) = (1-t)^3 P0 + 3(1-t)^2 t P1 + 3(1-t)t^2 P2 + t^3 P3
+0 <= t <= 1; t is a GEOMETRIC PARAMETER, NOT playback time
+P0=(0,60), P1=(0,0), P2=(120,0), P3=(120,60)
+```
+
+## 复算端点、参数中点与错误替代值
+
+原曲线在t为二分之一时权重为1、3、3、1各除8，横坐标为60，纵坐标为15。两控制点的平均为60、0，起终点连线中点为60、60，都不是这条曲线的参数中点。四分之一处为18.75、26.25，四分之三处为101.25、26.25，可与对称性一起核；这些数是局部坐标，不是屏幕抓点报告。特别是P1和P2纵坐标虽为零，原曲线在此例并不经过它们，最低的局部y为15。把纵坐标式展开可得六十减一百八十t加一百八十t平方，再配方为一百八十乘t减二分之一的平方加十五，故最低值有明确依据，不是只算中点便猜出的结论。参数等分也不保证弧长等分，四分之一点不能直接叫曲线走了四分之一长度。不要把控制点组成的折线当实际曲边，也不把填充块的几何中心拿来替换B值。
+
+```
+Original LOCAL curve:
+B(0)    = (0,60)
+B(1/4)  = (18.75,26.25)
+B(1/2)  = (60,15)
+B(3/4)  = (101.25,26.25)
+B(1)    = (120,60)
+Control average = (60,0); endpoint-chord midpoint = (60,60)
+```
+
+## 只改第一控制点纵坐标核端点不变
+
+第二条只令P1变为0、30，P0、P2、P3不动。代入同一中点权重，纵坐标比原值增加三除8乘30，即11.25，故B二分之一变成60、26.25，而两端仍为0、60与120、60。两端之间的水平距离仍为120，不能从曲边变形推断端点距离增加。这足以说明控制点能改曲边而不改两端，不能据此说整块图形都作同量平移。新曲线不再保持原来的左右对称，二分之一点也不能未经求极值就称新的最上端。额外比较时只换这一个数，若连P3也改，便不再是端点保持的对照；原稿必须留存，恢复时改回P1纵坐标零。
+
+```
+Modified P1=(0,30), all other points fixed:
+B(0)   = (0,60)
+B(1/2) = (60,26.25)
+B(1)   = (120,60)
+Midpoint Y change = (3/8)*30 = 11.25
+```
+
+## 通过实际字幕路径核曲边而不要求显示控制柄
+
+按云映安装版真实支持的字幕路径关联完整文件与原片，先在第一段核封闭色块、时刻和身份，再在第二段内部观察上边曲率是否可辨、两端条件是否保持。文件没有画出控制点圆圈或参考连线，不能因看不到控制柄就说b没解析，也不能在手机图上假填数学坐标已经测量。若出现文字命令，查模式与花括号；若没图形，查当前副本、p1、路径与支持范围。无关联或尚未播放时，源码和模型可先验收，渲染留待核；外部编辑器预览单列，不代云映结果。
+
+## 交付完整色块、单变量样本与参数说明
+
+保存两段ASS、四点角色表、公式与取点值，以及实际文件和观看条件，结束恢复原字幕而不改视频源。验收能读出b的两控制点和终点，说明起点来自m，为何控制点不必被穿过，以及为什么半参数点不能直接换成控制点平均。将第一条原始对称结论与第二条不对称反例分开，不把原最低y继续套给修改稿。源码文法、外部数学、预览和云映观看分别记证，未做重开或实际显示仍待核；不承诺所有引擎同一抗锯齿像素，不声称播放器生成曲线动画、编辑控制点或执行专业路径分析。
+
+## 相关教程与资料
+
+[绘图模式与封闭多边形](<https://allluckly.cn/guides/icouldplay-ass-vector-drawing-mode-polygon-text-scope/>)、[绘图坐标倍率与局部尺寸](<https://allluckly.cn/guides/icouldplay-ass-p2-p4-drawing-coordinate-resolution-divisor/>)。
+
+资料核对：2026年11月19日，[Apple公开查询](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261119-root>)列云映1.1.1，最低iOS / iPadOS 15.0；[官方商店](<https://apps.apple.com/cn/app/id6755653178>)公开ASS/SSA及内嵌、外挂字幕。字幕源稿、文法和数学在外部准备，云映通过实际可用路径关联与观看；公开格式范围不保证每种指令在所有引擎或设备一致。未声称完成真机字幕渲染、专业像素测量、所有格式或私人服务器测试。
+
+方法资料：[Aegisub官方ASS标签说明](<https://aegisub.org/docs/latest/ass_tags/>)。
+{% endraw %}

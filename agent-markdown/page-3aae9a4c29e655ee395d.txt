@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-crossfade-equal-power-source-correlation/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay crossfade material: two gains of 0.707 still depend on the relationship
+  between sources'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-crossfade-equal-power-source-correlation/
+agent_source_sha256: 8b88e64b4f36ee7edf943af475d51d9e531c971c82d8f0eda4d6b2ddd2a4b70c
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay crossfade material: two gains of 0.707 still depend on the relationship between sources
+
+Language: en
+Canonical: [iCouldPlay crossfade material: two gains of 0.707 still depend on the relationship between sources](<https://allluckly.cn/en/guides/icouldplay-crossfade-equal-power-source-correlation/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-crossfade-equal-power-source-correlation/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-crossfade-equal-power-source-correlation/>)
+Published: 2026-11-19T00:00:00+08:00
+Modified: 2026-11-19T10:09:17+08:00
+Author: Bison
+
+Compare constant-gain and explicitly defined constant-power weights for identical, inverted and orthogonal sources, without assuming a player mixer.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-crossfade-equal-power-source-correlation/>), translated on 2026-11-19. Original publication dates, attribution, code and version notes are retained.
+
+Equal weights for overlapping sounds do not guarantee a constant combined level for all content. A constant-power crossfade still depends on the relationship between its sources. Deliver external examples and a production record, then observe owned mixed clips in iCouldPlay. Summation and weights belong to source preparation, not an assumed automatic player transition.
+
+## Retain originals with three source relationships
+
+Use owned tones or calculation cards, without extracting commercial songs. Define A as a 1 kHz cosine of amplitude 0.2. Let B be identical to A, its pointwise negative, or an equal-amplitude 2 kHz cosine. At 8 kHz, average over complete eight-sample blocks or integer multiples, making the third pair’s mean product zero. Name each case and retain sources, gain plans and mixed exports separately. Different song names do not establish uncorrelated signals, and different stereo channels do not prove a measured zero mean product.
+
+## Specify both gain curves explicitly
+
+Let progress u run from zero to one. Linear constant-gain weights are 1-u and u. The explicitly chosen equal-power model uses cos(pi\*u/2) and sin(pi\*u/2), whose squares sum to one. The former weights sum to one; the latter generally do not. At the midpoint the pairs are 0.5/0.5 and approximately 0.707107/0.707107. This defines our mathematical curves, not the implementation of every similarly named software option. Progress is a fraction of the overlap, not necessarily half of each source file’s duration.
+
+```text
+linear: gA = 1-u, gB = u
+equal-power model: gA = cos(pi*u/2), gB = sin(pi*u/2)
+z[n] = gA*A[n] + gB*B[n]
+```
+
+## Sum identical material first
+
+For B identical to A, the linear midpoint remains A with amplitude 0.2. The equal-power midpoint is sqrt(2) times A, amplitude about 0.282843, doubling its mean square. Adding only separate powers would omit the cross term. Record the original and both midpoint mixes separately; these peaks remain below one and do not clip numerically. With original amplitudes of 0.8, the equal-power midpoint reaches about 1.131371. Production must address headroom externally; lowering a playback volume does not establish that file clipping was removed.
+
+## Check inverted and orthogonal cases separately
+
+When B is -A, both midpoint mixes cancel; the equal-power name does not guarantee audible output. For the defined 2 kHz B, averaging complete eight-point blocks gives mean square 0.02 per source and zero cross term. The equal-power midpoint retains mean square 0.02; the linear midpoint gives 0.01. Keep mean square separate from peak and instantaneous values. This is a signal-energy model, not a guarantee of equal perceived loudness. Frequency, window and real content affect perception; without listening, leave perception unassessed. Each mean-square card freezes progress u at the selected value throughout its eight-sample averaging window. For a real fade with sample-varying gains, average the entire squared weighted sum; do not take changing gains outside the mean as constants.
+
+```text
+mean(z*z) = gA*gA*mean(A*A) + gB*gB*mean(B*B)
+            + 2*gA*gB*mean(A*B)
+```
+
+## Compare in iCouldPlay only after making actual mixes
+
+With an existing trusted production tool, make owned video mixes externally using documented curves. Title them identical, inverted or orthogonal and linear or equal-power. Record soundtrack, sample rate and peak processing before selecting exports through actual video controls. Hold normal speed, output and comfortable volume fixed and note observed transitions, silent intervals and identity. Playing two originals separately does not compare mixed signals in one overlap window. A next-track transition does not establish this crossfade, and no undocumented mixing switch is required.
+
+## Extend the check to quarter progress
+
+At u=0.25, linear weights are 0.75 and 0.25; equal-power weights are about 0.923880 and 0.382683. Their squares still sum to one, but their sum is about 1.306563, so identical sources still rise. Inverted sources no longer cancel completely as at the midpoint. Compare both positions without extrapolating a flat whole transition from one instant. Changing the overlap to two seconds preserves the progress-based curve but changes absolute times; update timestamps instead of reusing old screenshot labels.
+
+## Troubleshoot source relationship and processing first
+
+For mismatches, establish whether B equals A, -A or another frequency and check normalization, limiting or extra markers. A window that does not span complete periods may have a nonzero cross term; that alone does not invalidate the equation. Hearing only one side calls for checking the exported mix and soundtrack, not expecting the player to calculate missing sums. Change one gain, source relationship or window condition at a time and retain exports. Document a production tool’s actual curve rather than relabeling it as our sine/cosine definition. Give another reviewer the window’s sample boundaries and averaging method, asking them to reproduce the identical-source case before the orthogonal one. The label alone cannot reconstruct source relationships and intervals.
+
+## Deliver a conditional comparison rather than a universal preset
+
+Reselect originals and mixes to confirm identity. Deliver three source relationships, two curves, two progress positions, peak-versus-mean-square distinctions and playback records. Restore ordinary volume and sources while retaining exercises separately. Explain why identical sources rise at the equal-power midpoint and inverted ones can vanish. Names do not replace correlation conditions, and equal mean square does not guarantee equal perceived loudness. Mark unmade mixes or unperformed playback accordingly; calculations do not establish automatic crossfading, peak protection or loudness analysis in iCouldPlay.
+
+## Related tutorials and sources
+
+[iCouldPlay stereo gain exercise: common gain versus independent normalization](<https://allluckly.cn/en/guides/icouldplay-stereo-common-gain-independent-normalization-balance/>); [iCouldPlay audio measures: equal peaks can have different RMS values](<https://allluckly.cn/en/guides/icouldplay-audio-rms-peak-window-duty-cycle-model/>).
+
+Method sources: [Audacity Crossfade Tracks](<https://manual.audacityteam.org/man/crossfade_tracks.html>).
+
+Checked on 19 November 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261119-hls>) list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.
+{% endraw %}

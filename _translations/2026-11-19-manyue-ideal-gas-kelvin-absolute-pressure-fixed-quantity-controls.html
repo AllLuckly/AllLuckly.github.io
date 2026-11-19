@@ -1,0 +1,81 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Read gas-state cards in ManYue: doubling kelvin temperature needs a declared fixed quantity'
+description: Compare fixed-pressure, rigid-container and isothermal cards for one mole of ideal gas, separating
+  absolute pressure and Celsius values.
+permalink: /en/guides/manyue-ideal-gas-kelvin-absolute-pressure-fixed-quantity-controls/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 248
+topic: Reading particles, amounts and state conditions
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-19-manyue-ideal-gas-kelvin-absolute-pressure-fixed-quantity-controls.md
+source_url: /guides/manyue-ideal-gas-kelvin-absolute-pressure-fixed-quantity-controls/
+translation_method: editorial
+translation_source_sha256: 6936d84c501edda21140697c93662a0ccbdc3886629f33a60d6756a351261cd7
+translation_date: '2026-11-19T01:51:03+00:00'
+excerpt: Compare fixed-pressure, rigid-container and isothermal cards for one mole of ideal gas, separating absolute
+  pressure and Celsius values.
+---
+{% raw %}
+<p>A heating arrow alone cannot decide whether a gas expands or its pressure rises. Read original state cards in ManYue, identify controlled quantities and units, and substitute into the ideal-gas equation. This is not an experiment heating sealed containers.</p>
+
+<h2 id="use-one-complete-state-as-the-common-starting-point">Use one complete state as the common starting point</h2>
+
+<p>Specify n=1mol ideal gas, T=300K, absolute p=100kPa and R=8.314kPa·L/(mol·K). Put state/units on P1, three controls on P2 and Celsius/gauge errors on P3; export PDF and retain source work. Check K, kPa, L are not cropped and bookmark P2. The model neglects molecular size/interactions within an ideal approximation; drawn dots do not count one mole, and container artwork does not measure volume.</p>
+
+<h2 id="calculate-initial-volume-using-absolute-pressure-and-kelvin">Calculate initial volume using absolute pressure and kelvin</h2>
+
+<p>pV=nRT gives V=1×8.314×300/100=24.942L. Both pV and nRT are 2494.2kPa·L. Check no thousandfold Pa/kPa mismatch. 1kPa·L=1J because kilo and milli cancel. Using Pa, m³ requires R=8.314Pa·m³/(mol·K), giving 0.024942m³. Do not retain 24.942 and merely replace L by m³; units must match R.</p>
+
+<p>R=8.314 is a common specified approximation; digits in 24.942 check substitution/units rather than physical precision. A more precise R can change final digits, so update all rows consistently instead of one. Display rounding does not add or remove gas. Separate input approximation, calculation and measurement precision and retain the chosen constant.</p>
+
+<h2 id="let-volume-follow-absolute-temperature-at-fixed-pressure">Let volume follow absolute temperature at fixed pressure</h2>
+
+<p>Control A holds n and absolute 100kPa while T becomes 600K, giving V=49.884L, double the initial volume. Its model permits moving boundaries to maintain pressure; do not import a rigid fixed-volume container. Check V2/V1=T2/T1=2 and 49.884×100=4988.4. A larger icon illustrates, not measures, the result. Doubling a drawn width does not automatically double a three-dimensional volume.</p>
+
+<h2 id="raise-pressure-at-fixed-rigid-volume">Raise pressure at fixed rigid volume</h2>
+
+<p>Control B holds n and V=24.942L while T rises 300→600K, giving p=200kPa and unchanged volume. Both controls satisfy pV=nRT under different constraints. T=600 K, p=100 kPa, V=24.942 L, n=1 mol is inconsistent: 2494.2 versus 4988.4. Do not halve R to preserve incompatible labels; in the chosen units it is a specified constant, not an adjustable repair.</p>
+
+<p>If n is not fixed, the 600K,100kPa,24.942L card gives n=pV/(RT)=0.5mol and is consistent. It conflicts specifically with the earlier fixed-one-mole premise, not with every possible gas state. Separate supplied, controlled and unknown quantities to decide whether to solve n or repair a label instead of silently deleting the starting condition.</p>
+
+<pre><code class="language-text">ideal model: n=1 mol; R=8.314 kPa*L/(mol*K)
+start: T=300 K; absolute p=100 kPa; V=24.942 L
+fixed p,n; T=600 K -&gt; V=49.884 L
+fixed V,n; T=600 K -&gt; absolute p=200 kPa
+fixed T=300 K,n; p=200 kPa -&gt; V=12.471 L
+300 K=26.85 degC; 600 K=326.85 degC
+</code></pre>
+
+<h2 id="distinguish-isothermal-and-amount-change-controls">Distinguish isothermal and amount-change controls</h2>
+
+<p>Control C holds T=300 K, n=1 mol and raises absolute p to 200kPa, giving 12.471L and unchanged pV=2494.2. A separate n=2 mol, T=300 K, p=100 kPa card also gives 49.884L, matching A’s volume without its temperature or amount. Full states distinguish causes. Start each control from the baseline rather than silently compose heating/compression. No process work or internal-energy model was specified.</p>
+
+<p>For one mole, pV/T is 2494.2/300=4988.4/600=8.314, and the isothermal card agrees. This ratio is nR, not always R for arbitrary amount. The two-mole card gives 16.628; expecting 8.314 there omits n. Use absolute pressure and kelvin rather than blame a Celsius-denominator discrepancy on the gas law.</p>
+
+<h2 id="respect-celsius-and-gauge-pressure-reference-zeros">Respect Celsius and gauge-pressure reference zeros</h2>
+
+<p>300K=26.85°C and 600K=326.85°C; doubling 26.85°C to 53.70°C does not double absolute temperature. Pressure must be absolute too. A separate gauge 100kPa with ambient absolute 100kPa means gas absolute 200kPa, giving 12.471L at 1mol/300K, not 24.942. Gauge zero is not no gas pressure, and Celsius zero is not absolute zero. Without ambient pressure, do not silently substitute a gauge reading as absolute.</p>
+
+<h2 id="diagnose-controlsstate-consistency-and-approximation-scope">Diagnose controls, state consistency and approximation scope</h2>
+
+<p>A 24942 L answer suggests Pa/kPa mismatch; heating with both p, V unchanged needs an amount-change declaration; a failed doubling claim may use Celsius ratios. Enlarge fixed-pressure, rigid, isothermal headings, repair one field and compare equation sides. Real high-pressure or near-condensation states may violate ideal approximation; matching cards do not certify all measured gases. Missing units/absolute-pressure labels remain pending, not inferred from icons, heating arrows or App display size.</p>
+
+<h2 id="reopen-and-restore-three-results-from-three-constraints">Reopen and restore three results from three constraints</h2>
+
+<p>At the reopened control page hide answers and recover 49.884L at fixed pressure,200kPa in the rigid case and 12.471L isothermally, stating each pair of unchanged quantities. Check Celsius/gauge controls and the common baseline. Deliver states, unit conversions, controls and unknowns, leaving unperformed reader actions pending. This is conditional equation reading, not App gas measurement, container-strength analysis, heating or pressure-equipment validation.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/manyue-hydrostatic-pressure-depth-gauge-absolute-area-reading/">ManYue gauge versus absolute pressure</a>; <a href="/en/guides/manyue-relative-humidity-cooling-saturation-vapour-density-panels/">ManYue humidity conditions</a>.</p>
+
+<p>Method references: <a href="https://openstax.org/books/chemistry-2e/pages/9-2-relating-pressure-volume-amount-and-temperature-the-ideal-gas-law">OpenStax ideal gas law</a>. Diagrams, report data, counterexamples and ledgers are original exercises.</p>
+
+<p>Version checked on 19 November 2026: the <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261119">Apple public lookup</a> lists ManYue 2.0.6, requiring iOS / iPadOS 15.0 or later; see the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities. Use self-made PDFs or supported comic images; controls depend on the installed version. External preparation and paper predictions do not constitute device observations. Leave unperformed checks blank.</p>
+{% endraw %}

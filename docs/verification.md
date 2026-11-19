@@ -1,5 +1,19 @@
 # 验证记录
 
+## 2026-11-19：七款应用各新增10篇中文及完整英文教程
+
+- 新增70篇中文详细教程及70篇完整英文；Aquarell250篇、漫阅+250篇、VectorPaint250篇、书屿230篇、云映210篇、调调50篇、键来50篇，Yearn保留20篇。全站1310篇中文教程、8条真实学习路线。14个新增阶段、连续编号及逐篇来源见[本批证据](tutorial-evidence-20261119.md)。
+- 当日重新核Apple公开版本、系统和实际能力。调调RU/CN均为1.0.2，中英文介绍同步当期发行说明的修复、小组件和主题范围，并保留1.0.1历史说明；其余应用按各自当日查询记录。用户指定的RU/FI入口与CN交叉核身份，官方截图与功能说明分项留证。
+- 中文正文共116,487汉字，单篇1,505–1,859汉字，不含frontmatter、含资料段；字数用于发现缺稿。70对完整中英文经独立跨组全文复核，最终140份源译SHA绑定。实际Liquid→Kramdown结构、字面代码、标题ID、内链、日期、署名和UTC通过，实质长段整段重复检查通过。
+- 原创材料、具体任务、计算条件、反例、结果检查与排障分别审阅。未执行的App真机、私人服务器、键盘宿主、字幕渲染、编解码或设备听测不记为通过；静态核验、外部标准库模型和网站抽查范围明确区分。
+- 两轮production Jekyll3.10构建完成，两轮之间导出语义原文并生成Markdown、阅读目录和技能摘要。实际启动显式使用JEKYLL_ENV=production及Homebrew Ruby，23项按顺序成功。站点：3250 JSON-LD graphs, 3246 sitemap URLs, Atom feed, 2816 new/updated pages, 1310 detailed tutorials, 8 complete learning routes and 8 work videos。
+- 首次流程已完成一轮production构建及中间生成；独立审阅发现阶段描述“ 双曲接缝 ”容易误读后，修为“ 两段音频接缝 ”并中断刚启动的第二轮，保留实际记录。修订后重新完整执行最终两轮及23项检查；本批累计三轮成功构建，最终验证对应后两轮。
+- 双语：1476 reciprocal language pairs, 1447/1447 complete English articles, preserved code/attribution/dates, localized collections and captions。旧技术文章、专题和阅读说明验证通过。
+- Markdown：2952 pages (2894 articles, 58 entry pages); 2546 code blocks and 4040 inline code nodes preserved; 0 files changed Generated sources are current.；阅读目录：Checked 40 llms.txt indexes; 2912 unique direct Markdown targets; 0 changed files.。技能摘要、Agent访问/搜索、API目录、统计/站点脚本及图标检查通过。中英文搜索各1447条，本批各70条新记录齐全。
+- 八款路线逐一核实际文章顺序、中英文阶段ID与编号范围，14个新阶段各覆盖五篇；所有旧阶段对象与字段逐项保留，另经独立审阅者对照基线核验，详情在本机忽略目录output/tutorials-20261119/stage-parity-review.json及independent-stage-integration-review.json。
+- 原生Safari抽查本批正文与任务样本，实际点击语言切换和阅读目录，并检查手机宽度的长标题与新阶段；范围记录在output/tutorials-20261119/safari-qa.json，网站检查不等于App真机操作。
+- 发布前GitHub Desktop同步origin/master，基线8e10a2e。2754份旧文章与译文逐字节保持，无删除或夹带其他任务改动；git diff --check与281个新增文件独立空白检查通过。Worker候选仅增加140条真实路由至2952条，保留2812条旧路由及原处理逻辑。GitHub Desktop提交/推送、精确SHA的Pages部署、现有边缘路由与线上目录/搜索/HTML/Markdown分别核验，本地通过不记为上线。
+
 ## 2026-11-18：七款应用各新增10篇中文及完整英文教程
 
 - 首次完整流程在双语目录验证发现云映英文新增阶段误用旧编号；修正为191–195和196–200并恢复原阶段。另为漫阅与书屿四个历史、四个新增阶段补齐确定性ID和由原summary保留的description，所有原字段值不变。首次失败记录保留，修正后重新执行两轮production构建及全部验证；前后共四次构建成功，最终两次对应修正后资源。

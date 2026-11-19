@@ -1,0 +1,74 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-sampled-alias-negative-sine-five-three-kilohertz/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay aliasing comparison: why 5 kHz folds to 3 kHz at 8 kHz sampling'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-sampled-alias-negative-sine-five-three-kilohertz/
+agent_source_sha256: 5ea349af8a337c8960ee1f14c7225768689fc869d39bf0ebef14bff40ded78b6
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay aliasing comparison: why 5 kHz folds to 3 kHz at 8 kHz sampling
+
+Language: en
+Canonical: [iCouldPlay aliasing comparison: why 5 kHz folds to 3 kHz at 8 kHz sampling](<https://allluckly.cn/en/guides/icouldplay-sampled-alias-negative-sine-five-three-kilohertz/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-sampled-alias-negative-sine-five-three-kilohertz/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-sampled-alias-negative-sine-five-three-kilohertz/>)
+Published: 2026-11-19T00:00:00+08:00
+Modified: 2026-11-19T09:27:23+08:00
+Author: Bison
+
+Compare original discrete sequences at 5 kHz and negative 3 kHz, checking phase and sampling limits before observing an owned video soundtrack.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-sampled-alias-negative-sine-five-three-kilohertz/>), translated on 2026-11-19. Original publication dates, attribution, code and version notes are retained.
+
+A file sampled at 8 kHz cannot preserve an 8 kHz sound. Playing a sequence already corrupted by aliasing cannot recover the missing original information. Calculate a defined sequence first, then distinguish external production conditions from the actual soundtrack in iCouldPlay. Hearing a lower tone alone does not establish a player fault.
+
+## Fix the sampling conditions and owned reference material
+
+Create a record with 8,000 samples per second and indices beginning at zero. Compare sine waves of amplitude 0.2 at 5 kHz and 3 kHz; do not treat music as a single-frequency signal. Paper work needs no audible file. If an existing trusted production tool is available, make owned clips with identifying title cards and record their exported soundtrack rate and codec. Keep projects, exports and notes separate: project settings do not prove export properties. These calculations are external, not an iCouldPlay tone generator or a request to install an unfamiliar plugin.
+
+## List eight samples before judging a frequency
+
+Use the formulas below for n from zero through seven, with angles in radians and time n divided by 8,000 seconds. Both sequences begin at zero phase. Substitute 5,000 for one and 3,000 for the other, preserving signs before rounding to six decimals. The first four normalized 5 kHz values are zero, -0.707107, 1 and -0.707107; apply the 0.2 amplitude afterward. Taking absolute values would create a different waveform. Use a calculator or an existing script and record method and precision. The table is a calculation, not a device measurement.
+
+```text
+Fs = 8000
+x[n] = 0.2 * sin(2*pi*5000*n/Fs)
+y[n] = 0.2 * sin(2*pi*3000*n/Fs)
+x[n] + y[n] = 0  (integer n, ideal arithmetic)
+```
+
+## Establish the negative-frequency and polarity relation
+
+For integer n, 5,000/8,000 equals one minus 3,000/8,000. Consequently, the 5 kHz sine sequence equals the negative-3 kHz sine sequence, or the pointwise negative of the 3 kHz sequence. It is not an unchanged copy of a zero-phase 3 kHz sine; cosine gives a different phase correspondence. Adding the two sequences should leave only rounding error, not subtracting them. Negative frequency here is a mathematical representation, not another soundtrack or a negative audible pitch. Listening to isolated tones generally cannot establish polarity; consult the source sequence. Extend indices through fifteen and verify signs throughout repeated periods instead of inferring the whole cycle from the first two points.
+
+## Separate the Nyquist boundary from anti-alias processing
+
+Half of 8 kHz is 4 kHz, so 5 kHz exceeds the boundary. An appropriate sampling chain suppresses out-of-band content before sampling or downsampling instead of asking playback to repair aliased data. Correctly downsampling a 48 kHz source to 8 kHz may filter out its 5 kHz component rather than producing a clear 3 kHz tone. Name the deliberately aliased formula model separately from a real tool’s filtered conversion. Do not claim arbitrary-phase content exactly at the boundary is fully reconstructible; retain the strict condition.
+
+## Observe only identified exports in iCouldPlay
+
+If you have owned exports, select them through the installed app’s visible local-video controls. Check the identifying title, duration and selected soundtrack. Keep playback speed, output device and volume fixed, comparing briefly at a comfortable low level. Record playability, sound presence and obvious differences; do not compensate for frequency-dependent perception by increasing volume. With only calculated sequences, mark playback unperformed. A failed experimental container is a file-path or codec observation, not proof of an aliasing error, and renaming an extension is not conversion.
+
+## Change one frequency for an in-band control
+
+Calculate an additional 1 kHz sequence at the same 8 kHz rate. It has exactly eight samples per cycle and lies below the half-rate limit. Keep the 5 kHz model, 1 kHz model and actual exports in separate rows without confusing sample counts. For a new clip, change only frequency while retaining amplitude, duration and export settings and assign a distinct name. This control illustrates frequency versus sample positions, not distortion-free recording for every sub-4 kHz signal. Quantization, noise, coding and the analog path remain separate conditions; limit conclusions to the defined sines and calculated integer indices.
+
+## Troubleshoot time units and actual export parameters
+
+If all eight values become zero, check radians versus degrees, whether n was mistaken for whole seconds and the sample-rate denominator. For reversed relations, inspect signs and starting phase instead of swapping channels. An export differing from the model calls for checking external filtering, resampling and peak processing; the app’s volume slider is not an amplitude calibrator. Change one condition in owned copies and retain failures and parameters. Without spectral or sample-reading tools, record listening impressions and limits rather than exact hertz or decibel measurements.
+
+## Deliver sequences, production conditions and observations
+
+Reopen the selected source, confirm the same export and restore the original soundtrack and normal speed. Deliver the eight-point calculation, pointwise sign relation, 1 kHz control, external processing conditions and observations. Mark unmade or unplayed items unperformed. At a new 9 kHz rate, recompute the boundary and folding relation rather than retaining the 3 kHz conclusion. Explain where aliasing entered and which file reached the player. Successful playback does not validate every rate, codec or output device, and equations do not establish real-file identity.
+
+## Related tutorials and sources
+
+[Compare audio rates in iCouldPlay: resampling differs from rate reinterpretation](<https://allluckly.cn/en/guides/icouldplay-audio-resampling-versus-rate-reinterpretation-duration-pitch/>); [iCouldPlay PCM quantization: why signed16-bit endpoints are asymmetric](<https://allluckly.cn/en/guides/icouldplay-signed-sixteen-bit-pcm-quantization-grid-endpoint-asymmetry/>).
+
+Method sources: [Audacity Digital Audio Fundamentals](<https://manual.audacityteam.org/man/digital_audio.html>).
+
+Checked on 19 November 2026: the [official iCouldPlay listing](<https://apps.apple.com/cn/app/id6755653178>) and [Apple public lookup](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261119-hls>) list version 1.1.1, requiring iOS / iPadOS 15.0 or later. Prepare text and calculations externally; iCouldPlay selects and observes existing owned real sources through actually visible installed controls. Keep syntax, hypothetical calculations, real-byte evidence and viewing separate, marking unperformed steps accordingly. No exhaustive physical-device, private-server, engine or output-device compatibility testing is claimed.
+{% endraw %}

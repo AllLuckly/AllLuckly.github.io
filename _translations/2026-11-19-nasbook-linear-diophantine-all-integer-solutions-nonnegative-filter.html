@@ -1,0 +1,83 @@
+---
+layout: guide
+author: Bison
+app_id: nas_book
+title: 'Read integer equations in Book Isle: one solution is not all, and nonnegativity
+  filters the parameter'
+description: Find every integer solution of four x plus six y equals fourteen, with
+  an impossible right side and a sixteen control.
+permalink: /en/guides/nasbook-linear-diophantine-all-integer-solutions-nonnegative-filter/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 224
+topic: Conditions in inference, infinity and random waiting
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-19-nasbook-linear-diophantine-all-integer-solutions-nonnegative-filter.md
+source_url: /guides/nasbook-linear-diophantine-all-integer-solutions-nonnegative-filter/
+translation_method: editorial
+translation_source_sha256: 9c76daf9a54bc5ed0b38117488de979fd04206a61ca4f8d1159a8005bf938339
+translation_date: '2026-11-19T02:10:36.949582+00:00'
+excerpt: Find every integer solution of four x plus six y equals fourteen, with an
+  impossible right side and a sixteen control.
+---
+{% raw %}
+<p>A real line has infinitely many points, but not every point solves an integer problem. Read a linear Diophantine equation through solvability, general solutions and extra constraints in Book Isle. Divisibility and enumeration are external, not an App equation or optimization solver.</p>
+
+<h2 id="separate-the-integer-domain-from-nonnegativity">Separate the integer domain from nonnegativity</h2>
+
+<p>Specify 4x+6y=14, first for arbitrary integers x, y, then with x≥0, y≥0. Put domain/gcd on P1, general solutions on P2 and changed-right-side controls on P3; export PDF and retain editable work. Check fourteen versus sixteen and bookmark P2. Mark integer/nonnegative conditions separately or record them externally. Nonnegative includes zero. One nonnegative solution is not a complete list of integer solutions.</p>
+
+<h2 id="use-divisibility-to-decide-solvability">Use divisibility to decide solvability</h2>
+
+<p>gcd(4, 6)=2 divides fourteen, so integer solutions exist. With right side fifteen, every integer left side is even and cannot equal an odd number. The criterion is gcd dividing the right side, not coefficient coprimality; noncoprime 4, 6 can solve fourteen. It guarantees an integer solution, not nonnegative/positive solutions or an answer inferred from an empty worksheet.</p>
+
+<p>A common factor does not prevent solutions: two divides both coefficients and fourteen. Dividing both sides by the same nonzero two gives 2x+3y=7 with the same integer solutions; dividing only one side or rounding the right side does not. Positive coefficients do not force general integer solutions to be positive. Apply nonnegativity only after constructing the full family.</p>
+
+<h2 id="check-a-particular-solution-then-introduce-the-parameter">Check a particular solution, then introduce the parameter</h2>
+
+<p>The pair (2, 1) gives 8+6=14. Changing x by +3 and y by −2 preserves the sum because 4·3+6·(−2)=0. Thus x=2+3t, y=1−2t for integer t. Values −1, 0, 1 give (−1, 3),(2, 1),(5, −1), all valid for the unrestricted integer question. Do not erase negative coordinates or let t become arbitrary real, which need not preserve integer coordinates.</p>
+
+<pre><code class="language-text">4*x+6*y=14; x,y integers; gcd(4,6)=2 divides14
+particular solution (2,1)
+all integer solutions: x=2+3*t; y=1-2*t; t integer
+t=-1,0,1 -&gt; (-1,3),(2,1),(5,-1)
+nonnegative: t&gt;=-2/3 and t&lt;=1/2 -&gt; t=0 only
+control RHS15: no integer solution
+control RHS16 nonnegative solutions: (1,2),(4,0)
+</code></pre>
+
+<h2 id="prove-that-no-integer-solutions-lie-outside-the-family">Prove that no integer solutions lie outside the family</h2>
+
+<p>Subtract (2, 1) from any integer solution: 4(x−2)+6(y−1)=0, so 2(x−2)=−3(y−1). Coprimality of two and three forces 3 to divide x−2; write x−2=3t and obtain y−1=−2t. This proves coverage, beyond substituting members to show validity. Separate validity and completeness; a few sampled t values do not prove all solutions. The argument is for this linear equation, not every higher-degree integer equation.</p>
+
+<p>Substitution cancels 12t with −12t and leaves 8+6=14, proving every integer parameter yields a solution. The coprime divisibility argument is still needed to prove every solution lies in the family. These are different directions. Testing t=−1, 0, 1 cannot establish completeness for all integers.</p>
+
+<h2 id="intersect-constraints-on-the-same-integer-parameter">Intersect constraints on the same integer parameter</h2>
+
+<p>Nonnegativity requires 2+3t≥0, hence t≥−2/3, and 1−2t≥0, hence t≤1/2. Their integer intersection is only t=0, giving (2, 1). Do not use different t values for each inequality or accept t=1/2 and (3.5, 0) as integers. Uniqueness follows from domain plus bounds, not visible dots. Positivity happens to leave the same pair here, but positive and nonnegative are not universally equivalent.</p>
+
+<h2 id="use-a-sixteen-control-to-test-the-role-of-zero">Use a sixteen control to test the role of zero</h2>
+
+<p>Change only the right side to sixteen: 2x+3y=8, with particular (1, 2) and family x=1+3t, y=2−2t. Nonnegative bounds −1/3≤t≤1 admit integer t=0, 1: (1, 2),(4, 0). Strict positivity removes (4, 0). Both right sides pass gcd divisibility but have different nonnegative counts; the criterion promised no common count. Retain right-side/constraint labels rather than copy the fourteen answer.</p>
+
+<p>For fourteen, the sole nonnegative solution (2, 1) is also strictly positive. For sixteen, (4, 0) must be excluded from a positive-integer task because zero is not greater than zero. “At least one of each” changes the inequalities. Preserve the constraint wording and signs alongside before/after counts, so a correct derivation does not deliver the wrong feasible set.</p>
+
+<h2 id="diagnose-domain-parameter-and-substitution-residuals">Diagnose domain, parameter and substitution residuals</h2>
+
+<p>A lone (2, 1) labelled general omits t; a full real line labelled integer ignores domain. Solvability for fifteen misses parity; one nonnegative solution for sixteen may exclude zero incorrectly. Record one shared t, x, y and 4x+6y per row, enlarging signs/bounds. If t is unsearchable in a scan, return by P2/particular-solution anchor. Page shifts do not alter the equation, and reader-open counts are not solver iterations.</p>
+
+<h2 id="reopen-with-existence-and-filtering-as-separate-steps">Reopen with existence and filtering as separate steps</h2>
+
+<p>At reopened P2 first decide fourteen solvable and fifteen impossible, then rebuild parameter steps +3/−2 and filter t. Check zero in the sixteen control and explain why substitution alone does not establish completeness. Deliver divisibility, coverage proof, constraint intersection and versions, marking unperformed import, highlighting and reopening pending. This is manual mathematical reading, not App enumeration, optimization or verification of arbitrary Diophantine equations.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/nasbook-euclidean-gcd-remainder-chain-lcm/">Book Isle Euclidean algorithm: trace divisors, remainders and the stopping condition</a>; <a href="/en/guides/nasbook-modular-negative-representative-cancellation/">Read congruences in Book Isle: choose remainder representatives before cancelling factors</a>.</p>
+
+<p>Method references: <a href="https://www.southampton.ac.uk/~wright/1001/linear-diophantine-equations.html">Southampton Wright: linear Diophantine equations</a>. Diagrams, report data, counterexamples and ledgers are original exercises.</p>
+
+<p>Version checked on 19 November 2026: the <a href="https://itunes.apple.com/lookup?id=6766198898&amp;country=cn&amp;entity=software&amp;timestamp=20261119">Apple public lookup</a> lists Book Isle 1.1.4, requiring iOS / iPadOS 15.6 or later; see the <a href="https://apps.apple.com/cn/app/id6766198898">official App Store</a> for published capabilities. Use self-made PDFs, EPUBs or clear text materials; bookmarks, highlights and notes depend on format and visible controls, without automatic solving or literary analysis. External preparation and paper predictions do not constitute device observations. Leave unperformed checks blank.</p>
+{% endraw %}

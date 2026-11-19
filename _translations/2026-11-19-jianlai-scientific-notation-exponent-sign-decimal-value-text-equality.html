@@ -1,0 +1,58 @@
+---
+layout: guide
+author: Bison
+app_id: jianlai
+title: 'Jianlai scientific-notation card: the exponent sign controls a power of ten, while equal values can have
+  different text'
+description: Type three explicit ASCII scientific-notation strings and convert them to decimal externally to check
+  signs and scale. Separate keyboard entry, host formatting and mathematical interpretation. Here e is neither a
+  unit nor Euler’s constant, and normalized display does not establish exact source text.
+permalink: /en/guides/jianlai-scientific-notation-exponent-sign-decimal-value-text-equality/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 50
+topic: Structured text and scientific notation
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-19-jianlai-scientific-notation-exponent-sign-decimal-value-text-equality.md
+source_url: /guides/jianlai-scientific-notation-exponent-sign-decimal-value-text-equality/
+translation_method: editorial
+translation_source_sha256: 4c3b6d956dee9799848e0a6f20df1ce69507960e5d739e66346e14cd6da255ca
+translation_date: '2026-11-19T02:24:33+00:00'
+excerpt: Type three explicit ASCII scientific-notation strings and convert them to decimal externally to check signs
+  and scale. Separate keyboard entry, host formatting and mathematical interpretation. Here e is neither a unit
+  nor Euler’s constant, and normalized display does not establish exact source text.
+---
+{% raw %}
+<p>Type three explicit ASCII scientific-notation strings and convert them to decimal externally to check signs and scale. Separate keyboard entry, host formatting and mathematical interpretation. Here e is neither a unit nor Euler’s constant, and normalized display does not establish exact source text.</p>
+<h2 id="section-1">Preserve three targets in a plain-text environment</h2>
+<p>Create an owned English/numeric draft with Jianlai and the host identified, preserving appearance/input state. Targets are 3.20e-4, 3.20e+4 and -3.20e-4 on separate lines, using ASCII dots, e and signs without spaces, units or labels. Keep the external source separate from decimal calculations instead of replacing targets with answers. These are text/math exercises, not measurements, money or experimental parameters. If the host evaluates or reformats them, preserve its response and use an existing plain-text field rather than invent a Jianlai scientific calculator or precision setting.</p>
+<h2 id="section-2">Type in portions and distinguish the two sign positions</h2>
+<p>For line one enter 3.20, lowercase e, ASCII minus and 4. Line two has an explicit plus before the exponent. Line three adds a leading minus while retaining the exponent’s minus. Inspect committed text, not keycaps or preview. The two minuses on line three have different roles: the leading sign controls the whole value, while the exponent sign controls the power of ten. They do not cancel merely because both are minus signs. Use actual newlines and record pasted/other-keyboard portions separately from manual Jianlai entry.</p>
+<pre><code>3.20e-4
+3.20e+4
+-3.20e-4
+</code></pre>
+<h2 id="section-3">Recover all three values using powers of ten</h2>
+<p>In this notation e means multiplying the preceding decimal coefficient by ten to an integer power. 3.20e-4 is 3.20 times ten to minus four, giving 0.000320. The next values are 32000 and -0.000320. Minus four neither subtracts four from 3.20 nor raises 3.20 to minus four. Write the power-of-ten layer before checking decimal positions; a negative exponent does not make the first value negative. e is notation here, not a physical unit, variable or Euler’s constant. Other formula environments require their own interpretation rules. An additional zero-exponent control, 3.20e0, still equals 3.20; zero is not an empty exponent. A bare 3.20e lacks its integer exponent and fails this complete form. Record the omission rather than borrow the previous line’s exponent. Save this control outside the three-line target. A negative-zero exponent in 3.20e-0 also gives 3.20; do not move the exponent minus to the coefficient.</p>
+<h2 id="section-4">Check sign and scale before trailing zeros</h2>
+<p>The second value divided by the first is ten to the eighth, or one hundred million. The third has the first’s magnitude with the opposite sign. These expose exponent-sign or leading-sign mistakes; shared digits 3 and 2 do not establish equality. Exact decimal values 0.000320 and 0.00032 agree, while text and trailing zeros differ. Preserve the target’s zero rather than treating normalized output as identical input. Some measurement reports assign significance to zeros, but this exercise supplies no measurements and establishes no precision, uncertainty or confidence interval.</p>
+<h2 id="section-5">Save value-equivalent but textually different controls</h2>
+<p>Externally change line one to 3.2e-4 and 3.20E-4. Under the Python Decimal rules used here, both have the same value but differ character by character from 3.20e-4. One drops a coefficient zero and one changes case. Parser acceptance does not establish source equality. A human-readable expression 3.20×10⁻⁴ is another representation, not the ASCII target or an automatically valid input to the same numeric-string parser. Label controls without requiring every variant to be typed. Separate exact text, meaning and actual acceptance, retaining manual predictions for unexecuted cases.</p>
+<h2 id="section-6">Use Decimal externally for the specified strings</h2>
+<p>With an existing Python installation, use the standard-library example in a separate practice file and record version/output. Construct Decimal directly from strings, avoiding an intermediate binary float that would introduce another representation. It only prints fixed-point text and changes no app data. Expected lines are 0.000320, 32000 and -0.000320, but actual execution is separate evidence. Fixed-point display differs from the scientific source, so retain entered strings too. Neither keyboard entry nor external calculation establishes exact host persistence automatically.</p>
+<pre><code>from decimal import Decimal
+for text in (&quot;3.20e-4&quot;, &quot;3.20e+4&quot;, &quot;-3.20e-4&quot;):
+    print(format(Decimal(text), &quot;f&quot;))
+</code></pre>
+<h2 id="section-7">Troubleshoot ASCII signs and host rewriting</h2>
+<p>A hundred-millionfold discrepancy suggests the exponent sign. Correct magnitude with wrong sign suggests the leading minus. Parse failure calls for inspecting Unicode minus, full-width dots, spaces or a written multiplication expression. This target requires ASCII without claiming every numeric tool accepts only ASCII or rejects all Unicode digits. Follow actual documentation/results. Repair one condition and preserve the initial draft instead of normalizing away evidence. If a host changes 3.20 to 3.2, retain both: equal value and changed text are different findings, not increased keyboard precision.</p>
+<h2 id="section-8">Reopen and deliver source strings, values and limits</h2>
+<p>Reopen the draft and check leading signs, e case, exponent signs and final digits, leaving persistence unpassed if not checked. Deliver targets, actual input, three decimal values and equivalent controls with host-processing and execution records. Restore normal input and keep practice out of real parameter files. Explain why two minuses do not cancel and where equal-value controls differ from the source. Units, rounding, exponent ranges and other languages require new checks, not claims of Jianlai scientific calculation, measurement-precision management or universal number-format compatibility.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/jianlai-signed-decimal-unit-text-card/">Signed decimals and units</a>; <a href="/en/guides/jianlai-zero-preserving-identifier-quantity-three-line-ledger/">Identifiers and quantities</a>.</p>
+<p>Checked on 19 November 2026: <a href="https://itunes.apple.com/lookup?id=6754281557&amp;country=fi&amp;entity=software&amp;timestamp=20261119">Apple’s Finland lookup</a> and <a href="https://itunes.apple.com/lookup?id=6754281557&amp;country=cn&amp;entity=software&amp;timestamp=20261119">China lookup</a> both list Jianlai 1.0.5, requiring iOS / iPadOS 16.0 or later. The <a href="https://apps.apple.com/fi/app/id6754281557">official store</a> describes themes, backgrounds, fonts and multilingual input. Use controls actually present in the installed version; system editing and host processing are distinguished separately. These are repeatable instructions and paper expectations, not claims of completed device input, host compatibility or format-parser tests.</p>
+<p>Method references: <a href="https://docs.python.org/3/library/decimal.html">Python Decimal numeric strings</a>.</p>
+{% endraw %}

@@ -1,0 +1,76 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint convex hull: seven input points need only four extreme vertices'
+description: Distinguish four corners, two interior points and a boundary midpoint from hull vertices, then add
+  an exterior point to obtain a five-vertex hull.
+permalink: /en/guides/vectorpaint-convex-hull-interior-boundary-extreme-points/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 244
+topic: Concurrency, metric identities, hulls and brackets
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-19-vectorpaint-convex-hull-interior-boundary-extreme-points.md
+source_url: /guides/vectorpaint-convex-hull-interior-boundary-extreme-points/
+translation_method: editorial
+translation_source_sha256: f96bba2f4d6095b24e454fb94ea1bd74a23c528244c65aacd334ebb79df7f73e
+translation_date: '2026-11-19T02:01:54+00:00'
+excerpt: Distinguish four corners, two interior points and a boundary midpoint from hull vertices, then add an exterior
+  point to obtain a five-vertex hull.
+---
+{% raw %}
+<p>Enclose a point set in its smallest convex set without requiring a boundary tour through every input. Interior points belong to the hull but are not extreme vertices; an input midway along a straight edge need not create a corner. Specify an extreme-vertex output convention, then check segments and half-planes instead of accepting any rubber-band-looking outline.</p>
+
+<h2 id="section-1">Plot seven distinct points by coordinates</h2>
+
+<p>Take A=(0,0), B=(6,0), C=(6,4), D=(0,4), E=(2,1), F=(4,3), G=(3,0). On about 1600 × 1200 pixels use u=300+140x, v=900−140y, reserving room rightwards for a control point. Use equal markers without connections first. Group points, boundary, notes and control, then save. Do not delete E and F as noise because they appear inside. G’s collinearity with AB is a positional condition, not a duplicate input or identical point.</p>
+
+<h2 id="section-2">Separate the smallest convex set from a visiting tour</h2>
+
+<p>A set is convex when the whole segment between any two of its points remains inside. Its convex hull is the smallest convex set containing all inputs. “Smallest” concerns set inclusion, not a shortest path visiting seven points. Close ABCD with a pale interior: E and F lie inside and G on the bottom edge. Explain that filled region and boundary together represent the hull; four lines alone may imply that only the outline is the set. Path filling performs no convexity analysis.</p>
+
+<h2 id="section-3">Retain the four corners without adding interior vertices</h2>
+
+<p>Every convex set containing the inputs contains their four corners and all convex combinations of those corners, hence the whole rectangle. The rectangle contains the other three points, so it is exactly the hull. Output extreme vertices A, B, C, D counterclockwise, closing to A without counting A again. Keep E and F as interior markers instead of dragging them onto the boundary. G lies between A and B without a turn, so this extreme-vertex list omits G, not its membership in the hull. G=(A+B)/2 directly represents it as a nontrivial convex combination of distinct inputs, so it is not extreme. E also equals one half A plus one quarter B plus one twelfth C plus one sixth D. These nonnegative weights sum to one and yield (2,1). Check weights separately instead of treating them as screen coordinates. This demonstrates containment without making E a fifth boundary vertex. One such representation establishes inclusion; uniqueness is unnecessary.</p>
+
+<h2 id="section-4">Check every point on the left of each directed hull edge</h2>
+
+<p>For counterclockwise edges AB, BC, CD, DA, require respectively y≥0, x≤6, y≤4, x≥0 for every point; all seven satisfy them, including equality at boundaries. Equivalently use cross(U,V,P)=(Vx−Ux)(Py−Uy)−(Vy−Uy)(Px−Ux): nonnegative means left or collinear. AB gives zero for G and six for E; BC gives eight for F. Calculate before labelling. Screen-down coordinates reverse orientation signs, so do not apply mathematical counterclockwise tests directly to screen rows.</p>
+
+<pre><code class="language-text">A=(0,0); B=(6,0); C=(6,4); D=(0,4)
+E=(2,1); F=(4,3); G=(3,0)
+extreme hull vertices CCW: A,B,C,D
+G on boundary, not an extreme vertex; E,F inside
+cross(A,B,G)=0; cross(A,B,E)=6; cross(B,C,F)=8
+add H=(8,2): hull A,B,H,C,D; area 24+4=28
+wrong tour turn cross(C,F,D)=-6
+</code></pre>
+
+<h2 id="section-5">Reconstruct the boundary after adding an exterior point</h2>
+
+<p>Save a version adding H=(8,2). It lies right of old BC, violating x≤6, so the old rectangle no longer contains all inputs. Close new extreme vertices A, B, H, C, D and weaken old BC as an internal reference, not a hull edge. Independently check area: old rectangle 24 plus triangle with base BC and height two, area four, gives 28. Area is not the definition. Add only H, without moving E, F or G; relocating labels without changing the boundary is not an update.</p>
+
+<h2 id="section-6">Use an all-point concave tour as a failed hull</h2>
+
+<p>A control tour A, G, B, C, F, D, E, A visits every input but indents inward. At C, F, D, vectors CF=(−2,−1), FD=(−4,1) have cross product −6, contradicting a counterclockwise convex boundary’s nonnegative turn. Visiting all inputs and closing is insufficient; this is not another valid hull. Also note that wholly collinear inputs have a segment hull. This example’s noncollinear corners justify polygon-vertex terminology.</p>
+
+<h2 id="section-7">Diagnose missing points, collinear points and concave turns</h2>
+
+<p>If all seven are called mandatory vertices, distinguish inputs, boundary points and extreme points. Restore G’s boundary marker if omission from the vertex list was mistaken for exclusion from the set. After adding H, test the old right half-plane for a missed exterior point. Fix a concave tour at its negative turn rather than hiding the indentation with transparency. Keep baseline and control, checking every point against every hull edge. Approximate placement is not exact collinearity; retain coordinates and do not assume paths recompute a hull when nodes move.</p>
+
+<h2 id="section-8">Reopen and check containment and minimal convexity</h2>
+
+<p>Save native work and seven-/eight-point lists, export SVG or PDF and open a PNG separately. At fit-to-window size compare four- and five-corner versions; enlarge for G on AB without a false turn and visible E/F. Reopen editable work, hide the answer, recover the old hull through four half-planes and test BH and HC. Deliver the extreme-point convention, inputs, concave failure and degeneracy conditions; mark unperformed output checks pending. CGAL supplies definitions, not evidence that VectorPaint embeds it, computes hulls or certifies surveyed boundaries.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-paired-value-scatterplot/">VectorPaint scatterplots: map every point to two values</a>; <a href="/en/guides/vectorpaint-concave-polygon-shoelace-signed-order-closing-edge/">Draw a concave polygon in VectorPaint: audit signed shoelace order and the closing edge</a>.</p>
+
+<p>Method sources: <a href="https://doc.cgal.org/latest/Convex_hull_2/index.html">CGAL: two-dimensional convex hulls and extreme points</a>. The official documentation supplies convexity, hull and extreme-point terminology. Seven points and the H control are original; no library code is used or attributed to the drawing app.</p>
+
+<p>Version and operation scope: checked on 19 November 2026 against the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261119-vectorpaint">Apple public lookup</a>: version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.</p>
+{% endraw %}

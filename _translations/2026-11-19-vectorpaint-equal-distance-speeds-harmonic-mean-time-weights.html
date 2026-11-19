@@ -1,0 +1,75 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint average speed: equal distances at eighteen and thirty do not average to twenty-four'
+description: Use two nine-kilometre legs to obtain 22.5 km/h through time weights, then compare equal-time and stopped
+  controls.
+permalink: /en/guides/vectorpaint-equal-distance-speeds-harmonic-mean-time-weights/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 248
+topic: Flow certificates, weighted averages and coloured graphs
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-19-vectorpaint-equal-distance-speeds-harmonic-mean-time-weights.md
+source_url: /guides/vectorpaint-equal-distance-speeds-harmonic-mean-time-weights/
+translation_method: editorial
+translation_source_sha256: 5b78e6c789bad004799b2e15a8cdc5598e86a8af322c09770f8433534cc6e442
+translation_date: '2026-11-19T02:31:49+00:00'
+excerpt: Use two nine-kilometre legs to obtain 22.5 km/h through time weights, then compare equal-time and stopped
+  controls.
+---
+{% raw %}
+<p>Draw a fictional speed–time model with two nine-kilometre legs at eighteen and thirty kilometres per hour and no stops. Average speed is total distance divided by elapsed time, not an unweighted arithmetic mean of the speeds. This is a paper model, without driving, real timing or phone sensors.</p>
+
+<h2 id="section-1">Specify equal distances rather than equal durations</h2>
+
+<p>Each leg covers nine kilometres, at constant positive speeds 18 km/h and 30 km/h respectively. Distance means path length, not directed displacement; calculate average speed only. On about 1800 × 1500 pixels group graph, units, ledger and controls, then save. Retain distances nine/nine together with speeds eighteen/thirty instead of discarding the weighting condition. Use kilometres and hours consistently; switching to minutes requires conversion, not treating thirty minutes as thirty hours.</p>
+
+<h2 id="section-2">Divide each distance by speed for half and three-tenths hour</h2>
+
+<p>Times are 9/18=1/2 hour, thirty minutes, and 9/30=3/10 hour, eighteen minutes. Total distance eighteen over time 4/5 hour, forty-eight minutes, gives 18÷(4/5)=45/2=22.5 km/h. The slower leg lasts longer, so equal time weights are wrong. Retain both rows and totals with traceable units. Dividing 18 by 48 gives kilometres per minute; multiply by sixty to obtain 22.5 km/h rather than merely relabelling the unit.</p>
+
+<h2 id="section-3">Draw rectangles using the actual durations</h2>
+
+<p>Let horizontal t be hours and vertical v km/h, mapped to screen u=300+1200t, w=1100−20v. Rectangle one spans t=0 to 0.5 at height eighteen: 600 by 360 pixels. Rectangle two spans 0.5 to 0.8 at thirty: 360 by 600 pixels. Both speed×time areas equal nine kilometres and both pixel areas are 216000, not physical square-distance areas. Draw axes before points, keeping unequal widths. Share boundary t=0.5 without overlap or a gap; equal horizontal widths would wrongly encode equal durations.</p>
+
+<h2 id="section-4">Place the equal-area average line at twenty-two and a half</h2>
+
+<p>Draw average line 22.5 across t=0 to 0.8. Its rectangle is 450 by 960 pixels, area 432000, equal to the two original areas combined. Mathematically 22.5×0.8=18. Its height follows total quantity over duration, not the geometric midpoint of the two tops. Both (18×0.5+30×0.3)/0.8 and, for equal distances, 2/(1/18+1/30) give 22.5. Preserve their derivation conditions; the unweighted harmonic mean cannot be applied indiscriminately to unequal distances. The time weights are 5/8 for the slower leg and 3/8 for the faster, summing to one; 18×5/8+30×3/8 remains 22.5. They are duration divided by total duration, not equal one-half weights inferred from equal distances. Check the shared total-time denominator before averaging.</p>
+
+<pre><code class="language-text">equal distances: d1=d2=9 km; v1=18; v2=30 km/h
+t1=1/2 h=30 min; t2=3/10 h=18 min
+D=18 km; T=4/5 h; average=45/2=22.5 km/h
+time weights: (18*0.5+30*0.3)/0.8=22.5
+equal times 0.5 h each: D=9+15=24 km; average=24 km/h
+original plus stop 0.2 h: D=18; T=1; average=18 km/h
+</code></pre>
+
+<h2 id="section-5">Obtain arithmetic mean twenty-four under equal times</h2>
+
+<p>In a separate frame retain both speeds but use 0.5 hour each. Distances become nine and fifteen, totalling twenty-four over one hour: 24 km/h=(18+30)/2. This no longer has two nine-kilometre legs, so do not transfer the result to the baseline. Draw equal control widths with unchanged heights, explicitly changing duration only. A shared speed scale aids comparison, but label different time endpoints 0.8 and one. If layouts are rescaled independently, visual width alone cannot identify the weights.</p>
+
+<h2 id="section-6">Separate elapsed time from moving time when stopped</h2>
+
+<p>In another independent control add a 0.2-hour stop to the original two legs. Distance stays eighteen but elapsed time becomes one hour, giving average including the stop 18 km/h. Add a zero-height interval of width 0.2 rather than hiding the pause at a seam. A moving-time-only average remains 22.5, but must explicitly exclude the stop. This is a mathematical condition, not road-operation advice. When positive-speed or no-stop assumptions change, revise the time ledger and definition before styling.</p>
+
+<h2 id="section-7">Diagnose denominator units and rectangle widths</h2>
+
+<p>For answer twenty-four, check an implicit equal-time assumption. For 0.375, check the missing conversion from km/min by sixty. If rectangle areas differ, repair widths 0.5 and 0.3 rather than changing speeds to fit faulty pixels. Recover the average line from 18/0.8, not the midpoint of heights. Keep the faulty graph and correct units, durations, areas or labels separately. Restoring the baseline removes the stop and returns forty-eight minutes. Alignment tools neither recompute weights nor measure a real journey from path length.</p>
+
+<h2 id="section-8">Reopen and recover the average from totals</h2>
+
+<p>Save editable work and time ledger, export SVG or PDF and open a PNG separately. At fit-to-window size inspect unequal rectangle widths; enlarge to confirm that 0.3 hours has not become three hours and that the 22.5 unit is complete. Reopen the source, hide the average line and recalculate from nine plus nine and thirty plus eighteen minutes, then restore line and controls. Deliver equal-distance, equal-time and stopped conditions, with unperformed output steps pending. The reference defines average speed; this uses no GPS, sensor, built-in statistics or real travel data and certifies no traffic measurement or performance test.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-coordinate-line-chart/">VectorPaint manual line charts: plot coordinates before connecting one dataset</a>; <a href="/en/guides/vectorpaint-unequal-bin-width-frequency-density-area/">VectorPaint unequal-width histogram: use frequency density so areas represent four, nine and five</a>.</p>
+
+<p>Method sources: <a href="https://openstax.org/books/college-physics-2e/pages/2-3-time-velocity-and-speed">OpenStax: distance, elapsed time and average speed</a>. The source establishes average speed as distance over elapsed time and distinguishes it from displacement-based velocity. Nine-kilometre legs, rectangle mapping and controls are original, without motion measurements.</p>
+
+<p>Version and operation scope: checked on 19 November 2026 against the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261119-vectorpaint">Apple public lookup</a>: version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.</p>
+{% endraw %}

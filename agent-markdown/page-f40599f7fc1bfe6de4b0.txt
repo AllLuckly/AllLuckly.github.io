@@ -1,0 +1,84 @@
+---
+layout: null
+permalink: /guides/icouldplay-ass-be-integer-passes-blur-fractional-edge-target/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映ASS边缘柔化：be整数次数与blur小数强度不能直接换算
+agent_source_url: https://allluckly.cn/guides/icouldplay-ass-be-integer-passes-blur-fractional-edge-target/
+agent_source_sha256: c10f7a2e3f91b623dc5c33875bc73e38fb8934334afcf22ee467d4382a93467f
+agent_generator_version: 1
+---
+{% raw %}# 云映ASS边缘柔化：be整数次数与blur小数强度不能直接换算
+
+语言：zh-CN
+原文：[云映ASS边缘柔化：be整数次数与blur小数强度不能直接换算](<https://allluckly.cn/guides/icouldplay-ass-be-integer-passes-blur-fractional-edge-target/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-be-integer-passes-blur-fractional-edge-target/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-be-integer-passes-blur-fractional-edge-target/>)
+发布于: 2026-11-19T00:00:00+08:00
+内容更新于: 2026-11-19T00:00:00+08:00
+署名：Bison
+
+保存同字样的无模糊、be两次与blur一点五三段完整字幕，固定描边后观察实际边缘。算法参数与作用组件分别核，不将数值大小当同一单位，也不把文字模糊误说成视频画面已经被处理。
+
+保存同字样的无模糊、be两次与blur一点五三段完整字幕，固定描边后观察实际边缘。算法参数与作用组件分别核，不将数值大小当同一单位，也不把文字模糊误说成视频画面已经被处理。
+
+## 先选能同时辨认字面与边缘的材料
+
+选择至少十二秒的自有静景视频，使用中等灰度背景更便于区分白色字面与黑色描边，原视频不加模糊滤镜。字幕正文统一Edge card，字体示例Arial、字号36、描边2、阴影0；实际字体若回退应记录，不保证当前安装路径具有同一字库。原字幕另留，不为测试覆盖正式对白。先在普通基线确认词句可读，文字本来缺字或片源画面本来失焦时，应先记录这些条件，不把它们当边缘柔化结果。播放缩放与方向保持，后续不通过播放器画面锐化或视频亮度替代字幕参数。
+
+## 把三段边缘条件与组件范围列出
+
+第一条一至三秒同时关闭be与blur，第二条四至六秒设be为2且blur为0，第三条七至九秒设be为0且blur为1.5。三条都明确描边2，所以本课先讨论有描边时边缘作用对象，不把第三条额外删边再与第二条叫同一条件。be与blur在样本中分别隔离，避免两种模糊同时开而无法区分。每段区间和文件身份先记清，停在边界的截图不替代段内观察。公开文档参数含义与实际播放器视觉反馈分两栏，没有看到差异时也不预填“必定同样明显”。
+
+## 保存可独立读取的完整边缘样本
+
+将全文另存UTF-8纯文本edge-softening.ass，保留头部、样式与三条事件，重开核不是富文本或多了一层txt后缀。事件都重复写be与blur当前值，避免误读未写参数来自哪里；这里不是让同一事件里的设置跨行继承。文字位于花括号外，标签位于覆盖块内，点号1.5是强度数值而非秒数。样式原始描边为零，三条事件各自明确覆盖为2，核源码时要同时看样式和事件，不能只读Style一行便说实际都无描边。编辑与保存由外部工具完成，不声称云映提供模糊编辑器。
+
+```
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,36,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,7,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:03.00,Default,,0,0,0,,{\an7\pos(120,140)\bord2\shad0\be0\blur0}Edge card
+Dialogue: 0,0:00:04.00,0:00:06.00,Default,,0,0,0,,{\an7\pos(120,140)\bord2\shad0\be2\blur0}Edge card
+Dialogue: 0,0:00:07.00,0:00:09.00,Default,,0,0,0,,{\an7\pos(120,140)\bord2\shad0\be0\blur1.5}Edge card
+```
+
+## 按官方定义区别次数与高斯强度
+
+Aegisub将扩展be的整数强度解释为重复普通边缘效果的次数，故2是两次，不是两像素半径；blur使用更进阶的高斯类算法并允许非整数强度，1.5不等于一次半be。两个参数之间没有本课可直接套用的固定换算，不能因为2大于1.5便宣布第二段更模糊。文档也不鼓励新字幕继续使用be，因为它随画面尺寸缩放有局限，本课保留它仅作已有格式对照，而非推荐生产字幕都改为be。零值关闭对应效果，过大的强度可能增加渲染负担，但没有实测数据就不填写CPU用量或帧率提升。
+
+## 在同一输出只观察字幕边缘
+
+通过云映当前真实可用的字幕路径关联文件，先核Edge card、时刻和片源身份，再在三段内部依次观察字面与黑色轮廓。有描边时文档说明模糊针对描边组件，无描边时才转向主字面；因此不要看到白色中心仍清楚就说完全没生效。记录是否可辨、是否被裁边或缩放掩盖，不要求耳朵或视频背景也发生变化。若只有外部编辑器预览，保留那一来源，云映未播的栏位仍待核。当前路径不呈现指令时不造隐藏的高斯开关，能显示ASS格式不保证每种标签都一致。
+
+## 只删第三段描边作组件反例
+
+另存edge-no-border.ass，只把第三条bord2改为bord0，保留blur1.5、be0、文字与时刻。这个副本只改描边条件，用来检查主字面是否变成受模糊对象，不能把边框消失简写成blur已关闭。第二条仍是be2有边，不拿它与新第三条作算法强度公平测量；真正可比的是原第三条和修改后第三条。重载实际副本再观察七至九秒，未执行就留待核。不要顺手改字体、颜色与视频分辨率，否则组件反例会变成多因素混合，无法说明具体改变发生在哪里。
+
+## 按文法、当前文件与边界裁切排错
+
+效果不明先核是否加载正确副本、两标签值与当前描边覆盖，再看样式和事件列是否对应；出现原标签文字先排解析，不急着增加到极大数值。模糊部分被裁掉时核字幕定位和可见边缘范围，不把少一圈当字符删除。若画面整体失焦，回视频源与显示路径，不把字幕边缘参数当视频滤镜。每次只改一个工作条件，保留清楚可读的基线；未知容错、核函数细节或整数舍入不猜成统一规则，尤其不把非法be小数在某次被接受说成官方就允许非整数。
+
+## 交付算法参数与作用组件两张账
+
+保存原完整文件、三段参数、无描边副本和真实观察，重开原片时再核字幕身份，仅对确实看到的区间填结果。验收能说明be次数与blur强度不能直接比大小、描边有无为何改变作用对象，以及为什么视频原画没有因此被编辑。保留一份原字号下的未处理参考，不拿不同缩放后的照片直接比较边缘像素数量；若需要换输出条件，另立记录重做三段，不将两轮结果混成同一次观察。恢复原字幕与日常显示，不覆盖原片。没有执行的副本、重载或播放器观看分别待核，不宣称专业锐度测量、性能基准或全设备一致；本课也不因为原格式可写便建议对所有旧字幕批量加大模糊参数。
+
+## 相关教程与资料
+
+[横纵描边与统一覆盖](<https://allluckly.cn/guides/icouldplay-ass-directional-border-width-reset-components/>)、[字形与视频裁剪边界](<https://allluckly.cn/guides/icouldplay-ass-clip-iclip-glyph-video-boundaries/>)。
+
+资料核对：2026年11月19日，[Apple公开查询](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software&timestamp=20261119-root>)列云映1.1.1，最低iOS / iPadOS 15.0；[官方商店](<https://apps.apple.com/cn/app/id6755653178>)公开ASS/SSA及内嵌、外挂字幕。字幕源稿、文法和数学在外部准备，云映通过实际可用路径关联与观看；公开格式范围不保证每种指令在所有引擎或设备一致。未声称完成真机字幕渲染、专业像素测量、所有格式或私人服务器测试。
+
+方法资料：[Aegisub官方ASS标签说明](<https://aegisub.org/docs/latest/ass_tags/>)。
+{% endraw %}

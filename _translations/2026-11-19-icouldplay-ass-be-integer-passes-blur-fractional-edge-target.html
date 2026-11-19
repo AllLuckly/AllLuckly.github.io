@@ -1,0 +1,66 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay ASS edge softening: integer be passes are not fractional blur strength'
+description: Save a complete subtitle with unblurred, two-pass be and blur-strength 1.5 conditions on identical
+  text. Fix the border and observe actual edges. Separate algorithm parameters and affected components without treating
+  values as one unit or describing text blur as processed video.
+permalink: /en/guides/icouldplay-ass-be-integer-passes-blur-fractional-edge-target/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 202
+topic: Subtitle glyphs and vector parameters
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-19-icouldplay-ass-be-integer-passes-blur-fractional-edge-target.md
+source_url: /guides/icouldplay-ass-be-integer-passes-blur-fractional-edge-target/
+translation_method: editorial
+translation_source_sha256: 4c3f612697368b4920b94cba8d06e759986e5001a8f04a01228a9a2a63908087
+translation_date: '2026-11-19T02:39:24+00:00'
+excerpt: Save a complete subtitle with unblurred, two-pass be and blur-strength 1.5 conditions on identical text.
+  Fix the border and observe actual edges. Separate algorithm parameters and affected components without treating
+  values as one unit or describing text blur as processed video.
+---
+{% raw %}
+<p>Save a complete subtitle with unblurred, two-pass be and blur-strength 1.5 conditions on identical text. Fix the border and observe actual edges. Separate algorithm parameters and affected components without treating values as one unit or describing text blur as processed video.</p>
+<h2 id="section-1">Prepare material revealing fill and edges</h2>
+<p>Use an owned still-scene clip at least twelve seconds long; a middle-grey background helps distinguish white fill/black outline without a video blur filter. Fix Edge card, example Arial size 36, border 2 and shadow 0. Record font fallback rather than guarantee a shared font library. Preserve normal subtitles. Establish readable baseline text and record missing glyphs/source defocus first. Hold fitting/orientation fixed instead of substituting video sharpening or brightness for subtitle parameters.</p>
+<h2 id="section-2">Map three edge conditions and their component scope</h2>
+<p>Event one at 1–3 s disables both be/blur; event two at 4–6 s uses be 2 with blur 0; event three at 7–9 s uses be 0 with blur 1.5. All retain border 2, initially fixing the affected outlined component. Do not remove the third border while calling conditions unchanged. Isolate algorithms rather than enable both. Record intervals/file identities and observe inside them, not just boundaries. Separate documented parameter meaning from actual visibility, including no discernible difference.</p>
+<h2 id="section-3">Save the independently readable full edge sample</h2>
+<p>Save the complete UTF-8 plain-text edge-softening.ass with header, style and three events, checking rich-text/double-extension mistakes on reopening. Each event explicitly supplies be/blur values, not cross-event inheritance. Put text outside overrides. The decimal 1.5 is strength, not seconds. The style’s original border is zero but each event explicitly sets 2, so inspect both rather than declare no outlines from Style alone. Editing/saving occurs externally; no iCouldPlay blur editor is claimed.</p>
+<pre><code>[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,36,&amp;H00FFFFFF,&amp;H000000FF,&amp;H00000000,&amp;H00000000,0,0,0,0,100,100,0,0,1,0,0,7,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:03.00,Default,,0,0,0,,{\an7\pos(120,140)\bord2\shad0\be0\blur0}Edge card
+Dialogue: 0,0:00:04.00,0:00:06.00,Default,,0,0,0,,{\an7\pos(120,140)\bord2\shad0\be2\blur0}Edge card
+Dialogue: 0,0:00:07.00,0:00:09.00,Default,,0,0,0,,{\an7\pos(120,140)\bord2\shad0\be0\blur1.5}Edge card
+</code></pre>
+<h2 id="section-4">Distinguish documented pass count from Gaussian strength</h2>
+<p>Aegisub defines extended integer be strength as the number of ordinary-edge passes: 2 means two passes, not a two-pixel radius. Gaussian blur permits fractional strength; 1.5 is not one-and-a-half be passes. No fixed conversion justifies declaring be 2 stronger because its number is larger. The documentation discourages be in new subtitles because of frame-scaling limitations; it remains here as a legacy-format comparison, not a production recommendation. Zero disables each effect. Large strengths may cost rendering work, but no measured CPU/frame-rate claim is supplied.</p>
+<h2 id="section-5">Observe subtitle edges under one output condition</h2>
+<p>Associate through an actually available iCouldPlay subtitle path and verify Edge card, timing/source before inspecting fill/black outline inside each interval. With a border, documentation targets the border; without one, the primary fill is blurred. A clear white centre does not alone prove no effect. Record visibility, clipping and scaling limits without requiring audio/background changes. External-editor preview is separate; unplayed iCouldPlay remains pending. Invent no hidden Gaussian switch or universal tag behavior from format support.</p>
+<h2 id="section-6">Remove only the third border as a component control</h2>
+<p>Save edge-no-border.ass and change only event three’s bord2 to bord0, retaining blur1.5, be0, text and timing. This changes the affected component; absent border does not mean blur disabled. Event two still has outlined be 2, so it is not a fair numerical-strength measurement against the new third condition. Compare original/modified third events at 7–9 s after reloading, or leave pending. Do not simultaneously change font, colour or video resolution and lose the one-factor comparison.</p>
+<h2 id="section-7">Check syntax, file identity and clipping</h2>
+<p>For unclear effects inspect selected copy, both tag values and border overrides, then style/event columns. Literal tags need parsing checks before huge strengths. For clipped blur inspect placement/visible bounds rather than call a missing ring deleted text. Whole-frame defocus belongs to source/display investigation, not a subtitle filter claim. Change one factor while retaining the readable baseline. Do not infer universal tolerance, kernel details or rounding, or treat a tolerated fractional be value as documented permission for non-integer values.</p>
+<h2 id="section-8">Deliver algorithm parameters and component evidence</h2>
+<p>Retain complete original, three conditions, no-border copy and observations. Reconfirm subtitle identity after reopening and report only viewed intervals. Explain non-comparable be/blur numbers, border-dependent target components and unchanged source video. Preserve an unprocessed reference at the original size rather than compare edge pixel counts in differently scaled images. A different output condition needs a separate record and all three events repeated, without merging two rounds into one observation. Restore normal subtitles/display without overwriting footage. Leave unperformed copy/reload/viewing pending, claiming no professional sharpness metric, performance benchmark or universal devices, and recommending no bulk stronger blur merely because the syntax exists.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-ass-directional-border-width-reset-components/">Horizontal/vertical border overrides</a>; <a href="/en/guides/icouldplay-ass-clip-iclip-glyph-video-boundaries/">Subtitle versus video clipping</a>.</p>
+<p>Checked on 19 November 2026: <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software&amp;timestamp=20261119-root">Apple public lookup</a> lists iCouldPlay 1.1.1, requiring iOS / iPadOS 15.0 or later. The <a href="https://apps.apple.com/cn/app/id6755653178">official store</a> describes ASS/SSA and embedded/external subtitles. Prepare source, syntax and mathematics externally; associate and observe through actual installed paths. Format support does not guarantee every instruction across all engines/devices. No completed physical-device subtitle rendering, professional pixel measurement, exhaustive-format or private-server testing is claimed.</p>
+<p>Method references: <a href="https://aegisub.org/docs/latest/ass_tags/">Aegisub ASS override tags</a>.</p>
+{% endraw %}

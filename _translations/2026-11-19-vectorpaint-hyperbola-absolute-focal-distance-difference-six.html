@@ -1,0 +1,74 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint hyperbola focal difference: absolute difference six, not sum or focal separation'
+description: Check vertices and nonvertices on x²/9−y²/16=1, separating its branches, foci and asymptotes.
+permalink: /en/guides/vectorpaint-hyperbola-absolute-focal-distance-difference-six/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 243
+topic: Concurrency, metric identities, hulls and brackets
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-19-vectorpaint-hyperbola-absolute-focal-distance-difference-six.md
+source_url: /guides/vectorpaint-hyperbola-absolute-focal-distance-difference-six/
+translation_method: editorial
+translation_source_sha256: 6e52acdc8b36c691909c69c9bf4ff41bc0f6a89519dd08375ee87b6cb4a01c4f
+translation_date: '2026-11-19T02:01:54+00:00'
+excerpt: Check vertices and nonvertices on x²/9−y²/16=1, separating its branches, foci and asymptotes.
+---
+{% raw %}
+<p>Draw a left–right-opening hyperbola with both focal distances at each checking point. Use their absolute difference consistently, not their sum or an unexplained reversal of subtraction. Verify rational points exactly before approximating the curve manually in VectorPaint. Finite samples do not prove that an entire Bézier path satisfies the equation.</p>
+
+<h2 id="section-1">Set the equation, axes and display window</h2>
+
+<p>Take x²/9−y²/16=1 with a=3, b=4 and O=(0,0), transverse axis horizontal. On about 1900 × 1600 pixels use u=950+80x, v=800−80y, equal scales and a window around −7 to 7 on both axes. Group axes, points, branches, focal segments and notes, then save. Nine and sixteen are squared parameters, not semiaxis lengths. The window is a crop, not a domain boundary, and units are not centimetres.</p>
+
+<h2 id="section-2">Find focal offset five from the sum of squares</h2>
+
+<p>For this hyperbola c²=a²+b²=25, so c=5 and foci L=(−5,0), R=(5,0), separated by ten. Vertices (−3,0) and (3,0) are not foci. The constant absolute distance difference is 2a=6, not c=5 or separation ten. Mark and name both foci and vertices independently of marker size. If the foci move inside the vertices, check for an incorrectly imported ellipse square-difference rule rather than moving the curve to accommodate them. The constant must also be strictly positive and smaller than the focal separation: here 0&lt;6&lt;10. The triangle inequality bounds the absolute distance difference by the focal separation. Constant zero gives the perpendicular bisector, not this hyperbola; a constant greater than ten gives no points. Equality at ten is a degenerate boundary, not the two smooth branches described here. Check these ranges before drawing rather than using a two-branch outline for every requested difference.</p>
+
+<h2 id="section-3">Check eight minus two at a vertex</h2>
+
+<p>At right vertex V=(3,0), distances to L and R are eight and two: absolute difference six, sum ten. Overlapping segments can use different line styles and offset labels; one visible segment does not remove the other distance. At the left vertex, distances are two and eight, so left-minus-right is −6 while the absolute difference remains six. At the origin both distances are five, difference zero; crossing coordinate axes do not make the hyperbola pass through the origin.</p>
+
+<h2 id="section-4">Check a rational nonvertex with distances 9.25 and 3.25</h2>
+
+<p>Take Q=(15/4,3): substitution gives 25/16−9/16=1. Its squared distance to L is (35/4)²+3²=1369/16, hence 37/4; to R it is (−5/4)²+3²=169/16, hence 13/4. Their difference is 24/4=6, not the horizontal differences 35/4 or 5/4. At P=(5,16/3), focal distances are 34/3 and 16/3, again differing by six. Retain separate rational calculations rather than a coincidence produced by rounded decimals.</p>
+
+<pre><code class="language-text">x^2/9-y^2/16=1; a=3; b=4; c=5
+L=(-5,0); R=(5,0); abs(QL-QR)=6
+V=(3,0): VL=8; VR=2
+Q=(15/4,3): QL=37/4; QR=13/4
+P=(5,16/3): PL=34/3; PR=16/3
+O=(0,0): abs(OL-OR)=0, not on curve
+asymptotes y=+/-4*x/3: left expression=0, not 1
+</code></pre>
+
+<h2 id="section-5">Connect each branch separately without crossing the origin</h2>
+
+<p>Approximate the right branch through (5,−16/3), (15/4,−3), (3,0), (15/4,3), (5,16/3) in that order. Negate x for a separate open left branch. Do not close paths, fill the middle or bridge the nearest ends. Retain sample markers while smoothing with few nodes; handles are not extra curve samples. Check P at about screen (1350,373.333). Label imprecise placement approximate rather than claiming built-in hyperbola constraints or function sampling.</p>
+
+<h2 id="section-6">Keep asymptotes as references, not curve edges</h2>
+
+<p>Add faint dashed y=±4x/3 as asymptotes and label them outside the hyperbola. Substitution of any point on either line gives zero, not one, so they are not straight tail sections attached to the curve. For instance (3,4) lies on a reference line but gives 9/9−16/16=0. Approaching far away does not mean intersecting at a finite location. Show the finite crop without endpoint dots implying termination. Weaken over-dominant references rather than deleting their definition to retain a decorative cross.</p>
+
+<h2 id="section-7">Diagnose difference signs and open-path state</h2>
+
+<p>If −6 on the left is judged a failure, restore the absolute value. For a nonvertex mismatch, check the missing vertical difference in squared distances. Distinguish focal separation ten from distance difference six. A closed diamond suggests branches and asymptotes were merged into a closed path. Keep the original and fix one item at a time, restoring both branches, four feature points and rational labels together. Do not shift foci to cancel curve approximation errors; record exact equations and screen approximations separately.</p>
+
+<h2 id="section-8">Reopen and check vertices and nonvertices</h2>
+
+<p>Save editable work and distance calculations, export SVG or PDF and open a PNG separately. At fit-to-window size inspect separated branches; enlarge for 37/4, 13/4 and absolute difference six, with foci not disguised as curve points by labels. Reopen the source, hide results and recompute Q’s distances, then check origin and (3,4) counterexamples. Deliver equation, definition, finite-window and approximation notes; mark unperformed output/reopening pending. The drawing proves neither an exact whole-curve fit, navigation position nor automatic app conic solving.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/vectorpaint-ellipse-focus-diagram/">VectorPaint ellipse-focus diagrams: distinguish semiaxes and the two focal distances</a>; <a href="/en/guides/vectorpaint-parabola-focus-directrix-distance/">VectorPaint parabola diagrams: compare focus distance and perpendicular directrix distance</a>.</p>
+
+<p>Method sources: <a href="https://openstax.org/books/precalculus-2e/pages/10-2-the-hyperbola">OpenStax: hyperbola definition and standard form</a>. The source establishes absolute focal difference, standard form and focal relation. Rational samples and distance calculations are original; a smoothed path is not an exact function.</p>
+
+<p>Version and operation scope: checked on 19 November 2026 against the <a href="https://apps.apple.com/cn/app/id1587272880">official VectorPaint listing</a> and <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software&amp;timestamp=20261119-vectorpaint">Apple public lookup</a>: version 1.0.8, requiring iOS / iPadOS 17.0 or later. Draw manually with published shapes, pen, Bézier nodes, grids/guides, alignment, layers/groups, text and file output through visible installed controls. Prepare definitions and calculations externally; infer no built-in formula, statistics or graph solver. Keep editable native work and inspect SVG, PDF or PNG as needed. SVG/PDF containing imported bitmaps do not automatically become entirely vector. Canvases and samples are original teaching settings, without physical-device execution or real measurement; mark unperformed actions pending.</p>
+{% endraw %}

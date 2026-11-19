@@ -1,0 +1,81 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Read half-life panels in ManYue: halve what remains, not the initial amount each time'
+description: Separate a model mean curve for eight thousand parent nuclei from interval decay counts, without predicting
+  one nucleus’s decay time.
+permalink: /en/guides/manyue-half-life-parent-nuclei-remaining-interval-decays-ledger/
+date: '2026-11-19 00:00:00 +08:00'
+modified: '2026-11-19 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 247
+topic: Reading particles, amounts and state conditions
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-19-manyue-half-life-parent-nuclei-remaining-interval-decays-ledger.md
+source_url: /guides/manyue-half-life-parent-nuclei-remaining-interval-decays-ledger/
+translation_method: editorial
+translation_source_sha256: 6ec9e0b69ef2d69afe2c59fb78b714b780d2e75437d9ca0f418a42c909d5903a
+translation_date: '2026-11-19T01:51:03+00:00'
+excerpt: Separate a model mean curve for eight thousand parent nuclei from interval decay counts, without predicting
+  one nucleus’s decay time.
+---
+{% raw %}
+<p>Fewer parent-nucleus dots in successive panels do not mean subtracting the same count every interval. Use a fictional nuclide/time table to read remaining fractions, interval decays and activity in ManYue. This statistical model involves no radioactive material or medical, storage, dating advice.</p>
+
+<h2 id="declare-parent-count-and-half-life">Declare parent count and half-life</h2>
+
+<p>Use a fictional parent nuclide with half-life 2h, N0=8000, in a closed sample with no new parents, tracking only this parent decay. Put 0,2,4,6h panels on P1, interval ledger on P2 and randomness controls on P3; export PDF and retain editable work. Check hours versus seconds and bookmark P2. Values are model means or large-sample predictions, not guaranteed exact halving for a real 8000-nucleus sample. Daughter behaviour is outside the specification.</p>
+
+<h2 id="repeatedly-multiply-the-remaining-amount-by-one-half">Repeatedly multiply the remaining amount by one half</h2>
+
+<p>After one, two, three half-lives the model leaves 4000,2000,1000, or fractions 1/2,1/4,1/8. N(t)=8000×2^(−t/2h) uses a dimensionless time ratio; 6h is not six half-lives. Subtracting initial-half 4000 every 2h incorrectly reaches zero at 4h and negative at 6h. Keep that linear-loss control rather than erase negatives. The specified decay constant does not change as the population decreases.</p>
+
+<h2 id="compute-interval-losses-from-consecutive-remaining-amounts">Compute interval losses from consecutive remaining amounts</h2>
+
+<p>Model decays are 4000 over 0–2h,2000 over 2–4h,1000 over 4–6h. Cumulative loss by 6h is 7000, plus 1000 remaining restores 8000. Later intervals do not each lose 4000, and 1000 remaining is not 7000 decays in the final interval. Label interval endpoints and the cumulative origin. From 2–6h the loss is 4000−1000=3000, not 8000 minus the endpoint. Equal endpoints do not imply equal questions.</p>
+
+<p>On whole-half-life cards, N≤500 first occurs at four half-lives, 8h, since 8000/2⁴=500. Strict N&lt;500 excludes 8h; the next card at 10h has 250. In continuous time the strict condition is t&gt;8h, with no smallest real value immediately above 8. Declare time grid and inequality before equating a first card with a continuous-time threshold.</p>
+
+<pre><code class="language-text">fictional parent half_life=2 h; N0=8000
+model mean N(t)=8000*2^(-t/(2 h))
+t=0,2,4,6 h: remaining=8000,4000,2000,1000
+interval decays=4000,2000,1000; cumulative at 6 h=7000
+2..6 h decays=3000
+activity=lambda*N; lambda=ln(2)/(2 h)
+</code></pre>
+
+<h2 id="a-half-half-life-is-not-a-quarter-of-the-initial-amount-lost">A half-half-life is not a quarter of the initial amount lost</h2>
+
+<p>At 1h, N=8000/√2≈5656.854, remaining fraction≈0.707107, not linear subtraction of 2000 giving 6000. Expected cumulative loss is ≈2343.146. Fractional values describe expectation/continuum approximation, not fractional physical nuclei. Round only display values to three decimal places; retain radicals/exponents for exact ratios. Inferring an exact half-life from rounded dots confuses depiction error with changing physical parameters.</p>
+
+<h2 id="activity-halves-with-the-parent-count-but-needs-consistent-units">Activity halves with the parent count but needs consistent units</h2>
+
+<p>For this parent A=λN,λ=ln2/(2h), so activity ratios at 0,2,4,6h are 1,1/2,1/4,1/8. For decays per second convert half-life to 7200s: first A≈0.770164s⁻¹ and at 6h≈0.096270s⁻¹. An hourly rate is not automatically becquerels, and activity is not sample mass. Radioactive daughters or mixed nuclides require further accounting before applying this curve to total activity.</p>
+
+<p>Doubling only N0 to 16000 with half-life 2h gives 8000,4000,2000 at 2,4,6h and twice the original activity at each time. Fractions still halve and λ stays unchanged. More parents do not make each nucleus decay faster. Keep number scale separate from time scale; do not also shorten half-life and attribute the change to N0 alone.</p>
+
+<h2 id="keep-single-nucleus-lifetimes-separate-from-population-means">Keep single-nucleus lifetimes separate from population means</h2>
+
+<p>On P3 show one surviving parent without a compulsory “decay at hour two” countdown. A half-life describes population survival probabilities; one nucleus still has half survival probability after that interval, not a scheduled decay time. The rule concerns remaining parents, not an instruction that numbered first 4000 decay before the rest. Dot positions confer no such identity. Unknown individual events remain unknown despite an exact expected curve.</p>
+
+<p>A positive finite-time mean curve does not guarantee a survivor in every actual small-sample observation. A statistical mean and one integer count are different records, especially with few parents. One zero reading also does not make the half-life zero; sample, detection and statistics would need checking. No detector data were provided, so observation fields remain blank rather than copied from smooth expected decimals.</p>
+
+<h2 id="diagnose-time-units-and-the-questions-starting-point">Diagnose time units and the question’s starting point</h2>
+
+<p>Zero at 4h suggests constant subtraction; 6000 at 1h suggests linear interpolation; 7000 lost over 2–6h uses the wrong origin. An activity 3600 times too large suggests hours/seconds confusion. Enlarge axes and cumulative labels, repair one field and restore remaining+cumulative=8000. Missing closure, parent-input or daughter-count conditions stay unknown; fewer cartoon dots alone do not establish a pure decay experiment.</p>
+
+<h2 id="reopen-with-separate-expected-and-unknown-event-records">Reopen with separate expected and unknown-event records</h2>
+
+<p>At the reopened ledger hide answers and recover remaining 4000,2000,1000 and matching interval losses, then explain 3000 over 2–6h. Check the 1h radical and per-second activity, and mark one nucleus’s event time unknown. Deliver model, units, intervals and randomness scope, leaving unperformed reader actions pending. Separate calculable expectation from unobserved events, without App radioactivity measurement, nuclide identification, cultivation or real-sample disposal conclusions.</p>
+
+<h2 id="related-tutorials-and-sources">Related tutorials and sources</h2>
+
+<p><a href="/en/guides/manyue-isotope-ion-proton-neutron-electron-symbol-ledger/">ManYue isotope counts</a>; <a href="/en/guides/manyue-current-net-charge-section-electron-opposite-direction-ledger/">ManYue interval-current ledger</a>.</p>
+
+<p>Method references: <a href="https://openstax.org/books/chemistry-2e/pages/21-3-radioactive-decay">OpenStax radioactive decay and half-life</a>. Diagrams, report data, counterexamples and ledgers are original exercises.</p>
+
+<p>Version checked on 19 November 2026: the <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software&amp;timestamp=20261119">Apple public lookup</a> lists ManYue 2.0.6, requiring iOS / iPadOS 15.0 or later; see the <a href="https://apps.apple.com/cn/app/id6753895889">official App Store</a> for published capabilities. Use self-made PDFs or supported comic images; controls depend on the installed version. External preparation and paper predictions do not constitute device observations. Leave unperformed checks blank.</p>
+{% endraw %}
