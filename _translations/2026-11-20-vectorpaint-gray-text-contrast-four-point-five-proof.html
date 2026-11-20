@@ -1,0 +1,52 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint gray text proof: two adjacent grays fall on opposite sides of 4.5 contrast'
+description: Design two equal-size gray text samples on white, calculate relative luminance and contrast externally, and distinguish color arithmetic from actual reading observations.
+permalink: /en/guides/vectorpaint-gray-text-contrast-four-point-five-proof/
+date: '2026-11-20 00:00:00 +08:00'
+modified: '2026-11-20 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 254
+topic: Text proofs and contrast checks
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-20-vectorpaint-gray-text-contrast-four-point-five-proof.md
+source_url: /guides/vectorpaint-gray-text-contrast-four-point-five-proof/
+translation_method: editorial
+translation_source_sha256: a1afbf50a20fce4a92e7a4fab1f0b295ae2c3c08ff5565c0d36ae3adcdb05e67
+translation_date: '2026-11-20T02:36:48+00:00'
+excerpt: Design two equal-size gray text samples on white, calculate relative luminance and contrast externally, and distinguish color arithmetic from actual reading observations.
+---
+{% raw %}
+<p>Design an original text comparison card with the same white background, words and font size, using opaque #767676 and #777777 gray. Their eight-bit channels differ by only one level, yet contrast against white under the standard sRGB relative-luminance formula is approximately 4.542 and 4.478. Make the proof and calculate externally. This does not claim an automatic accessibility score in the app or certify a whole product from one calculation.</p>
+<h2 id="section-1">Fix background, content and comparison conditions</h2>
+<p>Create an approximately 1600 × 1000 landscape canvas with an opaque #FFFFFF background. Arrange the same original short sentence in two rows, such as “Open the saved draft”, using identical font, weight, size and spacing. Mark rows A and B outside the text area. Group the background, rows and labels separately and save an editable draft. Canvas and sentence are practice choices, not the actual font size of a website or product. To make the comparison meaningful, keep conditions other than text color fixed.</p>
+<h2 id="section-2">Enter both colors and check opacity</h2>
+<p>Set the first line to #767676 and the second to #777777. Use an explicit color-value control if available in the installed version; otherwise record the actual method and do not call an approximate value exact. Keep both texts and background opaque, without shadows, gradients or overlays. Select each object to check ownership: white belongs to the background, gray to text. A swatch's presence alone does not prove the text uses it. If one row looks darker, check opacity and covering layers before blaming the formula.</p>
+<h2 id="section-3">Convert eight-bit channels to standard sRGB values</h2>
+<p>Hexadecimal 76 and 77 are decimal 118 and 119. Divide by 255 to obtain approximately 0.462745 and 0.466667. Each gray has equal red, green and blue channels, but those normalized values are not directly relative luminance. For a normalized channel c greater than 0.04045 use ((c+0.055)/1.055)^2.4; both grays fall in that range. White has linear channels of 1. Preserve the calculation and do not substitute an antialiased edge pixel from a screenshot for the specified text color.</p>
+<h2 id="section-4">Calculate luminance and contrast before rounding</h2>
+<p>Under WCAG relative-luminance weights L = 0.2126R + 0.7152G + 0.0722B. Equal linear channels make gray's L equal any one channel. With white as the lighter background, contrast is (1 + 0.05)/(L + 0.05). External calculation gives approximately 4.54222496:1 for #767676 and 4.47808945:1 for #777777. Judge using untruncated results before displaying a convenient number of decimals. The latter rounds to 4.5 at one decimal, but is actually below 4.5 and must not be treated as reaching that threshold on the rounded display.</p>
+<pre><code>background = #FFFFFF; text A = #767676; text B = #777777
+channel A = 118/255; channel B = 119/255
+linear(c) = ((c + 0.055)/1.055)^2.4 for these values
+contrast = (1.0 + 0.05)/(linear(c) + 0.05)
+A = 4.54222496...; B = 4.47808945...
+</code></pre>
+<h2 id="section-5">State the scope of the 4.5 threshold</h2>
+<p>WCAG 2.2's minimum text-contrast criterion generally requires at least 4.5:1 and lists exceptions including large text and inactive components. Apply it to the actual content and conditions rather than extending that threshold to all graphics or all sizes. This example only compares two specified opaque sRGB colors against white: A's theoretical result exceeds 4.5 and B's is below it. It is not a complete audit of an app interface and does not guarantee easy reading for every person. One text result does not establish that an entire page, all states or all users pass.</p>
+<h2 id="section-6">Inspect type size and color in an actual view</h2>
+<p>Return to the proof and check both rows use the same size, weight, content and white background before observing the grays. View at the intended output size and, without changing the original, make a slightly larger-type copy to compare reading experience. Type size does not cause the two color calculations. Zoom, display, color management and antialiasing affect perception. An imperceptible visual difference does not make the colors identical, and easy reading does not replace the external formula. Record device and viewing method; leave unobserved results pending.</p>
+<p>To reduce confusion from row position, copy both rows to a second proof and exchange their upper and lower positions while retaining color labels, weight and size. This can reveal whether position or local background affects your observation, but cannot change either color pair's theoretical ratio and is not a test of vision or reading ability. Close the temporary copy after comparison; A and B must still match their original color labels.</p>
+<h2 id="section-7">Troubleshoot color, transparency and sampling</h2>
+<p>If an external tool differs, first confirm #767676, #777777 and #FFFFFF in order and check that the letter O was not entered for zero; then inspect linearization and the 0.05 terms. Semitransparent text blends with its background and changes the displayed color, so this proof uses none. Screenshot edge samples mix text, background and antialiasing and cannot establish the specified text color. Preserve the original and change one condition at a time. If the exact object value cannot be confirmed, label it approximate instead of asserting a theoretical pass.</p>
+<h2 id="section-8">Export while preserving the limits of the judgment</h2>
+<p>Save the editable original, export an image or SVG through an entry actually available in the installed version and inspect both text rows, labels and white background in a separate viewer. Keep the external calculation, original color values, formula and untruncated results. If color space or export changes, recheck the actual deliverable. An SVG containing a bitmap does not automatically become fully vector; PNG does not retain editable text. Mark unperformed export, reopening or device-reading tests pending. Label the result a sample comparison rather than an unsupported accessibility certification.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/vectorpaint-gradient-proof-sheet/">Gradient proof sheet</a>; <a href="/en/guides/vectorpaint-transparent-overlap/">Transparent overlap</a>.</p>
+<p>Method references: <a href="https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html">W3C WCAG 2.2 contrast guidance</a> and the <a href="https://www.w3.org/TR/WCAG22/#dfn-relative-luminance">relative luminance definition</a>. The colors and proof layout are exercise choices; calculations cannot replace a complete check of an actual interface.</p>
+<p>Checked 20 November 2026: <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software">Apple's public lookup</a> lists VectorPaint 1.0.8, requiring iOS / iPadOS 17.0 or later. The <a href="https://apps.apple.com/cn/app/id1587272880">official store</a> describes text, color and vector editing. No completed physical-device test is claimed.</p>
+{% endraw %}

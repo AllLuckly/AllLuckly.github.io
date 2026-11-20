@@ -1,5 +1,18 @@
 # 验证记录
 
+## 2026-11-20：七款应用各新增10篇中文及完整英文教程
+
+- 新增70篇中文详细教程及70篇完整英文；Aquarell260篇、漫阅+260篇、VectorPaint260篇、书屿240篇、云映220篇、调调60篇、键来60篇，Yearn保留20篇。全站1380篇中文教程、8条真实学习路线。14个新增阶段、连续编号及逐篇来源见[本批证据](tutorial-evidence-20261120.md)。
+- 当日重新核Apple公开版本、系统和实际能力。调调RU/CN均为1.0.3，中英文介绍同步当期发行说明中的飞牛音乐、OpenList/AList和快捷指令支持，并保留历史说明；其余应用按各自当日查询记录。用户指定的RU/FI入口与CN交叉核身份，官方截图与功能说明分项留证。
+- 中文正文共106,976汉字，单篇1,500–1,804汉字，不含frontmatter、含资料段；字数用于发现缺稿。70对完整中英文经独立跨组全文复核，最终140份源译SHA绑定。实际Liquid→Kramdown结构、字面代码、标题ID、内链、日期、署名和UTC通过，实质长段整段重复检查通过。
+- 原创材料、具体任务、计算条件、反例、结果检查与排障分别审阅。未执行的App真机、私人服务器、键盘宿主、字幕渲染、编解码或设备听测不记为通过；静态核验、外部标准库模型和网站抽查范围明确区分。
+- 两轮production Jekyll3.10构建完成，两轮之间导出语义原文并生成Markdown、阅读目录和技能摘要。实际启动显式使用JEKYLL_ENV=production及Homebrew Ruby，24项按顺序成功。站点：3404 JSON-LD graphs, 3400 sitemap URLs, Atom feed, 2956 new/updated pages, 1380 detailed tutorials, 8 complete learning routes and 8 work videos。
+- 双语：1546 reciprocal language pairs, 1517/1517 complete English articles, preserved code/attribution/dates, localized collections and captions。旧技术文章、专题和阅读说明验证通过。
+- Markdown：3092 pages (3034 articles, 58 entry pages); 2570 code blocks and 4092 inline code nodes preserved; 0 files changed Generated sources are current.；阅读目录：Checked 40 llms.txt indexes; 3052 unique direct Markdown targets; 0 changed files.。技能摘要、Agent访问/搜索、API目录、统计/站点脚本及图标检查通过。中英文搜索各1517条，本批各70条新记录齐全。
+- 八款路线逐一核实际文章顺序、中英文阶段ID与编号范围，14个新阶段各覆盖五篇；所有旧阶段对象与字段逐项保留，另经独立审阅者对照基线核验，详情在本机忽略目录output/tutorials-20261120/stage-parity-review.json及independent-stage-integration-review.json。
+- 原生Safari抽查本批正文与任务样本，实际点击语言切换和阅读目录，并检查手机宽度的长标题与新阶段；范围记录在output/tutorials-20261120/safari-qa.json，网站检查不等于App真机操作。
+- 发布前GitHub Desktop同步origin/master，基线7ec2a19。2894份旧文章与译文逐字节保持，无删除或夹带其他任务改动；git diff --check与281个新增文件独立空白检查通过。Worker候选仅增加140条真实路由至3092条，保留2952条旧路由及原处理逻辑。GitHub Desktop提交/推送、精确SHA的Pages部署、现有边缘路由与线上目录/搜索/HTML/Markdown分别核验，本地通过不记为上线。
+
 ## 2026-11-19：七款应用各新增10篇中文及完整英文教程
 
 - 新增70篇中文详细教程及70篇完整英文；Aquarell250篇、漫阅+250篇、VectorPaint250篇、书屿230篇、云映210篇、调调50篇、键来50篇，Yearn保留20篇。全站1310篇中文教程、8条真实学习路线。14个新增阶段、连续编号及逐篇来源见[本批证据](tutorial-evidence-20261119.md)。

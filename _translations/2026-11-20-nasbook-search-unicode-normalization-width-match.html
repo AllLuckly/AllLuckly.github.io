@@ -1,0 +1,53 @@
+---
+layout: guide
+author: Bison
+app_id: nas_book
+title: 'Book Isle full-text search: check code points before recording matches for similar characters'
+description: Compare composed and combining accents and full-width versus ASCII digits in an original TXT, then
+  inspect actual search results.
+permalink: /en/guides/nasbook-search-unicode-normalization-width-match/
+date: '2026-11-20 00:00:00 +08:00'
+modified: '2026-11-20 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 232
+topic: Full-text search and character identity
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-20-nasbook-search-unicode-normalization-width-match.md
+source_url: /guides/nasbook-search-unicode-normalization-width-match/
+translation_method: editorial
+translation_source_sha256: 3e5a92f1092e37616f5212312f7b4dd24b349ca61632e355120a5d5195875bb2
+translation_date: '2026-11-20T02:06:39+00:00'
+excerpt: Compare composed and combining accents and full-width versus ASCII digits in an original TXT, then inspect
+  actual search results.
+---
+{% raw %}
+<p>Compare composed and combining accents and full-width versus ASCII digits in an original TXT, then inspect actual search results.</p>
+<h2 id="section-1">Create a small test-only text</h2>
+<p>In an existing text editor, prepare four tagged lines: A ends café with precomposed é, B ends cafe followed by a combining acute accent, C is note plus full-width digit ４, and D is note plus ASCII digit 4. The leading A, B, C and D locate results and are not the search terms. Preserve the source and provenance of any real book; use a new practice copy instead of altering it. Editors may convert characters, so similar appearance does not establish that A and B still have different code-point sequences. Record the source and tools used for any copy.</p>
+<h2 id="section-2">Generate verifiable characters with an existing tool</h2>
+<p>If Python 3 is already installed, run the original script below in a newly created empty practice directory. It exclusively creates book-search-sample.txt in UTF-8: an existing file causes an error rather than being overwritten. It prints code points after each line’s marker and space, checking the source rather than revealing Book Isle’s search implementation. A ends in U+00E9, B in U+0065 U+0301, C in U+FF14 and D in U+0034. Without Python, use an existing code-point inspection tool; if verification is unavailable, leave it pending instead of downloading an unknown program.</p>
+<pre><code class="language-python">from pathlib import Path
+lines = [&quot;A caf\u00e9&quot;, &quot;B cafe\u0301&quot;, &quot;C note\uff14&quot;, &quot;D note4&quot;]
+with Path(&quot;book-search-sample.txt&quot;).open(&quot;x&quot;, encoding=&quot;utf-8&quot;, newline=&quot;\n&quot;) as f:
+    f.write(&quot;\n&quot;.join(lines) + &quot;\n&quot;)
+for line in lines:
+    print(line[0], &quot; &quot;.join(&quot;U+%04X&quot; % ord(c) for c in line[2:]))
+</code></pre>
+<h2 id="section-3">Import the copy and check all four lines</h2>
+<p>Use an actually visible local-import entry in Book Isle to select the test TXT, open it and verify markers A through D and their words are visible. Record app version, device, filename, import time and any garbling or missing text. This is a short sample: chapter splitting and shelf sorting are not the target. Confirm readability before searching. If another same-named file was selected, a tool changed characters or only two lines appear, verify copy identity and, if needed, save another sample; do not immediately blame search.</p>
+<h2 id="section-4">Submit each query in the same book</h2>
+<p>Open the current book’s actually available full-text search. First enter precomposed café and record input source, hit count, result excerpt and whether A or B was reached. Return to the same book and separately search the decomposed form, full-width note４ and ASCII note4. Clear the preceding query each time and inspect the result list, without also changing book, scope or device. If a keyboard or paste operation normalizes input, note that its original code points could not be confirmed. Identical appearance does not prove identical input bytes. This exercise predicts no required match for any of the four queries.</p>
+<h2 id="section-5">Open results rather than counting entries alone</h2>
+<p>Open each actual result, check its neighboring line and A–D marker, then return to the result list. Record query, confirmable code points, displayed hit count, lines reached and duplicates separately. An excerpt may omit its marker, so verify the body; two matching lines on one page are not automatically one occurrence. If the interface shows no total or cannot navigate every result, record the visible scope rather than inventing hidden results.</p>
+<h2 id="section-6">Separate character identity from search behavior</h2>
+<p>Unicode NFC and NFD map canonically equivalent precomposed and decomposed forms to their selected representations. Full-width and ASCII digits have a compatibility relationship but are not the same code point. For the sample, the precomposed A word and decomposed B word have different code-point sequences but compare equal after NFC. C’s full-width digit and D’s ASCII digit remain different after NFC but can agree after NFKC. These controls distinguish the two standard relationships; compatibility normalization is not a mandatory cleanup for every document, because it can erase meaningful distinctions in representation. Finding both forms once establishes only visible behavior for this file, query and environment; several implementation paths may produce it. Finding one form likewise does not predict every character or book. Case-insensitive matching, accent-insensitive matching or other rules require their own controlled tests. Without evidence about the implementation or system input processing, do not assert a particular underlying algorithm.</p>
+<h2 id="section-7">Eliminate causes in layers when nothing appears</h2>
+<p>First verify the search scope is this test book, the target line appears in the body, the query has no extra spaces and the accent was not omitted; confirm correct import. Use ASCII note4 as a same-file control. If it also has no result, examine the search entry, index or actual error before attributing the issue to accent normalization. If text is visible but cannot be reached by search, retain the file copy, input method, full message and version and retry once through the actual interface. Do not rewrite a real book in bulk, delete an index or reinstall.</p>
+<h2 id="section-8">Reopen and deliver bounded results</h2>
+<p>Leave and reopen the same sample book, repeat at least one earlier query and verify its body line, recording whether the result repeats. Mark import, searches and reopening independently if not performed. Deliver the practice source, code-point inventory and four query records with device, version and time. If copying normalized characters, retain that limitation; a visual screenshot is not a code-point check. Keep the practice file as desired and preserve normal books and notes. One small sample does not validate other formats, languages or versions.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/nasbook-full-text-search/">Full-text search</a>; <a href="/en/guides/nasbook-txt-encoding-chapters/">TXT encoding and chapters</a>.</p>
+<p>Method: <a href="https://www.unicode.org/faq/normalization.html">Unicode normalization FAQ</a>. Checked on 20 November 2026: <a href="https://itunes.apple.com/lookup?id=6766198898&amp;country=cn&amp;entity=software">Apple lookup</a> lists Book Isle 1.1.4 and iOS / iPadOS 15.6 or later; its <a href="https://apps.apple.com/cn/app/id6766198898">App Store listing</a> describes TXT reading and full-text search. The sample is prepared externally; no device search test is claimed.</p>
+{% endraw %}

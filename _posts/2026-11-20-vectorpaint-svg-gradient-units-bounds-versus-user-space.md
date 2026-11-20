@@ -1,0 +1,85 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: VectorPaint 渐变坐标对照：对象包围盒与共享用户坐标产生不同色带
+description: 用四个矩形比较 objectBoundingBox 与 userSpaceOnUse，外部计算渐变位置并核实际 SVG 导入。
+permalink: /guides/vectorpaint-svg-gradient-units-bounds-versus-user-space/
+date: '2026-11-20 00:00:00 +08:00'
+modified: '2026-11-20 00:00:00 +08:00'
+category: 教程
+level: 进阶
+series_order: 260
+topic: SVG 渐变坐标与对象边界
+reading_time: 10
+---
+
+制作两行、每行两个矩形的渐变样本：上行使用相对各自包围盒的坐标，下行使用同一用户坐标区间。两种写法都采用黑到白，但第二行的左右矩形只显示共享渐变的不同片段。先在外部准备完整 SVG 并计算位置，再核 VectorPaint 的实际导入与输出；不能从公开 SVG 编辑说明推断每个属性在所有设备都会原样保留。
+
+## 固定矩形和两个坐标区间
+
+练习画布 viewBox 为 200×140；每行左矩形 x=20、宽60，右矩形 x=120、宽60，高度均40。上行 y=20，下行 y=80。左边范围为20至80，右边为120至180，中间保留40单位空隙；四个对象不施加额外变换。外部记录表分开“对象各自边界”和“画布用户坐标”，这些单位不是屏幕像素。先保存原文与副本，不把下面的纸面预测直接填成应用观察。
+
+## 保存包含两个渐变定义的 SVG
+
+用现有纯文本编辑器将下列完整内容保存为 gradient-units.svg。gBox 的横向渐变从对象包围盒的0到1；gUser 的横向渐变在用户空间从20到180。四个矩形分别通过 id 引用定义，上下两行的位置不同但 x 坐标一致。保留根元素、命名空间与结束标签，改动前另存；本例没有透明度、渐变变换或对象变换，以免引入额外变量。
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140">
+  <defs>
+    <linearGradient id="gBox" gradientUnits="objectBoundingBox" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000000"/><stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+    <linearGradient id="gUser" gradientUnits="userSpaceOnUse" x1="20" y1="0" x2="180" y2="0">
+      <stop offset="0" stop-color="#000000"/><stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+  <rect x="20" y="20" width="60" height="40" fill="url(#gBox)"/>
+  <rect x="120" y="20" width="60" height="40" fill="url(#gBox)"/>
+  <rect x="20" y="80" width="60" height="40" fill="url(#gUser)"/>
+  <rect x="120" y="80" width="60" height="40" fill="url(#gUser)"/>
+</svg>
+```
+
+## 计算对象包围盒中的位置
+
+上行每个矩形都用自己的边界建立从0到1的横向坐标，因此左矩形的20与80分别对应起点和终点，右矩形的120与180也分别对应起点和终点。它们各自完整覆盖定义的黑到白范围；不是两个对象共享从画布20开始的一条连续色带。若其中一块宽度变化，包围盒坐标会按该对象的新边界解释，但本节不因此推断应用导入后仍使用相同内部表示。
+
+## 计算共享用户空间中的位置
+
+下行使用从 x=20 到180 的同一160单位渐变区间。按 t=(x−20)/160 记录位置：左矩形从 t=0 到0.375，右矩形从0.625到1；中间没有矩形的40单位对应渐变中间区间0.375至0.625。两块矩形的颜色边缘因此不是各自都从完整黑白端点开始。t 是渐变位置，不直接等同某个截屏的 RGB 数字；插值、色彩管理和抗锯齿仍影响实际显示。
+
+```text
+left rectangle x=20..80; right rectangle x=120..180
+gBox: each object uses local position 0..1
+gUser: t=(x-20)/160
+left t=0..0.375; gap t=0.375..0.625; right t=0.625..1
+```
+
+## 导入并记录实际对象
+
+按安装版实际可用 SVG 入口导入副本，先检查四个矩形与两行布局，再观察上行是否各自覆盖较完整的黑白变化、下行是否表现为不同片段。选择对象时记录实际显示的渐变控件及图层；若导入转换了渐变或形状，不把转换后的对象自动称作原始属性。若应用不显示该文件、界面缺少所需控件或尚未导入，保留源文件与计算，明确标记待核，而不是声称设备测试已通过。
+
+## 单独移动右侧矩形制作反例
+
+在外部文本的独立副本中，只将下行右矩形的 x 从120改为100，宽度、定义及其他对象保持不变。此对象变为 x=100至160，按共享区间对应 t=0.5至0.875；不要同时改 gUser 的20与180。原稿的右矩形仍是0.625至1，两者对应不同片段。也可以在实际应用中移动对象，但先记录软件是否改变了对象变换或渐变引用；外部源码计算与应用产生的内部结构要分别验证。
+
+留一份原稿与移动稿并排比较时，先核两个文件的四个矩形数量与行次没有变化，再看下行右侧；上行两个对象作为未改条件。若只因视图缩放而觉得颜色变化，先统一窗口大小与背景。不能通过移动右矩形后截图上的一个边缘像素直接证明渐变插值精度，也不要把一处显示差异推广到所有导入引擎。
+
+## 排查引用、裁切和比较条件
+
+若矩形没有渐变，先检查 fill 的 url 引用与定义 id 的大小写是否一致、defs 是否保留，再检查应用实际支持与错误提示。若颜色被裁掉，核 viewBox、矩形边界及所选文件；不要把未显示部分误说成源代码已经删除。黑白色板也可能受到查看器背景或色彩管理影响，保存实际文件、设备和输出路径再比较。按一次只改一个条件的原则排查，不同时替换颜色、坐标和应用版本。
+
+还可在原始文本中逐项核四个 fill 引用：上面两块指向 gBox，下面两块指向 gUser；如果只错了一项，单独修复该引用并保留故障副本。参考表中的 t 区间只适用于这里未变换的矩形和定义，若加入旋转或渐变变换，需要另行计算，不能继续套用本表。
+
+## 保存原稿并检查实际导出
+
+保留原始 SVG、右矩形移动副本及位置计算表，再保存实际可编辑稿。按安装版实际入口导出 SVG 或 PNG 并在独立查看器打开，核对象数量、两行布局和实际文件结构；外观相似不证明导出仍使用原有 gradientUnits。PNG 是像素图，SVG 中也可能包含位图。未执行导入、导出、重开或真机比较时记录待核，不能将纸面位置当作屏幕测量。
+
+## 相关教程与资料
+
+[渐变色阶样张](/guides/vectorpaint-gradient-proof-sheet/)、[SVG 兼容排查](/guides/vectorpaint-svg-compatibility-check/)。
+
+方法资料：[W3C SVG 渐变坐标系统](https://www.w3.org/TR/SVG11/pservers.html#LinearGradientElementGradientUnitsAttribute)说明 objectBoundingBox 和 userSpaceOnUse；坐标、对象与移动对照为原创练习。规范预期不等于某应用对所有 SVG 特性的实现保证。
+
+版本核对：2026年11月20日，[Apple 公开查询](https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software)列 VectorPaint 1.0.8，最低 iOS / iPadOS 17.0；[官方商店](https://apps.apple.com/cn/app/id1587272880)介绍 SVG 编辑。未声称完成真机测试。

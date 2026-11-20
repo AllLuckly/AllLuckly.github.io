@@ -1,0 +1,80 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay SRT byte comparison: distinguish a UTF-8 signature, line endings and actual display'
+description: Create four versions of the same owned subtitle that differ only in UTF-8 signature and line endings;
+  verify bytes, file identity and player observations separately.
+permalink: /en/guides/icouldplay-srt-utf8-signature-line-endings-comparison/
+date: '2026-11-20 00:00:00 +08:00'
+modified: '2026-11-20 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 215
+topic: Subtitle bytes and line endings
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-20-icouldplay-srt-utf8-signature-line-endings-comparison.md
+source_url: /guides/icouldplay-srt-utf8-signature-line-endings-comparison/
+translation_method: editorial
+translation_source_sha256: 1da3dcb90b88b18de5f21090c407a12cad9b6d6da31469d28c143dc16cac2162
+translation_date: '2026-11-20T03:36:30+00:00'
+excerpt: Create four versions of the same owned subtitle that differ only in UTF-8 signature and line endings; verify
+  bytes, file identity and player observations separately.
+---
+{% raw %}
+<p>Create four versions of the same owned subtitle that differ only in UTF-8 signature and line endings; verify bytes, file identity and player observations separately.</p>
+
+<h2 id="prepare-one-identical-subtitle-message">Prepare one identical subtitle message</h2>
+
+<p>Choose an owned video at least eight seconds long and preserve both the video and normal subtitle. The sample has one cue from 1 to 4 seconds, numbered 1, displaying Hello 你好 with SRT comma-millisecond time notation. All four versions keep visible text, index and times identical; only the optional UTF-8 signature at the beginning and LF versus CRLF line endings change. Do not change both encoding and words and attribute the outcome to one byte. Record video identity and intended test time, marking playback pending before import.</p>
+
+<h2 id="understand-the-signature-and-visible-text-boundary">Understand the signature and visible-text boundary</h2>
+
+<p>Unicode explains that EF BB BF at the start can serve as a UTF-8 signature. It is not three letters intended for viewers and does not prove every later byte is valid. LF is the byte 0A, whereas CRLF is the pair 0D 0A; they represent line boundaries differently without changing the meaning of one second. Tools can differ in their handling of signatures, line endings and malformed data. This exercise does not assume iCouldPlay accepts all four files.</p>
+
+<h2 id="generate-four-samples-safely-in-an-empty-directory">Generate four samples safely in an empty directory</h2>
+
+<p>The following script creates a dedicated folder in the current directory and writes four SRT files with exclusive creation. Before running it, ensure the current working directory is your own practice location. It stops if the folder already exists; inspect it and choose another name rather than overwriting or deleting files. The text is a Python string and line endings are chosen explicitly before writing bytes. The script only writes practice files; it does not upload, use the network or modify the video. Use an existing Python installation; successful generation does not mean the player displayed the subtitles.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>from pathlib import Path
+from codecs import BOM_UTF8
+folder = Path("srt-byte-practice")
+folder.mkdir()  # fails if the directory already exists
+cue = "1\n00:00:01,000 --&gt; 00:00:04,000\nHello 你好\n\n"
+for name, ending, marked in [("plain-lf.srt", "\n", False),
+                             ("bom-lf.srt", "\n", True),
+                             ("plain-crlf.srt", "\r\n", False),
+                             ("bom-crlf.srt", "\r\n", True)]:
+    data = cue.replace("\n", ending).encode("utf-8")
+    if marked:
+        data = BOM_UTF8 + data
+    with (folder / name).open("xb") as output:
+        output.write(data)
+    print(name, len(data), data[:4].hex(" "))
+</code></pre></div></div>
+
+<h2 id="check-the-beginning-and-line-endings-separately">Check the beginning and line endings separately</h2>
+
+<p>The four files begin either with the ordinary first byte or EF BB BF. Line endings are 0A in LF files and 0D 0A in CRLF files; do not confuse other bytes inside UTF-8 Chinese characters with line breaks. The script reports byte lengths and initial bytes; record each output beside its filename. This sample has four line endings: without signatures, the CRLF version is four bytes longer than the LF version; for a fixed line ending, adding the signature adds three bytes. Those differences apply to this exercise, not every subtitle file. For the sample as written, the four lengths are 46, 49, 50 and 53 bytes. A marked file starts EF BB BF 31; the plain LF file starts 31 0A. If the output differs, check whether the editor altered the text or the script is the current version, then inspect the files actually generated. Check each filename, length and initial bytes after running. If the differences do not match, first inspect whether the copied script retained its backslashes instead of changing the source video. Open the copies in an editor that handles UTF-8 and confirm visible text and timing match. An editor’s treatment of an invisible signature is not evidence of iCouldPlay playback.</p>
+
+<h2 id="associate-each-copy-with-the-same-video-for-observation">Associate each copy with the same video for observation</h2>
+
+<p>Associate the first copy through a subtitle path actually available in the installed iCouldPlay version. Observe within 1–4 seconds whether the cue appears, its timing and whether the Chinese text is readable; record the actual filename. Before changing copies, confirm the previous subtitle is no longer selected so identical content is not confused. Keep video, device, player settings and picture position fixed. Fill the comparison only for observations actually made. If no path is found or playback has not been performed, mark it pending; an editor preview does not substitute for app evidence.</p>
+
+<h2 id="interpret-one-change-without-expanding-the-conclusion">Interpret one change without expanding the conclusion</h2>
+
+<p>First compare no-signature LF with signature LF: their line endings match and only three initial bytes are added. Then compare no-signature LF with no-signature CRLF: their starting condition matches while line-ending bytes differ. Record those two controls separately. Changing both factors at once does not identify which caused a difference. If all four display correctly, the result concerns this text, device, app version and path; it does not guarantee support for other encodings or all subtitle files.</p>
+
+<h2 id="troubleshoot-source-timing-and-bytes-in-order">Troubleshoot source, timing and bytes in order</h2>
+
+<p>If subtitles do not appear, first check the actually selected file, the video’s 1–4 second interval and the subtitle switch; then inspect filename, extension and saved directory. For corrupted characters, compare visible editor text with original bytes and check that copying did not alter characters. A missing glyph can also involve fonts or rendering and cannot always be attributed to a BOM. If the script stops because the folder or files exist, preserve existing results and use a new folder rather than deleting the user’s files. Record actual error text and steps and leave unfinished comparisons pending.</p>
+
+<h2 id="deliver-four-files-and-restore-normal-subtitles">Deliver four files and restore normal subtitles</h2>
+
+<p>Deliver the four clearly named subtitle files, script output, whether each was actually selected and the viewing result, with paper expectations separated from device observations. Record system, iCouldPlay version and subtitle association method; the sample does not prove the quality of all online subtitles. Restore the original subtitle afterward and keep the source video and backups. Mark unperformed physical-device playback as pending; do not promise automatic encoding detection, batch conversion or recovery of text already lost.</p>
+
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+
+<p><a href="/en/guides/icouldplay-srt-comma-millisecond-counter-timing/">Minimum SRT cue</a>; <a href="/en/guides/icouldplay-caption-character-reference/">subtitle character checks</a>. The <a href="https://www.unicode.org/faq/utf_bom.html">Unicode UTF-8 BOM FAQ</a> explains signatures; the <a href="https://apps.apple.com/cn/app/id6755653178">iCouldPlay App Store page</a> lists SRT and external subtitles. The public lookup on 20 November 2026 lists iCouldPlay 1.1.1, requiring iOS / iPadOS 15.0 or later. No physical-device subtitle playback test is claimed.</p>
+{% endraw %}

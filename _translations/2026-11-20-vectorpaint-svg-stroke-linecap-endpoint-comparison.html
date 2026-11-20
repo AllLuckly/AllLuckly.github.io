@@ -1,0 +1,52 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint stroke caps: equal centerlines with different butt, round and square extensions'
+description: Compare three identical centerlines using an external SVG sample, then check import, endpoints and output in VectorPaint while separating geometric expectations from observed rendering.
+permalink: /en/guides/vectorpaint-svg-stroke-linecap-endpoint-comparison/
+date: '2026-11-20 00:00:00 +08:00'
+modified: '2026-11-20 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 251
+topic: Stroke endpoints and SVG handoff
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-20-vectorpaint-svg-stroke-linecap-endpoint-comparison.md
+source_url: /guides/vectorpaint-svg-stroke-linecap-endpoint-comparison/
+translation_method: editorial
+translation_source_sha256: 9e8bb78bfb5c3484ef455c6e536dc11f818ee045fe7da81a6be24245b8175007
+translation_date: '2026-11-20T01:31:13+00:00'
+excerpt: Compare three identical centerlines using an external SVG sample, then check import, endpoints and output in VectorPaint while separating geometric expectations from observed rendering.
+---
+{% raw %}
+<p>Even without moving a path, its stroke may look longer because of its end caps. Prepare three horizontal lines with identical endpoints and use SVG butt, round and square caps, then inspect rendering and editing through an actual supported VectorPaint import route. Calculations are external expectations, not a claim that app import or format fidelity has been tested on a device.</p>
+<h2 id="section-1">Fix the centerline and stroke width</h2>
+<p>In an owned exercise record, set a 240 × 160 viewBox and three lines at y = 40, 80 and 120. Each centerline runs from x = 80 to x = 160 with stroke width 20. The centerline is 80 units long; cap value is the only difference. Leave space above for labels and retain the original sample separately from explanatory text. Colors, sizes and positions are reproducible exercise choices, not claimed app defaults. Sketch coordinate axes first and distinguish the x = 80 path endpoint from the outer stroke edge.</p>
+<h2 id="section-2">Save complete SVG source for all three lines</h2>
+<p>In an existing plain-text editor, save the following as cap-comparison.svg. Keep the svg extension, root element and namespace; do not copy just the three line elements. Color, width and endpoints are identical and only stroke-linecap differs. Save an original before handing a copy to an actually available SVG import entry. Do not overwrite the original without a backup or assume these attribute names are buttons in the app.</p>
+<pre><code>&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160"&gt;
+  &lt;line x1="80" y1="40" x2="160" y2="40" stroke="#31554c" stroke-width="20" stroke-linecap="butt"/&gt;
+  &lt;line x1="80" y1="80" x2="160" y2="80" stroke="#31554c" stroke-width="20" stroke-linecap="round"/&gt;
+  &lt;line x1="80" y1="120" x2="160" y2="120" stroke="#31554c" stroke-width="20" stroke-linecap="square"/&gt;
+&lt;/svg&gt;
+</code></pre>
+<h2 id="section-3">Separate path endpoints from stroke bounds</h2>
+<p>In W3C's cap definitions, butt stops at the endpoint; round adds an outward semicircle; square extends a rectangular half stroke-width beyond the endpoint. At width 20, round and square extend 10 on each end, giving horizontal bounds 70–170 and width 100. Butt spans 80–160 and width 80. Each centerline remains 80 long, and equal outer bounds do not make round and square shapes identical. At width 10 the extension becomes 5 per end, not 10.</p>
+<h2 id="section-4">Use area to distinguish square from round</h2>
+<p>Ignoring antialiasing, butt produces an 80 × 20 rectangle, or 1600 square user units. Round adds two semicircles of radius 10, together one circle, giving 1600 + 100π, about 1914.16. Square adds 10 × 20 at each end for 2000. This paper geometry has no joins, transforms or clipping and is not a pixel measurement. Equal horizontal width 100 does not imply equal area: inspect the endpoint corners at a larger scale.</p>
+<h2 id="section-5">Import a real copy and inspect each line</h2>
+<p>Open the copy through an SVG import route actually available in the installed version. Check that all three lines appear in order, then compare the butt's straight end, the round arc and the square's corners. When selecting a line, record the objects and editing controls actually presented; if import converts an object, do not assume its original attribute or nodes remain unchanged. Public material describes SVG editing, not fidelity for every SVG attribute on every device. If import is unavailable, record version, entry and message, preserving the external sample and calculation for troubleshooting.</p>
+<h2 id="section-6">Make a controlled copy changing only the cap</h2>
+<p>If the present interface offers an identifiable cap setting, change the first line from butt to round in a second copy while preserving endpoints, width, color and the other lines. If it does not, change only that line's attribute in an external text copy and import again. Compare the first two appearances and check centerline coordinates have not been rewritten. Do not also scale the line or change its width. If the two still differ, investigate inherited styling or import conversion and save original and modified copies separately.</p>
+<p>Record the original first line beside the modified first line, not only the first and second in one file: those already have different vertical coordinates. A ledger can state “original first line butt; copy first line round; shared endpoints 80 and 160; shared width 20”, leaving the actual import result blank until observed. If the software converts a line to a curve object, a matching appearance does not prove the exported code still uses a line element. Save and inspect the real export separately; mark element type pending if code has not been checked. Keeping both source files makes the change traceable without guessing from screenshots.</p>
+<h2 id="section-7">Troubleshoot clipping, scale and small images</h2>
+<p>If the round or square end is incomplete, check canvas and clipping boundaries first; x = 70–170 lies inside this sample's viewBox. If lengths appear different but endpoints cannot be selected, check whether the selection is the outer stroke rather than the path center, then consult source coordinates. Zoom changes screen pixels, so screenshot width is not a direct user-unit measurement. Antialiasing also affects tiny edges; enlarge the view and record source and rendered result as separate evidence.</p>
+<h2 id="section-8">Export and recheck editability</h2>
+<p>Save the actual editable project, then export SVG or PNG as needed and reopen it in a separate viewer supporting that format. Compare outlines, clipping and three-line order. If delivering editable SVG, inspect the elements and attributes actually exported; an extension alone does not prove full preservation. PNG is a raster result without editable SVG paths. Record app version, import route, original and exported copies, and checks actually performed. Leave unperformed import, export or reopening pending.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/vectorpaint-fill-stroke/">VectorPaint fill and stroke</a>; <a href="/en/guides/vectorpaint-getting-started/">Make an icon from shapes</a>.</p>
+<p>Method reference: <a href="https://www.w3.org/TR/SVG2/painting.html#LineCaps">W3C SVG 2 stroke caps</a>. The three-line coordinates, areas and controlled comparison are original exercise choices; specification geometry does not establish a particular app's import compatibility.</p>
+<p>Checked 20 November 2026: <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software">Apple's public lookup</a> lists VectorPaint 1.0.8, requiring iOS / iPadOS 17.0 or later. The <a href="https://apps.apple.com/cn/app/id1587272880">official store</a> describes SVG editing. These are repeatable instructions and external calculations; no completed physical-device app test is claimed.</p>
+{% endraw %}

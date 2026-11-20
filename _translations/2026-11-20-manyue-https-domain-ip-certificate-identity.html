@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'ManYue HTTPS library connections: distinguish domain and numeric-IP certificate identity'
+description: Check domain, IP and certificate identity with an administrator-confirmed secure address, then verify
+  the intended library and comic.
+permalink: /en/guides/manyue-https-domain-ip-certificate-identity/
+date: '2026-11-20 00:00:00 +08:00'
+modified: '2026-11-20 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 253
+topic: HTTPS library identity and connection
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-20-manyue-https-domain-ip-certificate-identity.md
+source_url: /guides/manyue-https-domain-ip-certificate-identity/
+translation_method: editorial
+translation_source_sha256: 8367c02058722c43d01a1ce0605d0ad2fd296df6a591fae093c09bb1720fc10d
+translation_date: '2026-11-20T04:41:29+00:00'
+excerpt: Check domain, IP and certificate identity with an administrator-confirmed secure address, then verify the
+  intended library and comic.
+---
+{% raw %}
+<p>Check domain, IP and certificate identity with an administrator-confirmed secure address, then verify the intended library and comic.</p>
+<h2 id="section-1">Prepare a known library and its trusted address</h2>
+<p>Prepare an HTTPS comic service you are authorized to use, one recognizable comic, and the complete domain URL supplied by its administrator. Record service type, port, original path and any error, retaining the settings and a local original; redact passwords from screenshots. This exercise compares domain and numeric-IP identity for the same service. It does not require buying a service or installing certificates. If no administrator-confirmed secure URL is available, stop after collecting information rather than guessing addresses.</p>
+<h2 id="section-2">Separate the changing URL components</h2>
+<p>Split the administrator’s URL into scheme, host, port and path; https://comics.example.test:8443/library/ is an illustration, not an address to connect to. Separately note the failing numeric-IP form, preserving its port and path. Do not publish household IP addresses, accounts or tokens. Even if a domain resolves to the same machine, virtual hosting, a proxy or certificate configuration can lead to a different service configuration. Similar page colors do not prove the libraries are identical.</p>
+<h2 id="section-3">Confirm the service at its trusted domain</h2>
+<p>Enter the administrator-supplied domain URL in a browser on the same device. Confirm that no certificate warning appears and, with normal authorization, check whether the intended service is reached. If there is a warning, stop, record it, and neither bypass the warning nor submit credentials. On a normal page, verify service identity, path and an authorized comic. A login screen without a successful sign-in proves only that the screen was reachable. Browser success describes that browser and connection, not guaranteed app behavior.</p>
+<h2 id="section-4">Compare certificate identity without changing it</h2>
+<p>If the administrator can safely supply certificate details, or the browser actually displays them, inspect DNS-name and IP-address entries in subjectAltName, plus validity and issuer. Do not publish certificate serial numbers, internal hosts or full screenshots. RFC 9525 specifies exact matching between an IP reference identity and an IP-address entry; a domain-only certificate should not be assumed valid for the server’s numeric address. A name match alone is not complete trust: chain, validity and client policy matter too. For example, a certificate listing only comics.example.test does not automatically match another alias or a numeric address; inspect the actual identity type and applicable rules. If alternative names are not shown, do not infer them from the certificate title: ask the administrator for verifiable details. What a tool displays may be incomplete, so “not visible” does not prove the server has no such entry. If only a warning is shown and details are unavailable, record its wording and time for the administrator; do not install an unknown root certificate. Continue after the administrator confirms the address and trust chain; otherwise mark the result untested.</p>
+<h2 id="section-5">Use the confirmed complete URL in ManYue</h2>
+<p>Choose the server connection type actually available in ManYue and enter the confirmed HTTPS domain, port and original path as supplied by the administrator. If this version lacks the entry or requires an entitlement, record that state without inventing controls. Keep account and directory constant, authenticate normally and observe save, sign-in and catalog feedback. Preserve a useful existing connection or screenshot before editing; do not clear data for a test. Record the exact failure stage and message rather than assigning every error to the certificate.</p>
+<h2 id="section-6">Verify the library and selected comic</h2>
+<p>After connecting, confirm library name, target folder and cover, then open recognizable first, middle and last pages. A visible listing does not prove image retrieval; if only the catalog appears, record catalog success and page failure separately. Leave the reader and locate the work again through the same entry, excluding a similarly named library. This checks the selected work and observed pages only, not every chapter or offline availability.</p>
+<h2 id="section-7">Narrow the difference on failure</h2>
+<p>If domain and IP results differ, first compare scheme, port, path, network, account and actual service identity. DNS, proxy rules and certificates can all cause differences; one comparison cannot establish a cause. For a name or expiry problem ask the server administrator to repair it and provide the correct secure address, rather than disabling verification, switching to plaintext or blindly trusting a certificate. If the browser works but the app fails, record times, versions and exact messages; check service type and app entry, and share redacted evidence if needed.</p>
+<h2 id="section-8">Keep a reproducible outcome</h2>
+<p>Keep redacted service type, URL components, whether certificate identity could be inspected, browser outcome, ManYue connection stage and page results. Mark unperformed steps untested and unavailable certificate details unknown. Check that the existing connection and local comic remain locatable and restore temporary settings. A successful secure domain works under the observed conditions; it does not prove the numeric IP should work or every certificate issue is solved. For further diagnosis contact the administrator without sharing passwords, tokens or private comics.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/manyue-https-proxy-base-path/">HTTPS and proxy subpaths</a>; <a href="/en/guides/manyue-server-connection-troubleshooting/">Server connection troubleshooting</a>.</p>
+<p>Checked 20 November 2026: <a href="https://itunes.apple.com/lookup?id=6753895889&amp;country=cn&amp;entity=software">Apple lookup</a> lists ManYue 2.0.6 and iOS / iPadOS 15.0 or later; the <a href="https://apps.apple.com/cn/app/id6753895889">App Store</a> describes server support. Identity matching reference: <a href="https://www.rfc-editor.org/rfc/rfc9525.html">RFC 9525</a>. Actual app entries depend on the installed version. No device or private-server test is claimed.</p>
+{% endraw %}

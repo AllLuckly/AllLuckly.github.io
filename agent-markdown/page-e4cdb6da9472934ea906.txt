@@ -1,0 +1,80 @@
+---
+layout: null
+permalink: /guides/icouldplay-ass-shadow-horizontal-vertical-independent-offset/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映 ASS 阴影方向：分别检查横向、纵向和完全关闭
+agent_source_url: https://allluckly.cn/guides/icouldplay-ass-shadow-horizontal-vertical-independent-offset/
+agent_source_sha256: 21e74f0e91ddcee4f47f96e5a2e9a50d3a8c39622d9c72ed5d88129eca4a0eca
+agent_generator_version: 1
+---
+{% raw %}# 云映 ASS 阴影方向：分别检查横向、纵向和完全关闭
+
+语言：zh-CN
+原文：[云映 ASS 阴影方向：分别检查横向、纵向和完全关闭](<https://allluckly.cn/guides/icouldplay-ass-shadow-horizontal-vertical-independent-offset/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-shadow-horizontal-vertical-independent-offset/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-shadow-horizontal-vertical-independent-offset/>)
+发布于: 2026-11-20T00:00:00+08:00
+内容更新于: 2026-11-20T00:00:00+08:00
+署名：Bison
+
+用同一条字幕与四个方向状态检查 xshad、yshad 和零偏移，分别记录纸面坐标及实际观看。
+
+用同一条字幕与四个方向状态检查 xshad、yshad 和零偏移，分别记录纸面坐标及实际观看。
+
+## 准备静景、源字幕与对照表
+
+选至少十二秒的自有静景视频，先保存原视频和日常字幕，练习结束能够切回。画布按640乘360设置，字幕使用同一个英文词 SHADOW、同一字号与位置；在纸上画四行记录条目时间、横向偏移、纵向偏移与实际现象。字幕脚本坐标只是一个工作坐标系，不直接表示设备屏幕像素。本文件开启 ScaledBorderAndShadow，因此本课中的偏移先按脚本分辨率理解；播放时画面适配、缩放以及设备像素密度可能改变屏幕上的实际距离。若需要比较两个观看窗口，先固定相同文件、画面比例和字幕设置，分别记录窗口条件，不要把更大的显示面积误认成源文件里的偏移参数发生改变。无法测出准确屏幕距离时，保留方向观察即可，并把截图的原始时间及查看条件写进记录。选中等灰度背景，让白字、黑描边与深色阴影有可辨对比；背景本身过黑时不要据此判断阴影一定不存在。
+
+## 核对正负方向和比较条件
+
+Aegisub 文档说明 xshad 与 yshad 分别指定水平及垂直阴影偏移，负值可使阴影位于文字左侧或上方；只有两个方向都为零才关闭阴影。本练习分别使用右下、左下、仅向下和双零四个状态。先把坐标写为二、二；负四、二；零、二；零、零。第一与第二状态同时改变水平幅度和方向，因此只能说明位置变化，若要单独比较正负，另做负二、二的副本；不要把这四条误说成每次只变一项。
+
+## 保存四条完整 ASS 事件
+
+将下方全文保存为 UTF-8 纯文本 shadow-directions.ass，保留 Script Info、样式、字段表和四条事件。每条事件都固定对齐、脚本位置、描边、文字与颜色，并先用 shad0 设置统一基线，再分别设置 xshad 和 yshad。标记位于文字前的花括号内，事件在一至三、四至六、七至九、十至十二秒内显示；将时间边界与参数表一起保存。复制后重新打开核对反斜线、负号和扩展名，不把中文标点替代英文符号。
+
+```
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,40,&H00FFFFFF,&H0000FFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,0,5,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:03.00,Default,,0,0,0,,{\an5\pos(320,180)\bord2\shad0\xshad2\yshad2}SHADOW
+Dialogue: 0,0:00:04.00,0:00:06.00,Default,,0,0,0,,{\an5\pos(320,180)\bord2\shad0\xshad-4\yshad2}SHADOW
+Dialogue: 0,0:00:07.00,0:00:09.00,Default,,0,0,0,,{\an5\pos(320,180)\bord2\shad0\xshad0\yshad2}SHADOW
+Dialogue: 0,0:00:10.00,0:00:12.00,Default,,0,0,0,,{\an5\pos(320,180)\bord2\shad0\xshad0\yshad0}SHADOW
+```
+
+## 用坐标差记录四个状态
+
+以文字轮廓参考位置为局部原点，第一条阴影参考点记作右二、下二；第二条记左四、下二；第三条水平不偏移而向下二；第四条水平与垂直均为零。比较的是偏移向量，不是字母轮廓每个像素的屏幕坐标，也不包含字体度量和抗锯齿。第三条 x 为零并不等于无阴影，因为 y 仍为二。将第二条与第三条对照时，水平偏移从负四变到零、纵向保持二；再从第三条到第四条才只改变纵向值。
+
+## 在实际字幕路径中观察
+
+在云映中打开自有视频，并通过安装版实际提供的字幕入口关联新文件。依次跳到四条事件内部，核对文字、时间与阴影相对位置；把设备、播放器版本、选中字幕文件和观察结果写入记录。四条显示次序只用于展示离散状态，不是阴影连续移动动画。如果没有成功关联文件，保留源码与预期并把设备观察标为待核，不能因其他软件预览成功就宣称云映已经验证。
+
+## 另存单变量正负对照
+
+从第一条另存练习副本，仅把水平二改成负二，垂直二和其余标记保持不变。脚本层面的横向偏移改变四个单位，纵向偏移仍为二；相对位置的描述要明确参照文字，而不是画面中心。原文件仍留作基线。不要通过同时改变字号、描边或背景使两个画面更明显，否则无法把差异归因于唯一改动；也不要把向量变化直接写成精确的设备像素距离。
+
+## 定位阴影看不见的原因
+
+看不到阴影时，先确认正确字幕文件与事件时间，再检查背景对比、阴影颜色与透明度。确认 xshad、yshad 位于文字之前，负号为普通 ASCII，且没有后续覆盖标签改变相同属性。若第三条看似没有阴影，不能仅因 x 为零就下结论；先比较背景和第四条的双零状态。若看到原始标签文字，检查花括号和文件类型。样式覆盖、字幕渲染引擎与显示缩放也可能影响观察，逐项留证，不把一个结果推广到所有设备。
+
+## 交付记录并恢复原状态
+
+保留四事件原稿、只改正负号的副本和偏移表，逐条注明纸面预测、实际操作与未完成项；未进行观看就保留待核。说明为什么零、二仍有垂直阴影，以及两个方向同时归零才关闭；如实写明效果是否在当前路径出现。最后切回原字幕，保留原视频和可恢复副本。这个练习验证的范围是一个有边界的字幕样本，不声称自动识别字幕、统一设备渲染或完成私人服务器测试。
+
+## 相关教程与资料
+
+[ASS 分向描边](<https://allluckly.cn/guides/icouldplay-ass-directional-border-width-reset-components/>)；[字幕样式](<https://allluckly.cn/guides/icouldplay-subtitle-style/>)。[Aegisub 官方说明](<https://aegisub.org/docs/latest/ass_tags/#shadow-distance-extended>)定义阴影偏移；[Apple 官方商店](<https://apps.apple.com/cn/app/id6755653178>)列 ASS/SSA 格式支持。2026 年 11 月 20 日公开查询列云映 1.1.1，最低 iOS / iPadOS 15.0。各指令是否生效以实际设备与渲染路径为准；未执行真机字幕渲染或私人服务器测试。
+{% endraw %}

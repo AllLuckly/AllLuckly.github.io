@@ -1,0 +1,96 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-ass-karaoke-instant-versus-sweep-timeline/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay ASS lyric highlighting: compare instant changes and colour sweeps
+  on one timeline'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-ass-karaoke-instant-versus-sweep-timeline/
+agent_source_sha256: 154de7b6c5ab639fd08087b80410ac563f8ba8e15bb589425c1d4a7eaa86c071
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay ASS lyric highlighting: compare instant changes and colour sweeps on one timeline
+
+Language: en
+Canonical: [iCouldPlay ASS lyric highlighting: compare instant changes and colour sweeps on one timeline](<https://allluckly.cn/en/guides/icouldplay-ass-karaoke-instant-versus-sweep-timeline/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-karaoke-instant-versus-sweep-timeline/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-karaoke-instant-versus-sweep-timeline/>)
+Published: 2026-11-20T00:00:00+08:00
+Modified: 2026-11-20T12:04:50+08:00
+Author: Bison
+
+Compare instant k and swept kf highlighting using the same two-event ASS, colours and centisecond schedule; observe and record only through an actual subtitle path.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-ass-karaoke-instant-versus-sweep-timeline/>), translated on 2026-11-20. Original publication dates, attribution, code and version notes are retained.
+
+Prepare an ASS subtitle for an owned short video with two English lyric segments. Keep both colours and each segment’s duration fixed, then compare the instant colour change of `\k` with the gradual sweep of `\kf`. Edit the subtitle externally and observe it in iCouldPlay only through an actually supported external-subtitle path; do not assume the player contains a lyric authoring tool.
+
+## Preserve the video, text and comparison conditions
+
+Choose an owned still-scene video at least twelve seconds long. Set a comfortable audio level and preserve the source file and normal subtitles. The demonstration text has two segments, `Blue` and `sky`. Allocate 150 centiseconds to each: the total is 300 centiseconds, or three seconds. The first event runs from 1 to 4 seconds and the second from 6 to 9 seconds, with a two-second gap to distinguish them. These words and times are exercise material, not an inferred alignment for every song.
+
+Use two events with the same colours but different effects: white primary, yellow secondary and black outline. ASS style colours are stored as alpha, blue, green and red rather than ordinary web RGB order. This exercise does not measure exact colours; the background and display can affect their appearance. Do not count player seeking, picture zoom or a system theme change as a single-variable subtitle comparison.
+
+## Save a complete subtitle file with both events
+
+Save the following as UTF-8 plain text named `karaoke-compare.ass`, retaining sections, style fields and both Dialogue lines. Each event’s lyric timing is relative to that event’s start. Put the same centisecond values before both segments; the events have different absolute times; their lyric-tag difference is lower-case `k` in event one and lower-case `kf` in event two. After copying, check braces, backslashes and ASCII punctuation, then reopen it to verify the `.ass` extension.
+
+```text
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,40,&H00FFFFFF,&H0000FFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,0,2,20,20,25,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:04.00,Default,,0,0,0,,{\k150}Blue {\k150}sky
+Dialogue: 0,0:00:06.00,0:00:09.00,Default,,0,0,0,,{\kf150}Blue {\kf150}sky
+```
+
+## Convert relative timing to video time
+
+First check event one on paper: `Blue` starts at 1 second and lasts 1.5 seconds; `sky` starts at 2.5 and lasts until 4 seconds. Event two starts at 6 seconds, so the corresponding ranges are 6–7.5 and 7.5–9 seconds. Equal segment durations and relative boundaries do not mean equal visual effects. Nor is the absolute video time of 6 seconds the duration of `kf150`. Here the second segment’s start is the sum of the previous duration; no separate special start-time tag is used.
+
+```text
+k:  Blue 1.00–2.50 s; sky 2.50–4.00 s; event ends 4.00 s
+kf: Blue 6.00–7.50 s; sky 7.50–9.00 s; event ends 9.00 s
+```
+
+## Predict the instant change and the sweep separately
+
+Aegisub’s public tag reference describes `\k` as an immediate change from secondary to primary colour when a syllable begins. `\kf` uses the syllable’s duration for a left-to-right colour sweep. In the first event, `Blue` changes when its first segment starts and `sky` near 2.5 seconds. In the second, `Blue` sweeps over 6–7.5 seconds and `sky` over 7.5–9 seconds. Left and right describe the text-colour sweep, not movement of the entire image or a change to the video pixels.
+
+Mark the difference between `k` and `kf` beside the timing table and preserve letter case. Do not rewrite `\k150` as a decimal-second value or infer identical animations merely because both events use equal durations. Font, language, text direction and renderer implementation can affect the visible result; this English sample does not represent every script.
+
+## Play through an actual subtitle path and record observations
+
+Open the owned video in iCouldPlay and associate the saved ASS using a path actually offered by the installed version. Observe when the segments change colour inside event one, then whether gradual filling appears in event two. Before replaying, record current playback time, filename and subtitle selection so a different same-named subtitle is not mistaken for the edited one. If no external association path is available, retain the file and paper timeline and mark in-app playback pending rather than inventing an entry point.
+
+Compare near 1, 2.5 and 4 seconds and near 6, 7.5 and 9 seconds, while recognizing that devices may not pause exactly at boundaries. Frame-accurate measurement requires a separate reliable frame tool; an ordinary paused image is an observation, not a millisecond measurement. Player colour or style overrides may affect the comparison, so record the actual settings before trying the original settings again.
+
+## Change one value to construct a counterexample
+
+Save another copy and change only the first `\kf150` of event two to `\kf100`, preserving the second `\kf150` and the 6–9 second event interval. By cumulative timing, the first segment now occupies 6–7 seconds and the second 7–8.5 seconds, leaving half a second within the event interval. Do not label that remainder as an added third segment or assert that all renderers display the final state identically.
+
+Distinguish the event ending at 9 seconds from the two tag durations totalling 250 centiseconds. Changing the first duration also advances the second segment’s start; no new start time was entered on the second segment. To restore two 1.5-second segments, restore the original value and save again rather than merely extending the event end.
+
+## Troubleshoot identical appearances one condition at a time
+
+If both events look the same, first verify the updated file, selected external subtitle, the second event’s literal `\kf`, and that primary and secondary colours differ. If ordinary text alone appears, record whether the player recognized ASS styling and whether a user style override is active. Do not install unknown fonts or change unrelated media-library settings to repair one sample. Literal backslashes on screen call for a brace and ASCII punctuation check; missing subtitles call for checks of timing, encoding and the associated video.
+
+One engine failing to show a sweep does not establish that every ASS file is unsupported. An external Aegisub preview cannot replace an actual iCouldPlay observation. Retain the original, modified copy and operation record; mark insufficient evidence as pending rather than entering a prediction as a device test.
+
+## Deliver the comparison and restore normal subtitles
+
+Deliver both ASS files, the two three-second timelines, absolute event times and actual viewing notes. Record player version, subtitle source and viewing conditions. Explain the difference between `\k` and `\kf` and why changing the first duration shifts the next segment’s start. Switch back to normal subtitles after the exercise and retain the source video. This sample establishes a checkable comparison of two tags; it does not promise lyric synchronization, effect compatibility or audio recognition.
+
+## Related guides and sources
+
+[ASS centisecond timing](<https://allluckly.cn/en/guides/icouldplay-ass-karaoke-centisecond-duration-check/>); [external subtitles](<https://allluckly.cn/en/guides/icouldplay-external-subtitles/>). Public format scope: [Apple App Store](<https://apps.apple.com/cn/app/id6755653178>). Tag behaviour: [Aegisub documentation](<https://aegisub.org/docs/latest/ass_tags/#karaoke-effect>). Apple’s public lookup on 20 November 2026 lists iCouldPlay 1.1.1 and minimum iOS / iPadOS 15.0. No physical-device subtitle rendering or private-server test was performed.
+{% endraw %}

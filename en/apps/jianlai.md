@@ -5,7 +5,7 @@ author: Bison
 title: 'Jianlai (键来): Custom Keyboard for iPhone and iPad'
 description: Explore Jianlai themes, fonts, backgrounds and space-bar customisation, Chinese, English and Japanese input, 26-key and nine-key layouts, piano sounds and haptic feedback.
 permalink: /en/apps/jianlai/
-modified: 2026-11-19
+modified: 2026-11-20
 lang: en
 source_url: /apps/jianlai/
 ---

@@ -5,7 +5,7 @@ author: Bison
 title: '调调: Personal Music Player for iPhone and iPad'
 description: Organise and play your own music with 调调, including file imports, Wi-Fi transfers, offline listening, lyrics, queues and compatible personal music servers.
 permalink: /en/apps/diaodiao/
-modified: 2026-11-19
+modified: 2026-11-20
 lang: en
 source_url: /apps/diaodiao/
 ---
@@ -48,6 +48,6 @@ The public release notes for 1.0.1 add multiple music themes and Home Screen wid
 
 ## Version and sources
 
-Checked on 19 November 2026: Apple’s public lookups for Russia and China both list 调调 **1.0.2**, requiring **iOS or iPadOS 17.6 or later**. The public 1.0.2 release notes continue to list known-issue fixes, Home Screen widgets and multiple music themes; they do not establish new controls. The historical 1.0.1 themes and widgets information is retained. This introduction uses the published description and the official store screenshots it lists. No step-by-step testing on a physical device or private music server is claimed.
+Checked on 20 November 2026: Apple’s public lookups for Russia and China both list 调调 **1.0.3**, requiring **iOS or iPadOS 17.6 or later**. The public release notes list support for fnOS Music, OpenList, AList and Apple Shortcuts, along with known-issue fixes. Connection requirements and available actions depend on the installed version; check the options actually offered. The 1.0.2 notes listed themes and Home Screen widgets, and the historical 1.0.1 information is retained. This introduction uses public information and does not claim step-by-step physical-device or private-server testing.
 
 Sources: [official App Store download page](https://apps.apple.com/ru/app/%E8%B0%83%E8%B0%83-%E4%B8%AA%E4%BA%BA%E9%9F%B3%E4%B9%90%E6%92%AD%E6%94%BE%E5%99%A8/id6827171352?l=en-GB), [Apple’s Russia lookup](https://itunes.apple.com/lookup?id=6827171352&country=ru&entity=software), [Apple’s China lookup](https://itunes.apple.com/lookup?id=6827171352&country=cn&entity=software).

@@ -5,7 +5,7 @@ author: Bison
 title: 调调：iPhone 与 iPad 个人音乐播放器、本地导入与离线听歌
 description: 用调调整理和播放自己的音乐，了解文件导入、Wi-Fi 传歌、离线播放、歌词、队列与个人音乐服务器的使用范围。
 permalink: /apps/diaodiao/
-modified: 2026-11-19
+modified: 2026-11-20
 ---
 
 **调调**是一款面向 iPhone 与 iPad 的个人音乐播放器。你可以把自己收藏的音频导入设备，也可以连接兼容的个人音乐服务器，把已有的收藏整理成随手可听的音乐库。
@@ -46,6 +46,6 @@ modified: 2026-11-19
 
 ## 版本与资料
 
-2026 年 11 月 19 日核对，Apple 公开查询在俄罗斯区与中国区均列出调调 **1.0.2**，最低要求 **iOS / iPadOS 17.6**。1.0.2 的公开发行说明继续列出修复已知问题、桌面小组件与多款音乐主题，未据此推断新的操作入口；1.0.1 的主题与小组件记录保留。本文依据当日公开说明和其列出的官方商店截图整理，没有声称已在真机或私人音乐服务器逐项实测。
+2026 年 11 月 20 日核对，Apple 公开查询在俄罗斯区与中国区均列出调调 **1.0.3**，最低要求 **iOS / iPadOS 17.6**。本版公开发行说明列出对 fnOS Music、OpenList、AList 与 Apple 快捷指令的支持，以及已知问题修复；具体连接条件和可用动作以安装版实际提供的选项为准。1.0.2 的发行说明曾列主题和桌面小组件，1.0.1 的主题与小组件记录保留。本文依据公开说明整理，没有声称已在真机或私人音乐服务器逐项实测。
 
 资料来源：[官方 App Store 下载页](https://apps.apple.com/ru/app/%E8%B0%83%E8%B0%83-%E4%B8%AA%E4%BA%BA%E9%9F%B3%E4%B9%90%E6%92%AD%E6%94%BE%E5%99%A8/id6827171352?l=en-GB)、[Apple 俄罗斯区版本查询](https://itunes.apple.com/lookup?id=6827171352&country=ru&entity=software)、[Apple 中国区版本查询](https://itunes.apple.com/lookup?id=6827171352&country=cn&entity=software)。

@@ -1,0 +1,83 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-ass-shadow-horizontal-vertical-independent-offset/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay ASS shadow direction: check horizontal, vertical and fully disabled
+  states'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-ass-shadow-horizontal-vertical-independent-offset/
+agent_source_sha256: 734b0192aa9e3be598d6e2f774987604e2bca2e2ad15eb2498177ad98c330066
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay ASS shadow direction: check horizontal, vertical and fully disabled states
+
+Language: en
+Canonical: [iCouldPlay ASS shadow direction: check horizontal, vertical and fully disabled states](<https://allluckly.cn/en/guides/icouldplay-ass-shadow-horizontal-vertical-independent-offset/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-ass-shadow-horizontal-vertical-independent-offset/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-ass-shadow-horizontal-vertical-independent-offset/>)
+Published: 2026-11-20T00:00:00+08:00
+Modified: 2026-11-20T09:51:41+08:00
+Author: Bison
+
+Use the same text and four direction states to check xshad, yshad and zero offset, recording the paper coordinates separately from actual viewing.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-ass-shadow-horizontal-vertical-independent-offset/>), translated on 2026-11-20. Original publication dates, attribution, code and version notes are retained.
+
+Use the same text and four direction states to check xshad, yshad and zero offset, recording the paper coordinates separately from actual viewing.
+
+## Prepare a still scene, original subtitles and a control ledger
+
+Choose an owned still-scene video at least twelve seconds long and preserve the video and normal subtitles so they can be restored afterward. Use a 640 by 360 script canvas, the same word SHADOW, font size and position. Make four ledger rows for event time, horizontal offset, vertical offset and actual observation. Script coordinates are a working coordinate system, not device pixels. This file enables ScaledBorderAndShadow, so interpret offsets first in the script-resolution coordinate system; fitting, zoom and pixel density may change the apparent screen distance. To compare two viewing windows, keep the file, picture aspect and subtitle settings fixed and record the window conditions separately. Do not mistake a larger display area for a changed source offset. If an accurate screen distance cannot be measured, retain the directional observation and record the screenshot time and viewing conditions. A medium-grey background makes the white text, black border and dark shadow easier to distinguish; a black background alone cannot establish that a shadow is absent.
+
+## Define positive and negative directions and the controls
+
+Aegisub documents xshad and yshad as horizontal and vertical offsets; negative values may place the shadow left or above the text, and both axes must be zero to disable it. Use four states: down-right, down-left, downward only and both zero. Write the pairs as (2,2), (-4,2), (0,2) and (0,0). The first and second change both horizontal magnitude and direction, so they only establish a positional comparison. For a sign-only comparison create a separate (-2,2) copy; do not call every transition a one-variable test.
+
+## Save four complete ASS events
+
+Save the complete block below as UTF-8 plain text shadow-directions.ass, preserving Script Info, the style, field declarations and four events. Each event fixes alignment, script position, border, text and colours. It first establishes a shad0 baseline, then sets xshad and yshad separately. Tags appear inside braces before the text. The events run from 1–3, 4–6, 7–9 and 10–12 seconds; retain these boundaries with the parameter ledger. Reopen the copied file and inspect backslashes, minus signs and extension without substituting full-width punctuation.
+
+```text
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 640
+PlayResY: 360
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,40,&H00FFFFFF,&H0000FFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,0,5,20,20,20,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.00,0:00:03.00,Default,,0,0,0,,{\an5\pos(320,180)\bord2\shad0\xshad2\yshad2}SHADOW
+Dialogue: 0,0:00:04.00,0:00:06.00,Default,,0,0,0,,{\an5\pos(320,180)\bord2\shad0\xshad-4\yshad2}SHADOW
+Dialogue: 0,0:00:07.00,0:00:09.00,Default,,0,0,0,,{\an5\pos(320,180)\bord2\shad0\xshad0\yshad2}SHADOW
+Dialogue: 0,0:00:10.00,0:00:12.00,Default,,0,0,0,,{\an5\pos(320,180)\bord2\shad0\xshad0\yshad0}SHADOW
+```
+
+## Record the four states using coordinate differences
+
+Treat the text outline’s reference position as a local origin. Record the first shadow reference point as right 2 and down 2; the second as left 4 and down 2; the third as no horizontal shift and down 2; the fourth as zero on both axes. These are offset vectors, not the screen coordinates of every glyph pixel, font metrics or antialiasing. A zero x value in the third event does not disable the shadow because y remains 2. Comparing the second and third changes horizontal offset from -4 to 0 while retaining vertical 2; the third to fourth changes only the vertical value.
+
+## Observe through an actual subtitle path
+
+Open the owned video in iCouldPlay and associate the new file through a subtitle entry actually available in the installed version. Seek within each event and check the text, time and relative shadow position. Record the device, player version, selected subtitle file and observations. The sequential events show discrete states, not continuous shadow animation. If association has not succeeded, retain the source and expected results and mark device observation pending; a preview in another program cannot establish iCouldPlay behaviour.
+
+## Save a sign-only control as a separate copy
+
+Save a practice copy of the first event and change only horizontal 2 to -2, keeping vertical 2 and all other tags fixed. At script level the horizontal offset changes by four units while vertical offset stays 2. Describe position relative to the text, not to the picture centre, and keep the original as the baseline. Do not simultaneously change font size, border or background to exaggerate the difference, because attribution to the one change would be lost. Do not report that vector change as an exact device-pixel distance.
+
+## Troubleshoot an invisible shadow
+
+If the shadow is invisible, first confirm the subtitle file and event interval, then inspect background contrast, shadow colour and opacity. Check that xshad and yshad precede the text, the minus sign is ASCII, and no later override changes the same properties. If event three appears shadowless, do not infer that from x being zero; first compare its background and event four’s both-zero state. Literal tag text calls for a brace and file-type check. Style overrides, subtitle engines and display scaling can also affect observations; record each condition without generalizing one result to every device.
+
+## Deliver the ledger and restore the prior state
+
+Keep the four-event source, sign-only copy and offset ledger, labeling paper predictions, actual actions and outstanding items separately. Leave viewing pending when not performed. Explain why (0,2) retains a vertical shadow and why both axes must be zero to disable it; record honestly whether the effect appeared in the current path. Switch back to the original subtitle and retain the source video and recoverable copies. The exercise concerns one bounded subtitle sample; it does not claim automatic subtitle recognition, uniform rendering across devices or completed private-server testing.
+
+## Related guides and sources
+
+[ASS directional borders](<https://allluckly.cn/en/guides/icouldplay-ass-directional-border-width-reset-components/>); [subtitle style](<https://allluckly.cn/en/guides/icouldplay-subtitle-style/>). The [Aegisub reference](<https://aegisub.org/docs/latest/ass_tags/#shadow-distance-extended>) defines shadow offsets; the [Apple store](<https://apps.apple.com/cn/app/id6755653178>) lists ASS/SSA format support. The public lookup on 20 November 2026 lists iCouldPlay 1.1.1, requiring iOS / iPadOS 15.0 or later. Actual tag behaviour depends on the device and rendering path; no physical-device subtitle rendering or private-server test was performed.
+{% endraw %}

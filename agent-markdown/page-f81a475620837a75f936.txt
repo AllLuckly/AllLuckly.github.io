@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /guides/icouldplay-srt-utf8-signature-line-endings-comparison/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映 SRT 字幕字节对照：分清 UTF-8 标记、换行与实际显示
+agent_source_url: https://allluckly.cn/guides/icouldplay-srt-utf8-signature-line-endings-comparison/
+agent_source_sha256: e2b0f188ad8b36fc3a63d1a2d0cd972e46610aa2000deb0f2dcf1a9d0d930a4e
+agent_generator_version: 1
+---
+{% raw %}# 云映 SRT 字幕字节对照：分清 UTF-8 标记、换行与实际显示
+
+语言：zh-CN
+原文：[云映 SRT 字幕字节对照：分清 UTF-8 标记、换行与实际显示](<https://allluckly.cn/guides/icouldplay-srt-utf8-signature-line-endings-comparison/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-srt-utf8-signature-line-endings-comparison/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-srt-utf8-signature-line-endings-comparison/>)
+发布于: 2026-11-20T00:00:00+08:00
+内容更新于: 2026-11-20T00:00:00+08:00
+署名：Bison
+
+用同一句自有字幕建立四个仅在 UTF-8 标记和换行上不同的样本，分别核原始字节、文件身份与播放器观察。
+
+用同一句自有字幕建立四个仅在 UTF-8 标记和换行上不同的样本，分别核原始字节、文件身份与播放器观察。
+
+## 准备一条内容一致的字幕
+
+选择至少八秒的自有短视频，保留原视频及日常字幕。测试文字包含一条一至四秒的提示“Hello 你好”，序号为1，时间使用 SRT 的逗号毫秒写法。四个样本的可见文字、序号和时间保持一致，只比较文件开头是否有 UTF-8 字节顺序标记，以及行尾为 LF 还是 CRLF；不能一边改编码又改句子，再把结果归因于某个字节。先记录视频身份和预定测试时间，尚未导入时标记播放待核。
+
+## 理解标记与可见正文的边界
+
+Unicode 对 UTF-8 字节顺序标记的说明指出，文件开头的 EF BB BF 可用作 UTF-8 标记；它不是要给观众阅读的三个字母，也不能证明文件后续字节一定有效。LF 是单字节 0A，CRLF 是两个字节 0D 0A；它们表示行边界的方式不同，并不会把一秒变成不同时间。各工具对标记、换行和格式错误的容忍可能不同，本课不预设云映一定接受四份文件。
+
+## 在空目录安全生成四份样本
+
+以下脚本在当前目录新建独立文件夹并用排他创建方式写入四份 SRT；运行前确认当前工作目录是自己的练习位置。若文件夹已存在会停止，先检查并改目录名，不覆盖或删除旧文件。正文用 Python 字符串表达，换行在写入字节之前显式确定；脚本只写练习文件，不上传、联网或修改视频。外部命令必须由已有 Python 环境运行，脚本生成成功不等于应用已播放字幕。
+
+```
+from pathlib import Path
+from codecs import BOM_UTF8
+folder = Path("srt-byte-practice")
+folder.mkdir()  # fails if the directory already exists
+cue = "1\n00:00:01,000 --> 00:00:04,000\nHello 你好\n\n"
+for name, ending, marked in [("plain-lf.srt", "\n", False),
+                             ("bom-lf.srt", "\n", True),
+                             ("plain-crlf.srt", "\r\n", False),
+                             ("bom-crlf.srt", "\r\n", True)]:
+    data = cue.replace("\n", ending).encode("utf-8")
+    if marked:
+        data = BOM_UTF8 + data
+    with (folder / name).open("xb") as output:
+        output.write(data)
+    print(name, len(data), data[:4].hex(" "))
+```
+
+## 逐项核对文件开头与行结束
+
+四份文件的首部应分别表现为普通首字节或 EF BB BF，LF 文件的换行是 0A，CRLF 文件对应 0D 0A；不要把 UTF-8 汉字多字节中的其他值当换行。脚本输出字节数和十六进制首部，可将四行结果记录在各自文件名旁。这段示例含四个行结束位置：同样不带标记时，CRLF 版本比 LF 版本多四字节；同种换行下，带标记版本比无标记版本多三字节。这个差值只针对本练习的文本，不是所有字幕文件的固定差值。按原样运行这份示例，四个文件长度依次为46、49、50、53字节，带标记的开头是 EF BB BF 31；普通 LF 文件开头是 31 0A。若输出不同，先检查文本是否被编辑器改变或脚本是否为当前版本，再复核实际生成的文件。运行后可逐文件核文件名、长度和开头，若差值不符，先检查实际复制的脚本是否保留反斜线，而不是改动原视频。随后用能正确处理 UTF-8 的文本编辑器打开副本，确认可见字幕文字与时间一致；如果编辑器显示一个看不见的标记，不应将编辑器表现当作云映的播放结果。
+
+## 逐份关联同一视频进行观察
+
+在云映安装版实际提供的字幕路径中关联第一份样本，用一至四秒范围观察提示是否出现、时间和中文是否可辨，再记录实际文件名。换下一份前确认上一份字幕已停止使用，避免两个同内容样本被混淆；保持视频、设备、播放器设置与画面位置不变。四次都可观察时再填对照表；找不到路径或未执行播放时写待核，不能用外部编辑器预览代替应用证据。
+
+## 用单一变化解释观察而不扩大结论
+
+先比较无标记 LF 与有标记 LF，行尾相同，仅增加三个开头字节；再比较无标记 LF 与无标记 CRLF，开头条件相同，仅换行字节不同。两组对照应分别记录，不能一次同时改变两个因素后断言某一因素造成差异。若四份都显示正常，只能说明这一段文字、设备、版本与路径下四次观察正常，不能据此保证其他编码或所有字幕文件兼容。
+
+## 按来源、时间与字节层排查
+
+字幕没出现时先核当前实际选中的文件、视频一至四秒区间和字幕开关，再检查文件名、扩展名及是否保存到预期目录。乱码时比较编辑器中可见文字与原始字节，确认没有在复制时改变字符；缺字也可能与字体或渲染有关，不能一律归因于 BOM。若脚本因目录或文件已存在而停止，先保存现有结果并选择新目录，不删除用户已有文件。遇到具体错误应记录原文和发生步骤，未完成的对照保留待核。
+
+## 交付四个文件并恢复原字幕
+
+交付四份标注清楚的字幕文件、脚本输出、各文件是否被实际选中及观看结果；把纸面预期与设备观察分栏。记录系统、云映版本和字幕关联方式，不把自己的样本当成所有网上字幕的质量证明。结束后切回原字幕并保留原视频和备份。未执行 App 真机播放时明确待核；本教程不承诺自动检测编码、批量转换或修复已丢失的文字。
+
+## 相关教程与资料
+
+[SRT 最小样本](<https://allluckly.cn/guides/icouldplay-srt-comma-millisecond-counter-timing/>)；[字幕字符检查](<https://allluckly.cn/guides/icouldplay-caption-character-reference/>)。[Unicode UTF-8 标记说明](<https://www.unicode.org/faq/utf_bom.html>)讨论 BOM；[云映官方商店](<https://apps.apple.com/cn/app/id6755653178>)列 SRT 与外挂字幕支持。2026 年 11 月 20 日公开查询列云映 1.1.1，最低 iOS / iPadOS 15.0。未声称真机字幕播放测试。
+{% endraw %}

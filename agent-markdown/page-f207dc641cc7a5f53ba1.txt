@@ -1,0 +1,96 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-svg-gradient-units-bounds-versus-user-space/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint gradient coordinates: object bounds and shared user space produce
+  different color bands'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-svg-gradient-units-bounds-versus-user-space/
+agent_source_sha256: 3674e5c71eba0abfbc949bc226a84ae82696bfd849b142d2ed04d28aa6f98a6b
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint gradient coordinates: object bounds and shared user space produce different color bands
+
+Language: en
+Canonical: [VectorPaint gradient coordinates: object bounds and shared user space produce different color bands](<https://allluckly.cn/en/guides/vectorpaint-svg-gradient-units-bounds-versus-user-space/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-svg-gradient-units-bounds-versus-user-space/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-svg-gradient-units-bounds-versus-user-space/>)
+Published: 2026-11-20T00:00:00+08:00
+Modified: 2026-11-20T12:50:53+08:00
+Author: Bison
+
+Compare objectBoundingBox and userSpaceOnUse across four rectangles, calculate gradient positions externally and check an actual SVG import.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-svg-gradient-units-bounds-versus-user-space/>), translated on 2026-11-20. Original publication dates, attribution, code and version notes are retained.
+
+Make two rows of two gradient rectangles. The upper row uses coordinates relative to each object's bounding box; the lower uses one user-space interval. Both definitions go from black to white, but the lower rectangles show different parts of a shared gradient. Prepare complete SVG and calculate positions externally, then check an actual VectorPaint import and output. Public SVG-editing information does not prove every attribute survives unchanged on every device.
+
+## Fix rectangles and both coordinate intervals
+
+Use a 200 × 140 viewBox. In each row the left rectangle starts x = 20 and is 60 wide, while the right starts x = 120 and is 60 wide; both are 40 high. Upper y = 20, lower y = 80. The left spans 20–80 and right 120–180, leaving a 40-unit gap. Apply no extra object transforms. Record each object's bounds separately from canvas user coordinates; these units are not screen pixels. Preserve source and a copy, and do not enter paper predictions as observed app results.
+
+## Save SVG with two gradient definitions
+
+Save the following complete plain text as gradient-units.svg. gBox runs horizontally from 0 to 1 in each object's bounding box. gUser runs from 20 to 180 in user space. Four rectangles reference the definitions by id; rows differ in y but share x coordinates. Preserve root, namespace and closing tags and save a copy before changes. There is no opacity, gradient transform or object transform in this example, avoiding extra variables.
+
+```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140">
+  <defs>
+    <linearGradient id="gBox" gradientUnits="objectBoundingBox" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000000"/><stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+    <linearGradient id="gUser" gradientUnits="userSpaceOnUse" x1="20" y1="0" x2="180" y2="0">
+      <stop offset="0" stop-color="#000000"/><stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+  <rect x="20" y="20" width="60" height="40" fill="url(#gBox)"/>
+  <rect x="120" y="20" width="60" height="40" fill="url(#gBox)"/>
+  <rect x="20" y="80" width="60" height="40" fill="url(#gUser)"/>
+  <rect x="120" y="80" width="60" height="40" fill="url(#gUser)"/>
+</svg>
+```
+
+## Calculate positions within each object bounding box
+
+Each upper rectangle establishes its own 0–1 horizontal coordinates. The left rectangle's 20 and 80 correspond to start and end; the right rectangle's 120 and 180 also correspond to start and end. Each covers the full black-to-white definition; they do not share one continuous band beginning at canvas x = 20. If one width changes, bounding-box coordinates are interpreted using its new bounds. This does not establish that the app retains the same internal representation after import.
+
+## Calculate positions in shared user space
+
+The lower row shares a 160-unit interval from x = 20 to 180. With t = (x − 20)/160, the left rectangle spans 0–0.375 and the right 0.625–1. The 40-unit gap with no rectangle corresponds to the middle 0.375–0.625 interval. Both rectangles therefore do not each start and end at the full black and white stops. t is a gradient position, not directly a screenshot RGB value; interpolation, color management and antialiasing still affect display.
+
+```
+left rectangle x=20..80; right rectangle x=120..180
+gBox: each object uses local position 0..1
+gUser: t=(x-20)/160
+left t=0..0.375; gap t=0.375..0.625; right t=0.625..1
+```
+
+## Import and record actual objects
+
+Import a copy through an SVG entry actually available in the installed version. First check four rectangles and two rows, then whether the upper row covers a fuller black-to-white range in each object and the lower row shows different segments. Select objects and record gradient controls and layers actually presented. If import converts gradients or shapes, do not automatically call the converted object the original attributes. If unavailable, unsupported or not yet imported, retain source and calculations and mark observation pending rather than claiming a device test passed.
+
+## Move only the right rectangle as a control
+
+In a separate external text copy, change only the lower right rectangle's x from 120 to 100, preserving width, definitions and other objects. It now spans x = 100–160, corresponding to t = 0.5–0.875 in the shared interval. Do not also change gUser's 20 and 180. The original right rectangle remains 0.625–1, so the two show different segments. You may also move the object in the actual app, but record whether it changes object transforms or gradient references; external source arithmetic and the app's resulting internal structure require separate checks.
+
+With original and moved copies side by side, first check both still contain four rectangles in two rows, then inspect the lower right; the two upper objects remain unchanged controls. If view zoom alone appears to change color, align window size and background first. One screenshot edge pixel after moving an object does not establish gradient interpolation precision, and one display result should not be generalized to every import engine.
+
+## Troubleshoot references, clipping and comparison conditions
+
+If a rectangle has no gradient, check fill url references match definition ids in case and that defs is present, then inspect actual app support and error messages. If colors appear cut off, inspect viewBox, rectangle bounds and selected file. A hidden region is not automatically deleted from source. Even black and white can be affected by viewer background and color management: save the actual file, device and output path for comparison. Change one condition at a time rather than replacing color, coordinates and app version together.
+
+In the source, check all four fill references individually: the upper two point to gBox and lower two to gUser. If only one is wrong, repair that reference and retain the failure copy. The t ranges in the ledger apply only to these untransformed rectangles and definitions. Rotation or a gradient transform needs a fresh calculation; do not reuse the table unchanged.
+
+## Save source and inspect the actual export
+
+Keep original SVG, moved-right copy and the position calculation, then save the actual editable project. Export SVG or PNG through an entry actually available in the installed version and open it in a separate viewer to check object count, two-row layout and file structure. Similar appearance does not prove the export retained gradientUnits. PNG is raster and SVG can contain bitmaps. Mark unperformed import, export, reopening or device comparison pending; paper positions are not screen measurements.
+
+## Related guides and sources
+
+[Gradient proof sheet](<https://allluckly.cn/en/guides/vectorpaint-gradient-proof-sheet/>); [SVG compatibility checks](<https://allluckly.cn/en/guides/vectorpaint-svg-compatibility-check/>).
+
+Method reference: [W3C SVG gradient coordinate systems](<https://www.w3.org/TR/SVG11/pservers.html#LinearGradientElementGradientUnitsAttribute>) defines objectBoundingBox and userSpaceOnUse. Coordinates, objects and movement control are original exercise choices; specification expectations do not guarantee an app's implementation of every SVG feature.
+
+Checked 20 November 2026: [Apple's public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software>) lists VectorPaint 1.0.8, requiring iOS / iPadOS 17.0 or later. The [official store](<https://apps.apple.com/cn/app/id1587272880>) describes SVG editing. No completed physical-device test is claimed.
+{% endraw %}

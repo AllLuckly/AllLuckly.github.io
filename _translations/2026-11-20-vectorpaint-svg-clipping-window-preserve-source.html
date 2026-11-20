@@ -1,0 +1,55 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint circular clipping window: preserve source beyond the window and check the boundary and import'
+description: Compare a circular clipping window, source shapes outside it and a separate outline using complete SVG, then check actual import and output.
+permalink: /en/guides/vectorpaint-svg-clipping-window-preserve-source/
+date: '2026-11-20 00:00:00 +08:00'
+modified: '2026-11-20 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 253
+topic: SVG clipping windows and source content
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-20-vectorpaint-svg-clipping-window-preserve-source.md
+source_url: /guides/vectorpaint-svg-clipping-window-preserve-source/
+translation_method: editorial
+translation_source_sha256: 35b5a5c15cbce714aec1353a89f0e8f3f3350af0a0d14f7d73a49bb0aec60cd4
+translation_date: '2026-11-20T02:23:57+00:00'
+excerpt: Compare a circular clipping window, source shapes outside it and a separate outline using complete SVG, then check actual import and output.
+---
+{% raw %}
+<p>Make a circular window image with a diagonal band across its interior. The original rectangle and band continue beyond the window in source; clipping restricts what is displayed. First examine external SVG, then observe an import route actually available in VectorPaint. The SVG extension does not guarantee every clipping object remains editable in its original structure in every version.</p>
+<h2 id="section-1">Fix the canvas and circular window</h2>
+<p>Use a 160 × 140 user-unit canvas and a window centered at (80,70) with radius 35. Its theoretical bounds are x = 45–115 and y = 35–105. The full background rectangle runs x = 20–140 and y = 20–120, covering the window. Add a diagonal band through the rectangle. Numbers are original practice choices, not app defaults or device pixels. Record circle, background and band separately; do not draw the background itself as a circle and then claim clipping worked.</p>
+<h2 id="section-2">Save SVG with both definition and reference</h2>
+<p>Save the following complete text as clip-window.svg. A clipPath in defs defines the circle; a group references its id and retains the rectangle and band; the final unfilled circle is a separate stroked outline. Preserve a plain-text original and a copy, including root and namespace. Rectangle and band coordinates remain outside the window in source even though clipping restricts display; their points have not thereby been deleted. Mark unperformed saving or import pending.</p>
+<pre><code>&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 140"&gt;
+  &lt;defs&gt;&lt;clipPath id="window"&gt;&lt;circle cx="80" cy="70" r="35"/&gt;&lt;/clipPath&gt;&lt;/defs&gt;
+  &lt;g clip-path="url(#window)"&gt;
+    &lt;rect x="20" y="20" width="120" height="100" fill="#b9d6cf"/&gt;
+    &lt;path d="M20 85 L140 35 L140 70 L20 120 Z" fill="#31554c"/&gt;
+  &lt;/g&gt;
+  &lt;circle cx="80" cy="70" r="35" fill="none" stroke="#172d28" stroke-width="2"/&gt;
+&lt;/svg&gt;
+</code></pre>
+<h2 id="section-3">Separate clipping shape from visible outline</h2>
+<p>The definition circle supplies the group's clipping region; only the final circle draws the dark outline. A centered width-2 stroke theoretically covers radii 34–36, so its outer edge is slightly outside the radius-35 window. Do not mistake that outline for the clipping of the previous group or assume a clipping circle automatically has a visible stroke. To inspect clipping alone, temporarily remove the final line in an external copy and keep the original; name outputs separately.</p>
+<h2 id="section-4">Make a control by removing the reference</h2>
+<p>Copy the source and remove only the group's clip-path attribute. Rectangle and band can now appear beyond the circle while the final outline remains; that circle does not automatically clip them. Check that the original has a reference and the control does not. Do not also change radius or rectangle size. If both look alike, verify the selected files and deletion, then check actual viewer support. Appearance alone cannot establish that an app deleted source shapes outside the window.</p>
+<h2 id="section-5">Check id, path and actual import</h2>
+<p>Confirm #window in the reference exactly matches the clipPath id, correcting case or spelling differences. Import a copy through an SVG entry actually available in the installed version. First observe light background and diagonal band within the circle, then inspect outline continuity. When selecting objects, record the layers or paths the app actually presents. If import converts structure, do not automatically call the converted object the original clipPath. Public information describes SVG editing; fidelity for individual features still needs observation. On failure preserve the message, version, source and control.</p>
+<h2 id="section-6">Change content rather than the window</h2>
+<p>In a backed-up copy change the band's fill to another contrasting color while keeping center, radius, background and reference fixed. If the app cannot reliably locate that object, change only the path's fill in an external text copy and import it again. Check whether the interior band changes while content outside remains restricted; the separate outline should retain its original color. Restore the color or retain two clearly named versions. Do not simultaneously move the circle or change the viewBox, because a color comparison would no longer isolate whether the reference remains effective.</p>
+<p>To demonstrate that rectangle and band originally extend beyond the window, consult the no-reference control as well rather than guessing hidden content from a selection box or screenshot. Label the three files “original”, “no clipping reference” and “color only”, recording the actual app and time used to open them. Check that center, radius and viewBox remain unchanged. If only a flattened image is visible and nodes cannot be inspected, record source inspection separately from editing results; inability to select a node does not establish that it disappeared from the source file.</p>
+<h2 id="section-7">Distinguish transparency from a white viewer</h2>
+<p>The root canvas has no additional full-screen white rectangle. Outside the circle, a viewer may show transparency or its default background; preview on light and dark backgrounds to avoid treating a viewer's white as part of the file. The background rectangle fills the window, but outside transparency can coexist with source coordinates extending beyond it. If a fine gap appears, enlarge the view and inspect alignment of clip and separate outline before checking export settings. Antialiasing can vary between renderers, so screenshots do not establish pixel identity.</p>
+<h2 id="section-8">Export and retain inspectable source</h2>
+<p>Keep complete source, the no-reference control and the color comparison, then save the actual editable project. Export SVG or PNG through a control available in the installed version and reopen it to compare the interior band, boundary and transparency. PNG is raster and does not retain an editable clipping structure. For an editable SVG deliverable, inspect the actual export for clipPath or another converted structure; similar appearance does not establish identical source. Mark import, export or reopening pending if not performed.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/vectorpaint-svg-compatibility-check/">SVG compatibility checks</a>; <a href="/en/guides/vectorpaint-transparent-png/">Transparent PNG output</a>.</p>
+<p>Method reference: <a href="https://www.w3.org/TR/css-masking-1/#the-clip-path">W3C CSS Masking: clipping paths</a>. Sample coordinates, colors and control are original; a specification definition does not prove support for every element on a particular device or app.</p>
+<p>Checked 20 November 2026: <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software">Apple's public lookup</a> lists VectorPaint 1.0.8, requiring iOS / iPadOS 17.0 or later. The <a href="https://apps.apple.com/cn/app/id1587272880">official store</a> describes SVG editing. No completed physical-device test is claimed.</p>
+{% endraw %}
