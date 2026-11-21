@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay and Jellyfin: audit external subtitle languages and flags'
+description: Compare external subtitle filenames and Jellyfin flags with the tracks
+  iCouldPlay actually displays.
+permalink: /en/guides/icouldplay-jellyfin-external-subtitle-flags-audit/
+date: '2026-11-21 00:00:00 +08:00'
+modified: '2026-11-21 00:00:00 +08:00'
+category: Tutorials
+level: Advanced
+series_order: 229
+topic: Jellyfin external-subtitle flags
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-21-icouldplay-jellyfin-external-subtitle-flags-audit.md
+source_url: /guides/icouldplay-jellyfin-external-subtitle-flags-audit/
+translation_method: editorial
+translation_source_sha256: 2650e4aa5f534b7ee23cf5491e7ba54074ea9f49a645324461614beff02e872b
+translation_date: '2026-11-21T04:38:36+00:00'
+---
+{% raw %}
+<p>One film can have regular subtitles, subtitles covering only foreign-language passages, and subtitles with sound cues. Jellyfin supports describing external subtitles through filename suffixes; iCouldPlay's visible names and playback behavior must be observed in the actual environment. A filename alone does not guarantee automatic selection or correct display.</p>
+<h2 id="section-1">Prepare a verifiable sample</h2>
+<p>Choose an owned or authorized short video and existing external subtitles, with permission to inspect the folder and Jellyfin library. In a trusted player check the opening, subtitle text and timing, and record a nonprivate reference line and time. Without external subtitles or server access, mark the prerequisite unmet. Do not download subtitles from an untrusted site or change a shared library for the exercise. Preserve originals and backups first.</p>
+<h2 id="section-2">Observe filenames and flags</h2>
+<p>In an authorized file manager record the video filename and its corresponding subtitle filenames. Jellyfin's official film documentation uses examples including <code>Film.mkv</code>, <code>Film.default.en.forced.ass</code> and <code>Film.en.sdh.srt</code>; these explain rules and are not your files. The suffix <code>en</code> identifies language, while <code>default</code>, <code>forced</code> and <code>sdh</code> are different flags and are not interchangeable. Record each actual file; format alone does not establish subtitle content or client compatibility.</p>
+<p>Note the documented ambiguity of <code>hi</code>: <code>hi</code> alone resolves as the Hindi language identifier, while alongside another language identifier it can mark a hearing-impaired track. Do not promise a language or accessibility content based on those letters alone; check the server record and actual text. Do not rename existing production subtitles here. Ask the administrator to confirm server version and library rules first.</p>
+<h2 id="section-3">Record server results separately</h2>
+<p>In the authorized Jellyfin interface find the same film. Record visible subtitle tracks and language, default, forced or hearing-impaired flags; mark fields not shown as invisible. Match each server record to the actual file and distinguish external subtitles from embedded tracks. If identically named films have multiple versions, identify the current film and version first rather than attributing another version's track list to this sample. If a file exists but is not recognized, retain that observation without renaming or triggering a full-library refresh.</p>
+<h2 id="section-4">Inspect visible tracks in iCouldPlay</h2>
+<p>Open the configured authorized Jellyfin source in iCouldPlay and confirm the server, account and film. In the playback screen use a subtitle selection entry only if the current version actually provides one; entrances, labels and choices can vary by version and source. If no entry is visible, record that limitation rather than claiming the required control exists. Compare visible language and labels with the server list row by row and retain unknowns.</p>
+<h2 id="section-5">Compare subtitle content and timing</h2>
+<p>If selection is available, select one track and play the previously confirmed reference time. Record whether the reference text appears, whether its language agrees and whether timing roughly matches. Then switch to another track using the visible entry and repeat. Fill two-track results only when both can actually be selected and compared. A track covering foreign dialogue may correctly show nothing during ordinary dialogue; a track with sound cues should not be judged on language alone. If selection is unavailable, record the limitation and do not treat a server flag as proof of automatic playback.</p>
+<h2 id="section-6">Investigate missing or inconsistent tracks</h2>
+<p>If files exist but the server lists no track, check expected video/subtitle folder, matching filenames and the Jellyfin account's read access. If the server lists a track but iCouldPlay does not, confirm the same server, film version and playback session. If the displayed language and text disagree, recheck reference time, selected track and actual subtitle content. Change only one reversible condition at a time and record it; do not modify shared files, lower permissions or publish private subtitles or server addresses.</p>
+<p>A default flag and an actual default selection are separate evidence: player, preferences and source can affect behavior. Mark unverifiable points pending. If text remains on the picture after subtitles are turned off, do not immediately attribute it to an external track; investigate whether it is part of the image. Format, fonts and client capabilities can affect rendering, but this observation cannot guarantee behavior on every device.</p>
+<h2 id="section-7">Make the comparison auditable</h2>
+<p>Keep the observation time for each row and identify whether it came from the file folder, Jellyfin interface or iCouldPlay playback. Do not combine results from different times or film versions into a single successful run. If an administrator later changes subtitle files or rescans, add a separate row for the new state and preserve the original pending items. When actual content conflicts with a flag, investigate using verifiable file content and the administrator-confirmed source; the filename is not proof of subtitle quality.</p>
+<h2 id="section-8">Save the comparison</h2>
+<p>Deliver a sanitized table of filename flags, Jellyfin-visible tracks, iCouldPlay-visible tracks, reference time and observed text. Confirm original files and configuration remain and restore the prior subtitle selection. The official documentation describes Jellyfin naming; this guide claims no physical test of any private server, app device or subtitle format.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-container-codec-stream-inventory/">Subtitle origin and stream inventory</a>; <a href="/en/guides/icouldplay-jellyfin-provider-id-catalog-identity-check/">Jellyfin title identity</a>.</p>
+<p>Checked on 21 November 2026: the <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software">Apple China lookup</a> lists Jellyfin support in iCouldPlay 1.1.1. <a href="https://jellyfin.org/docs/general/server/media/movies/">Jellyfin's movie and external-subtitle documentation</a> explains filename suffixes, languages and flags.</p>
+{% endraw %}

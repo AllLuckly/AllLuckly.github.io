@@ -1,0 +1,57 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint fill and stroke order: why the same rectangle shows different inner bands'
+description: Compare SVG fill-first and stroke-first rendering with a fixed rectangle and stroke width, then inspect appearance and attributes.
+permalink: /en/guides/vectorpaint-svg-paint-order-fill-stroke-band/
+date: '2026-11-21 00:00:00 +08:00'
+modified: '2026-11-21 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 265
+topic: SVG fill and stroke paint order
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-21-vectorpaint-svg-paint-order-fill-stroke-band.md
+source_url: /guides/vectorpaint-svg-paint-order-fill-stroke-band/
+translation_method: editorial
+translation_source_sha256: 9c8b6cf1d048e68cd5184f8d97607537bb566cb2aa93d205ec2a0d33ccf3a139
+translation_date: '2026-11-21T04:18:31+00:00'
+excerpt: Compare SVG fill-first and stroke-first rendering with a fixed rectangle and stroke width, then inspect appearance and attributes.
+---
+{% raw %}
+<p>The same rectangle, fill and stroke can show a different inner stroke band when painting order changes. Compare two calculable SVG samples using <code>paint-order</code>, then observe import, editing and output in VectorPaint. W3C SVG specifies the order property; support and retention depend on the installed version and no physical-device test is claimed.</p>
+<h2 id="section-1">Fix geometry and colors</h2>
+<p>Make a separate folder. Both rectangles start at x=50, y=35 and are 100 wide and 50 high, with red fill, dark-green stroke and stroke width 20. The viewport is 200 × 120; neither rectangle is rotated, scaled or rounded. The first paints fill before stroke, the second stroke before fill. Order is the only intended variable. Do not group the files together or change stroke width first. Coordinates are SVG user units, not automatically physical pixels.</p>
+<h2 id="section-2">Save the fill-first sample</h2>
+<p>Save this complete file as <code>fill-first.svg</code> in a plain-text editor, preserving root and namespace, and keep a backup. The explicit <code>paint-order="fill stroke"</code> facilitates comparison. A viewer may serialize this default order differently, so literal presence of the attribute alone does not establish visual correctness.</p>
+<pre><code>&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120"&gt;
+  &lt;rect x="50" y="35" width="100" height="50" fill="#cc3333" stroke="#31554c" stroke-width="20" paint-order="fill stroke"/&gt;
+&lt;/svg&gt;
+</code></pre>
+<h2 id="section-3">Save the stroke-first version separately</h2>
+<p>Copy the first file as <code>stroke-first.svg</code> and change only <code>paint-order</code> to <code>stroke fill</code>. The complete text follows; rectangle, width and colors are unchanged. Separate files make their viewports and attributes easier to inspect without assuming a grouping feature. Retain both sources after import.</p>
+<pre><code>&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120"&gt;
+  &lt;rect x="50" y="35" width="100" height="50" fill="#cc3333" stroke="#31554c" stroke-width="20" paint-order="stroke fill"/&gt;
+&lt;/svg&gt;
+</code></pre>
+<h2 id="section-4">Calculate two points near the boundary</h2>
+<p>The rectangle's left boundary is x=50. Its centered stroke of width 20 covers approximately x=40–60 near that side. Away from corners at y=60, inspect an inner point (55,60) and an outer point (45,60). In the fill-first sample the inner point is covered by the later dark-green stroke; with stroke first it is covered by the later red fill. The outer point is outside the fill and inside the stroke in both cases. Avoid sampling exactly at x=50 or x=60, where antialiasing could be mistaken for an attribute difference.</p>
+<h2 id="section-5">Distinguish the path from its visible band</h2>
+<p>Both source path boundaries remain x=50–150 and y=35–85, and both stroke widths remain 20. Covering the inner half with fill does not change the second source stroke width to 10. At corners consider joins and antialiasing; use points midway along an edge first. This model has no filters, blend modes or opacity; adding them calls for fresh analysis. If a reference viewer renders both alike, inspect <code>paint-order</code> support, the actual file difference and file identity before claiming coordinates moved.</p>
+<h2 id="section-6">Import and inspect object identity</h2>
+<p>Open each working copy using an SVG import or open control actually visible in VectorPaint. Record the actual colors near each edge midpoint and try selecting the rectangle and inspecting available properties. If the app ignores order, converts stroke to outline or splits objects, record that observation. If no entry or attribute inspection is available, retain sources and mark pending without inventing a paint-order control. Do not adjust width manually to imitate the expectation and call that faithful import.</p>
+<h2 id="section-7">Export, reopen and troubleshoot</h2>
+<p>Save editable copies and export each to a new file through a visible control. Reopen and compare the inside and outside points, rectangle outline and positions. SVG output may retain <code>paint-order</code> and <code>stroke-width</code> or express an equivalent result as converted shapes. Visual agreement does not establish literal attribute retention, and a bitmap cannot prove the rectangle remains independently editable. If results differ, check one of file identity, color, width, order or output format at a time and preserve each observation.</p>
+<h2 id="top-edge-control">Independently check the upper boundary</h2>
+<p>In both originals the rectangle's upper edge is y=35. Away from corners at x=100, compare an inner point (100,40) and an outer point (100,30). With fill first, both lie in the later green stroke. With stroke first, the red fill covers the inner point while the outer remains green. Cross-checking these with the two points on the left edge can reveal a local clipping or sample-selection problem. Geometry and stroke width are unchanged; the color difference does not imply a new separate line was added.</p>
+<p>Plot all four points on a paper coordinate diagram and inspect enlarged samples in a viewer that supports the property, recording viewer and file names. If results differ, compare full source and support first. If only a boundary is blended, choose a point farther from edges and corners, record its coordinates and recalculate rather than changing the sample to force a result. When exported colors agree but the original attribute is converted, retain separate appearance and structure columns.</p>
+<p>Separate backup copies showing only fill or only stroke can help identify each coverage region. Treat them as explanatory controls, not replacements for the original order experiment with both painted. Reopen a complete file and recheck all four points. If import splits the rectangle into several objects, record selection order and visible hierarchy before comparing the backup. Do not delete an object to establish the result unless working in an independent copy with a recovery path.</p>
+<h2 id="section-8">Deliver and extend</h2>
+<p>Deliver both sources, working copies, outputs and a table showing theoretical and observed colors at (55,60) and (45,60), plus attribute retention. In a separate copy you can try a narrower stroke and recalculate sampling points; do not reuse the boundaries calculated for width 20. Mark unperformed import, export, reopening or device operations pending. This experiment concerns rendering order, not a promise that the app exposes an independent control for it.</p>
+
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/vectorpaint-fill-stroke/">Fill and stroke basics</a>; <a href="/en/guides/vectorpaint-svg-import-edit/">Import and edit SVG</a>.</p>
+<p>Checked 21 November 2026: <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software">Apple's China lookup</a> lists VectorPaint 1.0.8, requiring iOS / iPadOS 17.0. <a href="https://www.w3.org/TR/SVG2/painting.html#PaintOrder">W3C SVG 2 paint-order</a> defines the drawing order for fill, stroke and markers. The coordinates, colors and sample are exercise choices.</p>
+{% endraw %}

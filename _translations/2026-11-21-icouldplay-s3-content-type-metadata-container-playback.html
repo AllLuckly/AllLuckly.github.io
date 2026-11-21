@@ -1,0 +1,48 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay S3 video types: compare object Content-Type, container and observed
+  playback'
+description: Inspect authorized object metadata, media information and playback without
+  mistaking an extension for proof.
+permalink: /en/guides/icouldplay-s3-content-type-metadata-container-playback/
+date: '2026-11-21 00:00:00 +08:00'
+modified: '2026-11-21 00:00:00 +08:00'
+category: Tutorials
+level: Advanced
+series_order: 227
+topic: S3 object type and media identity
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-21-icouldplay-s3-content-type-metadata-container-playback.md
+source_url: /guides/icouldplay-s3-content-type-metadata-container-playback/
+translation_method: editorial
+translation_source_sha256: cb5b2d6251c3ce5af88e76b94bccbcb4d544691ba171a44ae46d3e1e61aa30dc
+translation_date: '2026-11-21T04:35:33+00:00'
+---
+{% raw %}
+<p>A video can have a filename, S3 object Content-Type metadata, a container and internal codecs. iCouldPlay publicly supports S3-compatible sources and multiple video formats, but neither an extension nor one type label guarantees playback.</p>
+<h2 id="section-1">Prepare an authorized reference video</h2>
+<p>Choose a short video you recorded or have permission to use, and keep the original and uploaded copy. In a trusted local player check the opening picture, duration and sound, noting a nonprivate distinguishing detail. If permissions do not allow viewing object metadata, leave that item pending; do not borrow someone else's object, make a bucket public or put keys in your notes. Do not experiment on the only irreplaceable original.</p>
+<h2 id="section-2">Separate four independent fields</h2>
+<p>Record the local filename and extension. Use a trusted media-information tool to inspect the actual container, video codec and audio codec when there is an audio track. In an authorized S3 management interface inspect the target object's Content-Type. The filename suffix, service metadata and media codecs describe different layers: an object marked <code>video/mp4</code> does not itself prove its video codec is H.264 or that every player supports every audio track. If a tool cannot read a field, mark it unknown instead of inferring it from the name.</p>
+<h2 id="section-3">Confirm object identity at the service</h2>
+<p>Record sanitized aliases for service, bucket, object key and size; only an authorized person should view real values. Confirm the metadata is for the video, not an identically named poster, playlist or object in another bucket. If the key has multiple versions, record the current service state and which version you inspected; do not attribute an earlier version's metadata to the current object. Do not change Content-Type, upload again or change access permissions: this exercise only reads existing information.</p>
+<h2 id="section-4">Check the source and item in iCouldPlay</h2>
+<p>Open the already configured, authorized S3-compatible source in iCouldPlay. Confirm the service alias, bucket and visible path, and find the video. Record any name, duration or format that the app actually shows. If Content-Type, version ID or full object key is not shown, mark it invisible instead of guessing at internal client requests. Stop if access or the entry cannot be confirmed, keep sanitized errors, and never send credentials to an unfamiliar server.</p>
+<h2 id="section-5">Observe playback without inferring support</h2>
+<p>Open the target item. Separately record whether it is listed, whether playback starts and whether its opening picture and sound match the local reference. If picture works but audio does not, record the video and audio observations separately; if there is no audio track, do not label silence a playback fault. A matching short segment only supports the portion observed, not byte-for-byte identity of the whole object. A local player opening the file also does not prove iCouldPlay can play it on every device and network.</p>
+<h2 id="section-6">Handle inconsistent labels</h2>
+<p>If the service metadata appears inconsistent with the media, record the actual value and source, then check the object identity and tool output first. Only the service administrator can decide under their own process whether metadata needs correction. This exercise does not require overwriting, copying, relabeling or uploading a production object. Correcting a label does not automatically transcode the container or codecs; changing a suffix does not change audio or video codecs either. When uncertain, leave the original state intact and explain it to the administrator.</p>
+<h2 id="section-7">Investigate responses and actual media</h2>
+<p>If an item is visible but playback fails, separately check authorization, network, target object, service response and media information. A service error page can also have a title or body; receiving a response is not successful video playback. Inspect a response type only when authorized and when you understand the tool; never publish signed URLs or credentials. When comparing Content-Type with media information, say whether each observation is metadata, a response header or file content. Change one condition at a time and preserve the initial result.</p>
+<h2 id="section-8">Make an interpretable comparison</h2>
+<p>Make two rows: the first for the object type in the service management interface, such as <code>video/mp4</code> or <code>application/octet-stream</code>; the second for the actual response type and the method used to see it. Matching labels only show label agreement, not that the container's audio track is decodable. If the authorized interface does not show response headers, leave that row blank and ask an authorized administrator rather than exposing the object to fill a table. With a proxy or gateway, the response and object metadata can come from different points; identify each source. For access denied, address authorization first rather than treating the error response as media.</p>
+<p>Separately record container and audio/video codecs from the local media-information tool, plus the picture and sound observed in a short iCouldPlay segment. If only the file suffix is visible, mark codecs unknown. Even different type labels do not alone establish which component caused failure; retain observation time so an administrator can investigate without accessing credentials.</p>
+<h2 id="section-9">Deliver the record and preserve the object</h2>
+<p>Deliver a sanitized four-layer comparison: filename, service metadata, actual container and codecs, and iCouldPlay listing and playback observations, each with its source and pending items. Confirm the original object and local file remain and restore the earlier playback and output state. S3-compatible implementations, networks and devices can differ. This exercise claims no changes to a private service and no physical-device format-compatibility test.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-s3-object-prefix-identity/">S3 object keys and prefixes</a>; <a href="/en/guides/icouldplay-container-codec-stream-inventory/">Container, codec and stream inventory</a>.</p>
+<p>Checked on 21 November 2026: the <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software">Apple China lookup</a> lists iCouldPlay 1.1.1 and S3-compatible sources. <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingMetadata.html">Amazon S3 object metadata</a> describes metadata including Content-Type. No physical-device or private-server test is claimed.</p>
+{% endraw %}

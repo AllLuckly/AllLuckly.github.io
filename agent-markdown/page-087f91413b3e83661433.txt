@@ -1,0 +1,83 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-svg-group-opacity-overlap-composite/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint transparency overlap: individual shapes versus group opacity'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-svg-group-opacity-overlap-composite/
+agent_source_sha256: 0c331fa1369be7858c20c375096551f43177c39a22dfe7b1d8900aa0fbe16712
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint transparency overlap: individual shapes versus group opacity
+
+Language: en
+Canonical: [VectorPaint transparency overlap: individual shapes versus group opacity](<https://allluckly.cn/en/guides/vectorpaint-svg-group-opacity-overlap-composite/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-svg-group-opacity-overlap-composite/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-svg-group-opacity-overlap-composite/>)
+Published: 2026-11-21T00:00:00+08:00
+Modified: 2026-11-21T12:18:31+08:00
+Author: Bison
+
+Compare individual fill opacity and group opacity with overlapping red rectangles and inspect import and export.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-svg-group-opacity-overlap-composite/>), translated on 2026-11-21. Original publication dates, attribution, code and version notes are retained.
+
+Two translucent rectangles can look darker where they overlap. If two opaque shapes are first composed within a group and the entire group is then made translucent, their overlap need not darken. Construct both cases in SVG, then inspect, edit and export through an SVG entry actually available in VectorPaint. W3C compositing distinguishes element and group composition; application behavior must be observed in the installed version. No physical-device acceptance is claimed.
+
+## Define the comparison
+
+Use a white background, the same red `#cc3333` and equally sized rectangles. In the upper group each rectangle has `fill-opacity` 0.5; in the lower group the rectangles are opaque but their parent has `opacity` 0.5. Shapes overlap horizontally within each group, while the two groups do not touch. Color and geometry are held fixed; only the scope of opacity changes. Do not introduce a translucent background or stroke, which adds variables.
+
+## Save the complete sample
+
+Save the entire following text as `opacity-groups.svg` in a plain-text editor and keep a backup. Each rectangle is 100 wide and 50 high; the second begins 60 units farther right, leaving 40 units of overlap. A white rectangle sits behind both groups so a viewer's checkerboard does not affect comparison. Preserve root, namespace and groups. Import a working copy without overwriting the source.
+
+```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160">
+  <rect width="200" height="160" fill="white"/>
+  <g fill="#cc3333" fill-opacity="0.5">
+    <rect x="20" y="20" width="100" height="50"/>
+    <rect x="80" y="20" width="100" height="50"/>
+  </g>
+  <g opacity="0.5" fill="#cc3333">
+    <rect x="20" y="90" width="100" height="50"/>
+    <rect x="80" y="90" width="100" height="50"/>
+  </g>
+</svg>
+```
+
+## Check positions and coverage first
+
+The upper group occupies y=20–70 and the lower y=90–140, so they do not touch. Within each group x=20–80 belongs only to the first rectangle, x=80–120 overlaps and x=120–180 belongs only to the second. Pick interior points x=40, 100 and 160 away from antialiased edges. Sketch the three regions on paper, then check geometry in an SVG reference viewer. If positions differ, inspect `x`, `y` and `width` before blaming opacity.
+
+## Understand alpha on a transparent backdrop
+
+First use a model independent of the specific color: two same-color shapes, each alpha 0.5, placed in sequence over transparency have combined overlap alpha `0.5 + 0.5 × (1 − 0.5) = 0.75`. This is an intermediate result over transparency, not a claim that the sample's final white-backed pixel has alpha 0.75: the white background is opaque, so final output is normally opaque. Two translucent coverings in the upper group should make its overlap appear darker on white than a single covered region.
+
+## Compare group opacity
+
+The lower group's two opaque red rectangles are first composed within the group, so their overlapping and single regions are the same red. The complete group is then composed onto white at opacity 0.5, leaving those regions the same color. This conclusion depends on matching colors, no strokes and no blend mode; different colors or ordering change the result. Compare interior points x=40, 100 and 160 in a reference viewer rather than deriving exact colors from compressed edge pixels. Keep theory and viewer observations in separate columns; an expectation is not a passed test.
+
+## Inspect hierarchy in the application
+
+Choose the working copy through an SVG open or import entry actually displayed by VectorPaint. Record whether overlaps agree with the reference expectation, then try selecting groups and their rectangles. If a group can be expanded, inspect the displayed upper fill opacity and lower group opacity. If controls are absent, objects are expanded or import fails, preserve the source and record the observation without assuming attributes are editable. Redrawing a visually expected picture does not demonstrate faithful import.
+
+## Verify the grouping assumptions
+
+Draw each group's two rectangle outlines in your notes and mark left-only, overlapping and right-only regions. Confirm equal geometry and the intended opacity scope before comparing color: making one lower-group rectangle individually translucent changes the experiment. Choose three fixed interior points away from edges and record upper and lower groups separately; one screenshot position cannot stand in for both regions.
+
+In a separate control, move rectangles apart so neither pair overlaps. The former overlap disappears, leaving single-covered regions to compare; this no longer tests overlap composition. Retain both groups' colors, background and opacity and record the separation, then return to the unmoved source for the actual overlap. Color management, zoom and screenshot compression can change sampled channel numbers, so first inspect whether regions agree or differ. For quantitative sampling, also record viewer, sampling points and color environment.
+
+In the export check table add independent fields for whether each region can be selected, its displayed color and whether it remains in its original group. Select a left-only region and then the overlap. Selecting the top rectangle once does not prove the lower one is absent. If no hierarchy is visible, record selection as indeterminate rather than deleting a shape to test. Change only backed-up copies and reopen the untouched sample afterward. This separates selection limitations, structural conversion and visual compositing.
+
+## Export, reopen and troubleshoot
+
+Save an editable copy, export a separate file and reopen it to compare the darker upper overlap and uniform lower group. If the result is SVG, inspect group, rectangles and opacity scopes in plain text; if converted to equivalent objects, record structural change separately from appearance. A raster result can show appearance but cannot establish editable groups. For a discrepancy, check the white background, identical colors, hierarchy and file identity one at a time rather than declaring a defect from one display.
+
+## Related guides and sources
+
+[Transparent overlap basics](<https://allluckly.cn/en/guides/vectorpaint-transparent-overlap/>); [Layers and groups](<https://allluckly.cn/en/guides/vectorpaint-layers-groups/>). Deliver source, application copy, output and a table of theoretical expectations, observations, editable status and pending items. Mark unperformed reopening or device operations pending.
+
+Checked 21 November 2026: [Apple's China lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software>) lists VectorPaint 1.0.8, requiring iOS / iPadOS 17.0. [W3C Compositing and Blending Level 1](<https://www.w3.org/TR/compositing-1/>) describes compositing and groups. Coordinates, color and calculations are exercise choices.
+{% endraw %}

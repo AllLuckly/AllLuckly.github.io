@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /en/guides/jianlai-accented-cafe-nfc-nfd-character-identity/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Jianlai accented café: distinguish identical-looking Unicode sequences'
+agent_source_url: https://allluckly.cn/en/guides/jianlai-accented-cafe-nfc-nfd-character-identity/
+agent_source_sha256: 625697f00b9dabc5230ef6d079787a3d809b066fc8fdc79b858507580a974c7a
+agent_generator_version: 1
+---
+{% raw %}# Jianlai accented café: distinguish identical-looking Unicode sequences
+
+Language: en
+Canonical: [Jianlai accented café: distinguish identical-looking Unicode sequences](<https://allluckly.cn/en/guides/jianlai-accented-cafe-nfc-nfd-character-identity/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/jianlai-accented-cafe-nfc-nfd-character-identity/>)
+English: [English HTML](<https://allluckly.cn/en/guides/jianlai-accented-cafe-nfc-nfd-character-identity/>)
+Published: 2026-11-21T00:00:00+08:00
+Modified: 2026-11-21T10:19:14+08:00
+Author: Bison
+
+Compare actual keyboard entry, host display and external NFC/NFD checks for an accented word.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/jianlai-accented-cafe-nfc-nfd-character-identity/>), translated on 2026-11-21. Original publication dates, attribution, code and version notes are retained.
+
+An accented name may use one precomposed character or a base letter followed by a combining accent. These often look identical. Using the nonprivate word café, record actual Jianlai entry, host display and external Unicode checks separately; the keyboard is not treated as a normalization tool.
+
+## Prepare two explicit character sequences
+
+In an ordinary text host prepare a practice copy with the target café. Reference A ends with U+00E9, precomposed é. Reference B ends with U+0065, e, followed by U+0301, combining acute accent. Both begin U+0063, U+0061, U+0066. Record four code points for A and five for B. These are not byte counts, display widths, cursor movements or numbers of user-perceived characters. Preserve the original; do not use a real name or password.
+
+## Identify an actually available entry method
+
+Confirm Jianlai is added as a system keyboard and selected in an ordinary field. Enter the target using the language and layout actually available and the visible characters or candidates. Public information describes multilingual input, but does not guarantee an accented French key, long-press menu or combining-character entry in every layout. If the character is unavailable, record language, layout and result; use trusted reference text for later comparison and label the character pasted, not entered with Jianlai. Do not claim both forms can always be entered directly.
+
+## Record committed text and visible result
+
+Enter or paste one café line in the practice copy. Record steps, candidate visibility, confirmation action and whether the document retains the text after the cursor moves. Accent visibility and placement are display observations. Seeing é does not establish U+00E9. The host may transform or retain different sequences, so record only observed behavior. If the text is wrong, retain the first result and correct a separate copy before continuing.
+
+## Create two reference copies
+
+Use a trusted Unicode reference or a local tool under your control to prepare reference A and B on separately labelled lines, preserving the actual input line. If the host normalizes B immediately and preserves only one form, note that this host cannot retain the control. Use a local tool that preserves raw text or leave B pending. Copying, rendering and normalization can occur in different components; do not attribute a change to Jianlai from a single interface action.
+
+## Inspect code points externally
+
+On a computer you control, use a local tool that displays Unicode code points for each nonprivate line. Determine whether the entered line ends in U+00E9 or U+0065 U+0301. A tool that automatically normalizes its input cannot establish the original sequence. First check that the tool reports four and five code points for the two known references, then inspect the actual input. If no verifiable tool exists, record “sequence unchecked” rather than guessing from appearance. Do not upload a private draft to a third-party site.
+
+## Compare normalization and raw equality
+
+If Python 3 is available, run the following locally, paste only this exercise’s nonprivate word and press Return. It prints code points for raw, NFC and NFD, makes no network request and does not edit the original. Terminal input or copying may itself alter text, so validate both reference cards first; stop if their results are wrong.
+
+```python
+import unicodedata
+
+text = input("Practice text: ")
+for label, value in (("raw", text),
+                     ("NFC", unicodedata.normalize("NFC", text)),
+                     ("NFD", unicodedata.normalize("NFD", text))):
+    print(label, " ".join(f"U+{ord(ch):04X}" for ch in value))
+```
+
+Unicode considers the two forms canonically equivalent. If the tool shows NFC and NFD separately, observe their results without changing the originals. A and B have different raw sequences, but their NFC forms can match. Canonical equivalence does not guarantee identical search, sorting, byte comparison or synchronization in every system. Record raw sequence, transformation and result separately, and inspect the actual input line as well as the two references.
+
+## Recheck another field or host
+
+You may place copies of known references into another ordinary field you control and inspect the pasted raw sequences in the same way. Record source, target and copy action. A difference before and after handoff needs further isolation; it does not automatically identify Jianlai, iOS or the host as the cause. If both look alike without code-point evidence, record “visually similar; sequence pending.” Keep original input, references and handoff copies distinct.
+
+## Troubleshoot and finish
+
+If the accent is shown as a box, record host font and display conditions and then check whether the character exists; font rendering alone does not prove sequence damage. If the expected candidate is absent, inspect actual language and available options without promising every layout supports it. If a copied result changes, inspect tool, host and copying separately. Change one condition per trial and preserve the starting state. Deliver entry method, reference code points, visible state, external checks and pending items, then restore the usual keyboard. No physical input, font or search compatibility test is claimed.
+
+Record the test date and tool version for later checks.
+
+## Related guides and sources
+
+[Font coverage and fallback](<https://allluckly.cn/en/guides/jianlai-font-cmap-coverage-system-fallback-evidence/>); [Confusable glyphs and actual characters](<https://allluckly.cn/en/guides/jianlai-confusable-latin-digit-three-line-glyph-card/>).
+
+Checked on 21 November 2026: [Apple Finland lookup](<https://itunes.apple.com/lookup?id=6754281557&country=fi&entity=software>) lists Jianlai 1.0.5 and multilingual input. [Unicode Standard Annex 15](<https://www.unicode.org/reports/tr15/>) defines canonical equivalence and NFC/NFD. No physical-device test is claimed.
+{% endraw %}

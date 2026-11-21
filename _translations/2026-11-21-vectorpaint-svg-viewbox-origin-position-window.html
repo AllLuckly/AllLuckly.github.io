@@ -1,0 +1,57 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint viewBox origins: why unchanged SVG coordinates appear elsewhere'
+description: Calculate viewport placement for the same rectangle under two viewBox origins and distinguish window movement, object movement and clipping.
+permalink: /en/guides/vectorpaint-svg-viewbox-origin-position-window/
+date: '2026-11-21 00:00:00 +08:00'
+modified: '2026-11-21 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 264
+topic: SVG viewport origins and coordinates
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-21-vectorpaint-svg-viewbox-origin-position-window.md
+source_url: /guides/vectorpaint-svg-viewbox-origin-position-window/
+translation_method: editorial
+translation_source_sha256: bc0e930407603760b759d84b721f231e70fbd16815cf9deba9138ffd1bf5286d
+translation_date: '2026-11-21T04:18:31+00:00'
+excerpt: Calculate viewport placement for the same rectangle under two viewBox origins and distinguish window movement, object movement and clipping.
+---
+{% raw %}
+<p>An SVG object's <code>x</code> and <code>y</code> can stay fixed while a changed <code>viewBox</code> origin moves it within the output viewport. Make two files, calculate their positions, then observe and export through an SVG entry actually visible in VectorPaint. W3C defines viewBox as minimum x, minimum y, width and height; whether the installed application preserves those numbers requires actual testing, which is not claimed here.</p>
+<h2 id="section-1">Set calculable conditions</h2>
+<p>Both files declare a 200 × 120 viewport and a 100 × 60 viewBox, with matching aspect ratios and a scale factor of two. Color, rectangle position and size remain fixed. The first viewBox is <code>0 0 100 60</code>; the second is <code>50 20 100 60</code>. Both rectangles start at (70,30), with width and height 20. These are SVG user coordinates and declared viewport units, not automatically physical screen pixels. Keep both originals and separate working copies.</p>
+<h2 id="section-2">Save the first window</h2>
+<p>Copy this entire SVG into a plain-text editor as <code>origin-zero.svg</code>. Keep the namespace and ensure no extra <code>.txt</code> extension appears. The rectangle has no stroke, avoiding an extra boundary-width variable. Do not add a background rectangle that might be mistaken for the viewport after transformation.</p>
+<pre><code>&lt;svg xmlns="http://www.w3.org/2000/svg" width="200" height="120" viewBox="0 0 100 60"&gt;
+  &lt;rect x="70" y="30" width="20" height="20" fill="#cc3333"/&gt;
+&lt;/svg&gt;
+</code></pre>
+<h2 id="section-3">Change only the viewBox origin in a copy</h2>
+<p>Copy the first file as <code>origin-shifted.svg</code> and change only the root's <code>viewBox</code> to <code>50 20 100 60</code>; the rectangle attributes remain identical. The complete changed file follows. When comparing text, check all four viewBox values and their order so an origin change is not confused with a change in width or height.</p>
+<pre><code>&lt;svg xmlns="http://www.w3.org/2000/svg" width="200" height="120" viewBox="50 20 100 60"&gt;
+  &lt;rect x="70" y="30" width="20" height="20" fill="#cc3333"/&gt;
+&lt;/svg&gt;
+</code></pre>
+<h2 id="section-4">Calculate each viewport position</h2>
+<p>In the first file, the rectangle is (70,30) relative to origin (0,0), so its viewport upper-left is (140,60) and size is 40 × 40. In the second, subtract (50,20): relative position becomes (20,10), mapping to (40,20), with the same 40 × 40 size. Record positions relative to viewport upper-left (0,0). The observation window shifted relative to the coordinate system; source rectangle coordinates did not move. Matching aspect ratios mean no extra letterboxing or alignment offset in this example.</p>
+<h2 id="section-5">Compare files and visible images</h2>
+<p>Open both in an SVG-capable reference viewer and use the whole viewport boundary, not the rectangle edge, as reference. The first rectangle sits lower right and the second upper left; their areas remain equal. On transparency, use the viewer frame to locate the viewport and do not treat its checkerboard as part of the graphic. If observations disagree, check file identity, all four viewBox values, viewport dimensions and zoom before comparing absolute screen positions. Record calculated and observed positions separately; an unperformed observation is not a pass.</p>
+<h2 id="section-6">Inspect import and editing in VectorPaint</h2>
+<p>Open each working copy through an SVG import or open entry actually visible in the application. Record positions and how canvas boundaries appear. The application might normalize coordinates, convert to shapes or otherwise alter structure, so matching appearance does not prove the original viewBox was retained literally. If the rectangle is selectable, save a copy before moving and record the controls actually shown. If origin cannot be inspected or no import entry exists, mark pending without inventing a menu. Manually dragging an object back is not evidence that the original import was correct.</p>
+<h2 id="section-7">Make a separate clipping control</h2>
+<p>Copy the second file and change rectangle <code>x</code> to 140 while retaining width 20. The shifted window spans horizontal coordinates 50–150, placing 140–150 inside and 150–160 outside. A viewport display may show only part of the rectangle; actual clipping also depends on viewport and overflow settings. Record coordinates outside the window separately from what a viewer actually displays. Do not overwrite the two original samples or infer every exporter's clipping strategy from this control.</p>
+<h2 id="viewbox-corner-ledger">Recalculate size using all four corners</h2>
+<p>List the source rectangle's corners: upper-left (70,30), upper-right (90,30), lower-left (70,50) and lower-right (90,50). In the first window subtract (0,0) and multiply by two to get upper-left (140,60), lower-right (180,100). In the second subtract (50,20) before multiplying to get (40,20) and (80,60). Both are 40 wide and high: a move toward the upper-left is not a smaller rectangle. Record calculations separately from viewer observations and align using the whole viewport when a screenshot is scaled; screen pixels do not directly replace these values.</p>
+<p>Compare the two source <code>rect</code> attributes x, y, width, height and fill, circling only the changed first two viewBox values. If an application recalculates coordinates on export while appearance agrees, preserve both texts and record structural change and the actual visual result separately, not automatic damage. If the outside-window control displays the full object, record that viewer's overflow behavior rather than calling its coordinates inside the original window.</p>
+<p>For each file record source viewBox, source rectangle coordinates, viewport size and visible position after opening; give the control its own row. If the second file overwrites the first, restore from backup before comparing rather than reconstructing lost source from an expected position. If the application's imported canvas shows different units or margins, retain a full-view screenshot and displayed settings before comparing scale. Different displayed units do not necessarily mean source coordinates changed. Mark numerical values unavailable when no value is visible.</p>
+<h2 id="section-8">Export and deliver</h2>
+<p>Save editable working drafts and export separate files through available controls. Reopen them to compare viewport boundaries, rectangle positions and size. Inspect coordinates and viewBox in SVG text; a bitmap can establish appearance only, not preservation of source coordinates. Deliver both originals, working copies, outputs and a table of theoretical positions, observed results, import structures and pending items. Mark unperformed reopening or device operations pending.</p>
+
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/vectorpaint-svg-import-edit/">Import and edit SVG</a>; <a href="/en/guides/vectorpaint-canvas-units/">Canvas units</a>.</p>
+<p>Checked 21 November 2026: <a href="https://itunes.apple.com/lookup?id=1587272880&amp;country=cn&amp;entity=software">Apple's China lookup</a> lists VectorPaint 1.0.8, requiring iOS / iPadOS 17.0. <a href="https://www.w3.org/TR/SVG2/coords.html#ViewBoxAttribute">W3C SVG 2 viewBox</a> specifies the four window values. Sample and arithmetic are original to the exercise.</p>
+{% endraw %}

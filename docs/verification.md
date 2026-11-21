@@ -1,5 +1,19 @@
 # 验证记录
 
+## 2026-11-21：七款应用各新增10篇中文及完整英文教程
+
+- 新增70篇中文详细教程及70篇完整英文；Aquarell270篇、漫阅+270篇、VectorPaint270篇、书屿250篇、云映230篇、调调70篇、键来70篇。全站1450篇中文教程、8条真实学习路线；14个新增阶段及逐篇来源见[本批证据](tutorial-evidence-20261121.md)。
+- 当日按 Apple 独立查询核公开版本及系统要求；书屿 1.1.5 的小组件、双地址及进度合并，调调 1.0.4 的 CarPlay 与 Siri 功能以发行说明为依据；地区、时区及缓存观察见本批证据。
+- 中文正文共108,171汉字，单篇1,500–1,905汉字。70对中英文经独立全文复核并绑定140份文件 SHA；原文与译文的静态结构、链接、日期、署名和源哈希核对通过。字数不替代事实与翻译质量检查。
+- 公开来源、步骤、结果检查与排障分别核对；未执行的应用真机、私人服务器、全部设备或媒体兼容测试不记为通过。
+- 两轮 production Jekyll 构建及其间原文导出、Markdown、阅读目录和技能摘要生成按顺序完成，构建与检查共 24 项。站点：3558 JSON-LD graphs, 3554 sitemap URLs, Atom feed, 3096 new/updated pages, 1450 detailed tutorials, 8 complete learning routes and 8 work videos。
+- 双语：1616 reciprocal language pairs, 1587/1587 complete English articles, preserved code/attribution/dates, localized collections and captions。旧技术文章及专题验证通过。
+- Markdown：3232 pages (3174 articles, 58 entry pages); 2590 code blocks and 4320 inline code nodes preserved; 0 files changed Generated sources are current.；阅读目录：Checked 40 llms.txt indexes; 3192 unique direct Markdown targets; 0 changed files.。技能摘要、Agent 访问与搜索、API 目录、统计脚本和图标检查通过。
+- 构建后的中英文搜索各有1587条记录，本批各70条新记录齐全。
+- 8款路线的中英文阶段编号一致，全部旧阶段对象与字段对照原始及同步基线保留；新增阶段按每五篇连续覆盖。
+- 本地浏览器抽查范围以 `output/tutorials-20261121/safari-qa.json` 的实际记录为准（Safari local production Jekyll preview, 127.0.0.1:4173），包括页面阅读与语言切换；网站检查不等同应用真机测试。
+- 3034份旧文章和译文逐字节保留；git diff --check 与281个新增路径的空白检查通过。Worker 候选保留3092条既有路由并新增140条。GitHub Desktop 提交推送、精确提交的 Pages 部署及线上页面、搜索和 Markdown 均需另行核验；本地通过不记为上线。
+
 ## 2026-11-20：七款应用各新增10篇中文及完整英文教程
 
 - 新增70篇中文详细教程及70篇完整英文；Aquarell260篇、漫阅+260篇、VectorPaint260篇、书屿240篇、云映220篇、调调60篇、键来60篇，Yearn保留20篇。全站1380篇中文教程、8条真实学习路线。14个新增阶段、连续编号及逐篇来源见[本批证据](tutorial-evidence-20261120.md)。

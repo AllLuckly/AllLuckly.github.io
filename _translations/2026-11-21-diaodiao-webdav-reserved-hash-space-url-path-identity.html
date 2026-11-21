@@ -1,0 +1,54 @@
+---
+layout: guide
+author: Bison
+app_id: diaodiao
+title: '调调 WebDAV paths: distinguish spaces and hashes in names from URI fragments'
+description: Use an invalid example domain to compare directory names, URI encoding
+  and actual server resource identity.
+permalink: /en/guides/diaodiao-webdav-reserved-hash-space-url-path-identity/
+date: '2026-11-21 00:00:00 +08:00'
+modified: '2026-11-21 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 67
+topic: WebDAV path characters and identity
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-21-diaodiao-webdav-reserved-hash-space-url-path-identity.md
+source_url: /guides/diaodiao-webdav-reserved-hash-space-url-path-identity/
+translation_method: editorial
+translation_source_sha256: 4d4358242d1553d117a8de7839b56e53ed3124ecdc164c6700e0b87a317a876b
+translation_date: '2026-11-21T03:36:24+00:00'
+---
+{% raw %}
+<p>A space or hash in a folder name is not the same thing as a delimiter in a network address. 调调 1.0.4’s public release notes mention improved WebDAV connection and library browsing. First inspect an offline example, then observe an authorized server through its actual interface; do not assume a particular encoding method in 调调.</p>
+<h2 id="section-1">Specify an offline example and objective</h2>
+<p>Suppose a service root is <code>https://example.invalid/dav/</code> and a child directory is named exactly <code>A B#1</code>, with one space between A and B and a digit after the hash. The host <code>example.invalid</code> belongs to the reserved invalid domain and is used as an example: do not visit it or use it as a real server. Establish that the name is one path segment and distinguish display name, request address and a resource that actually exists. Paper notes suffice; no server or upload is needed.</p>
+<h2 id="section-2">Compare three address representations</h2>
+<p>In one explicitly chosen URI path-segment representation, space is <code>%20</code> and hash is <code>%23</code>, giving <code>https://example.invalid/dav/A%20B%231/</code>. Each escape represents a character from the directory name; the trailing slash is this example’s collection-path convention, not part of the name. In <code>https://example.invalid/dav/A%20B#1/</code>, the literal <code>#</code> introduces the URI fragment <code>1/</code>, not part of the path sent to the server. It is not an equivalent spelling of the first URI. Servers may apply different collection and normalization rules, so this paper example does not establish that a particular server accepts a request.</p>
+<h2 id="section-3">Inspect the components manually</h2>
+<p>On a card mark scheme <code>https</code>, host <code>example.invalid</code>, parent path <code>/dav/</code> and target segment <code>A%20B%231</code>. For the incorrect example separately mark the path ending in <code>A%20B</code> and fragment <code>1/</code>. A URI fragment is a client-side URI component, not literal hash text in the server directory path. Do not confuse path separators with characters inside a name. Other reserved characters require separate interpretation according to their position and purpose.</p>
+<h2 id="section-4">Distinguish one encoding from repeated encoding</h2>
+<p>On a computer with Python 3, this local program parses the example strings without any network request and prints paths and fragments. The first path contains <code>%23</code> and has an empty fragment; the second path ends at <code>A%20B</code> and its fragment is <code>1/</code>. Output checks example syntax, not an actual WebDAV response or server log.</p>
+<pre><code class="language-python">from urllib.parse import urlsplit
+
+examples = ["https://example.invalid/dav/A%20B%231/",
+            "https://example.invalid/dav/A%20B#1/"]
+for value in examples:
+    parsed = urlsplit(value)
+    print("path:", parsed.path, "fragment:", repr(parsed.fragment))
+</code></pre>
+<p><code>%23</code> is an encoded hash. Encoding the percent sign again yields <code>%2523</code>, whose single decoding produces the literal text <code>%23</code>, not a hash. This does not make every <code>%25</code> an error: the real name may contain a percent character, and client/server decoding layers require evidence. Preserve input and observations; do not repeatedly add or remove escapes without knowing the actual name and service rules. Use RFC 3986 and the real interface for the relevant context.</p>
+<h2 id="section-5">Confirm identity on an authorized service</h2>
+<p>If you manage or may access a WebDAV service, find an existing music directory containing a space or hash in that service’s own management interface. Record a non-sensitive service alias, parent and display name. Do not alter shared files or publish credentials, tokens, complete internal addresses or private library data. Without such an authorized resource, retain the paper exercise; there is no need to create public files or seek a stranger’s server.</p>
+<h2 id="section-6">Browse using the actual 调调 interface</h2>
+<p>Open the authorized WebDAV source, confirm service alias and account, and navigate through the visible parent and target folders. If the app shows a decoded name, record that display. If it does not show the raw request address, do not claim to have observed its encoding. Find an authorized track and separately check list visibility, identity and playback. A correctly displayed name with failed playback can involve network, permissions or file state; one result does not prove an encoding fault.</p>
+<h2 id="section-7">Troubleshoot and bound the evidence</h2>
+<p>For an absent target, first check selected service, user permission and parent folder, then whether the server resource exists. If authorized logs are available, remove sensitive information before comparing the actual requested path. Do not share authentication data, disable security or expose the service publicly. A service can redirect a path; record the observed status and destination rather than assuming all servers redirect identically. Change one condition per trial and keep the initial result.</p>
+<h2 id="section-8">Deliver and restore</h2>
+<p>Deliver the three example representations, encoding and fragment boundaries, plus sanitized real-service folder and track observations and pending items. Do not turn the example domain into a real address or call a visible listing a downloaded file. Restore the original source, volume and queue without modifying server content. RFC URI syntax and public release notes inform this exercise; no packet capture, private-server access or physical playback test is claimed.</p>
+<p>If an actual name contains Chinese or other non-ASCII characters, make a separate check using service documentation and real observations; do not copy these two escapes to another name. Record date and service version for follow-up.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/diaodiao-webdav-same-name-folders-collection-identity/">WebDAV same-name folders and resources</a>; <a href="/en/guides/diaodiao-wifi-displayed-url-host-port-path-exact-target/">Wi-Fi transfer address boundaries</a>.</p>
+<p>Checked on 21 November 2026: <a href="https://itunes.apple.com/lookup?id=6827171352&amp;country=cn&amp;entity=software">Apple China lookup</a> lists the 调调 1.0.4 WebDAV note; <a href="https://www.rfc-editor.org/rfc/rfc3986">RFC 3986</a> defines percent encoding and fragments, and <a href="https://www.rfc-editor.org/rfc/rfc2606">RFC 2606</a> reserves <code>.invalid</code> for invalid examples. No private-server or physical-device test is claimed.</p>
+{% endraw %}

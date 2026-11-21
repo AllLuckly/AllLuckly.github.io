@@ -5,7 +5,7 @@ title: 'Book Isle: Ebook Reader for iPhone and iPad'
 description: Learn about Book Isle local imports, WebDAV, SMB, OPDS, Calibre, notes and reading-data sync through a tutorial
   learning path.
 permalink: /en/apps/nasbook/
-modified: 2026-11-20
+modified: 2026-11-21
 lang: en
 source_url: /apps/nasbook/
 ---
@@ -44,6 +44,8 @@ The [Book Isle tutorials]({{ '/en/guides/nasbook/' | relative_url }}) cover a fi
 Book Isle centres on ebooks and reading records. For a collection mainly made of comics, also see [ManYue]({{ '/en/apps/manyue/' | relative_url }}) and choose according to your file types and library source.
 
 ## Version and sources
+
+On 21 November 2026, fresh Apple lookups for China, Finland and the US listed **1.1.5**, requiring iOS/iPadOS 15.6; one unparameterized lookup still returned 1.1.4. The 1.1.5 notes describe Reading and Note Review Home Screen widgets, local and public addresses for one NAS library, and merging progress from existing connections. Actual controls, connection conditions and widget behavior depend on the installed version; this is not a physical-device test.
 
 Checked on 14 November 2026: the China App Store listed **1.1.4**, requiring iOS or iPadOS 15.6 or later. This introduction uses the [Book Isle App Store page](https://apps.apple.com/cn/app/id6766198898), [Apple’s lookup API](https://itunes.apple.com/lookup?id=6766198898&country=cn) and relevant feature entry points. You provide the book files and servers; Book Isle does not include an online bookstore.
 

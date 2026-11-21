@@ -1,0 +1,67 @@
+---
+layout: null
+permalink: /guides/icouldplay-jellyfin-provider-id-catalog-identity-check/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映 Jellyfin 信息身份核对：分开资料提供方 ID、服务器条目和播放文件
+agent_source_url: https://allluckly.cn/guides/icouldplay-jellyfin-provider-id-catalog-identity-check/
+agent_source_sha256: e9979bc90bac61f347e6492c930a4f7b06ab8192da89342c4e2163f7584a8124
+agent_generator_version: 1
+---
+{% raw %}# 云映 Jellyfin 信息身份核对：分开资料提供方 ID、服务器条目和播放文件
+
+语言：zh-CN
+原文：[云映 Jellyfin 信息身份核对：分开资料提供方 ID、服务器条目和播放文件](<https://allluckly.cn/guides/icouldplay-jellyfin-provider-id-catalog-identity-check/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-jellyfin-provider-id-catalog-identity-check/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-jellyfin-provider-id-catalog-identity-check/>)
+发布于: 2026-11-21T00:00:00+08:00
+内容更新于: 2026-11-21T00:00:00+08:00
+署名：Bison
+
+以自有 Jellyfin 电影条目为例，对照资料提供方标识、云映显示与实际文件，不将海报视为身份凭证。
+
+在云映中看到电影海报，并不等于已经核对该条目的资料来源或播放文件。本课选择自己有权管理的一条 Jellyfin 电影记录，把资料提供方 ID、服务器条目、云映显示和实际片头分别记录。Jellyfin 官方文档说明可以通过提供方标识辅助识别；云映的界面是否显示该标识，需以实际版本为准。
+
+## 选一条可安全核对的条目
+
+准备已有 Jellyfin 电影库、一个有权限访问的账号和一段有权使用的测试视频。记录文件名、时长及不含隐私的片头识别点，保留原始文件与现有元数据的备份。若这是一段没有公共资料的自制片，不要为它编造 TMDb 或其他网站的 ID；可以把提供方 ID 标为「不适用」，只练习后面的条目与播放核对。不能管理服务器时，不改文件名或服务器元数据，仅在已授权范围观察。
+
+## 确认提供方和标识的来源
+
+在 Jellyfin 的实际服务器界面查看该条目可见的标题、年份和提供方标识，记录提供方名称及实际值；若没有标识，写「未显示」而不是推断。Jellyfin 文档也说明有些标识可以写入文件或目录名称，但这只是服务器识别输入的一种方式，不等于每个文件都必须改名。对于有公开资料的测试条目，以该提供方对应页面实际显示的作品信息核对，保留链接与确认日期；没有匹配证据就停止，不随意复制示例 ID。
+
+## 保存服务器侧基线
+
+在不更改配置时，记录当前媒体库名称、该条目的标题、年份、可见海报及所指向的文件身份。海报可能相似或沿用旧缓存，不能单独证明 ID 或文件正确；ID 也只标识资料提供方中的作品条目，不是视频文件的校验和。若有同名作品，写下可核对的年份及其他资料，而不依赖海报颜色判断。不要把私人服务器域名、账号、令牌或文件路径放进公开记录。
+
+## 在云映中定位同一条目
+
+打开云映中已配置的 Jellyfin 来源，确认服务器和库与基线一致，再通过实际可见的列表或搜索找到该片。记录界面上的标题、年份和图像；如果没有显示提供方 ID，保持空白，不把服务器侧的 ID 当作云映已展示。列表不存在时先核账号可见范围、当前来源及连接状态；不要仅凭一个搜索失败就删除媒体库或更改服务器识别规则。
+
+## 播放并核对文件身份
+
+打开云映中的条目，比较时长、片头标记及一个中段画面，确认与准备的测试视频相符。若服务器支持多版本，先记录可见的版本和选择动作；云映没有版本选择时不假定它提供。实际播放与服务器记录可能不一致，保留原始观察，先在服务器端检查条目与文件关联，不直接以标题相同或海报正确断言文件正确。播放失败时记录发生在列表、打开或播放哪个阶段。
+
+## 分开服务器资料与客户端更新
+
+制作对照表：提供方页面、Jellyfin 条目、云映显示、实际播放，各列记录可确认的信息和时间。若服务器资料更新而云映暂时仍显示旧图或旧名称，先确认当前来源和实际界面是否有重新进入或刷新方式；若没有，记待核，不声称缓存一定有固定时长。仅凭显示延迟无法证明 ID 错误；反过来，新的海报也不能证明视频文件已经替换。
+
+## 需要修正时保留恢复路径
+
+只有自己有权限管理且已经备份时，才在独立测试条目中按 Jellyfin 官方资料核查对应提供方与正确 ID，记录更改前后值，再按服务器实际界面操作。这里不要求修改生产文件名、不替他人更换 ID，也不预设云映具有编辑服务器元数据的权限。若外部资料提供方在当前网络不可达，记录访问限制并使用已有可靠信息，不能编造查询结果。处理后返回同一 Jellyfin 来源与云映条目，再分别核标题和实际播放。
+
+## 单独核对搜索入口
+
+若云映提供搜索，用服务器中实际可见的完整标题搜索一次，再从当前库的列表进入同一条目，比较两条路径显示的标题和播放片头。没有搜索入口时直接跳过，不把缺少控件写成零结果；搜索命中只能证明该入口展示了一条记录，不能单独证明提供方 ID 或底层文件正确。若两条路径结果不同，保留查询词、库名和观察时间，删除可能含私人内容的关键词后再分享。
+
+## 交付及恢复
+
+交付去除私人地址的对照表、测试视频识别点与相关资料链接，保留原始文件和更改前状态。若只做观察，应明确没有改变服务器；若修改过独立测试条目，按备份恢复并复查。未执行的播放、服务器操作及真机测试均标待核，不把本文示范写成已实测兼容所有 Jellyfin 版本。
+
+## 相关教程与资料
+
+[Jellyfin 媒体库连接](<https://allluckly.cn/guides/icouldplay-jellyfin-library/>)；[同名电影信息匹配纠错](<https://allluckly.cn/guides/icouldplay-metadata-correction/>)；[不同剪辑版身份](<https://allluckly.cn/guides/icouldplay-film-edition-duration-map/>)。
+
+资料核对：2026年11月21日，[Apple 中国区公开查询](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>)列云映 1.1.1 并描述 Jellyfin 媒体服务器支持；[Jellyfin 元数据](<https://jellyfin.org/docs/general/server/metadata/>)列资料来源，[提供方标识](<https://jellyfin.org/docs/general/server/metadata/identifiers/>)说明作品 ID 的用途及命名方式。实际控件及外部资料可用性以各服务为准。
+{% endraw %}

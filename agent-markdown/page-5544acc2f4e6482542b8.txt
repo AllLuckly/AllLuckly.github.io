@@ -1,0 +1,75 @@
+---
+layout: null
+permalink: /guides/vectorpaint-svg-linejoin-miter-round-bevel/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: VectorPaint 描边转角对照：尖角、圆角与斜角的外轮廓
+agent_source_url: https://allluckly.cn/guides/vectorpaint-svg-linejoin-miter-round-bevel/
+agent_source_sha256: 2abc7a9e33cc0731b71abd574c1762dbdb6991add95fe56b0223f7bd713390a1
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint 描边转角对照：尖角、圆角与斜角的外轮廓
+
+语言：zh-CN
+原文：[VectorPaint 描边转角对照：尖角、圆角与斜角的外轮廓](<https://allluckly.cn/guides/vectorpaint-svg-linejoin-miter-round-bevel/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-svg-linejoin-miter-round-bevel/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-svg-linejoin-miter-round-bevel/>)
+发布于: 2026-11-21T00:00:00+08:00
+内容更新于: 2026-11-21T00:00:00+08:00
+署名：Bison
+
+用三条相同折线对照 SVG 的 miter、round 和 bevel 转角，检查导入、顶点与导出结果。
+
+折线的中心路径相同，描边转角仍可显示为尖角、圆角或斜角。本练习用三个自制 SVG 折线比较 `stroke-linejoin`，再在 VectorPaint 中通过实际可见的 SVG 入口核对导入和输出。W3C SVG 规范定义了不同的描边连接形状；本地几何预期不能代替安装版的真机兼容测试。
+
+## 固定路径与比较条件
+
+建立独立练习文件夹，保存源文备份、应用工作副本和输出。三条折线的相对坐标相同：从左下出发，经中间上顶点，再到右下；三者沿画布水平方向错开。描边均为 12，颜色相同，无填充，端帽均为 butt；仅改变转角。将路径顶点与描边外沿分别记录，不能把尖角外沿误当作新的路径节点。画布坐标是 SVG 用户单位，不预设等于设备物理像素。
+
+## 保存完整 SVG
+
+将下面内容复制到纯文本编辑器，保存为 `joins.svg`。先复制原稿，之后只对工作副本做导入和编辑。保留根元素、命名空间及三个 `polyline`；避免保存成 `joins.svg.txt`。每个顶点的相对位置依次为 (0,60)、(40,10)、(80,60)，三组只通过平移改变位置。
+
+```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100">
+  <polyline points="10,60 50,10 90,60" fill="none" stroke="#31554c" stroke-width="12" stroke-linejoin="miter" stroke-miterlimit="4"/>
+  <polyline points="110,60 150,10 190,60" fill="none" stroke="#31554c" stroke-width="12" stroke-linejoin="round"/>
+  <polyline points="210,60 250,10 290,60" fill="none" stroke="#31554c" stroke-width="12" stroke-linejoin="bevel"/>
+</svg>
+```
+
+## 先观察三种连接
+
+在支持 SVG 的参考查看器打开备份，比较上方三个顶点外侧：miter 连接通常形成尖角，round 用圆弧连接，bevel 用斜直线截去外角。三条路径的中心顶点分别仍为 (50,10)、(150,10)、(250,10)，转角的外轮廓不能替代这些坐标。放大看细节，再缩小看整体；不要只凭小图抗锯齿差异判断路径是否移动。底部端点均为平头，它们不是这里比较的转角。
+
+## 分清尖角限制与节点
+
+示例第一条使用 `stroke-miterlimit="4"`。SVG 对尖角长度有限制，角度极尖时可能改用斜角；不要概括为所有 miter 在所有角度都无限延伸。此样本三条折线的开口角相同，因此先比较不同 join，再另存一份对照文件改变顶点，不要同时更改线宽和连接类型。改变顶点会改变路径几何，不能拿它证明软件自动修改了描边属性。记录原稿与对照稿的具体坐标。
+
+## 导入并记录实际对象
+
+在 VectorPaint 中通过实际可见的 SVG 导入或打开入口选择工作副本，观察三种角是否仍可区分，再尝试选择每条折线。记录显示为三个独立对象、组合或其他形式；如果入口不存在、导入失败或对象已转换，保留原稿并记为待核，不假设应用提供某个转角按钮。不要先手动重画再把结果称为导入保真。若角落被裁掉，先检查画布和缩放，而不是立即修改源坐标。
+
+## 分别检查编辑与导出
+
+若能单选，复制工作稿并只移动中间折线，确认左右两条及其顶点没有一起移动；若无法单独选择，记录限制并保留副本。保存可编辑稿，再使用可见的导出入口另存新文件。重新打开输出，比较三处外轮廓、底部端点与相对位置。若输出仍为 SVG，可额外检查 `stroke-linejoin` 是否保留或被转换成等效形状；外观看似相同不等于原属性仍在，路径被转成轮廓也不等于原折线仍可按节点编辑。
+
+## 用外轮廓与中心点做两栏记录
+
+先把三个相对顶点写成一张小表：每组上顶点相对左端都向右40、向上50；分别加上各组的水平起始位置，才得到画布中三个不同的 x 坐标。然后在参考查看器记录每个顶点外侧的形状，单列「中心路径」和「可见描边」：前者在本例不随 join 改变，后者则是要比较的内容。放大截图可以帮助观察，但截图中线条的屏幕粗细会受缩放影响，不能作为源文线宽的测量值。
+
+若想比较限制的效果，先复制原文件，再只修改第一条折线的顶点坐标，记下改变前后的三个点和 miterlimit；不要同时更换 round 或 bevel。角度变化可能影响尖角外形，显示是否回退还要结合实际数值和查看器结果判断。完成对照后重新打开未改坐标的原稿，核三组折线位置和端帽仍与最初记录一致；控制文件保留独立名称，不用它覆盖导出结果。
+
+在交付表中再为三个顶点分别写「预期外形」「参考查看器」「VectorPaint 实际显示」和「导出结果」；不要把示例中的三种名称直接填写为所有实际结果。若只看到其中一种角，保留原始 SVG 并核对导出是否将描边转换为封闭轮廓。转轮廓可能保留外形却不再保留原顶点编辑能力；若无法确认节点，不要以选中整个图形冒充逐节点编辑。记录控制文件名和查看器版本，便于以后在同一条件下复查。
+
+## 排查与交付
+
+若三角看起来相同，核查源文件三个属性值、描边宽度、当前缩放及导出格式。若尖角被削平，记录角度、miterlimit 和实际外观，再用备份对照，不把猜测写成软件缺陷。若输出为位图，只能记录可见结果，不能宣称可编辑节点仍保留。交付源文件、应用副本、输出及一张表：预期连接、实际外观、对象能否单选、输出格式和待核项；未执行的导入、重开或真机操作明确留空。
+
+## 相关教程与资料
+
+[描边端帽对照](<https://allluckly.cn/guides/vectorpaint-svg-stroke-linecap-endpoint-comparison/>)；[SVG 导入与编辑](<https://allluckly.cn/guides/vectorpaint-svg-import-edit/>)。
+
+资料核对：2026年11月21日，[Apple 中国区公开查询](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software>)列 VectorPaint 1.0.8，最低 iOS / iPadOS 17.0；[W3C SVG 2 描边连接](<https://www.w3.org/TR/SVG2/painting.html#StrokeLinejoinProperty>)描述连接及尖角限制。样本、坐标和验证步骤为本练习设计。 本文作者未实际在 VectorPaint 中导入或操作此样本。
+{% endraw %}

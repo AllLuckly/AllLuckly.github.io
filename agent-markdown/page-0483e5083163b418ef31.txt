@@ -1,0 +1,77 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-svg-linejoin-miter-round-bevel/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint stroke joins: compare miter, round and bevel outer corners'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-svg-linejoin-miter-round-bevel/
+agent_source_sha256: b305d52ff914c9bd78db4b7fed218dd882b5bbc352575638a8ce9269896b3abb
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint stroke joins: compare miter, round and bevel outer corners
+
+Language: en
+Canonical: [VectorPaint stroke joins: compare miter, round and bevel outer corners](<https://allluckly.cn/en/guides/vectorpaint-svg-linejoin-miter-round-bevel/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-svg-linejoin-miter-round-bevel/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-svg-linejoin-miter-round-bevel/>)
+Published: 2026-11-21T00:00:00+08:00
+Modified: 2026-11-21T12:18:31+08:00
+Author: Bison
+
+Compare miter, round and bevel on three identical SVG polylines and inspect import, vertices and export.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-svg-linejoin-miter-round-bevel/>), translated on 2026-11-21. Original publication dates, attribution, code and version notes are retained.
+
+The same centerline can produce a pointed, rounded or beveled outside corner. Compare three original SVG polylines with different `stroke-linejoin` values, then inspect import and output through an SVG entry actually visible in VectorPaint. W3C SVG defines these stroke joins; geometric expectations do not replace physical-device compatibility tests.
+
+## Fix the path and comparison conditions
+
+Make a practice folder for source backup, application working copy and output. The three polylines have the same relative geometry: lower left to upper center to lower right, shifted horizontally. All use width 12, the same color, no fill and butt caps; only the join changes. Record path vertices separately from the stroke outline. A pointed outer corner is not a new path node. SVG user units are not automatically physical device pixels.
+
+## Save the complete SVG
+
+Copy the complete sample into a plain-text editor as `joins.svg`. Retain an untouched source and import only a working copy. Preserve root, namespace and all three `polyline` elements and avoid accidentally saving `joins.svg.txt`. Each relative sequence is (0,60), (40,10), (80,60); the groups differ only in horizontal translation.
+
+```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100">
+  <polyline points="10,60 50,10 90,60" fill="none" stroke="#31554c" stroke-width="12" stroke-linejoin="miter" stroke-miterlimit="4"/>
+  <polyline points="110,60 150,10 190,60" fill="none" stroke="#31554c" stroke-width="12" stroke-linejoin="round"/>
+  <polyline points="210,60 250,10 290,60" fill="none" stroke="#31554c" stroke-width="12" stroke-linejoin="bevel"/>
+</svg>
+```
+
+## Observe the three joins
+
+Open the backup in an SVG-capable reference viewer and inspect the outside of the three top corners. Miter ordinarily forms a point, round joins with an arc, and bevel cuts the outside with a straight line. Their centerline vertices remain (50,10), (150,10) and (250,10); the visible stroke boundary is not a replacement for those coordinates. Inspect enlarged and reduced views, avoiding a path-movement claim based on thumbnail antialiasing alone. The bottom endpoints all have butt caps; they are not the joins being compared.
+
+## Distinguish the miter limit from a node
+
+The first line explicitly uses `stroke-miterlimit="4"`. SVG limits miter extension, so sufficiently sharp angles can fall back to a bevel; do not say that all miters extend infinitely at every angle. These three shapes share one opening angle: compare join types first, then save a separate control with a changed vertex rather than simultaneously changing width and join. Moving a vertex changes path geometry and does not prove the software automatically changed stroke attributes. Record the exact coordinates of both source and control.
+
+## Import and record actual objects
+
+Use an SVG import or open entry actually visible in VectorPaint to select the working copy. Observe whether the three corners remain distinct and try selecting each polyline. Record whether they are separate objects, a group or something else. If an entry is absent, import fails or objects are converted, keep the original and mark the result pending; do not assume a specific join button exists. Redrawing by hand is not evidence of faithful import. If corners are clipped, check canvas and zoom before changing source coordinates.
+
+## Inspect editing and export separately
+
+If individual selection works, duplicate the working draft and move only the middle line; confirm the left and right lines and vertices remain in place. If not, record the limitation and preserve the copy. Save an editable draft, then export a new file through a visible control. Reopen it and compare the three outer corners, bottom endpoints and relative positions. If output remains SVG, inspect whether `stroke-linejoin` survives or has been converted to equivalent shapes. Similar appearance does not prove identical attributes; an outlined stroke is not necessarily the original node-editable polyline.
+
+## Record outline and center point separately
+
+Make a small table of the relative vertices: in every group the top vertex is 40 units right and 50 units above its left endpoint. Add each horizontal starting coordinate to obtain the three different canvas x values. In the reference viewer record the outside shape at each top corner in a separate column from the center path: the former is being compared, while the latter is fixed in this sample. An enlarged screenshot helps observation, but on-screen line thickness varies with zoom and is not a measurement of source width.
+
+To explore the limit, duplicate the file and change only the first polyline's vertex coordinates, recording all three points and the miter limit before and after. Do not simultaneously switch it to round or bevel. A changed angle can alter the outer point; whether a fallback occurs depends on the actual values and observed renderer. Reopen the untouched original afterward and check all three positions and caps against the initial record. Give the control its own name rather than overwriting the export.
+
+For each corner add table columns for expected outline, reference viewer, actual VectorPaint display and exported result; do not prefill observations with the three source names. If only one corner type appears, retain the SVG and inspect whether export converted the stroke to closed outlines. Such a conversion can retain appearance while losing the original editable vertex. If individual nodes cannot be confirmed, selecting the whole shape is not a node-editing test. Record control file names and viewer version for a later comparison under the same conditions.
+
+## Troubleshoot and deliver
+
+If all three corners appear alike, inspect the three source attributes, stroke width, zoom and export format. If the miter is cut off, record angle, miter limit and actual display and compare the backup rather than declaring a software defect from a guess. A raster export can demonstrate appearance only, not retained editable nodes. Deliver source, application copy, output and a table of expected join, observed corner, individual selection, output format and pending items. Mark unperformed import, reopening or device operations pending.
+
+## Related guides and sources
+
+[Stroke cap comparison](<https://allluckly.cn/en/guides/vectorpaint-svg-stroke-linecap-endpoint-comparison/>); [Import and edit SVG](<https://allluckly.cn/en/guides/vectorpaint-svg-import-edit/>).
+
+Checked 21 November 2026: [Apple's China lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software>) lists VectorPaint 1.0.8, requiring iOS / iPadOS 17.0. [W3C SVG 2 stroke joins](<https://www.w3.org/TR/SVG2/painting.html#StrokeLinejoinProperty>) describes joins and the miter limit. The sample, coordinates and review steps are original to the exercise. The author did not actually import or operate this sample in VectorPaint.
+{% endraw %}

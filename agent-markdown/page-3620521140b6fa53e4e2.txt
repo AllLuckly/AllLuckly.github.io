@@ -1,0 +1,77 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-svg-dash-pattern-odd-list-repetition/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint dash rhythm: compare repeated odd and even SVG lists'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-svg-dash-pattern-odd-list-repetition/
+agent_source_sha256: ca7255bfca81ef07e5d753bd7bb20cc03a0319558c196763c3dd810be91f2ab5
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint dash rhythm: compare repeated odd and even SVG lists
+
+Language: en
+Canonical: [VectorPaint dash rhythm: compare repeated odd and even SVG lists](<https://allluckly.cn/en/guides/vectorpaint-svg-dash-pattern-odd-list-repetition/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-svg-dash-pattern-odd-list-repetition/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-svg-dash-pattern-odd-list-repetition/>)
+Published: 2026-11-21T00:00:00+08:00
+Modified: 2026-11-21T12:18:31+08:00
+Author: Bison
+
+Calculate fixed-length dash segments and compare imported and exported results using three SVG centerlines.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-svg-dash-pattern-odd-list-repetition/>), translated on 2026-11-21. Original publication dates, attribution, code and version notes are retained.
+
+The same line can have a different rhythm with `12 6` and `12 6 3`. Create a calculable SVG source, then use an SVG import route actually available in VectorPaint to observe, edit and export a copy. The W3C SVG specification alternates painted lengths and gaps, repeating an odd-length list once to make an even one. Import fidelity depends on the installed version; no physical-device test is claimed.
+
+## Fix the shared conditions
+
+Make a practice folder and keep the source separate from exported copies. Each horizontal centerline runs from x=20 to x=200, a length of 180, at y=30, 70 and 110. Use the same color, stroke width 4 and butt caps; only the dash arrays differ. The dimensions are viewBox user units, not automatically physical screen pixels. Butt caps make the visible ends easier to compare with centerline calculations; do not mistake cap extension for a changed dash array.
+
+## Save a reproducible source
+
+In a plain-text editor save the following complete content as `dash-patterns.svg`. Keep the `<svg>` root, namespace, three `line` elements and attributes. Retain an untouched backup and import a working copy; avoid a misleading `.svg.txt` extension and do not run embedded scripts from unknown files.
+
+```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 140">
+  <line x1="20" y1="30" x2="200" y2="30" stroke="#31554c" stroke-width="4" stroke-linecap="butt" stroke-dasharray="12 6"/>
+  <line x1="20" y1="70" x2="200" y2="70" stroke="#31554c" stroke-width="4" stroke-linecap="butt" stroke-dasharray="12 6 3"/>
+  <line x1="20" y1="110" x2="200" y2="110" stroke="#31554c" stroke-width="4" stroke-linecap="butt" stroke-dasharray="12 6 3 12 6 3"/>
+</svg>
+```
+
+## Calculate the first cycle
+
+The first line paints 12 and skips 6, a cycle of 18. Its 180 units fit exactly ten cycles; the final gap ends at the right endpoint. Measured from the left, record paint at 0–12, gap at 12–18 and paint at 18–30. Antialiasing may affect a few boundary pixels, so compare position and rhythm rather than treating one pixel as a length measurement. If the result is solid, check source and import behavior before blaming an imagined control.
+
+## Expand the odd list
+
+The three values in the second line repeat once, giving `12 6 3 12 6 3`. A 42-unit cycle is paint 12, gap 6, paint 3, gap 12, paint 6, gap 3; it is not endlessly repeated “paint 12, gap 6, paint 3.” Accumulate the boundaries: 0–12 painted, 12–18 gap, 18–21 painted, 21–33 gap, 33–39 painted, 39–42 gap. The 180-unit line contains four complete cycles and 12 more units, so the final painted segment is 168–180. The explicitly six-value third line should have the same rhythm as the second.
+
+## Import and inspect the objects
+
+Use an SVG import or open control actually visible in VectorPaint to choose the working copy. Inspect positions and rhythm before trying to select objects. Record whether the application presents separate objects, a group or something else. If there is no matching control, import fails, or objects are converted while editing, preserve the original and record the observation instead of assuming later steps succeeded. Before changing width, path or scale, capture or write down the first three painted segments at each left end.
+
+## Separate appearance, structure and export
+
+If the second and third look alike, the preview has shown no visible difference; that does not mean the source arrays were identical. If object movement is supported, move only the third line in a copy and check whether the other two remain fixed. If it cannot be selected separately, record that without forcibly breaking the original. Save an editable draft and export to a new file through a visible control. Reopen the export and compare rhythm, object positions and endpoints. If it is still SVG, inspect whether arrays remain or were transformed to another equivalent structure. Record visual agreement and exact attribute retention as separate outcomes.
+
+## Convert relative distances to canvas positions
+
+The earlier intervals begin at zero on the line. Add the left endpoint x=20 to compare with source coordinates: the second line's first painted segments are x=20–32, 38–41 and 53–59, its next cycle begins at x=62, and its final segment is x=188–200. The third should share that rhythm. Draw two equal paper strips, one with relative distances and one with canvas coordinates, before opening a viewer. If the three-unit dash is hard to see, zoom without changing the source and record the zoom; screen distances after zoom are not source units.
+
+Save a separate control with the second array changed to `12 6 3 0`. It has four values and a 21-unit cycle; the zero-length gap can make consecutive painted portions touch. Use it only to study gap order, retaining the original three lines. If viewers differ at a junction, record the display without generalizing to every export format. Return to the original working copy when comparing the three arrays so an intentional control is not mistaken for an import defect.
+
+In the record table separately list source array, reference-viewer rhythm, application display and exported display. If the application converts a dash into multiple short lines, the rhythm may remain while object structure changes. During selection record only what can actually be selected; moving one segment does not establish retention of the original path. Preserve source and export for independent review.
+
+## Troubleshoot and deliver
+
+If lines two and three differ, compare coordinates, width, caps and `stroke-dasharray`, then check for copy omissions, scaling differences or import conversion. A raster-only export can still be visually inspected but is not an editable path. Deliver source, application copy, output and a table stating expected cycle, observed rhythm, separate selection, output format and pending items. Confirm the backup was not overwritten; mark unperformed imports or exports as pending.
+
+## Related guides and sources
+
+[Stroke cap comparison](<https://allluckly.cn/en/guides/vectorpaint-svg-stroke-linecap-endpoint-comparison/>); [Import and edit SVG](<https://allluckly.cn/en/guides/vectorpaint-svg-import-edit/>).
+
+Checked 21 November 2026: [Apple's China lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software>) lists VectorPaint 1.0.8, requiring iOS / iPadOS 17.0; [W3C SVG 2 stroke dashing](<https://www.w3.org/TR/SVG2/painting.html#StrokeDashing>) specifies alternating lengths and odd-list repetition. The example, arithmetic and checks are designed for this exercise, not a claim of universal SVG compatibility.
+{% endraw %}
