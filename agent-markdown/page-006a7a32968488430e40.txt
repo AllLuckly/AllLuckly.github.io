@@ -1,0 +1,87 @@
+---
+layout: null
+permalink: /guides/vectorpaint-dashoffset-phase-open-line/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: VectorPaint 虚线起点对照：偏移数值如何改变同一路径的节奏
+agent_source_url: https://allluckly.cn/guides/vectorpaint-dashoffset-phase-open-line/
+agent_source_sha256: e91f670d5a168cb96bd5a56b690565a5ed97e60a258b8c11efb3edf65f5e2d9d
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint 虚线起点对照：偏移数值如何改变同一路径的节奏
+
+语言：zh-CN
+原文：[VectorPaint 虚线起点对照：偏移数值如何改变同一路径的节奏](<https://allluckly.cn/guides/vectorpaint-dashoffset-phase-open-line/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-dashoffset-phase-open-line/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-dashoffset-phase-open-line/>)
+发布于: 2026-11-22T00:00:00+08:00
+内容更新于: 2026-11-22T00:00:00+08:00
+署名：Bison
+
+制作三条坐标相同的 SVG 线段，对照虚线偏移并核查导入与导出结果。
+
+制作三条坐标相同的 SVG 线段，对照虚线偏移并核查导入与导出结果。
+
+## 确定实验问题
+
+本练习观察 SVG 的虚线图案沿一条固定路径如何移动，而不是移动路径本身。先准备三条相同的水平线：每条从 x=20 到 x=200，颜色、线宽和端帽一致，虚线数组均为 12 和 6。只将偏移分别设为 0、6、18。SVG 参考资料定义了偏移影响图案起点；它并不保证某个应用版本导入时保留该属性。
+
+## 先算出预期周期
+
+数组 12 6 表示沿中心线交替绘制 12 单位、留空 6 单位，一个完整周期是 18 单位。偏移 18 与偏移 0 相差一个完整周期，因此两条线应呈现相同的重复相位；偏移 6 则不同。使用数值单位，不把百分比当作路径长度的百分比，也不把坐标单位未经核对地当作设备像素。先写下这两个判断，避免看到结果后才倒推结论。
+
+## 建立独立的源文件
+
+在现有纯文本编辑器创建一个 SVG 文件，根元素设 xmlns 为 http://www.w3.org/2000/svg，viewBox 设为 0 0 220 140。分别添加三条 line 元素，x1=20、x2=200，y1 与 y2 分别同为 30、70、110。三条都设 stroke=#31554c、stroke-width=4、stroke-linecap=butt、stroke-dasharray=12 6；再依次设置 stroke-dashoffset=0、6、18。保存为 dash-phase.svg 并复制备份，确认扩展名不是 svg.txt。
+
+可直接复制完整样本：
+
+```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 140">
+  <line x1="20" y1="30" x2="200" y2="30" stroke="#31554c" stroke-width="4" stroke-linecap="butt" stroke-dasharray="12 6" stroke-dashoffset="0"/>
+  <line x1="20" y1="70" x2="200" y2="70" stroke="#31554c" stroke-width="4" stroke-linecap="butt" stroke-dasharray="12 6" stroke-dashoffset="6"/>
+  <line x1="20" y1="110" x2="200" y2="110" stroke="#31554c" stroke-width="4" stroke-linecap="butt" stroke-dasharray="12 6" stroke-dashoffset="18"/>
+</svg>
+```
+
+## 用坐标表检查前三段
+
+先把直线左端 x=20 当作局部距离零点。偏移 0 时，前两段可见描边分别从 x=20 到 x=32、从 x=38 到 x=50，中间 x=32 至 x=38 是空隙。正偏移 6 时，相当于在周期中从第 6 单位开始读取：第一段可见描边从 x=20 到 x=26，空隙到 x=32，再画到 x=44。偏移 18 与偏移 0 在完整周期上重合。这里使用 butt 端帽，使可见端面与计算的中心线边界一致；图形被画布裁掉或放大后出现抗锯齿时，不要只看一个边缘像素判断。
+
+在纸上分别标注 20、26、32、38、44、50 六个坐标，再用浏览器的放大功能比较段落顺序。放大只能帮助看清边缘，不改变原始坐标。若复制时把中间行偏移写成负数，相位方向会改变；先恢复正 6，保留另外一份负值作为自主延伸实验，避免将两个问题混在同一张验证表内。
+
+## 先在浏览器核对基准
+
+用支持 SVG 的浏览器打开原始文件，三条线应处在不同高度，左右路径端点应对齐。对照顶部与底部，重复的短划和空隙应上下对齐；中间一行应有相位差。用纸记下每行第一个可见短划的位置，并在文件中重新检查属性值。若所有行相同，先核偏移有没有拼错或被样式覆盖；若线不出现，检查 XML 引号、命名空间和颜色。保留这份浏览器结果作为比较，不等同于设备验收。
+
+## 导入副本并检查对象
+
+在安装的 VectorPaint 中寻找当前可见的 SVG 打开或导入入口，选择工作副本；界面没有该入口或不支持此文件时，记录为未完成，不把属性名当成必须存在的按钮。导入后不要立即修改，先检查三行位置、端点和节奏，再逐一尝试选择对象。记录它们是否仍能单独选中、外观是否与浏览器基准一致；外观相同不自动证明原来的 SVG 属性仍被保留。
+
+## 比较而不混入额外变量
+
+如果可以选中单行，先只移动它到空白位置再撤销，确认所选对象；不要同时改变颜色、线宽和缩放。若应用允许复制对象，可以保留一份未改动的导入结果，再在副本上做实验。观察到中间行与原图不同，应记录差异的具体位置，而不是直接归因于偏移：可能还有视图缩放、路径转换或渲染器差异。不能撤销时返回原副本重新开始。
+
+## 输出后进行两种复核
+
+使用当前版本实际提供的分享或导出方式，另存文件，不覆盖 SVG 原稿。先重新打开输出，从同一缩放程度比较三行；如果导出为 SVG，用文本编辑器查看线段与偏移是否仍在，或是否已转换为别的路径。若只能导出位图，只检查可见外观，不声称它仍是可编辑矢量。记录文件名、格式、是否可单选和与原稿的差异，避免把浏览器参考误记为应用输出。
+
+## 复查样本边界
+
+三条线的 y 坐标不同只是为了让结果能同时看见，并不是实验变量；线的长度和相位应沿横向比较。若把整张图缩放到不同尺寸再截图，先恢复相同缩放并对齐左端，否则视觉距离无法直接比较。练习完成后可将坐标表放在文件旁，方便下次检查别的虚线数组。
+
+## 排查异常并保留结论
+
+若顶部与底部不一致，回到备份检查两行除偏移外的坐标、数组、端帽及线宽；确认 18 是数组周期而不是只取了绘制段的 12。若中间行没有变化，检查样式是否覆盖属性，并分别打开浏览器原稿与应用输出。建立简短记录：预期、浏览器显示、应用导入、导出重开和未完成项；没有实际执行的步骤明确写待核。最后检查备份仍可打开，再决定是否分享练习文件。
+
+## 额外对照负偏移
+
+另存一份实验副本，只把中间线的偏移从正 6 改为负 6，其余数值保持不变。按数组周期计算，路径起点 x=20 落在空隙，第一段可见线从 x=26 到 x=38；原来的正 6 则从 x=20 开始画到 x=26。在浏览器比较两份文件，若方向与纸面预期不同，先检查负号和实际打开的副本；这项额外实验不改变应用导入结果。
+
+## 相关教程与资料
+
+[虚线数组重复规律](<https://allluckly.cn/guides/vectorpaint-svg-dash-pattern-odd-list-repetition/>)、[描边端帽对照](<https://allluckly.cn/guides/vectorpaint-svg-stroke-linecap-endpoint-comparison/>)。
+
+2026年11月22日核对：[Apple 公开版本查询](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software>)、[MDN：虚线偏移](<https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/stroke-dashoffset>)。未声称完成真实设备或私人服务器测试。
+{% endraw %}

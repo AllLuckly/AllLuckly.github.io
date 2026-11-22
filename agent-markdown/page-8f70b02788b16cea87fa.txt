@@ -1,0 +1,98 @@
+---
+layout: null
+permalink: /guides/vectorpaint-svg-meet-slice-viewport-comparison/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: VectorPaint 视口适配对照：完整显示与填满裁切如何选择
+agent_source_url: https://allluckly.cn/guides/vectorpaint-svg-meet-slice-viewport-comparison/
+agent_source_sha256: c6923cc5b5eff64898923d509acb48ad3daaa1cd60253181ab55d8149df8a3a9
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint 视口适配对照：完整显示与填满裁切如何选择
+
+语言：zh-CN
+原文：[VectorPaint 视口适配对照：完整显示与填满裁切如何选择](<https://allluckly.cn/guides/vectorpaint-svg-meet-slice-viewport-comparison/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-svg-meet-slice-viewport-comparison/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-svg-meet-slice-viewport-comparison/>)
+发布于: 2026-11-22T00:00:00+08:00
+内容更新于: 2026-11-22T00:00:00+08:00
+署名：Bison
+
+用同一组圆形比较 SVG 的 meet 与 slice，计算视口边界并复核应用导入结果。
+
+用同一组圆形比较 SVG 的 meet 与 slice，计算视口边界并复核应用导入结果。
+
+## 确定两个问题
+
+当宽画面进入方形视口时，可以完整显示并留白，也可以填满视口而让两边超出。SVG 的 preserveAspectRatio 可指定对齐及 meet 或 slice；这次固定居中，只比较适配方式。目标是判断圆形是否仍保持圆，以及每个圆在视口内是否可见，而不是测试应用一定有对应按钮。先记下浏览器参照与应用导入是两项独立观察。
+
+## 固定坐标和图形
+
+两组样本的 viewBox 均为 0 0 200 100；每组放三个半径 10 的圆，圆心依次为 (25,50)、(100,50)、(175,50)。两个嵌套视口均为 100×100，位置不同以便并排；左边用 xMidYMid meet，右边用 xMidYMid slice，并显式设置 overflow=hidden。两个背景方框帮助看清视口范围，颜色与尺寸不是软件默认值。
+
+## 手算完整显示
+
+左侧 meet 的缩放取 100/200 和 100/100 中较小的 0.5。内容宽 100、高 50，因此在方框上下各留 25 单位，三个圆全部显示；圆的半径也按同一比例变成 5。若画面整体随后缩放，需先按各自方框宽度归一化再比较，不把屏幕上的实际像素数当作源坐标。
+
+## 手算填满与裁切
+
+右侧 slice 的缩放取较大的 1，内容是 200×100，方框只容纳居中的横向 100 单位，即原坐标 x=50 到 x=150。圆心 x=100 的圆完整可见，左右两个圆连同各自半径都在窗口外。窗口之外不等于源文件删除了圆：检查原始 SVG 仍能看到三个 circle 元素。视口裁切和破坏性裁剪应分开记录。
+
+## 保存原始 SVG 并建立参照
+
+将下面的完整示例复制到纯文本编辑器，保存为 viewport-fit.svg，确认扩展名不是 svg.txt，再另存备份。用支持 SVG 的浏览器打开：左侧三个小圆位于方框中央的水平带内，右侧只显示一个较大的圆。若右侧仍显示边缘圆，检查嵌套 svg 的 overflow、slice 拼写及窗口尺寸；如果样本打不开，先检查根命名空间与引号。
+
+```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 120">
+  <rect x="10" y="10" width="100" height="100" fill="#edf2ef"/>
+  <rect x="140" y="10" width="100" height="100" fill="#edf2ef"/>
+  <svg x="10" y="10" width="100" height="100" viewBox="0 0 200 100" preserveAspectRatio="xMidYMid meet" overflow="hidden">
+    <circle cx="25" cy="50" r="10" fill="#31554c"/>
+    <circle cx="100" cy="50" r="10" fill="#31554c"/>
+    <circle cx="175" cy="50" r="10" fill="#31554c"/>
+  </svg>
+  <svg x="140" y="10" width="100" height="100" viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" overflow="hidden">
+    <circle cx="25" cy="50" r="10" fill="#31554c"/>
+    <circle cx="100" cy="50" r="10" fill="#31554c"/>
+    <circle cx="175" cy="50" r="10" fill="#31554c"/>
+  </svg>
+</svg>
+```
+
+## 区分留白和内容形状
+
+左侧的上下空白来自宽高比不一致时的完整适配，不是新增的白色色块；示例中的浅色方框只是视口背景。两个样本的圆仍按相同水平和垂直比例缩放，不能因圆在右侧更大就说被拉成椭圆。用纸记录左侧三个圆及上下留白、右侧中间圆与裁切；如果需要测量，先确认比较的是相同的显示倍率。
+
+## 在方格纸上复算窗口
+
+在纸上画一个宽 20 格、高 10 格的长方形，标出圆心 2.5、10、17.5 格；再画一个居中的宽 10 格、高 10 格方框。方框两侧分别落在第 5 格和第 15 格，因此只有中间圆处在方框内。这相当于右侧 slice 的原坐标窗口。若画纸方格代表 10 个源单位，先保留比例再比较，不要把标注的格数直接写作屏幕像素。
+
+完整显示可另画一个方框，把整个长方形等比缩到方框宽度：它的高度只占方框一半。分别在两张图写下「原坐标」「缩放后」「视口内可见」，避免将这三个不同层次的数据混到一个长度里。纸面预测与浏览器观察不一致时，先检查图形与视口的宽高是否抄反。
+
+## 在应用中导入副本
+
+在安装的 VectorPaint 中寻找当前可见的 SVG 打开或导入入口，选择工作副本；若入口不存在或文件不受支持，记录为未完成。先不要移动对象，观察方框、圆形与浏览器的差别，再尝试单独选择可见对象。导入可能转换嵌套视口或裁切，是否保留结构须以实际结果为准；不要把 SVG 属性名当作软件里必有的按钮。
+
+## 复查源结构与可见结果
+
+按预期左侧显示三个圆、右侧显示一个，共四个；若应用画面显示六个，则需要检查裁切或文件。先确认原稿中的两组各有三个 circle，右侧的两个原本在窗口之外，别把源元素存在误认为导入异常。观察应用是否忽略了视口裁切，或导入后将对象展开；记录事实即可，不假设内部原因。对象能单选也不等于嵌套结构、适配属性和裁切仍保持。若只能显示位图预览，写明可见外观与未验证的编辑能力。
+
+## 另存并复核输出
+
+通过当前版本实际可见的分享或导出入口另存，不覆盖原稿。重新打开输出比较左侧留白、右侧可见区域及边界；若输出为 SVG，可在文本编辑器核对 viewBox、preserveAspectRatio、overflow 与 circle 是否仍存在，也可能发现应用已转换为不同结构。若为位图，仅核外观与尺寸，不声称仍可编辑。记录来源文件、应用版本和操作步骤，避免将浏览器结果误写为导出结果。
+
+## 排查并保留待核事项
+
+图形看似变形时，先比较方框宽高、浏览器缩放和原稿中的 viewBox；不一致时只修正一项再复测。右侧多出的圆可能是裁切未生效，也可能是实际打开了其他副本，先核文件名与时间。将预期、浏览器、应用导入和导出重开分行记录；未执行的设备或导出步骤写待核，保留备份与原始参数以便后来复查。
+
+## 用半圆测试裁切边界
+
+另存测试副本，只将右侧样本最左圆的圆心从 x=25 移到 x=50，半径仍为 10。右侧裁切窗口从 x=50 开始，所以这个圆的一半应留在窗口内，中央圆仍完整；左侧三个圆不变。先在浏览器检查五个可见圆形部分，再恢复原稿；若半圆完整出现，核对裁切窗口是否生效，不把源元素增加或删除当作原因。
+
+## 相关教程与资料
+
+[视窗原点与位置](<https://allluckly.cn/guides/vectorpaint-svg-viewbox-origin-position-window/>)、[SVG 兼容排查](<https://allluckly.cn/guides/vectorpaint-svg-compatibility-check/>)。
+
+2026年11月22日核对：[Apple 公开版本查询](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software>)、[MDN：视口适配](<https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/preserveAspectRatio>)。未声称完成真实设备或私人服务器测试。
+{% endraw %}

@@ -1,0 +1,49 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay with Jellyfin: distinguish a feature film from its trailer'
+description: Use one authorized film and trailer to check Jellyfin extra identification, then inspect the entries
+  and playback actually offered in iCouldPlay.
+permalink: /en/guides/icouldplay-jellyfin-film-trailer-extra-separate-playback-check/
+date: '2026-11-22 00:00:00 +08:00'
+modified: '2026-11-22 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 231
+topic: Jellyfin feature and trailer identification
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-22-icouldplay-jellyfin-film-trailer-extra-separate-playback-check.md
+source_url: /guides/icouldplay-jellyfin-film-trailer-extra-separate-playback-check/
+translation_method: editorial
+translation_source_sha256: 3befffae012aac732d094ce415af3aa333818bca3774ea42cd86a29b1f8ba1a8
+translation_date: '2026-11-22T01:03:31+00:00'
+excerpt: Use one authorized film and trailer to check Jellyfin extra identification, then inspect the entries and
+  playback actually offered in iCouldPlay.
+---
+{% raw %}
+<p>Use one authorized film and trailer to check Jellyfin extra identification, then inspect the entries and playback actually offered in iCouldPlay.</p>
+<h2 id="section-1">Prepare two distinguishable files</h2>
+<p>Choose an authorized short film and its trailer and retain the original files and backups. Record each duration, opening image and size without sharing the content. First confirm that both play using a tool already available on the server. If a file itself cannot open, resolve that problem before attributing it to iCouldPlay. Use only your own Jellyfin server and an authorized account.</p>
+<h2 id="section-2">Arrange test copies using server rules</h2>
+<p>Place a copy of the feature in a test movie folder and name an MP4 trailer copy trailer.mp4 in that same folder, or trailer.mkv for an MKV trailer. Jellyfin documents the special trailer filename with trailer.mp4 as an example; use an extension matching the actual container rather than converting a file by renaming its extension. Name the folder and feature according to the existing movie-library rules, and avoid putting files directly in the library root. Do not move the only copies in a production library; stop if a separate test folder is unavailable.</p>
+<h2 id="section-3">Verify media identity in Jellyfin first</h2>
+<p>Use the server’s current administration interface to scan the movie library containing the test folder. After scanning, locate the movie in Jellyfin’s administration or web interface, compare its title and feature duration, and inspect whether the trailer is identified as extra content. Jellyfin version, library settings and interface affect presentation. If the trailer is missing, record its actual location, filename and scan result; an extra movie entry is not automatically successful extra identification.</p>
+<h2 id="section-4">Inspect entries actually visible in iCouldPlay</h2>
+<p>Open iCouldPlay and its connected Jellyfin source, and locate the same item by the test film name. Check whether the item appears and whether its title and duration match the feature. Then inspect whether the current interface actually offers a trailer or extras entry. The public listing supports Jellyfin but does not promise presentation of every server extra. If no entry appears, record it as not observed; do not assume it exists or mistake the feature cover for the trailer.</p>
+<h2 id="section-5">Play each item and check the result</h2>
+<p>Play the first few seconds of the feature and compare the opening and duration with the record. Only if a trailer entry is actually present, open it separately and compare the trailer’s opening and duration. Seeing artwork, launching a player and correctly playing the trailer are distinct outcomes. If playback fails, record the triggering entry, network state and a redacted error. Do not publish server addresses, tokens or private media paths. Mark trailer playback untested if the entry is absent.</p>
+<h2 id="section-6">Troubleshoot and preserve the original library</h2>
+<p>If Jellyfin itself does not identify the trailer, check that the test file is in the correct movie folder, that its name and real extension are correct, and that the scan finished. Change one condition at a time and observe again. If Jellyfin identifies it but iCouldPlay does not show it, record both versions and the observation; that does not prove server data loss. Remove the test copies through your own server-management process and confirm the original film remains available. This tutorial is based on public documentation and does not claim a device or server test.</p>
+<h2 id="compare-observations">Compare different observations on each side</h2>
+<p>Suppose the Jellyfin web interface plays a 90-second trailer but iCouldPlay shows only the 45-minute feature. First confirm that both use the same server, account and film; similar titles can refer to different items. The web interface identifying an extra establishes a server-side item, not an equivalent client entry. Record “visible on the server, not observed in iCouldPlay.” Preserve the originals; do not rename the trailer as a separate film just to force it to appear.</p>
+<p>If iCouldPlay presents an entry but plays the feature, record the entry path, recognizable opening of each sample and actual duration. Then check the trailer entry in Jellyfin itself. If both play the feature, investigate server identification and the files first. If only iCouldPlay differs, collect the client observation. A displayed title or cover alone does not establish which video played.</p>
+<h2 id="change-one-condition">Avoid false conclusions when changing conditions</h2>
+<p>Change one condition at a time: for example, rename the test copy, scan again and wait for completion. Record the names before and after and the scan result. Do not simultaneously change account, film folder and client network, because a changed result would not identify its cause. Scanning can take time; use the server interface’s actual completion state rather than assuming an immediate update.</p>
+<p>If the server recognizes the trailer but iCouldPlay has no entry, the app and server versions, test date and verified server outcome make a reproducible record. Exclude private videos, complete paths, login details and tokens; when seeking help, describe only the observation and a shareable test sample. Afterwards, remove test copies using the existing management process and check that the original still plays.</p>
+<p>If the library already contains a similarly titled film, compare its server folder and duration before confusing it with the test item. If the test material cannot be safely isolated, inspect the server read-only first; do not overwrite a real film or change another person’s library.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-jellyfin-library/">Connect a Jellyfin library</a>; <a href="/en/guides/icouldplay-server-original-transcoded-copy/">Check original and transcoded playback</a>.</p>
+<p>Checked 22 November 2026: <a href="https://apps.apple.com/cn/app/id6755653178">iCouldPlay App Store listing</a>; <a href="https://jellyfin.org/docs/general/server/media/movies/">Jellyfin media extras documentation</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

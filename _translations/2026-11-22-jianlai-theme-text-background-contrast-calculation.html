@@ -1,0 +1,70 @@
+---
+layout: guide
+author: Bison
+app_id: jianlai
+title: '键来 theme contrast: calculate two flat-color pairs, then inspect real key labels'
+description: Calculate sample opaque-color contrast and distinguish paper values from actual keyboard readability.
+permalink: /en/guides/jianlai-theme-text-background-contrast-calculation/
+date: '2026-11-22 00:00:00 +08:00'
+modified: '2026-11-22 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 79
+topic: Theme colors and contrast calculation
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-22-jianlai-theme-text-background-contrast-calculation.md
+source_url: /guides/jianlai-theme-text-background-contrast-calculation/
+translation_method: editorial
+translation_source_sha256: e728f036d8a1665eec36758176a9f74ecd01a1dfc21e2c8590bef73f98903cb9
+translation_date: '2026-11-22T01:40:39+00:00'
+---
+{% raw %}
+<p>When customizing a 键来 theme, similar text and key-background colors can make labels hard to read. This exercise calculates contrast for two opaque sample pairs outside the app, then observes the actual keyboard if possible. W3C’s web contrast method is a reference for comparing colors, not automatic conformance certification of this native interface. Images, transparency, font, size and display conditions may alter the result.</p>
+
+<h2 id="prepare-colors-and-a-recoverable-theme">Prepare colors and a recoverable theme</h2>
+
+<p>Record the current theme and colors and confirm the actual way to restore them; do not overwrite the user’s valued configuration. Prepare an ordinary note with nonprivate <code>ABC 123</code>. If text or key-background colors are not adjustable in the current theme, complete the paper calculation and mark in-app setup not applicable. Do not assume there is a precise hexadecimal input.</p>
+
+<p>Sample A uses white <code>#FFFFFF</code> text on medium gray <code>#777777</code>; sample B uses the same white text on darker gray <code>#595959</code>. Both are opaque flat colors without images, gradients or shadows. Only the background changes. These are not claimed app defaults. W3C has a 4.5:1 reference threshold for ordinary web text; here it compares the samples, not a claim of legal or comprehensive accessibility compliance for a native keyboard.</p>
+
+<h2 id="identify-the-two-layers-being-compared">Identify the two layers being compared</h2>
+
+<p>Choose a visible key label and the adjacent key background, not candidate text against the device wallpaper. If either is translucent, mark the flat-color calculation inapplicable until compositing is understood. A picture background can vary by position, so one configured color pair cannot establish readability of all keys.</p>
+
+<p>Record text color, background color, opacity, source and intended interface for each pair. Candidate and body text are different areas needing their own comparisons. This exercise calculates one selected flat-color key label, not every candidate, icon or host document. Do not upload screenshots containing private input to an online checker.</p>
+
+<h2 id="calculate-relative-luminance">Calculate relative luminance</h2>
+
+<p>W3C’s method divides each 0–255 sRGB channel by 255 and linearizes it: divide by 12.92 at or below 0.04045; otherwise calculate <code>((s+0.055)/1.055)^2.4</code>. Relative luminance is <code>0.2126R + 0.7152G + 0.0722B</code>. White <code>#FFFFFF</code> has luminance 1. Each gray has equal channels, so one channel calculation suffices.</p>
+
+<p>For <code>#777777</code> each channel is 119/255, producing about 0.184475 after linearization. For <code>#595959</code> it is 89/255, producing about 0.099899. Check with your own calculator; no image upload is required. Compare thresholds using unrounded intermediates. The displayed decimals only aid the calculation.</p>
+
+<h2 id="calculate-contrast-and-explain-the-boundary">Calculate contrast and explain the boundary</h2>
+
+<p>Use W3C’s formula <code>(L1+0.05)/(L2+0.05)</code> with the lighter and darker luminance. Sample A is about <code>1.05/(0.184475+0.05)=4.478:1</code>; sample B is about <code>1.05/(0.099899+0.05)=7.005:1</code>. Although A can be displayed as approximately 4.48, it is below 4.5 and must not be rounded into a pass. B is above 4.5. Contrast describes a color relationship, not every aspect of visual experience.</p>
+
+<p>If using an external color tool, confirm the same sRGB method and opaque inputs, and record tool and inputs. Its label is not a report on the actual 键来 interface; actual observable theme colors require a separate check. Users can select what works for them rather than treating one number as proof that everyone can read it.</p>
+
+<h2 id="observe--with-a-recoverable-setup">Observe 键来 with a recoverable setup</h2>
+
+<p>Only if the installed version offers the relevant controls and the user wants to, apply colors close to the two examples in a recoverable theme copy or practice theme. Without a precise color entry, record the visible selection and do not claim exact <code>#777777</code> or <code>#595959</code> values. Do not apply flat-color results directly to a translucent or image background.</p>
+
+<p>On the same device, brightness, host and layout, select 键来 and type <code>ABC 123</code>. Observe label, key boundary and candidate readability and correctness of body text separately. Readable key labels do not establish candidate or document readability. Change only one color condition and record actual results; changing font, size and image at once cannot isolate contrast.</p>
+
+<h2 id="troubleshoot-and-record-limits">Troubleshoot and record limits</h2>
+
+<p>If the calculation and subjective readability differ, check the actual colors, transparency, background pattern and observed location. Antialiasing and font weight can affect edge appearance on screen. A paper formula does not establish every rendered pixel or every user’s experience. Do not ask users to stare at a screen for long periods or repeatedly dim it.</p>
+
+<p>If the picker shows no values, actual foreground is unknown or an image covers the area, mark that condition unmeasured and keep a readable theme. Use self-made color blocks and nonprivate text for any support request. Check the original setting and save state before considering a reinstall or deleting theme data.</p>
+
+<h2 id="complete-the-record-and-restore">Complete the record and restore</h2>
+
+<p>Deliver sample A and B colors and calculation, whether exact values could be set in the theme, key and candidate observations and committed text. Identify paper calculations versus actual device observations. Restore the original theme or keep the new choice as the user wishes and reopen an ordinary input area. Do not mark unperformed operations as passed. No keyboard device, vision or accessibility-conformance test is claimed.</p>
+
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+
+<p><a href="/en/guides/jianlai-keyboard-theme-contrast-room-light-two-observation-ledger/">Theme readability in different lighting</a>; <a href="/en/guides/jianlai-background-image-key-label-readability/">background picture and labels</a>.</p>
+
+<p>Checked on 22 November 2026: <a href="https://itunes.apple.com/lookup?id=6754281557&amp;country=cn&amp;entity=software">Apple’s China app lookup</a> lists 键来 1.0.5 theme and color customization. <a href="https://www.w3.org/WAI/WCAG21/Techniques/general/G18">W3C’s contrast method</a> describes relative luminance, calculation and the web-text reference threshold. A paper result does not automatically certify a native interface.</p>
+{% endraw %}

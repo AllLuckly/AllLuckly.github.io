@@ -1,0 +1,52 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay and Jellyfin episode versions: distinguish two files for one episode'
+description: Use two authorized test videos for one episode to check Jellyfin version recognition and the entries
+  and playback actually offered in iCouldPlay.
+permalink: /en/guides/icouldplay-jellyfin-episode-multiple-versions-source-and-client-check/
+date: '2026-11-22 00:00:00 +08:00'
+modified: '2026-11-22 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 232
+topic: Jellyfin multiple versions of one episode
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-22-icouldplay-jellyfin-episode-multiple-versions-source-and-client-check.md
+source_url: /guides/icouldplay-jellyfin-episode-multiple-versions-source-and-client-check/
+translation_method: editorial
+translation_source_sha256: 09a6821d1d675084b99d673071609c2ab89785dc2d6ebd90400f824d8745fa8a
+translation_date: '2026-11-22T01:10:26+00:00'
+excerpt: Use two authorized test videos for one episode to check Jellyfin version recognition and the entries and
+  playback actually offered in iCouldPlay.
+---
+{% raw %}
+<p>Use two authorized test videos for one episode to check Jellyfin version recognition and the entries and playback actually offered in iCouldPlay.</p>
+<h2 id="server-version-and-scan">Confirm the Jellyfin version and scan prerequisites</h2>
+<p>Jellyfin’s 12.0 release notes identify multiple episode versions as a new feature; this exercise requires server 12.0 or later. On an older server, stop this check rather than treating ungrouped versions as an iCouldPlay fault. Jellyfin also requires a full library scan after upgrading and warns that the first scan takes longer. The administrator should read the official upgrade and backup instructions, assess a maintenance window and decide the scan scope; do not upgrade or start a large scan for this tutorial without authorization. An upgrade can change the database, so prepare the full data and configuration backup described by Jellyfin.</p>
+<h2 id="section-1">Prepare two distinguishable files</h2>
+<p>Prepare two short authorized videos as versions of one test episode. For example, display “Version A” and “Version B” at their openings and record each duration and size. Keep the originals and play each on the server first. Use an isolated test show without overwriting a real episode or using private material. These are test samples; transcoding or changing source resolution is not required.</p>
+<h2 id="section-2">Place copies according to Jellyfin rules</h2>
+<p>Jellyfin’s shows documentation states that videos in the same season folder identified as the same episode under the standard naming scheme can be recognized as multiple versions. Place copies in the test show’s Season 01, for example <code>Sample S01E01 - A.mkv</code> and <code>Sample S01E01 - B.mkv</code>. The extension must match the actual container; changing it does not convert a file. Folder structure, library type and server version must fit your actual setup.</p>
+<h2 id="section-3">Verify episode identity on the server first</h2>
+<p>Scan the show library containing the test directory in Jellyfin’s administration interface. After completion, open season one, episode one and inspect whether the server identifies two files and what version labels it actually shows. If two separate episodes appear, check paths, season and episode numbers and scan outcome first; do not delete original videos to force a merge. Official documentation describes server recognition; presentation depends on server version and configuration.</p>
+<h2 id="section-4">Inspect choices actually present in iCouldPlay</h2>
+<p>Open the same connected Jellyfin source in iCouldPlay and locate the same show and first episode. Record title, displayed duration and whether the current interface offers version selection. Public information says iCouldPlay supports Jellyfin but does not promise that every server version or selector is displayed. If no version entry appears, record it as not observed rather than inventing an unverified menu.</p>
+<h2 id="section-5">Identify the played version by its opening</h2>
+<p>Play the start of the current default result and compare its opening marker and duration with A and B. If the interface actually permits version switching, stop, select the other option and check its opening and duration again. Record selected labels and observations; do not identify a file from a resolution label alone. Without a selector, record only which default played and mark the other version untested. Server support does not establish that the client switched successfully.</p>
+<h2 id="section-6">Record differences and restore the test setup</h2>
+<p>If both versions appear on the server but only one in iCouldPlay, record app and server versions, entry path and redacted observations; for playback failures also record network and error. Do not share server addresses, tokens or private videos. Change one condition before retesting rather than renaming files and switching account and network at once. Remove test copies through your server process and confirm the original show is unchanged. No device or server test is claimed.</p>
+<h2 id="file-versus-label">Distinguish files from displayed labels</h2>
+<p>Before scanning, give each test copy a row for relative path, file size, duration, opening text and expected season and episode number. After scanning, add the server’s actual version label and order. If labels show only resolution and do not identify a file, open the corresponding version and check its opening. Jellyfin documents ordering affected by resolution-style labels; do not permanently identify A and B solely by first and second position.</p>
+<p>For example, A lasts 20 seconds and opens with A, while B lasts 30 seconds and opens with B. If server playback of B shows A, first check whether the wrong entry was selected or the copy contains the wrong content. Resolve the server observation before examining iCouldPlay. Do not infer playback solely from the test filename or use a thumbnail as sufficient proof. If cached playback prevents identification, record the current observation as unknown.</p>
+<h2 id="narrow-differences">Narrow differences one layer at a time</h2>
+<p>If the server lacks two versions, check that both files are in the same season folder, use the same season and episode number and were included in a completed show-library scan. Record filenames before changes; adjust only test copies, rescan and observe. Different episode numbers represent different content, so do not arbitrarily change real episode numbers to produce two versions.</p>
+<p>If the server can play A and B separately but two choices in iCouldPlay yield the same result, record both selected labels, observed openings, time and app version; first recheck that the other option was actually selected. If no choice appears, record “not observed” without reinstalling or changing server permissions to experiment. For support, provide reproducible steps and redacted observations, not private videos or credentials.</p>
+<h2 id="playback-conditions">Keep playback conditions separate from version identity</h2>
+<p>The same video may use different delivery methods depending on server and network conditions. Keep device, network and account constant while checking both versions and inspect the actual opening; a change in visual quality alone does not prove that the source file changed. If the server exposes actual playback information, record what it shows; without such an entry, mark it unknown. Record version identity, delivery method, playback quality and test time separately to keep later conclusions appropriately narrow.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-jellyfin-library/">Connect Jellyfin</a>; <a href="/en/guides/icouldplay-kodi-movie-versions-default-client-observation/">Check multiple versions in a client</a>.</p>
+<p>Checked 22 November 2026: <a href="https://apps.apple.com/cn/app/id6755653178">iCouldPlay App Store listing</a>; <a href="https://jellyfin.org/docs/general/server/media/shows/">Jellyfin episode version rules</a>; <a href="https://jellyfin.org/posts/jellyfin-release-12.0/">Jellyfin 12.0 release notes</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

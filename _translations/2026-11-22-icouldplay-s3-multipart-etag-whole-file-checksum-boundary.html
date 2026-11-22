@@ -1,0 +1,50 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay S3 media integrity: distinguish multipart ETags from whole-file checksums'
+description: Compare your own small source video and downloaded copy while recording object identity, ETag and checksum
+  algorithm separately.
+permalink: /en/guides/icouldplay-s3-multipart-etag-whole-file-checksum-boundary/
+date: '2026-11-22 00:00:00 +08:00'
+modified: '2026-11-22 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 239
+topic: S3 multipart ETag and whole-file checksum
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-22-icouldplay-s3-multipart-etag-whole-file-checksum-boundary.md
+source_url: /guides/icouldplay-s3-multipart-etag-whole-file-checksum-boundary/
+translation_method: editorial
+translation_source_sha256: 6b758d6f37ccc079da6d178b95860d6bacbeba495be303304e7b11827d653bde
+translation_date: '2026-11-22T01:21:33+00:00'
+excerpt: Compare your own small source video and downloaded copy while recording object identity, ETag and checksum
+  algorithm separately.
+---
+{% raw %}
+<p>Compare your own small source video and downloaded copy while recording object identity, ETag and checksum algorithm separately.</p>
+<h2 id="section-1">Prepare a known-source short video</h2>
+<p>Choose an authorized short video, retain the original and record its size, duration and opening. Confirm the upload target is S3 or compatible object storage you manage. Do not publish private video, bucket names, keys or signed URLs. Public iCouldPlay information supports S3-compatible storage but does not promise an ETag or checksum display.</p>
+<h2 id="section-2">Check object identity and upload method</h2>
+<p>In an authorized storage-management interface confirm bucket, key, actual size, version identifier and upload method. If the interface does not indicate multipart upload, record unknown rather than inferring it from a filename. Where versions exist, identify the intended current version first without overwriting or deleting an object. Metadata and checksum support vary among S3-compatible services; consult the provider’s documentation.</p>
+<h2 id="section-3">Understand the ETag boundary</h2>
+<p>Amazon S3 documents that a multipart-upload ETag is not the MD5 of the entire object, and an ETag for some single-upload encryption modes is not necessarily the whole-file MD5 either. A local MD5 differing from the ETag alone therefore does not establish video corruption. An ETag is a server-returned object label whose meaning depends on service, upload and encryption. Do not assume every Amazon S3 implementation detail applies to compatible services.</p>
+<h2 id="section-4">Compare the same whole-file algorithm</h2>
+<p>Download the object using a trusted storage tool to a new test path without overwriting the original. Use the same whole-file checksum algorithm on each, for example macOS Terminal <code>shasum -a 256</code> followed by the appropriate file path, or another trusted tool. Compare both algorithm names and complete results. Matching results provide strong evidence of identical bytes, not a guarantee that video content or playback experience is correct.</p>
+<h2 id="section-5">Check actual playback in iCouldPlay</h2>
+<p>Open the same storage source in iCouldPlay, confirm path, filename and duration, and play the beginning and a middle passage against known scenes. Normal playback, a complete download and a whole-file checksum are distinct outcomes; a cover or a few seconds of playback do not replace a whole-file comparison. On failure record network state and actual feedback. Do not claim the app calculated a hash or automatically verified the ETag.</p>
+<h2 id="section-6">Troubleshoot differences in layers</h2>
+<p>If the SHA-256 values differ, first check that the same object version was compared, the download completed and the correct path was selected; then inspect provider-supplied checksum information. Change one condition at a time. Do not overwrite the only original by reuploading or directly change bucket permissions. If hashes match but playback fails, separately investigate file format, client and network and retain redacted results. Afterwards remove only the test copy. No device or storage test is claimed.</p>
+<h2 id="ledger">Keep a reproducible comparison ledger</h2>
+<p>Use one row each for the local original and newly downloaded copy with a redacted name, byte size, retrieval time and SHA-256 result. Record the provider’s ETag and object version separately. Do not place an ETag in the SHA-256 column. If a tool uses another algorithm or shows only a truncated value, confirm the full algorithm and output before comparing; otherwise write unable to compare. Matching prefixes alone do not establish equality.</p>
+<p>In macOS Terminal, type <code>shasum -a 256 </code>, drag the file into the window so the system fills its path, and press Return. Repeat for the second file. Do not replace the file path with a remote link containing secrets or publish complete terminal output, since paths can reveal private information. Large files take time; mark a cancelled computation incomplete. On error inspect path and read permission rather than writing a guessed hash.</p>
+<h2 id="different-results">Choose the next step based on observed results</h2>
+<p>For example, equal sizes but different SHA-256 values establish only that the comparison differs. Check the intended object version, download completion and whether a similarly named old file was selected, then download to another non-overwriting location if needed. For a provider checksum, establish whether it is whole-object or composite and identify algorithm and encoding before comparing. Different checksum types cannot be compared directly.</p>
+<p>If both size and SHA-256 match but iCouldPlay pauses during playback, separately record device network, time and actual feedback. A completed byte comparison and streaming experience under current network conditions are distinct checks. If the version opened in iCouldPlay is uncertain, mark it unconfirmed rather than drawing a conclusion about the app. An administrator can inspect redacted server records as needed; do not expose tokens or temporarily make the bucket public for testing.</p>
+<h2 id="cleanup">Clean up and restore</h2>
+<p>After checking, confirm the original video and online object remain, then remove only the downloaded test copy using your storage-management process. Do not delete old object versions or interrupt someone else’s upload. If file identity is uncertain, retain it and ask the administrator. Record steps actually performed, their results and untested items. This exercise uses an external checksum tool; it does not claim iCouldPlay has that feature built in. If a complete object cannot be downloaded, retain the confirmed size and version and mark full verification unperformed; partial playback is not a substitute.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-s3-compatible-source-setup/">Set up an S3 source</a>; <a href="/en/guides/icouldplay-s3-versioned-object-current-versus-earlier-copy/">Check object version identity</a>.</p>
+<p>Checked 22 November 2026: <a href="https://apps.apple.com/cn/app/id6755653178">iCouldPlay App Store listing</a>; <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/checking-object-integrity-upload.html">Amazon S3 object integrity</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

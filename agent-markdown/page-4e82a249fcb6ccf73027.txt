@@ -1,0 +1,88 @@
+---
+layout: null
+permalink: /guides/vectorpaint-svg-miter-limit-threshold-acute-join/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: VectorPaint 尖角限制对照：同一折线何时变成斜角
+agent_source_url: https://allluckly.cn/guides/vectorpaint-svg-miter-limit-threshold-acute-join/
+agent_source_sha256: 5ed4a77698cc6e5098dcfc5e03e90d9fb8c2be8993a20ad598285668951ca639
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint 尖角限制对照：同一折线何时变成斜角
+
+语言：zh-CN
+原文：[VectorPaint 尖角限制对照：同一折线何时变成斜角](<https://allluckly.cn/guides/vectorpaint-svg-miter-limit-threshold-acute-join/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-svg-miter-limit-threshold-acute-join/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-svg-miter-limit-threshold-acute-join/>)
+发布于: 2026-11-22T00:00:00+08:00
+内容更新于: 2026-11-22T00:00:00+08:00
+署名：Bison
+
+以相同的尖角折线比较 SVG 斜接限制，区分几何预期、导入外观与可编辑性。
+
+以相同的尖角折线比较 SVG 斜接限制，区分几何预期、导入外观与可编辑性。
+
+## 确定问题和预期
+
+上一课比较了尖角、圆角和斜角的不同描边连接；这次只使用 miter 连接，改变限制值。SVG 规范中的限制比较斜接长度与线宽的比例，超过阈值时转为斜角。它不会改变路径节点坐标，也不代表 VectorPaint 必然提供同名控制项。先写下问题：同一锐角折线，限制为 2 和 10 时，外轮廓是否不同？
+
+## 构造相同的锐角
+
+用横向画布建立两个位置不同、形状相同的 V 形折线。第一条依次经过 (20,100)、(50,20)、(80,100)；第二条对应经过 (120,100)、(150,20)、(180,100)。顶点夹角约 41 度，斜接长度与线宽之比约 2.85，因此设为 2 时预期转为斜角，设为 10 时保留尖角。坐标为 SVG 用户单位，不假设等于屏幕像素。
+
+## 创建原始 SVG
+
+用纯文本编辑器新建文件，根元素的 xmlns 设为 http://www.w3.org/2000/svg，viewBox 为 0 0 200 120。两条 polyline 分别填写上述 points，均设置 fill=none、stroke=#31554c、stroke-width=8、stroke-linejoin=miter；第一条的 stroke-miterlimit 设 2，第二条设 10。保存为 miter-limit.svg，再复制一份只读备份。确认后缀不是 svg.txt，也不要把来自不明来源的脚本嵌入练习文件。
+
+可直接复制以下完整样本：
+
+```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+  <polyline points="20,100 50,20 80,100" fill="none" stroke="#31554c" stroke-width="8" stroke-linejoin="miter" stroke-miterlimit="2"/>
+  <polyline points="120,100 150,20 180,100" fill="none" stroke="#31554c" stroke-width="8" stroke-linejoin="miter" stroke-miterlimit="10"/>
+</svg>
+```
+
+## 在浏览器建立参照
+
+先在支持 SVG 的浏览器打开原稿。左侧顶端应是截平的斜角，右侧应有更长的尖角；两条折线的中心形状和线宽不应改变。放大时注意顶端离画布边缘仍有空间，避免把裁切误认成限制生效。记录浏览器、源文件名和观察到的两个外形；这只是外部标准的参照，并非应用导入的实测结果。
+
+## 解释阈值而非只背数值
+
+可用 1/sin(夹角的一半) 估算比例；该折线的夹角约为 2×arctan(30/80)，比例约 2.85。2 小于此值，10 大于此值，因此结果不同。线宽改成 4 或 12 会改变绝对可见尺寸，但同样角度的比例不因此改变；本次先保持线宽 8，不把线宽变化混进对照。避免恰好使用临界值，以免舍入和渲染差异影响判断。
+
+## 给折线做一张观察表
+
+在纸上画两列，分别标记左侧限制 2 和右侧限制 10，再分四行填写「顶点外轮廓」「两臂位置」「描边宽度」「对象能否单选」。先填浏览器原稿观察，再另建一张表填写应用中的情况。若左侧出现平直的短边而右侧出现尖端，记录各自的形状，而不是只写「正常」；这样后来重新打开输出时能逐项比较。不要通过调整节点位置，让导入结果看起来符合预期，因为那会改变原来被检验的对象。
+
+## 保持顶点和边缘留白
+
+该例两条折线顶点的 y 坐标均为 20，画布上边界为 0。完整的尖角应该留在画面中：放大浏览器并观察右侧顶点上方有无背景空隙，同时确认两条折线底端也未被画布遮住。如果另存时用户自己裁切了画面，先打开未裁切副本核对，不要把裁切造成的平边误认为斜接限制起效。若要试更尖的角，另存第三份，记录新坐标和计算比例，不要改写这份基准。
+
+## 在应用中打开工作副本
+
+通过当前安装的 VectorPaint 实际可见的 SVG 打开或导入入口选择副本；若入口缺失或文件不受支持，记录未完成。不要假设界面一定提供 miterlimit 设置，也不要把浏览器显示当作应用实测。导入后先不编辑，比较两端顶部与浏览器参照，再尝试分别选中左右折线；记下对象是否独立以及形状是否发生变化。
+
+## 隔离导入转换的影响
+
+如果两侧都变为尖角或都变为斜角，先确认打开的是正确副本并核对原文件中的两项限制值。再检查应用是否将描边转换成轮廓，或只保留了显示近似的形状；能够单选不一定意味着参数仍然存在。保留未编辑的应用副本，另建一份用于调整。若显示差异只发生在极小缩放下，先用相同视图比例复看，不要直接认定几何改变。
+
+## 另存输出并复查
+
+使用当前版本实际可用的分享或导出入口另存，保留源文件和最初的参数记录。重新打开输出并比较左右顶端、线宽和画布边界；若输出为 SVG，再以文本编辑器查看是否仍有 polyline、stroke-linejoin 和 stroke-miterlimit，或变成其他路径。若输出是位图，只记录视觉结果。将浏览器源文件、应用导入、重新打开的输出分别列在记录表中，不把其中任一项直接当作其他两项的证明。
+
+## 排查并保留未完成项
+
+若左侧仍尖，核实值 2 是否拼写正确、路径顶点是否真为锐角以及 CSS 样式是否覆盖属性；若右侧被裁切，检查 viewBox 和画布边缘。若两条折线宽度不一致，先回到源文件对照 stroke-width，再排除导入缩放。最后保存备份、工作副本与观察记录；没有实际操作过的设备步骤标记为待核，不写成兼容性结论。
+
+## 跨过阈值的单项实验
+
+另存原始 SVG 副本，只把左侧折线的限制值从 2 改成 3，右侧和所有节点保持不变。该折线的比例约为 2.85，3 高于这一数值，因此左侧预期由斜角变为尖角；先在浏览器比对两份文件。若左侧没有变化，检查实际打开的副本和数值，避免同时修改夹角或线宽。
+
+## 相关教程与资料
+
+[描边连接形式](<https://allluckly.cn/guides/vectorpaint-svg-linejoin-miter-round-bevel/>)、[线端形状](<https://allluckly.cn/guides/vectorpaint-svg-stroke-linecap-endpoint-comparison/>)。
+
+2026年11月22日核对：[Apple 公开版本查询](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software>)、[MDN：斜接限制](<https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/stroke-miterlimit>)。未声称完成真实设备或私人服务器测试。
+{% endraw %}

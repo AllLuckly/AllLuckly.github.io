@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay and Jellyfin: separate service health from playback'
+description: Record the service health check, web login, iCouldPlay listing and actual playback as separate observations.
+permalink: /en/guides/icouldplay-jellyfin-health-check-versus-playback/
+date: '2026-11-22 00:00:00 +08:00'
+modified: '2026-11-22 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 237
+topic: Jellyfin health check and playback
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-22-icouldplay-jellyfin-health-check-versus-playback.md
+source_url: /guides/icouldplay-jellyfin-health-check-versus-playback/
+translation_method: editorial
+translation_source_sha256: f06df2d9eca1bcd177307ed11595227dfe1d39bc5f5ba7c87275870eb2c19447
+translation_date: '2026-11-22T02:19:16+00:00'
+---
+{% raw %}
+<p>When iCouldPlay cannot open Jellyfin, a server health check can help establish whether the service responds. It does not replace account sign-in, library access or actual playback. Record all four results separately instead of treating one HTTP status as proof that video will play.</p>
+<h2 id="section-1">Prepare authorized conditions</h2>
+<p>Choose a Jellyfin server you manage or are authorized to check, and a health endpoint the administrator permits you to access. Prepare a short video available to the same account, and record the iCouldPlay device, network and time. Without permission, a supplied endpoint or when the server is under maintenance, stop at documentation. Do not scan unfamiliar addresses or open ports for this exercise. Preserve existing server and app settings.</p>
+<h2 id="section-2">Understand the health check</h2>
+<p>Jellyfin documentation describes <code>/health</code> as an underlying service check which currently returns HTTP 200 on success and verifies HTTP and database connectivity. Results may be unreliable during startup or migrations. It does not establish account permissions or validate every video file, transcode, audio track or iCouldPlay client. Ask the administrator to confirm the version and correct address. A reverse proxy may restrict the endpoint; do not change its rules yourself.</p>
+<h2 id="section-3">Prepare a sanitized record</h2>
+<p>Write four rows: service health, web account and library, iCouldPlay listing, and selected clip playback. Record the time and whether each succeeded, failed or was not performed. Use a server alias instead of its real hostname. Exclude passwords, tokens and signed playback URLs. If only the administrator may run the health check, request its status and time instead of asking for the private address.</p>
+<h2 id="section-4">Check the service response</h2>
+<p>An administrator authorized to use a terminal can run the documented <code>curl -i</code> check on a permitted network, using the confirmed health endpoint. The illustrative <code>curl -i http://myserver:8096/health</code> explains syntax and is not your server; do not send credentials over public HTTP. For HTTPS or a subpath, follow the actual deployment and administrator's instructions without bypassing certificate verification. Record the status and time, not full response headers.</p>
+<h2 id="section-5">Distinguish failure from uncertainty</h2>
+<p>Record a 200 as a status code first. Mark the check successful for that time and network path only after the administrator confirms the response came from the expected Jellyfin health endpoint; still check the account and media. Record timeout, refusal, 404, 403 or certificate error as observed instead of calling each a server outage. A reverse proxy may block the endpoint, or the path may differ from the example. During startup or migration, ask the administrator to confirm readiness. Do not repeatedly restart or edit the database because of one failure.</p>
+<h2 id="section-6">Check web and iCouldPlay in layers</h2>
+<p>Sign in to the administrator-provided Jellyfin web interface with your authorized account and confirm the expected library and clip. Then open the same server and account in iCouldPlay and check for the same library and title; use only fields and entry points visible in the installed version. If the web interface fails while health succeeds, record the differing outcomes without assuming a cause. If web works but the app list is missing, check account, network and actual server identity.</p>
+<h2 id="section-7">Observe the same clip</h2>
+<p>Open the clip and separately record whether it starts, picture, sound and where it stops. If playback fails, note whether the failure occurs before opening, at startup or during playback. A successful health check does not prove file access or playback processing is sound. If reproducible, keep the account, network and clip fixed and retry once after recording the time as the administrator recommends. Do not simultaneously change server settings, video format and playback device. Mark unperformed steps as such; never fill in expected results.</p>
+<h2 id="section-8">Narrow the scope using two observations</h2>
+<p>For example, the health check does not respond while the server is starting. Ten minutes later the administrator confirms startup is complete and checks again, obtaining 200, and confirms the response source. The web account can sign in, but iCouldPlay still does not list the expected video. Record the difference between service status, web access and the client listing; elapsed time alone does not establish what fixed the first result. Compare the confirmed address, account and network, then give the observed facts to the administrator if uncertainty remains.</p>
+<p>Conversely, if web and list work but a video stops at a fixed point, record that point and, if authorized, check the same segment in the web player. Failure at the same position is a lead, not proof that the file is damaged. A single failure only in iCouldPlay also does not establish an app defect. Preserve the time, clip identity and conditions rather than combining different media into one result.</p>
+<h2 id="section-9">Hand off and restore</h2>
+<p>Give an authorized administrator the four observations and the actual stage of any error, including whether web and iCouldPlay used the same account and network. Do not send passwords or complete private URLs; have the administrator redact tokens in logs first. Sign out of any temporary account and confirm the service, library and source files remain intact. If an administrator later supplies a diagnosis, append the confirmation time and source separately without overwriting the original failed or unperformed observation. This guide is based on public documentation and does not claim a private-server connection or a physical-device test.</p>
+<h2 id="section-10">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-jellyfin-library/">Jellyfin setup</a>; <a href="/en/guides/icouldplay-network-buffering/">Network buffering</a>.</p>
+<p>Checked 22 November 2026: <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software">Apple iCouldPlay listing</a>; <a href="https://jellyfin.org/docs/general/networking/monitoring/">Jellyfin health check documentation</a>.</p>
+{% endraw %}

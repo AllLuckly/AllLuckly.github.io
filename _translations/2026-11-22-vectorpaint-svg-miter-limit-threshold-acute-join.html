@@ -1,0 +1,60 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'Compare miter limits in VectorPaint: when the same sharp join becomes a bevel'
+description: Compare SVG miter limits on identical acute joins, separating geometric predictions from import appearance
+  and editability.
+permalink: /en/guides/vectorpaint-svg-miter-limit-threshold-acute-join/
+date: '2026-11-22 00:00:00 +08:00'
+modified: '2026-11-22 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 272
+topic: SVG miter-limit and import checks
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-22-vectorpaint-svg-miter-limit-threshold-acute-join.md
+source_url: /guides/vectorpaint-svg-miter-limit-threshold-acute-join/
+translation_method: editorial
+translation_source_sha256: 39c9495cd34f79267c9dc1899598389bd85c5eff44fbb7b4e304976a6db69093
+translation_date: '2026-11-22T01:07:06+00:00'
+excerpt: Compare SVG miter limits on identical acute joins, separating geometric predictions from import appearance
+  and editability.
+---
+{% raw %}
+<p>Compare SVG miter limits on identical acute joins, separating geometric predictions from import appearance and editability.</p>
+<h2 id="section-1">Define the question and prediction</h2>
+<p>The previous study compared miter, round and bevel joins. Here both joins use miter, and only the limit changes. SVG compares miter length with stroke width and converts the join to a bevel when the limit is exceeded. This does not move path nodes or imply VectorPaint has a control with the same name. Write the question first: will the outer contour differ for the same acute polyline with limits 2 and 10?</p>
+<h2 id="section-2">Construct identical acute angles</h2>
+<p>Use a landscape canvas with two V-shaped polylines at different positions but with identical geometry. The first passes through (20,100), (50,20), (80,100); the second through (120,100), (150,20), (180,100). Their vertex angle is approximately 41 degrees and the ratio of miter length to stroke width is about 2.85. A limit of 2 should produce a bevel, while 10 should retain the miter. Coordinates are SVG user units, not necessarily screen pixels.</p>
+<h2 id="section-3">Create the SVG source</h2>
+<p>In a plain-text editor create an SVG root with xmlns http://www.w3.org/2000/svg and viewBox 0 0 200 120. Give two polyline elements the respective points above, both with fill=none, stroke=#31554c, stroke-width=8 and stroke-linejoin=miter. Set stroke-miterlimit to 2 on the first and 10 on the second. Save as miter-limit.svg and make a read-only backup. Confirm the suffix is not svg.txt, and do not embed scripts from unknown sources.</p>
+<p>Copy this complete sample:</p>
+<pre><code>&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 200 120&quot;&gt;
+  &lt;polyline points=&quot;20,100 50,20 80,100&quot; fill=&quot;none&quot; stroke=&quot;#31554c&quot; stroke-width=&quot;8&quot; stroke-linejoin=&quot;miter&quot; stroke-miterlimit=&quot;2&quot;/&gt;
+  &lt;polyline points=&quot;120,100 150,20 180,100&quot; fill=&quot;none&quot; stroke=&quot;#31554c&quot; stroke-width=&quot;8&quot; stroke-linejoin=&quot;miter&quot; stroke-miterlimit=&quot;10&quot;/&gt;
+&lt;/svg&gt;
+</code></pre>
+<h2 id="section-4">Establish a browser reference</h2>
+<p>Open the original in an SVG-capable browser. The left tip should be beveled flat and the right tip should retain a longer point; the center geometry and stroke width should remain unchanged. When zooming, check that there is room above the vertex so a crop is not mistaken for a limit taking effect. Record the browser, source filename and both observed shapes. This is an external reference, not a test of app import.</p>
+<h2 id="section-5">Explain the threshold rather than memorize values</h2>
+<p>Estimate the ratio with 1/sin(half the angle). The angle here is about 2×arctan(30/80), giving roughly 2.85. Two is below the ratio and ten above it, explaining the different results. A width of 4 or 12 changes the absolute rendered size, but not the ratio for the same angle; keep width 8 for this comparison. Avoid choosing a value exactly at the threshold, where rounding and rendering differences complicate judgment.</p>
+<h2 id="observation-table">Make an observation table</h2>
+<p>Draw two columns on paper, labeled left limit 2 and right limit 10, and four rows for outer tip shape, arm positions, stroke width and separate selection. Fill in the browser source first, then make a second table for the app. If the left has a short flat edge and the right a point, describe each instead of merely writing “normal”; this supports an item-by-item comparison after reopening the output. Do not move the nodes just to make the import match the expectation, since that changes the object under test.</p>
+<h2 id="canvas-margins">Keep space around vertices and edges</h2>
+<p>Both vertices have y=20 and the upper canvas boundary is 0. The complete pointed join should fit: enlarge the browser view and check for background above the right tip and that neither lower end is clipped. If the output was manually cropped, compare with an uncropped copy before attributing a flat edge to the miter limit. To try a sharper angle, save a third version and record its new coordinates and calculated ratio instead of altering the baseline.</p>
+<h2 id="section-6">Open the working copy in the app</h2>
+<p>Use an SVG open or import entry actually visible in the installed VectorPaint and select the copy. If no entry exists or the file is unsupported, record the task as incomplete. Do not assume the interface exposes a miter-limit control or substitute browser display for an app test. Before editing, compare both top joins with the browser reference and try selecting the two polylines separately; note object independence and any visual changes.</p>
+<h2 id="section-7">Isolate import conversion</h2>
+<p>If both sides become pointed or both beveled, first verify the correct copy and both source limit values. Then inspect whether the app converted strokes to outlines or retained only a visually similar shape. Being separately selectable does not prove the parameter still exists. Preserve the unedited app copy and make another for adjustments. If a difference appears only at a tiny scale, review at the same zoom before concluding that geometry changed.</p>
+<h2 id="section-8">Save output and check it again</h2>
+<p>Use a share or export option actually available in the current version to save separately, preserving the source and the original parameter notes. Reopen the output and compare both tips, widths and canvas boundaries. If it is SVG, inspect in a text editor for polyline, stroke-linejoin and stroke-miterlimit, or conversion to another path. If it is a bitmap, record only the visual result. List the browser source, app import and reopened export separately; none automatically proves either of the others.</p>
+<h2 id="section-9">Troubleshoot and retain pending items</h2>
+<p>If the left remains pointed, check that 2 is spelled correctly, the vertex is acute and CSS is not overriding the attribute. If the right tip is clipped, inspect the viewBox and canvas edge. If widths differ, compare stroke-width in the source and then check import scaling. Keep the backup, working copy and observations. Mark device steps not actually performed as pending rather than reporting a compatibility conclusion.</p>
+<h2 id="supplemental-check">Cross the threshold with one change</h2>
+<p>Save a copy of the original SVG and change only the left polyline’s limit from 2 to 3; retain the right line and every node. The ratio is about 2.85, so 3 is above it and the left join is expected to change from beveled to pointed. Compare the two files in a browser first. If the left side does not change, check the open copy and value without simultaneously changing angle or stroke width.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/vectorpaint-svg-linejoin-miter-round-bevel/">Stroke join shapes</a>; <a href="/en/guides/vectorpaint-svg-stroke-linecap-endpoint-comparison/">Stroke cap shapes</a>.</p>
+<p>Checked 22 November 2026: <a href="https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software">Apple public version lookup</a>; <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/stroke-miterlimit">MDN: stroke-miterlimit</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

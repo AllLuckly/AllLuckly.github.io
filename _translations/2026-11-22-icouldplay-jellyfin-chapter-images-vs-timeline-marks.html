@@ -1,0 +1,50 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay and Jellyfin chapter previews: distinguish timeline marks from chapter images'
+description: Use a video with identifiable chapters to check server chapters, chapter images and seeking or previews
+  visible in iCouldPlay separately.
+permalink: /en/guides/icouldplay-jellyfin-chapter-images-vs-timeline-marks/
+date: '2026-11-22 00:00:00 +08:00'
+modified: '2026-11-22 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 234
+topic: Jellyfin chapter images and timeline
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-22-icouldplay-jellyfin-chapter-images-vs-timeline-marks.md
+source_url: /guides/icouldplay-jellyfin-chapter-images-vs-timeline-marks/
+translation_method: editorial
+translation_source_sha256: 728f24875c9ffb8b5f601f918c50fb5c7a2cee31fb2df38525cf2abcaebca8f5
+translation_date: '2026-11-22T01:17:10+00:00'
+excerpt: Use a video with identifiable chapters to check server chapters, chapter images and seeking or previews
+  visible in iCouldPlay separately.
+---
+{% raw %}
+<p>Use a video with identifiable chapters to check server chapters, chapter images and seeking or previews visible in iCouldPlay separately.</p>
+<h2 id="section-1">Prepare a video with identifiable scenes</h2>
+<p>Choose an authorized short video with visibly distinct scenes around 00:00, 01:00 and 02:00; record its exact duration and the image at each position. Confirm that the file itself has chapters or that chapters can be confirmed in the server interface; otherwise mark them unknown. Preserve the original and do not alter production-video metadata to manufacture an example.</p>
+<h2 id="section-2">Check server chapters and images first</h2>
+<p>Jellyfin distinguishes chapters from chapter images: chapters can exist without the image feature enabled, while chapter images are preview metadata corresponding to chapter times. In an authorized server interface, locate the same video and inspect chapter marks and images separately. Seeing marks alone does not establish generated images; images alone do not guarantee iCouldPlay displays them. Record server version, library and observation time.</p>
+<h2 id="section-3">Understand extraction settings and limits</h2>
+<p>Jellyfin configures chapter-image extraction per library, and warns it can be computationally intensive and slow scans substantially. If images are absent, first inspect existing configuration and task results; ask an administrator if you lack rights. Do not enable extraction across a large production library, delete caches or change intervals for this exercise. The server administrator decides whether to run tasks. Mark generation untested if not performed.</p>
+<h2 id="section-4">Observe the iCouldPlay player</h2>
+<p>Open the same server and video in iCouldPlay and record title and duration, then inspect the playback interface and timeline for chapter marks or thumbnails actually shown. Public information says iCouldPlay supports Jellyfin but does not promise every chapter-image or preview interaction. If no entry appears, record not observed rather than assuming a gesture or button exists. Record confirmed server state and client display separately.</p>
+<h2 id="section-5">Check the actual seek destination</h2>
+<p>If the current interface offers chapter seeking, select one recorded chapter and use it once. Compare destination time and image with the recorded scene. If only timeline dragging is available, drag near it but record manual seeking separately from chapter navigation. Preview image, destination time and actual playback frame are three observations; one correct result does not replace the others.</p>
+<h2 id="section-6">Troubleshoot in layers and restore</h2>
+<p>If the server lacks chapters, first confirm the selected video and source file. If chapters exist but images do not, inspect the library’s image settings and actual extraction results. If the server has images but iCouldPlay does not display them, record app and server versions and interface observations; do not claim image loss on that basis. Confirm the original video still plays, and record redacted times, settings and untested items without uploading private video or credentials. No device or server test is claimed.</p>
+<h2 id="three-times">Establish three time anchors</h2>
+<p>For example, a self-made video shows a red card at 00:00, a green card at 01:00 and a blue card at 02:00. Confirm the actual appearance times during ordinary playback, then check whether server chapter positions match them. Do not assume a scene change automatically creates a chapter. If the server actually has chapters only at 00:00 and 02:00, record those two; the green card at 01:00 is merely a visual anchor.</p>
+<p>If Jellyfin displays a blue chapter image at 02:00, record the server’s chapter time and image first, then inspect whether iCouldPlay actually presents the corresponding image. If iCouldPlay shows a timeline mark but no image, record “mark visible, image not observed,” rather than calling the mark a preview image. If neither appears, still separate confirmed server metadata from the client’s current interface.</p>
+<h2 id="image-versus-playback">Why an image and playback frame may differ</h2>
+<p>A chapter image is a static preview generated or stored by the server for a chapter time; the player frame comes from the actual playback position. If they differ, first check the same video, version and chapter and compare displayed times; use manual seeking to check the known cards if necessary. Do not immediately erase server metadata or claim file corruption. If the source of the difference is unclear, record it as unresolved.</p>
+<p>For example, if the server preview is blue but iCouldPlay shows green after seeking, check the actual preview time and the destination time displayed in iCouldPlay. If playback is still loading after one seek, wait for a stable result before recording; if it remains unclear, write unknown. Different video versions can have different chapters, so do not use another version with the same title as the baseline. Playback continuity, preview display and seek accuracy require separate checks.</p>
+<h2 id="resources-and-privacy">Protect server resources and private information</h2>
+<p>Jellyfin warns that a short interval generating extra chapters may affect player and server performance; this exercise does not require changing the default interval for more images. If adjustment is necessary, the administrator should assess library size and maintenance timing and document the original setting and restoration method. Record app and server versions, test date and the three recognizable times, but not signed URLs, accounts or private video. Explicitly say if no extraction was run.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-jellyfin-library/">Jellyfin library</a>; <a href="/en/guides/icouldplay-seek-caption-reentry-check/">Seeking and subtitle checks</a>.</p>
+<p>Checked 22 November 2026: <a href="https://apps.apple.com/cn/app/id6755653178">iCouldPlay App Store listing</a>; <a href="https://jellyfin.org/docs/general/server/metadata/chapter-images/">Jellyfin chapter image documentation</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

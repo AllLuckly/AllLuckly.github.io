@@ -1,0 +1,100 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-svg-meet-slice-viewport-comparison/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Compare SVG viewport fitting in VectorPaint: show all or fill and crop'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-svg-meet-slice-viewport-comparison/
+agent_source_sha256: 64d917c26133f8c2e6691b3f24e361b40234aea27a7e1e4ef4c29e0c4b56cc29
+agent_generator_version: 1
+---
+{% raw %}# Compare SVG viewport fitting in VectorPaint: show all or fill and crop
+
+Language: en
+Canonical: [Compare SVG viewport fitting in VectorPaint: show all or fill and crop](<https://allluckly.cn/en/guides/vectorpaint-svg-meet-slice-viewport-comparison/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-svg-meet-slice-viewport-comparison/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-svg-meet-slice-viewport-comparison/>)
+Published: 2026-11-22T00:00:00+08:00
+Modified: 2026-11-22T09:12:49+08:00
+Author: Bison
+
+Compare SVG meet and slice using identical circles, calculate viewport boundaries, and inspect app import results.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-svg-meet-slice-viewport-comparison/>), translated on 2026-11-22. Original publication dates, attribution, code and version notes are retained.
+
+Compare SVG meet and slice using identical circles, calculate viewport boundaries, and inspect app import results.
+
+## Define two questions
+
+A wide image placed in a square viewport can fit completely with empty space or fill the square with sides extending beyond it. SVG preserveAspectRatio specifies alignment and meet or slice. Here alignment remains centered and only fitting changes. Observe whether circles remain circular and which are visible inside the viewport; this is not a claim that the app has corresponding controls. Treat browser reference and app import as separate observations.
+
+## Fix coordinates and shapes
+
+Both samples use viewBox 0 0 200 100 with three circles of radius 10 centered at (25,50), (100,50) and (175,50). Each nested viewport measures 100 by 100 and they are placed side by side. The left uses xMidYMid meet, the right xMidYMid slice, both explicitly overflow=hidden. Background squares mark viewport boundaries. Colors and sizes are exercise choices, not app defaults.
+
+## Calculate the complete fit
+
+For the left meet sample, take the smaller scale of 100/200 and 100/100, which is 0.5. Content becomes 100 wide and 50 high, leaving 25 units above and below inside the square; all three circles are visible and their radii become 5. If the whole picture is subsequently scaled, normalize by each square’s width before comparing. Screen pixels are not source coordinates.
+
+## Calculate fill and clipping
+
+For the right slice sample, use the larger scale of 1. The content is 200 by 100, while the square shows the centered horizontal 100 units, corresponding to source x=50 through x=150. The circle at x=100 is fully visible; both outer circles and their radii fall outside. Outside the viewport does not mean deleted from the source: the original SVG still contains three circle elements. Record viewport clipping separately from destructive cropping.
+
+## Save the SVG and establish a reference
+
+Copy the complete example below into a plain-text editor as viewport-fit.svg, confirm it is not svg.txt and save a backup. Open it in an SVG-capable browser: the left shows three small circles in a centered horizontal band; the right shows one larger circle. If outer circles remain visible on the right, check nested svg overflow, slice spelling and viewport dimensions. If the sample does not open, check namespace and quotes first.
+
+```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 120">
+  <rect x="10" y="10" width="100" height="100" fill="#edf2ef"/>
+  <rect x="140" y="10" width="100" height="100" fill="#edf2ef"/>
+  <svg x="10" y="10" width="100" height="100" viewBox="0 0 200 100" preserveAspectRatio="xMidYMid meet" overflow="hidden">
+    <circle cx="25" cy="50" r="10" fill="#31554c"/>
+    <circle cx="100" cy="50" r="10" fill="#31554c"/>
+    <circle cx="175" cy="50" r="10" fill="#31554c"/>
+  </svg>
+  <svg x="140" y="10" width="100" height="100" viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" overflow="hidden">
+    <circle cx="25" cy="50" r="10" fill="#31554c"/>
+    <circle cx="100" cy="50" r="10" fill="#31554c"/>
+    <circle cx="175" cy="50" r="10" fill="#31554c"/>
+  </svg>
+</svg>
+```
+
+## Distinguish empty space from shape
+
+The space above and below on the left comes from fitting different aspect ratios, not an added white shape; the pale square is only a viewport background. Both samples scale circles equally in the horizontal and vertical directions. A larger circle on the right is not necessarily stretched into an ellipse. Record three circles and top-bottom space on the left, and the center circle and clipping on the right. For measurements, first ensure the display scale is the same.
+
+## Recalculate the window on grid paper
+
+Draw a rectangle 20 squares wide and 10 high, marking centers at 2.5, 10 and 17.5 squares. Overlay a centered 10-by-10 square. Its horizontal boundaries fall at 5 and 15, so only the center circle lies inside. This represents the right slice window in source coordinates. If each paper square represents ten source units, retain that scale; do not report the square count as screen pixels.
+
+For meet, draw a separate square and scale the whole rectangle proportionally to its width: the rectangle occupies only half the square’s height. Label the two drawings “source coordinates,” “after scaling,” and “visible within the viewport” to keep those different quantities separate. If the paper prediction disagrees with the browser, first check that the shape and viewport widths and heights were copied in the correct order.
+
+## Import a copy into the app
+
+In the installed VectorPaint, look for an SVG open or import entry that is actually available and choose the working copy. If no entry exists or the file is unsupported, mark the task incomplete. Before moving anything, compare squares and circles with the browser, then try selecting visible objects separately. Import may convert nested viewports or clipping; actual results determine what survives. Do not treat SVG attribute names as guaranteed app controls.
+
+## Recheck source structure and visible results
+
+The expected result is four visible circles: three on the left and one on the right. If the app displays six, inspect clipping or the file used. First confirm that each source group has three circles and two on the right originally lie outside the viewport; their presence in the source is not itself an import error. Observe whether viewport clipping appears absent or objects appear expanded, without assuming the internal cause. Separate selection does not prove nested structure, fitting attributes and clipping survive. If only a bitmap preview appears, record appearance and unverified editing ability.
+
+## Save and inspect the output
+
+Use a share or export entry actually visible in the installed version to save separately without overwriting the source. Reopen and compare the left margins, right visible area and boundaries. For SVG output, inspect viewBox, preserveAspectRatio, overflow and circle elements in a text editor; the app may instead have converted the structure. For a bitmap, assess appearance and dimensions only, without claiming editability. Record source file, app version and steps so browser results are not mistaken for export results.
+
+## Troubleshoot and preserve pending work
+
+If shapes appear distorted, compare square dimensions, browser zoom and source viewBox first; fix only one discrepancy before retesting. Extra right-side circles may indicate clipping did not apply or that a different copy was opened, so check filename and time. Record prediction, browser, app import and reopened output separately. Mark unperformed device or export steps pending, and keep the backup and initial parameters for later review.
+
+## Test the clipping edge with a half circle
+
+Save a test copy and change only the leftmost circle center in the right-hand sample from x=25 to x=50, keeping radius 10. The right clipping window begins at x=50, so half that circle should remain visible and the central circle should remain whole; the three left circles are unchanged. First inspect the five visible circle portions in a browser, then return to the original. If the half circle appears whole, inspect whether clipping applied rather than assuming source elements were added or removed.
+
+## Related guides and sources
+
+[ViewBox origin and position](<https://allluckly.cn/en/guides/vectorpaint-svg-viewbox-origin-position-window/>); [SVG compatibility checks](<https://allluckly.cn/en/guides/vectorpaint-svg-compatibility-check/>).
+
+Checked 22 November 2026: [Apple public version lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software>); [MDN: preserveAspectRatio](<https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/preserveAspectRatio>). No physical-device or private-server test is claimed.
+{% endraw %}

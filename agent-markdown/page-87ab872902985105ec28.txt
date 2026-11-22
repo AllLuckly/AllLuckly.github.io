@@ -1,0 +1,82 @@
+---
+layout: null
+permalink: /en/guides/nasbook-txt-utf8-bom-start-bytes-copy-check/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Book Isle TXT UTF-8 signatures: compare starting bytes before inspecting text'
+agent_source_url: https://allluckly.cn/en/guides/nasbook-txt-utf8-bom-start-bytes-copy-check/
+agent_source_sha256: 06bcb3373d88de1fc257e91ab08667eed9f473a1ebc218538b47a8dd3ec217cb
+agent_generator_version: 1
+---
+{% raw %}# Book Isle TXT UTF-8 signatures: compare starting bytes before inspecting text
+
+Language: en
+Canonical: [Book Isle TXT UTF-8 signatures: compare starting bytes before inspecting text](<https://allluckly.cn/en/guides/nasbook-txt-utf8-bom-start-bytes-copy-check/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/nasbook-txt-utf8-bom-start-bytes-copy-check/>)
+English: [English HTML](<https://allluckly.cn/en/guides/nasbook-txt-utf8-bom-start-bytes-copy-check/>)
+Published: 2026-11-22T00:00:00+08:00
+Modified: 2026-11-22T09:57:25+08:00
+Author: Bison
+
+Make two short files differing only by a BOM and distinguish signature, import feedback and text display.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/nasbook-txt-utf8-bom-start-bytes-copy-check/>), translated on 2026-11-22. Original publication dates, attribution, code and version notes are retained.
+
+Two TXT files saved as UTF-8 can differ by the initial three bytes `EF BB BF`. Unicode describes initial U+FEFF in UTF-8 as an optional signature; it does not change UTF-8 byte order. Make two nonprivate samples, inspect bytes on a computer and then try importing them into Book Isle to observe the opening and contents. This supplements ordinary UTF-8 troubleshooting without assuming Book Isle strips or displays the signature.
+
+## Preserve the original and define scope
+
+Do not change encoding in the only original or a book you are reading. Make separate practice files with two lines, 第一章 (“Chapter One”) and 春天。 (“Spring.”), recording the text, line breaks and file identities. You need a computer with Python 3 and a way to transfer files to iPhone or iPad. Without one, or if unfamiliar with commands, read the byte explanation and mark generation and import unperformed; do not download an unknown script. The examples are self-created and contain no private books or copyrighted content.
+
+Book Isle publicly lists TXT reading, local import and contents browsing, but parsing, duplicate handling and display require observation in the installed version. This compares an optional initial signature, not every encoding, heading convention or internal parser. Record OS and app versions while preserving the existing shelf and notes.
+
+## Create two files in a new directory
+
+On the computer first enter a safe working directory you choose and confirm that `bom-demo` does not already exist. Save the complete code below as `make_bom_demo.py` and run `python3 make_bom_demo.py`. It creates a new directory and uses exclusive writes. An existing directory or file causes it to stop; do not delete an existing folder to force a retry, choose another location. It only creates sample files and does not read or convert private manuscripts.
+
+```
+from pathlib import Path
+
+folder = Path('bom-demo')
+folder.mkdir()  # 若已存在则停止
+content = '第一章\n春天。\n'.encode('utf-8')
+for name, data in [('plain.txt', content),
+                   ('signed.txt', b'\xef\xbb\xbf' + content)]:
+    with (folder / name).open('xb') as out:
+        out.write(data)
+    print(name, len(data), data[:6].hex(' '))
+```
+
+Expected `plain.txt` begins `e7 ac ac`, the UTF-8 bytes for 第. `signed.txt` begins with `ef bb bf` followed by the same `e7 ac ac`. The signed file is exactly three bytes longer and otherwise identical. If actual output differs, inspect code, encoding and selected files; do not report a paper prediction as a computer test.
+
+## Separate bytes from body text
+
+`EF BB BF` encodes U+FEFF in UTF-8. At the beginning of a data stream it may serve as a UTF-8 signature; it does not make the file UTF-16 or make UTF-8 big- or little-endian. The signature is optional, so its absence is not automatically a fault. Some decoders recognize and omit an initial signature, while others may retain U+FEFF in text. Display depends on tool and protocol and cannot be inferred from a filename.
+
+For another external Python check without changing files, use `read_bytes()` for both and compare `signed[3:] == plain`. Mark it unperformed if you cannot run it. U+FEFF in the middle of text is not necessarily the same use as an initial signature; Unicode describes a different interpretation there. Do not globally remove invisible characters from a real manuscript.
+
+## Transfer and import separately
+
+Use a trusted system file transfer to place both examples on the device, confirming destination and filenames. A transfer success message does not prove Book Isle imported them. Through the local-file entry actually shown in Book Isle select `plain.txt`, record feedback and open it, then try `signed.txt`. If the app deduplicates by content, keeps one item or does not allow separate imports, record what happened. Do not delete other books or change the text merely to force two items.
+
+In each item actually opened, check 第一章 on line one, 春天。 on line two and any unexpected visible symbol, then inspect the available contents and reopening path. The sample’s line breaks are content; they do not guarantee every heading becomes a chapter. If only one file imports or there is no contents view, record that scope without assuming the other result.
+
+## Separate the signature from displayed text
+
+If the computer editor offers encoding inspection or invisible-character display, inspect each copy’s start; alternatively compare bytes externally in Python without changing files. A signature not visible in preview is not proof that it is absent. Likewise a box displayed by an app is not sufficient proof that the cause is the BOM. Confirm the exact selected file and original bytes before recording a visual result.
+
+Do not add or remove text, change line endings or edit headings between the samples. If Book Isle displays them differently, preserve both byte sequences, import feedback and versions. If they look the same, report that only for these two small files and this observation; it does not establish behavior for every TXT or every U+FEFF position.
+
+## Troubleshoot and preserve originals
+
+If generation fails, inspect whether the directory exists, Python is available and where the error occurred. Do not retry with an overwrite command. If the device cannot find files, check the actual destination and read access. If Book Isle reports a duplicate, preserve that behavior and compare the available item to external samples as appropriate. For a real garbled book, return to the retained source and determine its original encoding; deleting three bytes is not a universal repair.
+
+Record filenames, first six bytes, sizes, transfer and import feedback, opening and contents results, and pending items. Do not share a private manuscript or account information. The user may remove the practice `bom-demo` folder after confirming it contains only these nonprivate samples. Leave original books, old entries and reading progress intact. No Book Isle device or encoding-compatibility test is claimed.
+
+## Related guides and sources
+
+[TXT encoding, chapters and resumption](<https://allluckly.cn/en/guides/nasbook-txt-encoding-chapters/>); [TXT hard wraps and paragraphs](<https://allluckly.cn/en/guides/nasbook-txt-hard-linewraps/>).
+
+Checked on 22 November 2026: [Apple’s China app lookup](<https://itunes.apple.com/lookup?id=6766198898&country=cn&entity=software>) lists Book Isle 1.1.5 TXT reading. The [Unicode UTF and BOM FAQ](<https://www.unicode.org/faq/utf_bom.html>) explains `EF BB BF`, UTF-8 byte order and U+FEFF inside a stream. Actual app behavior depends on the device.
+{% endraw %}

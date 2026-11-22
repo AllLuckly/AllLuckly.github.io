@@ -1,0 +1,60 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'Compare dash starting phases in VectorPaint: shifting the pattern on one path'
+description: Make three SVG lines with the same coordinates, compare dash offsets, and check what survives import
+  and export.
+permalink: /en/guides/vectorpaint-dashoffset-phase-open-line/
+date: '2026-11-22 00:00:00 +08:00'
+modified: '2026-11-22 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 271
+topic: Dash offset and source-file checks
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-22-vectorpaint-dashoffset-phase-open-line.md
+source_url: /guides/vectorpaint-dashoffset-phase-open-line/
+translation_method: editorial
+translation_source_sha256: af0b9b5d89b37c9e50bd33eb24f9915113916a884d2b675ca437bcfba52fb57f
+translation_date: '2026-11-22T01:03:03+00:00'
+excerpt: Make three SVG lines with the same coordinates, compare dash offsets, and check what survives import and
+  export.
+---
+{% raw %}
+<p>Make three SVG lines with the same coordinates, compare dash offsets, and check what survives import and export.</p>
+<h2 id="section-1">Frame the experiment</h2>
+<p>This exercise observes a dash pattern moving along a fixed SVG path, not the path itself. Prepare three identical horizontal lines, each from x=20 to x=200, with the same color, stroke width and cap, and a dash array of 12 and 6. Change only the offset: 0, 6 and 18. The SVG reference describes how offset affects the pattern start; it does not guarantee that any app version preserves the attribute on import.</p>
+<h2 id="section-2">Calculate the expected period</h2>
+<p>The array 12 6 alternates a painted length of 12 units with a gap of 6; a full cycle is 18 units. Offsets 18 and 0 differ by exactly one cycle, so their repeated phase should match; offset 6 should differ. Use numeric units rather than assuming a percentage means a percentage of path length, and do not assume coordinate units are device pixels. Write down these predictions before observing the result.</p>
+<h2 id="section-3">Create an independent source file</h2>
+<p>In an available plain-text editor create an SVG with root xmlns http://www.w3.org/2000/svg and viewBox 0 0 220 140. Add three line elements, each with x1=20 and x2=200; set y1 and y2 to 30, 70 and 110 for the respective lines. Give each stroke=#31554c, stroke-width=4, stroke-linecap=butt and stroke-dasharray=12 6. Set stroke-dashoffset to 0, 6 and 18 respectively. Save as dash-phase.svg and make a backup; confirm the extension is not svg.txt.</p>
+<p>Copy the complete sample:</p>
+<pre><code>&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 220 140&quot;&gt;
+  &lt;line x1=&quot;20&quot; y1=&quot;30&quot; x2=&quot;200&quot; y2=&quot;30&quot; stroke=&quot;#31554c&quot; stroke-width=&quot;4&quot; stroke-linecap=&quot;butt&quot; stroke-dasharray=&quot;12 6&quot; stroke-dashoffset=&quot;0&quot;/&gt;
+  &lt;line x1=&quot;20&quot; y1=&quot;70&quot; x2=&quot;200&quot; y2=&quot;70&quot; stroke=&quot;#31554c&quot; stroke-width=&quot;4&quot; stroke-linecap=&quot;butt&quot; stroke-dasharray=&quot;12 6&quot; stroke-dashoffset=&quot;6&quot;/&gt;
+  &lt;line x1=&quot;20&quot; y1=&quot;110&quot; x2=&quot;200&quot; y2=&quot;110&quot; stroke=&quot;#31554c&quot; stroke-width=&quot;4&quot; stroke-linecap=&quot;butt&quot; stroke-dasharray=&quot;12 6&quot; stroke-dashoffset=&quot;18&quot;/&gt;
+&lt;/svg&gt;
+</code></pre>
+<h2 id="coordinate-check">Check the first segments against coordinates</h2>
+<p>Treat x=20 at the left path endpoint as local distance zero. At offset 0, the first two painted segments run from x=20 to x=32 and x=38 to x=50, with a gap from x=32 to x=38. With positive offset 6 the pattern is read from six units into the cycle: the first visible painted portion runs from x=20 to x=26, followed by a gap to x=32 and paint to x=44. Offset 18 matches offset 0 over a full cycle. Butt caps put the visible end face at the calculated centerline boundary; do not judge from one antialiased edge pixel or a cropped image.</p>
+<p>Mark 20, 26, 32, 38, 44 and 50 on paper, then enlarge the browser view to compare segment order. Zoom helps inspection without changing source coordinates. A mistakenly negative offset changes the phase direction; restore positive 6 and keep any negative-value variation as a separate experiment, so the verification table answers one question at a time.</p>
+<h2 id="section-4">Check a browser baseline</h2>
+<p>Open the original in an SVG-capable browser. The lines should occupy different heights with aligned path endpoints. The top and bottom dashes and gaps should align, while the middle row should have a different phase. Record the first visible dash position in each row and recheck attributes in the file. If all rows look identical, check the offset spelling and any overriding style; if lines are missing, check XML quotes, namespace and color. Keep the browser result for comparison; it is not a device acceptance test.</p>
+<h2 id="section-5">Import a copy and inspect objects</h2>
+<p>In the installed VectorPaint, look for a currently available SVG open or import entry and choose the working copy. If no entry exists or the file is unsupported, record the step as incomplete rather than treating an attribute name as a guaranteed button. Before editing, inspect the rows, endpoints and rhythm, then try selecting each object. Record whether each is separately selectable and whether it matches the browser baseline; matching appearance alone does not prove the original SVG attributes survived.</p>
+<h2 id="section-6">Compare without adding variables</h2>
+<p>If a single row can be selected, move only that row into empty space and undo to confirm the selection; do not also change color, width or scale. If copying is available, preserve the untouched import and experiment on a duplicate. If the middle row differs from the source, record exactly where; do not immediately blame the offset, since zoom, path conversion or rendering may also contribute. If undo is unavailable, return to the saved copy.</p>
+<h2 id="section-7">Check the output in two ways</h2>
+<p>Use a share or export option actually available in the installed version and save separately without overwriting the SVG source. Reopen the output and compare the rows at the same scale. If the output is SVG, inspect its text for the lines and offset or a conversion into other paths. If only a bitmap is available, assess visible appearance only; do not claim it remains editable vector. Record filename, format, separate selection and differences from the source, keeping browser and app outputs distinct.</p>
+<h2 id="sample-boundaries">Check the sample boundaries</h2>
+<p>The rows use different y coordinates only so they can be seen at once; compare length and phase horizontally. If screenshots were taken at different scales, restore the same scale and align the left endpoints before comparing visual distances. Keep the coordinate table beside the file to help inspect another dash array later.</p>
+<h2 id="section-8">Troubleshoot and preserve the result</h2>
+<p>If top and bottom differ, check their coordinates, array, cap and width in the backup; confirm 18 is the whole array period rather than just the painted 12. If the middle row does not change, check for a style overriding the attribute and open the browser source and app output separately. Keep a short record of prediction, browser display, app import, reopened export and pending items; mark unperformed steps as pending. Finally verify the backup still opens before sharing the exercise.</p>
+<h2 id="supplemental-check">Compare a negative offset</h2>
+<p>Save a separate experiment copy and change only the middle line’s offset from positive 6 to negative 6. Using the dash period, path start x=20 falls in a gap and the first visible dash runs from x=26 to x=38; with positive 6 it instead runs from x=20 to x=26. Compare both files in a browser. If the direction differs from the paper prediction, check the minus sign and which copy is open. This extra experiment does not change the app-import result.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/vectorpaint-svg-dash-pattern-odd-list-repetition/">Dash-array repetition</a>; <a href="/en/guides/vectorpaint-svg-stroke-linecap-endpoint-comparison/">Stroke cap comparison</a>.</p>
+<p>Checked 22 November 2026: <a href="https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software">Apple public version lookup</a>; <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/stroke-dashoffset">MDN: stroke-dashoffset</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

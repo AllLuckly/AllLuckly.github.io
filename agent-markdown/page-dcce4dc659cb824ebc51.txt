@@ -1,0 +1,94 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-svg-rotation-center-versus-origin/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Compare rotation centers in VectorPaint: why the same line lands in different
+  places'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-svg-rotation-center-versus-origin/
+agent_source_sha256: 2798661853c309f7a2d6ac65feaa6c48cd2491aae6ffa2744fbb4392474fc8c9
+agent_generator_version: 1
+---
+{% raw %}# Compare rotation centers in VectorPaint: why the same line lands in different places
+
+Language: en
+Canonical: [Compare rotation centers in VectorPaint: why the same line lands in different places](<https://allluckly.cn/en/guides/vectorpaint-svg-rotation-center-versus-origin/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-svg-rotation-center-versus-origin/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-svg-rotation-center-versus-origin/>)
+Published: 2026-11-22T00:00:00+08:00
+Modified: 2026-11-22T09:16:27+08:00
+Author: Bison
+
+Compare origin and specified-center rotation with a calculable SVG line and inspect import and output.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-svg-rotation-center-versus-origin/>), translated on 2026-11-22. Original publication dates, attribution, code and version notes are retained.
+
+Compare origin and specified-center rotation with a calculable SVG line and inspect import and output.
+
+## Change only the center
+
+A line rotated 90 degrees can have the same direction but land in a different position. SVG transform rotate can specify a center or omit it to use the current coordinate-system origin. Keep line, angle and stroke width fixed and compare centers (0,0) and (40,40). Calculate endpoints first, then observe in browser and app separately. SVG attributes describe the external file format; they do not imply identical fields in the app.
+
+## Define a calculable line
+
+The original line runs from A=(40,40) to B=(80,40), horizontal length 40. Rotate positive 90 degrees about A: A stays fixed and the vector from A to B changes from (40,0) to (0,40), giving (40,80). Rotate about the current origin instead: A maps to (-40,40) and B to (-40,80). In the usual SVG screen coordinates, y increases downward, so positive 90 degrees appears clockwise here. Both resulting lines remain length 40.
+
+## Give negative coordinates room
+
+Create an SVG root with xmlns=http://www.w3.org/2000/svg and viewBox=-60 -10 180 110. This viewport includes negative x, preventing the origin-rotated line from disappearing to its left. Keep the original line in pale gray, use rotate(90) for an orange line and rotate(90 40 40) for a green line, and mark origin and specified center with small dots. Colors identify test objects; they are not app defaults.
+
+## Save the sample and check the browser
+
+Copy the complete SVG below into a plain-text editor as rotation-centers.svg and make a backup. Check extension and XML quotes. In an SVG-capable browser, the gray line should be horizontal, the green line descend from its left endpoint, and the orange line be parallel to the green but farther left. If orange is missing, first check the negative viewBox and both strokes rather than assuming rotation failed. Record this as a browser reference, not an app test.
+
+```
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -10 180 110">
+  <line x1="40" y1="40" x2="80" y2="40" stroke="#aab5af" stroke-width="3"/>
+  <line x1="40" y1="40" x2="80" y2="40" stroke="#b95c28" stroke-width="3" transform="rotate(90)"/>
+  <line x1="40" y1="40" x2="80" y2="40" stroke="#31554c" stroke-width="3" transform="rotate(90 40 40)"/>
+  <circle cx="0" cy="0" r="2" fill="#333333"/>
+  <circle cx="40" cy="40" r="2" fill="#333333"/>
+</svg>
+```
+
+## Check positions with a coordinate table
+
+On paper make rows for original A and B, endpoints after specified-center rotation, and endpoints after origin rotation. Enter (40,40)/(80,40), (40,40)/(40,80), and (-40,40)/(-40,80). The rotated results differ horizontally by 80 units but share the same vertical extent. Use grid paper to see which endpoint remains at the rotation center; two vertical lines do not by themselves prove identical transforms. The dots are markers, not part of either line.
+
+## Calculate rotation without moving the coordinate origin
+
+For rotation around (40,40), subtract that center from A and B to obtain relative vectors (0,0) and (40,0). In this coordinate system, a positive 90-degree rotation gives (0,0) and (0,40); add the center back to obtain (40,40) and (40,80). Applying the same rotation around the origin gives (-40,40) and (-40,80). The centers differ, not the line lengths.
+
+On grid paper use ten units per square, mark x increasing right and y increasing down, and plot the original and both results. Do not rotate the whole sheet, which would make coordinate comparison harder. The gray and green lines share an endpoint; the small marker may cover part of their strokes. Checking source coordinates is more reliable than estimating an endpoint from pixels.
+
+## Open a copy in the app
+
+Choose the working copy through an SVG open or import entry actually available in the installed VectorPaint. If no entry exists or the file is unsupported, record the step incomplete; a screenshot is not a substitute for vector import. Before moving anything, inspect the three lines and two dots, then try selecting them separately. Record merging, clipping or positional differences. The app may bake transforms into coordinates or use a matrix; matching appearance does not prove the original attributes remain.
+
+## Do not confuse a node with the center
+
+The specified center (40,40) happens to equal one endpoint, so that endpoint of the green line stays put. In general a rotation center can be outside the object; do not always assume the geometric center is the pivot. To explore another center, save a separate copy and calculate the prediction first; preserve the baseline. Change one condition per test to distinguish angle, center and viewport clipping.
+
+## Check color and overlap
+
+Colors help distinguish lines; if color vision or display settings make them hard to distinguish, use position and the endpoint table. The center marker covers the gray-green intersection, so its appearance does not prove those lines were merged. Change colors only in a copy and record the change.
+
+## Inspect after export
+
+Use a share or export method actually visible in the current version and save separately without overwriting the original. Reopen and inspect both vertical lines relative to the gray line, markers and canvas edges. For SVG output inspect line coordinates and transform; a matrix or converted coordinates can produce the same appearance, so record structure and display separately. For bitmap output inspect appearance only, without calling it editable lines. Label browser and app results clearly.
+
+## Troubleshoot and keep pending items
+
+If the rotated lines overlap, check whether the specified center is missing or import converted the result; verify the filename and compare the browser original. If the orange line is clipped, inspect the negative-x viewport and device display region. Change one attribute per round and record the new filename. Keep the original, working copy and observation table. Mark import, export or device steps pending when unperformed; do not report compatibility as passed.
+
+## Save a half-turn variant
+
+In a copy, change only the green line’s transform to rotate(180 40 40), leaving the center and other elements unchanged. Calculate first: A remains at (40,40), while B turns halfway around A to (0,40), so the green line should extend horizontally left; the orange line stays unchanged. After viewing it in a browser, return to the baseline. If the green line points the wrong way, check the angle and center parameter order.
+
+## Related guides and sources
+
+[ViewBox origin and position](<https://allluckly.cn/en/guides/vectorpaint-svg-viewbox-origin-position-window/>); [SVG compatibility checks](<https://allluckly.cn/en/guides/vectorpaint-svg-compatibility-check/>).
+
+Checked 22 November 2026: [Apple public version lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software>); [MDN: SVG transform](<https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/transform>). No physical-device or private-server test is claimed.
+{% endraw %}

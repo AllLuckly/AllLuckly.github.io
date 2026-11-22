@@ -1,0 +1,86 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-svg-non-scaling-stroke-transform-check/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Compare stroke scaling in VectorPaint: does line width grow with the shape?'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-svg-non-scaling-stroke-transform-check/
+agent_source_sha256: 81484c1280043c51a5cc4b42c8655e43eea0667dc4efeda2fd3a0a6b6dcd9cdf
+agent_generator_version: 1
+---
+{% raw %}# Compare stroke scaling in VectorPaint: does line width grow with the shape?
+
+Language: en
+Canonical: [Compare stroke scaling in VectorPaint: does line width grow with the shape?](<https://allluckly.cn/en/guides/vectorpaint-svg-non-scaling-stroke-transform-check/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-svg-non-scaling-stroke-transform-check/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-svg-non-scaling-stroke-transform-check/>)
+Published: 2026-11-22T00:00:00+08:00
+Modified: 2026-11-22T09:21:22+08:00
+Author: Bison
+
+Compare ordinary and non-scaling strokes on equally enlarged SVG rectangles, then inspect import and output.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-svg-non-scaling-stroke-transform-check/>), translated on 2026-11-22. Original publication dates, attribution, code and version notes are retained.
+
+Compare ordinary and non-scaling strokes on equally enlarged SVG rectangles, then inspect import and output.
+
+## Define one comparison
+
+When enlarging a sign or map, strokes may become thicker with the shape, or you may want their visible width to remain stable. SVG vector-effect=non-scaling-stroke describes the latter. Keep rectangle, stroke and twofold transform fixed and change only that attribute. Compare first in a browser, then record actual VectorPaint import and output. A file-format attribute does not imply a corresponding app button.
+
+## Set source dimensions and predictions
+
+Each rectangle runs from (0,0) to (40,20) in its own coordinates, with no fill and stroke width 4. Both use scale(2), then placement translations put them side by side. The left has ordinary stroke; the right uses non-scaling-stroke. With a root viewBox mapped 1:1 to a 300 by 130 viewport, both paths are 80 by 40; expected left stroke is about 8 and right about 4. Placement translation only separates the examples and does not change stroke width.
+
+## Save the complete sample
+
+Copy the full SVG below into a plain-text editor as stroke-scaling.svg. Retain root, namespace and both rectangles, confirm it is not svg.txt and make a backup. The left transform is translate(30 35) scale(2), and the right is translate(170 35) scale(2); only their placement translations differ. Scaling is the same. The right has one extra vector-effect attribute. Do not include unknown scripts or overwrite another drawing’s original. Check that both strokes have the same color so color does not confound the visual comparison.
+
+```
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="130" viewBox="0 0 300 130">
+  <rect x="0" y="0" width="40" height="20" fill="none" stroke="#31554c" stroke-width="4" transform="translate(30 35) scale(2)"/>
+  <rect x="0" y="0" width="40" height="20" fill="none" stroke="#31554c" stroke-width="4" transform="translate(170 35) scale(2)" vector-effect="non-scaling-stroke"/>
+</svg>
+```
+
+## Observe in a browser first
+
+Open the source in an SVG-capable browser. The rectangular centerline paths should have equal width and height, with the left stroke visibly thicker. A stroke straddles the path, so its outer boundary differs slightly with stroke width; do not mistake that boundary for path dimensions. View both samples at the same scale and record relative thickness and corners. This is a format-rendering reference, not evidence of a successful app or device test.
+
+## Separate path size from stroke width
+
+The original path is 40 wide and 20 high; doubling it gives a centerline path of 80 by 40. The ordinary width 4 transforms to about 8, while the non-scaling stroke retains its width of 4 in the relevant rendering context. This numerical example assumes a 1:1 root viewport and viewBox. If the entire SVG display size or output resolution changes, describe the measurement context again; do not claim 4 is always four pixels on every screen. Do not change root viewport, scale and stroke width at once.
+
+## Check thickness using edge coordinates
+
+With the root viewport and viewBox mapped 1:1, both horizontal path centerlines lie at y=35 and y=75. The ordinary stroke is about 8 wide, extending about 4 on either side of the upper centerline, from y=31 to y=39. The non-scaling stroke is about 4 wide, extending about 2 on each side, from y=33 to y=37. Compare the middle of horizontal edges rather than corners or antialiased pixels, and record viewport size and zoom in the table.
+
+On grid paper draw identical 80-by-40 centerline rectangles, then add thicknesses of 4 and 2 units on each side. The normal stroke has a larger outer boundary even though the centerline path is unchanged. If a screenshot reveals only the outer boundary, record the estimation method rather than calling its outer width the path width. Preserve the original image before saving a second viewport-size comparison.
+
+## Make a repeatable observation table
+
+Draw columns for source parameters, browser observations and app observations, with rows for path dimensions, apparent stroke thickness, corners and separate selection. Both source paths share dimensions; if import converts one side to an outline, the same appearance does not prove it remains a stroke. Compare the middle of long edges to reduce corner effects. If a screenshot is too low-resolution, record the result as indeterminate instead of giving a precise value from a blurred boundary.
+
+## Import a working copy
+
+Choose the copy through an SVG open or import entry actually visible in the installed VectorPaint. If no entry exists or the file is unsupported, stop and record it; a bitmap preview does not establish editability. Before changing anything inspect both stroke appearances, then try selecting the rectangles separately. If their strokes are equally thick, record the app version, opened filename and browser reference without immediately asserting which attribute was ignored. Results can vary with version and input path.
+
+## Save and inspect structure
+
+Use a share or export entry actually visible in the current version to save separately without overwriting the source. After reopening, compare borders and path positions. For SVG, inspect rect, transform, stroke-width and vector-effect and note conversion to matrices or outlines. Matching appearance, matching structure and editability are three different results. For bitmap output, inspect image dimensions and appearance only, without claiming editable strokes.
+
+## Troubleshoot and restore
+
+If browser results differ from predictions, check scale(2) on both rectangles, spelling of the right attribute and any CSS override. Change one condition and retry with a new filename. If the app differs, compare the opened copy and any conversion. Keep the original, browser observation, app copy and pending items, and confirm the backup still opens. Mark device, import and export steps as pending when unperformed rather than reporting a compatibility conclusion.
+
+## Remove the effect as a control
+
+Save an SVG copy and remove vector-effect only from the right rectangle, retaining both scale(2) transforms and the other stroke settings. With the root viewport still one-to-one, both strokes should be approximately 8 units and both centerline paths 80×40. Compare the files in a browser: only the right side changing is the expected control result. This does not establish that the app preserves or supports the attribute.
+
+## Related guides and sources
+
+[Stroke join comparison](<https://allluckly.cn/en/guides/vectorpaint-svg-linejoin-miter-round-bevel/>); [SVG compatibility checks](<https://allluckly.cn/en/guides/vectorpaint-svg-compatibility-check/>).
+
+Checked 22 November 2026: [Apple public version lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software>); [MDN: vector-effect](<https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/vector-effect>). No physical-device or private-server test is claimed.
+{% endraw %}

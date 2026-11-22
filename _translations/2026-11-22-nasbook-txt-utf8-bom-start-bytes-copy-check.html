@@ -1,0 +1,78 @@
+---
+layout: guide
+author: Bison
+app_id: nas_book
+title: 'Book Isle TXT UTF-8 signatures: compare starting bytes before inspecting text'
+description: Make two short files differing only by a BOM and distinguish signature, import feedback and text display.
+permalink: /en/guides/nasbook-txt-utf8-bom-start-bytes-copy-check/
+date: '2026-11-22 00:00:00 +08:00'
+modified: '2026-11-22 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 259
+topic: TXT UTF-8 signature and file start
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-22-nasbook-txt-utf8-bom-start-bytes-copy-check.md
+source_url: /guides/nasbook-txt-utf8-bom-start-bytes-copy-check/
+translation_method: editorial
+translation_source_sha256: f46d7ee2b7d0a244d1ff66eb729a8313890386047c0fd833bac128455c472fc3
+translation_date: '2026-11-22T01:57:25+00:00'
+---
+{% raw %}
+<p>Two TXT files saved as UTF-8 can differ by the initial three bytes <code>EF BB BF</code>. Unicode describes initial U+FEFF in UTF-8 as an optional signature; it does not change UTF-8 byte order. Make two nonprivate samples, inspect bytes on a computer and then try importing them into Book Isle to observe the opening and contents. This supplements ordinary UTF-8 troubleshooting without assuming Book Isle strips or displays the signature.</p>
+
+<h2 id="preserve-the-original-and-define-scope">Preserve the original and define scope</h2>
+
+<p>Do not change encoding in the only original or a book you are reading. Make separate practice files with two lines, 第一章 (“Chapter One”) and 春天。 (“Spring.”), recording the text, line breaks and file identities. You need a computer with Python 3 and a way to transfer files to iPhone or iPad. Without one, or if unfamiliar with commands, read the byte explanation and mark generation and import unperformed; do not download an unknown script. The examples are self-created and contain no private books or copyrighted content.</p>
+
+<p>Book Isle publicly lists TXT reading, local import and contents browsing, but parsing, duplicate handling and display require observation in the installed version. This compares an optional initial signature, not every encoding, heading convention or internal parser. Record OS and app versions while preserving the existing shelf and notes.</p>
+
+<h2 id="create-two-files-in-a-new-directory">Create two files in a new directory</h2>
+
+<p>On the computer first enter a safe working directory you choose and confirm that <code>bom-demo</code> does not already exist. Save the complete code below as <code>make_bom_demo.py</code> and run <code>python3 make_bom_demo.py</code>. It creates a new directory and uses exclusive writes. An existing directory or file causes it to stop; do not delete an existing folder to force a retry, choose another location. It only creates sample files and does not read or convert private manuscripts.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s">'bom-demo'</span><span class="p">)</span>
+<span class="n">folder</span><span class="p">.</span><span class="n">mkdir</span><span class="p">()</span>  <span class="c1"># 若已存在则停止
+</span><span class="n">content</span> <span class="o">=</span> <span class="s">'第一章</span><span class="se">\n</span><span class="s">春天。</span><span class="se">\n</span><span class="s">'</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="p">[(</span><span class="s">'plain.txt'</span><span class="p">,</span> <span class="n">content</span><span class="p">),</span>
+                   <span class="p">(</span><span class="s">'signed.txt'</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\xef\xbb\xbf</span><span class="s">'</span> <span class="o">+</span> <span class="n">content</span><span class="p">)]:</span>
+    <span class="k">with</span> <span class="p">(</span><span class="n">folder</span> <span class="o">/</span> <span class="n">name</span><span class="p">).</span><span class="nb">open</span><span class="p">(</span><span class="s">'xb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">data</span><span class="p">[:</span><span class="mi">6</span><span class="p">].</span><span class="nb">hex</span><span class="p">(</span><span class="s">' '</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>Expected <code>plain.txt</code> begins <code>e7 ac ac</code>, the UTF-8 bytes for 第. <code>signed.txt</code> begins with <code>ef bb bf</code> followed by the same <code>e7 ac ac</code>. The signed file is exactly three bytes longer and otherwise identical. If actual output differs, inspect code, encoding and selected files; do not report a paper prediction as a computer test.</p>
+
+<h2 id="separate-bytes-from-body-text">Separate bytes from body text</h2>
+
+<p><code>EF BB BF</code> encodes U+FEFF in UTF-8. At the beginning of a data stream it may serve as a UTF-8 signature; it does not make the file UTF-16 or make UTF-8 big- or little-endian. The signature is optional, so its absence is not automatically a fault. Some decoders recognize and omit an initial signature, while others may retain U+FEFF in text. Display depends on tool and protocol and cannot be inferred from a filename.</p>
+
+<p>For another external Python check without changing files, use <code>read_bytes()</code> for both and compare <code>signed[3:] == plain</code>. Mark it unperformed if you cannot run it. U+FEFF in the middle of text is not necessarily the same use as an initial signature; Unicode describes a different interpretation there. Do not globally remove invisible characters from a real manuscript.</p>
+
+<h2 id="transfer-and-import-separately">Transfer and import separately</h2>
+
+<p>Use a trusted system file transfer to place both examples on the device, confirming destination and filenames. A transfer success message does not prove Book Isle imported them. Through the local-file entry actually shown in Book Isle select <code>plain.txt</code>, record feedback and open it, then try <code>signed.txt</code>. If the app deduplicates by content, keeps one item or does not allow separate imports, record what happened. Do not delete other books or change the text merely to force two items.</p>
+
+<p>In each item actually opened, check 第一章 on line one, 春天。 on line two and any unexpected visible symbol, then inspect the available contents and reopening path. The sample’s line breaks are content; they do not guarantee every heading becomes a chapter. If only one file imports or there is no contents view, record that scope without assuming the other result.</p>
+
+<h2 id="separate-the-signature-from-displayed-text">Separate the signature from displayed text</h2>
+
+<p>If the computer editor offers encoding inspection or invisible-character display, inspect each copy’s start; alternatively compare bytes externally in Python without changing files. A signature not visible in preview is not proof that it is absent. Likewise a box displayed by an app is not sufficient proof that the cause is the BOM. Confirm the exact selected file and original bytes before recording a visual result.</p>
+
+<p>Do not add or remove text, change line endings or edit headings between the samples. If Book Isle displays them differently, preserve both byte sequences, import feedback and versions. If they look the same, report that only for these two small files and this observation; it does not establish behavior for every TXT or every U+FEFF position.</p>
+
+<h2 id="troubleshoot-and-preserve-originals">Troubleshoot and preserve originals</h2>
+
+<p>If generation fails, inspect whether the directory exists, Python is available and where the error occurred. Do not retry with an overwrite command. If the device cannot find files, check the actual destination and read access. If Book Isle reports a duplicate, preserve that behavior and compare the available item to external samples as appropriate. For a real garbled book, return to the retained source and determine its original encoding; deleting three bytes is not a universal repair.</p>
+
+<p>Record filenames, first six bytes, sizes, transfer and import feedback, opening and contents results, and pending items. Do not share a private manuscript or account information. The user may remove the practice <code>bom-demo</code> folder after confirming it contains only these nonprivate samples. Leave original books, old entries and reading progress intact. No Book Isle device or encoding-compatibility test is claimed.</p>
+
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+
+<p><a href="/en/guides/nasbook-txt-encoding-chapters/">TXT encoding, chapters and resumption</a>; <a href="/en/guides/nasbook-txt-hard-linewraps/">TXT hard wraps and paragraphs</a>.</p>
+
+<p>Checked on 22 November 2026: <a href="https://itunes.apple.com/lookup?id=6766198898&amp;country=cn&amp;entity=software">Apple’s China app lookup</a> lists Book Isle 1.1.5 TXT reading. The <a href="https://www.unicode.org/faq/utf_bom.html">Unicode UTF and BOM FAQ</a> explains <code>EF BB BF</code>, UTF-8 byte order and U+FEFF inside a stream. Actual app behavior depends on the device.</p>
+{% endraw %}

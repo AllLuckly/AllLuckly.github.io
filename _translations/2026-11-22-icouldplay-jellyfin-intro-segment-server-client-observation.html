@@ -1,0 +1,50 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay and Jellyfin intro segments: inspect server markers and client display separately'
+description: Use an authorized video with a known intro to distinguish Jellyfin media-segment metadata from playback
+  actions actually available in iCouldPlay.
+permalink: /en/guides/icouldplay-jellyfin-intro-segment-server-client-observation/
+date: '2026-11-22 00:00:00 +08:00'
+modified: '2026-11-22 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 233
+topic: Jellyfin intro segments and client observation
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-22-icouldplay-jellyfin-intro-segment-server-client-observation.md
+source_url: /guides/icouldplay-jellyfin-intro-segment-server-client-observation/
+translation_method: editorial
+translation_source_sha256: 557561758bd4845928d201cb9fd9dbd092e54d9926e5a54dfffa4d4b8aeaf13b
+translation_date: '2026-11-22T01:14:01+00:00'
+excerpt: Use an authorized video with a known intro to distinguish Jellyfin media-segment metadata from playback
+  actions actually available in iCouldPlay.
+---
+{% raw %}
+<p>Use an authorized video with a known intro to distinguish Jellyfin media-segment metadata from playback actions actually available in iCouldPlay.</p>
+<h2 id="section-1">Prepare a sample with a known intro</h2>
+<p>Choose an authorized short episode and watch it using an existing server player. Record the approximate intro start and end and the first spoken line or image afterwards. Keep the original video; do not cut the intro to create a test outcome. Record Jellyfin and iCouldPlay versions, show name and episode. With a self-made video, use different text markers in the intro and content for easier identification.</p>
+<h2 id="section-2">Understand the source of server segments</h2>
+<p>Jellyfin documents media segments introduced in 10.10, storing typed start and end times such as intros and outros, with clients deciding how to use them. A server plugin normally supplies segments; server support does not establish that every video already has them. On a server you are authorized to administer, check the version, existing configuration and actual visible state. Without administrative rights ask the administrator; do not install unknown plugins yourself.</p>
+<h2 id="section-3">Check existing segments and tasks</h2>
+<p>If a trusted segment provider already exists, follow its official documentation and current interface to inspect whether the test episode has an intro segment; where necessary the administrator can decide whether to run the media-segment scan task. Do not blindly rescan the production library or change plugin settings. Record the intro type and times only when actually confirmable. If the interface does not show times, mark them unconfirmed; a chapter list is not automatically a media-segment list.</p>
+<h2 id="section-4">Observe actual controls in iCouldPlay</h2>
+<p>In iCouldPlay open the same connected Jellyfin server and episode, beginning playback before the intro. During the intro, observe whether the current interface actually offers an action such as skipping and record its appearance time; if none appears, record not observed. Public app information indicates Jellyfin support but does not promise every segment type or skipping behavior. Do not invent a hidden button or infer client support solely from a server marker.</p>
+<h2 id="section-5">Check one action only if visible</h2>
+<p>If an actionable entry actually appears, record playback time, use it once and observe the destination against the previously recorded intro-ending image. Reaching the start of content, skipping some content and no jump are different results. If the destination is inaccurate, record the times rather than immediately changing server data. Without an entry, do not simulate a click; mark the skip action untested.</p>
+<h2 id="section-6">Record diagnostic information and preserve the setup</h2>
+<p>Record separately whether the server segment was confirmed, whether an iCouldPlay control appeared, the actual destination and normal playback. A confirmed server segment without a client control does not prove server data loss; an unconfirmed segment does not prove the client ignored it. Share only redacted versions and times, not account details, server addresses or private video. This article follows public documentation and does not claim server, plugin or device tests.</p>
+<h2 id="time-ledger">Describe expected and actual times</h2>
+<p>For example, a self-made video has an intro from 00:10 to 00:30, with content starting at 00:30. First confirm both positions and corresponding images during ordinary playback and write “expected intro 00:10–00:30.” If the server actually shows Intro as 00:12–00:29, record the difference instead of claiming an exact match. One second of the ending might remain unmarked, but timestamps alone do not establish the viewing experience.</p>
+<p>Suppose iCouldPlay actually shows a skip control at 00:15, and using it reaches 00:29 showing the last intro frame. Record control time, destination and image rather than writing “reached the content.” If playback reached only 00:15 without a control, record the interface then and whether observation continued to 00:30; mark an unobserved interval untested. These times illustrate recording, not a promised iCouldPlay button or default server configuration.</p>
+<h2 id="chapters-and-seeking">Separate segments, chapters and manual seeking</h2>
+<p>A normal chapter can mark a position, while a Jellyfin media segment has a type and start and end times. They may be related, but a chapter point does not establish that an Intro segment exists. Manually seeking to 00:30 can check the content image but does not prove the client read or used an Intro segment. Record manual seeking and using an actually displayed skip action on separate lines.</p>
+<p>If a provider scan finds no segment, first confirm it supports this sample and server version, then consult that plugin’s public documentation for its prerequisites. Do not infer that scanning must succeed or change other people’s episodes for a test. If the difference appears only in iCouldPlay, record client version and reproduction conditions. If the server itself has no confirmable segment, ask the administrator to inspect the server first.</p>
+<h2 id="post-test">Check the original state after testing</h2>
+<p>Record whether a server scan was run, whether settings changed and who performed the action; if you only inspected existing state, record no changes. Return to the same episode’s beginning, confirm normal playback and compare the originally recorded intro position. Preserve the test sample and original server configuration; before removing temporary media, confirm that no one else uses it. If the provider of a segment is unknown, write unknown rather than deleting a plugin or existing metadata. Record the ending time and untested items.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-jellyfin-library/">Connect Jellyfin</a>; <a href="/en/guides/icouldplay-seek-caption-reentry-check/">Check subtitles after seeking</a>.</p>
+<p>Checked 22 November 2026: <a href="https://apps.apple.com/cn/app/id6755653178">iCouldPlay App Store listing</a>; <a href="https://jellyfin.org/docs/general/server/metadata/media-segments/">Jellyfin media segments documentation</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

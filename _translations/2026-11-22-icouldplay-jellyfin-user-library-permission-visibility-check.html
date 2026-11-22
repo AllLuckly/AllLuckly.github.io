@@ -1,0 +1,49 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'Jellyfin library missing in iCouldPlay: check user access and playback'
+description: Compare library access for two authorized server users, then check the account and same video in iCouldPlay.
+permalink: /en/guides/icouldplay-jellyfin-user-library-permission-visibility-check/
+date: '2026-11-22 00:00:00 +08:00'
+modified: '2026-11-22 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 238
+topic: Jellyfin user library access
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-22-icouldplay-jellyfin-user-library-permission-visibility-check.md
+source_url: /guides/icouldplay-jellyfin-user-library-permission-visibility-check/
+translation_method: editorial
+translation_source_sha256: d458d36249e61e6f28a3298700dcde8ba21a505477727e0a673f60d20797b64c
+translation_date: '2026-11-22T01:20:13+00:00'
+excerpt: Compare library access for two authorized server users, then check the account and same video in iCouldPlay.
+---
+{% raw %}
+<p>Compare library access for two authorized server users, then check the account and same video in iCouldPlay.</p>
+<h2 id="section-1">Prepare identifiable test content</h2>
+<p>On your own Jellyfin server choose a library available for testing and a nonprivate short video, recording library name, video title, duration and opening. Prepare two test accounts A and B that you are authorized to use. Do not use another person’s account or change permissions on a shared server without permission. Preserve original media and production accounts; stop if authorization is unclear.</p>
+<h2 id="section-2">Record existing user permissions first</h2>
+<p>Jellyfin’s user-management documentation describes per-user library access. An administrator checks A and B’s actual permissions for the test library in the current server interface and records original states; no permission change is needed for practice. Use account names locally only and A and B in shared records. If permissions cannot be inspected, mark unknown; a missing client library alone does not prove access was denied.</p>
+<h2 id="section-3">Compare the same library on the server side</h2>
+<p>Sign in to a Jellyfin client or web interface as A and B in turn. For each account check whether the test library and video appear and, where authorized, play the opening. Sign-in, library listing, video listing and playback are different layers; successful sign-in does not grant every library. Confirm the actual signed-in account each time so a retained browser session does not attribute A’s result to B.</p>
+<h2 id="section-4">Confirm the account used by iCouldPlay</h2>
+<p>Open the existing Jellyfin source in iCouldPlay and confirm server identity and current account using the actual interface. Switch test accounts only if connection information can be preserved safely and the comparison is needed. Record each account’s visible libraries and videos in iCouldPlay and play the authorized test video. Public information supports Jellyfin but does not promise identical user-configuration interfaces; if account identity is unavailable, mark unconfirmed rather than guessing.</p>
+<h2 id="section-5">Compare server and client outcomes</h2>
+<p>If A sees the library in both Jellyfin web and iCouldPlay while B sees it in neither, the administrator can inspect B’s actual permissions. If B sees it on the web but not in iCouldPlay, first confirm the same account, server, network and library, then record versions and observations. Do not grant all-library access solely because the client lacks an entry or use an administrator’s result as proof of a restricted user’s access.</p>
+<h2 id="section-6">Preserve permissions and record results</h2>
+<p>If an administrator must change access, record the original state, make only the necessary approved change to the test library, sign in again and check that account’s visible scope, then restore as agreed. Record test time, redacted account identifiers, whether original access was confirmed, library and playback results on both sides, and untested items. Do not share passwords, tokens or private media. This article follows public documentation and claims no device or server tests.</p>
+<h2 id="account-ledger">Avoid account confusion with a ledger</h2>
+<p>Use rows A and B and columns for confirmed server access, visible Jellyfin library, visible video, opening playback, visible iCouldPlay library and iCouldPlay playback. For example, if A has observations in all columns while B’s access is unconfirmed and the library is absent, record B’s access as unknown and library as not observed—not denied. After switching accounts, verify identity in the actual interface before acting. If the account is not displayed, stop that comparison and retain the connection settings.</p>
+<p>Suppose an administrator confirms B can access the test library and B can play it in Jellyfin web, but iCouldPlay does not show the library. First confirm the same server, B account and source in iCouldPlay and allow the current interface to finish loading. If the difference remains, send redacted results to app support. Web playback and an absent client entry are separate facts; neither proves that all server settings are correct nor immediately identifies a client defect.</p>
+<h2 id="library-versus-playback">Distinguish library access from one playable video</h2>
+<p>If a user sees the library but cannot play one video, compare another small authorized video from that same library under the same account and record both results. If only one fails, inspect whether that file is readable on the server and what the server actually reports; do not attribute every failure to account access. Conversely, if the library itself is absent, inspect account and library access first rather than guessing a video codec.</p>
+<p>Accounts may have other server-side restrictions; include a restriction in the record only if an administrator can verify it. Do not widen access to other libraries or disable account protection as a quick test. If a change is needed, establish its scope, original state and restoration owner; change one condition and retest the same video. If no permission was changed, record “unchanged” rather than describing a read-only inspection as a completed fix.</p>
+<h2 id="cache-and-relogin">Consider cached displays and signing in again</h2>
+<p>After permissions change, an already open page may retain an earlier display. Exit and reopen the source using the current client interface, and record when you signed in again and the server authorization state. Do not assume a fixed refresh interval. If you cannot safely sign out or identify the account, stop the comparison rather than overwriting an existing connection. An old listing alone does not establish continued access; check actual directory and playback under the account’s authorized scope.</p>
+<p>After testing, compare A and B’s server permissions with the pretest record. If the administrator intentionally retains a change, the administrator should document the new scope. Exclude account names, full addresses and reusable links from shared reports; use A, B and a test-library identifier.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-jellyfin-library/">Connect Jellyfin</a>; <a href="/en/guides/icouldplay-server-account-content-scope/">Server account content scope</a>.</p>
+<p>Checked 22 November 2026: <a href="https://apps.apple.com/cn/app/id6755653178">iCouldPlay App Store listing</a>; <a href="https://jellyfin.org/docs/general/server/users/adding-managing-users/">Jellyfin user management</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

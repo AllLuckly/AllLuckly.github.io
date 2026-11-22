@@ -1,0 +1,84 @@
+---
+layout: guide
+author: Bison
+app_id: nas_book
+title: 'Book Isle HTML fragment navigation: check a link and its target identifier'
+description: Compare matching and missing targets in self-made offline files, recording web reference and reader results separately.
+permalink: /en/guides/nasbook-html-fragment-link-target-id-offline-check/
+date: '2026-11-22 00:00:00 +08:00'
+modified: '2026-11-22 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 260
+topic: HTML in-document fragments and target identifiers
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-22-nasbook-html-fragment-link-target-id-offline-check.md
+source_url: /guides/nasbook-html-fragment-link-target-id-offline-check/
+translation_method: editorial
+translation_source_sha256: 7f48a3978580d3c4daba6e6651d8c1734eef9c79404bde00d9bb577db769f721
+translation_date: '2026-11-22T02:00:28+00:00'
+---
+{% raw %}
+<p>A visible contents label in a local HTML document does not establish that activating it reaches the right location. Use a self-made single-file sample to compare a link’s <code>href</code> fragment and target <code>id</code>, first in a local web tool and then as actually imported into Book Isle. This link targets the same file, unlike the earlier lesson on external pages and relative images. Do not assume Book Isle necessarily preserves or supports HTML navigation.</p>
+
+<h2 id="prepare-two-distinguishable-practice-copies">Prepare two distinguishable practice copies</h2>
+
+<p>In an existing plain-text editor create UTF-8 <code>anchor-good.html</code> with the complete sample below. It contains no scripts, external images, remote stylesheet or network request, and the text is self-made and nonprivate. Nothing needs to be uploaded. Preserve this baseline and save a second copy as <code>anchor-missing.html</code>. Do not change existing user pages or books, and do not treat <code>.html.txt</code> as HTML. In the sample, the labels mean “Go to section two,” “Section one,” “Section two,” and “Target sentence: Beyond the green hills is a small river.” Preserve the Chinese text exactly while comparing files.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!doctype html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"zh-CN"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;title&gt;</span>文内跳转练习<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;p&gt;&lt;a</span> <span class="na">href=</span><span class="s">"#part-b"</span><span class="nt">&gt;</span>前往第二节<span class="nt">&lt;/a&gt;&lt;/p&gt;</span>
+<span class="nt">&lt;h2</span> <span class="na">id=</span><span class="s">"part-a"</span><span class="nt">&gt;</span>第一节<span class="nt">&lt;/h2&gt;</span>
+<span class="nt">&lt;p&gt;</span>这里是第一节的自制练习文字。<span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">"height: 100vh"</span><span class="nt">&gt;&lt;/div&gt;</span>
+<span class="nt">&lt;h2</span> <span class="na">id=</span><span class="s">"part-b"</span><span class="nt">&gt;</span>第二节<span class="nt">&lt;/h2&gt;</span>
+<span class="nt">&lt;p&gt;</span>目标句：青山之后是小河。<span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+
+<p>In the second copy change only the link target <code>#part-b</code> to <code>#part-c</code>, leaving the second heading’s <code>id="part-b"</code> and all other content intact. The first has a matching target; the second has no matching <code>id</code>. Identical content helps isolate link differences. Do not modify the baseline or create or delete unrelated documents. If no appropriate HTML editing environment exists, retain a paper diagram and mark later steps unperformed rather than uploading files to an unknown site.</p>
+
+<h2 id="understand-fragments-and-identifiers">Understand fragments and identifiers</h2>
+
+<p><code>href="#part-b"</code> refers to fragment <code>part-b</code> in the current document. The target heading’s <code>id</code> is <code>part-b</code>; the hash belongs to the reference, not the <code>id</code> value. HTML defines document identifiers and fragment navigation. Check source characters exactly: two headings both titled 第二节 do not by themselves make their identifiers equal. This uses simple ASCII identifiers so encoding, case and network addresses are not mixed into the experiment.</p>
+
+<p>The second file’s <code>#part-c</code> has no matching target. A browser may stay in place or handle it in its actual way; do not invent an error prompt. The sample’s <code>style</code> creates blank space in a typical browser to make movement easier to see. Book Isle may ignore styling, reflow content or omit link interactions, so blank-space size is not a compatibility promise.</p>
+
+<h2 id="establish-a-local-web-tool-reference">Establish a local web-tool reference</h2>
+
+<p>Open <code>anchor-good.html</code> in a local browser or known-safe preview that supports interactive HTML. Find 前往第二节 near the top, then scroll to confirm 第二节 and the target sentence exist. Return to the top, activate the link in the same window, and observe whether heading or sentence enters view. Record tool, filename, actual location and feedback. If the whole page fits on screen, reduce the viewport or use reversible zoom before observing; mark movement pending if it cannot be determined.</p>
+
+<p>Open <code>anchor-missing.html</code> independently, confirm the second section still exists, and activate its same label, recording the actual result. Check the sources of both copies rather than substituting one browser result for the other. This is a reference for that local tool, not evidence that Book Isle passed.</p>
+
+<h2 id="import-into-book-isle-and-identify-versions">Import into Book Isle and identify versions</h2>
+
+<p>Transfer both samples to iPhone or iPad through a trusted system file method and record destination type and filenames. In Book Isle use the local-file import entry actually shown, first selecting the baseline and recording preview and import feedback, then trying the missing-target copy. If the app deduplicates or creates one item, record feedback rather than deleting existing books or assuming both imported based on similar names.</p>
+
+<p>For each item actually opened, first identify the beginning, second heading and target sentence. If text is missing, partial or the file identity is unclear, pause the navigation judgment. Book Isle publicly lists HTML reading but does not guarantee every style or fragment link. If a link label is extracted as plain text, record “text visible; no link action observed” rather than requiring an unavailable control.</p>
+
+<h2 id="compare-link-action-and-target">Compare link action and target</h2>
+
+<p>If the actual reader offers an actionable link and the user wants to, activate it once from the confirmed baseline’s beginning. Observe target heading, body position and feedback. Record no action or inability to tap as observed. If both sections already fit on screen, movement cannot be determined; do not mark a pass merely because the second section is visible. Click counts, browser history and manually finding a sentence are not automatically equivalent to link navigation.</p>
+
+<p>Only when the second copy is independently identifiable and opened should you perform the same observation on the missing-target sample. Record any actual movement or lack of it without generalizing to all invalid fragments. Two files, two viewers and text extraction can all affect the result, so include device, version and visible interface.</p>
+
+<h2 id="troubleshoot-and-respect-boundaries">Troubleshoot and respect boundaries</h2>
+
+<p>For a local reference failure, check <code>href</code> starts with <code>#</code>, the target <code>id</code> matches exactly, the file was saved and the correct copy opened. Change one practice-copy item per round. If the browser works but Book Isle has no link, record whether only text was extracted and whether style and heading are visible, without assuming web interactions must be retained. For import failure inspect type, encoding, destination and feedback before reinstalling, clearing the library or contacting an unfamiliar server.</p>
+
+<p>The sample has no external URL, script or form. Do not upload private HTML to a third-party service for testing. Support can use this self-made sample, versions and redacted feedback. Real books containing external links or images require separate decisions based on their source and user authorization; do not generalize from this internal-fragment test.</p>
+
+<h2 id="preserve-results-and-restore">Preserve results and restore</h2>
+
+<p>Deliver a table of both files’ <code>href</code>, target <code>id</code>, local reference, Book Isle import, visible link action, target position and pending items. Keep the baseline and missing-target copy; the user decides whether to remove practice files. Restore the earlier reading position and settings without deleting existing works or notes. No real Book Isle, browser or device navigation test is claimed.</p>
+
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+
+<p><a href="/en/guides/nasbook-html-offline-links/">Offline HTML links and resources</a>; <a href="/en/guides/nasbook-document-reading/">document import and reading</a>.</p>
+
+<p>Checked on 22 November 2026: <a href="https://itunes.apple.com/lookup?id=6766198898&amp;country=cn&amp;entity=software">Apple’s China app lookup</a> lists Book Isle 1.1.5 HTML reading. The HTML standard defines <a href="https://html.spec.whatwg.org/multipage/dom.html#the-id-attribute">the id attribute</a> and <a href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#scroll-to-fragid">fragment navigation</a>. Actual Book Isle display and navigation depend on the installed version.</p>
+{% endraw %}

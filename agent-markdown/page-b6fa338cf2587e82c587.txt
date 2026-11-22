@@ -1,0 +1,74 @@
+---
+layout: null
+permalink: /en/guides/nasbook-calibre-library-copy-database-files-consistency-wal/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Book Isle with a Calibre copy: check database and books come from a consistent
+  backup'
+agent_source_url: https://allluckly.cn/en/guides/nasbook-calibre-library-copy-database-files-consistency-wal/
+agent_source_sha256: b7f52a2dac1cfa20b2a3019f7383661058fccb3ae1075bb73b0ce620ad8bdec3
+agent_generator_version: 1
+---
+{% raw %}# Book Isle with a Calibre copy: check database and books come from a consistent backup
+
+Language: en
+Canonical: [Book Isle with a Calibre copy: check database and books come from a consistent backup](<https://allluckly.cn/en/guides/nasbook-calibre-library-copy-database-files-consistency-wal/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/nasbook-calibre-library-copy-database-files-consistency-wal/>)
+English: [English HTML](<https://allluckly.cn/en/guides/nasbook-calibre-library-copy-database-files-consistency-wal/>)
+Published: 2026-11-22T00:00:00+08:00
+Modified: 2026-11-22T09:43:46+08:00
+Author: Bison
+
+Check the Calibre library copy time, database state and one actual book rather than treating an isolated database as a complete library.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/nasbook-calibre-library-copy-database-files-consistency-wal/>), translated on 2026-11-22. Original publication dates, attribution, code and version notes are retained.
+
+Check the Calibre library copy time, database state and one actual book rather than treating an isolated database as a complete library.
+
+## Identify the source library and retained backup
+
+Choose your own Calibre library and an existing complete backup. Record source location, backup time and an authorized test book’s author, title and format. Confirm the original book opens. Do not practice copying or moving the only library. Book Isle publicly supports reading Calibre metadata.db through NAS, but the database and actual book files are different content.
+
+## Read Calibre backup guidance
+
+Consult current official Calibre guidance on library migration and backup and choose a formal export or complete library backup process suitable for your version. Check other processes, sync tools and servers using that library, and have the administrator plan a consistency window. Do not copy only a changing database while an application writes. Stop without a recoverable backup.
+
+## Understand possible SQLite journals
+
+SQLite documents that for a database using WAL mode, its WAL file is part of persistent state and separating it can lose transactions or corrupt data. This does not establish that every Calibre library uses WAL, nor that copying two changing files automatically makes a consistent snapshot. If related files appear or state is unclear, have the administrator consult Calibre and SQLite backup guidance. Do not manually delete journals or force database changes.
+
+## Check database-to-book correspondence
+
+In a confirmed-consistent test backup, inspect metadata.db, author and book directories and the test book file to see whether they belong to the same backup. Compare title, format, size and recognizable opening. A database listing a title does not establish the body file exists. If backup or copying is incomplete, preserve the state; a later replacement of one file does not automatically make the library consistent.
+
+## Verify actual reading in Book Isle
+
+In Book Isle select the authorized NAS connection and test-library copy and configure the Calibre database source using the actual interface. Wait for the actual synchronization or reading result, find the test book and record metadata, then use any visible entry to download or open the body and compare opening and format. A cover, database read completion and an opened file are separate results; mark unavailable entries or unperformed downloads untested.
+
+## Preserve evidence and stop unsafe repairs
+
+If a title appears but its file is missing, first check test-copy path, backup time and file completeness. If both open but content differs, check edition and source. Do not delete database journals, run repair commands against an active library or overwrite the only backup. Record redacted versions, times, observations and untested items and ask an administrator when needed. No device, NAS or database test is claimed.
+
+## Two inconsistent-copy symptoms
+
+Suppose a database copy lists a newly added practice book but its EPUB folder is missing from the backup. Book Isle may display the title without obtaining the body. Compare backup inventory and whether files came from the same time; do not put a same-named different edition into the missing path as a substitute. Conversely, if a backup contains an EPUB without a corresponding database entry, Book Isle’s database library may not list it. First inspect the source library and backup process.
+
+If the database and book directory came from different times, record both times and sources and have an administrator prepare a test copy using a verified Calibre backup or restore process. Do not arbitrarily rename author directories or directly edit database paths in a production library; this could break other correct book references. When backup time is unknown, mark it unknown and preserve every existing copy first.
+
+## WAL is a condition, not automatically a fault
+
+SQLite’s WAL guidance applies to databases actually using that journal mode. Not seeing a WAL file alone does not prove a backup is correct, and seeing one does not necessarily indicate a fault. Never delete or separately move a journal while the database is in use. An administrator should obtain a consistent copy using a backup method appropriate for the version and verify it safely; this tutorial does not recommend changing an active database’s journal mode.
+
+A consistent database copy alone also does not prove that book files match it. Check the complete library backup, the same book’s format and body. If the source has ongoing synchronization, multiple users or a complex state, record relevant running processes and ask an administrator to plan a write pause or snapshot. Do not stop another person’s service or force a checkpoint in an unknown state.
+
+## Keep a handoff ledger
+
+Include source library, backup time, database and file origins, test-book edition, local opening result, Book Isle listing and body results. Use redacted identifiers rather than NAS paths or private titles. Confirm original book, backup and test copy remain available. Explicitly mark backup or reading unperformed when applicable. If the issue cannot be located, retain original logs and provide only necessary redacted information to an authorized administrator. If any backup cannot be read, stop overwriting and ask the administrator to inspect available recovery sources before deciding the next safe step.
+
+## Related guides and sources
+
+[Calibre database connection](<https://allluckly.cn/en/guides/nasbook-calibre-database/>); [Compare Calibre access paths](<https://allluckly.cn/en/guides/nasbook-calibre-database-and-server-same-edition-compare/>).
+
+Checked 22 November 2026: [Book Isle App Store listing](<https://apps.apple.com/cn/app/id6766198898>); [SQLite WAL documentation](<https://www.sqlite.org/wal.html>); [Calibre official FAQ](<https://manual.calibre-ebook.com/faq.html>). No physical-device or private-server test is claimed.
+{% endraw %}

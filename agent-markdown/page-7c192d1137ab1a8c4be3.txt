@@ -1,0 +1,69 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-jellyfin-base-url-proxy-client-check/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay and Jellyfin: check a reverse-proxy subpath and client address'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-jellyfin-base-url-proxy-client-check/
+agent_source_sha256: 2f5ceaa95caa2891386028444e98f5b58ad20f88787bef896f7a27dcbe6d7267
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay and Jellyfin: check a reverse-proxy subpath and client address
+
+Language: en
+Canonical: [iCouldPlay and Jellyfin: check a reverse-proxy subpath and client address](<https://allluckly.cn/en/guides/icouldplay-jellyfin-base-url-proxy-client-check/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-jellyfin-base-url-proxy-client-check/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-jellyfin-base-url-proxy-client-check/>)
+Published: 2026-11-22T00:00:00+08:00
+Modified: 2026-11-22T10:19:16+08:00
+Author: Bison
+
+Compare the confirmed Jellyfin entry, browser redirects and visible iCouldPlay results when a service uses a subpath.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-jellyfin-base-url-proxy-client-check/>), translated on 2026-11-22. Original publication dates, attribution, code and version notes are retained.
+
+An existing Jellyfin service may be hosted under a domain subpath, for example the illustrative address `https://media.example.org/jellyfin`. A browser redirect does not mean every client supplies the path automatically. Compare the administrator-provided entry, the actual browser address, and what iCouldPlay shows. The example domain is not a real server.
+
+## Prepare a comparison
+
+Use an authorized Jellyfin service already available over HTTPS and a device that can reach it. Ask its administrator for a client address, an account and an owned test video. Confirm that the current network can reach the entry. Record a server alias and the time, without passwords, access tokens or signed URLs. Without an existing service or authorization, mark the prerequisite unmet; do not open ports for this exercise.
+
+## Separate address components
+
+Split the supplied address into protocol, host, any necessary port and path. In `https://media.example.org/jellyfin`, `/jellyfin` is the path; `/web/index.html` may instead be a subsequent web-interface page. They are not interchangeable. URLs can also contain private query parameters or tokens, so never paste a long browser bookmark into a public record. Ask the administrator for the actual entry rather than guessing from the example.
+
+## Establish a browser reference on the same device
+
+Open the confirmed entry in the device browser and sign in with your authorized account. Record whether the expected library and test video appear. Observe address-bar redirects, but do not assume the complete final login-page URL belongs in a client field. If the browser fails, distinguish connection failure, certificate warning and login failure, recording the network type. Ask the administrator to check service, network and certificate; do not disable certificate verification or attribute the failure to iCouldPlay.
+
+## Identify the prefix
+
+Jellyfin documentation says an administrator can set a Base URL that puts server pages under a prefix. Browsers may follow a redirect while some clients do not handle the same redirect automatically. Ask the administrator to confirm the actual prefix and client address, including whether that prefix is needed. Do not assume your service uses `/jellyfin` merely because it appears in an example, or confuse the web-interface path with the prefix. Users without server access need only request confirmation and should not change server settings.
+
+## Check the source in iCouldPlay
+
+Open the existing Jellyfin source in iCouldPlay and inspect its displayed alias and connection state. If a new connection is needed, use the Jellyfin entry actually available in the installed version and enter the administrator-provided address with the same authorized account. Field names and accepted formats depend on the installed version. If the interface rejects a path or lacks the entry, record the observation and stop; do not remove the path to manufacture apparent success. After saving, check library, title and edition to avoid connecting to a different service under the same domain.
+
+## Test listing and playback separately
+
+Open the same library that worked in the browser and locate the same test video. Record connection, listing and matching details separately as success, failure or not visible. Open the short clip and observe picture and sound. A visible listing establishes only that some requests succeeded; it does not establish media transfer, subtitles or complete playback. If playback works, leave and re-enter the source once. There is no need to delete the source, rebuild the library or overwrite server files.
+
+## Change one condition at a time
+
+When the browser works but iCouldPlay fails, compare network, account, protocol, port and confirmed prefix. Ask the administrator to check reverse proxy and Base URL configuration and client compatibility; do not modify production configuration without confirmation. If both browser and client fail, investigate service or network first. If the listing appears but playback fails, record the stage of failure and consult network and playback troubleshooting; this does not prove a path error.
+
+## Compare evidence from both checks
+
+For example, the browser reaches the test library in the morning but iCouldPlay cannot list the source. After the administrator confirms the prefix, repeat using the same account and network. Keep the time, address components and results for both checks rather than only the final success. Record any intervening Wi-Fi, account or server-version change separately so the difference is not attributed entirely to the path. Matching library names can still belong to different services; if necessary confirm server identity with the administrator and compare a recognizable test clip. Save sanitized error text only where authorized and free of private information.
+
+## Record the outcome and restore your setup
+
+Keep four observations: confirmed address components, browser access to the expected library, iCouldPlay visibility of the video, and actual playback of the sample. Mark invisible settings for administrator review and remove tokens or account data from the record. Preserve the original configuration; if you temporarily changed accounts, sign out or switch back. Results vary with app version, proxy configuration and network. This guide does not claim a private-server or physical-device test.
+
+## Related guides and sources
+
+[Jellyfin source setup](<https://allluckly.cn/en/guides/icouldplay-jellyfin-library/>); [Network buffering troubleshooting](<https://allluckly.cn/en/guides/icouldplay-network-buffering/>).
+
+Checked on 22 November 2026: [Apple iCouldPlay listing](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>); [Jellyfin networking and Base URL documentation](<https://jellyfin.org/docs/general/post-install/networking/>).
+{% endraw %}

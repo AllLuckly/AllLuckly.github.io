@@ -1,0 +1,74 @@
+---
+layout: null
+permalink: /en/guides/nasbook-opds-catalog-download-auth-401-403-separate-check/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Book Isle OPDS catalog visible but download fails: separate authentication
+  from resource access'
+agent_source_url: https://allluckly.cn/en/guides/nasbook-opds-catalog-download-auth-401-403-separate-check/
+agent_source_sha256: b977f5c76b880dddbe56c603c217e014d61a51a832716a7b9cc8cbce214f505f
+agent_generator_version: 1
+---
+{% raw %}# Book Isle OPDS catalog visible but download fails: separate authentication from resource access
+
+Language: en
+Canonical: [Book Isle OPDS catalog visible but download fails: separate authentication from resource access](<https://allluckly.cn/en/guides/nasbook-opds-catalog-download-auth-401-403-separate-check/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/nasbook-opds-catalog-download-auth-401-403-separate-check/>)
+English: [English HTML](<https://allluckly.cn/en/guides/nasbook-opds-catalog-download-auth-401-403-separate-check/>)
+Published: 2026-11-22T00:00:00+08:00
+Modified: 2026-11-22T09:15:51+08:00
+Author: Bison
+
+Check catalog and single-book acquisition using the same account, and investigate only actual 401, 403 or app feedback.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/nasbook-opds-catalog-download-auth-401-403-separate-check/>), translated on 2026-11-22. Original publication dates, attribution, code and version notes are retained.
+
+Check catalog and single-book acquisition using the same account, and investigate only actual 401, 403 or app feedback.
+
+## Choose an authorized test catalog
+
+Use your own OPDS service and authorized account, with a small nonprivate EPUB whose server-side copy opens. Record catalog name, book title, size and a recognizable text anchor. Retain both server and local originals; do not record a complete address containing a password or token. Stop if you lack permission to inspect the service or book.
+
+## Record catalog and download separately in Book Isle
+
+Open the existing OPDS source in Book Isle and confirm the target server, account and sample book. Record whether the catalog and book are visible, then use the current interface to open or download once. Separately note listing, progress, feedback and whether content opens. Bibliographic data and a cover do not establish that the acquisition link is readable; on error record the message actually shown, without inventing a status code.
+
+## Inspect results available on the server
+
+If authorized to administer the server, inspect redacted logs for the catalog request and book acquisition request at the same time, comparing path, time and actual response; otherwise ask the administrator. Catalog and book can be different resources, so catalog success does not establish book authorization. Do not share Authorization, Cookie, signed URLs or accounts from logs. If the matching request cannot be identified, do not attribute a log result to this operation.
+
+## Understand 401 and 403 without guessing causes
+
+In HTTP semantics, 401 means a request lacks valid authentication credentials for the target resource; 403 means the server understood the request but refuses it, for reasons not necessarily limited to credentials. Apply these descriptions only to an actually captured status. For 401 inspect account and authentication prompts; for 403 inspect server-provided refusal information and resource access scope. Do not repeatedly submit the same credentials or assume the password is wrong. Mark the status unknown if the app displays only a generic error.
+
+## Recheck after one confirmed change
+
+If an administrator confirms that the book is outside the authorized scope, follow the service’s own access rules rather than making the entire library public. If connection information in Book Isle must be updated, preserve the existing source settings and use the actual interface; do not delete the library or all notes. Change one confirmed condition at a time, reopen the same catalog and book, and record both outcomes and time.
+
+## Verify and prepare a redacted handoff
+
+If download succeeds, open the content and compare title, chapter and the recorded anchor, then check local state using the interface. Otherwise retain the error and untested items. For support provide only versions, network type, operation time, catalog and acquisition outcomes and redacted status, not the book, account, cookies or tokens. This article follows public documentation and does not claim physical-device or server tests.
+
+## Example: catalog succeeds but acquisition is refused
+
+Suppose the catalog displays a practice book at 10:00, while Book Isle reports only “unable to acquire” after download is selected. At the same time, an administrator confirms a 200 catalog response and a 403 book-resource response in server logs. Record “catalog request succeeded; target resource request refused.” This does not establish that Book Isle omitted a password or that the NAS service is down. Ask the administrator to inspect that account’s access to this resource and the actual server feedback.
+
+Alternatively, the acquisition request may return 401 with an actual authentication challenge. Check the account used for this service and the prompt visible in the app. If the password recently changed, update credentials through the provider’s secure process. A browser with a retained old session succeeding does not establish that the Book Isle account is authenticated. Do not repeatedly try uncertain passwords. Preserve account privacy and ask the administrator if necessary.
+
+## Identify the same request correctly
+
+A catalog can have multiple pages and one book may offer different formats or acquisition links. Observe the title, selected format and operation time in Book Isle; an administrator can then locate the corresponding resource in authorized logs. If multiple requests cannot be distinguished, record “unable to match.” Server logs can provide an independent observation when Book Isle does not show HTTP status, but they explain this failure only if matched to the same request.
+
+If the service uses a reverse proxy or redirect, browser, proxy and origin may record different stages. Do not add proxy rules or disable authentication based on an unverified guess. Have the administrator inspect the actual deployment and record the layer producing the status. Change only one confirmed condition, using the same book, account and network for the before-and-after check.
+
+## Verify the book, not just the listing
+
+After the server responds normally, repeat the operation once in Book Isle and wait for the interface’s actual result. If download completes, open the content and check title, opening passage and a middle location. If an offline mode is offered, test it separately after confirming local availability and your network conditions. A cover or completion message cannot replace checking the text. If the book opens but the chapter differs, record file identity and selected format and compare with the original sample; do not automatically call that an authentication failure.
+
+## Related guides and sources
+
+[OPDS private library](<https://allluckly.cn/en/guides/nasbook-opds-library/>); [Separate catalog and acquisition checks](<https://allluckly.cn/en/guides/nasbook-opds-later-catalog-page-list-search-acquisition/>).
+
+Checked 22 November 2026: [Book Isle App Store listing](<https://apps.apple.com/cn/app/id6766198898>); [HTTP 401 and 403 semantics](<https://www.rfc-editor.org/rfc/rfc9110.html#section-15.5.2>). No physical-device or private-server test is claimed.
+{% endraw %}

@@ -1,0 +1,69 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'Compare gradient boundaries in VectorPaint: pad, reflect and repeat color order'
+description: Make three matching linear-gradient bands, observe spreading beyond endpoints and inspect app import.
+permalink: /en/guides/vectorpaint-svg-gradient-spread-pad-reflect-repeat/
+date: '2026-11-22 00:00:00 +08:00'
+modified: '2026-11-22 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 276
+topic: SVG gradient bounds and spreading
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-22-vectorpaint-svg-gradient-spread-pad-reflect-repeat.md
+source_url: /guides/vectorpaint-svg-gradient-spread-pad-reflect-repeat/
+translation_method: editorial
+translation_source_sha256: 85ef3a8abf8225188b06dc056ee87ca41f1f20f5087edca9da913e7d3e67b6aa
+translation_date: '2026-11-22T01:26:17+00:00'
+excerpt: Make three matching linear-gradient bands, observe spreading beyond endpoints and inspect app import.
+---
+{% raw %}
+<p>Make three matching linear-gradient bands, observe spreading beyond endpoints and inspect app import.</p>
+<h2 id="section-1">Define the comparison</h2>
+<p>Linear-gradient endpoints can lie inside the filled shape. SVG spreadMethod determines the fill beyond them: pad extends endpoint colors, reflect alternates direction, and repeat continues in the original direction. Keep rectangle, gradient direction and stops fixed while changing only spreading. Write predictions first, then compare actual browser and VectorPaint results. A format attribute does not guarantee an identically named app control.</p>
+<h2 id="section-2">Divide each band into three regions</h2>
+<p>Use rectangles from x=20 to x=140, width 120, at y=15, 55 and 95, each 25 high. Each gradient uses userSpaceOnUse from x=60 to x=100, with blue #315b8a at the start and orange #dc8538 at the end. This creates equal regions 20–60, 60–100 and 100–140. All three have blue-to-orange in the middle; their outer regions reveal the spread method. Coordinates are example user units, not automatically phone pixels.</p>
+<h2 id="section-3">Predict color order on both sides</h2>
+<p>For pad, the left region stays blue and the right stays orange. Reflect runs orange-to-blue, blue-to-orange, then orange-to-blue from left to right; colors meet continuously at the boundaries. Repeat runs blue-to-orange in every region, jumping from orange back to blue at each new period. A single pixel at a boundary may depend on rendering or antialiasing; inspect overall color direction before judging one edge pixel.</p>
+<h2 id="section-4">Save the complete SVG sample</h2>
+<p>Copy the full example below into a plain-text editor as gradient-spread.svg and make a backup. Keep defs, three unique gradient IDs, endpoint stops and each rectangle’s fill reference; copying rectangles alone leaves them without gradients. All gradients share coordinates, colors and stops and differ only in spreadMethod. Confirm the extension is not svg.txt, do not add scripts from unknown sources, and do not overwrite existing work.</p>
+<pre><code>&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 160 135&quot;&gt;
+  &lt;defs&gt;
+    &lt;linearGradient id=&quot;gpad&quot; gradientUnits=&quot;userSpaceOnUse&quot; x1=&quot;60&quot; y1=&quot;0&quot; x2=&quot;100&quot; y2=&quot;0&quot; spreadMethod=&quot;pad&quot;&gt;
+      &lt;stop offset=&quot;0&quot; stop-color=&quot;#315b8a&quot;/&gt;&lt;stop offset=&quot;1&quot; stop-color=&quot;#dc8538&quot;/&gt;
+    &lt;/linearGradient&gt;
+    &lt;linearGradient id=&quot;greflect&quot; gradientUnits=&quot;userSpaceOnUse&quot; x1=&quot;60&quot; y1=&quot;0&quot; x2=&quot;100&quot; y2=&quot;0&quot; spreadMethod=&quot;reflect&quot;&gt;
+      &lt;stop offset=&quot;0&quot; stop-color=&quot;#315b8a&quot;/&gt;&lt;stop offset=&quot;1&quot; stop-color=&quot;#dc8538&quot;/&gt;
+    &lt;/linearGradient&gt;
+    &lt;linearGradient id=&quot;grepeat&quot; gradientUnits=&quot;userSpaceOnUse&quot; x1=&quot;60&quot; y1=&quot;0&quot; x2=&quot;100&quot; y2=&quot;0&quot; spreadMethod=&quot;repeat&quot;&gt;
+      &lt;stop offset=&quot;0&quot; stop-color=&quot;#315b8a&quot;/&gt;&lt;stop offset=&quot;1&quot; stop-color=&quot;#dc8538&quot;/&gt;
+    &lt;/linearGradient&gt;
+  &lt;/defs&gt;
+  &lt;rect x=&quot;20&quot; y=&quot;15&quot; width=&quot;120&quot; height=&quot;25&quot; fill=&quot;url(#gpad)&quot;/&gt;
+  &lt;rect x=&quot;20&quot; y=&quot;55&quot; width=&quot;120&quot; height=&quot;25&quot; fill=&quot;url(#greflect)&quot;/&gt;
+  &lt;rect x=&quot;20&quot; y=&quot;95&quot; width=&quot;120&quot; height=&quot;25&quot; fill=&quot;url(#grepeat)&quot;/&gt;
+&lt;/svg&gt;
+</code></pre>
+<h2 id="section-5">Establish a browser reference</h2>
+<p>Open the original in an SVG-capable browser. From top to bottom observe pad, reflect and repeat. Cover the middle region on paper to compare the outer colors first, then verify that each middle region runs blue to orange. If a rectangle is a single color, check that its fill ID exists and matches. If rows look nearly identical, confirm x1 and x2 lie inside the rectangle rather than spanning its full width. Record the result without calling it an app test.</p>
+<h2 id="section-6">Record color continuity on paper</h2>
+<p>Draw three strips of three boxes on paper and label each box’s start and end colors. For pad write blue, blue-to-orange, orange; for reflect write orange-to-blue, blue-to-orange, orange-to-blue; for repeat write blue-to-orange in every box. Mark joins as continuous or abrupt and compare with the browser. If print or screen makes the colors hard to distinguish, change both colors consistently across all rows in a copy while keeping the original and its record.</p>
+<h2 id="endpoints-and-midpoints">Check direction at endpoints and midpoints</h2>
+<p>Mark x=20, 40, 60, 80, 100, 120 and 140 on a sketch. For reflect the color near x=60 is blue and near x=100 orange, with the outer regions reversing direction; to the right of the orange endpoint it moves back toward blue. For repeat each 40-unit period begins again at blue, so an orange-to-blue jump occurs near x=100. Pad instead keeps endpoint colors outside the defined range.</p>
+<p>Check the three interval widths before deciding that similar-looking colors indicate the same attribute. If a screenshot cuts off an end, return to the complete browser rectangle. Exact intermediate pixels can vary with color space, display and rendering; this exercise checks direction and continuity, not an identical middle color value across devices.</p>
+<h2 id="section-7">Open a working copy in the app</h2>
+<p>In the installed VectorPaint, find an SVG open or import entry actually available and choose the copy. If absent or unsupported, mark the step incomplete. Inspect the three bands and their color regions before trying to select each rectangle separately. A single flattened image is not an editable gradient; correct appearance alone does not establish that spreadMethod remains a separate attribute. Record app version and the entry actually used.</p>
+<p>When comparing the app display, first check row height and order so the middle reflect band is not mistaken for bottom repeat. Record row numbers in external notes without changing the baseline SVG. Record system settings that affect displayed color as part of the conditions.</p>
+<h2 id="section-8">Save and distinguish appearance from structure</h2>
+<p>Use an export or share entry visible in the current version to save separately without overwriting the source. Reopen and inspect the center gradient and outer continuation. For SVG output, check linearGradient, spreadMethod, stops and fill references in a text editor, or note conversion to another path, pattern or image. For bitmap output compare visible bands and dimensions only, not editable stops. Record browser, import and export results separately.</p>
+<h2 id="section-9">Troubleshoot color and boundaries</h2>
+<p>For a black or missing gradient, check all three IDs against fill references, then stop-color and XML quotes; do not rename everything at once. If repeat has no apparent jump, confirm its endpoints lie inside the rectangle and the correct copy was opened. If app and browser differ, preserve both results for a knowledgeable reviewer rather than declaring a feature universally unsupported. Mark unperformed device, import or export steps pending and confirm the backup opens.</p>
+<h2 id="supplemental-check">Change the repeat period as a countercheck</h2>
+<p>Save a separate copy and change only the bottom repeat gradient’s x2 from 100 to 80, leaving x1 at 60. The repeat period changes from 40 to 20 units, so an additional period boundary appears at x=80 before the original x=100 boundary; the upper two rows remain unchanged. Compare both files in a browser. If all rows change, inspect the edited gradient ID and references. Do not overwrite the baseline.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/vectorpaint-svg-gradient-units-bounds-versus-user-space/">Gradient units and object bounds</a>; <a href="/en/guides/vectorpaint-svg-compatibility-check/">SVG compatibility checks</a>.</p>
+<p>Checked 22 November 2026: <a href="https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software">Apple public version lookup</a>; <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/spreadMethod">MDN: gradient spreadMethod</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

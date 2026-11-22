@@ -1,0 +1,78 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-s3-object-list-pagination-prefix-client-observation/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay S3 listing appears incomplete: check prefix, pagination and video
+  identity'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-s3-object-list-pagination-prefix-client-observation/
+agent_source_sha256: 6933628d5d2b21a3038d35dc4f0b99432b231637390ffa7e7481262d8597d5f1
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay S3 listing appears incomplete: check prefix, pagination and video identity
+
+Language: en
+Canonical: [iCouldPlay S3 listing appears incomplete: check prefix, pagination and video identity](<https://allluckly.cn/en/guides/icouldplay-s3-object-list-pagination-prefix-client-observation/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-s3-object-list-pagination-prefix-client-observation/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-s3-object-list-pagination-prefix-client-observation/>)
+Published: 2026-11-22T00:00:00+08:00
+Modified: 2026-11-22T09:23:03+08:00
+Author: Bison
+
+Compare paginated storage results with the directory visible in iCouldPlay using your own test prefix, without treating one page as the whole listing.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-s3-object-list-pagination-prefix-client-observation/>), translated on 2026-11-22. Original publication dates, attribution, code and version notes are retained.
+
+Compare paginated storage results with the directory visible in iCouldPlay using your own test prefix, without treating one page as the whole listing.
+
+## Prepare identifiable test objects
+
+In object storage you manage and are authorized to read, choose a test prefix and several shareable short videos. Record redacted relative keys, sizes, durations and opening scenes; retain originals. First confirm iCouldPlay connects to the same storage service, bucket and prefix. Do not publish bucket names, keys, tokens or signed URLs, or change other people’s objects.
+
+## Understand storage-service pagination
+
+Amazon S3 ListObjectsV2 returns up to 1,000 key names by default in a response and may return fewer; when `IsTruncated` is true, the returned `NextContinuationToken` can continue the listing. A continuation token is not an object key. Compatible services may differ, so use their documentation and actual response. This does not establish which interface iCouldPlay uses or promise a pagination control.
+
+## Check the same prefix on the service
+
+An authorized administrator uses a trusted management interface or tool to inspect the target prefix, determine whether the listing spans pages, and continue according to the tool until complete. Record page counts, whether more pages remain and whether the test objects appear; do not publish tokens or complete keys. If the tool loads all results automatically, record automatic pagination rather than inferring a single underlying page from one screen.
+
+## Observe the actual directory in iCouldPlay
+
+Open the same source and prefix in iCouldPlay. Record initially visible objects and any continuation or scrolling behavior actually offered. If a load-more control exists, follow it and wait for one result. Without one, do not invent a button or claim automatic pagination. Look for each recorded test video, distinguishing a missing cover, an unlisted file and playback failure.
+
+## Play and identify an object
+
+Select a test video actually present, confirm its relative name and duration, play the opening and compare the recorded scene. A listed item does not prove that the player retrieved the correct version. If keys look similar, verify the full relative path first. Mark an unlisted object unplayed; do not guess addresses or switch accounts to bypass current permissions.
+
+## Troubleshoot in layers and retain results
+
+If the service itself cannot list an object, first confirm bucket, prefix, account permissions and object version. If the service lists it completely but iCouldPlay does not show it, reconfirm source and actual loading state and record app and service versions for support. Do not make the bucket public, delete objects or treat S3’s default page size as a fixed iCouldPlay limit. Confirm originals remain afterwards. No device or storage test is claimed.
+
+## Understand continuation with a small-page example
+
+Suppose an administrator sets a test tool’s page limit to two and lists five objects in their own test prefix. The first response has two items and indicates more, the second has two, and the last has one with no more indicated. Compare all three actual results instead of treating the first screen’s two items as the total. Two and five are illustrative test numbers, not an iCouldPlay page-size or ordering promise.
+
+If the first response has `IsTruncated` true but the next request fails, record “continuation incomplete,” not object loss. The administrator can follow tool and provider documentation to inspect token use and the error. Do not share the token with third parties or try to open it as a filename. If API responses are unavailable, record only what the management interface actually shows; do not infer status fields.
+
+## Distinguish files from prefix groups
+
+Object keys are names, and a management interface may group several keys like folders using a delimiter. In Amazon S3’s list API, rolled-up `CommonPrefixes` also count against the return limit when a delimiter is used. A page count therefore need not equal the number of video files. Record direct objects and expandable prefixes separately, then enter the actual groups; a group name is not a playable video.
+
+For example, `films/a.mp4` and `films/series/b.mp4` share the `films/` prefix, but a delimiter-based top-level response may group the latter under `series/`. Observe separately whether the management tool and iCouldPlay present them in the same way. One interface showing a folder and another a full key does not alone prove a file is missing. Sorting can also differ between object services or directory types; do not use list position as object identity.
+
+## Avoid false conclusions during changes
+
+If someone uploads, removes or moves objects during the test, record the operation time and affected prefix, then obtain a fresh authorized complete listing. Explain the change when comparing across time. Do not pause another person’s work or remove objects to stabilize the list. Mark unconfirmable read-only observations unknown and separately record the stage and actual error of an incomplete continuation. Preserve the original configuration and test objects afterwards.
+
+## Prepare a redacted report
+
+When seeking help, provide app version, storage service type, test time, confirmed prefix depth, whether the management tool completed pagination and the behavior actually seen in iCouldPlay. Label test objects A and B and mark unobserved server responses unknown. Record the test end time too. Do not upload complete object lists, credentials, reusable URLs or private video.
+
+## Related guides and sources
+
+[Set up S3 source](<https://allluckly.cn/en/guides/icouldplay-s3-compatible-source-setup/>); [Object prefix and identity](<https://allluckly.cn/en/guides/icouldplay-s3-object-prefix-identity/>).
+
+Checked 22 November 2026: [iCouldPlay App Store listing](<https://apps.apple.com/cn/app/id6755653178>); [Amazon S3 list API](<https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectsV2.html>). No physical-device or private-server test is claimed.
+{% endraw %}
