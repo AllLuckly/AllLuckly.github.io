@@ -1,0 +1,54 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint text-on-path starts: compare quarter, half and three-quarter offsets'
+description: Compare text starts on three equal SVG paths and distinguish path-length percentages from viewBox percentages.
+permalink: /en/guides/vectorpaint-svg-textpath-startoffset-path-length/
+date: '2026-11-23 00:00:00 +08:00'
+modified: '2026-11-23 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 287
+topic: Text-on-path starts and path length
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-23-vectorpaint-svg-textpath-startoffset-path-length.md
+source_url: /guides/vectorpaint-svg-textpath-startoffset-path-length/
+translation_method: editorial
+translation_source_sha256: 2a8dda0d6f339e5676d71a2331ca846f0e6f77784f40ea5e4a798dccec081e13
+translation_date: '2026-11-23T01:34:07+00:00'
+excerpt: Compare text starts on three equal SVG paths and distinguish path-length percentages from viewBox percentages.
+---
+{% raw %}
+<p>Compare text starts on three equal SVG paths and distinguish path-length percentages from viewBox percentages.</p>
+<h2 id="section-1">Identify the percentage denominator</h2>
+<p>MDN explains that a textPath startOffset percentage is measured along the referenced path: 0% is the path start and 100% the end. This differs from the viewport normalized diagonal used for stroke-dasharray percentages. Use left-to-right straight paths and one Latin letter for a clear comparison. The specification does not guarantee that the current VectorPaint version preserves textPath or its properties; observe the application behavior.</p>
+<h2 id="section-2">Set up three equal paths</h2>
+<p>Create a UTF-8 SVG in a plain-text editor with the SVG namespace and viewBox 0 0 280 140. Create three separate horizontal paths from x=20 to x=260 at y=35, 70 and 105, with IDs p1, p2 and p3. Each is 240 user units long. Give them a pale-gray stroke so the paths are visible. All run left to right to avoid introducing direction as a variable in the first experiment.</p>
+<h2 id="section-3">Place text on each path</h2>
+<p>Create three text elements with direction ltr, text-anchor start and the same font size. Inside each place a textPath referencing p1, p2 or p3 using href and containing the same letter A. Set startOffset to 25%, 50% and 75% respectively. Save as textpath-offset.svg and copy a backup, checking the extension. Ensure each href refers to an existing unique path ID; incorrect quotes, tags or namespace can prevent the text or path from displaying.</p>
+<h2 id="section-4">Calculate the three starts</h2>
+<p>Each path is 260 minus 20, or 240 user units long. Offsets of 25%, 50% and 75% correspond to 60, 120 and 180 units along the path, giving theoretical start positions x=80, 140 and 200 from the canvas left. These are text layout start positions; visible ink at the left edge of the letter need not land on exactly the same pixel. Write the calculation down first and do not multiply by the viewBox width of 280.</p>
+<h2 id="section-5">Compare with browser guides</h2>
+<p>Open the original in an SVG-capable browser. The gray paths should be parallel and equal in length, and letters should move rightward from top to bottom. Optional pale vertical guides at x=80, 140 and 200 can help without changing text or paths. If a row is missing, inspect path IDs, href, tags and font size; if positions are identical, inspect each offset and any overriding style. Record browser and font without claiming identical ink across renderers.</p>
+<h2 id="section-6">Make a numeric-offset control</h2>
+<p>Save a copy replacing the percentages with numeric offsets 60, 120 and 180, keeping all else fixed. Without extra path-length calibration or transforms in this example, these refer to the same along-path distances, so corresponding browser positions should be close. Use the same font and display scale for the comparison. If copies differ noticeably, first check path references and whether pathLength, a transform or another font was introduced.</p>
+<h2 id="section-7">Change one path length separately</h2>
+<p>Save another copy from the original and change the second path’s endpoint from x=260 to x=220 while keeping its start at x=20 and other rows unchanged. The second path is now 200 units long: 50% advances 100 from the start to x=120 instead of x=140. Compare text and gray path within the same image rather than mistaking screenshot zoom for path length. Change only this condition and ensure href still points to the second path.</p>
+<h2 id="section-8">Import a copy and check editability</h2>
+<p>In the VectorPaint gallery, tap the square-and-down-arrow import icon at the top right (accessibility label “Import Artwork”), or “Import from Files” in an empty gallery, and select the exercise SVG working copy in the system file picker. If the interface differs, the entry is unavailable, or the file cannot be read, record the step as incomplete. Compare each text position with its gray path before trying to select text and paths. Correct-looking text does not establish that textPath and its offset remain editable attributes. If the app shows outlines or merged objects, record the observation without inferring internal structure.</p>
+<h2 id="section-9">Separate the start from centering</h2>
+<p>The exercise fixes text-anchor at start so text begins at the calculated position. In a copy changed to middle, text centers around that position and visible glyph ink moves; do not attribute this change to startOffset. Different fonts affect glyph width, but the numerical path-start calculation and font width are separate issues. Change one property per copy and record anchor, offset and font in the comparison table.</p>
+<h2 id="section-10">Troubleshoot path direction and style</h2>
+<p>If 25% appears on the right rather than left, check whether the path runs from x=260 toward x=20: percentages start at the actual path start, not always the canvas left. Then inspect direction, anchor, referenced ID, path transforms and CSS overrides. For a curved path, horizontal endpoint difference is not its length; distance must be measured along the curve. This exercise gives hand calculations only for horizontal straight lines.</p>
+<h2 id="section-11">Save output and reopen</h2>
+<p>Save the app’s editable original and use a share or export entry actually shown in the current version to save separately without overwriting the SVG backup. Reopen and inspect three text positions relative to their gray paths. For SVG, inspect whether textPath, href and startOffset remain or were converted to outlines. A bitmap permits appearance checks only and does not prove editable text. Record expectation, browser, app and reopened output, marking unperformed device and export steps pending.</p>
+<h2 id="check-path-identities">Check each path identity</h2>
+<p>Although equal in length, the three paths have different y positions. Pair p1, p2 and p3 with top, middle and bottom, then inspect each textPath href. If all text crowds onto the first line, first check for copied duplicate IDs or references rather than immediately adjusting offsets. Ensure IDs are unique; guide lines are visual aids only.</p>
+<h2 id="endpoint-room">Consider room near the end</h2>
+<p>This example uses one letter and a maximum offset of 75% to leave room near the path end. Longer words or an offset of 100% can extend beyond available path length; save a separate copy and observe rather than treating that outcome as a calculation error in this example.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/vectorpaint-text-on-path/">Text on a path</a>; <a href="/en/guides/vectorpaint-svg-text-anchor-start-middle-end/">Text-anchor comparison</a>.</p>
+<p>Checked 23 November 2026: <a href="https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software">Apple public version lookup</a>; <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/startOffset">MDN: text-path startOffset</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

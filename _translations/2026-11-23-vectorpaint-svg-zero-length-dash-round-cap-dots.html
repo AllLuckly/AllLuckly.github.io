@@ -1,0 +1,52 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint dotted strokes: zero-length dashes and round caps'
+description: Compare round and butt caps on matching SVG paths and observe zero-length dashes and gaps.
+permalink: /en/guides/vectorpaint-svg-zero-length-dash-round-cap-dots/
+date: '2026-11-23 00:00:00 +08:00'
+modified: '2026-11-23 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 286
+topic: Zero-length dashes and caps
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-23-vectorpaint-svg-zero-length-dash-round-cap-dots.md
+source_url: /guides/vectorpaint-svg-zero-length-dash-round-cap-dots/
+translation_method: editorial
+translation_source_sha256: e3ed6f2c3957820d395ad483d839274202516927b61b866593c0c3bf5c69f853
+translation_date: '2026-11-23T01:30:20+00:00'
+excerpt: Compare round and butt caps on matching SVG paths and observe zero-length dashes and gaps.
+---
+{% raw %}
+<p>Compare round and butt caps on matching SVG paths and observe zero-length dashes and gaps.</p>
+<h2 id="section-1">Define the comparison</h2>
+<p>The W3C SVG stroking specification illustrates dotted strokes made with zero-length dashes and round caps. Compare the same 0 20 dash array using round and butt caps: zero is the dash length and 20 the following gap, not a count of dots. Establish a browser reference before observing VectorPaint import and output; a specification example does not guarantee attribute preservation by an app version.</p>
+<h2 id="section-2">Set up the lines and canvas</h2>
+<p>Create a UTF-8 SVG in a plain-text editor, with the SVG namespace and viewBox 0 0 240 120 on the root. Add two lines from x1=20 to x2=220 at y=35 and y=85. Give both the same dark-blue stroke, stroke-width 8 and stroke-dasharray 0 20. Set the first line’s stroke-linecap to round and the second to butt. Set a convenient display width and height on the root, save as zero-dash-caps.svg, copy a backup and check its extension.</p>
+<h2 id="section-3">Predict dot size and spacing</h2>
+<p>Along the 200-user-unit centerline the cycle is 0 plus 20, or 20 user units. A round cap at a zero-length dash makes a circular mark whose diameter is determined by stroke width 8. Adjacent centers are about 20 units apart; that is not the empty edge-to-edge distance. A butt cap on a zero-length segment does not make the corresponding circular area. Inspect actual endpoint truncation and rendering rather than assuming all browsers show exactly the same endpoint count.</p>
+<h2 id="section-4">Establish a browser reference</h2>
+<p>Open the original in an SVG-capable browser and observe whether the upper row forms dots while the lower row lacks the same circular marks. Ensure enough contrast with the background so an invisible zero-length butt dash is not mistaken for a failed file. Zoom the whole page to compare center spacing; zoom affects pixels but does not make 20 user units equal 20 physical millimeters. If the upper row is solid, inspect array and cap spelling and CSS overrides.</p>
+<h2 id="section-5">Separate center spacing from empty space</h2>
+<p>For equal 8-unit dots with centers 20 units apart, both inside the line and not clipped at endpoints, visible edge-to-edge space is approximately 20 minus 8, or 12 user units. This applies to equal circles on the same straight line; clipping or transforms require another assessment. On paper mark centers at x=20 and x=40 and extend radius 4 on both sides to check edges. Do not call the gap-array value 20 the visible empty edge-to-edge distance.</p>
+<h2 id="section-6">Change width as one control</h2>
+<p>Save a copy and change stroke-width from 8 to 12 for both lines, leaving array and coordinates unchanged. The dot diameter should increase while centers retain a 20-unit cycle; the interior edge-to-edge space becomes about 8. Endpoint and edge observations still require checking clipping. Do not alter only the upper width and attribute every difference to caps. Record the changed property in each copy before comparing browser results.</p>
+<h2 id="section-7">Change spacing separately</h2>
+<p>Save a different copy from the original and change both arrays to 0 30 while retaining width 8. The center cycle is now 30, with about 22 user units of visible space between interior dots; dot size should not increase merely because spacing changed. Name this file separately from the width-change copy to avoid changing two factors at once. If the number of dots changes, consider line length and cycle together instead of treating the second array item as a dot count.</p>
+<h2 id="section-8">Open a copy in the app</h2>
+<p>In the VectorPaint gallery, tap the square-and-down-arrow import icon at the top right (accessibility label “Import Artwork”), or “Import from Files” in an empty gallery, and select the exercise SVG working copy in the system file picker. If the interface differs, the entry is unavailable, or the file cannot be read, record the step as incomplete. Do not assume stroke-linecap is an app button. Before editing, compare upper dot size and spacing and the lower appearance, then try selecting the lines separately. Record differences from the browser; matching appearance does not prove the zero-length array is retained unchanged.</p>
+<h2 id="section-9">Troubleshoot style and display</h2>
+<p>If both rows become dotted in the app, first check whether import converted caps, whether a shared style overrides them and whether the correct copy was opened; do not immediately declare a defect. If only some dots vanish, check viewBox clipping, zoom, opacity and export bounds. Browser and app may use different renderers. Record versions, filename and visible results, leaving untested conditions unknown.</p>
+<h2 id="section-10">Perform two output checks</h2>
+<p>Save the editable original and use a share or export entry actually shown in the current version to save separately without overwriting the SVG backup. Reopen and inspect dot shape, spacing and endpoint crop. For SVG output, use a text editor to inspect whether lines, arrays and caps remain or were converted to another representation. A matching screenshot alone does not prove editable attributes; bitmap comparison covers appearance only. Record expectation, browser, app and reopened result, marking unperformed device steps pending.</p>
+<h2 id="compare-all-zero-array">Compare an all-zero array</h2>
+<p>Save another original copy and change both arrays to 0 0. The SVG specification treats an array of all zero values as none, so the expected result is a continuous undashed stroke. This differs from 0 20, which contains a nonzero gap. Keep line, color and width unchanged and label the copy. A continuous line is not evidence of infinitely overlapping round dots; this is the specification’s special handling of an all-zero array.</p>
+<h2 id="record-scope">Record the experiment scope</h2>
+<p>List array, width, cap, browser version and observed result for each file. Record the two rows first rather than extrapolating one browser result to every device. Mark files not actually opened in the app as pending.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/vectorpaint-svg-stroke-linecap-endpoint-comparison/">Stroke-cap comparison</a>; <a href="/en/guides/vectorpaint-svg-dash-pattern-odd-list-repetition/">Dash-array repetition</a>.</p>
+<p>Checked 23 November 2026: <a href="https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software">Apple public version lookup</a>; <a href="https://www.w3.org/TR/SVG/latest/painting.html">W3C: SVG stroking</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

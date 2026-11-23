@@ -1,0 +1,81 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-svg-text-anchor-start-middle-end/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint text anchors: compare start, middle and end at one coordinate'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-svg-text-anchor-start-middle-end/
+agent_source_sha256: b80b4b94571a991c970c9e9bbd855e5a5f8ba1449aa7ccbc55b270648a56688e
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint text anchors: compare start, middle and end at one coordinate
+
+Language: en
+Canonical: [VectorPaint text anchors: compare start, middle and end at one coordinate](<https://allluckly.cn/en/guides/vectorpaint-svg-text-anchor-start-middle-end/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-svg-text-anchor-start-middle-end/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-svg-text-anchor-start-middle-end/>)
+Published: 2026-11-23T00:00:00+08:00
+Modified: 2026-11-23T09:26:23+08:00
+Author: Bison
+
+Build three SVG text rows around one reference line, compare text anchors and inspect font substitution and export.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-svg-text-anchor-start-middle-end/>), translated on 2026-11-23. Original publication dates, attribution, code and version notes are retained.
+
+Build three SVG text rows around one reference line, compare text anchors and inspect font substitution and export.
+
+## Define what the anchor controls
+
+MDN explains that SVG text-anchor values start, middle and end align a text chunk relative to its initial position. This exercise uses left-to-right horizontal Latin text only. Start and end follow writing direction; they are not universally left and right for every language. Visible glyph ink can sit slightly away from the theoretical anchor because of font spacing, so do not use one glyph pixel as an exact coordinate. Establish a browser reference before observing app import.
+
+## Make a three-row test file
+
+Create a UTF-8 SVG in a plain-text editor, with the SVG namespace and viewBox 0 0 240 150 on the root. Add a pale-gray vertical guide from x=120, y=10 to x=120, y=140. Add three text elements containing ABC, each at x=120 with y=40, 80 and 120 respectively. Set the same font size 24, direction ltr and color, with text-anchor start, middle and end respectively. Save as text-anchor-study.svg and copy a backup.
+
+## Write down expected positions
+
+All rows share the same horizontal anchor coordinate but have different baseline heights. For this left-to-right example, the start row begins near the guide and extends right; the middle row centers its text advance on the guide; the end row ends near the guide and extends left. The y value participates in text positioning and is not automatically the top of the visible glyph bounding box. Record these expectations before using a screenshot to interpret the attributes.
+
+## Establish a browser reference
+
+Open the original in an SVG-capable browser. Confirm all three rows show ABC at the same font size and form three alignments around the gray guide. If a row disappears, check text tags, x, y and fill; if all extend to the same side, inspect spelling and any CSS overriding the attribute. Missing fonts can trigger fallback and change text width, but when all rows use the same font the alignment directions can still be compared.
+
+## Separate the anchor from glyph ink
+
+Spaces can make text advance differ from visible ink edges, so start with ABC without leading or trailing spaces. Even then, a font’s glyph outline need not coincide pixel-for-pixel with the text start or end coordinate. Compare the whole run relative to the guide instead of claiming the outermost letter pixel must land on x=120. Observe again after changing fonts; do not hard-code one font’s measured width.
+
+## Import a copy and observe objects
+
+In the VectorPaint gallery, tap the square-and-down-arrow import icon at the top right (accessibility label “Import Artwork”), or “Import from Files” in an empty gallery, and select the exercise SVG working copy in the system file picker. If the interface differs, the entry is unavailable, or the file cannot be read, record the step as incomplete. Before editing, compare the rows with the guide and try selecting text separately. If it appears as outlines or a single object, record that observation instead of assuming it remains editable text.
+
+## Check font substitution
+
+Record the font actually shown in the browser and fonts available in the app, using a font available in both when possible; do not assume an unverified font is installed. If shape or width changes on import while anchor relationships remain correct, substitution is one possible cause, not a conclusion established by appearance. Save a separate copy and compare with a common available font, retaining original and screenshots and recording font differences separately from alignment differences.
+
+## Test the middle with longer text
+
+Save another SVG and change all three rows from ABC to ABCDE while keeping other properties unchanged. The start row should still extend from the same start, the end row should end at the same position, and the middle row should grow on both sides around the same coordinate. Do not alter only the middle row, which makes text length and anchor effects harder to separate. Font size, spacing and font changes also affect advance width; record the one condition changed each time.
+
+## Treat writing direction separately
+
+This example explicitly uses ltr, so start and end are not universal synonyms for left and right across languages. For a later right-to-left example, save a separate copy with suitable text and direction settings and check the target environment instead of treating the ABC screenshot as another script’s result. Vertical text, multiple tspans and text on a path have additional layout conditions; this exercise does not infer application support for them.
+
+## Check style precedence and layers
+
+If browser or app behavior differs from expectation, first inspect whether CSS text-anchor overrides the element attribute, then check x, direction, font and text. Confirm that the guide has not moved or been hidden, so a layer problem is not misdiagnosed as text layout. If the app permits only group operations, do not force the objects apart. Record whether individual selection, editing and undo were possible, and leave incomplete items for device verification.
+
+## Save, export and recheck
+
+Save the editable original, then use a share or export entry actually shown in the current version to save separately and retain the SVG source backup. Reopen the output and inspect all rows, the guide and relative positions. If it is SVG, inspect whether text elements and anchors remain or have been converted to paths. Similar-looking paths do not mean text remains editable; a bitmap supports appearance checks only. Record browser and app versions, fonts and incomplete steps without claiming unperformed device tests.
+
+## Check text baselines
+
+Different y values keep the rows apart; they are not the alignment condition being compared. Keep font and size equal and compare the horizontal anchor at each row’s own position. Restore an accidentally changed baseline before comparison; the height where the glyph top crosses the guide does not establish horizontal alignment.
+
+## Related guides and sources
+
+[Text layout](<https://allluckly.cn/en/guides/vectorpaint-text-layout/>); [Font fallback proof](<https://allluckly.cn/en/guides/vectorpaint-font-fallback-proof/>).
+
+Checked 23 November 2026: [Apple public version lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software>); [MDN: SVG text-anchor](<https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/text-anchor>). No physical-device or private-server test is claimed.
+{% endraw %}

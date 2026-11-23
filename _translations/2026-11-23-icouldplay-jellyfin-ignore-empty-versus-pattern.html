@@ -1,0 +1,48 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay and Jellyfin scan exclusions: empty .ignore versus a specific file rule'
+description: Compare scan scope, server entries and iCouldPlay display in an isolated library.
+permalink: /en/guides/icouldplay-jellyfin-ignore-empty-versus-pattern/
+date: '2026-11-23 00:00:00 +08:00'
+modified: '2026-11-23 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 245
+topic: Jellyfin scan exclusion scope
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-23-icouldplay-jellyfin-ignore-empty-versus-pattern.md
+source_url: /guides/icouldplay-jellyfin-ignore-empty-versus-pattern/
+translation_method: editorial
+translation_source_sha256: 9da12b1b62c3d4afda1bc41cd593314615aa84fb89ddedbcb04a93b1f45d49f1
+translation_date: '2026-11-23T01:00:00+00:00'
+---
+{% raw %}
+<p>When a file exists in a library but is absent from iCouldPlay, examine server scan scope, account and client display separately. Compare two exclusion rules only in an isolated test library.</p>
+<h2 id="section-1">Establish version and scope</h2>
+<p>Jellyfin uses .ignore files to exclude items from library scans. Its documentation says an empty file excludes its entire containing directory and subdirectories. A non-empty file can specify Git-like ignore patterns, a feature introduced in 10.11.x and later. Older versions treat non-empty contents differently, so do not infer the new behavior. Ask the administrator to confirm server version and documentation; iCouldPlay is an observation client, not the server scan configuration.</p>
+<h2 id="section-2">Create an isolated test directory</h2>
+<p>Ask the administrator to prepare authorized short video copies A and B and a ignore-test-dir subdirectory containing clip C in a separate test movie library. Use self-made or authorized material and leave the production library alone. Record relative paths, opening pictures and durations to distinguish them, keeping private absolute paths out of shared records. Without an administrator or test library, stop at preparation and mark the test not performed.</p>
+<h2 id="section-3">Observe the baseline without an ignore file</h2>
+<p>After the administrator scans the test library normally and it finishes, record whether A, B and C appear on the web and verify each picture and identity. Inspect the same library with the same account in iCouldPlay and record the actual entries. Missing metadata or an incompatible test file does not establish that an ignore rule took effect. If an item is absent at baseline, investigate the sample or mark the comparison unavailable.</p>
+<h2 id="section-4">Experiment one: exclude a whole subdirectory</h2>
+<p>Have the administrator confirm that ignore-test-dir has no existing .ignore and back up the test library. Create an empty .ignore inside ignore-test-dir. Do not put it in the test library root, where its scope differs, and especially do not place it in a production library or show root. Hidden files may not appear in a file manager: the administrator should verify that it exists and is not named .ignore.txt using a familiar method.</p>
+<h2 id="section-5">Rescan and compare inside and outside</h2>
+<p>The documentation requires a library rescan after creating or changing .ignore. After the administrator completes it, inspect A, B and C on the web, then record the same library in iCouldPlay. The rule is expected to exclude the entire ignore-test-dir directory containing C; A and B lie outside its scope. Whether an existing listing disappears immediately depends on the actual server and scan result. The rule affects scanning, not file deletion; confirm that C still exists as a test source file.</p>
+<h2 id="section-6">Restore a comparable state</h2>
+<p>Record the first result, then have the administrator remove only the empty .ignore created for this exercise and rescan. After completion check whether C is recognized again. If not, inspect its existence, scan scope and permissions; do not toggle many settings or delete the database. Start the next comparison only after restoration. If the file’s original status is uncertain, stop and ask the administrator rather than removing someone else’s ignore file.</p>
+<h2 id="section-7">Experiment two: use a non-empty rule</h2>
+<p>Only on a server supporting non-empty rules in 10.11.x or later, first confirm that no .ignore already exists in the test library root, then create .ignore there containing one line naming B exactly, for example B.mkv. Keep the A.mkv and B.mkv filename ledger to prevent case or extension mistakes. Do not apply wildcard rules to production folders, and do not describe this test as access control or encryption. On an older server, mark this comparison inapplicable and skip it.</p>
+<h2 id="section-8">Compare the scopes</h2>
+<p>After another administrator-run rescan, inspect A and B on the web. The expected rule matches only B.mkv and should not exclude A by that line alone. If actual names differ from the example, use the exact filename. Check the same account and library in iCouldPlay, recording entries, time and whether A opens. If web and app differ, compare refresh, account, network and entry identity before attributing behavior to client caching or refresh.</p>
+<h2 id="section-scope-ledger">Check the rule location</h2>
+<p>Write three relative paths: A.mkv and B.mkv in the test library root, and C.mkv in its ignore-test-dir subdirectory. The first empty file is inside ignore-test-dir; the second rule naming B.mkv is at the test root. Do not leave both files present at once. Record scan start and completion times to avoid treating a stale page during a scan as a final result. Confirm no rule existed before creating one, and remove only the file made for this test.</p>
+<h2 id="section-9">Investigate and keep the ledger</h2>
+<p>If both A and B disappear, check whether .ignore is accidentally empty, in the wrong directory, or accompanied by other rules or permission differences. If B remains visible, check server version, exact filename, scan completion and whether an old entry remains. Change one condition at a time and record before and after. Include baseline, empty file, restoration and non-empty rule as four rows, with separate web, iCouldPlay and source-file states. Never mark unperformed cells successful.</p>
+<h2 id="section-10">Restore and bound the conclusion</h2>
+<p>At the end, the administrator removes the .ignore created for this exercise, rescans and confirms the test environment is restored. Retain or remove test copies under the administrator’s normal practice. Confirm production libraries and source files are unaffected and exclude credentials, tokens and private addresses from handoff. The guide uses public documentation and claims no private-server or physical-device test. Scan visibility, file existence and user access are distinct questions.</p>
+<h2 id="section-11">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-jellyfin-user-library-permission-visibility-check/">Jellyfin user library permissions</a>; <a href="/en/guides/icouldplay-jellyfin-health-check-versus-playback/">Jellyfin health check</a>. Checked 23 November 2026: <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software">Apple iCouldPlay listing</a>; <a href="https://jellyfin.org/docs/general/server/media/excluding-directory/">Jellyfin excluding files and directories</a>.</p>
+{% endraw %}

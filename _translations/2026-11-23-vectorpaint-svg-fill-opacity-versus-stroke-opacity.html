@@ -1,0 +1,52 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint fill and stroke opacity: how two properties affect one shape'
+description: Compare fill and stroke opacity on two SVG squares and inspect edge overlap and output.
+permalink: /en/guides/vectorpaint-svg-fill-opacity-versus-stroke-opacity/
+date: '2026-11-23 00:00:00 +08:00'
+modified: '2026-11-23 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 289
+topic: Fill opacity and stroke opacity
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-23-vectorpaint-svg-fill-opacity-versus-stroke-opacity.md
+source_url: /guides/vectorpaint-svg-fill-opacity-versus-stroke-opacity/
+translation_method: editorial
+translation_source_sha256: 13f6175d98d99689f3d80439f4acb32e8e007cbceb4f475a18b9ea691d4ac6df
+translation_date: '2026-11-23T01:42:19+00:00'
+excerpt: Compare fill and stroke opacity on two SVG squares and inspect edge overlap and output.
+---
+{% raw %}
+<p>Compare fill and stroke opacity on two SVG squares and inspect edge overlap and output.</p>
+<h2 id="section-1">Define the two properties</h2>
+<p>MDN and W3C distinguish SVG fill-opacity, which affects the fill painting operation, from stroke-opacity, which affects the stroke. Both differ from opacity applied to the whole element. Compare two squares on the same background while keeping other properties fixed. SVG specifications do not guarantee that a particular VectorPaint version preserves each attribute; observe the app’s actual result.</p>
+<h2 id="section-2">Create background and two squares</h2>
+<p>Create a UTF-8 SVG in a plain-text editor with SVG namespace and viewBox 0 0 240 120. Add a light-gray background covering the canvas, then two non-overlapping squares at x=20 and x=140, both y=20 with width and height 80. Give both red fill, dark-blue stroke and stroke-width 8. The background is not a test object. Save as paint-opacity.svg and copy a backup.</p>
+<h2 id="section-3">Set opposite paint opacities</h2>
+<p>Set the left square to fill-opacity=0.25 and stroke-opacity=1; set the right to fill-opacity=1 and stroke-opacity=0.25. Do not add overall opacity or alpha to either paint color, which would introduce another factor. The two squares swap only their separate fill and stroke opacities. Write down the property table and ensure shared CSS does not override the values before opening the file.</p>
+<h2 id="section-4">Predict interior and outer stroke</h2>
+<p>The left red interior blends with gray while its dark-blue stroke away from the junction remains opaque. The right red interior is opaque while its dark-blue stroke is partly transparent. A centered stroke lies partly over fill and partly outside it: under the right inner stroke is red and under the outer stroke is gray, so their blends can differ. Do not assume the whole translucent border always blends over one background.</p>
+<h2 id="section-5">Establish a browser reference</h2>
+<p>Open the file in an SVG-capable browser and inspect each interior, inner stroke and outer stroke. Zoom the whole view enough to compare, but do not infer exact color from one edge pixel because antialiasing affects boundaries. If the left stroke also looks translucent, check stroke-opacity, overall opacity, paint-color alpha and style overrides. If both squares look identical, first confirm that the latest copy is open.</p>
+<h2 id="section-6">Change the background alone</h2>
+<p>Save a copy changing the background from light gray to white while retaining both squares’ properties. The left translucent fill and right translucent outer stroke can look different against the new background; the left opaque stroke and right opaque fill, away from overlap and antialiased edges, should retain their painted colors. This illustrates the influence of underlying content without changing the original fill or stroke color values.</p>
+<h2 id="section-7">Compare whole-element opacity</h2>
+<p>Save another copy from the original and add a third square with fill-opacity=1, stroke-opacity=1 and overall opacity=0.25. Compare it separately with the originals, but do not claim all three are identical everywhere. Whole-element opacity applies to the rendered object, while fill and stroke opacities apply to their individual painting operations, producing different compositing at their junction. Keep each file and label the third square as an extra control.</p>
+<h2 id="section-8">Import a copy into the app</h2>
+<p>In the VectorPaint gallery, tap the square-and-down-arrow import icon at the top right (accessibility label “Import Artwork”), or “Import from Files” in an empty gallery, and select the exercise SVG working copy in the system file picker. If the interface differs, the entry is unavailable, or the file cannot be read, record the step as incomplete. Before editing, compare interiors and borders, then try selecting the squares separately. The app may convert appearance into a different representation; matching appearance does not prove both SVG attributes remain independent editable settings.</p>
+<h2 id="section-9">Troubleshoot colors and stacking</h2>
+<p>If the right border differs on its inner and outer halves, check whether it lies over red fill and gray background respectively; this may be expected compositing. If the background covers the squares, inspect paint order and layers rather than changing opacity alone. CSS fill-opacity or stroke-opacity can override the corresponding presentation attribute. Check styles, inherited values and alpha in the colors themselves before editing; change one condition at a time and record both values.</p>
+<h2 id="section-10">Save and reopen</h2>
+<p>Save the app’s editable original, then use a share or export entry actually shown in the current version to save separately without overwriting the SVG backup. Reopen and inspect the background, square interiors and borders. For SVG, inspect whether fill-opacity, stroke-opacity and any overall opacity remain or were converted. A bitmap supports appearance comparison only and does not prove editable properties. Record expectation, browser, app and reopened result; mark unperformed device or export steps pending.</p>
+<h2 id="three-sample-positions">Use three positions to explain the boundary</h2>
+<p>Mark an interior center, inner stroke and outer stroke on each square. The center is away from the stroke and helps inspect fill and background; the inner stroke overlays fill and the outer stroke overlays background. This explains why the right translucent border can look different on its two sides. A junction pixel is not the stroke paint color alone. Avoid corners and antialiased boundary pixels to reduce zoom-related differences.</p>
+<h2 id="comparison-record">Keep a comparison table and copies</h2>
+<p>Give the original, white-background copy and whole-opacity copy separate rows with fill opacity, stroke opacity, overall opacity, background and observation. If an attribute was not set, record default or unset rather than assuming zero. Check filenames and modification dates and reopen the correct copy; leave unperformed app observations blank or pending and record the version actually used.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/vectorpaint-svg-group-opacity-overlap-composite/">Group opacity and overlap</a>; <a href="/en/guides/vectorpaint-svg-paint-order-fill-stroke-band/">Fill and stroke paint order</a>.</p>
+<p>Checked 23 November 2026: <a href="https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software">Apple public version lookup</a>; <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/fill-opacity">MDN: fill opacity</a>; <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/stroke-opacity">MDN: stroke opacity</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

@@ -1,0 +1,51 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay and Jellyfin multipart versions: selector order and playback boundaries'
+description: Check multipart ordering, client selection and transitions with three authorized clips.
+permalink: /en/guides/icouldplay-jellyfin-stacked-parts-version-selector-order/
+date: '2026-11-23 00:00:00 +08:00'
+modified: '2026-11-23 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 244
+topic: Multipart version order and playback boundary
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-23-icouldplay-jellyfin-stacked-parts-version-selector-order.md
+source_url: /guides/icouldplay-jellyfin-stacked-parts-version-selector-order/
+translation_method: editorial
+translation_source_sha256: 0fdd774e8bd629f7bf48f174c9cbb908784283d0c61a00517220526d0061d911
+translation_date: '2026-11-23T01:00:00+00:00'
+---
+{% raw %}
+<p>When one episode has both a multipart version and a single-file version, the server selection order may not put the highest resolution first. Use isolated samples to check recognition, display and playback.</p>
+<h2 id="section-1">Identify the variable</h2>
+<p>Jellyfin can recognize multipart movie and episode files, and combine parts with multiple versions. Its documentation says that in this combined case the version with additional parts appears first in the selector, unlike the resolution or alphabetical order used for versions alone. Check server recognition and order, then observe the installed iCouldPlay version. A version list is not a playback or picture-quality measurement.</p>
+<h2 id="section-episode-version-prerequisite">Check the episode-version prerequisite</h2>
+<p>Jellyfin 12.0 release notes identify multiple versions for episodes as a new feature. Because this example combines episode versions and parts, ask the administrator to confirm server version 12.0 or later first. Stop on an older server rather than attributing failed grouping to iCouldPlay. The release notes also call for a full library scan after upgrade, which can take time. The administrator should assess the maintenance window, read backup guidance and decide whether to run it; do not upgrade or trigger a large scan for this tutorial. Mark the experiment unperformed if prerequisites cannot be confirmed.</p>
+<h2 id="section-2">Prepare three authorized samples</h2>
+<p>In an isolated show test library you manage or are authorized to use, ask the administrator to prepare three short copies of the same episode: two continuous clips representing parts one and two of a 720p version, and a separate 1080p version. These labels identify the samples; verify actual resolution rather than treating filenames as measurements. Use self-made or authorized material. Without permission or suitable files, mark the exercise not performed and leave production shows unchanged.</p>
+<h2 id="section-3">Build the file ledger</h2>
+<p>Create a separate show and Season 01 folder. Following the Jellyfin example, name the parts Series Name S01E01 - 720p - part1.mkv and Series Name S01E01 - 720p - part2.mkv, and the single file Series Name S01E01 - 1080p.mkv. The administrator may change the show name, but all three files should identify the same episode. Preserve originals and record each duration, opening and closing pictures and measured dimensions. Do not treat part2 as episode two.</p>
+<h2 id="section-4">Check the prediction and recognition</h2>
+<p>The documented prediction is that, if the server recognizes the first two as one multipart version and the third as another version, the multipart 720p version appears before 1080p. Recognition must actually succeed; filenames alone do not prove it. Have the administrator scan the test library normally, wait for completion and open the episode on the web. Record whether there is one episode entry, and note version labels and order.</p>
+<h2 id="section-5">Check the parts by duration</h2>
+<p>Inspect the end of part one and start of part two in a file tool and record a continuous action or time marker. If the server selector shows only the first part name, that does not mean part two disappeared; neither does the name prove part two plays. An administrator can choose the version on the web and observe the boundary, recording stalls, stops or transitions. Do not assume the displayed total duration equals the sum without checking.</p>
+<h2 id="section-6">Observe the iCouldPlay version control</h2>
+<p>Connect iCouldPlay to the same authorized server and account, open the same test episode and locate the version control actually offered. Record which versions appear, their order and default. If no control or only one result is visible, record that observation without assuming all Jellyfin functions are available in a third-party client. Verify entry identity before opening so different accounts or libraries are not conflated.</p>
+<h2 id="section-7">Check playback at the boundary</h2>
+<p>If iCouldPlay allows selecting the multipart version, use the prepared pictures to find the end of part one and observe whether it continues into part two. Record picture, sound and stop position. Do not operate while driving or in unsafe conditions, or generalize one successful transition to all files. If the version cannot be selected, mark this step not performed. Open the single-file version separately to check its beginning and actual picture, without overwriting originals.</p>
+<h2 id="section-8">Separate recognition from sorting</h2>
+<p>If the web interface shows two separate episodes, check the S01E01 marker, directory hierarchy, part suffixes and completed scan before changing episode numbers. If web order is correct but iCouldPlay differs, confirm account, client version, refresh and selected entry. Jellyfin sorting rules do not guarantee the same third-party client list; record the discrepancy without diagnosing code from a single observation.</p>
+<h2 id="section-9">Do not treat labels as measurements</h2>
+<p>If the file labeled 720p has different measured dimensions, record the filename label and measured size separately and correct the test ledger before comparing. Resolution alone does not determine bitrate, quality or file size and cannot prove direct playback. Server information supports only the observation made at that time. Without actual stream verification, leave codec, transcoding and playback path unknown.</p>
+<h2 id="section-parts-ledger">Check the ledger for duplicates or missing parts</h2>
+<p>List all three files before scanning: 720p part one, 720p part two and the single 1080p file. After scanning, record actual web episode and version entries in another column. Two displayed versions for three files do not by themselves prove a missing part. Compare the first ending and second opening pictures and then note whether playback actually reaches the second part. If the samples themselves overlap or omit content, replace the authorized test copies before attributing a transition problem to the client.</p>
+<p>Retain the selector labels and displayed order. If the client omits full filenames, record what it actually shows. First in the list does not prove the version was selected by default; check the current selection before opening. If selection status is not shown, mark the default unknown rather than inferring it from position.</p>
+<h2 id="section-10">Review and restore</h2>
+<p>Ensure the record covers three file identities, server recognition, selector order, web and iCouldPlay observations and steps not performed. The administrator handles test copies under normal procedure and confirms the production library remains available; keep originals and backups. Do not share private server addresses, passwords or tokens. This guide uses public documentation and does not claim a private-server or physical-device test.</p>
+<h2 id="section-11">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-jellyfin-episode-multiple-versions-source-and-client-check/">Jellyfin episode versions</a>; <a href="/en/guides/icouldplay-jellyfin-film-trailer-extra-separate-playback-check/">Feature and trailer entries</a>. Checked 23 November 2026: <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software">Apple iCouldPlay listing</a>; <a href="https://jellyfin.org/docs/general/server/media/movies/#multiple-parts">Jellyfin multiple parts and versions</a>; <a href="https://jellyfin.org/posts/jellyfin-release-12.0/">Jellyfin 12.0 release notes</a>.</p>
+{% endraw %}

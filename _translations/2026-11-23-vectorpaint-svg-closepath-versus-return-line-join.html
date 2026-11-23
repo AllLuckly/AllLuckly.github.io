@@ -1,0 +1,52 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: 'VectorPaint path closure: compare Z with a line returning to the start'
+description: Make two SVG triangular outlines with matching coordinates to compare a closepath join with capped
+  ends, then inspect import and output.
+permalink: /en/guides/vectorpaint-svg-closepath-versus-return-line-join/
+date: '2026-11-23 00:00:00 +08:00'
+modified: '2026-11-23 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 281
+topic: Closed joins and coincident endpoints
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-23-vectorpaint-svg-closepath-versus-return-line-join.md
+source_url: /guides/vectorpaint-svg-closepath-versus-return-line-join/
+translation_method: editorial
+translation_source_sha256: 90aba8c5ba554fea7cbd4ed85a865c37a2558df2a3bf3dcd8ca4042b44a2930e
+translation_date: '2026-11-23T01:08:16+00:00'
+excerpt: Make two SVG triangular outlines with matching coordinates to compare a closepath join with capped ends,
+  then inspect import and output.
+---
+{% raw %}
+<p>Make two SVG triangular outlines with matching coordinates to compare a closepath join with capped ends, then inspect import and output.</p>
+<h2 id="section-1">Define the comparison</h2>
+<p>The W3C SVG path specification distinguishes closepath Z from a line command returning to the start: the former joins the first and last segments with linejoin; the latter remains an open subpath and applies linecap separately to its ends. Centerlines can occupy the same positions while a thick stroke looks different at the start. Establish a browser reference first, then observe the current VectorPaint version’s import and output. The specification does not guarantee that any app preserves the commands.</p>
+<h2 id="section-2">Prepare two triangular outlines</h2>
+<p>Create a UTF-8 file with an svg extension in a plain-text editor. Set the SVG namespace on the root and viewBox to 0 0 260 160. Add two path elements, both with fill none, a dark-blue stroke, stroke-width 12, stroke-linecap butt and stroke-linejoin miter. Set the first path data to M 30 120 L 70 30 L 110 120 Z; set the second to M 150 120 L 190 30 L 230 120 L 150 120. The shapes and sizes match; the second is translated 120 units to the right.</p>
+<h2 id="section-3">Keep an independent source</h2>
+<p>Ensure the root element has opening and closing tags, each path is complete, and each command sequence is in its own d attribute. Save as closure-study.svg and create a backup; check that the system did not append .txt. Setting root width and height to 260 and 160 only assists comparison: viewBox units are not automatically physical millimeters on screen. Work from a copy so the original commands remain available after export.</p>
+<h2 id="section-4">Check the browser reference</h2>
+<p>Open the original in an SVG-capable browser. Both triangles should have the same height and size and no fill. Compare each lower-left corner, the start of each path. The left uses Z to join the segments; the right returns to its start but remains open, with separate butt caps. Stroke width, zoom and antialiasing affect visibility, so enlarge and compare the outer contours rather than a single edge pixel. If neither appears, inspect namespace, quotes, tags and stroke attributes.</p>
+<h2 id="section-5">Sketch caps and join</h2>
+<p>On paper mark the lower-left start and adjacent centerlines. The first segment of the open path starts there and the last ends there, so each has a cap. The closed path joins the two according to linejoin; a miter can project outward and is also constrained by miterlimit. This sketch is a prediction, not a promise that every angle makes the distinction obvious. If the difference is too small, keep both paths proportional and increase both stroke widths by the same amount before comparing.</p>
+<h2 id="section-6">Import a copy and record what is visible</h2>
+<p>In the VectorPaint gallery, tap the square-and-down-arrow import icon at the top right (accessibility label “Import Artwork”), or “Import from Files” in an empty gallery, and select the exercise SVG working copy in the system file picker. If the interface differs, the entry is unavailable, or the file cannot be read, record the step as incomplete. Before editing, inspect positions, lower-left corners and blue strokes, then try selecting the two objects separately. Record differences from the browser reference. Matching appearance alone does not prove that Z survives in the internal representation.</p>
+<h2 id="section-7">Change one comparison condition</h2>
+<p>Save a second test file in the text editor and change linecap from butt to round for both paths, keeping all other data unchanged. Compare the open path’s start in the browser and check that the closed start is still treated as a join. Do not modify only one path and mistake a color or width change for a closure difference. For a separate bevel or round join experiment, save a third file and record both properties clearly. Keep filenames and changes together.</p>
+<h2 id="section-8">Do not use fill as proof of closure</h2>
+<p>This experiment explicitly uses fill none to compare strokes. SVG can calculate an open path’s fill as if the region were closed even when its endpoints differ, so seeing triangular fill alone does not prove that d contains Z. Temporarily changing a copy to a pale fill is only an additional observation; record it separately from whether stroke endpoints join. Restore none afterward so the fill does not obscure stroke details.</p>
+<h2 id="section-9">Recheck both kinds of output</h2>
+<p>Save an editable original and use an export or share option actually available in the current version to save separately without overwriting the SVG backup. Reopen the output and compare positions, color and both starts. If it is SVG, inspect its paths or other element structure in a text editor. An application may convert paths into an equivalent representation, so absence of Z does not by itself prove the appearance wrong; it also does not prove the original command was retained. For bitmap output, record visible contours only and do not claim they remain editable.</p>
+<h2 id="section-10">Troubleshoot and save an observation table</h2>
+<p>If the starts look nearly identical, check whether both paths accidentally contain Z, whether caps remain butt, whether the stroke is too thin and whether the latest copy is open. If the right start has an unexpected gap, confirm that its final coordinate really returns to 150 120; if the left has an extra segment, inspect the last point before Z. Record expectation, browser reference, app import, reopened output and incomplete steps on five lines. With different renderers, compare commands and view scale before explaining a visual difference.</p>
+<h2 id="check-transforms-and-style-precedence">Check transforms and style precedence</h2>
+<p>If the paths are in a scaled or rotated group, record that group transform and keep it the same for both objects. Scaling only one can change visible width or angle and is not a closure comparison. Also check whether a stylesheet overrides the path cap and join attributes: the browser displays the resulting styles, not necessarily a single attribute in the file. Restore a simple copy using element attributes alone, then compare both lower-left corners again.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/vectorpaint-svg-linejoin-miter-round-bevel/">Stroke join comparison</a>; <a href="/en/guides/vectorpaint-svg-stroke-linecap-endpoint-comparison/">Stroke cap comparison</a>.</p>
+<p>Checked 23 November 2026: <a href="https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software">Apple public version lookup</a>; <a href="https://www.w3.org/TR/SVG/latest/paths.html">W3C SVG Paths</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

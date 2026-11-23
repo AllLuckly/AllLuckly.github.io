@@ -1,0 +1,77 @@
+---
+layout: null
+permalink: /guides/manyue-komga-comicinfo-publisher-mode-count-maximum/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 漫阅+ 与 Komga 系列资料：比较多数出版方与最大册数
+agent_source_url: https://allluckly.cn/guides/manyue-komga-comicinfo-publisher-mode-count-maximum/
+agent_source_sha256: 0b41dc1bbc99d9450a166da2649c5a56eee67faf0f969f02a180fd1e6e6618a8
+agent_generator_version: 1
+---
+{% raw %}# 漫阅+ 与 Komga 系列资料：比较多数出版方与最大册数
+
+语言：zh-CN
+原文：[漫阅+ 与 Komga 系列资料：比较多数出版方与最大册数](<https://allluckly.cn/guides/manyue-komga-comicinfo-publisher-mode-count-maximum/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-komga-comicinfo-publisher-mode-count-maximum/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-komga-comicinfo-publisher-mode-count-maximum/>)
+发布于: 2026-11-23T00:00:00+08:00
+内容更新于: 2026-11-23T00:00:00+08:00
+署名：Bison
+
+用三本测试漫画核对 ComicInfo 系列字段的不同汇总方式。
+
+单本漫画的元数据汇总成系列信息时，不同字段可能采用不同规则。用三本测试书分别计算并核对。
+
+## 分清单本与系列字段
+
+Komga 可从 CBZ 内的 ComicInfo.xml 导入书籍和系列元数据。官方文档说明系列的 Publisher 使用各书中出现最多的值，Count 则使用各书中的最高值；这两种汇总方式不同。导入受资料库选项影响。漫阅+ 如何显示系列资料需要实际观察，不能把 Komga 的字段规则当成应用必然提供的编辑功能。
+
+## 准备三本授权测试书
+
+管理员在隔离测试系列中准备三本自制或获授权的小型 CBZ 副本，分别标记 A、B、C，每本都有可辨认的第一页。保留原始压缩包和数据库备份，不修改正式漫画。账户需能访问测试系列；若没有测试库、备份或管理员权限，停在准备阶段并记录未执行。不得公开未授权漫画原图或私人服务器地址。
+
+## 建立字段值对照表
+
+由管理员在三个测试副本的 ComicInfo.xml 中分别准备 Publisher 和 Count。举例：A 为 Atlas 与 4，B 为 Atlas 与 7，C 为 Birch 与 5；这些出版方名称只是虚构测试标记。按文档，Publisher 候选值为出现两次的 Atlas，Count 候选值为最大数 7。先将各书的文件名、第一页标记和字段值记在纸上，避免同名文件混淆。
+
+## 确认导入条件
+
+管理员确认测试库允许从 ComicInfo.xml 导入相关元数据，文件位于对应 CBZ 内且 XML 可以解析。记录服务器版本、库选项与测试文件身份；标签名、大小写和闭合状态按当前文档和文件格式核对。如果库不启用导入或字段被其他设置影响，先标记条件不满足，不修改正式库配置来强行获得预期结果。
+
+## 进行一次受控刷新
+
+管理员按当前版本正常流程扫描或刷新测试系列元数据，等待任务完成。记录执行对象是单本、系列还是整个测试库及完成时间；不要盲目对正式全库操作。先在网页确认 A、B、C 都属于同一测试系列，再查看系列出版方和总册数字段。记录原始值，不把预期直接填成观察结果。
+
+## 核对两种计算
+
+用表格数出版方出现次数：Atlas 两次，Birch 一次；因此候选是 Atlas。再比较 Count 的 4、7、5，最大值为 7，而不是出现最多的数字，也不是三本实际文件数量。服务器结果如果不同，先查测试书是否全被识别、库导入选项、字段值与刷新状态。并列最多值的处理不在本练习中断言，应另列待核。
+
+## 在漫阅+ 查看相同系列
+
+漫阅+ 连接相同 Komga 服务器与账户，进入同一测试系列，查看当前应用界面实际展示的系列标题、出版方或册数。若某个字段没有展示，记录未提供或未观察到，不假设它被错误导入；若展示旧值，核对来源、账户和观察时间后再按应用实际方式重新进入。服务器值正确不等于客户端立即更新。
+
+## 区分总册数和实际书目
+
+即使系列元数据 Count 显示 7，本测试系列也只放了三本书；数字是导入的总册信息，不证明服务器存在七个文件。分别记录网页与漫阅+ 的实际条目数量、能否打开 A、B、C 及各自第一页。不要因为数字不同而自动添加、删除或下载文件，也不要将缺失的四本当成扫描失败的证据。
+
+## 排查内容与刷新范围
+
+如果只有两本被服务器识别，先核对目录、账户和扫描完成状态；如果三本都有而元数据仍旧，管理员可核查 ComicInfo.xml 是否在副本中、库导入选项和字段锁定或刷新范围。每次保留先前结果并只改变一个条件，避免同时修改三个压缩包。不了解锁定机制时请管理员按当前文档确认，不对正式条目做批量解锁。
+
+## 在文件与界面之间留出核对点
+
+请管理员先在压缩包副本外保存一份简短清单：A、B、C 各自文件名、Publisher、Count 与第一页标记。完成字段准备后重新打开三个副本，确认每本包含预期的 ComicInfo.xml，且测试标记没有被放进别的系列；仅靠编辑器中的未保存内容不能证明压缩包已经更新。打开压缩包使用管理员熟悉的工具，不执行批量覆盖或删除原始文件。
+
+系列字段汇总之前还应核对每本书在服务器中的身份。若 B 没有被扫描，即使文件内 Count 为 7，也不能用它预测当前已识别系列的显示结果。先等待扫描，确认 A、B、C 均在同一系列后，再比较候选值。若两个不同的 Series 字段值导致书籍分组变化，记录分组并暂停，不在同一次操作中同时调整所有字段。
+
+这个例子中的 Atlas 与 Birch 不指向真实出版者，数字也不是事实书目；把测试样本移出后，不应将其作为正式作品信息传播。对于真实系列，先核实各书来源和资料字段，避免因为重复文件或不同版本而错误计算。
+
+## 还原和交接
+
+完成后由管理员按既定规则恢复或清理测试副本，并确认正式书籍、元数据和数据库备份仍在。表格写明三本字段值、候选计算、网页实际值、漫阅+ 可见字段和未执行步骤；不要分享私人账号或漫画原文。本文依据公开资料编写，未声称连接私人服务器或完成真机测试。
+
+## 相关教程与资料
+
+[Komga 扫描、分析与元数据刷新](<https://allluckly.cn/guides/manyue-komga-scan-analyze-metadata-refresh-separate-results/>)；[Komga 阅读列表排序](<https://allluckly.cn/guides/manyue-komga-read-list-manual-release-date-order/>)。2026年11月23日核对：[Apple 漫阅+ 资料](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software>)；[Komga ComicInfo 导入](<https://komga.org/docs/guides/scan-analysis-refresh/#import-metadata-for-cbrcbz-containing-a-comicinfoxml-file>)。
+{% endraw %}

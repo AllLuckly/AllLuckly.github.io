@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /guides/vectorpaint-svg-text-anchor-start-middle-end/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: VectorPaint 文字锚点：同一坐标比较 start、middle 与 end
+agent_source_url: https://allluckly.cn/guides/vectorpaint-svg-text-anchor-start-middle-end/
+agent_source_sha256: a123c4cfcf5c1bf225bf5548a5e2ee955517ccabede818f5556a0897fa793085
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint 文字锚点：同一坐标比较 start、middle 与 end
+
+语言：zh-CN
+原文：[VectorPaint 文字锚点：同一坐标比较 start、middle 与 end](<https://allluckly.cn/guides/vectorpaint-svg-text-anchor-start-middle-end/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-svg-text-anchor-start-middle-end/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-svg-text-anchor-start-middle-end/>)
+发布于: 2026-11-23T00:00:00+08:00
+内容更新于: 2026-11-23T00:00:00+08:00
+署名：Bison
+
+建立三行 SVG 文字与共同参考线，对照文本锚点并检查字体替换和导出。
+
+建立三行 SVG 文字与共同参考线，对照文本锚点并检查字体替换和导出。
+
+## 明确锚点控制什么
+
+MDN 的 SVG text-anchor 资料说明，start、middle 和 end 将文字片段相对其初始位置对齐。本文只讨论从左向右的水平拉丁文字；start 对应文字起始方向，end 对应结束方向，而不是所有语言永远的左与右。文字实际可见墨迹可能因字体边距略离理论锚点，不以某个字形像素当作精确坐标。先在浏览器建立基准，再观察应用导入。
+
+## 制作三行测试文件
+
+在纯文本编辑器新建 UTF-8 SVG，根元素设置 SVG 命名空间和 viewBox 0 0 240 150。添加一条从 x=120、y=10 到 x=120、y=140 的淡灰垂直参考线，再添加三条 text，文本都写 ABC，x 都设 120，y 分别设 40、80、120。三条字体大小均为 24，direction 为 ltr，颜色相同；text-anchor 分别设 start、middle、end。保存为 text-anchor-study.svg，并复制备份。
+
+## 先写出预期位置
+
+三行共享相同的水平锚坐标，但基线高度不同。对于从左向右的本文样本，start 行的文字起始位置在参考线附近并向右排列；middle 行的文字排版宽度以参考线为中点；end 行的结束位置在参考线附近并向左排列。这里的 y 是文字定位的一部分，不表示文字外框的顶部。将预期写在纸上，避免事后用截图解释属性。
+
+## 在浏览器建立参考
+
+在支持 SVG 的浏览器中打开原稿，确认三行都显示 ABC、字号相同，并与灰色参考线形成三种对齐。若某行完全消失，检查 text 标签、x、y 和填色；若三行都向同一侧排列，检查属性拼写以及可能覆盖属性的 CSS。浏览器找不到指定字体时可能使用后备字体，改变字符宽度，但三行若使用相同字体，锚点方向仍可按各行比较。
+
+## 区分锚点与字形边缘
+
+使用含空格的文本会使排版宽度与可见墨迹边缘产生差别；为了让首轮结果更容易读，先使用无前后空格的 ABC。即使如此，字体的字形轮廓也未必与文字起始或结束坐标像素级重合。比较整段相对于参考线的布局，而不是声称字母最外缘必须落在 x=120。切换字体后应重新观察，不把任何字体的具体宽度写死。
+
+## 导入副本并观察对象
+
+在 VectorPaint 的作品集，点右上角方框向下箭头导入图标（无障碍标签为“导入作品”）；若作品集为空，可点“从文件导入”，在系统文件选择器中选择本练习的 SVG 工作副本。若界面不同、入口不可见或文件无法读取，记录未完成。导入后先不编辑，比较三行相对参考线的布局，并尝试分别选择文字。若只显示为轮廓或单个对象，记录实际观察，不假定它仍是可编辑文本。
+
+## 检查字体替换
+
+记录浏览器实际显示的字体与应用可用字体，条件允许时使用两边都有的同一字体；不要声称未安装或未确认的字体必然存在。导入后如果字符形状或宽度变化，而锚点关系仍正确，字体替换可能是原因之一，不能仅凭外观断言。另存一份并用同一可用字体比较，保留原稿和截图，分开记录字体差异与对齐差异。
+
+## 用不同长度检验中点
+
+另存一份 SVG，将三行 ABC 同时改成 ABCDE，其他属性保持不变。预期 start 行仍从相同起点向右延伸，end 行仍在同一终点结束，middle 行则以相同坐标为中心向两侧增长。不要只修改中间一行，否则很难分离文字长度和锚点的影响。字号、字距或字体发生变化时也会改变总宽度，记录每次只改变的条件。
+
+## 单独考虑阅读方向
+
+本样本明确设为 ltr，因此不应把 start 和 end 解释为跨语言固定的左对齐和右对齐。若之后制作从右向左文本，应另存副本、使用适合的文字和方向设置，并在目标环境实际检查，而不是把英文 ABC 的截图直接当作其他文字的结果。竖排、多段 tspan 或沿路径文字又有各自的布局条件，本练习不推断它们在应用中的支持情况。
+
+## 核查样式覆盖与图层
+
+如果应用或浏览器中三行表现与预期不同，先检查 CSS 的 text-anchor 是否覆盖元素属性，再核 x、方向、字体和文字内容。检查参考线是否被移动或隐藏，避免把图层问题当成文字排版问题。应用中若只能对整组操作，不需要强行拆解对象；记录单独选择、修改和撤销是否可行，将未完成项留待有设备时复核。
+
+## 保存、输出与复核
+
+保存可编辑原稿，再通过当前版本实际可见的分享或导出入口另存文件，保留 SVG 源稿备份。重新打开输出，检查三行、参考线和相对位置；若输出是 SVG，用文本编辑器查看 text 元素和锚点是否保留，或是否已转换为路径。路径外观相似不等于文字仍可编辑；位图只能核外观。记录浏览器和应用版本、字体与未完成项，不声称未执行的设备测试。
+
+## 检查文字基线
+
+三行使用不同的 y 数值是为了避免相互重叠，不是本实验改变的对齐方式。每行都使用相同字体与字号，并应以各自行的位置比较水平锚点。如果把某一行的基线设置成别的值，先还原后再比较；文字上缘与灰色参考线的交叉高度不能代替水平对齐的判断。
+
+## 相关教程与资料
+
+[文字排版](<https://allluckly.cn/guides/vectorpaint-text-layout/>)、[字体替换检查](<https://allluckly.cn/guides/vectorpaint-font-fallback-proof/>)。
+
+2026年11月23日核对：[Apple 公开版本查询](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software>)、[MDN：SVG 文字锚点](<https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/text-anchor>)。未声称完成真实设备或私人服务器测试。
+{% endraw %}

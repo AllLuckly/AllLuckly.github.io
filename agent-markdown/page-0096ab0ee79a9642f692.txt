@@ -1,0 +1,82 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-svg-dash-percentage-normalized-diagonal/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'VectorPaint dash percentages: check lengths against the normalized viewBox
+  diagonal'
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-svg-dash-percentage-normalized-diagonal/
+agent_source_sha256: 9fefabcbd31a8b96ab839bcd230ae3b7f51e571ab6949dc572a553d1c634b4c2
+agent_generator_version: 1
+---
+{% raw %}# VectorPaint dash percentages: check lengths against the normalized viewBox diagonal
+
+Language: en
+Canonical: [VectorPaint dash percentages: check lengths against the normalized viewBox diagonal](<https://allluckly.cn/en/guides/vectorpaint-svg-dash-percentage-normalized-diagonal/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-svg-dash-percentage-normalized-diagonal/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-svg-dash-percentage-normalized-diagonal/>)
+Published: 2026-11-23T00:00:00+08:00
+Modified: 2026-11-23T09:16:49+08:00
+Author: Bison
+
+Compare percentage and numeric dashes in one SVG, calculate the normalized diagonal and check import and output.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-svg-dash-percentage-normalized-diagonal/>), translated on 2026-11-23. Original publication dates, attribution, code and version notes are retained.
+
+Compare percentage and numeric dashes in one SVG, calculate the normalized diagonal and check import and output.
+
+## Identify the percentage basis
+
+In an SVG stroke dash array, percentages refer to the normalized diagonal of the current SVG viewport, using the applied viewBox dimensions when present. Both the W3C SVG specification and MDN describe this basis. It is not a percentage of path length and is not necessarily a percentage of viewport width. Establish a browser reference before observing actual import and export in VectorPaint; the specification does not guarantee preservation by a particular app version.
+
+## Calculate the reference values
+
+Use viewBox 0 0 200 100, width 200 and height 100. The normalized diagonal is the square root of width squared plus height squared, divided by the square root of two, or approximately 158.114 user units. Ten percent is about 15.811 units and five percent about 7.906 units. Keep three decimals as approximations; they are not screen pixels or physical millimeters. The later path length is 160 units to show several cycles, but it is not the percentage denominator.
+
+## Make two comparison lines
+
+Create a UTF-8 SVG in a plain-text editor. Set the namespace, viewBox 0 0 200 100 and convenient display width and height on the root. Add two line elements, both from x1=20 to x2=180, the first at y=35 and the second at y=65, with identical color, stroke width 4 and butt caps. Give the first stroke-dasharray 10% 5% and the second 15.811 7.906. Save as dash-percent.svg, copy a backup and check that the extension did not become svg.txt.
+
+## Compare the first two cycles in a browser
+
+Open the original in an SVG-capable browser. The lines start at the same x coordinate. The first dash should extend approximately from x=20 to x=35.811, followed by a gap of about 7.906; the second dash begins near x=43.717. The numeric row uses three-decimal approximations, so corresponding boundaries should be close with tiny rounding and antialiasing differences allowed. If both lines are solid, check the property name, quotes and style overrides; if a row is absent, check coordinates and color.
+
+## Contrast the path-length misconception
+
+Each line is 160 units long. Mistaking 10% for a percentage of path length gives an initial guess of 16, rather than about 15.811. These values are close, so eyesight alone cannot prove which calculation applies. Write down the calculation, then save a separate copy with the numeric row changed to 16 8 and compare the accumulated boundary shift at higher zoom. This copy exposes the misconception; it does not replace the accurate approximation control.
+
+## Keep other variables fixed
+
+In both comparison files check viewBox, line coordinates, stroke width, caps and starting offset. Do not enlarge only one line or change color and width simultaneously to make a difference more obvious; an individual element transform introduces another variable. To inspect closely, zoom the whole page while keeping both lines at the same scale. Label each file’s purpose so the 16 8 counterexample is not mistaken for the specification-based calculation.
+
+## Open a copy in the app
+
+In the VectorPaint gallery, tap the square-and-down-arrow import icon at the top right (accessibility label “Import Artwork”), or “Import from Files” in an empty gallery, and select the exercise SVG working copy in the system file picker. If the interface differs, the entry is unavailable, or the file cannot be read, record the step as incomplete. An SVG property is not necessarily an app button. Before editing, compare row positions, segment lengths and phase, and try selecting each line separately. Record whether appearance matches the browser; matching appearance does not prove percentage expressions remain unchanged internally.
+
+## Change the viewBox in a separate experiment
+
+Save another copy and change viewBox height from 100 to 200, keeping width 200 and ensuring the lines remain visible. The new normalized diagonal is 200, so 10% and 5% are 20 and 10 user units. Keep the numeric row at 15.811 7.906; its cycle should now differ in a browser. Display size and preserveAspectRatio can affect screen scaling, so compare the two rows within the same image rather than inferring user units directly from pixels across screenshots.
+
+## Check property precedence
+
+If percentage and numeric rows differ unexpectedly, inspect element attributes and CSS rules that may override them; a matching stylesheet property can change the computed result. Confirm that no pathLength, element transform or inherited stroke style was introduced, and restore conditions one at a time. With nested SVG elements, identify the current viewport used by the percentage instead of assuming the outermost dimensions. Record these factors separately and avoid changing multiple conditions together.
+
+## Export and recheck
+
+Save the app’s editable original, then use a share or export entry actually shown in the current version to save separately without overwriting the SVG backup. Reopen and compare the dashed rows. If the result is SVG, inspect its elements, arrays and viewBox or any converted equivalent representation. If only a bitmap is available, compare appearance alone and do not claim editable percentages. Record expectation, browser, app and reopened output; mark unperformed device and export steps as pending.
+
+## Calculate end truncation
+
+One original percentage cycle is approximately 15.811 plus 7.906, or 23.717 units. Six cycles occupy about 142.302 units. Starting from x=20, the seventh dash begins near x=162.302 and ends near x=178.113; its following gap extends beyond the line endpoint at x=180. The end may therefore fall in a gap, and its appearance alone cannot reveal the percentage basis. The three-decimal calculations are approximations; check rounding and antialiasing before interpreting tiny edge differences.
+
+## Record version observations
+
+Record browser and app versions, which copy was opened and whether the view was zoomed, keeping expected and observed results in separate columns. Leave any step not personally performed blank or marked pending.
+
+## Related guides and sources
+
+[Dash array repetition](<https://allluckly.cn/en/guides/vectorpaint-svg-dash-pattern-odd-list-repetition/>); [Dash offset comparison](<https://allluckly.cn/en/guides/vectorpaint-dashoffset-phase-open-line/>).
+
+Checked 23 November 2026: [Apple public version lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software>); [MDN: stroke dash array](<https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/stroke-dasharray>); [W3C: SVG stroking](<https://www.w3.org/TR/SVG/latest/painting.html>). No physical-device or private-server test is claimed.
+{% endraw %}

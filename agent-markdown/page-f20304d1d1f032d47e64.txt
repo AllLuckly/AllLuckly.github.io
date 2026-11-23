@@ -1,0 +1,75 @@
+---
+layout: null
+permalink: /en/guides/diaodiao-audio-file-sha256-roundtrip-copy-check/index.md
+sitemap: false
+noindex: true
+lang: en
+title: '调调 tutorial 88: check a transferred audio copy with SHA-256'
+agent_source_url: https://allluckly.cn/en/guides/diaodiao-audio-file-sha256-roundtrip-copy-check/
+agent_source_sha256: a6fe02616cb63cb0658401e3e2e520a8b281bc0796e51744586b7d8c89e681ec
+agent_generator_version: 1
+---
+{% raw %}# 调调 tutorial 88: check a transferred audio copy with SHA-256
+
+Language: en
+Canonical: [调调 tutorial 88: check a transferred audio copy with SHA-256](<https://allluckly.cn/en/guides/diaodiao-audio-file-sha256-roundtrip-copy-check/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/diaodiao-audio-file-sha256-roundtrip-copy-check/>)
+English: [English HTML](<https://allluckly.cn/en/guides/diaodiao-audio-file-sha256-roundtrip-copy-check/>)
+Published: 2026-11-23T00:00:00+08:00
+Modified: 2026-11-23T09:37:28+08:00
+Author: Bison
+
+Transfer an owned audio copy to a phone and back, compare file digests, then check 调调 import and playback separately.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/diaodiao-audio-file-sha256-roundtrip-copy-check/>), translated on 2026-11-23. Original publication dates, attribution, code and version notes are retained.
+
+Matching filenames and sizes do not establish that every byte of two audio files matches. Calculate SHA-256 on an owned working copy on Mac, transfer it to iPhone and copy the received file back to Mac, then compare digests. Check 调调 import and playback separately. This round trip does not establish the app’s internal copy, lossless sound or bit-perfect device output.
+
+## Prepare an identifiable working copy
+
+Prepare a Mac, an iPhone with 调调 and a short audio file you own or may transfer. Keep the original and backup. Create two separate folders, `original-copy` and `returned-copy`; place the working copy in the first and leave the second empty. Note name, size, duration and a recognizable sound cue. Do not transfer private or unauthorized content or delete the original library.
+
+Prepare a transfer method controlled by you on both sides, such as a verified AirDrop flow to the iPhone Files app. If devices or transfer conditions are unavailable, mark the task pending. Confirm an actual file was saved for sharing again, not merely previewed; receive options vary. Do not assume it automatically entered 调调, and do not upload private files to an unfamiliar checksum website.
+
+## Calculate the first digest on Mac
+
+Open Terminal on Mac, enter the following command prefix and add a space at the end:
+
+```
+shasum -a 256
+```
+
+Drag the working audio file from `original-copy` in Finder into the Terminal window so its path is inserted, then press Return. Verify that you dragged a file rather than a folder. Let Finder insert a path containing spaces instead of guessing shell escaping. Terminal should display a hexadecimal digest and path; a SHA-256 digest has 64 hexadecimal characters. If the command fails or the path is unclear, stop without entering unknown commands or changing permissions.
+
+Record the digest locally as “before sending” and identify its file path. A digest is not an encrypted copy and does not conceal the audio; avoid publishing private paths or hashes. Hashing does not modify audio. If the file is edited, re-encoded or replaced afterwards, calculate and timestamp a new digest.
+
+## Transfer to the phone and back to Mac
+
+Transfer that same working copy to your iPhone and confirm its saved location, name and size in Files. If receipt is unclear or download is incomplete, wait and verify; a preview alone is not a persistent copy. Where system preview supports it, listen for the cue, but listening cannot prove every byte matches. For a same-name prompt, inspect the actual location and avoid overwriting other files.
+
+From that file just saved on the phone, use a transfer method you control to copy it back into Mac’s `returned-copy` folder. Do not copy the original Mac working file again and treat that as the return. Record phone location, return time and actual received name. If the method converts the file to another format, note that change first; a converted result is not an original byte copy.
+
+## Compare the second digest
+
+In Terminal enter the same `shasum -a 256` prefix, add a space, drag the file from `returned-copy` and run it. Confirm that the displayed path belongs to the return folder; record the second 64-character digest as “after return”. Compare every character. Matching SHA-256 values provide strong evidence that the two files’ bytes matched at calculation, but verify the paths are distinct and correctly selected. Hashing the same file twice does not verify a transfer.
+
+If values differ, do not overwrite or delete either file. Check for a wrong path, incomplete transfer, or editing or conversion during transit. A name change alone does not change file contents. Correct one condition at a time and recalculate the affected files. A matching digest does not establish trustworthy provenance or legal permission; check those separately.
+
+## Import into 调调 and verify separately
+
+On the iPhone use 调调’s visible local import flow to select the saved audio and record format, size or permission feedback. If selection or import fails, mark it incomplete; a matching digest is not evidence of import. Once imported, identify it by title, duration and cue, and play briefly at a comfortable volume, recording library visibility and actual sound separately.
+
+The digest comparison covered the Mac working copy and a file returned from the phone’s receive location. It does not automatically cover an internal copy the app may create or retain. If no actual app copy can be exported, its byte state remains unknown; do not infer it through traffic interception, hidden directories or unpublished interfaces. Hearing the right sound is not a bit-exact output measurement.
+
+## Review and restore
+
+Keep the before and return hashes, non-sensitive path descriptions, transfer and import results; remove personal paths before sharing. Verify original and backup remain. The user decides whether to keep practice copies, checking folder identity before deletion. If Terminal is unavailable or path operations are unfamiliar, perform only file-identity and playback checks and mark hashing incomplete; installing software is unnecessary.
+
+This guide is designed from public sources and does not claim device execution. Recalculate when the file, transfer method or system changes. An earlier match does not verify a new copy or guarantee all transfers succeed.
+
+## Related tutorials and references
+
+[AirDrop audio from Mac to iPhone](<https://allluckly.cn/en/guides/diaodiao-airdrop-mac-iphone-audio-receive-import/>); [WAV and FLAC decoded comparison limits](<https://allluckly.cn/en/guides/diaodiao-wav-flac-decoded-pcm-equality-not-device-bitperfect/>).
+
+Checked November 23, 2026: [Apple’s public app lookup](<https://itunes.apple.com/lookup?id=6827171352&country=cn&entity=software>) lists 调调 1.0.4. The [Python hashlib documentation](<https://docs.python.org/3/library/hashlib.html>) describes SHA-256 digests of bytes. Command-line interfaces and phone transfer flows depend on the actual systems.
+{% endraw %}

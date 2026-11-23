@@ -1,0 +1,58 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay and Jellyfin NFO descriptions: compare plot and review order'
+description: Separate NFO field precedence, web results and iCouldPlay display using a test film.
+permalink: /en/guides/icouldplay-jellyfin-nfo-plot-review-order/
+date: '2026-11-23 00:00:00 +08:00'
+modified: '2026-11-23 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 243
+topic: Jellyfin NFO same-field precedence
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-23-icouldplay-jellyfin-nfo-plot-review-order.md
+source_url: /guides/icouldplay-jellyfin-nfo-plot-review-order/
+translation_method: editorial
+translation_source_sha256: d033b871f79330dbff29f53ab59cb5b47f6b5d27237e04bd48a4e6e536854f54
+translation_date: '2026-11-23T01:00:00+00:00'
+---
+{% raw %}
+<p>When a movie description differs from its NFO, check which tags map to the same field, then observe the server web interface and iCouldPlay separately.</p>
+<h2 id="section-1">Define the boundary</h2>
+<p>Jellyfin can read local NFO metadata. Its documentation states that plot and review map to the same internal field and, when multiple tags map to one field, the last tag in the file takes priority. This is a server rule, not an iCouldPlay editing feature. Use an authorized isolated test library to inspect the web result, then observe whether iCouldPlay displays the same description. Do not assume immediate refresh in every client.</p>
+<h2 id="section-2">Prepare an isolated test movie</h2>
+<p>Use a short self-made or authorized video, with Test Movie (2030) as an example folder and filename. Ask the administrator to put a video copy in a separate movie library and prepare movie.nfo in the movie folder. Leave production films, original NFO files and images untouched. Without administrator access, ask the administrator rather than scanning an unfamiliar server. The title and year distinguish the test and do not identify a real film.</p>
+<h2 id="section-3">Record the initial state</h2>
+<p>Write an alias for the server and test library, the account, app version, time, and the title and description visible on web and iCouldPlay. Exclude real paths, passwords, tokens and private URLs from shared records. Confirm both interfaces open the same test film. If similar names make identity uncertain, compare the opening picture and duration.</p>
+<h2 id="section-4">Create two distinct candidate values</h2>
+<p>Have the administrator create a test movie.nfo in a plain-text editor with title, plot and review inside a movie root. Use “blue square” for plot and “red dot” for review, making the values distinguishable. Close the tags, use UTF-8 and place review after plot. Back up the test folder first. Do not paste a real NFO containing private information into the example.</p>
+<h2 id="section-5">Check the sample file</h2>
+<p>This self-made sample contains identifiable markers, not a review of a real movie:</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;movie&gt;
+  &lt;title&gt;Test Movie&lt;/title&gt;
+  &lt;plot&gt;蓝色方块&lt;/plot&gt;
+  &lt;review&gt;红色圆点&lt;/review&gt;
+&lt;/movie&gt;
+</code></pre>
+<p>Confirm the name is movie.nfo, not movie.nfo.txt. Put the video and NFO in the same test movie folder. Leave other metadata settings alone initially and keep the prior version.</p>
+<h2 id="section-6">Predict and check the web result</h2>
+<p>Under the documented same-field rule, the expected description after reading this file is the last review value, “红色圆点” (red dot). Ask the administrator to scan or refresh the test film using the normal method for their server version, wait for completion and inspect the web interface. Record the displayed value and refresh method. If it differs, do not report the prediction as verified: check the actual file, entry identity, NFO parsing and refresh method.</p>
+<h2 id="section-7">Swap tag order for a control</h2>
+<p>With a backup available, exchange only the tag order so review comes first and plot last, leaving the values unchanged. Have the administrator refresh the same test item. The documented prediction becomes “蓝色方块” (blue square). Preserve both timestamps, file contents and web results so text, settings and tag order are not conflated. If refresh or editing cannot be confirmed, mark this comparison not performed.</p>
+<h2 id="section-8">Observe iCouldPlay</h2>
+<p>Using the same server account, open the same film in iCouldPlay and inspect the details page actually offered by the installed version. Record whether a description appears, its text, time and whether it matches the web. If no description entry exists or old content remains, confirm film identity and network, then reopen normally. Do not claim a guaranteed client refresh or infer caching from one difference. Record web and app separately and mark uncertain results pending.</p>
+<h2 id="section-9">Separate parsing from display</h2>
+<p>If the web never shows either marker, check the extension, XML closure, folder hierarchy and administrator-selected refresh scope. An old file, a different matched film or incomplete scan each require separate investigation. If both web results show the same marker, recheck saved tag order. A changed web description and unchanged app only establish differing observations, not their cause, and do not justify deleting production metadata.</p>
+<h2 id="section-other-sources">Check other metadata sources</h2>
+<p>Jellyfin documents local NFO priority over remote providers. Record the existing provider configuration; do not disable providers in the production library to force an expected result, or equate network failure with an unread NFO. Ask the administrator to confirm the test file and refresh scope. If a remote description remains, keep it as an unresolved observation rather than claiming a test that was not completed.</p>
+<h2 id="section-empty-values">Distinguish empty values from deletion</h2>
+<p>This exercise uses two explicit non-empty markers. It does not test empty tags or whether deleting a tag clears a stored description. Do not experiment by deleting production NFO files when old text remains. Keep the test backup and ask the administrator to confirm refresh and overwrite scope for their version. State the actual server and refresh conditions instead of generalizing one observation to all versions or clients.</p>
+<h2 id="section-10">Finish and restore</h2>
+<p>Have the administrator remove or retain the test copy according to normal practice, and confirm that the production film and NFO were not changed. Restore any modified test-library settings. The record should include both NFO tag orders, web results, app result and steps not performed. This guide is based on public documentation and claims neither a private-server connection nor physical-device testing.</p>
+<h2 id="section-11">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-jellyfin-health-check-versus-playback/">Jellyfin web and app checks</a>; <a href="/en/guides/icouldplay-jellyfin-film-trailer-extra-separate-playback-check/">Feature and trailer entries</a>. Checked 23 November 2026: <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software">Apple iCouldPlay listing</a>; <a href="https://jellyfin.org/docs/general/server/metadata/nfo/">Jellyfin local NFO metadata</a>.</p>
+{% endraw %}

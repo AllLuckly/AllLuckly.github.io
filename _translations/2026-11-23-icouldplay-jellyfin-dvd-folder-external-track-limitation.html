@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay and Jellyfin disc folders: external track limits and playback'
+description: Compare a VIDEO_TS folder and a single video file in the server and iCouldPlay.
+permalink: /en/guides/icouldplay-jellyfin-dvd-folder-external-track-limitation/
+date: '2026-11-23 00:00:00 +08:00'
+modified: '2026-11-23 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 241
+topic: Disc folders and external tracks
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-23-icouldplay-jellyfin-dvd-folder-external-track-limitation.md
+source_url: /guides/icouldplay-jellyfin-dvd-folder-external-track-limitation/
+translation_method: editorial
+translation_source_sha256: ade0c36131bc40552e46b0209daf90052af49e898720836affa9f74b43bb4b16
+translation_date: '2026-11-23T01:00:00+00:00'
+---
+{% raw %}
+<p>When using iCouldPlay with a Jellyfin movie library, distinguish a disc folder from a regular video file before checking subtitle selection at each layer.</p>
+<h2 id="section-1">Separate the three objects</h2>
+<p>A Jellyfin movie library may contain regular video files, VIDEO_TS folders or BDMV folders. A disc folder, its VOB files and a separate MKV are different objects. This exercise compares the server entry and availability of external tracks; it does not assume the app can open any folder as a media file. Jellyfin documents that VIDEO_TS and BDMV do not support multiple versions, multiple parts or external subtitle and audio tracks. That does not mean internal disc tracks necessarily fail, or that iCouldPlay exposes every server option.</p>
+<h2 id="section-2">Prepare reversible samples</h2>
+<p>Choose a short video you created or are authorized to use and a short subtitle you made yourself. Ask the administrator to prepare an identifiable VIDEO_TS folder in a separate test library and a lawfully obtained single-file copy of the same content for comparison. This guide does not instruct bypassing disc protection. Record duration, picture content, language and filenames. Without a comparison copy or authorization, read the guide and mark the test not performed. Leave the production library and originals intact.</p>
+<h2 id="section-3">Write predictions and limits</h2>
+<p>Create five columns: sample, server entry, external subtitle availability, corresponding iCouldPlay choice and actual playback. The documented prediction for external tracks in the VIDEO_TS group is unsupported. Mark the single-file group as pending because format, naming, server settings, permissions and client all affect the result. Do not prefill it as successful, or claim identical codec, quality or subtitle content based on file extensions.</p>
+<h2 id="section-4">Check the server directory hierarchy</h2>
+<p>Ask the administrator to inspect the test library and confirm that the movie folder contains a VIDEO_TS folder rather than numbering its VOB files as separate films. The actual structure should match the Jellyfin example and the legitimate source. Place the self-made subtitle in the administrator-approved test location for observation, without modifying protected disc content or the production library. Give the comparison single file its own movie folder and matching name so two test entries are not accidentally combined. Record relative hierarchy, not the private server path.</p>
+<h2 id="section-5">Confirm matching content first</h2>
+<p>Open both test entries in the server web interface and compare title, opening image and duration. Mark any edit differences before diagnosing subtitle timing. For a short sample, choose an obvious visual event, note its time and content, then check the other entry at the same position. Similar filenames alone cannot establish identical content.</p>
+<h2 id="section-6">Compare subtitle choices on the web</h2>
+<p>Have the administrator update the test library using the normal procedure, wait for scanning to finish and refresh the web interface. Open playback options for each entry and record the actual subtitle choices and languages. If the VIDEO_TS group does not show an external subtitle, note that the observation matches the documentation. If a choice appears, establish whether it is internal to the disc instead of assuming it is an external file. Observe the single-file group too. If its subtitle is absent, inspect server recognition, language labels and permissions before changing production configuration.</p>
+<h2 id="section-7">Check the same entries in iCouldPlay</h2>
+<p>Connect iCouldPlay to the same authorized Jellyfin account. Confirm server, test library and identity of both entries. Open each short clip and inspect subtitle or audio controls actually offered by the installed app. Record visible choices, selection and screen result. If a control is absent, mark it unavailable or not observed; do not assume the client presents all server capabilities. Follow the installed interface and avoid changing several playback settings at once.</p>
+<h2 id="section-8">Investigate differences without overwriting samples</h2>
+<p>If web and app show different entry counts, first check the account, library and completion of scanning. If entries appear but playback cannot start, record whether failure occurs in listing, opening or playback instead of automatically attributing it to the external-track limitation. If a single-file subtitle appears out of sync, check that it corresponds to the same clip and edit. Preserve originals and disc content. Change one test condition at a time and record before and after.</p>
+<h2 id="section-9">Finish the check and clean up</h2>
+<p>A useful result distinguishes both sample types and both observation points, marking each cell successful, failed, unavailable or not performed; it does not require both samples to offer external subtitles. Share sanitized findings with the administrator, excluding passwords, tokens and private URLs. Ask the administrator to remove test copies under the normal cleanup procedure after verifying that production content and originals remain accessible. Retain uncertain items as pending. This guide is based on public documentation and does not claim a private-server connection or physical-device test.</p>
+<h2 id="section-record-timing">Review the observation timeline</h2>
+<p>Check observation times after filling the table. A web result before server scanning completes cannot be compared directly with a client result afterward. Record different networks too. If conditions cannot be matched, list that as a limitation rather than attributing the difference to a feature. On a retry, preserve the earlier row and add a new one so the administrator can see the changed conditions and results.</p>
+<h2 id="section-10">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-jellyfin-film-trailer-extra-separate-playback-check/">Jellyfin feature and trailer checks</a>; <a href="/en/guides/icouldplay-jellyfin-external-subtitle-flags-audit/">External subtitle flags</a>. Checked 23 November 2026: <a href="https://itunes.apple.com/lookup?id=6755653178&amp;country=cn&amp;entity=software">Apple iCouldPlay listing</a>; <a href="https://jellyfin.org/docs/general/server/media/movies/">Jellyfin movie organization</a>.</p>
+{% endraw %}

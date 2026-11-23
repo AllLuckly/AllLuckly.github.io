@@ -1,0 +1,73 @@
+---
+layout: null
+permalink: /guides/icouldplay-jellyfin-ignore-empty-versus-pattern/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映与 Jellyfin 扫描排除：比较空 .ignore 与指定文件规则
+agent_source_url: https://allluckly.cn/guides/icouldplay-jellyfin-ignore-empty-versus-pattern/
+agent_source_sha256: 60d8e1bd57427876963daf32920503be42f0d4f872365b658ead0b2ce23ed178
+agent_generator_version: 1
+---
+{% raw %}# 云映与 Jellyfin 扫描排除：比较空 .ignore 与指定文件规则
+
+语言：zh-CN
+原文：[云映与 Jellyfin 扫描排除：比较空 .ignore 与指定文件规则](<https://allluckly.cn/guides/icouldplay-jellyfin-ignore-empty-versus-pattern/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-jellyfin-ignore-empty-versus-pattern/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-jellyfin-ignore-empty-versus-pattern/>)
+发布于: 2026-11-23T00:00:00+08:00
+内容更新于: 2026-11-23T00:00:00+08:00
+署名：Bison
+
+使用隔离样本核对扫描规则、服务端条目和云映显示。
+
+资料库中有文件而云映列表看不到时，先分别检查服务器扫描范围、账户与客户端显示。本练习只在隔离测试库中比较两类排除规则。
+
+## 确定服务器版本与范围
+
+Jellyfin 使用 .ignore 文件排除资料库扫描。官方文档说明空文件可排除所在整个目录及其子目录；非空文件可使用类似 Git 的忽略规则排除指定项目，这是 10.11.x 及更高版本的新功能。旧版对非空内容的处理不同，不能按新规则推断。请管理员先确认服务器版本和文档；云映只是观察客户端，不提供或代替服务器扫描配置。
+
+## 建立隔离测试目录
+
+请管理员在已授权的独立测试电影资料库中准备两个短片副本 A 和 B，以及名为 ignore-test-dir 的子目录和一个短片 C。使用自制或有权使用的素材，不触碰正式库。记录三个文件的相对路径、开头画面和时长，方便辨别；名称只用测试示例，不将私人绝对路径写进记录。没有管理员权限或测试库时，停止在准备阶段，标明未执行。
+
+## 先观察没有忽略文件时
+
+管理员按常规方式扫描测试库，等待结束后用网页记录 A、B、C 是否出现，核对每个条目的画面和身份。再用相同账户在云映查看对应库，记录实际可见条目。不要因测试片没有元数据或文件不兼容就认定忽略规则已经生效；如果基线条目本就不可见，应先处理测试样本或记录无法比较。
+
+## 实验一：排除整个子目录
+
+请管理员先确认 ignore-test-dir 中没有原有 .ignore，并备份测试资料库。然后在 ignore-test-dir 内新建一个空的 .ignore 文件。不要把空文件放在测试库根目录，否则作用范围会不同；尤其不要将它放进正式电影库或剧集根目录。隐藏文件可能在文件管理器中不可见，应由管理员通过其熟悉的方式确认文件确实存在且名称不是 .ignore.txt。
+
+## 扫描后比较目录内外
+
+官方要求创建或更改 .ignore 后重新扫描资料库。管理员完成扫描并等待结束后，先检查网页中 A、B 与 C，再在云映访问同一库记录结果。预期 C 所在整个 ignore-test-dir 目录被排除，A 和 B 在该规则下不属于排除范围；是否立刻从已有列表中消失，应以实际服务器版本和扫描结果为准。规则用于扫描，不是删除文件；检查 C 的测试源文件是否仍存在。
+
+## 恢复到可比较状态
+
+管理员先记录第一次结果，再移除仅为本练习新建的空 .ignore 并重新扫描。等待结束后确认 C 是否重新被服务器识别。若 C 未回来，核对文件是否仍在、扫描范围与权限；不要不断切换多个设置或删除数据库。确认恢复后再开始下一组对照。如果原文件状态不确定，停止并让管理员处理，不移除可能属于他人的忽略文件。
+
+## 实验二：使用非空规则
+
+仅当服务器版本支持 10.11.x 及以上的非空规则时，确认测试库根目录没有原有 .ignore 后，在该目录中创建 .ignore，并写入一行精确的 B 文件名，例如 B.mkv。保留 A.mkv 与 B.mkv 的文件名对应表，避免大小写或扩展名不同导致误判。不要将星号规则用于正式目录，也不将这一测试解释为权限隔离或文件加密。旧版本不满足前提时，本组标为不适用并跳过。
+
+## 比较两个规则的作用
+
+管理员重新扫描后，在网页查看 A 与 B：本组预期规则只匹配 B.mkv，不应仅凭该行排除 A。若文件名并非示例，应以实际精确名称为准。然后在云映核对同一账户和库，记录条目、时间及是否能打开 A；若网页和云映不同，先确认刷新、账户、网络及条目身份，不能断言客户端一定遵循某一种缓存或刷新机制。
+
+## 检查规则所在层级
+
+把相对路径写成三行：测试库根目录中的 A.mkv、同目录中的 B.mkv，以及 ignore-test-dir 子目录中的 C.mkv。第一组空文件在 ignore-test-dir 内，第二组包含 B.mkv 的规则位于测试库根目录；这两个文件不同时存在。表格中还应注明每次扫描的开始与结束时间，避免把扫描尚未完成时的旧页面当成新规则的最终结果。确认规则文件原本不存在后才创建，测试结束只移除这次创建的文件。
+
+## 处理异常和保留记录
+
+若 A 与 B 都消失，检查 .ignore 是否意外为空、是否写在错误层级、是否存在其他规则和权限差异；若 B 仍显示，核对服务器版本、文件名、扫描是否完成及是否为旧条目。每次只更改一个条件并写下修改前后。结果表至少包含基线、空文件、恢复、非空规则四行，分别记录网页、云映与源文件状态，没有执行的格子不能填成功。
+
+## 还原并说明结论
+
+测试结束后由管理员移除练习中新建的 .ignore、再次扫描并确认测试环境恢复；保留或删除测试副本依管理员的正常规则进行。确认正式资料库及源文件未受影响，交接前隐藏账号、令牌与私人地址。教程依据公开说明写作，没有声称连接过私人服务器或完成真机测试；扫描可见性、文件存在与用户访问权限是不同问题。
+
+## 相关教程与资料
+
+[Jellyfin 用户资料库权限](<https://allluckly.cn/guides/icouldplay-jellyfin-user-library-permission-visibility-check/>)；[Jellyfin 健康检查](<https://allluckly.cn/guides/icouldplay-jellyfin-health-check-versus-playback/>)。2026年11月23日核对：[Apple 云映资料](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>)；[Jellyfin 排除文件与目录](<https://jellyfin.org/docs/general/server/media/excluding-directory/>)。
+{% endraw %}
