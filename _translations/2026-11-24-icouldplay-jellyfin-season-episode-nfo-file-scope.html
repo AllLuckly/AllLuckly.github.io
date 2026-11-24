@@ -1,0 +1,52 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay and Jellyfin NFO files: distinguish season metadata from episode metadata'
+description: Use an isolated series and two local descriptions to inspect the scopes of season.nfo and a same-named
+  episode NFO.
+permalink: /en/guides/icouldplay-jellyfin-season-episode-nfo-file-scope/
+date: '2026-11-24 00:00:00 +08:00'
+modified: '2026-11-24 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 254
+topic: Season and episode NFO scope
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-24-icouldplay-jellyfin-season-episode-nfo-file-scope.md
+source_url: /guides/icouldplay-jellyfin-season-episode-nfo-file-scope/
+translation_method: editorial
+translation_source_sha256: 2f20b2487e078e3c6dacbf2835b008294962ce316fca18316061b4d453a854b4
+translation_date: '2026-11-24T02:01:34+00:00'
+excerpt: Use an isolated series and two local descriptions to inspect the scopes of season.nfo and a same-named
+  episode NFO.
+---
+{% raw %}
+<p>Use an isolated series and two local descriptions to inspect the scopes of season.nfo and a same-named episode NFO.</p>
+<h2 id="section-1">Clarify file scope</h2>
+<p>Jellyfin supports local NFO metadata, naming a season file season.nfo and an episode file after the episode video’s base filename with .nfo. The name identifies the level the server attempts to associate; it does not guarantee iCouldPlay displays every field. The documentation also states local metadata takes priority over remote providers, so use an isolated library rather than changing expectations for real entries.</p>
+<h2 id="section-2">Prepare the video and backups</h2>
+<p>Have an administrator prepare an isolated shows library and one self-made or authorized short, keeping the original video and any existing NFO backups outside the library. Create fictional Practice Series (2030)/Season 01 and name the video copy Practice Series S01E01.mp4, matching the extension to its container. Record relative path, file size and opening image; without administrator access mark later operations unperformed.</p>
+<h2 id="section-3">Establish a server baseline</h2>
+<p>Have the administrator scan the folder without this exercise’s test NFO files and wait. In the Jellyfin web interface locate the season and first episode, recording their titles, visible descriptions and video opening. A remote provider may find nothing for a fictional title; no match is still a valid baseline. Do not disable providers globally in the real library or blame iCouldPlay for missing web metadata. Record each scan’s start and finish so later local edits can be distinguished from stale entries.</p>
+<h2 id="section-4">Create a local season description</h2>
+<p>In the test season folder create season.nfo with the one-line example <code>&lt;season&gt;&lt;title&gt;Season sample&lt;/title&gt;&lt;plot&gt;Season notes A&lt;/plot&gt;&lt;/season&gt;</code>, whose title and description are non-personal test text. Use a real .nfo extension and do not overwrite an existing file. Save as UTF-8 in a text editor and check matching opening and closing tags. If unfamiliar with the format, read the official documentation first instead of treating arbitrary plain text as valid NFO.</p>
+<h2 id="section-5">Create the episode description</h2>
+<p>In the same folder create Practice Series S01E01.nfo for the video copy, with <code>&lt;episodedetails&gt;&lt;title&gt;Episode sample&lt;/title&gt;&lt;plot&gt;Episode notes A&lt;/plot&gt;&lt;season&gt;1&lt;/season&gt;&lt;episode&gt;1&lt;/episode&gt;&lt;/episodedetails&gt;</code>, whose title and description differ from the season’s. The examples use different root elements; do not simply rename the season file as an episode file or overwrite real metadata to show a test description. Check that the NFO base filename exactly matches the video base filename, with only the extension changed. On systems hiding extensions, confirm it is not .nfo.txt. Do not move or rename the original video to accommodate a mistaken test metadata file.</p>
+<h2 id="section-6">Refresh and inspect the server</h2>
+<p>Have the administrator refresh the test series normally in the current version and wait. Enter the season and first episode separately on the web, recording whether and where each test text appears. Tag structure, server version and existing metadata state can affect the result. If text is absent, check paths, read permissions and XML structure before claiming the NFO was parsed or clearing server data.</p>
+<h2 id="section-7">Observe both levels in iCouldPlay</h2>
+<p>Connect iCouldPlay to the server with the same authorized account and inspect the test series, season entry and first-episode details. Record only visible titles, descriptions and locations. If iCouldPlay has no season description area, do not report that as a season NFO read failure. Play the opening and confirm it is still the original test-video copy, separating metadata display from playback identity.</p>
+<h2 id="section-8">Make one controlled change</h2>
+<p>With administrator agreement, change only one word at the end of the season NFO’s test description, leaving the episode file and video untouched. Back up the previous version, refresh normally, and record season and episode text on the web, then observe iCouldPlay. Existing metadata and client refresh behavior remain factors; a single unchanged result does not establish a software defect. Record file contents and server display time before and after the edit, verifying the comparison concerns the same season rather than another similarly named test series.</p>
+<h2 id="section-9">Restore and verify original content</h2>
+<p>Restore the season NFO from its pre-change backup and refresh the test library using the administrator’s normal procedure. Verify that both NFO files and the video remain in the expected folder. Compare actual web and iCouldPlay presentation after restoration; if it has not returned, record last refresh and file contents before deleting or overwriting anything. The administrator decides whether to remove samples under the isolated-library agreement.</p>
+<h2 id="section-10">Troubleshoot the hierarchy</h2>
+<p>If season text appears at the wrong level, first check whether season.nfo was placed in the series root. If episode text is missing, compare video and NFO base names, season directory and read permissions. Hide private paths and server addresses when inspecting files. A missing field in iCouldPlay alone cannot prove the server failed to read it; inspect the corresponding server item in the web interface or administration tools.</p>
+<h2 id="section-11">Hand over a recoverable record</h2>
+<p>List the test hierarchy, relative names of both NFO files, each controlled change and refresh time, actual server and iCouldPlay presentation, and unperformed steps. Do not share raw screenshots containing private titles, user tokens or real server addresses. Keep original video and NFO backups for the administrator to restore. This guide uses public sources and claims no private-service login or device verification.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-jellyfin-nfo-plot-review-order/">NFO plot and review order</a>; <a href="/en/guides/icouldplay-jellyfin-season-folder-name-episode-scope/">Season folder and episode number</a>.</p>
+<p>Checked 24 November 2026: <a href="https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software">Apple iCouldPlay listing</a>; <a href="https://jellyfin.org/docs/general/server/metadata/nfo/">Jellyfin: local NFO metadata</a>; <a href="https://jellyfin.org/docs/general/server/media/shows/">Jellyfin: TV shows</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

@@ -1,0 +1,79 @@
+---
+layout: null
+permalink: /guides/manyue-kavita-smart-filter-genre-any-all-opds/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 漫阅+ 与 Kavita 智能筛选：比较类型任一匹配和全部匹配
+agent_source_url: https://allluckly.cn/guides/manyue-kavita-smart-filter-genre-any-all-opds/
+agent_source_sha256: 33289e11afb710dd7e370ab071a933a7d4475bda329a60fa4478bbed5a1a0dc4
+agent_generator_version: 1
+---
+{% raw %}# 漫阅+ 与 Kavita 智能筛选：比较类型任一匹配和全部匹配
+
+语言：zh-CN
+原文：[漫阅+ 与 Kavita 智能筛选：比较类型任一匹配和全部匹配](<https://allluckly.cn/guides/manyue-kavita-smart-filter-genre-any-all-opds/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-kavita-smart-filter-genre-any-all-opds/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-kavita-smart-filter-genre-any-all-opds/>)
+发布于: 2026-11-24T00:00:00+08:00
+内容更新于: 2026-11-24T00:00:00+08:00
+署名：Bison
+
+用三组测试系列对照 Kavita 多选类型的任一与全部条件，并检查漫阅中的目录。
+
+用三组测试系列对照 Kavita 多选类型的任一与全部条件，并检查漫阅中的目录。
+
+## 区分服务器筛选与客户端
+
+Kavita 文档说明筛选器可保存为用户自己的 Smart Filter，多选字段的 Contains 表示至少包含一个所选项，Must Contains 表示包含全部所选项；OPDS 文档列出 Smart Filters 的目录入口。这里的筛选计算发生在 Kavita，不能假设漫阅能创建或编辑同样的筛选。本文比较两种服务器结果，并观察用户授权目录在漫阅里的呈现。
+
+## 准备授权与恢复条件
+
+请管理员或账户所有者准备独立测试库和三部有权使用的系列，记录服务器版本及现有筛选设置。测试筛选使用容易辨认且不与正式名称冲突的新名称，不修改其他用户的筛选或共享权限。没有测试权限时只做表格推演；不要为测试公开 OPDS 地址、账户名或密钥。
+
+## 构造三组类型标签
+
+由管理员在测试系列元数据中为 A 设置类型 Adventure，为 B 设置 Mystery，为 C 同时设置 Adventure 与 Mystery。标签名称仅是示例，以当前 Kavita 实际字段和选项为准。三部系列各保留明确标题与卷数，记下修改前值以便恢复；不要把测试标签应用到真实他人作品，也不要直接更改原文件元数据。
+
+## 先写两种预期
+
+在纸上画 A、B、C 三行与两列条件。选择两个类型时，Contains 的预期是 A、B、C 都满足至少一个；Must Contains 的预期是只有 C 同时包含两个。筛选字段必须是系列的类型，而不是文本标题；如果实际使用不同字段或额外条件，先重新计算预期，不直接套用这张表。
+
+## 创建任一匹配筛选
+
+在 Kavita 支持筛选的页面，由账户所有者选择系列类型字段、两个测试类型和 Contains，确认没有额外条件后查看结果；实际界面名称或翻译不同就按版本记录。若该页面允许保存，输入唯一测试名称并保存为 Smart Filter。不能保存或缺少字段时停下并记录，不能假设所有页面提供相同控件。
+
+## 单独创建全部匹配筛选
+
+在不覆盖前一个测试筛选的前提下建立第二个测试名称，把同一字段及两个类型的条件改为 Must Contains。再次核对其他条件为空，查看结果是否只有 C。两种筛选名称、条件和结果分别记录，避免后来更改已绑定筛选时让第一条结果也发生变化；若界面不能独立保存两份，保留截图或纸面记录再进行比较。
+
+## 检查账户和 OPDS 目录
+
+Kavita 文档说明 Smart Filter 属于用户，OPDS 为不同集合提供入口。以同一测试账户访问相应 OPDS 目录，确认两个测试筛选及系列结果；若服务器界面或目录未显示，记录当前版本、账户和筛选名称，不把其他账户的过滤器当作同一结果。不要把含认证密钥的私有链接写入报告。
+
+## 在漫阅观察相同目录
+
+通过漫阅当前实际支持的 Kavita 或 OPDS 连接进入同一授权账户，查找实际出现的两个测试筛选或对应目录。若客户端未展示该目录，记为未提供或未观察到，不凭服务器功能声称客户端必然支持。分别记录目录名和可见的 A、B、C；遇到分页时先检查是否有后续结果，避免把首页当成全集。
+
+## 打开并返回一个测试系列
+
+在已出现且用户有权阅读的结果中选择 C，核对系列标题和测试卷，再按实际界面打开一册，完成后返回筛选目录。将结果可见、书籍可打开和返回位置分别记录；若只有普通 OPDS 整包链接而不能直接阅读，按实际表现标未完成，不将其误判为筛选计算错误。没有授权样本时跳过。
+
+## 排查并恢复测试状态
+
+结果与预期不符时先确认账户、共享库、元数据、所选字段、两个条件及刷新时间，再一次只检查一个变量。实际样本为空或标签拼写不同时不要改写预期后的记录。测试结束后由账户所有者按原记录恢复测试元数据及筛选，确认选择的是测试对象后再决定是否移除；不删除真实资料。作者未连接私人服务器或进行真机测试。
+
+## 核对条件与结果而非名称
+
+两个测试筛选可以由用户起任意不冲突的名称，因此名称里写“全部”本身不能证明条件确为 Must Contains。重新打开筛选条件时，应对照字段、操作符和选中的两个类型，再看结果表。若 C 的类型标签后来被更改，先记录更改发生的时间；不能把更改后的结果与修改前预期直接比较。
+
+## 理解动态筛选的边界
+
+Kavita 文档将 Smart Filter 描述为保存的动态筛选：新加入且符合条件的对象可能出现在结果中。观察前后变化不需要复制或上传更多作品；如果测试期间目录确实发生变化，记下系列及元数据变化，再刷新观察。用户未添加内容时，不应为了制造变化改动正式书库；本练习的核心是理解同一组 A、B、C 在两种条件下如何区分。
+
+## 相关教程与资料
+
+[OPDS 目录分页](<https://allluckly.cn/guides/manyue-kavita-opds-paginated-catalog-next-results/>)、[继续阅读别名](<https://allluckly.cn/guides/manyue-kavita-opds-continue-from-alias-and-chapter-identity/>)。
+
+2026年11月24日核对：[Apple 漫阅公开资料](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software>)、[Kavita 筛选文档](<https://wiki.kavitareader.com/guides/features/filtering/>)、[Kavita OPDS 文档](<https://wiki.kavitareader.com/guides/features/opds/>)。未声称完成真实设备或私人服务器测试。
+{% endraw %}

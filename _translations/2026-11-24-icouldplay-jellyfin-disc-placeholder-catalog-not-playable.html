@@ -1,0 +1,52 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay and Jellyfin placeholders: a catalog item is not necessarily a playable video'
+description: Compare a catalog placeholder with a real video in an isolated library, recording server and iCouldPlay
+  observations separately.
+permalink: /en/guides/icouldplay-jellyfin-disc-placeholder-catalog-not-playable/
+date: '2026-11-24 00:00:00 +08:00'
+modified: '2026-11-24 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 251
+topic: Placeholder versus playable media
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-24-icouldplay-jellyfin-disc-placeholder-catalog-not-playable.md
+source_url: /guides/icouldplay-jellyfin-disc-placeholder-catalog-not-playable/
+translation_method: editorial
+translation_source_sha256: 6be2388225ecbf1256783725e190b22860af644bb329470d461e9b4678bf06fe
+translation_date: '2026-11-24T01:56:00+00:00'
+excerpt: Compare a catalog placeholder with a real video in an isolated library, recording server and iCouldPlay
+  observations separately.
+---
+{% raw %}
+<p>Compare a catalog placeholder with a real video in an isolated library, recording server and iCouldPlay observations separately.</p>
+<h2 id="section-1">Separate two questions</h2>
+<p>Jellyfin media placeholders allow a movie entry to exist in the library without a playable video. Its documentation specifies an empty file with the normal title and a .disc extension; the contents are not used for playback. iCouldPlay publicly supports Jellyfin, but whether it displays a placeholder or a particular message depends on the client. Check the server first, then observe iCouldPlay; a poster alone does not prove a video file exists.</p>
+<h2 id="section-2">Prepare an isolated test</h2>
+<p>Ask a server administrator to prepare an isolated movie test library and a copy of a self-made or authorized short video with sufficient storage. Choose a fictional sample name unlike any real movie, for example “Practice Film (2030).” Record the test root and relative location of the short copy without disclosing server addresses, accounts or tokens. Without administrator access, read the procedure but mark server operations and results unperformed.</p>
+<h2 id="section-3">Create the placeholder</h2>
+<p>Inside the isolated movie folder, have the administrator create an empty file named Practice Film (2030).disc. In the file manager, verify that its extension is actually .disc, not a hidden .disc.txt. Do not rename a real video into a placeholder or overwrite a same-named file in the real collection. The title and year are fictional and do not guarantee external metadata.</p>
+<h2 id="section-4">Scan and record the web baseline</h2>
+<p>Have the administrator scan the test library using the current Jellyfin version’s normal process and wait for completion. In the web interface record whether the item appears, its title, folder contents and whether an actual media file exists. Treat posters or matched metadata as separate information, not proof of a video. If another folder shares the title, pause and check the server-relative path to avoid touching another user’s film. If no item appears, inspect library type, path and full extension before touching any database.</p>
+<h2 id="section-5">Observe the placeholder in iCouldPlay</h2>
+<p>Connect iCouldPlay to the same server with an account authorized for the test library and look for the same title. Record item visibility, visible controls and actual feedback. If the item or playback control is absent, record that rather than inferring a hidden feature. Do not immediately blame the network for failure; first confirm on the server that the sample contains only the empty placeholder.</p>
+<h2 id="section-6">Prepare a playable control</h2>
+<p>Have the administrator create a differently named control movie folder in the test library, copy a self-made or authorized short video into it with its normal video extension, and preserve the original. Do not alter the placeholder folder. Make titles and folders distinct to avoid confusing matches. Record duration, a recognizable visual event and the actual container; an extension alone does not prove codec or client compatibility.</p>
+<h2 id="section-7">Compare both items</h2>
+<p>After a server scan, inspect both items in the web interface, then open them in iCouldPlay under the same account. For the playable short, record actual picture and sound; for the placeholder, record its display or inability to play. If both fail, verify the control on the server or web first, then compare account permissions, network and client observations rather than attributing every failure to placeholders.</p>
+<h2 id="section-8">Recognize extensions and types</h2>
+<p>Jellyfin also permits an optional type immediately before .disc, such as .dvd.disc or .bluray.disc, to label a physical medium; it remains a placeholder without video content. Do not confuse .dvd.disc with a real DVD folder or assume a type is recognized after inserting other text between the type and .disc. For a basic visibility test, keep the simple .disc first instead of changing several conditions together.</p>
+<h2 id="section-9">Record observations and unknowns</h2>
+<p>Use separate columns for the server file list, web item and iCouldPlay behavior. Record only observed titles, whether a video file exists, whether playback begins and any error; do not fill in an imagined playback control. If iCouldPlay shows an old list, reopen or refresh using a normal control visible in the current interface and note the time. If the item remains absent, preserve uncertainty instead of deleting other library data to force the expected result.</p>
+<h2 id="section-10">Troubleshoot while preserving originals</h2>
+<p>If the placeholder is absent, check that its directory was scanned and its extension is real. If the control short fails, separately check authorization, file completeness and server playback. If only the iCouldPlay list differs, record server and client versions and the behavior under the same account without promising that server support implies client support. Avoid repeatedly renaming real movies or replacing original media; do not share screenshots containing private addresses.</p>
+<h2 id="section-11">Clean up and hand over</h2>
+<p>Afterward, the administrator may retain or remove the two test copies and empty placeholder according to the test-library agreement, checking that the original short, real library and other users’ data remain intact. The handover should include scan completion time, relative sample names, server files and web results, actual iCouldPlay visibility, and unperformed steps. This exercise is based on public documentation and claims no private-server login or device test.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-jellyfin-library/">Connect to a Jellyfin library</a>; <a href="/en/guides/icouldplay-kodi-library-playback-path/">Catalog and actual media path</a>.</p>
+<p>Checked 24 November 2026: <a href="https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software">Apple iCouldPlay listing</a>; <a href="https://jellyfin.org/docs/general/server/media/placeholders/">Jellyfin: media placeholders</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

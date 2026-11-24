@@ -1,0 +1,75 @@
+---
+layout: null
+permalink: /guides/icouldplay-jellyfin-episode-thumb-versus-season-cover/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映与 Jellyfin 集图：分开单集缩略图和整季封面
+agent_source_url: https://allluckly.cn/guides/icouldplay-jellyfin-episode-thumb-versus-season-cover/
+agent_source_sha256: a0dbdb0460d1cee3dbd857c1fd4a23205b6bc8b44ed066fb0d76368cb7e54345
+agent_generator_version: 1
+---
+{% raw %}# 云映与 Jellyfin 集图：分开单集缩略图和整季封面
+
+语言：zh-CN
+原文：[云映与 Jellyfin 集图：分开单集缩略图和整季封面](<https://allluckly.cn/guides/icouldplay-jellyfin-episode-thumb-versus-season-cover/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-jellyfin-episode-thumb-versus-season-cover/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-jellyfin-episode-thumb-versus-season-cover/>)
+发布于: 2026-11-24T00:00:00+08:00
+内容更新于: 2026-11-24T00:00:00+08:00
+署名：Bison
+
+在隔离剧集库用两种自制图片核对季封面与单集图片的作用范围。
+
+在隔离剧集库用两种自制图片核对季封面与单集图片的作用范围。
+
+## 理解两种图片范围
+
+Jellyfin 文档区分剧集、季与单集的图片：季目录中的 cover.jpg 可作为季封面，跟随单集文件名的 -thumb.jpg 可作为该集的主要图片。它们是服务器端图片身份，不保证云映所有页面都展示相同类型；同样，集图不等于播放时间线上的章节预览。先核服务器，再记录客户端可见画面。
+
+## 准备隔离测试素材
+
+管理员在独立剧集测试库准备两段自制或获授权短片以及两张自己制作的 JPG 图：一张写“SEASON”，另一张写“EPISODE 1”，字样和背景色明显不同。保留源文件与原始短片，避免使用家庭照片、别人有版权的海报或真实账号信息；测试用字样只是辨认图像，不需要包含真实剧名。先在图片查看器中打开两张图，确认颜色和文字可辨，再保存一份未改名的源图；这样后续能区分图片本身错误与服务器识别错误。
+
+## 设置剧集目录
+
+使用虚构剧名和年份建立 Practice Series (2030) 文件夹，内部建立 Season 01，再放入两份短片副本，例如 Practice Series S01E01.mp4 和 Practice Series S01E02.mp4。后缀应与实际视频一致，改扩展名不会转换格式。记录两段视频开头画面与目录位置，先确认没有覆盖已有文件，再让管理员扫描。
+
+## 先只放季封面
+
+在下一轮扫描前把写有 SEASON 的自制图片复制到 Season 01 并命名 cover.jpg，暂不放单集图片。管理员正常扫描并等待结束，在 Jellyfin 网页记录剧集、季及两集各自显示的图片，不要将季卡片上的图片自动归属到每一集。若网页没出现自制封面，先核对文件路径、文件名、读取权限和扫描状态。
+
+## 给第一集放专属图片
+
+将写有 EPISODE 1 的图复制到同一季目录，并使用与第一集视频基础文件名一致的 Practice Series S01E01-thumb.jpg；不要将它命名为整个季的 cover.jpg。保持第二集没有专属样本，使两集形成对照。第二集可能显示由服务器生成或来自资料提供方的其他图片，因此对照的目标是记录具体来源与位置，不是要求第二集一定空白。记录文件名中的空格与大小写，确保图像真实为 JPG；仅改变文件后缀不会转换图片格式。
+
+## 刷新并对照服务端
+
+管理员使用当前版本支持的正常刷新或扫描方式，等待任务完成；在网页分别查看季、第一集和第二集。记录 SEASON 与 EPISODE 1 字样实际出现的位置，以及第二集是否仍使用其他图片。若结果与预期不同，检查单集图前缀与视频基础名是否一致、图片权限和已有服务器图片来源，不要立即断定客户端出错。
+
+## 在云映查看实际呈现
+
+云映连接同一服务器，用有权访问测试库的账号进入该剧，分别查找季入口与第一、第二集条目。记录每个位置实际出现的图片或没有图片，以及是否看到文字；界面若不提供某种图片位置，应写未显示。用开头画面确认两集片源身份，避免只凭缩略图判断打开的是正确短片。
+
+## 检查缓存与来源
+
+若网页已出现新图而云映仍显示旧图，先记下当时画面，再用当前界面可见的正常返回、重进或刷新方式复查。不能由一次旧图断言缓存缺陷；先核对服务器、账号、条目及显示位置是否相同。服务器端也可能使用已存在的图片或其他来源，交管理员检查，避免删除正式库图片或更改全库设定。
+
+## 区分集图与章节图
+
+单集图片用于标识整集，章节图片对应视频内部特定时间点，两者的生成、位置与使用方式不同。本练习不要求生成章节图片，也不假定云映时间线上必然有图片预览。若播放画面中看见静态文字，应判断它是否来自短片本身、单集页面或时间线上的控件，分别记录，不用一个现象推断另一个。打开短片时还要确认当前时间点和声音正常，以便把播放故障与静态图片显示差异分开。
+
+## 处理遮挡与可读性
+
+如果 SEASON 和 EPISODE 1 字样在小卡片上难辨，先用管理员保留的原始图片增加对比与留白，在测试副本上替换，再记录刷新前后的差异。避免直接覆盖正式海报。图片尺寸和裁切由不同页面决定，服务器网页可见并不保证云映一定采用相同裁切；不清楚时保留截图或简短文字记录，并移除私人地址。核对前后使用相同的账号和同一条目，避免图片差异实际上来自另一份同名测试数据。
+
+## 恢复或清理并交接
+
+由管理员按测试库约定保留或清理两张自制图片和短片副本，确认原视频与正式海报没有改变。记录季图和集图文件名、相对路径、服务器网页位置、云映实际呈现及未执行步骤；如果服务器有权限或显示问题，保留问题现象而非伪造成功。本教程依据公开资料，不声称已操作私人服务器或真机。
+
+## 相关教程与资料
+
+[电影封面与背景](<https://allluckly.cn/guides/icouldplay-jellyfin-cover-backdrop-two-image-roles/>)、[章节图片与时间线](<https://allluckly.cn/guides/icouldplay-jellyfin-chapter-images-vs-timeline-marks/>)。
+
+2026年11月24日核对：[Apple 云映资料](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>)、[Jellyfin：剧集和本地图片](<https://jellyfin.org/docs/general/server/media/shows/>)。未声称完成真实设备或私人服务器测试。
+{% endraw %}

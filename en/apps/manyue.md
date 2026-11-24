@@ -5,7 +5,7 @@ title: 'ManYue: Comic Reader for iPhone and iPad'
 description: Learn about ManYue comic imports, offline reading, WebDAV, SMB and personal comic servers, then choose a tutorial
   for your library.
 permalink: /en/apps/manyue/
-modified: 2026-11-21
+modified: 2026-11-24
 lang: en
 source_url: /apps/manyue/
 ---
@@ -57,6 +57,8 @@ The public description lists these formats, as well as CB7, ZIP, RAR and 7z. The
 Yes. Public information lists Komga, Kavita, Suwayomi / Tachidesk, LANraragi and OPDS / Ubooquity libraries. You need an accessible server and the relevant account. Some capabilities require Ultra.
 
 ## Version and sources
+
+Checked on 24 November 2026: the [China public lookup](https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software) lists **2.0.7**, requiring iOS / iPadOS 15.0 or later. The release notes say downloaded comic covers are saved to the system photo library by default, describe improvements to iPad navigation, settings and the built-in web view, and add opening and importing `.js` comic-source files from the Files app. These are public release notes; permissions and device behaviour depend on the actual interface. No device acceptance test was performed here.
 
 Rechecked on 18 November 2026: the [China public lookup](https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261118) lists **2.0.6**, requiring iOS / iPadOS 15.0 or later. Public release notes add iCloud backup recovery: export all cloud copies before choosing a backup to address sync conflicts. They also describe stronger integrity checks, preservation of original copies, interrupted-recovery continuation, and improved export progress, failure messages and setup guidance. These are release-note statements, not claims that this introduction performed actual backup recovery or acceptance tests on each device.
 

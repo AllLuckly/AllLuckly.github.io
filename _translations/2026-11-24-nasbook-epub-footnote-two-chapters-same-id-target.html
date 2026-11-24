@@ -1,0 +1,52 @@
+---
+layout: guide
+author: Bison
+app_id: nas_book
+title: 'Book Isle EPUB notes: distinguish identical IDs in two chapter files'
+description: Use a two-chapter EPUB to check file-scoped anchors, note links and return behavior in Book Isle.
+permalink: /en/guides/nasbook-epub-footnote-two-chapters-same-id-target/
+date: '2026-11-24 00:00:00 +08:00'
+modified: '2026-11-24 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 271
+topic: Cross-file note targets
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-24-nasbook-epub-footnote-two-chapters-same-id-target.md
+source_url: /guides/nasbook-epub-footnote-two-chapters-same-id-target/
+translation_method: editorial
+translation_source_sha256: 6f2499b712561382f15796f04886bf20d366e8f65ee10d335ad0e4dea588ccdf
+translation_date: '2026-11-24T01:09:19+00:00'
+excerpt: Use a two-chapter EPUB to check file-scoped anchors, note links and return behavior in Book Isle.
+---
+{% raw %}
+<p>Use a two-chapter EPUB to check file-scoped anchors, note links and return behavior in Book Isle.</p>
+<h2 id="section-1">Define the problem</h2>
+<p>EPUB chapters are often separate XHTML documents. The same ID in two documents does not automatically identify the same note: the file path and fragment together determine the target. This exercise uses one note1 anchor in each of two chapters and observes links in Book Isle, without assuming a popup, return button or automatic footnote detection.</p>
+<h2 id="section-2">Prepare a reversible sample</h2>
+<p>Use a small EPUB you created or are authorized to edit, keeping the original book and reading history. In an EPUB editor create two chapters with different short sentences and different note text. Without an editable sample, complete the path table on paper and mark the test unperformed. Do not modify protected purchases or bypass encryption.</p>
+<h2 id="section-3">Create the chapter notes</h2>
+<p>In chapter one create a target with ID note1 and text “chapter one note.” In chapter two create the same ID with text “chapter two note.” Link each chapter to its own target, and avoid duplicate IDs within one XHTML document. Record the actual paths, filenames and targets shown by the editor. Its link and anchor controls can be used if it has no source view.</p>
+<h2 id="section-4">Check relative paths</h2>
+<p>Inspect link properties: a same-file link can use a fragment, while a cross-file link identifies the chapter file plus the fragment. Relative paths start from the current document’s directory. If the files are in different folders, do not infer paths from bookshelf titles. Record three entry points: each chapter’s own link and one link from chapter one to chapter two, with the expected file and text.</p>
+<h2 id="section-5">Validate the EPUB</h2>
+<p>Save and run the editor’s EPUB structure check. Fix missing files, incorrect paths and duplicate IDs within a file; retain the report and do not overwrite the original. Ensure both chapters are in reading order and the targets exist. A standard validator can detect some structural issues but cannot establish a particular reader’s popup or return behavior. Fix errors before client testing.</p>
+<h2 id="section-6">Import the copy into Book Isle</h2>
+<p>Save the test under a clearly different filename and use the currently visible file import method in Book Isle. Verify the title and both chapters so the test copy is not confused with the original. Record an incomplete step if the interface or permissions differ. Do not delete the original or synchronization records. Whether the reader presents a special note style remains an observation.</p>
+<h2 id="section-7">Test each link</h2>
+<p>Click the first chapter’s local link and check for the chapter one note. Return to the reading position, then test chapter two’s same-named link and its own note. Finally follow the cross-file link from chapter one to chapter two. Record expected and actual text separately. If it navigates to a page rather than opening a popup, record navigation; presentation alone does not determine whether the target is correct.</p>
+<h2 id="section-8">Check return navigation</h2>
+<p>Before each click, note the chapter, paragraph and visible text. Use the return method actually offered by the interface. If no dedicated control exists, use the table of contents to locate the chapter and record whether the same position is restored. Do not assume a system gesture restores the note origin. Record correct target and failed return separately; if the chapter is absent from the contents, inspect reading order.</p>
+<h2 id="section-9">Diagnose an incorrect target</h2>
+<p>If the first chapter’s local link opens the second note, inspect the source document and whether the href names the second chapter file. If nothing happens, check ID spelling, case and package inclusion. Ensure the newly imported file is not an old copy. Change one thing at a time, record the expectation and rerun structure checks. Do not immediately classify the result as an app defect or delete a production library.</p>
+<h2 id="section-10">Keep a reproducible result</h2>
+<p>Retain the test EPUB, validation output and three rows recording entry file, target file, fragment ID, expected and observed text, and return method. Add a new row after an OS update or on another device rather than rewriting history. Share only authorized samples. Before removing a test book, confirm it is the copy and understand any reading-history effects. No physical-device or private-library test is claimed.</p>
+<h2 id="controlled-error">Make a controlled error comparison</h2>
+<p>Save a third sample and temporarily change the first chapter cross-file link to target the first chapter itself, keeping the fragment ID. Validation may still pass because the target exists there; the click should show the first note instead of the second. A wrong path can remain a live link, so compare target text. Keep the record and return to the correct sample; do not replace the backup. If the editor renames a chapter, inspect both actual paths instead of inferring the href from the display title.</p>
+<h2 id="target-and-presentation">Separate target and presentation</h2>
+<p>A reader might navigate to the note paragraph or present it another way. Identify the chapter of the text first, then record the presentation. A popup does not guarantee the correct target and page navigation alone is not failure. If adjacent notes appear, compare their text rather than scroll distance. If text is truncated, use controls actually available on the device and mark anything you cannot confirm.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/nasbook-epub-cross-reference-target-check/">EPUB cross-reference targets</a>; <a href="/en/guides/nasbook-epub-landmarks-bodymatter-vs-toc-opening/">Body start versus table of contents</a>.</p>
+<p>Checked 24 November 2026: <a href="https://itunes.apple.com/lookup?id=6766198898&country=cn&entity=software">Apple Book Isle listing</a>; <a href="https://www.w3.org/TR/epub-33/">W3C EPUB 3.3</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

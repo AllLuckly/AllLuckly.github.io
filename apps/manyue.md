@@ -4,7 +4,7 @@ app_id: man_yue
 title: 漫阅+：本地漫画、离线阅读与 NAS 书库
 description: 了解漫阅+ 的本地漫画导入、离线阅读、WebDAV、SMB 与服务器书库支持，按自己的文件和阅读场景开始使用。
 permalink: /apps/manyue/
-modified: 2026-11-21
+modified: 2026-11-24
 ---
 
 漫阅+ 是一款用于 **iPhone 与 iPad 的漫画阅读器和个人书库管理工具**。可以阅读自己导入的漫画文件，添加漫画源，或连接个人 NAS 与漫画服务器。中国区商店名称是「漫阅+ 漫画阅读器」。
@@ -54,6 +54,8 @@ OPDS-PSE 支持逐页阅读。普通 OPDS 条目如果只提供整包下载链�
 可以，公开说明列出 Komga、Kavita、Suwayomi / Tachidesk、LANraragi 和 OPDS / Ubooquity 等服务器书库。需要自己准备可访问的服务器与相应账号，部分能力属于 Ultra 权益。
 
 ## 版本与来源
+
+2026 年 11 月 24 日核对：[中国区公开查询](https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software)列出 **2.0.7**，最低 iOS / iPadOS 15.0。发行说明称漫画封面下载默认保存到系统相册，改进 iPad 返回操作、设置开关与内置网页交互，并支持从「文件」App 打开并导入 `.js` 漫画源文件。以上为公开发行说明，具体权限与设备表现以实际界面为准；本次未进行真机验收。
 
 2026 年 11 月 18 日重新核对：[中国区公开查询](https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software&timestamp=20261118)列出 **2.0.6**，最低 iOS / iPadOS 15.0。公开更新新增 iCloud 备份恢复：先导出全部云端副本，再选择所需备份处理同步冲突；并加强完整性校验、保留原始副本与中断后继续恢复的保护，改进导出进度、失败提示和设置指引。以上是发行说明范围，不表示本文已执行真实备份恢复或逐设备验收。
 

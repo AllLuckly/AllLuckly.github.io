@@ -1,0 +1,54 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Manyue+ and Komga restrictions: check allow conditions and exclusion priority'
+description: Use isolated test series and an account to compare Komga allow rules, exclusion labels and visibility
+  in Manyue+.
+permalink: /en/guides/manyue-komga-allow-or-exclude-priority-test-series/
+date: '2026-11-24 00:00:00 +08:00'
+modified: '2026-11-24 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 297
+topic: Combined series sharing restrictions
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-24-manyue-komga-allow-or-exclude-priority-test-series.md
+source_url: /guides/manyue-komga-allow-or-exclude-priority-test-series/
+translation_method: editorial
+translation_source_sha256: 5b5572bd452ea62c4f126038b4a68f1668eed7736f3b4c99f38234ef3e6096dd
+translation_date: '2026-11-24T01:29:46+00:00'
+excerpt: Use isolated test series and an account to compare Komga allow rules, exclusion labels and visibility in
+  Manyue+.
+---
+{% raw %}
+<p>Use isolated test series and an account to compare Komga allow rules, exclusion labels and visibility in Manyue+.</p>
+<h2 id="section-1">Separate server and client roles</h2>
+<p>Komga’s user-account documentation says content restrictions apply at series level and affect books, collections and reading lists. Multiple allow rules use OR, while exclusions take priority. Manyue is a client for an authorized library, not necessarily a server-user administration interface. Observe four series in an isolated test environment without changing real users’ access.</p>
+<h2 id="section-2">Prepare a reversible test</h2>
+<p>Ask an administrator for an isolated test library, test account and four small authorized comic series. Record Komga version, current sharing settings and the libraries visible to that account. Without administrative rights or isolation, stop at the paper exercise; do not request another person’s password. Do not experiment on production users, child accounts or live libraries. Preserve settings and confirm restoration.</p>
+<h2 id="section-3">Create four test cases</h2>
+<p>Prepare test series A, B, C and D, each with one identifiable authorized comic. The administrator assigns A age 8 with no special label; B age 14 and test label kids; C age 14 without it; D age 8 and test label blocked. Names are examples. Ages and labels are test metadata, not judgments about real works.</p>
+<h2 id="section-4">Write the expectation table</h2>
+<p>Suppose the test account is allowed content rated 10 or below OR labeled kids, and excludes blocked. Under the documented OR rule, A qualifies by age and B by label; C meets neither allow rule and should be hidden. D qualifies by age but blocked exclusion takes priority, so it should be hidden. Write the reasoning before testing. Library sharing and account permissions also affect results.</p>
+<h2 id="section-5">Have the administrator check settings</h2>
+<p>The administrator uses Komga’s user restrictions for the isolated test account, shares only the test library and checks the actual age, allow-label and exclusion options. Inspect before applying. If the version or fields differ, record the difference rather than assuming example labels are universal controls; do not expand other users’ access. Record series metadata and account restrictions, checking label spelling.</p>
+<h2 id="section-6">Check the server web view</h2>
+<p>Use the test account’s existing sign-in method in the Komga web interface, wait for library recognition and look for A through D. Record what is actually visible and do not bypass restrictions when an item is expected to be hidden. If results differ, ask the administrator to check series ages, labels, account and shared library before changing rules. The example applies only when the actual setup matches it.</p>
+<h2 id="section-7">Check the same account in Manyue</h2>
+<p>In Manyue, access the same authorized Komga test account and library. Confirm server and account identity, then look for the same four series. Mark visible, not visible or unknown; a failed connection is not proof a rule hid content. Open one authorized visible book and observe list, opening and page display separately. Downloading is unnecessary, and server management controls need not appear in Manyue.</p>
+<h2 id="section-8">Separate cached views and accounts</h2>
+<p>If the web view shows A and B but Manyue still shows earlier entries, first verify the same account, test library and connection, then refresh using the available interface and record times. A previously loaded client view alone cannot establish that server restrictions failed. Do not clear a production shelf, reinstall the app or repeatedly switch private accounts to test.</p>
+<h2 id="section-9">Inspect the exclusion control</h2>
+<p>For D record two facts: age 8 meets an allow rule, while blocked matches an exclusion. Hidden D agrees with exclusion priority. If visible, ask the administrator to verify the label is on the series, the exclusion is saved and the client account is correct. Do not add another allow label as a diagnosis, which would change the conditions.</p>
+<h2 id="section-10">Restore and record</h2>
+<p>After testing, the administrator restores the test account and library settings from the record, confirms production users were unaffected and handles test copies under the existing procedure. Deleting the account or reading progress is unnecessary. Keep a table of expectations, web and Manyue results, times and incomplete steps, excluding names, passwords and private addresses. This exercise is based on public documentation; no private server or device test is claimed.</p>
+<h2 id="unrated">Do not assume an unrated value</h2>
+<p>Both A and D explicitly have age 8. If a real series has an empty age field, do not treat it automatically as zero or above the threshold. Record the empty value on the server and observe visibility with the test account. This table does not predict empty-value behavior. For a separate test, use another authorized series and retain the other conditions rather than rewriting A through D.</p>
+<h2 id="series-books-collections">Separate series, books and collections</h2>
+<p>The documentation says restrictions apply at series level and affect books, collections and reading lists, while client presentation may differ. Check A through D via series first, then observe those works in an actually visible collection or reading list. If there is no entry, mark it not observed. A visible collection name does not prove every book inside can be opened; record list visibility and specific book readability separately.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/manyue-komga-page-stream-file-download-user-roles-check/">Page streaming and download roles</a>; <a href="/en/guides/manyue-komga-two-user-progress-server-client-observation/">Accounts and reading progress</a>.</p>
+<p>Checked 24 November 2026: <a href="https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software">Apple Manyue listing</a>; <a href="https://komga.org/docs/guides/user-accounts/">Komga user accounts and restrictions</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

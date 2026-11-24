@@ -1,0 +1,75 @@
+---
+layout: null
+permalink: /guides/icouldplay-jellyfin-season-episode-nfo-file-scope/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映与 Jellyfin 本地 NFO：分别核对季与单集文件名
+agent_source_url: https://allluckly.cn/guides/icouldplay-jellyfin-season-episode-nfo-file-scope/
+agent_source_sha256: 48c0cb7902eee063c2b3cc7d4ac0fc81a62f299bed51930fddfbafa607eb5bff
+agent_generator_version: 1
+---
+{% raw %}# 云映与 Jellyfin 本地 NFO：分别核对季与单集文件名
+
+语言：zh-CN
+原文：[云映与 Jellyfin 本地 NFO：分别核对季与单集文件名](<https://allluckly.cn/guides/icouldplay-jellyfin-season-episode-nfo-file-scope/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-jellyfin-season-episode-nfo-file-scope/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-jellyfin-season-episode-nfo-file-scope/>)
+发布于: 2026-11-24T00:00:00+08:00
+内容更新于: 2026-11-24T00:00:00+08:00
+署名：Bison
+
+用隔离剧集和两份本地描述文件检查 season.nfo 与单集同名 NFO 的作用范围。
+
+用隔离剧集和两份本地描述文件检查 season.nfo 与单集同名 NFO 的作用范围。
+
+## 先明确文件作用范围
+
+Jellyfin 支持本地 NFO 元数据，并为季使用 season.nfo、为单集使用与该集视频基础文件名相同的 .nfo。文件名决定服务器尝试关联的层级，不代表云映一定展示每个字段。官方文档还说明本地元数据优先于远程提供方；因此实验应放在隔离测试库，避免本地样本覆盖正式条目的资料预期。
+
+## 准备测试视频与备份
+
+管理员准备独立剧集测试库及一段自制或获授权短片，先在库外保存原始视频与任何既有 NFO 的备份。创建虚构剧集 Practice Series (2030) 和 Season 01 目录，把短片副本命名 Practice Series S01E01.mp4，扩展名以实际容器为准。记录相对路径、文件大小和开头画面；无管理权限时把后续操作标为未执行。
+
+## 建立服务器基线
+
+管理员先扫描没有本教程测试 NFO 的目录，等待扫描结束。在 Jellyfin 网页查找季与第一集，记录各自标题、简介来源是否可见及视频开头。远程提供方可能为虚构名称找不到资料；无匹配同样是有效基线。不要在正式资料库关闭全局提供方，也不要把网页缺少资料直接归因于云映。记录每次扫描的开始与结束时间，后面修改本地文字时才能分清看到的是修改前还是修改后的条目。
+
+## 制作季的本地描述
+
+在测试季目录新建 season.nfo，使用一行示例 `<season><title>Season sample</title><plot>Season notes A</plot></season>` 提供可辨认的季标题与简介；其中标题和简介都是不含个人信息的测试文字。文件应使用真实 .nfo 扩展名，且不能覆盖既有文件；先在文本编辑器中保存为 UTF-8，再检查标记成对闭合。对现成资料不熟悉时先阅读官方规范，不把随手写的普通文本当成有效 NFO。
+
+## 制作第一集的描述
+
+在同一目录为视频副本创建 Practice Series S01E01.nfo；可写入 `<episodedetails><title>Episode sample</title><plot>Episode notes A</plot><season>1</season><episode>1</episode></episodedetails>`，其标题和简介与季不同，便于观察归属。两个示例使用不同的根元素，不要复制季文件再只修改扩展名就当作单集文件；也不要为了显示测试简介而覆盖已有正式元数据。核对 NFO 的基础文件名与视频基础名逐字一致，只有扩展名不同；隐藏扩展名的系统中尤其要确认没有 .nfo.txt。不要通过移动或重命名原始视频来适配错误的测试元数据。
+
+## 刷新并核对服务器
+
+管理员按当前版本正常刷新测试剧集并等待完成；网页中分别进入季及第一集，记录测试文字是否出现以及出现在哪里。两份文件的标签格式、服务器版本和已有元数据状态都可能影响结果；未出现时先核对文件路径、读取权限和 XML 结构，不要声称 NFO 必定被解析或立即清除整个服务器数据。
+
+## 在云映观察两个层级
+
+用有权限的同一账号将云映连接到服务器，进入测试剧集并分别查看季入口和第一集详情；只记录实际可见的标题、简介与页面位置。若云映没有季简介区域，不应把它写为季 NFO 读取失败。播放短片开头，核对画面仍对应原来的视频副本，将描述显示与播放身份分开。
+
+## 做受控的单一变化
+
+若管理员同意继续，仅在季 NFO 的测试简介末尾增加一个不同的词，保持单集文件与视频不变；保存前备份原版，正常刷新后分别记录网页季与集文字。再观察云映实际显示。这个对照验证变化范围时仍需考虑已有元数据和客户端刷新方式，不能把一次未变化结果解释成明确的软件缺陷。修改之前与之后分别记录文件内容和服务器显示时间，确认比较的是同一条季记录，而非另一个同名测试剧集。
+
+## 还原并验证原始内容
+
+将季 NFO 恢复到修改前的备份，再按管理员的常规方式刷新测试库，核对两个 NFO 与视频仍位于预期目录。比较网页和云映中实际可见的内容是否恢复；若未恢复，先记录最后一次刷新和文件内容，不删除其他媒体或强制覆盖正式 NFO。测试结束是否移除样本由管理员按隔离库约定决定。
+
+## 排错时检查层级
+
+如果季文字出现在错误位置，先核对是不是把 season.nfo 放到了剧集根目录；若第一集文字缺失，比较视频与 NFO 的基础名、季目录与读取权限。检查文件内容时隐藏私有路径和服务器地址。仅凭云映没有某个字段不能推断服务器没有读取，先回到网页或管理工具观察对应条目的服务端状态。
+
+## 交接可恢复的记录
+
+列出测试目录结构、两份 NFO 的相对名称、每次受控更改和刷新时间、服务器网页与云映实际展示，并注明未执行的环节。不要分享包含私人片名、用户令牌或真实服务器地址的原始截图；保留原始视频和 NFO 备份供管理员恢复。本文依据公开资料编写，不声称登录私人服务或在真机上验证。
+
+## 相关教程与资料
+
+[NFO 简介字段顺序](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-plot-review-order/>)、[季目录与集号](<https://allluckly.cn/guides/icouldplay-jellyfin-season-folder-name-episode-scope/>)。
+
+2026年11月24日核对：[Apple 云映资料](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>)、[Jellyfin：本地 NFO 元数据](<https://jellyfin.org/docs/general/server/metadata/nfo/>)、[Jellyfin：剧集目录](<https://jellyfin.org/docs/general/server/media/shows/>)。未声称完成真实设备或私人服务器测试。
+{% endraw %}
