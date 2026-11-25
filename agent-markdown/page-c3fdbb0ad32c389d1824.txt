@@ -1,0 +1,87 @@
+---
+layout: null
+permalink: /guides/icouldplay-jellyfin-nfo-critic-community-rating-evidence/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映与 Jellyfin 评分核对：分开影评人、社区与家长分级
+agent_source_url: https://allluckly.cn/guides/icouldplay-jellyfin-nfo-critic-community-rating-evidence/
+agent_source_sha256: 16feeae66c54de645bf8e1bccae694ca1dcfd66edfc71690c0090c14623d3c1f
+agent_generator_version: 1
+---
+{% raw %}# 云映与 Jellyfin 评分核对：分开影评人、社区与家长分级
+
+语言：zh-CN
+原文：[云映与 Jellyfin 评分核对：分开影评人、社区与家长分级](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-critic-community-rating-evidence/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-critic-community-rating-evidence/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-jellyfin-nfo-critic-community-rating-evidence/>)
+发布于: 2026-11-25T00:00:00+08:00
+内容更新于: 2026-11-25T00:00:00+08:00
+署名：Bison
+
+对照隔离影片的 NFO 字段、服务器页面和云映可见信息，避免把不同评分当成同一数值。
+
+对照隔离影片的 NFO 字段、服务器页面和云映可见信息，避免把不同评分当成同一数值。
+
+## 区分评分概念
+
+Jellyfin 本地 NFO 文档列出 criticrating、customrating、mpaa 等字段，并说明 ratings 可以有多个子标签，名称用于区分影评人或社区评分。影评人评价、社区评价与家长内容分级并非同一概念，也不应仅凭字段名字猜测数值范围。服务器读取某字段不表示云映必定展示或提供编辑入口。
+
+## 选择无敏感资料的测试影片
+
+在自己管理的隔离测试库选择一段自制短片，并备份视频、NFO 和现有元数据。记录测试影片的标题、时长与自制画面标记；不需要真实受限制内容来练习分级概念。使用有权限访问该库的普通测试账户，避免通过管理员账户绕过日常访问限制。若不能隔离或恢复测试环境，仅做只读观察。
+
+## 建立服务器和客户端基线
+
+在 Jellyfin 网页找到同一测试影片，记录页面实际展示的评分名称、数值、分级和来源；未展示的写未显示。以同一普通账户在云映打开对应条目，记录可见字段和时间。通过时长与画面标记确认是同一文件，不以相同海报或片名单独判断。现有评分可能来自远程提供方，先不要假定来自 NFO。
+
+## 定位与检查 NFO
+
+依据 Jellyfin 命名表定位与测试电影对应的 NFO，只在有权检查的副本中查看 criticrating、ratings、customrating 和 mpaa 是否存在及其原始值。对于 ratings 子标签，记录实际名称与对应数值，不要把未知名称硬归为影评人或社区。若没有样本或不熟悉 XML，记录不可检查，不下载陌生元数据或修改正式影片。
+
+## 分开数值和内容分级
+
+将有明确来源的影评人和社区数值分别记录，再将影片内容分级及其适用地区或来源列为不同栏目。不要直接比较不同来源的评分尺度，也不要把某个分级标签写成数值评分。没有来源、地区或尺度时填未知；即使服务器页面只展示一个数字，也不能据此确定另一个字段不存在或其含义。
+
+## 观察可恢复的刷新
+
+若管理员已确认隔离环境和恢复方式，可对测试影片按当前界面执行一次元数据刷新，记录选择、时间与完成状态。Jellyfin 文档说明本地 NFO 元数据优先于远程提供方；这不证明页面中每个评分字段都已经从该文件读取。无法判断刷新范围或会影响正式数据时，停止在基线，不更改生产设置。
+
+## 再次核对服务器页面
+
+任务完成后回到服务器网页，用同一影片和账户记录可见字段及变化。若显示标签或数值与 NFO 不同，先核对影片身份、字段名称、元数据锁定状态和任务结果；每次只改变一个可恢复条件。不要把评分显示为空就判断文件损坏，也不要仅凭一个数值相同便确认来源。
+
+## 在云映检查实际显示
+
+在云映重新进入同一测试影片，分别记录是否显示评分、内容分级及其标签；没有该字段就写未显示。若客户端和服务器不一致，先检查连接、账户、条目与页面状态，不声称应用展示所有 NFO 字段。只有实际提供的控件才进行操作，不要求重置应用或清除其他用户数据。
+
+## 恢复和保留结论边界
+
+恢复隔离测试备份及原设置，确认视频和其他用户信息保留；若恢复影响不明，交由管理员处理。结果表应保留 NFO 原字段、来源及尺度、服务器显示、客户端显示和未执行项，分享前移除私人路径、账户与凭据。本文依据公开资料，不声称实测特定设备或访问私人服务器。
+
+## 用记录表避免数值混淆
+
+为每个可核对字段单独建立一行，填写原始名称、原始文本、来源说明、可能的数值范围和观察时间。若服务器将某个字段显示为星号、百分比或文字标签，仅记录实际格式；在没有官方说明时不自行把数字换算成百分比，也不假设不同来源使用相同最大值。测试数据可以使用虚构标记，但要清楚注明是测试值，不把它当成真实影片评价。
+
+## 对照远程数据时保留来源
+
+如果测试服务器同时启用远程元数据提供方，记录服务器界面可见的提供方名称和刷新状态，并与本地 NFO 原文分开保管。没有界面或日志能够识别字段来源时，将来源标记为未知；服务器的一般优先级规则不能代替对某个具体字段的观察。不要为了证明结论而禁用整个正式媒体库的提供方或删除已经保存的资料。
+
+## 区分显示与访问控制
+
+影片详情页可能展示内容分级，但某个普通账户是否能看到或播放该影片还取决于服务器账户和书库权限。详情页上看到标签不等于验证访问限制生效；若要另行测试，必须使用自己管理的隔离账户并先记录原权限。本教程仅核对字段显示，不更改真实用户的分级策略，也不使用无权访问的内容进行验证。
+
+## 一组可复现的测试样本
+
+自制 movie.nfo 可先使用下列虚构字段；80 是测试影评人值、7.5 是测试社区值，PG 是独立的内容分级标签，并非对真实作品的评价。当前 Jellyfin 公开解析代码将 criticrating 读取为数值、communityrating 在 0 至 10 范围内读取；版本、单位和页面展示需要分别核对，不能将不同尺度直接相加。
+
+```
+<movie><title>River Demo</title><criticrating>80</criticrating><communityrating>7.5</communityrating><mpaa>PG</mpaa></movie>
+```
+
+## 相关教程与资料
+
+[NFO 文件层级](<https://allluckly.cn/guides/icouldplay-jellyfin-season-episode-nfo-file-scope/>)、[资料提供方身份](<https://allluckly.cn/guides/icouldplay-jellyfin-provider-id-catalog-identity-check/>)。
+
+2026年11月25日核对：[Apple 云映资料](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>)、[Jellyfin 本地 NFO 文档](<https://jellyfin.org/docs/general/server/metadata/nfo/>)。解析器字段可参考 [Jellyfin 官方 NFO 解析代码](<https://github.com/jellyfin/jellyfin/blob/master/MediaBrowser.XbmcMetadata/Parsers/BaseNfoParser.cs>)。未声称完成真实设备或私人服务器测试。
+{% endraw %}

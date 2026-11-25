@@ -1,0 +1,85 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-jellyfin-nfo-art-first-thumbnail-priority/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay and Jellyfin NFO artwork: check the first image and display source'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-jellyfin-nfo-art-first-thumbnail-priority/
+agent_source_sha256: 1ded8688c49af80e39624ea74e79b5898c4366c6d34c3dcf5996d2420e627ccb
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay and Jellyfin NFO artwork: check the first image and display source
+
+Language: en
+Canonical: [iCouldPlay and Jellyfin NFO artwork: check the first image and display source](<https://allluckly.cn/en/guides/icouldplay-jellyfin-nfo-art-first-thumbnail-priority/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-art-first-thumbnail-priority/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-jellyfin-nfo-art-first-thumbnail-priority/>)
+Published: 2026-11-25T00:00:00+08:00
+Modified: 2026-11-25T09:13:32+08:00
+Author: Bison
+
+Use an isolated sample to distinguish NFO image declarations, server selection and cover display in iCouldPlay.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-art-first-thumbnail-priority/>), translated on 2026-11-25. Original publication dates, attribution, code and version notes are retained.
+
+Use an isolated sample to distinguish NFO image declarations, server selection and cover display in iCouldPlay.
+
+## Understand the documented rules
+
+Jellyfin’s local NFO documentation says only one image is supported for each artwork type, so only the first thumb tag for that type is used. It also says local paths or URLs declared in NFO take priority over remote image providers and media-folder images. These are server-side rules; they do not guarantee immediate cover updates in iCouldPlay or acceptance of every NFO form by every version.
+
+## Prepare an isolated movie and artwork
+
+Use a test library you administer and an authorized short video. Back up the video, existing NFO and original artwork. Prepare two self-made posters in the same format with clearly different colors or text and record their filenames. Use an accessible local test path with clear permissions; a public upload is unnecessary. Confirm the test item’s identity and restoration method first.
+
+## Record the original display
+
+Find the test movie in Jellyfin’s web interface and record title, duration, current poster and metadata refresh state. Use an authorized normal account to find the same item in iCouldPlay and record its cover and time. Similar titles can denote different editions, so verify duration and a self-made frame marker. If the client has no cover or directory entry, record the actual display without assuming the server selected incorrectly.
+
+## Identify the NFO and artwork type
+
+Locate the test movie’s NFO using Jellyfin’s naming table and save a backup. Inspect existing image tags, including artwork type and path or URL. Compare only two declarations clearly belonging to the same type; do not mix posters and backdrops. If the file format or an attribute is uncertain, consult documentation for the server version or ask its administrator and stop editing rather than overwriting real metadata.
+
+## Set the first test order
+
+Only if you understand XML and NFO syntax, have permission and can restore the sample, arrange poster A before poster B for the same image type in the isolated copy. Use paths and syntax supported by the server’s documentation; do not guess attributes. Check XML validity and record tag order and edit time. If the interface supports only a single image, do not invent a second tag: record this step as not performed.
+
+## Refresh and inspect the server first
+
+Run one metadata refresh for the test item using the current server interface and record the option, time and completion. Compare the server’s image for that type with the visible A and B markers. Seeing A is consistent with the rule, but retain paths, task state and other image-source information. If the image does not change, cache, path permissions or refresh scope may be involved; one result does not establish that the NFO is invalid.
+
+## Observe the cover in iCouldPlay
+
+Using the same normal account, return to the iCouldPlay directory and reopen the test item; record whether A, B, an old image or no image appears. If the server shows A while the client retains an old image, first verify connection, item identity and page state. Do not describe a client display delay as server parsing failure. If no reload control is visible, record that rather than clearing all app cache or deleting user data.
+
+## Reverse the order as a separate control
+
+Where restoration is possible, reverse the two same-type declarations in the isolated sample so B comes before A; leave paths, images and library settings unchanged. Save, validate and perform a separate refresh, recording server and client results separately. If editing is unsafe or the installed version rejects the sample, stop and mark it incomplete instead of changing additional parameters to obtain the expected result.
+
+## Troubleshoot in layers
+
+If the server keeps showing the old image, check NFO name, tag type, XML validity, server permission to access the image path and task results, changing one condition at a time. Media-folder and remote images may also exist, but documented NFO priority means a same-name file alone does not prove the source. If server and client differ, inspect account, item identity and client page state separately.
+
+## Restore and document
+
+Restore the isolated NFO, artwork and settings from backup and confirm the original video and existing user data remain. Record versions, both tag orders, refresh results, actual server and client images and reasons for skipped steps. Remove private paths, accounts and credentials before sharing. This guide is based on public documentation and does not claim private-server access, device testing or guaranteed cover refresh in iCouldPlay.
+
+## Interpret results and evidence limits
+
+Use separate rows for A-first and B-first, each recording the server image, iCouldPlay image and task completion. If both show A, retain the observation without concluding that either system violated the rule: exclude stale images, whether the NFO was read, path permissions and artwork type. If the display follows the order, that establishes behavior only for this controlled sample and environment, not all versions or media types. Mark unsafe or unavailable steps as untested and preserve the evidence for the administrator.
+
+## A reproducible test sample
+
+An administrator can create /srv/jellyfin-test for an isolated sample and put self-made poster-a.jpg and poster-b.jpg with A and B markers there; place the following movie.nfo in the isolated movie directory. These absolute local paths must be replaced with paths readable by the actual server; back up and confirm permissions. Jellyfin’s current public parser recognizes aspect=poster and handles absolute paths, using the first image of a type. Installed version and refresh results require observation; this example was not executed on the user’s server.
+
+```
+<movie><title>River Demo</title><thumb aspect="poster">/srv/jellyfin-test/poster-a.jpg</thumb><thumb aspect="poster">/srv/jellyfin-test/poster-b.jpg</thumb></movie>
+```
+
+## Related guides and sources
+
+[NFO file scope](<https://allluckly.cn/en/guides/icouldplay-jellyfin-season-episode-nfo-file-scope/>); [Episode thumbnail and season cover](<https://allluckly.cn/en/guides/icouldplay-jellyfin-episode-thumb-versus-season-cover/>).
+
+Checked 25 November 2026: [Apple iCouldPlay listing](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>); [Jellyfin local NFO documentation](<https://jellyfin.org/docs/general/server/metadata/nfo/>). Parser field reference: [Jellyfin official NFO parser](<https://github.com/jellyfin/jellyfin/blob/master/MediaBrowser.XbmcMetadata/Parsers/BaseNfoParser.cs>). No physical-device or private-server test is claimed.
+{% endraw %}

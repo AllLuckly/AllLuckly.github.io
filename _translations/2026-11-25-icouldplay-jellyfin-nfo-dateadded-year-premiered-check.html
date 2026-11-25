@@ -1,0 +1,58 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay and Jellyfin movie dates: distinguish date added, year and premiere'
+description: Use an isolated self-made movie to compare NFO date fields, the server page and actual iCouldPlay display.
+permalink: /en/guides/icouldplay-jellyfin-nfo-dateadded-year-premiered-check/
+date: '2026-11-25 00:00:00 +08:00'
+modified: '2026-11-25 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 268
+topic: NFO date added and movie dates
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-25-icouldplay-jellyfin-nfo-dateadded-year-premiered-check.md
+source_url: /guides/icouldplay-jellyfin-nfo-dateadded-year-premiered-check/
+translation_method: editorial
+translation_source_sha256: 4f16ff87c9e8acf67c47f86fefc29f0bf52cda25194502f7f40b66c8b56ade75
+translation_date: '2026-11-25T02:06:51+00:00'
+excerpt: Use an isolated self-made movie to compare NFO date fields, the server page and actual iCouldPlay display.
+---
+{% raw %}
+<p>Use an isolated self-made movie to compare NFO date fields, the server page and actual iCouldPlay display.</p>
+<h2 id="section-1">Understand different dates</h2>
+<p>Jellyfin’s local NFO documentation lists fields including dateadded, year and premiered and notes that dateadded is in UTC when writing NFO files. Date added, movie year and premiere date represent different facts. Similar dates should not be merged, and the writing note does not automatically establish that every existing file is UTC or that a client displays the fields.</p>
+<h2 id="section-2">Prepare an isolated self-made movie</h2>
+<p>Use a self-made short clip in an isolated movie library you administer, recording title, duration and visual marker and backing up video, NFO and metadata. Use a normal account with library access and avoid altering real movies or others’ progress. Later dates are fictional test values. Without confirmed isolation and restoration, stop at read-only inspection and do not change production server date settings.</p>
+<h2 id="section-3">Establish server and client baselines</h2>
+<p>Find the test movie in Jellyfin’s web interface and record visible year, dates, added order and labels; mark absent fields not displayed. Find the same item in iCouldPlay with the same server and account, verifying duration and self-made marker. List ordering or displayed dates can involve several settings; without a field label, do not call a date the NFO date added.</p>
+<h2 id="section-4">Inspect raw fields separately</h2>
+<p>Use the official movie NFO naming table to find the test file. In an authorized copy record raw dateadded, year and premiered text and whether each is missing. If dateadded’s time zone or format is unknown, preserve it verbatim and mark it unknown instead of converting it. Sources may disagree on year or premiere; a filesystem modification time is not an NFO tag value.</p>
+<h2 id="section-5">Use explicit fictional dates</h2>
+<p>Only when an administrator confirms isolation, backup and restoration and the editor understands XML, use year 2020 and premiered 2020-05-06 in a self-made NFO copy, recording a test dateadded with a clear source explanation. Check the installed version’s accepted format and validate XML first; leave a field untested if the format is unclear. These values distinguish concepts and are not a real release or user history.</p>
+<h2 id="section-6">Refresh and inspect the server</h2>
+<p>Wait for or run a metadata refresh for the test movie through current server controls, recording task state, time and version. Inspect visible year, premiere and added information separately; mark absent entry points not displayed. Local NFO metadata has documented priority over remote providers, but matching values alone do not establish the exact source of a page field.</p>
+<h2 id="section-7">Inspect the actual iCouldPlay interface</h2>
+<p>In iCouldPlay reopen the movie with the same server and normal account, recording any displayed year or date, label and self-made playback marker. Mark raw NFO fields unavailable if there is no entry point; do not assume premiere or added time is displayed. If server and client differ, check item identity, source, page state and display format before calling either incorrect.</p>
+<h2 id="section-8">Handle time zones and date boundaries</h2>
+<p>If reliable evidence establishes that the test dateadded is UTC, retain the original time and separately note the observed interface time zone; calendar dates may differ across midnight. Without time-zone evidence do not convert it, and do not automatically treat a premiere date as a timestamp. Filesystem modification, server import and user playback times also need separate records.</p>
+<h2 id="section-9">Restore and document</h2>
+<p>Restore isolated NFO and settings from backup and confirm original video and other users’ data remain; defer uncertain effects to the administrator. Record raw fields, whether source and time zone are known, server and iCouldPlay display and skipped steps. Remove private paths and credentials before sharing. This guide relies on public documentation and claims no private-server or device test.</p>
+<h2 id="fictional-values">Record meanings of fictional dates</h2>
+<p>For example, a self-made movie’s test metadata can use year 2020 and premiered 2020-05-06, while the administrator separately records when the test file was copied into the isolated directory. The first two are declarations; copying is an observed file operation and is not automatically the dateadded value. If the current server documentation does not establish an accepted dateadded format, preserve the original and skip editing rather than guessing a timestamp.</p>
+<h2 id="interface-labels">Check labels in each interface</h2>
+<p>One interface may show only a four-digit year while another shows a full date or local time. Record actual labels and formats first, not just numbers. An unlabeled value cannot be confidently identified as movie year or added time. An authorized NFO copy can be separate evidence when the server does not show raw fields; its existence does not prove every client read them.</p>
+<h2 id="control-and-existing-data">Control changes and existing data</h2>
+<p>When restoration is confirmed, an administrator may change one test year field and record refresh and outcome while keeping other fields, video and account settings fixed. Existing server cache, metadata locks or remote sources may affect observation; unchanged values do not alone prove the NFO was unread. Stop at recording if variables cannot be isolated rather than clearing a production library cache or rewriting original metadata.</p>
+<h2 id="privacy">Keep the record private</h2>
+<p>Before sharing, retain only fictional dates, relative paths and necessary versions. Remove accounts, tokens, household server addresses and personal viewing history from screenshots and notes.</p>
+<h2 id="reproducible-test-sample">A reproducible test sample</h2>
+<p>The following movie.nfo uses a fictional year and premiere date. Jellyfin’s current public parser reads year and premiered, but accepted date format depends on server settings and installed version. The sample does not guess dateadded input format: preserve the original and skip editing that field. After refresh, record server year, premiere and iCouldPlay display separately; execution is not claimed.</p>
+<pre><code>&lt;movie&gt;&lt;title&gt;River Demo&lt;/title&gt;&lt;year&gt;2020&lt;/year&gt;&lt;premiered&gt;2020-05-06&lt;/premiered&gt;&lt;/movie&gt;
+</code></pre>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-jellyfin-nfo-title-originaltitle-identity/">Local and original titles</a>; <a href="/en/guides/icouldplay-jellyfin-provider-id-catalog-identity-check/">Metadata provider identity</a>.</p>
+<p>Checked 25 November 2026: <a href="https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software">Apple iCouldPlay listing</a>; <a href="https://jellyfin.org/docs/general/server/metadata/nfo/">Jellyfin local NFO date fields</a>. Parser field reference: <a href="https://github.com/jellyfin/jellyfin/blob/master/MediaBrowser.XbmcMetadata/Parsers/BaseNfoParser.cs">Jellyfin official NFO parser</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

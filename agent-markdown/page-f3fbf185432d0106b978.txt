@@ -1,0 +1,90 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-jellyfin-nfo-title-originaltitle-identity/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay and Jellyfin movie titles: distinguish local title, original title
+  and item identity'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-jellyfin-nfo-title-originaltitle-identity/
+agent_source_sha256: 7b84d842179fa528fa44dca3a16de291af1dd2cff3503f8ceee84b03ca663121
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay and Jellyfin movie titles: distinguish local title, original title and item identity
+
+Language: en
+Canonical: [iCouldPlay and Jellyfin movie titles: distinguish local title, original title and item identity](<https://allluckly.cn/en/guides/icouldplay-jellyfin-nfo-title-originaltitle-identity/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-title-originaltitle-identity/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-jellyfin-nfo-title-originaltitle-identity/>)
+Published: 2026-11-25T00:00:00+08:00
+Modified: 2026-11-25T09:51:12+08:00
+Author: Bison
+
+Use an isolated movie to record NFO titles, original title, server display and the actual item in iCouldPlay separately.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-title-originaltitle-identity/>), translated on 2026-11-25. Original publication dates, attribution, code and version notes are retained.
+
+Use an isolated movie to record NFO titles, original title, server display and the actual item in iCouldPlay separately.
+
+## Understand fields and display
+
+Jellyfin’s local NFO documentation lists name, title, localtitle and originaltitle, with title and localtitle mapping to the same name data while originaltitle is listed separately. It warns that when multiple tags map to the same internal data, the last in the file has priority. Server display in the current interface and whether iCouldPlay shows an original title require observation.
+
+## Prepare an isolated self-made movie
+
+Use an isolated movie library you administer and a self-made short clip, choosing two fictional non-sensitive names for display and original title. Record video duration and visual marker and back up video, NFO and metadata. Do not modify another person’s movie, shared library or real titles. Observe the interface only when authorization or restoration is unavailable.
+
+## Establish server and client baselines
+
+As a normal user authorized for the test library, find the movie in the server web interface and record displayed title, whether original title is visible, duration and identification source; mark absent fields not displayed. Find the same item in iCouldPlay using the same server and account, verifying identity by duration and self-made marker. Matching titles or covers alone do not prove the same file. Preserve playback progress.
+
+## Inspect NFO fields in order
+
+Locate the test movie NFO using Jellyfin’s naming table. In an authorized copy, record raw name, title, localtitle and originaltitle values in document order. Distinguish missing, empty and uninspectable fields; do not present a folder name or remote metadata name as XML content. If structure or encoding is uncertain, stop at observation instead of replacing real data with an unknown NFO.
+
+## Configure a single-variable test copy
+
+Only when an administrator confirms isolation, backup and restoration and the editor understands XML, put one fictional display title and a different original title in the test copy and record their order. Initially avoid multiple tags mapping to the same internal name and validate format and location. Skip unsafe edits and do not describe a future possible result as completed testing.
+
+## Refresh and inspect the server
+
+Run or wait for a metadata refresh for the test item using current controls, recording option, completion and messages. The documentation describes local NFO priority over remote providers, but matching text alone does not prove a particular field’s source. Inspect displayed title, original title and movie identity; if results differ, first check NFO name, fields, locks and task completion.
+
+## Compare tags mapping to the same name separately
+
+If safe, necessary and administrator-approved, compare two different fictional values in name, title or localtitle in an isolated copy, preserving document order and recording refresh results. Change only tag order or one value while holding other metadata fixed. The documentation gives priority to the later tag when they map to the same internal data. Skip if variables cannot be isolated rather than treating uncertainty as rule failure.
+
+## Check iCouldPlay display and playback
+
+In iCouldPlay return to the same server and normal account, reopen the test movie and record its actual title, whether original title is visible and the self-made playback marker. If server and client names differ, check item identity, account and page state. Mark a missing original-title field not displayed; do not reset the app or claim it reads every NFO tag. A correct title alone does not prove the expected file plays.
+
+## Restore and document
+
+Restore test NFO and settings from backup, confirming original video, progress and other users’ data remain; defer uncertain effects to the administrator. Record raw tags and order, server display, client display, movie marker and skipped steps separately. Remove private paths and credentials before sharing. This guide relies on public documentation and claims no private-server or device testing.
+
+## Record tag order and file identity
+
+An NFO can contain several name types alongside metadata already saved on the server. For each experiment retain the test file’s path scope, tag order, fictional values and modification time without publishing private directories. Keep the later-tag rule for fields mapped to the same internal name separate from originaltitle; do not automatically treat originaltitle as a name alias. Stop and consult an XML-capable administrator when structure or duplicate roots are unclear.
+
+## A name is not a movie edition
+
+Even when local and original titles match expectations, a server item can contain different cuts or encodings. Compare duration and the self-made marker of the selected test file before playback. A details-page name alone does not identify the playing file. If two same-name items appear, retain both while checking directories, provider identities and files rather than deleting an uncertain item.
+
+## Separate visible text from source evidence
+
+Use separate columns for raw NFO tags, server-visible text, iCouldPlay-visible text and whether the source was established. When the server does not show an original title, mark it not displayed rather than treating the NFO value as user-interface output. If remote and local data happen to match, the text alone cannot identify its source. Mark that source unknown and retain before-and-after records.
+
+## A reproducible test sample
+
+The following movie.nfo uses fictional values: name and title map to the same internal name and title appears later, so the current documented rule gives its value priority; originaltitle is separate. Verify only in a restorable isolated copy and observe server and iCouldPlay separately; this example neither claims execution nor guarantees client display of the original title.
+
+```
+<movie><name>River First</name><title>River Later</title><originaltitle>River Original</originaltitle></movie>
+```
+
+## Related guides and sources
+
+[NFO plot and review order](<https://allluckly.cn/en/guides/icouldplay-jellyfin-nfo-plot-review-order/>); [Metadata provider identity](<https://allluckly.cn/en/guides/icouldplay-jellyfin-provider-id-catalog-identity-check/>).
+
+Checked 25 November 2026: [Apple iCouldPlay listing](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>); [Jellyfin local NFO documentation](<https://jellyfin.org/docs/general/server/metadata/nfo/>). Parser field reference: [Jellyfin official NFO parser](<https://github.com/jellyfin/jellyfin/blob/master/MediaBrowser.XbmcMetadata/Parsers/BaseNfoParser.cs>). No physical-device or private-server test is claimed.
+{% endraw %}

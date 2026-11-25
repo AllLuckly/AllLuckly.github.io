@@ -1,0 +1,58 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay and Jellyfin ratings: separate critic, community and parental ratings'
+description: Compare NFO fields, the server page and iCouldPlay for an isolated movie without conflating different
+  rating concepts.
+permalink: /en/guides/icouldplay-jellyfin-nfo-critic-community-rating-evidence/
+date: '2026-11-25 00:00:00 +08:00'
+modified: '2026-11-25 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 264
+topic: NFO critic and community ratings
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-25-icouldplay-jellyfin-nfo-critic-community-rating-evidence.md
+source_url: /guides/icouldplay-jellyfin-nfo-critic-community-rating-evidence/
+translation_method: editorial
+translation_source_sha256: 2a6eb93c7249a3f2ebc4b523a0bc843e9d1d954b598952d42a1b58cecea9055a
+translation_date: '2026-11-25T01:35:35+00:00'
+excerpt: Compare NFO fields, the server page and iCouldPlay for an isolated movie without conflating different rating
+  concepts.
+---
+{% raw %}
+<p>Compare NFO fields, the server page and iCouldPlay for an isolated movie without conflating different rating concepts.</p>
+<h2 id="section-1">Distinguish rating concepts</h2>
+<p>Jellyfin’s local NFO documentation lists fields including criticrating, customrating and mpaa, and says ratings can have multiple child tags whose names distinguish critic and community ratings. Critic ratings, community ratings and parental content classifications are different concepts; do not infer a numeric scale from a field name. Server support does not guarantee iCouldPlay displays or edits a field.</p>
+<h2 id="section-2">Choose a non-sensitive test movie</h2>
+<p>Use a self-made short video in an isolated library you administer, backing up video, NFO and existing metadata. Record title, duration and a self-made frame marker; restricted real content is unnecessary. Use a normal account authorized for the library rather than bypassing normal limits as an administrator. Observe read-only if isolation or restoration is not possible.</p>
+<h2 id="section-3">Establish server and client baselines</h2>
+<p>Find the same test movie in Jellyfin’s web interface and record actual rating labels, values, classifications and sources; mark absent fields not displayed. Open the corresponding item in iCouldPlay with the same normal account and record visible fields and time. Match duration and visual marker, not just cover or title. Existing ratings may come from a remote provider, so do not assume an NFO source.</p>
+<h2 id="section-4">Locate and inspect the NFO</h2>
+<p>Use Jellyfin’s naming table to locate the test movie NFO. In an authorized copy, record whether criticrating, ratings, customrating and mpaa exist and their raw values. For ratings children, record actual names and values without forcing an unknown name into a critic or community category. If no sample or XML expertise is available, mark it uninspected; do not download unknown metadata or alter a production movie.</p>
+<h2 id="section-5">Separate numeric scores and classification</h2>
+<p>Record critic and community values only with an identifiable source, and place content classification and its jurisdiction or source in a separate column. Do not directly compare rating scales from different sources or turn a classification label into a numeric score. Mark unknown source, region or scale as unknown. A server page showing one number does not establish that another field is absent or what it means.</p>
+<h2 id="section-6">Observe a reversible refresh</h2>
+<p>If the administrator confirms isolation and restoration, run one metadata refresh on the test movie using current controls and record the option, time and completion. Jellyfin documents local NFO priority over remote providers; that does not prove each displayed rating was read from that file. If refresh scope is unclear or production data might be affected, stop at the baseline and do not change production settings.</p>
+<h2 id="section-7">Check the server page again</h2>
+<p>After completion, return to the same server item and account and record visible fields and changes. If labels or values differ from NFO, first check item identity, field names, metadata locks and task results, changing at most one reversible condition at a time. An empty score does not by itself prove file corruption, and one matching value does not prove its source.</p>
+<h2 id="section-8">Inspect the actual iCouldPlay display</h2>
+<p>Reopen the same test movie in iCouldPlay and record whether rating, content classification and labels are visible; mark missing fields not displayed. If client and server differ, check connection, account, item and page state before concluding anything. Do not claim the app exposes every NFO field. Use only controls actually offered and do not reset the app or clear other users’ data.</p>
+<h2 id="section-9">Restore and preserve evidence boundaries</h2>
+<p>Restore isolated backups and original settings, confirming video and other users’ information remain; defer unclear restoration effects to the administrator. Record raw NFO fields, sources and scales, server display, client display and skipped steps. Remove private paths, accounts and credentials before sharing. This guide relies on public documentation and does not claim device tests or private-server access.</p>
+<h2 id="rating-table">Avoid confusing numbers in the record</h2>
+<p>Give each inspectable field a separate row for raw name, raw text, source description, possible scale and observation time. If the server displays stars, a percentage or a label, record its actual format. Without official explanation, do not convert a value to a percentage or assume equal maxima across sources. Clearly label fictional test values and do not present them as real movie reviews.</p>
+<h2 id="remote-source">Preserve remote-source uncertainty</h2>
+<p>If remote metadata providers are enabled, record any provider name and refresh state visible in the server interface separately from local NFO text. If no interface or log identifies a particular field’s source, mark it unknown; a general priority rule cannot replace field-level observation. Do not disable providers for a production library or delete saved metadata merely to prove the result.</p>
+<h2 id="display-and-access">Distinguish display from access control</h2>
+<p>A details page may display a content classification, while whether an ordinary account can see or play the item also depends on account and library permissions. Seeing a label does not validate an access restriction. A separate test requires an isolated account you administer and recorded original permissions. This tutorial checks display only; it does not change real-user restrictions or use unauthorized material.</p>
+<h2 id="reproducible-test-sample">A reproducible test sample</h2>
+<p>A self-made movie.nfo can use the following fictional fields: 80 is a test critic value, 7.5 a test community value, and PG a separate content classification, not a review of a real work. Jellyfin’s current public parser reads criticrating numerically and communityrating within 0 to 10; check version, scale and display separately and do not add different scales.</p>
+<pre><code>&lt;movie&gt;&lt;title&gt;River Demo&lt;/title&gt;&lt;criticrating&gt;80&lt;/criticrating&gt;&lt;communityrating&gt;7.5&lt;/communityrating&gt;&lt;mpaa&gt;PG&lt;/mpaa&gt;&lt;/movie&gt;
+</code></pre>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-jellyfin-season-episode-nfo-file-scope/">NFO file scope</a>; <a href="/en/guides/icouldplay-jellyfin-provider-id-catalog-identity-check/">Metadata provider identity</a>.</p>
+<p>Checked 25 November 2026: <a href="https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software">Apple iCouldPlay listing</a>; <a href="https://jellyfin.org/docs/general/server/metadata/nfo/">Jellyfin local NFO documentation</a>. Parser field reference: <a href="https://github.com/jellyfin/jellyfin/blob/master/MediaBrowser.XbmcMetadata/Parsers/BaseNfoParser.cs">Jellyfin official NFO parser</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

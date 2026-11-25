@@ -1,0 +1,62 @@
+---
+layout: guide
+author: Bison
+app_id: icouldplay
+title: 'iCouldPlay and Plex sidecar subtitles: distinguish forced dialogue and SDH descriptions'
+description: Use a self-made clip and two subtitle files to compare Plex filename flags, server recognition and
+  track selection in iCouldPlay.
+permalink: /en/guides/icouldplay-plex-local-subtitle-forced-versus-sdh/
+date: '2026-11-25 00:00:00 +08:00'
+modified: '2026-11-25 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 263
+topic: Plex sidecar forced and SDH subtitles
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-25-icouldplay-plex-local-subtitle-forced-versus-sdh.md
+source_url: /guides/icouldplay-plex-local-subtitle-forced-versus-sdh/
+translation_method: editorial
+translation_source_sha256: ca41fdbf32aa3bba192071cb55314ed3b8b84d4647cd4c89ba2aeec5dd192cc6
+translation_date: '2026-11-25T01:22:06+00:00'
+excerpt: Use a self-made clip and two subtitle files to compare Plex filename flags, server recognition and track
+  selection in iCouldPlay.
+---
+{% raw %}
+<p>Use a self-made clip and two subtitle files to compare Plex filename flags, server recognition and track selection in iCouldPlay.</p>
+<h2 id="section-1">Understand the flags</h2>
+<p>Plex documents forced subtitles as tracks often used for particular foreign-language segments and SDH or CC subtitles as potentially including sound descriptions and speaker identification. These flags describe different purposes; they do not create missing subtitle content. Plex specifies server-version and newer Plex Movie agent requirements for SDH or CC recognition. iCouldPlay’s labels and automatic selection must be observed separately.</p>
+<h2 id="section-2">Prepare your own short clip</h2>
+<p>Use a self-made, authorized clip in an isolated movie library and back up the original video and subtitles. Choose short identifiable moments, such as an on-screen marker and a knock, and record duration and times. Do not upload copyrighted films or download unknown subtitles, and do not modify a production media folder used by household members.</p>
+<h2 id="section-3">Create two distinguishable files</h2>
+<p>Using a UTF-8 plain-text editor, create two SRT copies timed to the clip: the forced file contains a self-written cue for the test-language moment, while the SDH file includes a self-written sound description at the appropriate time. Each cue needs a valid time interval and short text. Distinct content aids observation; filename flags do not mean automatic translation or a completed accessibility quality audit.</p>
+<h2 id="section-4">Place files using movie naming rules</h2>
+<p>Follow Plex documentation to place sidecar files in the appropriate movie directory, matching the video’s base name and adding a documented language code and forced or sdh flag. Check the full extension, which the operating system may hide, and record all three filenames. Use a controlled test library and do not mix television episode directory rules with movie rules.</p>
+<h2 id="section-5">Check server version and source</h2>
+<p>In server administration record Plex Media Server version, the test library’s movie agent and file paths, and check the documented SDH or CC support conditions. If version or agent is unclear, do not claim the flag must be recognized. Scan or refresh metadata only for the test item as the current interface requires, recording the action and completion time; do not simultaneously alter production-wide settings.</p>
+<h2 id="section-6">Inspect tracks on the server first</h2>
+<p>Find the same clip in the Plex web interface using duration and self-made markers. Record available subtitle tracks and labels, whether forced and SDH appear separately and whether language matches the filename. If a track is missing, check path, extension, encoding, server scan and agent requirements. A file’s presence does not prove server recognition, and similar labels do not make two files the same track.</p>
+<h2 id="section-7">Select tracks in iCouldPlay</h2>
+<p>With an account authorized for the test library, open the same clip in iCouldPlay and inspect the subtitle controls actually available. If both tracks can be selected, choose each in turn and play the relevant interval, recording whether the self-made cue or sound description appears; return to a known time between trials. If no selection control exists or labels are indistinguishable, mark the result unobserved rather than assuming a fixed menu or automatic choice.</p>
+<h2 id="section-8">Separate automatic choice from file content</h2>
+<p>Keep audio track, account language preferences and test files unchanged while recording any automatically selected subtitle at initial playback, then manually choose the other track and observe its contents. Plex’s forced flag may participate in server preference selection, but audio, language preferences and client implementation also matter. An SDH file contains sound descriptions only if its actual text does; a filename does not prove accuracy or completeness.</p>
+<h2 id="section-9">Troubleshoot and restore</h2>
+<p>For mistimed cues, first check the test video edition, SRT time range, encoding and playback position. For an absent track, inspect server recognition, account and client controls in layers. Change one condition at a time and retain unexplained differences. Restore the test library afterward, preserving original video, subtitles and other user data. Record version, agent, filenames, web and client observations and skipped steps. No device or private-server test is claimed.</p>
+<h2 id="check-cue-timing">Check self-made cue timing separately</h2>
+<p>Use the self-made visual marker as a time reference and note expected cue start and end before comparing playback. If the forced cue appears but the SDH description does not, confirm selected track and its own time range before changing server preferences. If both are mistimed, inspect video edition and timestamp validity separately. Edit only test copies and keep before-and-after records. Mark playback untested if a valid sample cannot be prepared.</p>
+<h2 id="uncertain-selection">Record uncertainty in track selection</h2>
+<p>Keep separate columns for server labels, visible iCouldPlay labels, content after manual selection and the initial playback choice. If the client shows no forced or SDH label but a selected track displays the self-made text, that proves only the observed playback, not recognition of the flag. An absence of automatically selected subtitles also does not alone prove that the server failed to read the file; account preferences, audio and client behavior may matter. Preserve unknown conclusions where evidence is insufficient.</p>
+<h2 id="reproducible-test-sample">A reproducible test sample</h2>
+<p>Name the self-made movie River Demo (2020).mkv; in the same isolated movie directory place River Demo (2020).en.forced.srt and River Demo (2020).en.sdh.srt. The next two blocks are each one complete SRT cue, saved in that order as UTF-8 with cue number, time line, text and trailing line break. The forced cue is a self-made phrase and the SDH cue describes a self-made knock. Check version and Plex Movie agent as above before observation; client track selection is not guaranteed.</p>
+<pre><code>1
+00:00:01,000 --&gt; 00:00:03,000
+[foreign phrase]
+</code></pre>
+<pre><code>1
+00:00:01,000 --&gt; 00:00:03,000
+[knock]
+</code></pre>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/icouldplay-plex-season-subs-folder-version-boundary/">Subtitle folder and server version</a>; <a href="/en/guides/icouldplay-plex-audio-language-auto-versus-manual-selection/">Automatic and manual track selection</a>.</p>
+<p>Checked 25 November 2026: <a href="https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software">Apple iCouldPlay listing</a>; <a href="https://support.plex.tv/articles/200471133-adding-local-subtitles-to-your-media/">Plex local subtitle documentation</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

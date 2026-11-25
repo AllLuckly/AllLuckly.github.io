@@ -1,0 +1,83 @@
+---
+layout: null
+permalink: /guides/icouldplay-jellyfin-nfo-user-data-single-user-scope/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映与 Jellyfin NFO：核对观看状态导入只关联哪个账户
+agent_source_url: https://allluckly.cn/guides/icouldplay-jellyfin-nfo-user-data-single-user-scope/
+agent_source_sha256: a91674adb8f70d756aee10f502639e31197854a24c83cedb10131bcfaf9d0bcd
+agent_generator_version: 1
+---
+{% raw %}# 云映与 Jellyfin NFO：核对观看状态导入只关联哪个账户
+
+语言：zh-CN
+原文：[云映与 Jellyfin NFO：核对观看状态导入只关联哪个账户](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-user-data-single-user-scope/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-user-data-single-user-scope/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-jellyfin-nfo-user-data-single-user-scope/>)
+发布于: 2026-11-25T00:00:00+08:00
+内容更新于: 2026-11-25T00:00:00+08:00
+署名：Bison
+
+在隔离媒体库中区分本地 NFO 的用户数据、服务器账户与云映实际显示。
+
+在隔离媒体库中区分本地 NFO 的用户数据、服务器账户与云映实际显示。
+
+## 先理解导入的范围
+
+Jellyfin 的本地 NFO 文档列出 watched、playcount 和 lastplayed 等用户数据，并明确这些用户数据只能导入给一个在 NFO 设置中指定的用户。这是服务器元数据导入的范围，不代表所有客户端都会展示相同字段，也不意味着只读 NFO 就能证明云映的实际进度。本文以管理员自己的测试库为例，具体设置名称和同步时间以当前服务器界面为准。
+
+## 准备两个独立测试账户
+
+建立或选择两个有权访问同一测试库的测试账户 A 和 B，并确认各自可以登录服务器网页和云映；不要使用其他人的账户，也不要记录密码或令牌。选择一段自己拥有且可播放的短片，保留原件和原 NFO 的备份。隔离测试库不应引用正式影片或生产元数据，避免一次刷新改变家庭成员的观看状态。
+
+## 记录修改前的观察
+
+用账户 A 在服务器网页找到测试影片，记下是否显示已看、播放次数和最后播放信息；账户 B 独立重复，无法看到的字段标记为未显示。随后用相同账户分别进入云映对应条目，记录能看到的状态。先确认两个账户确实指向同一个影片，建议用时长和视频中自制的画面标记辨认，不用相同封面单独判断身份。
+
+## 核对 NFO 文件与受控值
+
+参考 Jellyfin 官方的本地 NFO 命名表，为测试影片确认正确的 NFO 名称和所在目录；不同媒体类型的命名规则不同。先复制备份，再检查文件中的 watched、playcount 和 lastplayed 是否存在。仅在了解 XML 格式、拥有修改权限且愿意恢复测试环境时做最小修改；如不能安全编辑，就停止在观察步骤，不删除已有文件或替换正式资料。
+
+## 确认服务器导入目标
+
+在服务器管理界面的 NFO 相关设置中查看用户数据导入目标，并记下当前选择。仅在隔离测试环境且了解影响时选择账户 A，保存设置后记录时间；若当前版本没有可识别的入口，就标记未完成并查阅该版本文档。不要猜测切换用户会自动清除旧记录，也不要在不知影响时更改正式服务器的全局设置。
+
+## 触发并记录一次刷新
+
+按服务器当前界面的实际选项对测试条目执行一次元数据刷新，记录选项、开始与完成时间，不把普通扫描、替换所有元数据与用户数据导入视为同一动作。等待任务结束后再查看 A 和 B。刷新若报错或仍在运行，保留错误类别和未完成状态；避免连续重复操作使得无法判断哪次操作产生变化。
+
+## 先在服务器区分账户结果
+
+分别登录 A 和 B 的网页界面，返回同一测试影片，逐项对比已看状态和可见的次数、最后播放时间。把 A 变化、B 未变化、字段未显示或结果不确定分别记录；如果 B 原本就有播放记录，不能因它仍存在就断定 NFO 同时导入给 B。服务器文档说明的是导入目标，实际数据还受既有状态及具体版本影响。
+
+## 在云映复核显示和实际播放
+
+在云映确认当前连接的是同一服务器和对应账户，打开相同影片并记下可见的已看标记或续播位置；若没有某字段就记录未显示。需要播放时只播放自己的短片，并记下播放本身可能产生新的服务器用户数据。先拍下或记下播放前状态，再操作，避免把测试播放后的新记录误认为 NFO 导入结果。
+
+## 排查差异而不扩大测试
+
+如果网页和云映不同，先核对登录账户、媒体库、影片身份、服务器刷新是否完成以及客户端是否仍显示旧页面；必要时按实际界面返回列表再打开。若服务器两个账户结果都没有变化，检查测试文件名、XML 合法性、导入目标和任务错误，逐次只改一个条件。不要根据一次无变化就推断应用一定不支持，也不要把账号令牌发给他人排障。
+
+## 恢复设置并保存结果
+
+完成后将服务器导入目标恢复为原选择，按备份恢复隔离样本，并确认正式媒体未被修改。记录服务器与应用版本、NFO 字段、原目标和测试目标、两账户的前后观察及未执行步骤；去除私人服务器地址与账号信息。本文依据公开资料说明操作思路，没有声称实测你的设备或私人服务器。
+
+## 单独判断日期与状态
+
+如果 NFO 既含最后播放时间又含已看状态，分别列出这两个值，并确认服务器实际显示的时区或日期格式；无法判断时间含义时保留原始文本，不自行换算后声称精确一致。两个字段可能来自不同操作，看到日期接近并不能证明导入成功。也不要依赖播放次数是否等于某个数字来推断另一账户没有观看；本练习的证据是受控前后观察和服务器明确的导入对象。若软件未显示次数或时间，填未显示即可，不需要改变账户历史来凑齐表格。
+
+## 一组可复现的测试样本
+
+自制隔离样本使用 movie.nfo，示例中的 River Demo 是虚构影片，watched 和 playcount 分别为布尔值和整数。只在服务器管理员确认用户数据导入对象与恢复方式后使用，记录 A、B 的前后状态；以下是语法示例，未声称在你的服务器运行，lastplayed 暂不填写。
+
+```
+<movie><title>River Demo</title><watched>true</watched><playcount>1</playcount></movie>
+```
+
+## 相关教程与资料
+
+[季与单集 NFO 的范围](<https://allluckly.cn/guides/icouldplay-jellyfin-season-episode-nfo-file-scope/>)、[账户播放权限核对](<https://allluckly.cn/guides/icouldplay-jellyfin-playback-permission-transcode-boundary/>)。
+
+2026年11月25日核对：[Apple 云映资料](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>)、[Jellyfin 本地 NFO 文档](<https://jellyfin.org/docs/general/server/metadata/nfo/>)。解析器字段可参考 [Jellyfin 官方 NFO 解析代码](<https://github.com/jellyfin/jellyfin/blob/master/MediaBrowser.XbmcMetadata/Parsers/BaseNfoParser.cs>)。未声称完成真实设备或私人服务器测试。
+{% endraw %}

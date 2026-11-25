@@ -1,0 +1,85 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-line-chart-missing-day-gap/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Draw a line chart with a missing observation day in VectorPaint
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-line-chart-missing-day-gap/
+agent_source_sha256: 3cc10dfd30de7451ab6b3818cd4c888528d6525122f6c812a92c519f6fe5daff
+agent_generator_version: 1
+---
+{% raw %}# Draw a line chart with a missing observation day in VectorPaint
+
+Language: en
+Canonical: [Draw a line chart with a missing observation day in VectorPaint](<https://allluckly.cn/en/guides/vectorpaint-line-chart-missing-day-gap/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-line-chart-missing-day-gap/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-line-chart-missing-day-gap/>)
+Published: 2026-11-25T00:00:00+08:00
+Modified: 2026-11-25T09:13:34+08:00
+Author: Bison
+
+Plot six days of example data, preserving the missing day as a gap and checking axes, labels and trend.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-line-chart-missing-day-gap/>), translated on 2026-11-25. Original publication dates, attribution, code and version notes are retained.
+
+Plot six days of example data, preserving the missing day as a gap and checking axes, labels and trend.
+
+## Prepare example data with a gap
+
+Use six hypothetical daily readings: days 1–6 are 12, 15, 14, missing, 18 and 16 liters. Missing means no observation was recorded; it is not automatically zero, nor can day 4 be assumed halfway between 14 and 18. The UK Office for National Statistics recommends leaving a gap where regularly collected data is missing so a continuous observation is not implied. This example is illustrative, not a real measurement.
+
+## Set up the canvas and objects
+
+Create a landscape VectorPaint document, for example 1600 by 1000 units, and save an editable original first. Use the available object controls to separate axes, grid, data lines, markers, text and missing-data note; use the actual labels in the installed version. Reserve space for a title, vertical-axis unit and source note instead of filling the entire canvas with the plot.
+
+## Define axes and vertical range
+
+Draw horizontal and vertical axes, labeling them observation day and reading in liters. For example, use a vertical scale from 0 to 20 in increments of 5 liters. It includes all known values without placing the missing value at zero. Decide plot height before positioning ticks so equal numerical differences have equal vertical distances. Do not move individual ticks to exaggerate a change.
+
+## Space all six days equally
+
+Place six equally spaced ticks for days 1 through 6, including the missing fourth day. Duplicate a tick and position copies with the controls available, then compare adjacent gaps. Place labels below the axis without crowding. If day 4 is removed, days 3 and 5 appear adjacent and distort the time interval, so its position must remain.
+
+## Map the five known values
+
+Mark heights 12, 15, 14, 18 and 16 at days 1, 2, 3, 5 and 6 respectively. As a check, if a plot spanning 0 to 20 is 400 units high, 5 liters correspond to 100 units and 12 liters lie 240 units above the baseline. This is only a convenient example and the canvas may be scaled. Add no value marker at day 4, including on the baseline.
+
+## Draw two separate line segments
+
+Connect the first three points using an open path, then draw a second open path from day 5 to day 6. Do not connect days 3 and 5 with a solid line, and do not automatically draw a dashed interpolation that guesses day 4. If a defensible interpolation is added later, its assumptions must be stated separately. Use consistent styling for both segments to identify one series, while leaving the gap unobscured.
+
+## Annotate the gap and data points
+
+Write “No observation” near day 4 and use a short leader or placement to identify the blank area; the leader must not resemble a data line. Small markers are appropriate for these few known values, with each center aligned to its day and height. Leave space around labels to avoid overlap. A text note preserves the missing-data information in monochrome, unlike color alone.
+
+## Check values and continuity
+
+Read the chart point by point: day 2 is higher than day 1, day 3 is slightly below day 2, and day 6 is below day 5. Check that day 4 has neither a marker nor a line connecting days 3 and 5; do not infer that the missing period rose continuously. Place the data table alongside the chart and ask another reader to identify known values and the gap, then correct any ambiguity.
+
+## Compare misleading alternatives
+
+Make a temporary copy and incorrectly plot day 4 at zero to see the invented plunge, then undo it. Another copy that bridges the gap suggests a continuous trend through an unobserved period. Comparing both errors with the original gap demonstrates why missing differs from zero. Before publishing, confirm that the correctly broken version is selected for export.
+
+## Add a title and source
+
+Use an accurate title such as “Example: daily readings over six days” and state “No observation on day 4; hypothetical data.” Include units and period so readers do not treat the example as actual water use or official statistics. Credit the UK Office for National Statistics chart guidance. If replacing the values with real data, record the source, measurement method and reason for missingness instead of reusing this example note.
+
+## Check scale and marker order
+
+Align 0, 5, 10, 15 and 20 on the vertical axis with their respective grid lines, and check that adjacent grid gaps are equal. The value 15 belongs on its grid line; 12 lies between 10 and 15, nearer 10. Both 16 and 18 lie between 15 and 20, with 18 higher. Screen coordinates may increase downward, so check visual height against the labeled value rather than assuming a larger screen coordinate means a larger reading. After checking, lock or retain an axis copy before adjusting points independently to avoid shifting the entire scale.
+
+## Troubleshoot and export
+
+If the gap disappears, check whether the two paths were merged and whether an annotation leader resembles the data line. If ticks are uneven, correct horizontal placement before repositioning points. Save the editable original and use the visible export control to save a separate SVG or PNG. Reopen it to inspect text, the gap and axis labels, then return to the original to confirm objects remain editable. Mark unperformed physical-device steps as pending.
+
+## Check that the gap has no value
+
+Place a temporary vertical guide through day 4 and check that no data point lies on it, then hide the guide. This check does not estimate the missing reading; the change between days 3 and 5 remains unknown.
+
+## Related guides and sources
+
+[Number line interval endpoints](<https://allluckly.cn/en/guides/vectorpaint-interval-number-line-open-closed-endpoints/>); [Quarter share chart](<https://allluckly.cn/en/guides/vectorpaint-quarter-share-chart/>).
+
+Checked 25 November 2026: [Apple public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software>); [UK Office for National Statistics: missing data in line charts](<https://service-manual.ons.gov.uk/data-visualisation/chart-types/line-chart>). No physical-device or private-server test is claimed.
+{% endraw %}

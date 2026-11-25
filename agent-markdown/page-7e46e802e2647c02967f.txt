@@ -1,0 +1,78 @@
+---
+layout: null
+permalink: /en/guides/nasbook-epub-manifest-fallback-chain-inspect/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'Book Isle EPUB fallback chain: compare declarations, resources and reading
+  results'
+agent_source_url: https://allluckly.cn/en/guides/nasbook-epub-manifest-fallback-chain-inspect/
+agent_source_sha256: 42d5b35c385b6d207e85836557724e95ecc933e80cca55751934a6626dc806d5
+agent_generator_version: 1
+---
+{% raw %}# Book Isle EPUB fallback chain: compare declarations, resources and reading results
+
+Language: en
+Canonical: [Book Isle EPUB fallback chain: compare declarations, resources and reading results](<https://allluckly.cn/en/guides/nasbook-epub-manifest-fallback-chain-inspect/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/nasbook-epub-manifest-fallback-chain-inspect/>)
+English: [English HTML](<https://allluckly.cn/en/guides/nasbook-epub-manifest-fallback-chain-inspect/>)
+Published: 2026-11-25T00:00:00+08:00
+Modified: 2026-11-25T09:08:22+08:00
+Author: Bison
+
+Inspect EPUB manifest fallback declarations and record what Book Isle actually renders.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/nasbook-epub-manifest-fallback-chain-inspect/>), translated on 2026-11-25. Original publication dates, attribution, code and version notes are retained.
+
+Inspect EPUB manifest fallback declarations and record what Book Isle actually renders.
+
+## Understand the standard and limitation
+
+EPUB 3.3 allows a publisher to use the fallback attribute on manifest items, referencing another item ID to form a chain. The specification cautions that practical reading-system support for manifest fallbacks is limited. For foreign resources inside content it strongly encourages intrinsic HTML or SVG fallbacks, whereas a foreign content document directly referenced by the spine requires a fallback chain containing at least one EPUB content document. A declaration does not prove Book Isle uses it, and this mechanism is distinct from intrinsic HTML fallbacks. Inspect an authorized existing sample without changing the original.
+
+## Prepare an authorized sample
+
+Choose an EPUB you created or are allowed to inspect, preferably with documentation identifying the section or image with a fallback. Copy the original to a separate folder and record its name, source and version. If encryption or license terms prevent unpacking, stop that inspection and use publisher-provided structural information. Pick a target section and note a short marker and expected image; an arbitrary file without documentation is not automatically a valid test sample.
+
+## Establish a reading baseline
+
+Open the unmodified sample in Book Isle and use the available contents, search or page controls to locate the target section. Record text, image, blank area or error and the observation time. If the book cannot open, first check download completeness and format recognition; do not claim that a fallback was selected. Preserve existing notes and progress and record a usable bookmark or paper location.
+
+## Locate the package and manifest
+
+Only when permitted, inspect the copied EPUB container. Find the package-document path in META-INF/container.xml and locate its manifest; books need not place the package in the same directory. Find the item corresponding to the target and record its id, href, media-type and any fallback attribute. Resolve paths relative to the package document; matching filenames alone do not identify the referenced item.
+
+## Trace the referenced items
+
+If the target item has a fallback, find an item in the same manifest whose ID exactly matches the attribute value, then record its href and media type. Follow further fallback attributes in order when present. Keep a set of visited IDs and stop if an ID repeats, recording a possible cycle. The standard forbids self-referential or circular chains, but a correctly spelled attribute does not establish that the file exists or is equivalent.
+
+## Check files against publisher information
+
+Resolve recorded relative paths from the package-document location and check whether the corresponding resources exist in the copy. Compare them with the publisher’s description. Do not infer media type, image contents or permission solely from an extension. Record a missing path, unknown ID and decoding failure separately. If the relationship remains uncertain, preserve the original path text for the publisher rather than replacing material with an unknown online resource.
+
+## Distinguish spine content from embedded resources
+
+Determine whether the target is content directly referenced by the spine or an image or other resource embedded inside an XHTML page; different fallback requirements apply. A foreign content document in the spine requires a chain containing at least one EPUB content document. For embedded resources, also consider intrinsic HTML or SVG alternatives. This is a structural check, not a conclusion that the entire publication conforms.
+
+## Compare reading and structural evidence
+
+Return to the same location in Book Isle and compare the recorded marker, image and any error. Successful reading establishes only that this sample was readable in the observed environment; appearance alone does not prove which chain item was selected. If content is missing, record app version, device environment, location and sample source against the publisher’s expectation. Do not attribute a blank area to a specific code path from one observation.
+
+## Troubleshoot by layer
+
+First confirm the same authorized sample, target section and complete file, then inspect the package, manifest IDs, relative paths and actual resources. A known readable ordinary EPUB provides an independent control, but its success does not validate the problem sample. For repair, provide the record to the publication creator. Do not modify the only original, rename an extension to simulate conversion or weaken device security for testing.
+
+## Save the record and finish
+
+Record the sample version, target ID, ordered fallback IDs and paths, actual readable content, skipped steps and unresolved conclusions. Do not publish private books or screenshots. Preserve the original, backup and existing notes. This guide relies on the W3C specification and Apple’s public listing; it does not claim a device test or assert that Book Isle implements manifest fallback.
+
+## Check whether the evidence supports the conclusion
+
+Separate what the publication declares, what Book Isle visibly displays and what evidence is missing between them. A declared alternative and a visible image alone do not establish that the alternative was used: the original resource may render correctly. For further investigation, ask the publisher for an authorized sample with distinguishable visual markers and use a separate copy. Change only one condition at a time and retain the record; do not modify the file if restoration is uncertain. Mark skipped or inapplicable checks explicitly and do not present guesses as observations.
+
+## Related guides and sources
+
+[Contents and spine order](<https://allluckly.cn/en/guides/nasbook-epub-toc-spine-order-two-chapter-audit/>); [Local stylesheet path](<https://allluckly.cn/en/guides/nasbook-epub-local-stylesheet-path-display-offline/>).
+
+Checked 25 November 2026: [Apple Book Isle listing](<https://itunes.apple.com/lookup?id=6766198898&country=cn&entity=software>); [W3C EPUB 3.3 fallbacks](<https://www.w3.org/TR/epub-33/#sec-manifest-fallbacks>). No physical-device or private-server test is claimed.
+{% endraw %}

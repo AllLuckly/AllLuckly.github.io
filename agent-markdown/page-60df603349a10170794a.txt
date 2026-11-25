@@ -1,0 +1,89 @@
+---
+layout: null
+permalink: /en/guides/vectorpaint-graph-bridge-two-triangles-cut-edge/index.md
+sitemap: false
+noindex: true
+lang: en
+title: Draw a graph bridge in VectorPaint using two triangles
+agent_source_url: https://allluckly.cn/en/guides/vectorpaint-graph-bridge-two-triangles-cut-edge/
+agent_source_sha256: 45992aa2ce6a4b76ca498d3624d8c993a7cd03da8d55beb1b015c0edaba6b7d2
+agent_generator_version: 1
+---
+{% raw %}# Draw a graph bridge in VectorPaint using two triangles
+
+Language: en
+Canonical: [Draw a graph bridge in VectorPaint using two triangles](<https://allluckly.cn/en/guides/vectorpaint-graph-bridge-two-triangles-cut-edge/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/vectorpaint-graph-bridge-two-triangles-cut-edge/>)
+English: [English HTML](<https://allluckly.cn/en/guides/vectorpaint-graph-bridge-two-triangles-cut-edge/>)
+Published: 2026-11-25T00:00:00+08:00
+Modified: 2026-11-25T09:50:03+08:00
+Author: Bison
+
+Connect two triangles with one edge and compare deleting that bridge with deleting an edge on a cycle.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/vectorpaint-graph-bridge-two-triangles-cut-edge/>), translated on 2026-11-25. Original publication dates, attribution, code and version notes are retained.
+
+Connect two triangles with one edge and compare deleting that bridge with deleting an edge on a cycle.
+
+## Define the graph
+
+Use an undirected simple graph: vertices A, B and C form a left triangle, D, E and F form a right triangle, and C–D is their only connecting edge. The edge set is AB, BC, CA, DE, EF, FD and CD: six vertices and seven edges. Graph connectivity concerns whether vertices remain mutually reachable after removals. This exercise removes one edge at a time and keeps all vertices.
+
+## Create canvas and objects
+
+Create a landscape VectorPaint canvas, for example 1800 by 1000 pixels, and save an editable original. Use available object controls to separate vertex circles, letters, triangle edges, the connecting edge and notes. Leave room between triangles for the C–D label and below for before-and-after comparisons. Use the buttons and grouping methods actually shown in the installed version.
+
+## Draw the left triangle
+
+Place A, B and C on the left, for example A above, B lower left and C lower right. Draw AB, BC and CA. Keep labels near circles without covering line junctions; edges should visibly meet their intended vertices, and crossings should not look like extra vertices. Trace A→B→C→A to confirm the three edges form a cycle.
+
+## Draw the right triangle
+
+Place D, E and F on the right and connect DE, EF and FD. Put D near C to give the bridge a clear path. The triangles need not have identical geometric size because the graph conclusion depends on connections, not area. Trace D→E→F→D to confirm a second three-edge cycle and ensure no unintended extra cross-group edge appears.
+
+## Connect C and D
+
+Draw one edge from C to D and verify it is the only edge between the triangles. A distinct line style may emphasize it temporarily, but retain endpoint labels and explanatory text rather than relying only on red and green. Now A reaches E through A–C–D–E. Similarly any left vertex can reach C, cross CD to D and reach any right vertex, so the whole graph is connected.
+
+## Remove C–D on a copy
+
+Duplicate the graph and hide or remove only edge CD, retaining C, D and all triangle edges. The result has two connected components, {A,B,C} and {D,E,F}; A can no longer reach E along remaining edges. Since the original is connected and removing CD disconnects it, CD is a bridge. Do not delete vertices C or D when the exercise calls for removing an edge.
+
+## Remove AB on another copy
+
+Duplicate the complete original again and remove only AB. A still reaches B through A–C–B, so the left vertices remain connected. The right triangle is intact and CD still connects the groups, so the whole graph remains connected. AB is not a bridge. The alternative path through the triangle explains the result; geometric length or line color does not.
+
+## Compare adjacency at every vertex
+
+List neighbors in scratch work: A has B and C; B has A and C; C has A, B and D; D has C, E and F; E has D and F; F has D and E. Trace each on the original, checking CD is present and no extra A–D was added. In the copy without CD only the mutual C/D adjacency disappears; all other neighbor relationships remain.
+
+## Label the results accessibly
+
+Caption the three figures “Original: connected,” “Remove CD: two components,” and “Remove AB: still connected,” stating that CD is a bridge while AB is not. Weight and color may help but vertex letters, removed edge names and conclusions must suffice in monochrome. Provide a text alternative listing six vertices, seven edges and the paths or components after each removal.
+
+## Check counterexamples and assumptions
+
+If AB is mistaken for a bridge, trace A–C–B. If CD is mistaken as non-bridge, check whether another cross-group line was accidentally drawn. Adding B–E would preserve a cross-group path after CD is removed, changing the conclusion; that is a different graph and must not be added silently. Edges have no arrows because this is an undirected graph; do not transfer the result directly to directed reachability.
+
+## Save and inspect the export
+
+Save the editable original, then use an available export control to create a separate SVG or PNG. Reopen it and check six vertex labels, seven original edges, both copies and explanatory text for clipping. Return to confirm CD and AB can be selected separately. If merged lines cannot be hidden independently, redraw the relevant copy and recheck adjacency. Mark unperformed device steps as pending.
+
+## Find alternate paths for other cycle edges
+
+Starting from the complete original each time, deleting BC leaves B–A–C; deleting CA leaves C–B–A. On the right, deleting DE leaves D–F–E, deleting EF leaves E–D–F, and deleting FD leaves F–E–D. Do not carry one deletion into the next copy. Each removed cycle edge has an alternate route between its endpoints while CD remains, so removing any one of these edges leaves this graph connected. An alternate path can be highlighted with dashed styling in a copy, but do not add a nonexistent edge to the original.
+
+## Compare the two connected components
+
+In the copy without CD, starting at A reaches B and C but no edge crosses to D, E or F. Starting at D reaches E and F but cannot cross back. Write the two sets beside the figure and check that every original vertex appears exactly once, with no overlap and all six retained. These are graph components, not merely two cropped images: moving vertices on the canvas alone does not change connectivity. Keep set braces clear of the C and D circles so they do not look deleted.
+
+## Compare a copy with an extra cross-group edge
+
+Make another copy and add B–E, explicitly marking it as a changed graph. Even after removing CD there is then a path A–B–E–D from the left group to the right, so CD is no longer a bridge in that changed graph. Compare this with the original deletion: a bridge depends on the absence of an alternate cross-group path, not merely on a line being drawn between two shapes. Remove the temporary B–E when returning to the original and verify its seven edges again.
+
+## Related guides and sources
+
+[Without-replacement probability tree](<https://allluckly.cn/en/guides/vectorpaint-probability-tree-two-draws-without-replacement/>); [Set membership diagram](<https://allluckly.cn/en/guides/vectorpaint-set-membership-diagram/>).
+
+Checked 25 November 2026: [Apple public lookup](<https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software>); [Guichard: graph connectivity](<https://math.libretexts.org/Bookshelves/Combinatorics_and_Discrete_Mathematics/Combinatorics_and_Graph_Theory_%28Guichard%29/05%3A_Graph_Theory/5.07%3A_Connectivity>). No physical-device or private-server test is claimed.
+{% endraw %}

@@ -1,0 +1,86 @@
+---
+layout: null
+permalink: /en/guides/icouldplay-jellyfin-nfo-user-data-single-user-scope/index.md
+sitemap: false
+noindex: true
+lang: en
+title: 'iCouldPlay and Jellyfin NFO: identify the account receiving imported watch
+  data'
+agent_source_url: https://allluckly.cn/en/guides/icouldplay-jellyfin-nfo-user-data-single-user-scope/
+agent_source_sha256: 52f7ec7c9e05734bb982a7be75b0aa13e779f695b655ff5ee021b204d781b452
+agent_generator_version: 1
+---
+{% raw %}# iCouldPlay and Jellyfin NFO: identify the account receiving imported watch data
+
+Language: en
+Canonical: [iCouldPlay and Jellyfin NFO: identify the account receiving imported watch data](<https://allluckly.cn/en/guides/icouldplay-jellyfin-nfo-user-data-single-user-scope/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-user-data-single-user-scope/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-jellyfin-nfo-user-data-single-user-scope/>)
+Published: 2026-11-25T00:00:00+08:00
+Modified: 2026-11-25T09:06:22+08:00
+Author: Bison
+
+Use an isolated library to distinguish local NFO user data, server accounts and what iCouldPlay displays.
+
+English translation of the [Chinese original](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-user-data-single-user-scope/>), translated on 2026-11-25. Original publication dates, attribution, code and version notes are retained.
+
+Use an isolated library to distinguish local NFO user data, server accounts and what iCouldPlay displays.
+
+## Understand the import scope
+
+Jellyfin documents watched, playcount and lastplayed as user data and says NFO user data can be imported for one user selected in NFO settings. This defines server import scope; it does not promise that every client shows every field or that the NFO alone proves progress in iCouldPlay. Use an administrator-controlled test library and observe the actual interface and timing.
+
+## Prepare two separate test accounts
+
+Use two test accounts, A and B, with permission to access the same isolated library. Confirm each can sign in to the server web interface and iCouldPlay without recording credentials. Choose a short video you own and preserve the original and any existing NFO. Keep the test library separate from production media so a refresh cannot affect another person’s records.
+
+## Record the baseline
+
+In the server web interface, record whether A sees the item as watched, its play count and last-played information; repeat separately for B and mark absent fields as not displayed. Open the same item in iCouldPlay with each account and record what is actually visible. Confirm identity using duration and a self-made frame marker, not an identical cover alone.
+
+## Identify the NFO and controlled values
+
+Use Jellyfin’s naming table to find the appropriate NFO name and directory for the test item; rules vary by media type. Back up first, then inspect whether watched, playcount and lastplayed are present. Make a minimal change only if you understand XML, have permission and can restore the test environment. Otherwise stop at observation; do not delete files or replace production data.
+
+## Identify the server import target
+
+Inspect the NFO user-data import setting in the server administration interface and record its current selection. Only in the isolated test environment, select A if the interface and effects are understood and note the time. If the installed version has no identifiable control, mark the step incomplete and consult its documentation. Do not assume changing the selected user clears old records or change a production-wide setting without understanding it.
+
+## Run and record one refresh
+
+Use the server’s actual interface to refresh metadata for the test item once, noting the selected option and start and finish times. A scan, replacing all metadata and user-data import are distinct actions. Wait for completion before inspecting A and B. If the job fails or remains active, record the error category and incomplete state rather than repeatedly refreshing and obscuring which action caused a change.
+
+## Separate account results on the server
+
+Sign in separately as A and B, return to the same test item and compare watched state and any visible count or last-played time. Record changes, unchanged values, unavailable fields and uncertainty separately. A pre-existing B record remaining visible does not prove that NFO data was imported for B. The documentation describes the target; existing state and server version also affect the observed result.
+
+## Compare the client and actual playback
+
+In iCouldPlay confirm the server and account, open the same item and record the watched indicator or resume position if visible. Mark missing fields as not displayed. If playback is necessary, use your own short video and remember that playback may itself create new user data on the server. Record the pre-playback state first so a new playback event is not mistaken for the NFO import.
+
+## Troubleshoot without broadening the test
+
+If web and client differ, check account, library, item identity, refresh completion and whether the client is still showing an old page; return to the list and reopen when the interface allows. If neither server account changes, check the test filename, XML validity, selected import user and job errors, changing only one condition at a time. One unchanged result does not establish that the app lacks a feature. Never share account tokens for troubleshooting.
+
+## Restore settings and preserve the result
+
+Restore the original server import target, restore the isolated sample from backup and confirm production media was not changed. Record server and app versions, NFO fields, original and test targets, before-and-after observations for both accounts and skipped steps; remove private addresses and account details. This procedure is based on public documentation and makes no claim to have tested your device or private server.
+
+## Assess date and state separately
+
+If the NFO contains both last-played time and watched state, list them separately and check the displayed time zone or date format. Preserve the original text when its meaning is uncertain; do not claim an exact match after guessing a conversion. Similar dates do not prove an import. Do not infer that the other account never played the item from a count alone. The evidence is the controlled before-and-after observation and the server’s selected import target. Mark unavailable values as not displayed instead of changing account history to fill a table.
+
+## A reproducible test sample
+
+Use movie.nfo in an isolated self-made sample; River Demo is fictional, and watched and playcount are a boolean and an integer. Use only after the administrator confirms the import target and restoration, recording A and B before and after. This illustrates syntax, not execution on your server; lastplayed is omitted.
+
+```
+<movie><title>River Demo</title><watched>true</watched><playcount>1</playcount></movie>
+```
+
+## Related guides and sources
+
+[Season and episode NFO scope](<https://allluckly.cn/en/guides/icouldplay-jellyfin-season-episode-nfo-file-scope/>); [Account playback permissions](<https://allluckly.cn/en/guides/icouldplay-jellyfin-playback-permission-transcode-boundary/>).
+
+Checked 25 November 2026: [Apple iCouldPlay listing](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>); [Jellyfin local NFO documentation](<https://jellyfin.org/docs/general/server/metadata/nfo/>). Parser field reference: [Jellyfin official NFO parser](<https://github.com/jellyfin/jellyfin/blob/master/MediaBrowser.XbmcMetadata/Parsers/BaseNfoParser.cs>). No physical-device or private-server test is claimed.
+{% endraw %}

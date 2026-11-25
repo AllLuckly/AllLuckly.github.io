@@ -1,0 +1,56 @@
+---
+layout: guide
+author: Bison
+app_id: draw_illustration
+title: Plot a piecewise jump in VectorPaint with open and closed endpoints
+description: Plot a function that jumps at x=1 and check its two branches, endpoint markers and function value.
+permalink: /en/guides/vectorpaint-piecewise-jump-two-branches-open-closed/
+date: '2026-11-25 00:00:00 +08:00'
+modified: '2026-11-25 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 304
+topic: Jump in a piecewise function
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-25-vectorpaint-piecewise-jump-two-branches-open-closed.md
+source_url: /guides/vectorpaint-piecewise-jump-two-branches-open-closed/
+translation_method: editorial
+translation_source_sha256: 3d35e1d553c236c5a38ec49734f2a8db8b333eb8d6e93758659b367cd408426b
+translation_date: '2026-11-25T01:21:49+00:00'
+excerpt: Plot a function that jumps at x=1 and check its two branches, endpoint markers and function value.
+---
+{% raw %}
+<p>Plot a function that jumps at x=1 and check its two branches, endpoint markers and function value.</p>
+<h2 id="section-1">Write the piecewise definition</h2>
+<p>Use f(x)=x when x&lt;1 and f(x)=x+2 when x≥1. Each formula has its own domain: x=1 belongs to the second branch, so f(1)=3. The first branch approaches (1,1) but does not include it. OpenStax explains that the branches share a coordinate system and that the boundary may require open or closed circles. This is an exercise chosen for illustration.</p>
+<h2 id="section-2">Prepare canvas and objects</h2>
+<p>Create a landscape VectorPaint document, for example 1600 by 1100 pixels, and save an editable original. Keep axes, ticks and grid, two paths, open marker, closed marker and labels separately manageable using controls visible in the installed version. Leave room for the formula above and explanation beside the plot so coordinates and endpoint markers do not overlap.</p>
+<h2 id="section-3">Set the coordinate range</h2>
+<p>Use a display window of x from -2 to 4 and y from -2 to 6, with for example 100 canvas units per unit on each axis; this scale may be resized uniformly. Mark the origin and evenly spaced integer ticks, especially x=1, y=1 and y=3. The display window is a crop, not the domain of the function. If arrows are used, make the continuation direction clear.</p>
+<h2 id="section-4">Calculate points on the left branch</h2>
+<p>For y=x with x&lt;1, choose (-1,-1), (0,0) and (0.5,0.5). The boundary position (1,1) does not belong to this branch. Connect the valid points with a separate straight path and extend it left to the display boundary. Stop at the boundary for an open marker; do not extend this branch into x&gt;1.</p>
+<h2 id="section-5">Calculate points on the right branch</h2>
+<p>For y=x+2 with x≥1, calculate (1,3), (2,4) and (3,5). Connect them as a second straight path extending right from x=1 to the display boundary. Both slopes are 1, but their vertical positions differ by 2. Do not bridge the blank space with one diagonal line, which would merge different definitions. Temporarily hide the left branch and verify the right path passes through all three calculated points; restore it and select each path separately to check that changing one does not accidentally move the other.</p>
+<h2 id="section-6">Add boundary markers</h2>
+<p>Place an open circle at (1,1) for the excluded left boundary and a filled circle at (1,3) for the included right endpoint. A transparent circle may allow the path to show through; use a background-colored fill and visible stroke or adjust order with available controls. The circle centers share x=1 but align to y=1 and y=3 respectively.</p>
+<h2 id="section-7">Label formulas and domains</h2>
+<p>Label the branches “y=x, x&lt;1” and “y=x+2, x≥1,” preserving the inequality signs. Align text with each line or use leaders that do not obscure the points. Color can help, but labels and marker shapes must remain distinguishable in monochrome. Label (1,1) and (1,3) without covering the circle centers.</p>
+<h2 id="section-8">Check four substitutions</h2>
+<p>Substitute x=0, 0.5, 1 and 2 to obtain f(0)=0, f(0.5)=0.5, f(1)=3 and f(2)=4. Check that (1,1) is open and (1,3) filled, so the only function value at x=1 is 3. Do not treat the left-hand approached height 1 as f(1), and do not connect the two solid branches vertically: the intermediate heights are not given by the definition.</p>
+<h2 id="section-9">Check the jump and continuation</h2>
+<p>Following the left branch toward x=1 from below approaches height 1; following the right branch toward x=1 from above approaches height 3. The two one-sided approached heights differ, giving a jump in this example; not every piecewise function jumps. Check that arrows or notes explain continuation beyond the frame, so the canvas edge is not mistaken for a domain endpoint.</p>
+<h2 id="section-10">Check visual hierarchy and troubleshoot</h2>
+<p>If the open point appears filled, inspect path and circle order and the background-colored fill. If f(1) reads as 1, check whether ≥ was mistakenly assigned to the left branch. Hide the grid to verify both paths and markers remain clear, then restore it to check positions. At intended reading size the open circle should retain visible interior space, and coordinate labels and minus signs should not crowd each other.</p>
+<h2 id="check-endpoint-alignment">Check endpoint alignment after scaling</h2>
+<p>Zoom into the boundary and draw a temporary vertical guide through the x=1 tick. Verify both circle centers lie on that guide. Compare the horizontal ticks at y=1 and y=3: the open and filled centers should be two vertical units apart. Hide or remove the guide afterward so it cannot be mistaken for part of the function. After moving or resizing a circle, recheck its center against the coordinate rather than aligning its outer edge with the tick.</p>
+<h2 id="compare-equality-assignment">Compare a copy with the equality reassigned</h2>
+<p>Duplicate the graph and change the conditions to x≤1 and x&gt;1. Change (1,1) to filled and (1,3) to open. The function value at the boundary is now 1, while the approached heights remain 1 and 3. The line positions can stay the same, but endpoint states and condition labels must change together. Substitute x=1 in both definitions to check that color is not needed to identify the branch with equality. Keep the original x&lt;1 and x≥1 version as this exercise’s final result.</p>
+<h2 id="section-11">Save and inspect</h2>
+<p>Save the editable original and use an available export control to create a separate SVG or PNG. Reopen it and inspect axes, formulas, both paths, endpoint markers and canvas edges. Return to the original and confirm paths and circles remain independently editable. Retain the four hand-calculated test values and source link, marking any device steps not actually performed as pending.</p>
+<h2 id="additional-check">Recheck boundary coordinates</h2>
+<p>Align the x=1 tick with both marker centers and confirm the open marker is at height 1 and the filled marker at height 3. Marker size may be adjusted for legibility, but the centers must remain at their coordinates.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/vectorpaint-interval-number-line-open-closed-endpoints/">Open and closed number-line endpoints</a>; <a href="/en/guides/vectorpaint-paired-value-scatterplot/">Paired-value scatterplot</a>.</p>
+<p>Checked 25 November 2026: <a href="https://itunes.apple.com/lookup?id=1587272880&country=cn&entity=software">Apple public lookup</a>; <a href="https://openstax.org/books/calculus-volume-1/pages/1-2-basic-classes-of-functions">OpenStax: graphing piecewise-defined functions</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}

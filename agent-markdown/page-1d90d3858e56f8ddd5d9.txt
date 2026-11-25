@@ -1,0 +1,83 @@
+---
+layout: null
+permalink: /guides/manyue-kavita-comicinfo-count-ended-owned-complete/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 漫阅+ 与 Kavita 期数核对：区分出版结束和本地收齐
+agent_source_url: https://allluckly.cn/guides/manyue-kavita-comicinfo-count-ended-owned-complete/
+agent_source_sha256: 612a1a0e9d6124d38807240139e47868b89ead4f03929f96ca6b363636a68e74
+agent_generator_version: 1
+---
+{% raw %}# 漫阅+ 与 Kavita 期数核对：区分出版结束和本地收齐
+
+语言：zh-CN
+原文：[漫阅+ 与 Kavita 期数核对：区分出版结束和本地收齐](<https://allluckly.cn/guides/manyue-kavita-comicinfo-count-ended-owned-complete/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/manyue-kavita-comicinfo-count-ended-owned-complete/>)
+English: [English HTML](<https://allluckly.cn/en/guides/manyue-kavita-comicinfo-count-ended-owned-complete/>)
+发布于: 2026-11-25T00:00:00+08:00
+内容更新于: 2026-11-25T00:00:00+08:00
+署名：Bison
+
+用自制漫画核对 ComicInfo Count、系列出版状态和自己书库的收齐情况。
+
+用自制漫画核对 ComicInfo Count、系列出版状态和自己书库的收齐情况。
+
+## 理解官方字段规则
+
+Kavita 漫画元数据文档说明，在字段未锁定时，如果系列中至少一份 ComicInfo 的 Count 已定义且不为零，服务器会将出版状态视为 ended；Count 与卷数或章节数匹配时，服务器会视为 completed，即本地拥有全部项目。出版结束与自己拥有全部文件是不同结论，均不能直接等同用户已经阅读完毕。
+
+## 准备隔离样本
+
+使用自己管理的隔离书库和两份自制短漫画，保留原文件与元数据备份。以明显不同的画面标记区分两期，并使用可访问该库的普通测试账户。无需购买真实漫画或改动他人作品；如果无法恢复样本或不具备编辑权限，只做只读观察，不改变正式库的漫画文件和阅读进度。
+
+## 记录系列和现有状态
+
+在 Kavita 网页找到测试系列，记下系列名称、实际可见的期数或卷数、出版状态、拥有状态与用户阅读进度；各项没有显示时记未显示。检查是否存在同名系列或被锁定的字段。再用相同普通账户在漫阅+ 找到对应作品，记录实际可见字段与章节，不假设客户端提供服务器网页上的每一个徽标。
+
+## 检查 ComicInfo 与 Count
+
+Kavita 文档要求 ComicInfo.xml 位于漫画压缩包根目录。仅在有权检查的副本中查看两个文件的 Series、Number、Volume 和 Count，记录每个值及其所属包；不要将不同文件中的字段混为一个对象。Count 的理想值是系列的总卷数或期数，而不是已经读过的页数。字段缺失、零值和无法检查应分别标记。
+
+## 建立一个未收齐对照
+
+只有管理员确认隔离及恢复方式，且编辑者熟悉 XML 时，才在自制副本中建立清楚的测试值：例如总期数大于实际拥有的两期。保存前核对包根目录、编号及 XML 格式，并记录测试前后的值。测试值仅用于实验，不代表任何真实出版物；不能编辑或确认服务器规则时写未执行，不猜测软件界面。
+
+## 观察服务器扫描结果
+
+按服务器当前界面执行或等待测试库扫描，记录任务完成时间。随后在网页分别核对出版状态和拥有数量：文档中的 ended 与 completed 判定条件不同，不应因为出现出版结束就写本地已经收齐。若结果不符，先检查字段锁定、实际系列归组、每份文件的 Count 与服务器版本，保持其他条件不变。
+
+## 在条件允许时单独对照
+
+若管理员允许且能恢复隔离副本，可另做一次独立对照，使测试总数与服务器实际识别的期数相符，记录修改前后值与扫描结果。不要同时改用户阅读进度或书库授权；新状态应与服务器当前识别的卷或章节数量比较，而不是单看磁盘文件总数。无法隔离变量时停止，不称已验证 completed 规则。
+
+## 在漫阅观察可见信息
+
+返回漫阅+ 的同一服务器和普通账户，重新进入对应系列，记录期数、章节与实际可见状态。若未显示 ended 或 completed 标记，写未显示；服务器已有信息不保证该连接会暴露它。可打开授权的自制章节核对画面，但不要把能打开章节或读到末页写成整个系列已经收齐。
+
+## 恢复并记录
+
+恢复测试副本及书库设置，确认原文件和其他用户进度保留；不清楚影响时由管理员处理。记录服务器版本、各文件 Count、识别数量、字段锁定、服务器状态、漫阅观察与未执行项。删除私人路径与凭据后再分享。本文依据公开文档，不声称私人服务器或特定设备实测。
+
+## 核对编号与服务器归组
+
+两个压缩包即使都包含 ComicInfo，也可能因 Series、Volume 或 Number 等值而被服务器识别成不同系列或不同层级。先对照每份自制样本的文件名、元数据和值，查看服务器网页实际显示的系列和期数，再使用服务器识别的数量做对照。一个文件对应多个章节、重复编号或扫描尚未完成时，应记下不确定性，不以磁盘上文件恰好有两份就断言服务器拥有两期。
+
+## 分开三个状态做记录
+
+可以为出版是否结束、本地是否收齐和测试账户是否读完分别建立列。前两项与系列元数据和拥有项目有关，最后一项与该用户的阅读进度有关；任何一列缺少显示都应标为未知。若系列出版结束但仍缺一本，只记录这一组合，不需要为了制造“收齐”状态下载其他人的漫画。反之，本地收齐也不表示用户已经打开每一章。
+
+## 注意字段锁定与来源
+
+官方 Count 规则明确以字段未锁定为前提。若服务器元数据编辑界面显示相关字段被锁定，先记录现状；不清楚解锁影响时不要更改正式资料。若同时存在远程元数据或其他文件的 Count，也需将来源和文件逐一列出。一次观察不足以证明某个具体来源覆盖了另一个，无法判断时保留未知，交给有权限的管理员继续检查。
+
+## 一组可复现的测试值
+
+可复现样本：两份根目录 ComicInfo.xml 均写 Series 为 River Demo，Number 分别为 1 和 2，Count 均为 3。隔离服务器识别为同一系列的两期且字段未锁定时，按文档预期非零 Count 可对应出版结束，而已识别两期少于总数三期，不能称收齐。独立对照仅将两包 Count 改为 2，保持其他字段不变并重新扫描；若服务器仍识别两期，检查 completed 状态。具体标签及结果按当前版本记录。
+
+## 相关教程与资料
+
+[漫画元数据与阅读列表](<https://allluckly.cn/guides/manyue-kavita-comicinfo-seriesgroup-storyarc-output-scope/>)、[阅读进度图标](<https://allluckly.cn/guides/manyue-kavita-opds-progress-icons-title-vs-position/>)。
+
+2026年11月25日核对：[Apple 漫阅+ 资料](<https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software>)、[Kavita 漫画元数据与 Count](<https://wiki.kavitareader.com/guides/metadata/comics/>)。未声称完成真实设备或私人服务器测试。
+{% endraw %}

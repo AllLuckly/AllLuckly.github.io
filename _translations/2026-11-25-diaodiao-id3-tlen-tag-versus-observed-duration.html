@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: diaodiao
+title: '调调 lesson 107: compare TLEN duration tags with playback'
+description: Check millisecond tags, app display and listening on two owned audio copies.
+permalink: /en/guides/diaodiao-id3-tlen-tag-versus-observed-duration/
+date: '2026-11-25 00:00:00 +08:00'
+modified: '2026-11-25 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 107
+topic: Duration tags and playback observations
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-25-diaodiao-id3-tlen-tag-versus-observed-duration.md
+source_url: /guides/diaodiao-id3-tlen-tag-versus-observed-duration/
+translation_method: editorial
+translation_source_sha256: 64480e1812f0d5e6fcbb445fa279d7b31e39d12594aa0657863082ecf74ffce9
+translation_date: '2026-11-25T01:39:10+00:00'
+excerpt: Check millisecond tags, app display and listening on two owned audio copies.
+---
+
+{% raw %}
+<p>The duration displayed by 调调 may differ from a duration tag within a file. ID3v2.4&#x27;s TLEN frame records length as a numeric string in milliseconds, but the standard does not require a player to use it. Set different TLEN values on two copies of an owned MP3, then separately record external readback, app display and listening results without presupposing how the app reads tags.</p>
+<h2 id="section-1">Prepare an original and two copies</h2>
+<p>Choose a short MP3 you have permission to edit and preserve the unmodified original. Listen with a reliable player and record its visible total duration; a recording with a recognizable sound at the end is helpful. The example uses about thirty seconds, but your file determines the actual result. Make clearly distinguishable copies A and B. Check that both play the same beginning and ending with no obvious truncation. Do not intentionally put an incorrect tag on a file intended for formal release.</p>
+<h2 id="section-2">Understand TLEN units</h2>
+<p>ID3 defines TLEN as the audio file&#x27;s length, represented by a numeric string in milliseconds. For example, thirty seconds is 30000 milliseconds and twenty-five seconds is 25000 milliseconds. The tag is metadata, not the audio itself; changing it does not automatically trim the sound. The example values provide a recognizable difference, not a true duration for arbitrary files. A player may calculate display from the audio stream, tag or other information; only observation establishes the interface result. If the external player shows whole seconds only, record A as approximate. Rounded thirty seconds is not a precise measurement of 30000 milliseconds; a precise comparison requires a trusted higher-resolution tool and documented measurement conditions.</p>
+<h2 id="section-3">Record a file baseline first</h2>
+<p>Open A and B in a trusted tag editor. See whether it explicitly identifies the TLEN frame, and record its initial value, title and duration. Do not assume a generic duration display with no identified source is TLEN; consult tool documentation or stop editing tags. Confirm original and working-copy paths to avoid changing the wrong file. Tools differ in empty tags, numeric entry and saving; follow the actual tool&#x27;s instructions.</p>
+<h2 id="section-4">Write each copy&#x27;s tag</h2>
+<p>Only if the tool explicitly supports TLEN, set A to the actual recording length converted to milliseconds, and set B to a clearly different positive integer for practice. For the thirty-second example, A can be 30000 and B 25000; for another duration choose and record values appropriate to that file. Do not write the wrong value to the original. Record the A/B mapping on paper before editing each so a later file reorder cannot reverse experiment labels and playback results. Save and close the editor. If TLEN cannot be edited or units are uncertain, mark not tested; do not change file extensions to bypass the problem.</p>
+<h2 id="section-5">Read back tags and listen</h2>
+<p>Reopen both copies and read TLEN separately, checking A and B against your record and making sure seconds were not mistakenly entered as milliseconds. Compare titles, file identities and visible durations, then listen to the beginning, middle and end of each. If sound is truncated, tags did not save, or a file will not play, stop the comparison and prepare fresh copies from the retained original. Tag changes may alter file size, so size differences alone do not establish an audio change; keep clear listening notes as well.</p>
+<h2 id="section-6">Import in separate rounds and identify</h2>
+<p>Record existing entries in 调调, then select A through the actual visible file-import control and B separately. For each round record app feedback, title and source. If the app reports a duplicate, same-name conflict or merge, stop and establish which item is which rather than assuming both must become entries. If B cannot be identified, mark its app observation unconfirmed; do not substitute A or an old file. Preserve old same-name entries rather than clearing the library for the test.</p>
+<h2 id="section-7">Observe display and playback separately</h2>
+<p>For identifiable A and B, record the duration shown in list or playback view and, where practical, play through to the recording&#x27;s end. Record whether the final recognizable sound is heard and the playback state, allowing manual timing error. If display matches despite different tags, or differs while the sound is the same, record only the actual observation. If playback to the end is not possible, mark it not tested. A progress bar alone does not establish that the player uses TLEN.</p>
+<h2 id="section-8">Compare and investigate differences</h2>
+<p>Keep three columns for each copy: TLEN read back, duration displayed by the app and observable playback result. Check units and file identity first, then consider possible factors such as tag editor, file structure or app version. Without direct evidence, do not attribute a difference to a specific internal algorithm. Display precision and manual observation error can also cause differences. One result cannot establish behaviour for other files, sources or versions.</p>
+<h2 id="section-9">Clean up and restore</h2>
+<p>Preserve the original and practice record; do not publish B with its intentionally incorrect TLEN as a formal file. If removing test entries, first identify them as these copies; leave uncertain items alone. Record app version and incomplete steps but do not publish private paths or recording contents. This guide uses public format and store information and does not claim step-by-step tests on a personal device or private server.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p>See <a href="/en/guides/diaodiao-mp3-constant-variable-bitrate-weighted-duration-byte-ledger/">estimating duration for constant and variable bitrates</a> and <a href="/en/guides/diaodiao-title-tag-edit-versus-duplicate-import/">duplicate import after a title edit</a>. TLEN is defined in the <a href="https://github.com/id3/ID3v2.4/blob/master/id3v2.4.0-frames.txt">ID3v2.4 frame specification</a>; public 调调 information is in the <a href="https://apps.apple.com/ru/app/id6827171352">App Store listing</a>.</p>
+{% endraw %}

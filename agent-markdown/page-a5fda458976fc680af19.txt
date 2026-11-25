@@ -1,0 +1,91 @@
+---
+layout: null
+permalink: /guides/icouldplay-jellyfin-nfo-dateadded-year-premiered-check/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映与 Jellyfin 影片日期：区分入库时间、年份和首映日期
+agent_source_url: https://allluckly.cn/guides/icouldplay-jellyfin-nfo-dateadded-year-premiered-check/
+agent_source_sha256: 3efe3f0a75263f10988c10d3e85e550690c5a53584be2a18a8596615b2c92cc7
+agent_generator_version: 1
+---
+{% raw %}# 云映与 Jellyfin 影片日期：区分入库时间、年份和首映日期
+
+语言：zh-CN
+原文：[云映与 Jellyfin 影片日期：区分入库时间、年份和首映日期](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-dateadded-year-premiered-check/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-dateadded-year-premiered-check/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-jellyfin-nfo-dateadded-year-premiered-check/>)
+发布于: 2026-11-25T00:00:00+08:00
+内容更新于: 2026-11-25T00:00:00+08:00
+署名：Bison
+
+用自制隔离影片对照 NFO 日期字段、服务器页面和云映实际显示。
+
+用自制隔离影片对照 NFO 日期字段、服务器页面和云映实际显示。
+
+## 理解日期的不同含义
+
+Jellyfin 本地 NFO 文档列出 dateadded、year 和 premiered 等字段，并注明写出 NFO 时 dateadded 使用 UTC。入库时间、影片年份和首映日期表达不同事实，不应仅凭日期相近就合并；文档的写出说明也不能自动证明每个已有文件都是 UTC 或当前客户端一定显示这些字段。
+
+## 准备隔离和自制影片
+
+在自己管理的隔离电影库使用一段自制短片，记录标题、时长和画面标记；备份视频、NFO 与元数据。用普通测试账户访问该库，避免改动真实电影或其他人的观看记录。后续例子只使用虚构日期，若不能确认隔离和恢复方式，停在只读检查，不修改生产服务器日期设置。
+
+## 建立服务器与云映基线
+
+在 Jellyfin 网页找到测试影片，记录页面可见的年份、日期、添加顺序和字段标签；不可见的写未显示。再在云映用同一服务器和账户找到同一条目，依据时长与自制画面标记确认身份。列表排序或显示日期可能涉及多种设置，不要在缺少字段标签时把它直接称为 NFO 入库时间。
+
+## 逐项检查原始字段
+
+依据官方电影 NFO 命名表定位测试影片的文件，在有权检查的副本中记录 dateadded、year、premiered 的原始文本及是否缺失。dateadded 的时区或格式不明时原样保存并标为未知，不自行转换；不同来源的年份或首映时间也可能不一致。不要把文件系统修改时间当作 NFO 标签的值。
+
+## 使用明确的虚构日期
+
+仅在管理员确认隔离、备份及恢复方式，且编辑者熟悉 XML 时，在自制 NFO 副本中使用 year 为 2020、premiered 为 2020-05-06，并记录一个明确带来源说明的测试 dateadded。先查当前版本支持的格式并验证 XML；不熟悉格式时保留字段未执行。例子用于区分概念，不代表真实影片上映或用户入库日期。
+
+## 刷新并观察服务器
+
+按当前服务器界面等待或执行对测试影片的元数据刷新，记录任务状态、时间和版本。分别查看服务器可见的年份、首映日期和入库信息；若没有某项入口，标记未显示。文档说明本地 NFO 元数据优先于远程提供方，但数值相同并不足以证明某个页面字段的具体来源。
+
+## 在云映核对实际界面
+
+在云映以相同服务器和普通账户重新进入该影片，记录实际显示的年份或日期、标签及播放时画面标记。没有原始 NFO 字段入口就写未显示，不假设应用一定展示首映日期或添加时间。服务器页面与客户端数字不同，先核对影片身份、来源、页面状态和显示格式，不立即宣称某一端错误。
+
+## 处理时区和日期边界
+
+若有可靠证据表明测试 dateadded 使用 UTC，可在记录中保留原始时间并单独注明观察界面的时区；跨午夜时日历日期可能不同。没有时区证据时不推算，不把 premiered 的日期自动当成带时区的时间戳。文件修改日期、服务器导入时间和用户观看时间也要分别记录。
+
+## 恢复并记录
+
+按备份恢复隔离 NFO 和设置，确认原视频和其他用户资料保留；不确定影响时由管理员处理。结果表列出原字段、来源和时区是否已知、服务器与云映显示以及未执行步骤；分享前移除私人路径和账户凭据。本文依据公开资料，不声称实测私人服务器或设备。
+
+## 记录虚构日期的各自含义
+
+例如自制影片在测试元数据中写 year 为 2020、premiered 为 2020-05-06；管理员另行记录测试文件复制到隔离目录的日期。前两项是样本声明，复制日期是文件操作的观察记录，不要将后者直接写入 dateadded。若服务器当前版本文档没有提供可确认的 dateadded 输入格式，保留原值并跳过编辑；不要靠猜测的时间字符串制造所谓成功案例。
+
+## 核对不同界面的标签
+
+一处界面可能只显示四位年份，另一处可能显示完整日期或本地时间；首先记下它们各自的标签和格式，而非只比较数字。没有标签时不能确定该值是影片年份还是加入时间。若服务器不展示原始 NFO 内容，可保留有权检查的副本作为独立证据，但不要因此断言所有客户端都读到了这些字段。
+
+## 受控对照与旧数据
+
+若管理员已确认可恢复，可单独改变测试副本中的一个年份字段，再记录刷新方式和结果；其他字段、影片文件和账户设置保持不变。已有服务器缓存、元数据锁定或远程来源可能影响观察，不能只因数值未变化就宣称 NFO 未被读取。无法隔离这些条件时停在记录，避免清空整个正式库缓存或改写原始资料。
+
+## 确认记录不包含私人信息
+
+向他人分享测试结果前，只保留虚构日期、相对路径和必要版本。账号、令牌、家庭服务器地址及用户个人观看历史均不属于日期字段核对所需内容，应从截图和笔记中移除。
+
+## 一组可复现的测试样本
+
+以下 movie.nfo 使用虚构年份与首映日；Jellyfin 当前公开解析代码读取 year 与 premiered，但日期格式受服务器设置约束，应核对当前版本。示例不猜测 dateadded 的输入格式：保留原字段并跳过该字段编辑。刷新后分开记录服务器年份、首映日和云映可见值；未声称运行。
+
+```
+<movie><title>River Demo</title><year>2020</year><premiered>2020-05-06</premiered></movie>
+```
+
+## 相关教程与资料
+
+[本地片名与原名](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-title-originaltitle-identity/>)、[资料提供方身份](<https://allluckly.cn/guides/icouldplay-jellyfin-provider-id-catalog-identity-check/>)。
+
+2026年11月25日核对：[Apple 云映资料](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>)、[Jellyfin 本地 NFO 日期字段](<https://jellyfin.org/docs/general/server/metadata/nfo/>)。解析器字段可参考 [Jellyfin 官方 NFO 解析代码](<https://github.com/jellyfin/jellyfin/blob/master/MediaBrowser.XbmcMetadata/Parsers/BaseNfoParser.cs>)。未声称完成真实设备或私人服务器测试。
+{% endraw %}

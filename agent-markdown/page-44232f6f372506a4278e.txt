@@ -1,0 +1,87 @@
+---
+layout: null
+permalink: /guides/icouldplay-jellyfin-nfo-title-originaltitle-identity/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映与 Jellyfin 片名核对：区分本地标题、原名和影片身份
+agent_source_url: https://allluckly.cn/guides/icouldplay-jellyfin-nfo-title-originaltitle-identity/
+agent_source_sha256: fcd943d97e0c99f005f2234082725b27a1cd272606b1e5681fab00d7071383d1
+agent_generator_version: 1
+---
+{% raw %}# 云映与 Jellyfin 片名核对：区分本地标题、原名和影片身份
+
+语言：zh-CN
+原文：[云映与 Jellyfin 片名核对：区分本地标题、原名和影片身份](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-title-originaltitle-identity/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-title-originaltitle-identity/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-jellyfin-nfo-title-originaltitle-identity/>)
+发布于: 2026-11-25T00:00:00+08:00
+内容更新于: 2026-11-25T00:00:00+08:00
+署名：Bison
+
+用隔离影片分开记录 NFO 标题、原名、服务器显示和云映中的实际影片。
+
+用隔离影片分开记录 NFO 标题、原名、服务器显示和云映中的实际影片。
+
+## 理解字段不等于界面
+
+Jellyfin 本地 NFO 文档列出 name、title、localtitle 和 originaltitle，其中 title 与 localtitle 映射到同一 name 数据，而 originaltitle 单独列出。文档还提醒多个标签映射到同一内部数据时，以文件中最后一个为准。服务器如何在当前界面显示以及云映是否展示原名，应以实际观察为准。
+
+## 准备自制隔离影片
+
+使用自己管理的隔离电影库和一段自制短片，选择两个不含私人信息的虚构片名作为显示标题和原名。记录视频时长及画面标记，备份原视频、NFO 和已有元数据。不要修改其他人的影片、共享库或真实片名；不具备权限及恢复条件时只记录界面，不进行文件编辑。
+
+## 建立服务器和云映基线
+
+用有权访问测试库的普通账户在服务器网页找到影片，记录显示标题、是否可见原名、时长和识别来源；字段不可见时写未显示。再在云映用同一服务器和账户找到同一条目，通过时长和自制画面核对身份。相同片名或海报不能单独证明指向同一文件；保留原有播放进度。
+
+## 逐项查看 NFO 字段
+
+依据 Jellyfin 的电影 NFO 命名表定位测试影片文件，在有权检查的副本中按出现顺序记录 name、title、localtitle 和 originaltitle 的原始值。字段缺失、为空和无法检查应分开记；不要把文件夹名或远程资料名称冒充 XML 内容。若结构或编码无法确认，停止在观察，不下载未知 NFO 替换真实资料。
+
+## 配置单变量测试副本
+
+只有管理员确认隔离、备份和恢复方式且编辑者熟悉 XML 时，才在测试副本中放入一个虚构显示标题和一个不同的原名，并记录其出现顺序。先避免同时放入多个映射到同一内部名称的标签，验证格式和文件位置。不能安全编辑时跳过，不将未来可能的结果写成已完成测试。
+
+## 刷新并检查服务器
+
+按当前界面对测试影片执行或等待元数据刷新，记录选项、完成时间和实际提示。服务器文档说明本地 NFO 相对远程提供方有优先级，但不能仅凭相同文字就证明某个字段来源。检查当前页面显示的标题、原名及影片身份；若与预期不符，先核对 NFO 名称、字段、锁定状态和任务是否完成。
+
+## 单独比较同一内部名称的标签
+
+若管理员确认安全且确有必要，可在隔离副本中单独对照 name、title 或 localtitle 的两个不同虚构值，保留文件顺序并记录刷新结果。只改变标签顺序或一个值，其他元数据保持不变；文档说明同一内部数据由后出现标签优先。无法确保变量隔离时跳过，不把不确定结果当成规则失效。
+
+## 在云映检查显示与播放
+
+回到云映同一服务器和普通账户，重新进入测试影片，记录实际标题、是否可见原名及播放短片的自制画面。若服务器与客户端名称不同，检查条目身份、账户及页面状态；客户端没有原名字段就记未显示，不要求重置应用或声称其一定读取所有 NFO 标签。标题显示正确不单独证明播放的是预期文件。
+
+## 恢复与记录
+
+按备份恢复测试 NFO 和设置，确认原视频、进度和其他用户数据保留；不确定恢复作用时由管理员处理。结果表分别记录各原始标签及顺序、服务器显示、客户端显示、影片标记和未执行步骤。分享前移除私人路径及认证信息。本文依据公开资料，不声称访问私人服务器或真机测试。
+
+## 记录标签顺序与文件身份
+
+同一影片的 NFO 可能不止包含一类名称，也可能已有服务器保存的数据。对每次实验保留测试文件的路径范围、标签顺序、虚构值和修改时间；无需在公共记录中暴露完整私人目录。若两个标签映射到同一内部名称，文档中的后者优先规则与原名字段应分开检查，不把 originaltitle 自动当作另一个 name 别名。阅读结构不明确或有重复 XML 根元素时应停止并请熟悉格式的管理员检查。
+
+## 名称不等于影片版本
+
+即使本地标题和原名都与预期一致，服务器条目仍可能包含不同剪辑版或编码副本。播放前比较测试文件时长和自制画面标记，记录所选版本；不能仅凭详情页文字判断实际播放了哪个文件。若测试库中出现两个同名条目，先保留两者并检查目录、提供方身份与文件，不删除不确定的条目。
+
+## 将可见内容和来源证据分栏
+
+在结果表中分别列出 NFO 的原始标签、服务器页面可见的文字、云映可见的文字以及来源是否经过确认。服务器页面未提供原名时写未显示，不把 NFO 里存在原名误记为用户界面已展示。若远程资料和本地字段恰好相同，观察到相同片名并不足以识别来源；无法确认时写来源未知，并保留测试前后的记录。
+
+## 一组可复现的测试样本
+
+以下 movie.nfo 使用虚构值：name 和 title 映射同一内部名称，title 后出现，因此按当前官方规则其值优先；originaltitle 是独立原名。仅在可恢复的隔离副本中验证并观察服务器与云映界面，不以示例声称实际运行或保证客户端显示原名。
+
+```
+<movie><name>River First</name><title>River Later</title><originaltitle>River Original</originaltitle></movie>
+```
+
+## 相关教程与资料
+
+[NFO 简介标签顺序](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-plot-review-order/>)、[资料身份核对](<https://allluckly.cn/guides/icouldplay-jellyfin-provider-id-catalog-identity-check/>)。
+
+2026年11月25日核对：[Apple 云映资料](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>)、[Jellyfin 本地 NFO 文档](<https://jellyfin.org/docs/general/server/metadata/nfo/>)。解析器字段可参考 [Jellyfin 官方 NFO 解析代码](<https://github.com/jellyfin/jellyfin/blob/master/MediaBrowser.XbmcMetadata/Parsers/BaseNfoParser.cs>)。未声称完成真实设备或私人服务器测试。
+{% endraw %}

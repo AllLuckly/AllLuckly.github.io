@@ -1,0 +1,46 @@
+---
+layout: guide
+author: Bison
+app_id: diaodiao
+title: '调调 lesson 105: distinguish FLAC indexes from separate audio files'
+description: Inspect a continuous recording CUESHEET block, then observe imported entries and duration.
+permalink: /en/guides/diaodiao-flac-cuesheet-index-versus-separate-tracks/
+date: '2026-11-25 00:00:00 +08:00'
+modified: '2026-11-25 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 105
+topic: FLAC indexes and separate tracks
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-25-diaodiao-flac-cuesheet-index-versus-separate-tracks.md
+source_url: /guides/diaodiao-flac-cuesheet-index-versus-separate-tracks/
+translation_method: editorial
+translation_source_sha256: bc0bf2986130a5a05dd97a8cccbee405e8198757e70b8f0cab9f962d6874befa
+translation_date: '2026-11-25T01:28:02+00:00'
+excerpt: Inspect a continuous recording CUESHEET block, then observe imported entries and duration.
+---
+
+{% raw %}
+<p>A continuous recording can contain track indexes, but an index does not mean a player will split it into individual songs. FLAC defines a CUESHEET metadata block; 调调&#x27;s public description does not promise to recognize that block or automatically split tracks. First inspect the indexes in an owned continuous recording, then observe the actual number of entries and playable durations in 调调.</p>
+<h2 id="section-1">Prepare a supported sample</h2>
+<p>Choose an owned FLAC continuous recording you have permission to process and play. Preserve the untouched original and make a working copy. The sample should have a documented section record, for example three spoken passages beginning at the start, about thirty seconds and about sixty seconds. These numbers are only examples; use the actual recording. Listen to each section with a player that can open it and note total duration and recognizable sound anchors. Without trustworthy section information, do not invent exact indexes from listening. Record the source and estimated uncertainty for each anchor, such as “original record says about thirty seconds”; do not apply the example numbers to your file. If the recording contains private conversation, choose non-sensitive material instead.</p>
+<h2 id="section-2">Distinguish audio, indexes and independent files</h2>
+<p>A CUESHEET metadata block in a FLAC file can hold tracks and index points; those points are not independent audio files. Unlike a player-created queue, the index belongs to file metadata. Xiph&#x27;s official documentation says its metadata tool can list blocks; a text tag named CUESHEET is not necessarily the same structure as a CUESHEET block. This exercise concerns a block confirmed by a tool, not a similarly named text field alone.</p>
+<h2 id="section-3">Inspect the metadata block</h2>
+<p>If a trusted copy of the official FLAC tools is already installed on a computer, list the working copy in Terminal using <code>metaflac --list --block-type=CUESHEET sample.flac</code>. Replace the example filename with the actual path; quote a path containing spaces according to shell rules. This command lists data and does not modify a file; do not manually alter the original. Read the official tool documentation and confirm you are addressing the copy. Do not run editing commands from unknown websites. If you lack a computer, tool or sample, record the step as not tested; there is no need to download an unfamiliar file to perform it.</p>
+<h2 id="section-4">Check tracks and indexes</h2>
+<p>See whether output explicitly lists a CUESHEET block, tracks and indexes. If no output or an error appears, record what happened without declaring the file damaged. Sample offsets relate to recording time; verify sample rate, units and origin before converting, and do not mistake track numbers for seconds. Compare confirmed indexes with documented sound anchors and mark uncertain or unconverted items. This establishes file information, not whether 调调 uses the indexes.</p>
+<h2 id="section-5">Import and identify in 调调</h2>
+<p>Select the working copy using the file import control actually visible in 调调. Record the pre-import library state, file identity and interface response. If a same-name conflict, rejection or merge appears, stop and preserve the actual message without guessing whether an old entry was overwritten. Count displayed entries only after identifying this copy. If an existing same-name item cannot be distinguished, mark the count unconfirmed; do not substitute that old entry for the new result.</p>
+<h2 id="section-6">Compare entry counts and playback duration</h2>
+<p>Observe whether 调调 shows one continuous item, multiple identifiable items or another result. For any item you can open, record displayed duration, playback start and actual sound. If seeking is safely available, listen near the documented anchors and record each observation. Hearing the second section does not prove it became an independent track; one visible entry is not a reason to delete the original. If a positioning control is unavailable, mark that step not tested.</p>
+<h2 id="section-7">Investigate differences</h2>
+<p>List metadata blocks on the working copy again, and verify the app opened that same file. If the file has indexes but 调调 shows one item, that is only the current observation; do not claim indexes were deleted or every app version lacks support. If multiple items appear, first rule out previously imported separate files and other sources; do not attribute them to CUESHEET before confirming identity. Network, source, format support and current version can also influence behaviour; record them separately rather than guessing a cause.</p>
+<h2 id="section-8">When independent sections are needed</h2>
+<p>If your real task requires separate files, work on a copy of the original recording in a trusted audio editor. Export individual sections at verified boundaries and listen to the beginning and end of each. Keep the continuous original and an export inventory, then separately import a small authorized test result. Do not assume 调调 provides an unpublished automatic splitting feature. Stop if boundaries are unclear, tools are unavailable or editing permission is missing; do not fabricate apparently precise cuts.</p>
+<h2 id="section-9">Keep the results and restore</h2>
+<p>Record file identity, metadata-block inspection, app entry count, duration and incomplete steps, while retaining the original. Before removing a test entry, identify it as this copy so an older same-name item is not deleted; leave it alone if uncertain. Do not upload personal recordings or full private paths to public services. This guide uses public format and store information and does not claim a test on a personal device or private server.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p>See <a href="/en/guides/diaodiao-combined-three-parts-source-local-time-map/">mapping the timing of continuous recording sections</a> and <a href="/en/guides/diaodiao-wav-flac-decoded-pcm-equality-not-device-bitperfect/">comparing lossless audio</a>. Tool options are documented by <a href="https://www.xiph.org/flac/documentation_tools_metaflac.html">Xiph&#x27;s metaflac guide</a>; public app information is in the <a href="https://apps.apple.com/ru/app/id6827171352">调调 App Store listing</a>.</p>
+{% endraw %}

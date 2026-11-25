@@ -1,0 +1,83 @@
+---
+layout: null
+permalink: /guides/icouldplay-jellyfin-nfo-art-first-thumbnail-priority/index.md
+sitemap: false
+noindex: true
+lang: zh-CN
+title: 云映与 Jellyfin NFO 图片：核对首个同类型图像与显示来源
+agent_source_url: https://allluckly.cn/guides/icouldplay-jellyfin-nfo-art-first-thumbnail-priority/
+agent_source_sha256: 57b7630ab635ea1f0a9f7672203dc599541e3307ce196215fcbad5ca0844469b
+agent_generator_version: 1
+---
+{% raw %}# 云映与 Jellyfin NFO 图片：核对首个同类型图像与显示来源
+
+语言：zh-CN
+原文：[云映与 Jellyfin NFO 图片：核对首个同类型图像与显示来源](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-art-first-thumbnail-priority/>)
+中文：[中文 HTML](<https://allluckly.cn/guides/icouldplay-jellyfin-nfo-art-first-thumbnail-priority/>)
+English: [English HTML](<https://allluckly.cn/en/guides/icouldplay-jellyfin-nfo-art-first-thumbnail-priority/>)
+发布于: 2026-11-25T00:00:00+08:00
+内容更新于: 2026-11-25T00:00:00+08:00
+署名：Bison
+
+用隔离样本区分 NFO 图像声明、服务器选择和云映封面显示。
+
+用隔离样本区分 NFO 图像声明、服务器选择和云映封面显示。
+
+## 先理解公开规则
+
+Jellyfin 本地 NFO 文档说明，每种艺术图片类型只支持一个图片，因此该类型只使用第一个 thumb 标签。文档还说明 NFO 中声明的本地路径或 URL 优先于远程图片提供方和媒体文件夹中的图片。这是服务器端规则，不保证云映立即更新封面，也不保证每种 NFO 写法都会被当前版本读取。
+
+## 准备隔离电影与图片
+
+使用自己管理的隔离测试库和一段有权使用的短片，保留视频、现有 NFO 和原封面的备份。准备两张自己制作、同样格式且有明显不同颜色或文字的海报，记录对应文件名；不要使用含个人信息的图片。选择服务器可以访问且权限明确的本地测试路径，不需要将图片上传到公共网络。先确认测试条目的身份与恢复方式。
+
+## 记录原始显示
+
+在 Jellyfin 网页找到测试电影，记下标题、时长、当前海报和元数据刷新状态。使用有权访问该库的普通测试账户在云映找到相同电影，记录海报和时间；相同标题可能指向不同版本，可用时长与自制画面标记核对。若客户端没有封面或目录入口，记录实际显示，不先假设服务器选择错误。
+
+## 核对 NFO 文件与类型
+
+按 Jellyfin 命名表定位测试电影对应的 NFO，并先另存备份。查看已有图片标签，注意 thumb 的 artwork type 和路径或 URL；只比较明确属于同一类型的两个声明，不把海报与背景图混成同一组。若文件格式或属性含义无法确认，参考服务器版本文档或由管理员协助，停止修改，不覆盖真实电影元数据。
+
+## 设置第一个测试顺序
+
+仅在熟悉 XML 和 NFO 语法、拥有权限且能够恢复时，在隔离副本的同一种图片类型中安排海报 A 在前、海报 B 在后。使用该服务器文档支持的路径与写法，不猜测标签参数。保存后检查 XML 格式，并记下文件原始顺序和修改时间；如果界面只能编辑单张图片，就不要臆造第二个标签，改为记录该步骤未执行。
+
+## 刷新并先看服务器
+
+对测试条目按服务器当前界面执行一次元数据刷新，记录所选方式、时间和是否完成。完成后查看服务器显示的该类型图片，并与 A、B 的明显标记比较。A 出现与规则一致，但仍需记录文件路径、任务状态和其他图片来源；若图片未变化，可能涉及缓存、路径权限或刷新范围，不能单凭一次结果判定 NFO 无效。
+
+## 在云映观察封面
+
+使用同一普通账户返回云映目录并重新进入测试条目，记录看到 A、B、旧图或无图的实际状态。服务器已经显示 A 而客户端仍显示旧图时，先核对连接、电影身份和页面状态；不要把客户端显示延迟写成服务器读取失败。若当前版本没有可见的重新载入方式，就记录未观察到，不要求清除整个应用缓存或删除用户数据。
+
+## 交换顺序做单独对照
+
+在具备恢复条件的隔离测试中，将同类型两条声明的顺序交换，使 B 在前、A 在后；其余路径、图片文件和库设置保持不变。再次保存、验证格式并执行单独一次刷新，分别记录服务器和云映结果。若无法安全更改或版本不接受该样本，就停止并注明未完成，不为了得到预期结果改动其他参数。
+
+## 分层检查差异
+
+如果服务器始终显示旧图，检查 NFO 名称、标签类型、XML 合法性、服务器访问图片路径的权限和任务结果；一次只改变一个条件。文件夹图片或远程海报也可能存在，但本地 NFO 图片按文档优先，不能仅凭看到同名文件就断定来源。若服务器和客户端不同，单独检查客户端账号、项目身份及页面状态。
+
+## 恢复和记录
+
+将隔离测试 NFO、封面和设置恢复为备份，确认原视频和既有用户资料保留。记录版本、两次声明顺序、刷新结果、服务器及云映实际画面，以及未完成原因；分享前去掉私人路径、账户和认证信息。本文基于公开资料编写，没有声称登录私人服务器、真机测试或保证云映一定刷新某个封面。
+
+## 判断结果与证据边界
+
+结果表可用两行记录 A 在前和 B 在前，每行分别填写服务器所见、云映所见以及任务是否完成。如果两次都看到 A，先保留这个观察，不推断客户端或服务器必然违反规则：需要排除旧图缓存、NFO 文件是否实际读取、路径权限与服务器是否采用预期图片类型。若两次显示恰好随声明顺序改变，也只能说明本次受控样本与所观察环境中的表现，不能推广为所有版本和全部媒体类型都完全相同。若某一步没有安全的执行条件，将该行标为未测，保留原始证据供管理员决定后续操作。
+
+## 一组可复现的测试样本
+
+自制测试目录可由管理员建立 /srv/jellyfin-test，并放置两张有 A、B 标记的自制图片 poster-a.jpg 和 poster-b.jpg；将以下 movie.nfo 置于隔离影片目录。示例使用绝对本地路径，需按服务器实际可读路径替换；备份并确认文件权限。Jellyfin 当前公开解析代码将 aspect=poster 识别为海报并处理绝对路径，同类型取首张；版本与刷新结果需实测，示例未在用户服务器执行。
+
+```
+<movie><title>River Demo</title><thumb aspect="poster">/srv/jellyfin-test/poster-a.jpg</thumb><thumb aspect="poster">/srv/jellyfin-test/poster-b.jpg</thumb></movie>
+```
+
+## 相关教程与资料
+
+[NFO 文件层级](<https://allluckly.cn/guides/icouldplay-jellyfin-season-episode-nfo-file-scope/>)、[集缩略图与季封面](<https://allluckly.cn/guides/icouldplay-jellyfin-episode-thumb-versus-season-cover/>)。
+
+2026年11月25日核对：[Apple 云映资料](<https://itunes.apple.com/lookup?id=6755653178&country=cn&entity=software>)、[Jellyfin 本地 NFO 文档](<https://jellyfin.org/docs/general/server/metadata/nfo/>)。解析器字段可参考 [Jellyfin 官方 NFO 解析代码](<https://github.com/jellyfin/jellyfin/blob/master/MediaBrowser.XbmcMetadata/Parsers/BaseNfoParser.cs>)。未声称完成真实设备或私人服务器测试。
+{% endraw %}

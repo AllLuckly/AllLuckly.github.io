@@ -1,0 +1,50 @@
+---
+layout: guide
+author: Bison
+app_id: man_yue
+title: 'Manyue+ and Kavita folder watching: distinguish changes, delay and library scans'
+description: Observe a file change, queued server scan and client directory update in an isolated comic library.
+permalink: /en/guides/manyue-kavita-folder-watching-scan-delay-library-scope/
+date: '2026-11-25 00:00:00 +08:00'
+modified: '2026-11-25 00:00:00 +08:00'
+category: Tutorials
+level: Intermediate
+series_order: 302
+topic: Kavita folder watching and scan timing
+reading_time: 10
+lang: en
+source_path: _posts/2026-11-25-manyue-kavita-folder-watching-scan-delay-library-scope.md
+source_url: /guides/manyue-kavita-folder-watching-scan-delay-library-scope/
+translation_method: editorial
+translation_source_sha256: 887520b5c18e0f4c9b2d6a476bec53c06ec9d06f090afe23190e6deccda7f98d
+translation_date: '2026-11-25T01:12:06+00:00'
+excerpt: Observe a file change, queued server scan and client directory update in an isolated comic library.
+---
+{% raw %}
+<p>Observe a file change, queued server scan and client directory update in an isolated comic library.</p>
+<h2 id="section-1">Understand watching and scanning</h2>
+<p>Kavita’s library documentation says folder watching is enabled by default and takes about ten minutes to trigger after a change; detected additions, renames and deletions queue a scan. This documented interval is not a strict guarantee in every environment. Disabled watching, an unsupported host or server load may affect the result. A server scan and reopening a directory in Manyue+ are separate steps.</p>
+<h2 id="section-2">Choose a safe test sample</h2>
+<p>Prepare an isolated library you administer, two small authorized comic files and a normal test account allowed to access that library. Preserve the originals and backups; do not rename or delete other household members’ content. Use distinguishable covers or content markers and record filenames, directories and expected series. Restrict operations to your own test folder and stop if authorization is unclear.</p>
+<h2 id="section-3">Check settings and environment</h2>
+<p>In Kavita administration inspect the folder-watching setting shown for the test library and record its state and server version. The documentation says the library setting overrides server-level watching, but a shared folder might still be processed by another watched library. It also notes that Docker on Windows through WSL2 does not support folder watching. Record the deployment environment instead of assuming identical behavior everywhere.</p>
+<h2 id="section-4">Establish server and client baselines</h2>
+<p>Find the existing sample on the server web interface and record its series, count and latest scan result. In Manyue+ connect with the same normal account, locate the corresponding directory and record visible items. If the library is unavailable, check authorization rather than switching to an administrator account. Use cover and chapter content to distinguish same-name series so another comic is not mistaken for the new result.</p>
+<h2 id="section-5">Make one controlled change</h2>
+<p>Add the second authorized file to the isolated directory in a server-supported form and record when copying completes. Confirm file size has stabilized and the copy did not fail before observing. Do not rename existing files, change library settings or trigger a manual scan at the same time. Changing one condition makes the later directory change interpretable, even if logs or tasks cannot be inspected.</p>
+<h2 id="section-6">Observe the delay and task state</h2>
+<p>Inspect any activity or scan task visible in the server web interface and separately record change time, queued or start time and completion time. The documented roughly ten-minute trigger delay does not require repeated actions or guarantee an exact result. Mark an unfinished task as pending. If the interface does not expose a queue time, record it as unavailable rather than inventing a timestamp.</p>
+<h2 id="section-7">Check server results first</h2>
+<p>After the task completes, inspect the series name, count and new file in Kavita’s web interface. If multiple series appear, check filename and folder; if the file is missing, record the scan result, file completeness and library path. A cover does not prove every chapter can open. Open one authorized chapter and return. Do not rename or delete production media while the cause remains unclear.</p>
+<h2 id="section-8">Then inspect Manyue+ entries</h2>
+<p>Return to the same server and account in Manyue+, navigate back and reopen the directory using the available interface, then record series, chapters and order. If the server has the file but the client does not, check connection identity, library and whether the page remains on an older view. Reopening a client page is not a server scan. If no refresh control exists, mark it unavailable instead of claiming automatic or instant synchronization.</p>
+<h2 id="section-9">Compare a manual scan separately</h2>
+<p>If no result appears after waiting, record that the first test did not trigger or produce an observed result. With administrator authorization, run one manual scan of the test library as a separate control and record its time and outcome. A file appearing afterward shows visibility following that action; it does not prove the watcher succeeded. Compare actual watcher settings, shared paths, host environment and available service logs.</p>
+<h2 id="section-10">Finish and restore</h2>
+<p>Confirm any cleanup targets only the test copy and restore the test directory and settings as the administrator permits. Do not delete the only original, another person’s media or server history. Record app and server versions, deployment environment, settings, change time, task state, web and Manyue+ observations and skipped steps. Remove private paths and credentials before sharing. This guide uses public documentation and does not claim device or private-server testing.</p>
+<h2 id="uncertain-causality">Record missing triggers and uncertain causes</h2>
+<p>Keep a separate row for watcher setting, file completeness, visible task, web result and client result. Not seeing a task does not prove no scan ran, since the interface may not expose its history. Likewise, the eventual appearance of an item does not alone prove the watcher caused it: another administrator or scheduled task may have acted. If these factors cannot be ruled out, mark the cause unknown rather than treating timing as proof. Remove internal paths and account identifiers before sharing.</p>
+<h2 id="related-guides-and-sources">Related guides and sources</h2>
+<p><a href="/en/guides/manyue-kavita-library/">Connect to Kavita</a>; <a href="/en/guides/manyue-kavita-opds-paginated-catalog-next-results/">Paginated catalog checks</a>.</p>
+<p>Checked 25 November 2026: <a href="https://itunes.apple.com/lookup?id=6753895889&country=cn&entity=software">Apple Manyue+ listing</a>; <a href="https://wiki.kavitareader.com/guides/admin-settings/libraries/index.html">Kavita library settings</a>. No physical-device or private-server test is claimed.</p>
+{% endraw %}
